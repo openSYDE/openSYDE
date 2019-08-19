@@ -82,6 +82,7 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    mu32_NodeIndex(0)
 {
    QPixmap c_ImgLogo;
+   QSizePolicy c_SizePolicy;
 
    // init UI
    mpc_Ui->setupUi(this);
@@ -111,6 +112,11 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    //set explicit min width to allow the layout to cut off parts of the button (necessary to free space for smaller
    // screen resolutions)
    this->mpc_Ui->pc_PushButtonFlashloaderOptions->setMinimumWidth(52);
+
+   //retain size when hidden
+   c_SizePolicy = this->mpc_Ui->pc_PushButtonFlashloaderOptions->sizePolicy();
+   c_SizePolicy.setRetainSizeWhenHidden(true);
+   this->mpc_Ui->pc_PushButtonFlashloaderOptions->setSizePolicy(c_SizePolicy);
 
    InitStaticNames();
 
@@ -267,7 +273,7 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                         "Symbolic node name. Unique within Network Topology.\n"
                                                         "\nFollowing C naming conventions are required:"
                                                         "\n - must not be empty"
-                                                        "\n - only alphanumeric characters + \"_\""
+                                                        "\n - only alphanumeric characters and \"_\""
                                                         "\n - should not be longer than 31 characters"));
 
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
@@ -631,7 +637,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                   if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
                   {
                      // add the bitrate
-                     c_BusName += " (" + QString::number(pc_Bus->u64_BitRate / 1000ULL) + " kBit/s)";
+                     c_BusName += " (" + QString::number(pc_Bus->u64_BitRate / 1000ULL) + " kbit/s)";
                   }
 
                   q_Connected = true;
@@ -1165,7 +1171,8 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
       {
          m_TrimNodeName();
          m_RegisterChange();
-         Q_EMIT this->SigNameChanged(this->mpc_Ui->pc_LineEditNodeName->text());
+         Q_EMIT (this->SigNameChanged(C_GtGetText::h_GetText(
+                                         "NETWORK TOPOLOGY"), this->mpc_Ui->pc_LineEditNodeName->text(), false));
       }
       hq_InProgress = false;
    }

@@ -202,7 +202,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_13">
               <property name="spacing">
-               <number>5</number>
+               <number>0</number>
               </property>
               <item>
                <spacer name="horizontalSpacer_12">
@@ -228,6 +228,22 @@
                </widget>
               </item>
               <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>5</width>
+                  <height>1</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
                <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditCustomDllPath">
                 <property name="minimumSize">
                  <size>
@@ -244,16 +260,35 @@
                </widget>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonBrowse">
+               <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PushButtonVariables">
                 <property name="minimumSize">
                  <size>
-                  <width>50</width>
+                  <width>33</width>
                   <height>30</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
+                  <width>33</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>ABC</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonBrowse">
+                <property name="minimumSize">
+                 <size>
+                  <width>33</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>33</width>
                   <height>30</height>
                  </size>
                 </property>
@@ -524,26 +559,48 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeRabProperties</class>
-   <extends>QRadioButton</extends>
-   <header>C_OgeRabProperties.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
    <extends>QPushButton</extends>
    <header>C_OgePubConfigure.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupSubItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupSubItem.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLeFilePath</class>
    <extends>QLineEdit</extends>
    <header>C_OgeLeFilePath.h</header>
   </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubOpen</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubOpen.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubPathVariables</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubPathVariables.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeRabProperties</class>
+   <extends>QRadioButton</extends>
+   <header>C_OgeRabProperties.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGroupSubItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupSubItem.h</header>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>pc_BushButtonOk</tabstop>
+  <tabstop>pc_RadioButtonPeak</tabstop>
+  <tabstop>pc_RadioButtonVector</tabstop>
+  <tabstop>pc_RadioButtonOther</tabstop>
+  <tabstop>pc_LineEditCustomDllPath</tabstop>
+  <tabstop>pc_PushButtonVariables</tabstop>
+  <tabstop>pc_PushButtonBrowse</tabstop>
+  <tabstop>pc_BushButtonConfigureDll</tabstop>
+  <tabstop>pc_BushButtonTestConnection</tabstop>
+  <tabstop>pc_BushButtonCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -180,6 +180,16 @@ uint32 C_HexFile::LoadFromFile(const charn * const opcn_FileName)
                RemoveFirst();                            // remove first element (zero offset)
             }
          }
+         else
+         {
+            //Release created file pointer
+            (void)fclose(pt_File);
+         }
+      }
+      else
+      {
+         //Release created file pointer
+         (void)fclose(pt_File);
       }
    }
 

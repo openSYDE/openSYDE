@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -19,25 +19,25 @@
 #include "TGLUtils.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle notification about incoming response to event driven data pool reading
 
    Translates the openSYDE protocol specific notification to a generic notification.
@@ -48,7 +48,7 @@ using namespace stw_scl;
    \param[in]     ou16_ElementIndex    Element index
    \param[in]     orc_Value            Value of element stored in uint8 vector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDiagProtocolOsy::m_OsyReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIndex,
                                                               const uint16 ou16_ListIndex,
                                                               const uint16 ou16_ElementIndex,
@@ -67,7 +67,7 @@ void C_OSCDiagProtocolOsy::m_OsyReadDataPoolDataEventReceived(const uint8 ou8_Da
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle notification about incoming negative response to event driven data pool reading
 
    Translates the openSYDE protocol specific notification to a generic notification.
@@ -78,7 +78,7 @@ void C_OSCDiagProtocolOsy::m_OsyReadDataPoolDataEventReceived(const uint8 ou8_Da
    \param[in]  ou16_ElementIndex    Element index
    \param[in]  ou8_NrCode           Negative response code
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDiagProtocolOsy::m_OsyReadDataPoolDataEventErrorReceived(const uint8 ou8_DataPoolIndex,
                                                                    const uint16 ou16_ListIndex,
                                                                    const uint16 ou16_ElementIndex,
@@ -91,29 +91,29 @@ void C_OSCDiagProtocolOsy::m_OsyReadDataPoolDataEventErrorReceived(const uint8 o
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Set up class
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDiagProtocolOsy::C_OSCDiagProtocolOsy(void) :
    C_OSCDiagProtocolBase(),
    C_OSCProtocolDriverOsy()
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Tear down class
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDiagProtocolOsy::~C_OSCDiagProtocolOsy(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get endianness of data returned by and passed to protocol services
 
    Here: return "big"
@@ -121,13 +121,13 @@ C_OSCDiagProtocolOsy::~C_OSCDiagProtocolOsy(void)
    \return
    mhu8_ENDIANNESS_BIG
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint8 C_OSCDiagProtocolOsy::GetEndianness(void) const
 {
    return mhu8_ENDIANNESS_BIG;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Perform cyclic communication tasks
 
    Invoke protocol's "Cycle" function.
@@ -136,13 +136,13 @@ uint8 C_OSCDiagProtocolOsy::GetEndianness(void) const
    C_NO_ERR   at least one service received
    C_CONFIG   transport protocol not installed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::Cycle(void)
 {
    return C_OSCProtocolDriverOsy::Cycle();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read numeric data from server's data pool
 
    Send request and wait for response.
@@ -163,7 +163,7 @@ sint32 C_OSCDiagProtocolOsy::Cycle(void)
    C_WARN     error response
    C_RD_WR    malformed protocol response
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                  const uint16 ou16_ElementIndex, std::vector<uint8> & orc_ReadData,
                                                  uint8 * const opu8_NrCode)
@@ -172,7 +172,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
    return this->DataPoolReadArray(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, orc_ReadData, opu8_NrCode);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read array data from server's data pool
 
    Send request and wait for response.
@@ -194,7 +194,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
    C_RD_WR    malformed protocol response (e.g. reported size does not match expected size)
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolReadArray(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                const uint16 ou16_ElementIndex, std::vector<uint8> & orc_ReadData,
                                                uint8 * const opu8_NrCode)
@@ -213,7 +213,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write numeric data to server's data pool
 
    Send request and wait for response.
@@ -233,7 +233,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
    C_RD_WR    malformed protocol response
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                   const uint16 ou16_ElementIndex,
                                                   const std::vector<uint8> & orc_DataToWrite, uint8 * const opu8_NrCode)
@@ -242,7 +242,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
                                      orc_DataToWrite, opu8_NrCode);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write array data to server's data pool
 
    Send request and wait for response.
@@ -263,7 +263,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
    C_RD_WR    malformed protocol response
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                 const uint16 ou16_ElementIndex,
                                                 const std::vector<uint8> & orc_DataToWrite, uint8 * const opu8_NrCode)
@@ -272,7 +272,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, c
                                      opu8_NrCode);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set rate of event driven transmissions
 
    Configure update rate of event driven transmissions in ms.
@@ -295,13 +295,13 @@ sint32 C_OSCDiagProtocolOsy::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, c
    C_RD_WR    malformed protocol response
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolSetEventDataRate(const uint8 ou8_Rail, const uint16 ou16_IntervalMs)
 {
    return this->OsyWriteDataPoolEventDataRate(ou8_Rail, ou16_IntervalMs);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Request cyclic driven transmission of data pool element.
 
    Request cyclic transmission of data pool element.
@@ -325,7 +325,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolSetEventDataRate(const uint8 ou8_Rail, cons
    C_RD_WR    malformed protocol response
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                 const uint16 ou16_ElementIndex, const uint8 ou8_Rail,
                                                 uint8 * const opu8_NrCode)
@@ -333,7 +333,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, c
    return this->OsyReadDataPoolDataCyclic(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, ou8_Rail, opu8_NrCode);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Request change driven transmission of data pool element.
 
    Request change driven transmission of data pool element.
@@ -359,7 +359,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, c
    C_RD_WR    malformed protocol response
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                       const uint16 ou16_ElementIndex, const uint8 ou8_Rail,
                                                       const uint32 ou32_Threshold, uint8 * const opu8_NrCode)
@@ -368,7 +368,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
                                                 ou32_Threshold, opu8_NrCode);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Request stop all change driven transmissions.
 
    Request stop all change driven transmissions.
@@ -384,13 +384,13 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
    C_RD_WR    malformed protocol response
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolStopEventDriven(void)
 {
    return this->OsyStopDataPoolEvents();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Request cyclic driven transmission of NVM content.
 
    \param[in]     ou32_MemoryAddress NVM memory address to read (first read byte)
@@ -406,7 +406,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolStopEventDriven(void)
    C_WARN     error response
    C_COM      expected server response not received because of communication error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::NvmRead(const uint32 ou32_MemoryAddress, std::vector<uint8> & orc_DataRecord,
                                      uint8 * const opu8_NrCode)
 {
@@ -417,7 +417,7 @@ sint32 C_OSCDiagProtocolOsy::NvmRead(const uint32 ou32_MemoryAddress, std::vecto
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start NVM write sequence
 
    For the openSYDE protocol there's nothing to do ...
@@ -428,7 +428,7 @@ sint32 C_OSCDiagProtocolOsy::NvmRead(const uint32 ou32_MemoryAddress, std::vecto
    \return
    C_NO_ERR   write sequence started
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::NvmWriteStartTransaction(const uint8 ou8_DataPoolIndex, const uint16 ou16_NVMAccessCount)
 {
    (void)ou8_DataPoolIndex;
@@ -436,7 +436,7 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteStartTransaction(const uint8 ou8_DataPoolIn
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write to NVM
 
    Usage:
@@ -458,7 +458,7 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteStartTransaction(const uint8 ou8_DataPoolIn
    C_RANGE    orc_DataRecord empty
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::NvmWrite(const uint32 ou32_MemoryAddress, const std::vector<uint8> & orc_DataRecord,
                                       uint8 * const opu8_NrCode)
 {
@@ -469,7 +469,7 @@ sint32 C_OSCDiagProtocolOsy::NvmWrite(const uint32 ou32_MemoryAddress, const std
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   NVM write operation finalization
 
    For the openSYDE protocol there's nothing to do ...
@@ -477,13 +477,13 @@ sint32 C_OSCDiagProtocolOsy::NvmWrite(const uint32 ou32_MemoryAddress, const std
    \return
    C_NO_ERR   no problem
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::NvmWriteFinalizeTransaction(void)
 {
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read data pool version
 
    Version format: One byte for Major, Minor, Release
@@ -492,6 +492,7 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteFinalizeTransaction(void)
 
    \param[in]  ou8_DataPoolIndex   Data pool index
    \param[out] orau8_Version       Read version; format: see function description
+   \param[out] opu8_NrCode         if != NULL: negative response code in case of an error response
 
    \return
    C_NO_ERR   request sent, positive response received
@@ -501,13 +502,14 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteFinalizeTransaction(void)
    C_WARN     error response
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3])
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3],
+                                                 stw_types::uint8 * const opu8_NrCode)
 {
    sint32 s32_Retval;
    C_DataPoolMetaData c_MetaData;
 
-   s32_Retval = this->OsyReadDataPoolMetaData(ou8_DataPoolIndex, c_MetaData);
+   s32_Retval = this->OsyReadDataPoolMetaData(ou8_DataPoolIndex, c_MetaData, opu8_NrCode);
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -519,7 +521,48 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read Datapool meta data
+
+   Version format: One byte for Major, Minor, Release
+
+   Example: v1.23r4 in 3 Bytes   -> (0x01, 0x17, 0x04)
+
+   \param[in]  ou8_DataPoolIndex   Datapool index
+   \param[out] orau8_Version       Read version; format: see function description
+   \param[out] orc_Name            Read name of Datapool
+   \param[out] opu8_NrCode         if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received; or: no action required
+   C_RANGE    data pool index is zero
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not send protocol request
+   C_CONFIG   CAN dispatcher not installed
+   C_WARN     error response
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCDiagProtocolOsy::DataPoolReadMetaData(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3],
+                                                  stw_scl::C_SCLString & orc_Name, stw_types::uint8 * const opu8_NrCode)
+{
+   sint32 s32_Retval;
+   C_DataPoolMetaData c_MetaData;
+
+   s32_Retval = this->OsyReadDataPoolMetaData(ou8_DataPoolIndex, c_MetaData, opu8_NrCode);
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      orau8_Version[0] = c_MetaData.au8_Version[0];
+      orau8_Version[1] = c_MetaData.au8_Version[1];
+      orau8_Version[2] = c_MetaData.au8_Version[2];
+
+      orc_Name = c_MetaData.c_Name;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Verify data pool consistency
 
    Used to check whether the referenced data pool matches with the passed criteria.
@@ -541,7 +584,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, 
    C_RD_WR    unexpected content in response (here: wrong data pool index)
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolVerify(const uint8 ou8_DataPoolIndex, const uint16 ou16_NumberOfDataPoolElements,
                                             const uint16 ou16_DataPoolVersion, const uint32 ou32_DataPoolChecksum,
                                             bool & orq_Match)
@@ -556,7 +599,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolVerify(const uint8 ou8_DataPoolIndex, const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Notify NVM data changes
 
    \param[in]  ou8_DataPoolIndex           Data pool index
@@ -574,7 +617,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolVerify(const uint8 ou8_DataPoolIndex, const
    C_RD_WR    unexpected content in response (here: wrong data pool or list index)
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, const uint8 ou8_ListIndex,
                                                 bool & orq_ApplicationAcknowledge, uint8 * const opu8_NrCode)
 {
@@ -585,4 +628,4 @@ sint32 C_OSCDiagProtocolOsy::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, c
 
    return s32_Retval;
 }
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

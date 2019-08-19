@@ -36,7 +36,7 @@
 #ifndef CSCLINIFILEH
 #define CSCLINIFILEH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <string>
 #include "stwtypes.h"
@@ -44,10 +44,10 @@
 #include "CSCLStringList.h"
 #include "SCLDynamicArray.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_scl
 {
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 //maybe this will be a part of a Borland library:
 #ifndef SCL_PACKAGE
 #ifdef __BORLANDC__
@@ -67,9 +67,9 @@ namespace stw_scl
 #endif
 #endif
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 ///This structure stores the definition of a key.
 /// A key is a named identifier that is associated with a value. It may or may not have a comment.
 /// All comments must PRECEDE the key on the line in the config file.
@@ -81,7 +81,7 @@ public:
    C_SCLString c_Comment; ///< comment preceeding the key
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///This structure stores the definition of a section.
 /// A section contains any number of keys, and may or may not have a comment.
 /// Like keys, all comments must precede the section.
@@ -93,7 +93,7 @@ public:
    SCLDynamicArray<C_SCLIniKey> c_Keys; ///< key/value pairs contains in this section
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///INI file handling
 class SCL_PACKAGE C_SCLIniFile
 {
@@ -186,7 +186,7 @@ public:
    C_SCLString FileName; ///< path to ini file; can be used after creation to store data in another ini file
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

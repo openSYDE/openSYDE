@@ -218,8 +218,8 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
       case C_CHECKSUM:
          this->mc_ErrorMessage =
             QString(C_GtGetText::h_GetText(
-                       "Datapool structure differs between client and server. The CRC over at least one Datapool does not match. Are the applications on all nodes "
-                       "up to date? Datapool added/moved/deleted/modified?"));
+                       "The Datapool definition differs between client and node.\n"
+                       "Generate the code for all listed nodes in the details again."));
          this->mc_ErrorMessageDetails =
             QString(C_GtGetText::h_GetText("Affected node(s) and Datapool(s):\n%1")).arg(
                c_ErrorDetails);
@@ -242,7 +242,7 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
          this->mc_ErrorMessage = QString(C_GtGetText::h_GetText("Protocol error response detected."));
          this->mc_ErrorMessageDetails = QString(C_GtGetText::h_GetText("Possible scenario:\n"
                                                                        "- Node can currently not enter diagnostic session\n"
-                                                                       "- A Datapool defined in the openSYDE tool is not available on the node"));
+                                                                       "- If the node is in Flashloader (Try restarting the node to fix this error)"));
          break;
       default:
          this->mc_ErrorMessage =
@@ -258,7 +258,7 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Run step: set up all necessary cyclic tranmissions
+/*! \brief  Run step: set up all necessary cyclic transmissions
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)

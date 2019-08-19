@@ -428,9 +428,20 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
                             orc_Service.c_Data[static_cast<uintn>(u32_Counter) + 3U])
                         {
                            q_Match = false;
-                           m_LogErrorWithHeader("Synchronous communication", "Sync negative response to expected service"
-                                                " but unexpected data bytes received. Ignoring.",
-                                                TGL_UTIL_FUNC_ID);
+                           //when starting cyclic calls we might interpret the first data transmission of the last call
+                           // as the response of the next cyclic service registration,
+                           // so we should not discard this message but instead handle the error accordingly
+                           if (orc_Service.c_Data[1] == mhu8_OSY_SI_READ_DATA_POOL_DATA_EVENT_DRIVEN)
+                           {
+                              //handle data error
+                              s32_Return = m_HandleAsyncResponse(orc_Service);
+                           }
+                           else
+                           {
+                              m_LogErrorWithHeader("Synchronous communication", "Sync negative response to expected service"
+                                                   " but unexpected data bytes received. Ignoring.",
+                                                   TGL_UTIL_FUNC_ID);
+                           }
                            break;
                         }
                      }
@@ -2789,6 +2800,7 @@ void C_OSCProtocolDriverOsy::m_LogErrorWithHeader(const C_SCLString & orc_Activi
    const C_SCLString c_LogText = "openSYDE protocol driver node " +
                                  C_SCLString::IntToStr(mc_ServerId.u8_BusIdentifier) + "." +
                                  C_SCLString::IntToStr(mc_ServerId.u8_NodeIdentifier) + ": " + orc_Information;
+
    if (oq_AsError == true)
    {
       C_OSCLoggingHandler::h_WriteLogError(orc_Activity, c_LogText, __FILE__, opcn_Function);

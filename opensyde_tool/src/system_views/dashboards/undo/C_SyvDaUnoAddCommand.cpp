@@ -46,6 +46,7 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     orc_IDs                           Affected unique IDs
    \param[in]     ore_Type                          Item type
    \param[in]     orc_NewPos                        New position
+   \param[in]     of64_ZValue                       Z value
    \param[in]     orc_AdditionalInformation         Additional string information
    \param[in,out] opc_Parent                        Optional pointer to parent
    \param[in]     orq_ForceUseAdditionalInformation Optional flag to force use of additional string information
@@ -55,13 +56,15 @@ using namespace stw_opensyde_gui_logic;
 C_SyvDaUnoAddCommand::C_SyvDaUnoAddCommand(QGraphicsScene * const opc_Scene,
                                            const std::vector<stw_types::uint64> & orc_IDs,
                                            const C_PuiSvDbDataElement::E_Type & ore_Type, const QPointF & orc_NewPos,
-                                           const QString & orc_AdditionalInformation, QUndoCommand * const opc_Parent,
+                                           const float64 of64_ZValue, const QString & orc_AdditionalInformation,
+                                           QUndoCommand * const opc_Parent,
                                            const bool & orq_ForceUseAdditionalInformation,
                                            const bool & orq_DarkModeDefault) :
    C_SyvDaUnoAddBaseCommand(opc_Scene, orc_IDs, "Add drawing element(s)",
                             opc_Parent),
    me_Type(ore_Type),
    mc_NewPos(orc_NewPos),
+   mf64_ZValue(of64_ZValue),
    mc_AdditionalInformation(orc_AdditionalInformation),
    mq_ForceUseAdditionalInformation(orq_ForceUseAdditionalInformation),
    mq_DarkModeDefault(orq_DarkModeDefault)
@@ -111,7 +114,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_LabelData, this->mc_AdditionalInformation);
             //Specific settings
-            c_LabelData.f64_ZOrder = mf64_ZORDER_INIT_LABEL_WIDGET;
+            c_LabelData.f64_ZOrder = this->mf64_ZValue;
             c_LabelData.c_UIPosition = mc_NewPos;
             c_LabelData.f64_Height = 84.0;
             c_LabelData.f64_Width = 150.0;
@@ -122,7 +125,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Fix
             c_ParamWidgetData.e_DisplayStyle = C_PuiSvDbWidgetBase::eOPENSYDE;
             //Specific settings
-            c_ParamWidgetData.f64_ZOrder = mf64_ZORDER_INIT_PARAM_WIDGET;
+            c_ParamWidgetData.f64_ZOrder = this->mf64_ZValue;
             c_ParamWidgetData.c_UIPosition = mc_NewPos;
             c_ParamWidgetData.f64_Height = 246.0;
             c_ParamWidgetData.f64_Width = 895.0;
@@ -132,7 +135,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_PieChartData, this->mc_AdditionalInformation);
             //Specific settings
-            c_PieChartData.f64_ZOrder = mf64_ZORDER_INIT_PIE_CHART_WIDGET;
+            c_PieChartData.f64_ZOrder = this->mf64_ZValue;
             c_PieChartData.c_UIPosition = mc_NewPos;
             c_PieChartData.f64_Height = 150.0;
             c_PieChartData.f64_Width = 150.0;
@@ -142,7 +145,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_SpinBoxData, this->mc_AdditionalInformation);
             //Specific settings
-            c_SpinBoxData.f64_ZOrder = mf64_ZORDER_INIT_SPIN_BOX_WIDGET;
+            c_SpinBoxData.f64_ZOrder = this->mf64_ZValue;
             c_SpinBoxData.c_UIPosition = mc_NewPos;
             c_SpinBoxData.f64_Height = 60.0;
             c_SpinBoxData.f64_Width = 200.0;
@@ -152,7 +155,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_SliderData, this->mc_AdditionalInformation);
             //Specific settings
-            c_SliderData.f64_ZOrder = mf64_ZORDER_INIT_SLIDER_WIDGET;
+            c_SliderData.f64_ZOrder = this->mf64_ZValue;
             c_SliderData.c_UIPosition = mc_NewPos;
             c_SliderData.f64_Height = 40.0;
             c_SliderData.f64_Width = 400.0 * (7.0 / 9.0);
@@ -162,7 +165,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_TableData, this->mc_AdditionalInformation);
             //Specific settings
-            c_TableData.f64_ZOrder = mf64_ZORDER_INIT_TABLE_WIDGET;
+            c_TableData.f64_ZOrder = this->mf64_ZValue;
             c_TableData.c_UIPosition = mc_NewPos;
             c_TableData.f64_Height = 120.0;
             c_TableData.f64_Width = 511.0;
@@ -172,7 +175,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_ProgressBarData, this->mc_AdditionalInformation);
             //Specific settings
-            c_ProgressBarData.f64_ZOrder = mf64_ZORDER_INIT_PROGRESS_BAR_WIDGET;
+            c_ProgressBarData.f64_ZOrder = this->mf64_ZValue;
             c_ProgressBarData.c_UIPosition = mc_NewPos;
             c_ProgressBarData.f64_Height = 100.0;
             c_ProgressBarData.f64_Width = 100.0;
@@ -184,7 +187,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_ChartData, this->mc_AdditionalInformation);
             //Specific settings
-            c_ChartData.f64_ZOrder = mf64_ZORDER_INIT_CHART_WIDGET;
+            c_ChartData.f64_ZOrder = this->mf64_ZValue;
             c_ChartData.c_UIPosition = mc_NewPos;
             c_ChartData.f64_Height = 300.0;
             c_ChartData.f64_Width = 600.0;
@@ -194,14 +197,14 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_ToggleData, this->mc_AdditionalInformation);
             //Specific settings
-            c_ToggleData.f64_ZOrder = mf64_ZORDER_INIT_TOGGLE_WIDGET;
+            c_ToggleData.f64_ZOrder = this->mf64_ZValue;
             c_ToggleData.c_UIPosition = mc_NewPos;
             c_ToggleData.f64_Height = 50.0;
             c_ToggleData.f64_Width = 83.0;
             c_InitialData.AddWidget(&c_ToggleData, this->me_Type);
             break;
          case C_PuiSvDbDataElement::eLINE_ARROW:
-            c_LineArrowData.f64_ZOrder = mf64_ZORDER_INIT_LINE_ARROW;
+            c_LineArrowData.f64_ZOrder = this->mf64_ZValue;
             c_LineArrowData.c_UIInteractionPoints.push_back(mc_NewPos);
             c_LineArrowData.c_UIInteractionPoints.push_back(mc_NewPos + QPointF(200.0, 0.0));
             c_InitialData.AddLineArrow(c_LineArrowData);
@@ -210,11 +213,11 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             c_BoundaryData.c_UIPosition = mc_NewPos;
             c_BoundaryData.f64_Height = 100.0;
             c_BoundaryData.f64_Width = 100.0;
-            c_BoundaryData.f64_ZOrder = mf64_ZORDER_INIT_BOUNDARY;
+            c_BoundaryData.f64_ZOrder = this->mf64_ZValue;
             c_InitialData.AddBoundary(c_BoundaryData);
             break;
          case C_PuiSvDbDataElement::eTEXT_ELEMENT:
-            c_TextData.f64_ZOrder = mf64_ZORDER_INIT_TEXT_ELEMENT;
+            c_TextData.f64_ZOrder = this->mf64_ZValue;
             c_TextData.c_UIPosition = mc_NewPos;
             c_TextData.f64_Height = 50.0;
             c_TextData.f64_Width = 50.0;
@@ -229,7 +232,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
                c_ImageData.f64_Height = c_Image.height();
                c_ImageData.f64_Width = c_Image.width();
                c_ImageData.c_UIImagePixmap = c_Image;
-               c_ImageData.f64_ZOrder = mf64_ZORDER_INIT_IMAGE;
+               c_ImageData.f64_ZOrder = this->mf64_ZValue;
                c_InitialData.AddImage(c_ImageData);
             }
             break;
@@ -240,7 +243,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
          }
          //ID map
          c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(this->me_Type), 0), c_IDs[0]);
-         pc_Scene->CopyFromSnapshotToScene(c_InitialData, NULL, &c_IDMap);
+         pc_Scene->CopyFromSnapshotToScene(c_InitialData, &c_IDMap);
       }
    }
 }

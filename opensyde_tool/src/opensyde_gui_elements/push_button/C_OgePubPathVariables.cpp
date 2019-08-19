@@ -1,10 +1,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Line edit with right border styled for seamless transition to browse-button. (implementation)
+   \brief       Button with menu for selecting path variables
 
-   Line edit with right border styled for seamless transition to browse-button.
-   Mostly this class exist to apply a stylesheet, but it also handles path minimizing.
+   Button with menu for selecting path variables.Styled to fit seamless between
+   path line edit and browse button.
 
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -13,11 +13,10 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QDir>
-
-#include "C_CamOgeLeDarkBrowse.h"
-#include "C_Uti.h"
 #include "constants.h"
+#include "C_GtGetText.h"
+#include "C_OgePubPathVariables.h"
+#include "C_OgeLabGenericNoPaddingNoMargins.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
@@ -44,105 +43,102 @@ using namespace stw_opensyde_gui;
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamOgeLeDarkBrowse::C_CamOgeLeDarkBrowse(QWidget * const opc_Parent) :
-   C_OgeLeToolTipBase(opc_Parent),
-   mc_CompletePath("")
+C_OgePubPathVariables::C_OgePubPathVariables(QWidget * const opc_Parent) :
+   C_OgePubToolTipBase(opc_Parent),
+   mpc_Menu(new C_OgeMuSections(opc_Parent))
 {
+   // first section: openSYDE actions
+   this->mpc_Menu->AddCustomSection(C_GtGetText::h_GetText("openSYDE"));
+   this->mpc_Menu->addAction(C_GtGetText::h_GetText("openSYDE Binary"),
+                             this, &C_OgePubPathVariables::m_OpenSYDEExeTriggered);
+   this->mpc_Menu->addAction(C_GtGetText::h_GetText("openSYDE Project"),
+                             this, &C_OgePubPathVariables::m_OpenSYDEProjTriggered);
+
+   // second section: system actions
+   this->mpc_Menu->AddCustomSection(C_GtGetText::h_GetText("System"));
+   this->mpc_Menu->addAction(C_GtGetText::h_GetText("User Name"), this, &C_OgePubPathVariables::m_UserNameTriggered);
+   this->mpc_Menu->addAction(C_GtGetText::h_GetText("Computer Name"),
+                             this, &C_OgePubPathVariables::m_ComputerNameTriggered);
+   this->mpc_Menu->setMinimumWidth(140);
+
+   this->setMenu(this->mpc_Menu);
+
+   this->setIcon(QIcon("://images/IconPathVariables.svg"));
+   this->SetToolTipInformation(C_GtGetText::h_GetText("Insert Variable"),
+                               C_GtGetText::h_GetText("Use common locations like your project path as variables."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get complete path (pendant to text() of usual line edit)
-
-   \return
-   complete path
+/*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_CamOgeLeDarkBrowse::GetPath() const
+C_OgePubPathVariables::~C_OgePubPathVariables()
 {
-   return this->mc_CompletePath;
+   delete this->mpc_Menu;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set new path, show minimized text and update tooltip.
-
-   \param[in]     orc_NewPath    new path
+/*! \brief  Add Data Block section to menu
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamOgeLeDarkBrowse::SetPath(const QString & orc_NewPath)
+void C_OgePubPathVariables::AddDatablockSection(void)
 {
-   this->mc_CompletePath = QDir::cleanPath(orc_NewPath);
-
-   this->m_ShowMinimizedPath();
+   this->mpc_Menu->AddCustomSection(C_GtGetText::h_GetText("Data Block"));
+   this->mpc_Menu->addAction(C_GtGetText::h_GetText("Project Path"),
+                             this, &C_OgePubPathVariables::m_DataBlockProjTriggered);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten focus out event slot to minimize path.
+/*! \brief   Slot of openSYDE binary menu action.
 
-   \param[in,out]    opc_Event    Event identification and information
+   Emit signal with variable as string.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamOgeLeDarkBrowse::focusInEvent(QFocusEvent * const opc_Event)
+void C_OgePubPathVariables::m_OpenSYDEExeTriggered(void)
 {
-   C_OgeLeToolTipBase::focusInEvent(opc_Event);
-   this->setText(this->mc_CompletePath);
+   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_OPENSYDE_BIN));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten focus out event slot to minimize path.
+/*! \brief   Slot of openSYDE project menu action.
 
-   \param[in,out]    opc_Event    Event identification and information
+   Emit signal with variable as string.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamOgeLeDarkBrowse::focusOutEvent(QFocusEvent * const opc_Event)
+void C_OgePubPathVariables::m_OpenSYDEProjTriggered(void)
 {
-   this->mc_CompletePath = QDir::cleanPath(this->text());
-   C_OgeLeToolTipBase::focusOutEvent(opc_Event);
-   this->m_ShowMinimizedPath();
+   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_OPENSYDE_PROJ));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten resize event.
+/*! \brief   Slot of data block project menu action.
 
-   Here: Recalculate minimized path on resize.
-
-   \param[in]     opc_Event      event identification and information
+   Emit signal with variable as string.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamOgeLeDarkBrowse::resizeEvent(QResizeEvent * const opc_Event)
+void C_OgePubPathVariables::m_DataBlockProjTriggered(void)
 {
-   C_OgeLeToolTipBase::resizeEvent(opc_Event);
-   this->m_ShowMinimizedPath();
+   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_DATABLOCK_PROJ));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten key press event slot
+/*! \brief   Slot of user name menu action.
 
-   Here: Set new path on enter or return key press.
-   This is analogue to normal line edit but often not needed because of following focus loose.
-
-   \param[in,out] opc_KeyEvent Event identification and information
+   Emit signal with variable as string.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamOgeLeDarkBrowse::keyPressEvent(QKeyEvent * const opc_KeyEvent)
+void C_OgePubPathVariables::m_UserNameTriggered(void)
 {
-   if ((opc_KeyEvent->key() == static_cast<stw_types::sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<stw_types::sintn>(Qt::Key_Return)))
-   {
-      this->mc_CompletePath = QDir::cleanPath(this->text());
-   }
-
-   // after update of complete path
-   C_OgeLeToolTipBase::keyPressEvent(opc_KeyEvent);
+   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_USER_NAME));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculate minimized path and set text to this.
+/*! \brief   Slot of computer name menu action.
+
+   Emit signal with variable as string.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamOgeLeDarkBrowse::m_ShowMinimizedPath()
+void C_OgePubPathVariables::m_ComputerNameTriggered(void)
 {
-   const QFont c_Font = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13);
-   const QString c_MinimizedPath = C_Uti::h_MinimizePath(this->mc_CompletePath, c_Font, this->width(), 16);
-
-   this->setText(c_MinimizedPath);
+   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_COMPUTER_NAME));
 }

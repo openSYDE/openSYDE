@@ -49,37 +49,7 @@
         <property name="verticalSpacing">
          <number>10</number>
         </property>
-        <item row="3" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFormat">
-          <property name="text">
-           <string>Format TR</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2" colspan="2">
-         <widget class="stw_opensyde_gui_elements::C_OgeLeDark" name="pc_LeFile">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>30</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFile">
-          <property name="text">
-           <string>File TR</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
+        <item row="0" column="4">
          <widget class="stw_opensyde_gui_elements::C_CamOgePubDarkBrowse" name="pc_PubBrowse">
           <property name="minimumSize">
            <size>
@@ -98,8 +68,15 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFile">
+          <property name="text">
+           <string>File TR</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="2">
-         <widget class="stw_opensyde_gui_elements::C_CamOgeLeDarkBrowse" name="pc_LeFolder">
+         <widget class="stw_opensyde_gui_elements::C_CamOgeLeFilePath" name="pc_LeFolder">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -114,7 +91,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="2" colspan="2">
+        <item row="3" column="2" colspan="3">
          <widget class="stw_opensyde_gui_elements::C_CamOgeCbxDark" name="pc_CbxFormat">
           <property name="minimumSize">
            <size>
@@ -130,7 +107,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="2" colspan="2">
+        <item row="2" column="2" colspan="3">
          <widget class="stw_opensyde_gui_elements::C_CamOgeCbxDark" name="pc_CbxOverwrite">
           <property name="minimumSize">
            <size>
@@ -143,13 +120,6 @@
             <width>16777215</width>
             <height>30</height>
            </size>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOverwrite">
-          <property name="text">
-           <string>Overwrite Mode TR</string>
           </property>
          </widget>
         </item>
@@ -176,6 +146,55 @@
           </property>
          </spacer>
         </item>
+        <item row="2" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOverwrite">
+          <property name="text">
+           <string>Overwrite Mode TR</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFormat">
+          <property name="text">
+           <string>Format TR</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" colspan="3">
+         <widget class="stw_opensyde_gui_elements::C_OgeLeDark" name="pc_LeFile">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="stw_opensyde_gui_elements::C_CamOgePubPathVariables" name="pc_PubVariables">
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>30</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>ABC</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -196,6 +215,11 @@
    <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_CamOgePubDarkBrowse</class>
+   <extends>QPushButton</extends>
+   <header>C_CamOgePubDarkBrowse.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLeDark</class>
    <extends>QLineEdit</extends>
    <header>C_OgeLeDark.h</header>
@@ -206,14 +230,14 @@
    <header>C_CamOgeCbxDark.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeLeDarkBrowse</class>
-   <extends>QLineEdit</extends>
-   <header>C_CamOgeLeDarkBrowse.h</header>
+   <class>stw_opensyde_gui_elements::C_CamOgePubPathVariables</class>
+   <extends>QPushButton</extends>
+   <header>C_CamOgePubPathVariables.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgePubDarkBrowse</class>
-   <extends>QPushButton</extends>
-   <header>C_CamOgePubDarkBrowse.h</header>
+   <class>stw_opensyde_gui_elements::C_CamOgeLeFilePath</class>
+   <extends>QLineEdit</extends>
+   <header>C_CamOgeLeFilePath.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

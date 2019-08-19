@@ -68,6 +68,7 @@ private:
    void m_OnOverwriteModeSelected(const stw_types::sint32 os32_Index) const;
    void m_OnFormatSelected(const stw_types::sint32 os32_Index) const;
    void m_OnBrowse(void);
+   void m_InsertPathVar(const QString & orc_Variable) const;
 
    void m_DecideStartStop(void);
    void m_CheckAndStartLogging(void);

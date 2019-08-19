@@ -117,6 +117,7 @@ private:
    void m_SignalItemHovered(const bool oq_Hover);
    void m_SetNewLength(const stw_types::sint16 os16_Lenth);
    void m_SetError(const bool oq_Active);
+   bool m_IsLengthValid(const stw_types::sint16 os16_Length) const;
 
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const mpc_MessageSyncManager;
 
@@ -129,6 +130,7 @@ private:
    QVector<C_SdBueMlvSignalItem *> mc_VecSignalItems;
 
    QString mc_Name;
+   bool mq_MultiplexerSignal;
    C_SignalItemColors mc_ColorConfiguration;
    stw_types::uint16 mu16_LastBit;
    stw_opensyde_core::C_OSCCanSignal mc_Signal;
@@ -137,6 +139,7 @@ private:
    bool mq_Hovered;
    const stw_types::float64 mf64_Space;
    const stw_types::sint16 ms16_MaximumLength;
+   const stw_types::sint16 ms16_MaximumLengthMultiplexer;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

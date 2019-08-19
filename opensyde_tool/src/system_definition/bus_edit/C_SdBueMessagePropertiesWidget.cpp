@@ -198,7 +198,7 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
                                                         "Symbolic message name. Unique within a bus."
                                                         "\nFollowing C naming conventions are required:"
                                                         "\n - must not be empty"
-                                                        "\n - only alphanumeric characters + \"_\""
+                                                        "\n - only alphanumeric characters and \"_\""
                                                         "\n - should not be longer than 31 characters"));
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this message."));
@@ -303,6 +303,7 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
       {
          this->mpc_Ui->pc_WidgetReceiver->SetAlwaysHideTimeout(false);
       }
+      this->mpc_Ui->pc_ComboBoxTxMethod->SetItemState(ms32_TX_TYPE_INDEX_ON_CHANGE, !pc_Message->IsMultiplexed());
 
       //Cycle time
       this->mpc_Ui->pc_SpinBoxCycleTime->setValue(pc_Message->u32_CycleTimeMs);

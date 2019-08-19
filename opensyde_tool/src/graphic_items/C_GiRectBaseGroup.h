@@ -32,6 +32,9 @@ public:
                      const stw_types::float64 of64_MinHeight, const stw_types::float64 of64_ActionPointOffset,
                      const bool oq_KeepAspectRatio, QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiRectBaseGroup(void);
+
+   //GI base
+   virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

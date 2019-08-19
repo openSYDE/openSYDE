@@ -51,8 +51,6 @@ Q_SIGNALS:
    void SigSetupStyle(QGraphicsItem * const opc_Item);
 
    void SigBringToFront(void);
-   void SigBringForward(void);
-   void SigSendBackward(void);
    void SigSendToBack(void);
    void SigAlign(const QGraphicsItem * const opc_GuidelineItem,
                  const stw_opensyde_gui_logic::E_Alignment & ore_Alignment);
@@ -80,11 +78,9 @@ protected:
    QAction * mpc_ActionBendLine;
    QAction * mpc_ActionRemoveBendLine;
    // Order objects actions
-   QAction * mpc_ActionOrderObjects;
    QAction * mpc_ActionBringToFront;
-   QAction * mpc_ActionBringForward;
-   QAction * mpc_ActionSendBackward;
    QAction * mpc_ActionSendToBack;
+   QAction * mpc_ActionOrderSeparator;
    // Alignment actions
    QAction * mpc_ActionAlignment;
    QAction * mpc_ActionAlignLeft;
@@ -99,7 +95,6 @@ protected:
    virtual bool m_ItemTypeHasSetupStyle(const stw_types::sintn osn_ItemType);
 
    void m_ContextMenuClosed(void);
-   void m_InsertBendLineActions(QAction * const opc_Action);
 
 private:
    //Avoid call

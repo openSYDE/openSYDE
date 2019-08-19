@@ -22,12 +22,12 @@
 #endif
 #endif
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 namespace stw_cmon_protocol
 {
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 //Base class for all protocol interpretations
 //Provides basic functions to help converting a CAN message structure into text.
@@ -63,7 +63,7 @@ public:
                                                const stw_scl::C_SCLString & orc_Section);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //Common base for KEFEX-style variable-based protocols
 ///Adds functionality to link in an opened KEFEX project in order to decode variable indexes from CAN messages.
 class CMONPROTOCOL_PACKAGE C_CMONProtocolKEFEX_IVA : public C_CMONProtocolBase
@@ -91,7 +91,7 @@ public:
 #endif
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 }
 

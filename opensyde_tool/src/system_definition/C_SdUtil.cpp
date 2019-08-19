@@ -729,14 +729,6 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message,  cons
    switch (oe_Type)
    {
    case C_OSCCanProtocol::eECES:
-      //CAN ID only in range of 0-7FF
-      if (orc_Message.u32_CanId > 0x7FF)
-      {
-         c_Info.push_back(QString(C_GtGetText::h_GetText(
-                                     "Message ID changed from 0x%1 to 0x7FF due to ECeS protocol restrictions.")).arg(
-                             orc_Message.u32_CanId, 0, 16));
-         orc_Message.u32_CanId = 0x7FF;
-      }
       //DLC fix 8
       if (orc_Message.u16_Dlc != 8U)
       {

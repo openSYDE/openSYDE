@@ -14,6 +14,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QStyledItemDelegate>
 #include <QPainter>
+#include <QSvgRenderer>
 #include "stwtypes.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -30,6 +31,7 @@ class C_CamMetTreeDelegate :
 
 public:
    C_CamMetTreeDelegate(QObject * const opc_Parent = NULL);
+   ~C_CamMetTreeDelegate(void);
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
@@ -45,8 +47,10 @@ Q_SIGNALS:
    //lint -restore
    void SigStartAccept(void) const;
    void SigEndAccept(void) const;
+   void SigStoreRenderer(const QString & orc_Path, QSvgRenderer * const opc_Renderer) const;
 
 private:
+   QMap<QString, QSvgRenderer *> mc_ActiveRenderers;
    static const QColor mhc_HighlightBackgroundColor;
    static const QColor mhc_HighlightForegroundColor;
    static const QColor mhc_HighlightBorderColor;
@@ -55,12 +59,13 @@ private:
    static const QFont mhc_HighlightFont;
    static const QFont mhc_DefaultFont;
 
-   static void mh_PaintSelectedCellIcon(QPainter * const opc_Painter, const QRect & orc_CellRect,
-                                        const QModelIndex & orc_Index, const bool oq_Selected);
+   void m_PaintSelectedCellIcon(QPainter * const opc_Painter, const QRect & orc_CellRect, const QModelIndex & orc_Index,
+                                const bool oq_Selected) const;
+   void m_StoreRenderer(const QString & orc_Path, QSvgRenderer * const opc_Renderer);
    static bool mh_PaintChildCell(QPainter * const opc_Painter, const QRect & orc_CellRect,
                                  const QModelIndex & orc_Index, const bool oq_Selected);
    static stw_types::sint32 mh_GetMaxLength(const QStringList & orc_Names);
-   static std::vector<stw_types::sint32> mh_GetChildColWidths(void);
+   static std::vector<stw_types::sint32> mh_GetChildColWidths(const bool oq_IsThirdLayer);
    static std::vector<QFlags<Qt::AlignmentFlag> > mh_GetTopAlignmentFlags(void);
    static std::vector<QString> mh_GetTopSpaces(void);
 };

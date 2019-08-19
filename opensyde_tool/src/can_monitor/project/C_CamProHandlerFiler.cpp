@@ -142,18 +142,18 @@ void C_CamProHandlerFiler::h_SaveMessages(const std::vector<C_CamProMessageData>
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveMessage(const C_CamProMessageData & orc_Message, C_OSCXMLParserBase & orc_XMLParser)
 {
-   orc_XMLParser.SetAttributeUint32("ID", orc_Message.u32_ID);
-   orc_XMLParser.SetAttributeUint32("DLC", orc_Message.u8_DLC);
-   orc_XMLParser.SetAttributeUint32("XTD", orc_Message.u8_XTD);
-   orc_XMLParser.SetAttributeUint32("RTR", orc_Message.u8_RTR);
-   orc_XMLParser.SetAttributeUint32("DB1", orc_Message.au8_Data[0]);
-   orc_XMLParser.SetAttributeUint32("DB2", orc_Message.au8_Data[1]);
-   orc_XMLParser.SetAttributeUint32("DB3", orc_Message.au8_Data[2]);
-   orc_XMLParser.SetAttributeUint32("DB4", orc_Message.au8_Data[3]);
-   orc_XMLParser.SetAttributeUint32("DB5", orc_Message.au8_Data[4]);
-   orc_XMLParser.SetAttributeUint32("DB6", orc_Message.au8_Data[5]);
-   orc_XMLParser.SetAttributeUint32("DB7", orc_Message.au8_Data[6]);
-   orc_XMLParser.SetAttributeUint32("DB8", orc_Message.au8_Data[7]);
+   orc_XMLParser.SetAttributeUint32("ID", orc_Message.u32_Id);
+   orc_XMLParser.SetAttributeUint32("DLC", orc_Message.u16_Dlc);
+   orc_XMLParser.SetAttributeBool("XTD", orc_Message.q_IsExtended);
+   orc_XMLParser.SetAttributeBool("RTR", orc_Message.q_IsRTR);
+   orc_XMLParser.SetAttributeUint32("DB1", orc_Message.c_Bytes[0]);
+   orc_XMLParser.SetAttributeUint32("DB2", orc_Message.c_Bytes[1]);
+   orc_XMLParser.SetAttributeUint32("DB3", orc_Message.c_Bytes[2]);
+   orc_XMLParser.SetAttributeUint32("DB4", orc_Message.c_Bytes[3]);
+   orc_XMLParser.SetAttributeUint32("DB5", orc_Message.c_Bytes[4]);
+   orc_XMLParser.SetAttributeUint32("DB6", orc_Message.c_Bytes[5]);
+   orc_XMLParser.SetAttributeUint32("DB7", orc_Message.c_Bytes[6]);
+   orc_XMLParser.SetAttributeUint32("DB8", orc_Message.c_Bytes[7]);
    orc_XMLParser.SetAttributeBool("do-cyclic-trigger", orc_Message.q_DoCyclicTrigger);
    orc_XMLParser.SetAttributeUint32("interval", orc_Message.u32_CyclicTriggerTime);
    orc_XMLParser.SetAttributeUint32("key-press-offset", orc_Message.u32_KeyPressOffset);
@@ -236,7 +236,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
 
    if (orc_XMLParser.AttributeExists("ID") == true)
    {
-      orc_Message.u32_ID = orc_XMLParser.GetAttributeUint32("ID");
+      orc_Message.u32_Id = orc_XMLParser.GetAttributeUint32("ID");
    }
    else
    {
@@ -244,7 +244,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("DLC") == true)
    {
-      orc_Message.u8_DLC = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DLC"));
+      orc_Message.u16_Dlc = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DLC"));
    }
    else
    {
@@ -252,7 +252,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("XTD") == true)
    {
-      orc_Message.u8_XTD = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("XTD"));
+      orc_Message.q_IsExtended = orc_XMLParser.GetAttributeBool("XTD");
    }
    else
    {
@@ -260,7 +260,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("RTR") == true)
    {
-      orc_Message.u8_RTR = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("RTR"));
+      orc_Message.q_IsRTR = orc_XMLParser.GetAttributeBool("RTR");
    }
    else
    {
@@ -268,7 +268,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("DB1") == true)
    {
-      orc_Message.au8_Data[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB1"));
+      orc_Message.c_Bytes[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB1"));
    }
    else
    {
@@ -276,7 +276,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("DB2") == true)
    {
-      orc_Message.au8_Data[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB2"));
+      orc_Message.c_Bytes[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB2"));
    }
    else
    {
@@ -284,7 +284,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("DB3") == true)
    {
-      orc_Message.au8_Data[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB3"));
+      orc_Message.c_Bytes[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB3"));
    }
    else
    {
@@ -292,7 +292,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("DB4") == true)
    {
-      orc_Message.au8_Data[3] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB4"));
+      orc_Message.c_Bytes[3] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB4"));
    }
    else
    {
@@ -300,7 +300,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("DB5") == true)
    {
-      orc_Message.au8_Data[4] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB5"));
+      orc_Message.c_Bytes[4] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB5"));
    }
    else
    {
@@ -308,7 +308,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("DB6") == true)
    {
-      orc_Message.au8_Data[5] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB6"));
+      orc_Message.c_Bytes[5] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB6"));
    }
    else
    {
@@ -316,7 +316,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("DB7") == true)
    {
-      orc_Message.au8_Data[6] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB7"));
+      orc_Message.c_Bytes[6] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB7"));
    }
    else
    {
@@ -324,7 +324,7 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    }
    if (orc_XMLParser.AttributeExists("DB8") == true)
    {
-      orc_Message.au8_Data[7] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB8"));
+      orc_Message.c_Bytes[7] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("DB8"));
    }
    else
    {

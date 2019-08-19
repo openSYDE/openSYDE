@@ -302,7 +302,7 @@ QVariant C_SdNdeDataPoolListTableModel::headerData(const sintn osn_Section, cons
                "Symbolic data element name. Unique within a Datapool list."
                "\nFollowing C naming conventions are required:"
                "\n - must not be empty"
-               "\n - only alphanumeric characters + \"_\""
+               "\n - only alphanumeric characters and \"_\""
                "\n - should not be longer than 31 characters");
             break;
          case eCOMMENT:

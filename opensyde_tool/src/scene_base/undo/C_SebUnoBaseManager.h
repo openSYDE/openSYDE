@@ -61,8 +61,7 @@ public:
    void DoAlign(const QList<QGraphicsItem *> & orc_Items, const QGraphicsItem * const opc_AlignItem,
                 const E_Alignment & ore_Alignment);
    virtual void AdaptZOrder(const QList<QGraphicsItem *> & orc_SelectedItems, const QList<QGraphicsItem *> & orc_Items,
-                            const stw_types::float64 of64_Diff, stw_types::float64 & orf64_ZOrderHigh,
-                            stw_types::float64 & orf64_ZOrderLow);
+                            const bool oq_BringToFront);
    void SaveStyleInformation(const QList<QGraphicsItem *> & orc_Items, const bool oq_DarkMode);
    void RegisterStyleChange(void);
 

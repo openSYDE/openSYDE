@@ -48,6 +48,7 @@ private:
                                               C_CieConverter::C_CIENodeMessage & orc_Message);
    static stw_types::sint32 mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal,
                                          C_CieConverter::C_CIENodeMessage & orc_Message);
+   static void mh_VerifySignalValueTable(C_CieConverter::C_CIECanSignal & orc_DbcSignal);
    static stw_types::sint32 mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSignal,
                                                C_CieConverter::C_CIEDataPoolElement & orc_Element,
                                                stw_scl::C_SCLStringList & orc_WarningMessages);

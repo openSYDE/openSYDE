@@ -11,17 +11,17 @@
 #ifndef C_OSCNODEAPPLICATION_H
 #define C_OSCNODEAPPLICATION_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "CSCLString.h"
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCNodeApplication
 {
@@ -50,11 +50,12 @@ public:
    stw_scl::C_SCLString c_CodeGeneratorPath; ///< Path to code generator
    stw_scl::C_SCLString c_GeneratePath;      ///< Path to generate sources for this application in
                                              //(can be relative to data block project)
+   stw_types::uint16 u16_GenCodeVersion;     ///< Version of structure of generated code
    stw_scl::C_SCLString c_ResultPath;        ///< Path to result file of this application
                                              //(can be relative to data block project)
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

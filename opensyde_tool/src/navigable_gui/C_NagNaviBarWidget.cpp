@@ -110,20 +110,6 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
 
    // create the dynamic buttons (all 'sub' buttons)
 
-   //Topology label style
-   this->mpc_Ui->pc_LabelNodes->SetBackgroundColor(-1);
-   this->mpc_Ui->pc_LabelNodes->SetForegroundColor(9);
-   this->mpc_Ui->pc_LabelNodes->SetFontPixel(14, true);
-   this->mpc_Ui->pc_LabelNodesCount->SetBackgroundColor(-1);
-   this->mpc_Ui->pc_LabelNodesCount->SetForegroundColor(9);
-   this->mpc_Ui->pc_LabelNodesCount->SetFontPixel(14, true);
-   this->mpc_Ui->pc_LabelBuses->SetBackgroundColor(-1);
-   this->mpc_Ui->pc_LabelBuses->SetForegroundColor(9);
-   this->mpc_Ui->pc_LabelBuses->SetFontPixel(14, true);
-   this->mpc_Ui->pc_LabelBusesCount->SetBackgroundColor(-1);
-   this->mpc_Ui->pc_LabelBusesCount->SetForegroundColor(9);
-   this->mpc_Ui->pc_LabelBusesCount->SetFontPixel(14, true);
-
    //Set left border state (both included!)
    this->mpc_Ui->pc_WidgetTabSd->SetIncludeLeftBorder(true);
    this->mpc_Ui->pc_WidgetTabSc->SetIncludeLeftBorder(true);
@@ -393,8 +379,6 @@ void C_NagNaviBarWidget::ResetUseCaseAfterChangeFailure(const sint32 os32_Mode) 
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::InitText(void) const
 {
-   this->mpc_Ui->pc_LabelBuses->setText(C_GtGetText::h_GetText("Buses"));
-   this->mpc_Ui->pc_LabelNodes->setText(C_GtGetText::h_GetText("Nodes"));
    this->mpc_Ui->pc_PushButtonTopology->setText(C_GtGetText::h_GetText("NETWORK TOPOLOGY"));
    this->mpc_Ui->pc_BtnMain->setText(C_GtGetText::h_GetText("MAIN"));
 
@@ -482,6 +466,22 @@ void C_NagNaviBarWidget::resizeEvent(QResizeEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
+
+   Here: draw background
+   (Not automatically drawn in any QWidget derivative)
+
+   \param[in,out] opc_Event Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagNaviBarWidget::paintEvent(QPaintEvent * const opc_Event)
+{
+   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+
+   QWidget::paintEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handles all visible elements on minimize / maximize
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -546,7 +546,8 @@ void C_NagNaviBarWidget::m_NodesChanged(void) const
    std::vector<QString> c_Nodes;
 
    //Update node count
-   this->mpc_Ui->pc_LabelNodesCount->setText(QString("(%1)").arg(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize()));
+   this->mpc_Ui->pc_LabelNodes->setText(QString(C_GtGetText::h_GetText("Nodes (%1)")).arg(C_PuiSdHandler::h_GetInstance()
+                                                                                          ->GetOSCNodesSize()));
 
    c_Nodes.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize());
    //add new nodes
@@ -572,7 +573,8 @@ void C_NagNaviBarWidget::m_BussesChanged(void) const
    std::vector<QString> c_Buses;
 
    //Update bus count
-   this->mpc_Ui->pc_LabelBusesCount->setText(QString("(%1)").arg(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize()));
+   this->mpc_Ui->pc_LabelBuses->setText(QString(C_GtGetText::h_GetText("Buses (%1)")).arg(C_PuiSdHandler::h_GetInstance()
+                                                                                          ->GetOSCBusesSize()));
 
    c_Buses.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize());
    //add new nodes
@@ -936,7 +938,7 @@ void C_NagNaviBarWidget::m_AnimationTimerEvent()
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_PbTopologyClick(void)
 {
-   const QString c_Name = C_GtGetText::h_GetText("Network Topology");
+   const QString c_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
    const sint32 s32_SubMode = ms32_SUBMODE_SYSDEF_TOPOLOGY;
 
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, s32_SubMode, 0, c_Name);

@@ -23,6 +23,7 @@
 #include "CCAN.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_ImpUtil.h"
+#include "C_PuiUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -66,7 +67,9 @@ C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw_opensyde_gui_el
 
    this->m_ShowCustomDllPath(false);
 
-   this->setFocusPolicy(Qt::ClickFocus); // to get focus out of line edit without hiding line edit
+   // Remove "..." and "ABC" string
+   this->mpc_Ui->pc_PushButtonBrowse->setText("");
+   this->mpc_Ui->pc_PushButtonVariables->setText("");
 
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked,
@@ -83,8 +86,10 @@ C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw_opensyde_gui_el
            this, &C_SyvSeDllConfigurationDialog::m_ConcretDllClicked);
    connect(this->mpc_Ui->pc_RadioButtonOther, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
            this, &C_SyvSeDllConfigurationDialog::m_OtherDllClicked);
-   connect(this->mpc_Ui->pc_PushButtonBrowse, &C_OgePubConfigure::clicked,
+   connect(this->mpc_Ui->pc_PushButtonBrowse, &C_OgePubOpen::clicked,
            this, &C_SyvSeDllConfigurationDialog::m_OnBrowse);
+   connect(this->mpc_Ui->pc_PushButtonVariables, &C_OgePubPathVariables::SigVariableSelected,
+           this->mpc_Ui->pc_LineEditCustomDllPath, &C_OgeLeFilePath::InsertVariable);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,7 +121,10 @@ void C_SyvSeDllConfigurationDialog::InitText(void) const
    this->mpc_Ui->pc_LabelBitrateInfo->setText(C_GtGetText::h_GetText(
                                                  "CAN bitrate will be applied automatically."));
    this->mpc_Ui->pc_RadioButtonOther->setText(C_GtGetText::h_GetText("Other"));
-   this->mpc_Ui->pc_PushButtonBrowse->setText(C_GtGetText::h_GetText("..."));
+
+   this->mpc_Ui->pc_PushButtonBrowse->SetToolTipInformation(
+      C_GtGetText::h_GetText("Browse"),
+      C_GtGetText::h_GetText("Browse for custom DLL file."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -271,7 +279,7 @@ void C_SyvSeDllConfigurationDialog::m_CancelClicked(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_ConfigureDllClicked(void) const
 {
-   const QString c_Path = C_Uti::h_GetAbsolutePathFromExe(this->m_GetAbsoluteDllPath());
+   const QString c_Path = this->m_GetAbsoluteDllPath();
 
    if (QFile::exists(c_Path) == true)
    {
@@ -307,7 +315,7 @@ void C_SyvSeDllConfigurationDialog::m_TestConnectionClicked(void) const
    // 3 of 4 message cases are of type "failed"
    C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
    QString c_Description;
-   const QString c_Path = C_Uti::h_GetAbsolutePathFromExe(this->m_GetAbsoluteDllPath());
+   const QString c_Path = this->m_GetAbsoluteDllPath();
    const QString c_Heading = C_GtGetText::h_GetText("PC CAN Interface configuration");
 
    if (QFile::exists(c_Path) == true)
@@ -365,6 +373,7 @@ void C_SyvSeDllConfigurationDialog::m_ConcretDllClicked(void) const
 void C_SyvSeDllConfigurationDialog::m_OtherDllClicked(void) const
 {
    this->m_ShowCustomDllPath(true);
+   this->mpc_Ui->pc_LineEditCustomDllPath->setFocus();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -372,8 +381,8 @@ void C_SyvSeDllConfigurationDialog::m_ShowCustomDllPath(const bool oq_Active) co
 {
    this->mpc_Ui->pc_LabelCustomDllPath->setVisible(oq_Active);
    this->mpc_Ui->pc_LineEditCustomDllPath->setVisible(oq_Active);
-   this->mpc_Ui->pc_LineEditCustomDllPath->setFocus();
    this->mpc_Ui->pc_PushButtonBrowse->setVisible(oq_Active);
+   this->mpc_Ui->pc_PushButtonVariables->setVisible(oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -385,22 +394,10 @@ void C_SyvSeDllConfigurationDialog::m_ShowCustomDllPath(const bool oq_Active) co
 void C_SyvSeDllConfigurationDialog::m_OnBrowse(void)
 {
    QString c_Path = "";
-   QString c_Folder = this->mpc_Ui->pc_LineEditCustomDllPath->GetPath();
+   QString c_Folder = C_PuiUtil::h_GetResolvedAbsPathFromExe(this->mpc_Ui->pc_LineEditCustomDllPath->GetPath());
    const QString c_Filter = QString(C_GtGetText::h_GetText("CAN DLL ")) + "(*.dll)";
    QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select CAN DLL"), c_Folder, c_Filter);
 
-   if ((c_Folder == "") || (QFileInfo(c_Folder).dir().exists() == false))
-   {
-      // use executable path if no existing directory is given
-      c_Folder = C_Uti::h_GetExePath();
-   }
-   else
-   {
-      // get directory of dll path
-      c_Folder = QFileInfo(c_Folder).dir().absolutePath();
-   }
-
-   c_Dialog.setDirectory(c_Folder);
    c_Dialog.setDefaultSuffix(".dll");
 
    if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
@@ -408,7 +405,11 @@ void C_SyvSeDllConfigurationDialog::m_OnBrowse(void)
       c_Path = c_Dialog.selectedFiles().at(0);
       // check if relative path is possible and appreciated
       c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, C_Uti::h_GetExePath());
-      this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
+
+      if (c_Path != "")
+      {
+         this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
+      }
    }
 }
 
@@ -439,16 +440,10 @@ QString C_SyvSeDllConfigurationDialog::m_GetAbsoluteDllPath(void) const
       break;
    }
 
-   // make absolute if it is relative
-   if (c_Return.compare("") != 0)
+   // resolve variables and make absolute if it is relative (only if not empty)
+   if (c_Return.isEmpty() == false)
    {
-      const QFileInfo c_Info(c_Return);
-
-      if (c_Info.isRelative() == true)
-      {
-         c_Return = C_Uti::h_GetExePath() + "/" + c_Return;
-      }
+      c_Return = C_PuiUtil::h_GetResolvedAbsPathFromExe(c_Return);
    }
-
    return c_Return;
 }

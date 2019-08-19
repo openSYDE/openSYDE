@@ -165,6 +165,9 @@ void C_CamMetTreeView::Pause(void)
 
    this->mc_Model.Pause();
 
+   //Update children for continuous mode (children are invalid while not paused/stopped)
+   m_SetAllChildren();
+
    C_SyvComMessageMonitor::Pause();
 }
 
@@ -178,6 +181,9 @@ void C_CamMetTreeView::Stop(void)
    m_HandleSorting();
 
    this->mc_Model.Stop();
+
+   //Update children for continuous mode (children are invalid while not paused/stopped)
+   m_SetAllChildren();
 
    C_SyvComMessageMonitor::Stop();
 }
@@ -420,7 +426,9 @@ void C_CamMetTreeView::selectionChanged(const QItemSelection & orc_Selected, con
          const QModelIndex c_CurIndex = this->mc_SortProxyModel.mapToSource(*c_It);
          if (c_CurIndex.parent().isValid() == true)
          {
-            this->mc_Model.SetSelection(c_CurIndex.parent().row(), c_CurIndex.row());
+            this->mc_Model.SetSelection(
+               c_CurIndex.parent().parent().isValid() ? c_CurIndex.parent().parent().row() : c_CurIndex.parent().row(),
+               static_cast<sint32>(this->mc_Model.TranslateTreeRowsToSignalIndex(c_CurIndex)));
          }
          else
          {
@@ -468,105 +476,114 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
 {
    // Adapt the color
    QPen c_Pen = opc_Painter->pen();
-   QPoint c_TopLeft = orc_Rect.topLeft();
-   const sintn sn_MsgPosX = c_TopLeft.x() + 10;
-   sintn sn_PixelCounter;
+   const QPoint c_TopLeft = orc_Rect.topLeft();
+   const sintn sn_OffsetL1 = 10;
+   const sintn sn_OffsetL2 = 30;
+   const sintn sn_OffsetL3 = 50;
 
    c_Pen.setColor(mc_STYLE_GUIDE_COLOR_10);
    c_Pen.setWidth(1);
+   opc_Painter->save();
    opc_Painter->setPen(c_Pen);
 
+   //Message
    if (orc_Index.parent().isValid() == false)
    {
-      const bool q_Children = orc_Index.child(0, 0).isValid();
-      bool q_OneSibling = false;
-
-      // Message layer
-      if (orc_Index.sibling(orc_Index.row() + 1, 0).isValid() == true)
+      const QModelIndex c_MessageIndex = orc_Index;
+      if (this->model()->rowCount(c_MessageIndex) > 0)
       {
-         // There is a further message
-         opc_Painter->drawPoint(sn_MsgPosX, c_TopLeft.y() + 14);
-         opc_Painter->drawPoint(sn_MsgPosX, c_TopLeft.y() + 16);
-
-         q_OneSibling = true;
-
-         if (q_Children == false)
+         //Don't draw with arrow
+      }
+      else
+      {
+         if (c_MessageIndex.sibling(c_MessageIndex.row() + 1, 0).isValid())
          {
-            // No children, no arrow icon. Paint points instead
-            opc_Painter->drawPoint(sn_MsgPosX, c_TopLeft.y() + 10);
-            opc_Painter->drawPoint(sn_MsgPosX, c_TopLeft.y() + 12);
+            //Draw +
+            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OffsetL1);
+         }
+         else
+         {
+            //Draw L
+            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OffsetL1);
          }
       }
-
-      if (orc_Index.sibling(orc_Index.row() - 1, 0).isValid() == true)
+   }
+   else if (orc_Index.parent().parent().isValid() == false)
+   {
+      const QModelIndex c_MessageIndex = orc_Index.parent();
+      //Draw |
+      if (c_MessageIndex.sibling(c_MessageIndex.row() + 1, 0).isValid())
       {
-         // There is a previous message
-         opc_Painter->drawPoint(sn_MsgPosX, c_TopLeft.y());
-         opc_Painter->drawPoint(sn_MsgPosX, c_TopLeft.y() + 2);
-
-         q_OneSibling = true;
-
-         if (q_Children == false)
-         {
-            // No children, no arrow icon. Paint points instead
-            opc_Painter->drawPoint(sn_MsgPosX, c_TopLeft.y() + 4);
-            opc_Painter->drawPoint(sn_MsgPosX, c_TopLeft.y() + 6);
-         }
+         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OffsetL1);
       }
-
-      if (q_OneSibling == true)
+   }
+   else
+   {
+      const QModelIndex c_MessageIndex = orc_Index.parent().parent();
+      //Draw |
+      if (c_MessageIndex.sibling(c_MessageIndex.row() + 1, 0).isValid())
       {
-         // At least one connection without an icon necessary
-         const sintn sn_PosY = c_TopLeft.y() + 8;
-         for (sn_PixelCounter = 6; sn_PixelCounter <= 10; sn_PixelCounter += 2)
+         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OffsetL1);
+      }
+   }
+   //Signal
+   if (orc_Index.parent().parent().isValid())
+   {
+      const QModelIndex c_SignalIndex = orc_Index.parent();
+      //Draw |
+      if (c_SignalIndex.sibling(c_SignalIndex.row() + 1, 0).isValid())
+      {
+         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OffsetL2);
+      }
+   }
+   else if (orc_Index.parent().isValid())
+   {
+      const QModelIndex c_SignalIndex = orc_Index;
+      if (this->model()->rowCount(c_SignalIndex) > 0)
+      {
+         //Don't draw with arrow
+      }
+      else
+      {
+         if (c_SignalIndex.sibling(c_SignalIndex.row() + 1, 0).isValid())
          {
-            opc_Painter->drawPoint(sn_MsgPosX + sn_PixelCounter, sn_PosY);
+            //Draw +
+            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OffsetL2);
          }
-
-         if (q_Children == false)
+         else
          {
-            // No children, no arrow icon. Paint the extra points instead
-            opc_Painter->drawPoint(sn_MsgPosX, sn_PosY);
-            opc_Painter->drawPoint(sn_MsgPosX + 2, sn_PosY);
-            opc_Painter->drawPoint(sn_MsgPosX + 4, sn_PosY);
+            //Draw L
+            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OffsetL2);
          }
       }
    }
    else
    {
-      const sintn sn_SigPosX = c_TopLeft.x() + 31;
-
-      // Signal layer
-      if (orc_Index.parent().sibling(orc_Index.parent().row() + 1, 0).isValid() == true)
+      //No signal
+   }
+   if (orc_Index.parent().parent().isValid())
+   {
+      //Mux
+      const QModelIndex c_MuxIndex = orc_Index;
+      if (this->model()->rowCount(c_MuxIndex) > 0)
       {
-         // There is a further message. Points on the message layer
-         for (sn_PixelCounter = 0; sn_PixelCounter <= 16; sn_PixelCounter += 2)
-         {
-            opc_Painter->drawPoint(sn_MsgPosX, c_TopLeft.y() + sn_PixelCounter);
-         }
+         //Don't draw with arrow
       }
-
-      // From top previous signal or message
-      opc_Painter->drawPoint(sn_SigPosX, c_TopLeft.y());
-      opc_Painter->drawPoint(sn_SigPosX, c_TopLeft.y() + 2);
-      opc_Painter->drawPoint(sn_SigPosX, c_TopLeft.y() + 4);
-      opc_Painter->drawPoint(sn_SigPosX, c_TopLeft.y() + 6);
-      opc_Painter->drawPoint(sn_SigPosX, c_TopLeft.y() + 8);
-      // To the right to the signal icon
-      opc_Painter->drawPoint(sn_SigPosX + 2, c_TopLeft.y() + 8);
-      opc_Painter->drawPoint(sn_SigPosX + 4, c_TopLeft.y() + 8);
-      opc_Painter->drawPoint(sn_SigPosX + 6, c_TopLeft.y() + 8);
-      opc_Painter->drawPoint(sn_SigPosX + 8, c_TopLeft.y() + 8);
-
-      if (orc_Index.sibling(orc_Index.row() + 1, 0).isValid() == true)
+      else
       {
-         // There is a further signal. Points below the middle
-         for (sn_PixelCounter = 10; sn_PixelCounter <= 16; sn_PixelCounter += 2)
+         if (c_MuxIndex.sibling(c_MuxIndex.row() + 1, 0).isValid())
          {
-            opc_Painter->drawPoint(sn_SigPosX, c_TopLeft.y() + sn_PixelCounter);
+            //Draw +
+            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OffsetL3);
+         }
+         else
+         {
+            //Draw L
+            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OffsetL3);
          }
       }
    }
+   opc_Painter->restore();
 
    QTreeView::drawBranches(opc_Painter, orc_Rect, orc_Index);
 }
@@ -607,7 +624,7 @@ void C_CamMetTreeView::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
    const bool q_Selected = (this->selectedIndexes().size() > 0L);
 
    if ((q_Selected == true) ||
-       (this->mc_Model.rowCount() > 0))
+       (this->mc_SortProxyModel.rowCount() > 0))
    {
       this->mpc_ActionCopy->setVisible(q_Selected);
 
@@ -642,7 +659,9 @@ void C_CamMetTreeView::m_CopySelection(void)
             if (c_TopLevelIndex.parent().isValid() == true)
             {
                // In case of a selected signal
-               c_TopLevelIndex = c_TopLevelIndex.parent();
+               c_TopLevelIndex =
+                  c_TopLevelIndex.parent().parent().isValid() ? c_TopLevelIndex.parent().parent() : c_TopLevelIndex.
+                  parent();
                c_CanMessageData.q_Extended = true;
             }
             else
@@ -697,7 +716,6 @@ void C_CamMetTreeView::m_UpdateUi(const std::list<C_CamMetTreeLoggerData> & orc_
    //Don't allow multiple concurrent add row steps
    this->mc_MutexUpdate.lock();
    c_Rows = this->mc_Model.AddRows(orc_Data);
-   this->mc_MutexUpdate.unlock();
    if (this->mq_UniqueMessageMode == false)
    {
       // In case of continuous mode, adapt the new messages for showing the signals in correct column size
@@ -715,7 +733,11 @@ void C_CamMetTreeView::m_UpdateUi(const std::list<C_CamMetTreeLoggerData> & orc_
       // It is possible that already existing messages got a signal interpretation
       // TODO: Is there a more efficient way?
       this->m_SetAllChildren();
+      //update style (necessary so stylesheet sees changes -> necessary for expand and collapse icon update)
+      this->style()->unpolish(this);
+      this->style()->polish(this);
    }
+   this->mc_MutexUpdate.unlock();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -729,14 +751,30 @@ void C_CamMetTreeView::m_SetChildColumns(const std::vector<stw_types::sint32> & 
    for (uint32 u32_It = 0; u32_It < orc_Indices.size(); ++u32_It)
    {
       const sint32 s32_ParentRow = orc_Indices[u32_It];
-      const QModelIndex c_ParentIndex = this->mc_Model.index(s32_ParentRow, 0);
+      const QModelIndex c_ParentIndex = this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(s32_ParentRow, 0));
+      m_SetChildColumns(c_ParentIndex);
+   }
+}
 
-      if (c_ParentIndex.isValid() == true)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set child item stretch property for this index
+
+   \param[in] orc_ModelIndex Stretch all child items for this index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeView::m_SetChildColumns(const QModelIndex & orc_ModelIndex)
+{
+   if (orc_ModelIndex.isValid() == true)
+   {
+      for (sint32 s32_ItRow = 0; s32_ItRow < this->mc_SortProxyModel.rowCount(orc_ModelIndex); ++s32_ItRow)
       {
-         for (sint32 s32_ItRow = 0; s32_ItRow < this->mc_Model.rowCount(c_ParentIndex); ++s32_ItRow)
+         const QModelIndex c_Child = this->mc_SortProxyModel.index(s32_ItRow, 0, orc_ModelIndex);
+         if (this->mc_SortProxyModel.rowCount(c_Child) > 0)
          {
-            this->setFirstColumnSpanned(s32_ItRow, this->mc_SortProxyModel.mapFromSource(c_ParentIndex), true);
+            this->m_SetChildColumns(c_Child);
          }
+         //Every child needs an expanded row
+         this->setFirstColumnSpanned(s32_ItRow, orc_ModelIndex, true);
       }
    }
 }
@@ -747,16 +785,10 @@ void C_CamMetTreeView::m_SetChildColumns(const std::vector<stw_types::sint32> & 
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_SetAllChildren(void)
 {
-   for (sint32 s32_It = 0; s32_It < this->mc_Model.rowCount(); ++s32_It)
+   for (sint32 s32_It = 0; s32_It < this->mc_SortProxyModel.rowCount(); ++s32_It)
    {
-      const QModelIndex c_ParentIndex = this->mc_Model.index(s32_It, 0);
-      if (c_ParentIndex.isValid() == true)
-      {
-         for (sint32 s32_ItRow = 0; s32_ItRow < this->mc_Model.rowCount(c_ParentIndex); ++s32_ItRow)
-         {
-            this->setFirstColumnSpanned(s32_ItRow, this->mc_SortProxyModel.mapFromSource(c_ParentIndex), true);
-         }
-      }
+      const QModelIndex c_ParentIndex = this->mc_SortProxyModel.index(s32_It, 0);
+      m_SetChildColumns(c_ParentIndex);
    }
 }
 
@@ -983,4 +1015,68 @@ void C_CamMetTreeView::m_HandleSorting(void)
          this->mc_SortProxyModel.setDynamicSortFilter(true);
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Draw L part of branch
+
+   \param[in,out]   opc_Painter Painter to draw with
+   \param[in]       orc_TopLeft Top left point
+   \param[in]       os32_Offset Offset to paint at
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeView::mh_DrawL(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const sint32 os32_Offset)
+{
+   //Down
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y()));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 2));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 4));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 6));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 8));
+   //Right
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 2, orc_TopLeft.y() + 8));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 4, orc_TopLeft.y() + 8));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 6, orc_TopLeft.y() + 8));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 8, orc_TopLeft.y() + 8));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Draw "|-" part of branch
+
+   \param[in,out]   opc_Painter Painter to draw with
+   \param[in]       orc_TopLeft Top left point
+   \param[in]       os32_Offset Offset to paint at
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeView::mh_DrawPlus(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const sint32 os32_Offset)
+{
+   //Down
+   mh_DrawVLine(opc_Painter, orc_TopLeft, os32_Offset);
+   //Right
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 2, orc_TopLeft.y() + 8));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 4, orc_TopLeft.y() + 8));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 6, orc_TopLeft.y() + 8));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 8, orc_TopLeft.y() + 8));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Draw vertical line of branch
+
+   \param[in,out]   opc_Painter Painter to draw with
+   \param[in]       orc_TopLeft Top left point
+   \param[in]       os32_Offset Offset to paint at
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeView::mh_DrawVLine(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const sint32 os32_Offset)
+{
+   //Down
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y()));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 2));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 4));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 6));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 8));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 10));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 12));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 14));
+   opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y() + 16));
 }

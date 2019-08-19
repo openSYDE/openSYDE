@@ -79,6 +79,8 @@ C_CamGenSigTableView::C_CamGenSigTableView(QWidget * const opc_Parent) :
 
    connect(&this->mc_Model, &C_CamGenSigTableModel::SigUpdateMessageData, this,
            &C_CamGenSigTableView::SigUpdateMessageData);
+   connect(&this->mc_Model, &C_CamGenSigTableModel::SigResetPermanentEditors, this,
+           &C_CamGenSigTableView::m_SetPersistentEditorWidgets);
    connect(&this->mc_Model, &C_CamGenSigTableModel::SigTriggerModelUpdateCyclicMessage, this,
            &C_CamGenSigTableView::SigTriggerModelUpdateCyclicMessage);
 }

@@ -28,8 +28,8 @@ class C_SyvDaUnoAddCommand :
 public:
    C_SyvDaUnoAddCommand(QGraphicsScene * const opc_Scene, const std::vector<stw_types::uint64> & orc_IDs,
                         const C_PuiSvDbDataElement::E_Type & ore_Type, const QPointF & orc_NewPos,
-                        const QString & orc_AdditionalInformation = "", QUndoCommand * const opc_Parent = NULL,
-                        const bool & orq_ForceUseAdditionalInformation = false,
+                        const stw_types::float64 of64_ZValue, const QString & orc_AdditionalInformation = "",
+                        QUndoCommand * const opc_Parent = NULL, const bool & orq_ForceUseAdditionalInformation = false,
                         const bool & orq_DarkModeDefault = false);
    virtual ~C_SyvDaUnoAddCommand(void);
 
@@ -39,6 +39,7 @@ protected:
 private:
    const C_PuiSvDbDataElement::E_Type me_Type;
    const QPointF mc_NewPos;
+   const stw_types::float64 mf64_ZValue;
    const QString mc_AdditionalInformation;
    const bool mq_ForceUseAdditionalInformation;
    const bool mq_DarkModeDefault;

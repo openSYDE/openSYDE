@@ -59,20 +59,17 @@ border-radius: 4px;
 border-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgePubOpen:enabled,
 stw_opensyde_gui_elements--C_OgePubConfigure:enabled
 {
 border-style: none;
 }
 
-stw_opensyde_gui_elements--C_OgePubOpen:!enabled,
 stw_opensyde_gui_elements--C_OgePubConfigure:!enabled
 {
 border-style: solid;
 border-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgePubOpen,
 stw_opensyde_gui_elements--C_OgePubDialog,
 stw_opensyde_gui_elements--C_OgePubConfigure
 {
@@ -85,6 +82,25 @@ stw_opensyde_gui_elements--C_OgePubDialog:focus
 text-decoration: underline;
 }
 
+stw_opensyde_gui_elements--C_OgePubOpen
+{
+border-style: solid;
+border-width: 1px;
+border-left-width: 0px;
+}
+
+stw_opensyde_gui_elements--C_OgePubPathVariables
+{
+border-style: solid;
+border-width: 1px;
+border-left-width: 0px;
+border-right-width: 0px;
+}
+
+stw_opensyde_gui_elements--C_OgePubPathVariables::menu-indicator
+{
+width: 0px;
+}
 
 /* --------------------------------------------------------------------- */
 stw_opensyde_gui_elements--C_OgePubNavigation,
@@ -164,7 +180,7 @@ padding: 10px;
 /* --------------------------------------------------------------------- */
 stw_opensyde_gui_elements--C_OgePubNavigation
 {
-padding-left: 20px;
+padding-left: 26px;
 text-align: left;
 }
 
@@ -173,4 +189,23 @@ stw_opensyde_gui_elements--C_OgePubNavigationHover
 padding-left: 27px;
 text-align: left;
 }
+
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgePubMessageOk,
+stw_opensyde_gui_elements--C_OgePubMessageCancel
+{
+border-style: solid;
+border-radius: 2px;
+border-width: 1px;
+text-align: center;
+min-height: 30px;
+max-height: 30px;
+}
+
+stw_opensyde_gui_elements--C_OgePubMessageOk:focus,
+stw_opensyde_gui_elements--C_OgePubMessageCancel:focus
+{
+text-decoration: underline;
+}
+
 /* --------------------------------------------------------------------- */

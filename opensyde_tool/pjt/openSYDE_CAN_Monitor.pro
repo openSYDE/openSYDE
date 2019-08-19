@@ -10,10 +10,6 @@ CONFIG   += no_keywords
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets charts svg
 
-#TARGET = CAN_Monitor_2_rows_no_stylesheet
-#TARGET = CAN_Monitor_2_rows_simple_stylesheet
-#TARGET = CAN_Monitor_10_rows_no_stylesheet
-#TARGET = CAN_Monitor_10_rows_simple_stylesheet
 TARGET = openSYDE_CAN_Monitor
 TEMPLATE = app
 
@@ -145,7 +141,6 @@ SOURCES +=\
     ../src/can_monitor/C_CamMainWindow.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiOnlyBackground.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiWithToolTip.cpp \
-    ../src/can_monitor/message_trace/C_CamMetTreeDataSource.cpp \
     ../src/can_monitor/message_trace/C_CamMetTreeDelegate.cpp \
     ../src/can_monitor/message_trace/C_CamMetTreeGUIBuffer.cpp \
     ../src/can_monitor/message_trace/C_CamMetTreeModel.cpp \
@@ -267,7 +262,6 @@ SOURCES +=\
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleDynamicDecimalsBase.cpp \
     ../src/can_monitor/can_monitor_gui_elements/widget/C_CamOgeWiSpinBoxGroupTable.cpp \
     ../src/can_monitor/can_monitor_gui_elements/combo_box/C_CamOgeCbxDark.cpp \
-    ../src/can_monitor/can_monitor_gui_elements/line_edit/C_CamOgeLeDarkBrowse.cpp \
     ../src/can_monitor/can_monitor_gui_elements/push_button/C_CamOgePubDarkBrowse.cpp \
     ../src/can_monitor/project/C_CamProLoggingData.cpp \
     ../src/can_monitor/data_base/C_CamDbDbc.cpp \
@@ -294,7 +288,17 @@ SOURCES +=\
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.cpp \
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.cpp \
-    ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.cpp
+    ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.cpp \
+    ../src/can_monitor/can_monitor_gui_elements/push_button/C_CamOgePubPathVariables.cpp \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePathBase.cpp \
+    ../src/can_monitor/can_monitor_gui_elements/line_edit/C_CamOgeLeFilePath.cpp \
+    ../src/opensyde_gui_elements/menu/C_OgeMuSections.cpp \
+    ../src/table_base/tree_base/C_TblTreSimpleItem.cpp \
+    ../src/table_base/tree_base/C_TblTreSimpleModel.cpp \
+    ../src/opensyde_gui_elements/combo_box/C_OgeCbxTableBase.cpp \
+    ../src/can_monitor/message_trace/C_CamMetTreeLoggerDataGreyOutInformation.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/can_monitor/precomp_headers.h
 
@@ -431,7 +435,6 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../src/can_monitor/C_CamMainWindow.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiOnlyBackground.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiWithToolTip.h \
-    ../src/can_monitor/message_trace/C_CamMetTreeDataSource.h \
     ../src/can_monitor/message_trace/C_CamMetTreeDelegate.h \
     ../src/can_monitor/message_trace/C_CamMetTreeGUIBuffer.h \
     ../src/can_monitor/message_trace/C_CamMetTreeModel.h \
@@ -671,7 +674,6 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleDynamicDecimalsBase.h \
     ../src/can_monitor/can_monitor_gui_elements/widget/C_CamOgeWiSpinBoxGroupTable.h \
     ../src/can_monitor/can_monitor_gui_elements/combo_box/C_CamOgeCbxDark.h \
-    ../src/can_monitor/can_monitor_gui_elements/line_edit/C_CamOgeLeDarkBrowse.h \
     ../src/can_monitor/can_monitor_gui_elements/push_button/C_CamOgePubDarkBrowse.h \
     ../src/can_monitor/project/C_CamProLoggingData.h \
     ../src/can_monitor/data_base/C_CamDbDbc.h \
@@ -698,7 +700,17 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.h \
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.h \
-    ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.h
+    ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.h \
+    ../src/can_monitor/can_monitor_gui_elements/push_button/C_CamOgePubPathVariables.h \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePathBase.h \
+    ../src/can_monitor/can_monitor_gui_elements/line_edit/C_CamOgeLeFilePath.h \
+    ../src/opensyde_gui_elements/menu/C_OgeMuSections.h \
+    ../src/table_base/tree_base/C_TblTreSimpleItem.h \
+    ../src/table_base/tree_base/C_TblTreSimpleModel.h \
+    ../src/opensyde_gui_elements/combo_box/C_OgeCbxTableBase.h \
+    ../src/can_monitor/message_trace/C_CamMetTreeLoggerDataGreyOutInformation.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h
 
 FORMS    += \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.ui \
@@ -758,6 +770,7 @@ INCLUDEPATH += ../src \
                ../src/opensyde_gui_elements/group_box \
                ../src/opensyde_gui_elements/label \
                ../src/opensyde_gui_elements/line_edit \
+               ../src/opensyde_gui_elements/menu \
                ../src/opensyde_gui_elements/push_button \
                ../src/opensyde_gui_elements/radio_button \
                ../src/opensyde_gui_elements/splitter \

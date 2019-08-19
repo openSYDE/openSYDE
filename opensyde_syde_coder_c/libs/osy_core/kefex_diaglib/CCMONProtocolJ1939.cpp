@@ -11,7 +11,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -23,14 +23,14 @@
 #include "CCMONProtocolJ1939.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_cmon_protocol;
 using namespace stw_scl;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 /* PDU formats, PDU1 (0..0xEF), PDU2 (0xF0..0xFF) */
 #define J1939_PDU1_MAX    (static_cast<uint8>(0xEFU))
 
@@ -69,7 +69,7 @@ using namespace stw_can;
 /* Source Addresses */
 #define J1939_SA_NULL                        (static_cast<uint8>(0xFEU))     // NULL address (used by addressless nodes)
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 typedef struct
 {
@@ -78,9 +78,9 @@ typedef struct
    C_SCLString c_Verbose;   // PGN verbose text, e.g. Torque/Speed Control 1
 }T_J1939_PGN;
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 const T_J1939_PGN mat_Pgn[J1939_MAX_PGN] =
 {
    {0x0000U, "TSC1",     "Torque/Speed Control 1"},
@@ -344,14 +344,14 @@ const T_J1939_PGN mat_Pgn[J1939_MAX_PGN] =
    {0xFEFFU, "WFI",      "Water in Fuel Indicator"}
 };
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 C_CMONProtocolJ1939::C_CMONProtocolJ1939(void) : C_CMONProtocolBase()
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert CAN message to text representation.
 
    \param[in]     orc_Msg              message to convert
@@ -359,7 +359,7 @@ C_CMONProtocolJ1939::C_CMONProtocolJ1939(void) : C_CMONProtocolBase()
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolJ1939::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    uint8 u8_PduFormat;
@@ -606,19 +606,19 @@ C_SCLString C_CMONProtocolJ1939::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get name of protocol as string
 
    \return
    Text representation of protocol name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolJ1939::GetProtocolName(void) const
 {
    return "SAE J1939 06/2006";
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolJ1939::m_PgnToString(const uint32 ou32_Pgn) const
 {
@@ -663,14 +663,14 @@ C_SCLString C_CMONProtocolJ1939::m_PgnToString(const uint32 ou32_Pgn) const
    return c_Pgn;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 uint32 C_CMONProtocolJ1939::m_GetPgn(const uint8 * const opu8_Data) const
 {
    return (static_cast<uint32>(opu8_Data[2]) << 16) + (static_cast<uint32>(opu8_Data[1]) << 8) + opu8_Data[0];
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolJ1939::m_GetMessageSize(const T_STWCAN_Msg_RX & orc_Msg) const
 {
@@ -681,7 +681,7 @@ C_SCLString C_CMONProtocolJ1939::m_GetMessageSize(const T_STWCAN_Msg_RX & orc_Ms
    return c_Size;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolJ1939::m_GetData(const T_STWCAN_Msg_RX & orc_Msg, const uint8 ou8_StartIdx) const
 {
@@ -709,7 +709,7 @@ C_SCLString C_CMONProtocolJ1939::m_GetData(const T_STWCAN_Msg_RX & orc_Msg, cons
    return c_Data;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolJ1939::m_GetName(const T_STWCAN_Msg_RX & orc_Msg) const
 {

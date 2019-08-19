@@ -12,6 +12,7 @@
 #define C_SYVDAITPATREEMODEL_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include "C_TblTreItem.h"
 #include "C_TblTreModel.h"
 #include "C_PuiSvDbDataElementHandler.h"
 

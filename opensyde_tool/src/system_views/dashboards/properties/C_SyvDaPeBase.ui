@@ -693,6 +693,9 @@
           <item>
            <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxDataElementChangeable">
             <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <property name="spacing">
+              <number>0</number>
+             </property>
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -706,7 +709,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeLePropertiesToolTip" name="pc_LineEditDataElement">
+              <widget class="stw_opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditDataElement">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -722,40 +725,40 @@
               </widget>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonDataElement">
+              <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PushButtonClearDataElement">
                <property name="minimumSize">
                 <size>
-                 <width>50</width>
+                 <width>33</width>
                  <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>50</width>
+                 <width>33</width>
                  <height>30</height>
                 </size>
                </property>
                <property name="text">
-                <string>PushButton</string>
+                <string>Clear</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonClearDataElement">
+              <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonDataElement">
                <property name="minimumSize">
                 <size>
-                 <width>50</width>
+                 <width>33</width>
                  <height>30</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>50</width>
+                 <width>33</width>
                  <height>30</height>
                 </size>
                </property>
                <property name="text">
-                <string>PushButton</string>
+                <string>...</string>
                </property>
               </widget>
              </item>
@@ -831,7 +834,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeLePropertiesToolTip" name="pc_LineEditDataElementDisplayName">
+                <widget class="stw_opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditDataElementDisplayName">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
@@ -1370,6 +1373,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
    <header>C_OgeLabHeadingGroupBold.h</header>
@@ -1378,38 +1386,6 @@
    <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFrameSeparator.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItemValue</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItemValue.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
-   <extends>QComboBox</extends>
-   <header>C_OgeCbxText.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxGrayedEdit</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxGrayedEdit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -1434,6 +1410,48 @@
    <header>C_OgePubConfigure.h</header>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLeProperties.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubOpen</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubOpen.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGroupItemValue</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItemValue.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubPathVariables</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubPathVariables.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeChxProperties</class>
+   <extends>QCheckBox</extends>
+   <header>C_OgeChxProperties.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
+   <extends>QComboBox</extends>
+   <header>C_OgeCbxText.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxGrayedEdit</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxGrayedEdit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeFrame</class>
    <extends>QFrame</extends>
    <header>C_OgeFrame.h</header>
@@ -1445,11 +1463,6 @@
    <header>C_SebGraphicsView.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxProperties</class>
-   <extends>QCheckBox</extends>
-   <header>C_OgeChxProperties.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeSpxDoubleProperties</class>
    <extends>QDoubleSpinBox</extends>
    <header>C_OgeSpxDoubleProperties.h</header>
@@ -1458,11 +1471,6 @@
    <class>stw_opensyde_gui_elements::C_OgeSpxFactorProperties</class>
    <extends>QDoubleSpinBox</extends>
    <header>C_OgeSpxFactorProperties.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLePropertiesToolTip</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLePropertiesToolTip.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

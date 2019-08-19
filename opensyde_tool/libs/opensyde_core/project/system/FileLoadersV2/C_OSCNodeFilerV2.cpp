@@ -1451,6 +1451,9 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
                c_CurApplication.u8_ProcessId = 0U;
             }
 
+            // Set generated code version to 1 (new feature not supported by V2; but default would be 0)
+            c_CurApplication.u16_GenCodeVersion = 1U;
+
             //Type
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("type") == "type"))
             {

@@ -360,23 +360,20 @@ bool C_UsSystemView::GetNavigationExpandedStatus(void) const
 /*! \brief   Set dashboard integrated tab index
 
    \param[in] orc_DashboardName Dashboard name (identifier)
-   \param[in] os32_TabIndex     Current tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemView::SetDashboardMainTab(const QString & orc_DashboardName, const sint32 os32_TabIndex)
+void C_UsSystemView::SetDashboardMainTab(const QString & orc_DashboardName)
 {
    if (this->mc_Dashboards.contains(orc_DashboardName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
       C_UsSystemViewDashboard & rc_Dashboard = this->mc_Dashboards.operator [](orc_DashboardName);
       rc_Dashboard.q_TornOff = false;
-      rc_Dashboard.s32_MainWindowTabIndex = os32_TabIndex;
    }
    else
    {
       C_UsSystemViewDashboard c_DashboardSettings;
       c_DashboardSettings.q_TornOff = false;
-      c_DashboardSettings.s32_MainWindowTabIndex = os32_TabIndex;
       this->mc_Dashboards.insert(orc_DashboardName, c_DashboardSettings);
    }
 }

@@ -944,6 +944,17 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
                c_CurApplication.u8_ProcessId = 0U;
             }
 
+            if (orc_XMLParser.AttributeExists("generated-code-version"))
+            {
+               c_CurApplication.u16_GenCodeVersion =
+                  static_cast<uint16>(orc_XMLParser.GetAttributeUint32("generated-code-version"));
+            }
+            else
+            {
+               // probably deprecated project -> default to first version
+               c_CurApplication.u16_GenCodeVersion = 1U;
+            }
+
             //Type
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("type") == "type"))
             {
@@ -1092,6 +1103,8 @@ void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication>
       orc_XMLParser.CreateAndSelectNodeChild("application");
       orc_XMLParser.SetAttributeBool("active", rc_CurApplication.q_Active);
       orc_XMLParser.SetAttributeUint32("process-id", static_cast<uint32>(rc_CurApplication.u8_ProcessId));
+      orc_XMLParser.SetAttributeUint32("generated-code-version",
+                                       static_cast<uint32>(rc_CurApplication.u16_GenCodeVersion));
       orc_XMLParser.CreateNodeChild("type", C_OSCNodeApplication::h_ApplicationToString(rc_CurApplication.e_Type));
       orc_XMLParser.CreateNodeChild("name", rc_CurApplication.c_Name);
       orc_XMLParser.CreateNodeChild("comment", rc_CurApplication.c_Comment);

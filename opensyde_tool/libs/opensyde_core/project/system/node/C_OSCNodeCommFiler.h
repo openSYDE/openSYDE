@@ -70,6 +70,10 @@ private:
       const C_OSCCanSignal::E_ByteOrderType & ore_CommunicationByteOrder);
    static stw_types::sint32 mh_StringToCommunicationByteOrder(const stw_scl::C_SCLString & orc_String,
                                                               C_OSCCanSignal::E_ByteOrderType & ore_Type);
+   static stw_scl::C_SCLString mh_CommunicationMuxTypeToString(
+      const C_OSCCanSignal::E_MultiplexerType & ore_CommunicationByteOrder);
+   static stw_types::sint32 mh_StringToCommunicationMuxType(const stw_scl::C_SCLString & orc_String,
+                                                            C_OSCCanSignal::E_MultiplexerType & ore_Type);
    static stw_scl::C_SCLString mh_NodeComMessageTxMethodToString(
       const C_OSCCanMessage::E_TxMethodType & ore_NodeComMessageTxMethod);
    static stw_types::sint32 mh_StringToNodeComMessageTxMethod(const stw_scl::C_SCLString & orc_String,

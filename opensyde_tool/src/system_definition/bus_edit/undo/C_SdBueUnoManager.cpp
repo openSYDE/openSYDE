@@ -260,6 +260,7 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
    \param[in]     orc_UISignals          Signal ui data
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
+   \param[in]     oe_ProtocolType        Current active protocol to handle necessary adaptations
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -269,7 +270,8 @@ void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndice
                                        const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
                                        const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
                                        C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
-                                       QTreeWidget * const opc_MessageTreeWidget)
+                                       QTreeWidget * const opc_MessageTreeWidget,
+                                       const C_OSCCanProtocol::E_Type oe_ProtocolType)
 {
    //Check if consitent size
    if ((((orc_Signals.size() == orc_OSCSignalCommons.size()) &&
@@ -287,11 +289,13 @@ void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndice
             C_SdBueUnoSignalAddCommand * const pc_AddCommand = new C_SdBueUnoSignalAddCommand(orc_MessageId,
                                                                                               u32_CurrentSignalIndex,
                                                                                               orc_Signals[u32_ItSignal].u16_ComBitStart,
+                                                                                              C_OSCCanSignal::eMUX_DEFAULT, 0,
                                                                                               opc_MessageSyncManager,
                                                                                               pc_MessageTreeWidget,
                                                                                               pc_PasteCommand);
             pc_AddCommand->SetInitialData(orc_Signals[u32_ItSignal], orc_OSCSignalCommons[u32_ItSignal],
-                                          orc_UISignalCommons[u32_ItSignal], orc_UISignals[u32_ItSignal]);
+                                          orc_UISignalCommons[u32_ItSignal], orc_UISignals[u32_ItSignal],
+                                          oe_ProtocolType);
             ++u32_CurrentSignalIndex;
          }
          this->DoPush(pc_PasteCommand);
@@ -329,12 +333,17 @@ void C_SdBueUnoManager::DoDeleteMessage(const C_OSCCanMessageIdentificationIndic
    \param[in]     orc_MessageId          Message identification indices
    \param[in]     oru32_SignalIndex      Signal index
    \param[in]     ou16_StartBit          Start bit of signal
+   \param[in]     oe_MultiplexerType     Multiplexer signal type
+   \param[in]     ou16_MultiplexerValue  Multiplexer value (only relevant if
+                                         oe_MultiplexerType is eMUX_MULTIPLEXED_SIGNAL)
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoAddSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                     const uint32 & oru32_SignalIndex, const uint16 ou16_StartBit,
+                                    const C_OSCCanSignal::E_MultiplexerType oe_MultiplexerType,
+                                    const uint16 ou16_MultiplexerValue,
                                     C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                     QTreeWidget * const opc_MessageTreeWidget)
 {
@@ -342,7 +351,8 @@ void C_SdBueUnoManager::DoAddSignal(const C_OSCCanMessageIdentificationIndices &
    C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
       dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
 
-   this->DoPush(new C_SdBueUnoSignalAddCommand(orc_MessageId, oru32_SignalIndex, ou16_StartBit, opc_MessageSyncManager,
+   this->DoPush(new C_SdBueUnoSignalAddCommand(orc_MessageId, oru32_SignalIndex, ou16_StartBit, oe_MultiplexerType,
+                                               ou16_MultiplexerValue, opc_MessageSyncManager,
                                                pc_MessageTreeWidget));
 }
 

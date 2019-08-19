@@ -469,9 +469,65 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal,
       s32_Return = stw_errors::C_WARN;
    }
 
+   // Handle multiplexing information
+   if (orc_DbcSignal.multiplexorSwitch == true)
+   {
+      c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL;
+      c_Signal.u16_MultiplexValue = 0; //
+   }
+   else if (orc_DbcSignal.multiplexedSignal == true)
+   {
+      c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL;
+      c_Signal.u16_MultiplexValue = orc_DbcSignal.multiplexerSwitchValue;
+   }
+   else
+   {
+      c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_DEFAULT;
+      c_Signal.u16_MultiplexValue = 0; // default
+   }
+   C_CieImportDbc::mh_VerifySignalValueTable(c_Signal);
+
    orc_Message.c_CanMessage.c_Signals.push_back(c_Signal);
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Verify if all signal values are inside of the signal value range, if not: remove
+
+   \param[in,out] orc_DbcSignal Signal for which to clean up the value tables
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CieImportDbc::mh_VerifySignalValueTable(C_CieConverter::C_CIECanSignal & orc_DbcSignal)
+{
+   if (orc_DbcSignal.u16_ComBitLength <= 64U)
+   {
+      const uint64 u64_MaxVal = orc_DbcSignal.u16_ComBitLength ==
+                                64U ? std::numeric_limits<uint64>::max() : ((1ULL << orc_DbcSignal.u16_ComBitLength) -
+                                                                            1ULL);
+      for (std::map<uint32, stw_scl::C_SCLString>::const_iterator c_ItValueDescr =
+              orc_DbcSignal.c_ValueDescription.begin();
+           c_ItValueDescr != orc_DbcSignal.c_ValueDescription.end();)
+      {
+         if (static_cast<uint64>(c_ItValueDescr->first) <= u64_MaxVal)
+         {
+            //Fine, iterate to next position
+            ++c_ItValueDescr;
+         }
+         else
+         {
+            const C_SCLString & rc_String = orc_DbcSignal.c_Element.c_Name.c_str();
+            const C_SCLString & c_String2 = c_ItValueDescr->second;
+            osc_write_log_warning("DBC file import",
+                                  "signal \"" + rc_String + "\" value \"" + c_String2 +
+                                  "\" removed, because value " + C_SCLString::IntToStr(
+                                     c_ItValueDescr->first) + " out of range of " + C_SCLString::IntToStr(
+                                     orc_DbcSignal.u16_ComBitLength) + " bit");
+            //Remove, new item at current position
+            c_ItValueDescr = orc_DbcSignal.c_ValueDescription.erase(c_ItValueDescr);
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -660,6 +716,10 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
       else if (c_StartValue.valueType == Vector::DBC::AttributeValueType::Hex) // has the same representation as int
       {
          f64_InitialValue = static_cast<float64>(c_StartValue.hexValue);
+      }
+      else if (c_StartValue.valueType == Vector::DBC::AttributeValueType::Enum)
+      {
+         f64_InitialValue = static_cast<float64>(c_StartValue.enumValue);
       }
       else
       {
@@ -929,13 +989,22 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
          }
          catch (...)
          {
-            // strange, print a warning to user
-            s32_Return = stw_errors::C_WARN;
-            mhc_WarningMessages.Append("Default initial value for signals \"" + c_DefaultInitialValue +
-                                       "\" could not be interpreted. Default value set to \"0\".");
-            osc_write_log_warning("DBC file import",
-                                  "Default initial value for signals \"" + c_DefaultInitialValue +
-                                  "\" could not be interpreted. Default value set to \"0\".");
+            // could be of type enum
+            if ((c_DbcAttributeDefaults.second).valueType == Vector::DBC::AttributeValueType::Enum)
+            {
+               mhf32_DefaultInitialValue = static_cast<float32>((c_DbcAttributeDefaults.second).enumValue);
+               mhq_DefaultValueDefined = true;
+            }
+            else
+            {
+               // strange, print a warning to user
+               s32_Return = stw_errors::C_WARN;
+               mhc_WarningMessages.Append("Default initial value for signals \"" + c_DefaultInitialValue +
+                                          "\" could not be interpreted. Default value set to \"0\".");
+               osc_write_log_warning("DBC file import",
+                                     "Default initial value for signals \"" + c_DefaultInitialValue +
+                                     "\" could not be interpreted. Default value set to \"0\".");
+            }
          }
          break;
       }
@@ -976,7 +1045,7 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
    // this is the default (in case of attribute missing)
    orc_Message.c_CanMessage.u32_CycleTimeMs = 0U;
 
-   // search for attribute cycle time (cylce time also means cyclic transmission methode)
+   // search for attribute cycle time (cycle time also means cyclic transmission method)
    for (auto c_DbcAttributeValue : orc_DbcMessage.attributeValues)
    {
       if (mhc_CycleTime.AnsiCompare(c_DbcAttributeValue.first.c_str()) == 0)
@@ -990,8 +1059,8 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
    }
 
    // set global default send type
-   // 2018-06-18 DPO: do not print any warnings if specific message has no explicit send type
-   if (mhc_DefaultSendTypeValue.Pos("cyclic"))
+   // do not print any warnings if specific message has no explicit send type
+   if (mhc_DefaultSendTypeValue.LowerCase().Pos("cyclic"))
    {
       orc_Message.c_CanMessage.e_TxMethod = C_OSCCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC;
    }
@@ -1000,7 +1069,7 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
       orc_Message.c_CanMessage.e_TxMethod = C_OSCCanMessage::E_TxMethodType::eTX_METHOD_ON_EVENT;
    }
 
-   // search for attribute send type (keyword 'cyclic' shall always indicate openSYDE methode eTX_METHOD_CYCLIC,
+   // search for attribute send type (keyword 'cyclic' shall always indicate openSYDE method eTX_METHOD_CYCLIC,
    // otherwise it shall be of type eTX_METHOD_ON_EVENT)
    for (auto c_DbcAttributeValue : orc_DbcMessage.attributeValues)
    {
@@ -1019,24 +1088,24 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
             {
                if (c_Tmp.Pos("cyclic") > 0)
                {
+                  orc_Message.c_CanMessage.e_TxMethod = C_OSCCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC;
                   // only display warning if it does not match exactly (case-insensitive)
                   if (c_Tmp != "cyclic")
                   {
-                     orc_Message.c_CanMessage.e_TxMethod = C_OSCCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC;
-                     osc_write_log_warning("DBC file import",
-                                           "Message type \"" + c_MessageType + "\" interpreted as \"Cyclic\".");
-                     orc_Message.c_Warnings.Append("Message type \"" + c_MessageType + "\" interpreted as \"Cyclic\".");
+                     const C_SCLString c_Message = "Message type \"" + c_MessageType + "\" interpreted as \"Cyclic\".";
+
+                     osc_write_log_warning("DBC file import", c_Message);
+                     orc_Message.c_Warnings.Append(c_Message);
                   }
                }
                else
                {
-                  // all other messages send types shall interpreted as "OnEvent"
+                  // all other messages send types shall be interpreted as "OnEvent"
+                  orc_Message.c_CanMessage.e_TxMethod = C_OSCCanMessage::E_TxMethodType::eTX_METHOD_ON_EVENT;
                   // only display warning if it does not match exactly (case-insensitive)
                   if (c_Tmp != "onevent")
                   {
-                     orc_Message.c_CanMessage.e_TxMethod = C_OSCCanMessage::E_TxMethodType::eTX_METHOD_ON_EVENT;
-                     const C_SCLString c_Message = "Message type \"" + c_MessageType +
-                                                   "\" interpreted as \"OnEvent\".";
+                     const C_SCLString c_Message = "Message type \"" + c_MessageType + "\" interpreted as \"OnEvent\".";
                      osc_write_log_warning("DBC file import", c_Message);
                      orc_Message.c_Warnings.Append(c_Message);
                   }

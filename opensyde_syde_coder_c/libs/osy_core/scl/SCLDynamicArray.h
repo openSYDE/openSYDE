@@ -17,11 +17,11 @@
 #ifndef SCLDYNAMICARRAYH
 #define SCLDYNAMICARRAYH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_scl
 {
 //maybe this will be a part of a Borland library:
@@ -33,9 +33,9 @@ namespace stw_scl
 #endif
 #endif
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 //suppress PC-Lint false positives (those do have side-effects):
 //lint -estring(1960,"stw_scl::SCLDynamicArray<<1>>::Delete(long)")
@@ -70,7 +70,7 @@ public:
    void IncLength(const stw_types::sint32 os32_By = 1);
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set length of array
 
    Sets the number of elements in the array.
@@ -79,7 +79,7 @@ public:
 
    \param[in]     os32_Length    new array length
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> void SCLDynamicArray<T>::SetLength(const stw_types::sint32 os32_Length)
 {
@@ -90,7 +90,7 @@ template <class T> void SCLDynamicArray<T>::SetLength(const stw_types::sint32 os
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Increase length of array
 
    Increase length of array.
@@ -99,14 +99,14 @@ template <class T> void SCLDynamicArray<T>::SetLength(const stw_types::sint32 os
 
    \param[in]     os32_By   number of elements to add (use a negative value to reduce length)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> void SCLDynamicArray<T>::IncLength(const stw_types::sint32 os32_By)
 {
    this->SetLength(static_cast<stw_types::sint32>(mc_Array.size()) + os32_By);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   get number of entries in array
 
    Return length of array.
@@ -114,14 +114,14 @@ template <class T> void SCLDynamicArray<T>::IncLength(const stw_types::sint32 os
    \return
    number of elements in array
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> stw_types::sint32 SCLDynamicArray<T>::GetLength(void) const
 {
    return static_cast<stw_types::sint32>(mc_Array.size());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   get index of last entry in array
 
    Return highest valid index of array.
@@ -131,7 +131,7 @@ template <class T> stw_types::sint32 SCLDynamicArray<T>::GetLength(void) const
    \return
    Index of last entry in array
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> stw_types::sint32 SCLDynamicArray<T>::GetHigh(void) const
 {
@@ -144,7 +144,7 @@ template <class T> stw_types::sint32 SCLDynamicArray<T>::GetHigh(void) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   get reference to array element
 
    Return reference to array element.
@@ -155,14 +155,14 @@ template <class T> stw_types::sint32 SCLDynamicArray<T>::GetHigh(void) const
    \return
    Reference to selected index
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> T & SCLDynamicArray<T>::operator [](const stw_types::sint32 os32_Index)
 {
    return mc_Array[os32_Index];
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   get const reference to array element
 
    Return const reference to array element.
@@ -173,50 +173,50 @@ template <class T> T & SCLDynamicArray<T>::operator [](const stw_types::sint32 o
    \return
    Reference to selected index
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> const T & SCLDynamicArray<T>::operator [](const stw_types::sint32 os32_Index) const
 {
    return mc_Array.operator [](os32_Index);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   copy constructor
 
    Assign content from pre-existing array.
 
    \param[in]   orc_Src   source array
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> SCLDynamicArray<T>::SCLDynamicArray(const SCLDynamicArray<T> & orc_Src)
 {
    this->operator =(orc_Src);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default constructor
 
    Nothing special to do here ...
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> SCLDynamicArray<T>::SCLDynamicArray(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   default destructor
 
    Nothing special to do here ...
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> SCLDynamicArray<T>::~SCLDynamicArray(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   assignment operator
 
    Copy specified data over existing data.
@@ -225,7 +225,7 @@ template <class T> SCLDynamicArray<T>::~SCLDynamicArray(void)
 
    \return  reference to (*this)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> SCLDynamicArray<T> & SCLDynamicArray<T>::operator =(const SCLDynamicArray<T> & orc_Src)
 {
@@ -236,7 +236,7 @@ template <class T> SCLDynamicArray<T> & SCLDynamicArray<T>::operator =(const SCL
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   delete one element from array
 
    Delete (destroy) one element from the array.
@@ -247,7 +247,7 @@ template <class T> SCLDynamicArray<T> & SCLDynamicArray<T>::operator =(const SCL
 
    \param[in]  os32_Index   index of element to erase (0 = first element)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> void SCLDynamicArray<T>::Delete(const stw_types::sint32 os32_Index)
 {
@@ -260,7 +260,7 @@ template <class T> void SCLDynamicArray<T>::Delete(const stw_types::sint32 os32_
    (void)mc_Array.erase(c_Index);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   insert one element into array
 
    Insert one element into the array.
@@ -272,7 +272,7 @@ template <class T> void SCLDynamicArray<T>::Delete(const stw_types::sint32 os32_
    \param[in]  os32_Index   index to insert the new element at (0 = first element)
    \param[in]  orc_Src      element to insert
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
 template <class T> void SCLDynamicArray<T>::Insert(const stw_types::sint32 os32_Index, const T & orc_Src)
 {
@@ -285,7 +285,7 @@ template <class T> void SCLDynamicArray<T>::Insert(const stw_types::sint32 os32_
    (void)mc_Array.insert(c_Index, orc_Src);
 }
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

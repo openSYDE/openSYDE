@@ -965,8 +965,6 @@ bool C_OSCComMessageLogger::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Interprets the system definition message
 
-   This function is thread safe.
-
    \param[in,out] orc_MessageData    Message data target for the interpretation
 
    \return
@@ -982,30 +980,59 @@ bool C_OSCComMessageLogger::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_Me
        (this->mpc_OsySysDefDataPoolList != NULL))
    {
       uint32 u32_Counter;
+      bool q_MultiplexerFound = false;
+      uint32 u32_MultiplexerIndex = 0U;
+      uint16 u16_MultiplexValue = 0U;
 
       orc_MessageData.c_Name = this->mpc_OsySysDefMessage->c_Name.c_str();
 
-      // Interpret the signals
+      // Check if a multiplexer signal exists
       for (u32_Counter = 0U; u32_Counter < this->mpc_OsySysDefMessage->c_Signals.size(); ++u32_Counter)
       {
          const C_OSCCanSignal & rc_OscSignal = this->mpc_OsySysDefMessage->c_Signals[u32_Counter];
 
-         if (rc_OscSignal.u32_ComDataElementIndex < this->mpc_OsySysDefDataPoolList->c_Elements.size())
+         if (rc_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
          {
-            C_OSCComMessageLoggerDataSignal c_Signal;
-            const C_OSCNodeDataPoolListElement & rc_OscElement =
-               this->mpc_OsySysDefDataPoolList->c_Elements[rc_OscSignal.u32_ComDataElementIndex];
+            this->m_InterpretSysDefCanSignal(orc_MessageData, rc_OscSignal);
 
-            c_Signal.c_Name = rc_OscElement.c_Name.c_str();
-            c_Signal.c_Unit = rc_OscElement.c_Unit.c_str();
-            c_Signal.c_Comment = rc_OscElement.c_Comment.c_str();
+            if (orc_MessageData.c_Signals.size() > 0)
+            {
+               const C_OSCComMessageLoggerDataSignal & rc_Signal =
+                  orc_MessageData.c_Signals[orc_MessageData.c_Signals.size() - 1];
 
-            // Get the current value for the correct type configuration
-            mh_InterpretCanSignalValue(c_Signal, orc_MessageData.c_CanMsg.au8_Data, orc_MessageData.c_CanMsg.u8_DLC,
-                                       rc_OscSignal, rc_OscElement.c_Value, rc_OscElement.f64_Factor,
-                                       rc_OscElement.f64_Offset);
+               if (rc_Signal.q_DlcError == false)
+               {
+                  try
+                  {
+                     u16_MultiplexValue = static_cast<uint16>(rc_Signal.c_RawValueDec.ToInt());
+                     q_MultiplexerFound = true;
+                     u32_MultiplexerIndex = u32_Counter;
+                  }
+                  catch (...)
+                  {
+                  }
+               }
+            }
+            break;
+         }
+      }
 
-            orc_MessageData.c_Signals.push_back(c_Signal);
+      // Interpret the signals
+      for (u32_Counter = 0U; u32_Counter < this->mpc_OsySysDefMessage->c_Signals.size(); ++u32_Counter)
+      {
+         // Skip the multiplexer signal if one was found. It was added already.
+         if ((q_MultiplexerFound == false) ||
+             (u32_Counter != u32_MultiplexerIndex))
+         {
+            const C_OSCCanSignal & rc_OscSignal = this->mpc_OsySysDefMessage->c_Signals[u32_Counter];
+
+            // Interpret all not multiplexed signals and all multiplexed signals with the matching multiplexer value
+            if ((rc_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT) ||
+                ((q_MultiplexerFound == true) &&
+                 (u16_MultiplexValue == rc_OscSignal.u16_MultiplexValue)))
+            {
+               this->m_InterpretSysDefCanSignal(orc_MessageData, rc_OscSignal);
+            }
          }
       }
 
@@ -1071,22 +1098,6 @@ C_SCLString C_OSCComMessageLogger::m_GetOsySysDefStringDec(void) const
    }
 
    return c_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the timestamp as string
-
-   Using C_CMONProtocols implementation
-
-   \param[in]     ou64_TimeStamp   Timestamp in us
-
-   \return
-   Formatted timestamp
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComMessageLogger::m_GetTimestampAsString(const uint64 ou64_TimeStamp) const
-{
-   return C_CMONProtocols::FormatTimeStamp(ou64_TimeStamp, true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1298,9 +1309,9 @@ void C_OSCComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
    }
 
    this->mc_HandledCanMessage.c_TimeStampAbsolute =
-      this->m_GetTimestampAsString(this->mc_HandledCanMessage.u64_TimeStampAbsolute);
+      C_OSCComMessageLoggerData::h_GetTimestampAsString(this->mc_HandledCanMessage.u64_TimeStampAbsolute);
    this->mc_HandledCanMessage.c_TimeStampRelative =
-      this->m_GetTimestampAsString(this->mc_HandledCanMessage.u64_TimeStampRelative);
+      C_OSCComMessageLoggerData::h_GetTimestampAsString(this->mc_HandledCanMessage.u64_TimeStampRelative);
    // Save the timestamp for the next message to calculate the relative timestamp
    this->mu64_LastTimeStamp = orc_Msg.u64_TimeStamp;
 
@@ -1335,6 +1346,36 @@ void C_OSCComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
          ++c_ItCounter->second;
          this->mc_HandledCanMessage.c_Counter = C_SCLString::IntToStr(c_ItCounter->second);
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Interprets the system definition message signal
+
+   \param[in,out] orc_MessageData    Message data target for the interpretation
+   \param[in]     orc_OscSignal      CAN signal of system definition
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCComMessageLogger::m_InterpretSysDefCanSignal(C_OSCComMessageLoggerData & orc_MessageData,
+                                                       const C_OSCCanSignal & orc_OscSignal) const
+{
+   if ((this->mpc_OsySysDefDataPoolList != NULL) &&
+       (orc_OscSignal.u32_ComDataElementIndex < this->mpc_OsySysDefDataPoolList->c_Elements.size()))
+   {
+      C_OSCComMessageLoggerDataSignal c_Signal;
+      const C_OSCNodeDataPoolListElement & rc_OscElement =
+         this->mpc_OsySysDefDataPoolList->c_Elements[orc_OscSignal.u32_ComDataElementIndex];
+
+      c_Signal.c_Name = rc_OscElement.c_Name.c_str();
+      c_Signal.c_Unit = rc_OscElement.c_Unit.c_str();
+      c_Signal.c_Comment = rc_OscElement.c_Comment.c_str();
+
+      // Get the current value for the correct type configuration
+      mh_InterpretCanSignalValue(c_Signal, orc_MessageData.c_CanMsg.au8_Data, orc_MessageData.c_CanMsg.u8_DLC,
+                                 orc_OscSignal, rc_OscElement.c_Value, rc_OscElement.f64_Factor,
+                                 rc_OscElement.f64_Offset);
+
+      orc_MessageData.c_Signals.push_back(c_Signal);
    }
 }
 

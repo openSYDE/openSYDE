@@ -328,7 +328,7 @@ void C_GiSvPc::LoadData(void)
       C_GiCustomFunctions::h_AdaptMouseRangePos(c_PcData.c_UIPosition);
       this->LoadBasicData(c_PcData);
       //Overwrite z order
-      this->setZValue(mf64_ZORDER_MAX - 1.0);
+      this->SetZValueCustom(mf64_ZORDER_MAX - 1.0);
       // And adapt size
       this->ApplySizeChange(c_PcData.c_UIPosition, QSizeF(c_PcData.f64_Width, c_PcData.f64_Height));
    }

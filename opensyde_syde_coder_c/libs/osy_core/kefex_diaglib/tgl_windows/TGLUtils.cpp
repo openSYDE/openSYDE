@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -25,25 +25,25 @@
 #define STR_TABLE_INCLUDE  //we really want the symbols from the DLStrings.h header
 #include "DLStrings.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_tgl;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 static C_SCLResourceStrings mc_ResourceStrings;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Report assertion
 
    In this implementation: Display a messagebox with an error message containing all specified details.
@@ -52,7 +52,7 @@ static C_SCLResourceStrings mc_ResourceStrings;
    \param[in]   opcn_Func    Function name where the problem turned up
    \param[in]   os32_Line    Line number where the problem turned up
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void TGL_PACKAGE stw_tgl::TGL_ReportAssertion(const charn * const opcn_Module, const charn * const opcn_Func,
                                               const sint32 os32_Line)
 {
@@ -64,7 +64,7 @@ void TGL_PACKAGE stw_tgl::TGL_ReportAssertion(const charn * const opcn_Module, c
                                                             //provided by system headers; no problems expected
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   report assertion with detail
 
    Show a messagebox with a detailed error message.
@@ -74,7 +74,7 @@ void TGL_PACKAGE stw_tgl::TGL_ReportAssertion(const charn * const opcn_Module, c
    \param[in]     opcn_Func              Function name where the problem turned up
    \param[in]     os32_Line              Line number where the problem turned up
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void TGL_PACKAGE stw_tgl::TGL_ReportAssertionDetail(const charn * const opcn_DetailInfo,
                                                     const charn * const opcn_Module, const charn * const opcn_Func,
                                                     const sint32 os32_Line)
@@ -87,7 +87,7 @@ void TGL_PACKAGE stw_tgl::TGL_ReportAssertionDetail(const charn * const opcn_Det
                                                                      //provided by system headers; no problems expected
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   get system user name
 
    Reports the name of the currently logged in system user (i.e. the user running the active process)
@@ -98,7 +98,7 @@ void TGL_PACKAGE stw_tgl::TGL_ReportAssertionDetail(const charn * const opcn_Det
    true      user name detected and places in oc_UserName  \n
    false     error -> oc_UserName not valid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool TGL_PACKAGE stw_tgl::TGL_GetSystemUserName(C_SCLString & orc_UserName)
 {
    charn acn_WinUserName[UNLEN + 1];
@@ -117,13 +117,13 @@ bool TGL_PACKAGE stw_tgl::TGL_GetSystemUserName(C_SCLString & orc_UserName)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Poll system message queue
 
    Polls the system's message queue and posts detected messages for handling.
    This function can be used to proceed processing system messages while actively waiting for an event.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void TGL_PACKAGE stw_tgl::TGL_HandleSystemMessages(void)
 {
    MSG t_Msg;
@@ -137,7 +137,7 @@ void TGL_PACKAGE stw_tgl::TGL_HandleSystemMessages(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   load resource string
 
    Load resource strings from resource table.
@@ -154,7 +154,7 @@ void TGL_PACKAGE stw_tgl::TGL_HandleSystemMessages(void)
    \return
    string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString TGL_PACKAGE stw_tgl::TGL_LoadStr(const uint16 ou16_StringIndex)
 {
    static bool hq_Initialized = false;
@@ -168,7 +168,7 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_LoadStr(const uint16 ou16_StringIndex)
    return mc_ResourceStrings.LoadStr(ou16_StringIndex);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set environment variable for calling process
 
    Sets an environment variable to a fixed value.
@@ -180,7 +180,7 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_LoadStr(const uint16 ou16_StringIndex)
    0   variable set
    -1  could not set variable
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 TGL_PACKAGE stw_tgl::TGL_SetEnvironmentVariable(const C_SCLString & orc_Name, const C_SCLString & orc_Value)
 {
    sintn sn_Return;

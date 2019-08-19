@@ -1152,7 +1152,38 @@ bool File::readAttributeValueNetwork(Network & network, std::string & line)
 
         // Enumeration
         case AttributeValueType::Enum:
-            attribute.enumValue = stoul(attributeValue);
+            // 2019-07-26 STW: added handling for non-numerical values
+            //                 Attribute values are allowed to be of type char_string
+            //                 (cf. DBC File Format Documentation, Version 1.0.6, chapter 12).
+            //                 In the Enum-case the value must match an enum identifier.
+            //                 Because stoul throws an exception for strings that are no numbers,
+            //                 files that use this feature caused a crash.
+            try
+            {
+                attribute.enumValue = stoul(attributeValue);
+            }
+            catch (...)
+            {
+                // remove leading and trailing '"'
+                if(attributeValue.front() == '"')
+                {
+                   attributeValue.erase(attributeValue.begin());
+                }
+
+                if(attributeValue.back() == '"')
+                {
+                   attributeValue.erase(attributeValue.end() - 1);
+                }
+
+                // string must exist in attributeDefinition enum names
+                const std::vector<std::string>::const_iterator c_EnumIt =
+                      std::find(attributeDefinition.enumValues.begin(), attributeDefinition.enumValues.end(),
+                                attributeValue);
+                if(c_EnumIt != attributeDefinition.enumValues.end())
+                {
+                   attribute.enumValue = c_EnumIt - attributeDefinition.enumValues.begin();
+                }
+            }
             break;
         }
         return true;
@@ -1214,7 +1245,38 @@ bool File::readAttributeValueNode(Network & network, std::string & line)
 
         // Enumeration
         case AttributeValueType::Enum:
-            attribute.enumValue = stoul(attributeValue);
+            // 2019-07-26 STW: added handling for non-numerical values
+            //                 Attribute values are allowed to be of type char_string
+            //                 (cf. DBC File Format Documentation, Version 1.0.6, chapter 12).
+            //                 In the Enum-case the value must match an enum identifier.
+            //                 Because stoul throws an exception for strings that are no numbers,
+            //                 files that use this feature caused a crash.
+            try
+            {
+                attribute.enumValue = stoul(attributeValue);
+            }
+            catch (...)
+            {
+                // remove leading and trailing '"'
+                if(attributeValue.front() == '"')
+                {
+                   attributeValue.erase(attributeValue.begin());
+                }
+
+                if(attributeValue.back() == '"')
+                {
+                   attributeValue.erase(attributeValue.end() - 1);
+                }
+
+                // string must exist in attributeDefinition enum names
+                const std::vector<std::string>::const_iterator c_EnumIt =
+                      std::find(attributeDefinition.enumValues.begin(), attributeDefinition.enumValues.end(),
+                                attributeValue);
+                if(c_EnumIt != attributeDefinition.enumValues.end())
+                {
+                   attribute.enumValue = c_EnumIt - attributeDefinition.enumValues.begin();
+                }
+            }
             break;
         }
         return true;
@@ -1274,7 +1336,38 @@ bool File::readAttributeValueMessage(Network & network, std::string & line)
 
         // Enumeration
         case AttributeValueType::Enum:
-            attribute.enumValue = stoul(attributeValue);
+           // 2019-07-26 STW: added handling for non-numerical values
+           //                 Attribute values are allowed to be of type char_string
+           //                 (cf. DBC File Format Documentation, Version 1.0.6, chapter 12).
+           //                 In the Enum-case the value must match an enum identifier.
+           //                 Because stoul throws an exception for strings that are no numbers,
+           //                 files that use this feature caused a crash.
+           try
+           {
+               attribute.enumValue = stoul(attributeValue);
+           }
+           catch (...)
+           {
+               // remove leading and trailing '"'
+               if(attributeValue.front() == '"')
+               {
+                  attributeValue.erase(attributeValue.begin());
+               }
+
+               if(attributeValue.back() == '"')
+               {
+                  attributeValue.erase(attributeValue.end() - 1);
+               }
+
+               // string must exist in attributeDefinition enum names
+               const std::vector<std::string>::const_iterator c_EnumIt =
+                     std::find(attributeDefinition.enumValues.begin(), attributeDefinition.enumValues.end(),
+                               attributeValue);
+               if(c_EnumIt != attributeDefinition.enumValues.end())
+               {
+                  attribute.enumValue = c_EnumIt - attributeDefinition.enumValues.begin();
+               }
+           }
             break;
         }
         return true;
@@ -1335,8 +1428,39 @@ bool File::readAttributeValueSignal(Network & network, std::string & line)
 
         // Enumeration
         case AttributeValueType::Enum:
-            attribute.enumValue = stoul(attributeValue);
-            break;
+           // 2019-07-26 STW: added handling for non-numerical values
+           //                 Attribute values are allowed to be of type char_string
+           //                 (cf. DBC File Format Documentation, Version 1.0.6, chapter 12).
+           //                 In the Enum-case the value must match an enum identifier.
+           //                 Because stoul throws an exception for strings that are no numbers,
+           //                 files that use this feature caused a crash.
+           try
+           {
+               attribute.enumValue = stoul(attributeValue);
+           }
+           catch (...)
+           {
+               // remove leading and trailing '"'
+               if(attributeValue.front() == '"')
+               {
+                  attributeValue.erase(attributeValue.begin());
+               }
+
+               if(attributeValue.back() == '"')
+               {
+                  attributeValue.erase(attributeValue.end() - 1);
+               }
+
+               // string must exist in attributeDefinition enum names
+               const std::vector<std::string>::const_iterator c_EnumIt =
+                     std::find(attributeDefinition.enumValues.begin(), attributeDefinition.enumValues.end(),
+                               attributeValue);
+               if(c_EnumIt != attributeDefinition.enumValues.end())
+               {
+                  attribute.enumValue = c_EnumIt - attributeDefinition.enumValues.begin();
+               }
+           }
+           break;
         }
         return true;
     }
@@ -1395,7 +1519,38 @@ bool File::readAttributeValueEnvironmentVariable(Network & network, std::string 
 
         // Enumeration
         case AttributeValueType::Enum:
-            attribute.enumValue = stoul(attributeValue);
+            // 2019-07-26 STW: added handling for non-numerical values
+            //                 Attribute values are allowed to be of type char_string
+            //                 (cf. DBC File Format Documentation, Version 1.0.6, chapter 12).
+            //                 In the Enum-case the value must match an enum identifier.
+            //                 Because stoul throws an exception for strings that are no numbers,
+            //                 files that use this feature caused a crash.
+            try
+            {
+                attribute.enumValue = stoul(attributeValue);
+            }
+            catch (...)
+            {
+                // remove leading and trailing '"'
+                if(attributeValue.front() == '"')
+                {
+                   attributeValue.erase(attributeValue.begin());
+                }
+
+                if(attributeValue.back() == '"')
+                {
+                   attributeValue.erase(attributeValue.end() - 1);
+                }
+
+                // string must exist in attributeDefinition enum names
+                const std::vector<std::string>::const_iterator c_EnumIt =
+                      std::find(attributeDefinition.enumValues.begin(), attributeDefinition.enumValues.end(),
+                                attributeValue);
+                if(c_EnumIt != attributeDefinition.enumValues.end())
+                {
+                   attribute.enumValue = c_EnumIt - attributeDefinition.enumValues.begin();
+                }
+            }
             break;
         }
         return true;
@@ -1516,7 +1671,38 @@ void File::readAttributeRelationValue(Network & network, std::string & line)
 
         // Enumeration
         case AttributeValueType::Enum:
-            attributeRelation.enumValue = stoul(attributeValue);
+            // 2019-07-26 STW: added handling for non-numerical values
+            //                 Attribute values are allowed to be of type char_string
+            //                 (cf. DBC File Format Documentation, Version 1.0.6, chapter 12).
+            //                 In the Enum-case the value must match an enum identifier.
+            //                 Because stoul throws an exception for strings that are no numbers,
+            //                 files that use this feature caused a crash.
+            try
+            {
+                attributeRelation.enumValue = stoul(attributeValue);
+            }
+            catch (...)
+            {
+                // remove leading and trailing '"'
+                if(attributeValue.front() == '"')
+                {
+                   attributeValue.erase(attributeValue.begin());
+                }
+
+                if(attributeValue.back() == '"')
+                {
+                   attributeValue.erase(attributeValue.end() - 1);
+                }
+
+                // string must exist in attributeDefinition enum names
+                const std::vector<std::string>::const_iterator c_EnumIt =
+                      std::find(attributeDefinition.enumValues.begin(), attributeDefinition.enumValues.end(),
+                                attributeValue);
+                if(c_EnumIt != attributeDefinition.enumValues.end())
+                {
+                   attributeRelation.enumValue = c_EnumIt - attributeDefinition.enumValues.begin();
+                }
+            }
             break;
         }
         network.attributeRelationValues.insert(attributeRelation);
@@ -1530,7 +1716,7 @@ void File::readAttributeRelationValue(Network & network, std::string & line)
 }
 
 /* Value Descriptions (VAL) for Signals (SG) */
-bool File::readValueDescriptionSignal(Network & network, std::string & line)
+bool File::readValueDescriptionSignal(Network & network, std::ifstream & ifs, std::string & line)
 {
    // 2018-09-20 STW: after discussion with colleagues we replace the following code lines.
    //                 Reason is a known stack overflow problem with the std::regex function
@@ -1552,35 +1738,74 @@ bool File::readValueDescriptionSignal(Network & network, std::string & line)
    //                 At the moment the most appropriate way seems to replace the implementation by using simple
    //                 string operations.
    //                 Hint: the statusCallback is not used. If it is used you must take care of it.
-   // 2019-02-22 STW: Adapted our replacement and added some defensive checks for std::string::erase in combination
+   // 2019-05-29 STW: Adapted our replacement and added some defensive checks for std::string::erase in combination
    //                 with finding a specific character. No ";" in a VAL_ line led to crashes. This issue occured on
    //                 files with line breaks between different values. Parsing such files will still not work correctly,
    //                 because at the moment only the first line is considered.
+   // 2019-06-04 STW: Adapted interface for multiline value description: Values that contain line breaks between VAL_
+   //                 and the semicolon ';' were ignored in original implementation and also in our fix.
+   //                 Now if no semicolon is found we assume that the semicolon is in one of the next lines. We
+   //                 therefore concatenate the next lines recursively till either a line is empty or there is a ';'
+   //                 found. Ending a signal value description with semicolon is mandatory according to DBC File Format
+   //                 Documentation (Version 1.0.6.).
 
    const char * pcn_Trim = " \t\r\n\v\f";
    std::string c_SearchLine = line;
    bool q_Return = false;
    size_t un_Pos;
 
+   // Trim left
    un_Pos = c_SearchLine.find_first_not_of(pcn_Trim);
 
    if (un_Pos < c_SearchLine.size())
    {
-      c_SearchLine.erase(un_Pos);
+      c_SearchLine.erase(0, un_Pos);
    }
 
    if (c_SearchLine.substr(0, 4) == "VAL_")
    {
       unsigned int un_MessageId;
       std::string c_SignalName;
-
+      bool q_NextLine = true;
       q_Return = true;
-      // Trim right and remove line ending of value description
-      un_Pos = c_SearchLine.find_first_of(';');
-      if (un_Pos < c_SearchLine.size())
+
+      while(q_NextLine == true)
       {
-         c_SearchLine.erase(un_Pos);
+         un_Pos = c_SearchLine.find_first_of(';');
+         if (un_Pos < c_SearchLine.size())
+         {
+            c_SearchLine.erase(un_Pos);
+            q_NextLine = false;
+         }
+         else
+         {
+            // try next line
+            std::string c_NextLine;
+            std::getline(ifs, c_NextLine);
+
+            // stop if line is empty
+            if(c_NextLine == "")
+            {
+               q_NextLine = false;
+               q_Return = false;
+            }
+            else
+            {
+               // Trim left
+               un_Pos = c_NextLine.find_first_not_of(pcn_Trim);
+
+               if (un_Pos < c_NextLine.size())
+               {
+                  c_NextLine.erase(0, un_Pos);
+               }
+
+               // concatenate with line
+               c_SearchLine = c_SearchLine + c_NextLine;
+            }
+         }
       }
+
+      // Trim right and remove line ending of value description
       c_SearchLine.erase(c_SearchLine.find_last_not_of(pcn_Trim) + 1);
 
       // Remove the VAL_
@@ -1732,10 +1957,13 @@ bool File::readValueDescriptionEnvironmentVariable(Network & network, std::strin
 }
 
 /* Value Descriptions (VAL) */
-void File::readValueDescription(Network & network, std::string & line)
+void File::readValueDescription(Network & network, std::ifstream & ifs, std::string & line)
 {
     // for signal
-    if (readValueDescriptionSignal(network, line)) {
+    // 2019-06-04 STW: adapted interface for multiline value description
+    //                 (could also be useful for readValueDescriptionEnvironmentVariable, but we have not seen any
+    //                  DBC file where this is necessary)
+    if (readValueDescriptionSignal(network, ifs, line)) {
         return;
     }
 
@@ -2008,7 +2236,8 @@ Status File::load(Network & network, const char * filename)
 
             /* Value Descriptions (VAL) */
             if (name == "VAL_") {
-                readValueDescription(network, line);
+               // 2019-06-04 STW: adapted interface for multiline value description
+                readValueDescription(network, ifs, line);
             } else
 
             /* Category Definitions (CAT_DEF, obsolete) */

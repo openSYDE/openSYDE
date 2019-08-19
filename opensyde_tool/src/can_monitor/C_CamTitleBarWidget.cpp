@@ -44,7 +44,7 @@ using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //C_GtGetText does not work here (executed before main)
-const QString C_CamTitleBarWidget::mhc_FILTER = QString("openSYDE Parameter Set File (*%1)").arg(".syde_cam");
+const QString C_CamTitleBarWidget::mhc_FILTER = "openSYDE CAN Monitor Project (*.syde_cam)";
 const QString C_CamTitleBarWidget::mhc_NORECENTPROJECT = "No recent project found. Click here to browse.";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -428,12 +428,10 @@ void C_CamTitleBarWidget::m_OnOpenProjectClicked(void)
 {
    if (HandleProjectComparison() == true)
    {
-      const QString c_FullFilePath = QFileDialog::getOpenFileName(this,
-                                                                  C_GtGetText::h_GetText(
-                                                                     "Select opeSYDE CAN monitor project file"),
-                                                                  C_Uti::h_GetExePath(),
-                                                                  C_CamTitleBarWidget::mhc_FILTER,
-                                                                  NULL);
+      const QString c_FullFilePath =
+         QFileDialog::getOpenFileName(this,
+                                      C_GtGetText::h_GetText("Select openSYDE CAN Monitor Project File"),
+                                      C_Uti::h_GetExePath(), C_CamTitleBarWidget::mhc_FILTER, NULL);
       if (c_FullFilePath != "")
       {
          // Let all modules save their specific user settings before saving to file

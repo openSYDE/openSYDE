@@ -23,6 +23,7 @@
 #include "C_OgePopUpDialog.h"
 #include "C_CieImportDbc.h"
 #include "C_UsHandler.h"
+#include "C_OgeWiUtil.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_CieDataPoolComListImportReportWidget.h"
@@ -144,6 +145,8 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
                   c_ImportWarnings.SetHeading(C_GtGetText::h_GetText("DBC file import"));
                   c_ImportWarnings.SetDescription(C_GtGetText::h_GetText("Warnings occurred during DBC file import."));
                   c_ImportWarnings.SetDetails(c_Warnings);
+                  c_ImportWarnings.SetCustomMinWidth(750);
+                  c_ImportWarnings.SetCustomMinHeight(400);
                   c_ImportWarnings.Execute();
                }
 
@@ -361,8 +364,8 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
 {
    //Load user settings value
    QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownExportPath();
-   // open file selector with DBC filter
    const QString c_FilterName = QString(C_GtGetText::h_GetText("openSYDE DBC export")) + " (*.dbc)";
+   const QString c_DefaultFilename = QString(orc_CommDef.c_Bus.c_Name.c_str()) + ".dbc";
    QString c_FullFilePath;
    sint32 s32_Return = C_NOACT;
 
@@ -371,28 +374,21 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
    {
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
-   // give user default filename
-   QString c_DefaultFilename = QString(orc_CommDef.c_Bus.c_Name.c_str()) + ".dbc";
-   // prepare file dialog
-   QFileDialog c_FileDialog(opc_Parent, C_GtGetText::h_GetText("Select File for openSYDE DBC Export"));
-   c_FileDialog.setFileMode(QFileDialog::AnyFile);
-   c_FileDialog.setAcceptMode(QFileDialog::AcceptSave);
-   c_FileDialog.setDirectory(c_Folder);
-   c_FileDialog.selectFile(c_DefaultFilename);
-   c_FileDialog.setNameFilter(c_FilterName);
-   // show file dialog
-   sintn sn_UserChoice = c_FileDialog.exec();
-   if (sn_UserChoice == QDialog::Accepted)
-   {
-      // take file name (we save only one file therefore take first entry)
-      c_FullFilePath = c_FileDialog.selectedFiles().at(0);
 
+   //Get file name
+   c_FullFilePath =
+      C_OgeWiUtil::h_GetSaveFileName(opc_Parent, C_GtGetText::h_GetText("Select File for openSYDE DBC Export"),
+                                     c_Folder, c_FilterName, c_DefaultFilename);
+
+   //Check for user abort (empty string)
+   if (c_FullFilePath.compare("") != 0)
+   {
       const QFileInfo c_FileInfo(c_FullFilePath);
       //Only use lower case suffix
       const QString c_Extension = c_FileInfo.completeSuffix().toLower();
       //Store new user settings value
       C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownExportPath(c_FileInfo.absoluteDir().absolutePath());
-      if (c_Extension.contains("dbc") == true)
+      if (c_Extension == "dbc")
       {
          stw_scl::C_SCLString c_Error;
          stw_scl::C_SCLStringList c_Warnings;
@@ -491,7 +487,8 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
       else
       {
          C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
-         c_Message.SetDescription(C_GtGetText::h_GetText("File type not allowed."));
+         c_Message.SetDescription(C_GtGetText::h_GetText("The specified file has the wrong extension, use: \".dbc\"."));
+         c_Message.SetDetails(QString("Invalid extension: \"%1\"").arg("." + c_Extension));
          c_Message.Execute();
       }
    }

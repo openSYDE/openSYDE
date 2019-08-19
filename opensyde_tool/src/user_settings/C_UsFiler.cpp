@@ -707,7 +707,6 @@ void C_UsFiler::mh_SaveDashboard(C_SCLIniFile & orc_Ini, const QString & orc_Sec
    const QString c_DashboardIdTornOffFlag = QString("%1_torn_off_flag").arg(orc_DashboardIdBase);
    const QString c_DashboardIdMinFlag = QString("%1_min_flag").arg(orc_DashboardIdBase);
    const QString c_DashboardIdMaxFlag = QString("%1_max_flag").arg(orc_DashboardIdBase);
-   const QString c_DashboardIdTabIndex = QString("%1_tab_index").arg(orc_DashboardIdBase);
    const QString c_DashboardIdScenePosX = QString("%1_scene_x").arg(orc_DashboardIdBase);
    const QString c_DashboardIdScenePosY = QString("%1_scene_y").arg(orc_DashboardIdBase);
    const QString c_DashboardIdSceneZoom = QString("%1_scene_zoom").arg(orc_DashboardIdBase);
@@ -719,9 +718,6 @@ void C_UsFiler::mh_SaveDashboard(C_SCLIniFile & orc_Ini, const QString & orc_Sec
    orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
                      c_DashboardIdTornOffFlag.toStdString().c_str(),
                      orc_Dashboard.q_TornOff);
-   //Tab index
-   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_DashboardIdTabIndex.toStdString().c_str(),
-                        orc_Dashboard.s32_MainWindowTabIndex);
    //Window pos
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_DashboardIdWindowPosX.toStdString().c_str(),
                         orc_Dashboard.c_TornOffWindowPosition.x());
@@ -1604,11 +1600,7 @@ void C_UsFiler::mh_LoadDashboard(C_SCLIniFile & orc_Ini, const QString & orc_Sec
       }
       else
       {
-         //Tab index
-         const QString c_DashboardIdTabIndex = QString("%1_tab_index").arg(orc_DashboardIdBase);
-         const sintn sn_TabIndex = orc_Ini.ReadInteger(
-            orc_SectionName.toStdString().c_str(), c_DashboardIdTabIndex.toStdString().c_str(), -1);
-         orc_UserSettings.SetProjSvDashboardMainTab(orc_ViewName, c_DashboardName, sn_TabIndex);
+         orc_UserSettings.SetProjSvDashboardMainTab(orc_ViewName, c_DashboardName);
       }
       //Scene pos
       c_Pos.setX(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),

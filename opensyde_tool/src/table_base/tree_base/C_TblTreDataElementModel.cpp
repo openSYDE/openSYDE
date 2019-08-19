@@ -528,9 +528,8 @@ const
    \param[in]     orc_SyncManagers Sync managers to store
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_TblTreDataElementModel::C_TblTreDataElementModelState::C_TblTreDataElementModelState(C_TblTreItem * const opc_Tree,
-                                                                                       const std::vector<C_PuiSdNodeCanMessageSyncManager *> & orc_SyncManagers)
-   :
+C_TblTreDataElementModel::C_TblTreDataElementModelState::C_TblTreDataElementModelState(
+   C_TblTreSimpleItem * const opc_Tree, const std::vector<C_PuiSdNodeCanMessageSyncManager *> & orc_SyncManagers) :
    pc_Tree(opc_Tree),
    c_SyncManagers(orc_SyncManagers)
 {
@@ -1077,7 +1076,9 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
       // Node layer
       for (u32_NodeCounter = 0U; u32_NodeCounter < this->mpc_InvisibleRootItem->c_Children.size(); ++u32_NodeCounter)
       {
-         C_TblTreItem * const pc_NodeItem = this->mpc_InvisibleRootItem->c_Children[u32_NodeCounter];
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         C_TblTreItem * const pc_NodeItem =
+            dynamic_cast<C_TblTreItem * const>(this->mpc_InvisibleRootItem->c_Children[u32_NodeCounter]);
          const C_OSCNode * pc_OscNode = NULL;
 
          if (pc_NodeItem != NULL)
@@ -1093,7 +1094,9 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
             // Datapool type layer
             for (u32_DpTypeCounter = 0U; u32_DpTypeCounter < pc_NodeItem->c_Children.size(); ++u32_DpTypeCounter)
             {
-               C_TblTreItem * const pc_DpTypeItem = pc_NodeItem->c_Children[u32_DpTypeCounter];
+               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               C_TblTreItem * const pc_DpTypeItem =
+                  dynamic_cast<C_TblTreItem * const>(pc_NodeItem->c_Children[u32_DpTypeCounter]);
 
                if (pc_DpTypeItem != NULL)
                {
@@ -1103,7 +1106,9 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
                   for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < pc_DpTypeItem->c_Children.size();
                        ++u32_DatapoolCounter)
                   {
-                     C_TblTreItem * const pc_DatapoolItem = pc_DpTypeItem->c_Children[u32_DatapoolCounter];
+                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     C_TblTreItem * const pc_DatapoolItem =
+                        dynamic_cast<C_TblTreItem * const>(pc_DpTypeItem->c_Children[u32_DatapoolCounter]);
 
                      if (pc_DatapoolItem != NULL)
                      {
@@ -1113,7 +1118,9 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
                         for (u32_ListCounter = 0U; u32_ListCounter < pc_DatapoolItem->c_Children.size();
                              ++u32_ListCounter)
                         {
-                           C_TblTreItem * const pc_ListItem = pc_DatapoolItem->c_Children[u32_ListCounter];
+                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           C_TblTreItem * const pc_ListItem =
+                              dynamic_cast<C_TblTreItem * const>(pc_DatapoolItem->c_Children[u32_ListCounter]);
 
                            if (pc_ListItem != NULL)
                            {
@@ -1123,7 +1130,9 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
                               for (u32_ElementCounter = 0U; u32_ElementCounter < pc_ListItem->c_Children.size();
                                    ++u32_ElementCounter)
                               {
-                                 C_TblTreItem * const pc_ElementItem = pc_ListItem->c_Children[u32_ElementCounter];
+                                 //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                                 C_TblTreItem * const pc_ElementItem =
+                                    dynamic_cast<C_TblTreItem * const>(pc_ListItem->c_Children[u32_ElementCounter]);
 
                                  // Check if the element index is valid
                                  if ((pc_ElementItem != NULL) &&
@@ -1431,17 +1440,24 @@ const
 
    if (pc_TreeItem != NULL)
    {
-      const C_TblTreItem * const pc_FirstParent = pc_TreeItem->pc_Parent;
-      if (pc_FirstParent->pc_Parent != NULL)
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_TblTreItem * const pc_FirstParent = dynamic_cast<const C_TblTreItem * const>(pc_TreeItem->pc_Parent);
+      if ((pc_FirstParent != NULL) && (pc_FirstParent->pc_Parent != NULL))
       {
-         const C_TblTreItem * const pc_SecondParent = pc_FirstParent->pc_Parent;
-         if (pc_SecondParent->pc_Parent != NULL)
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         const C_TblTreItem * const pc_SecondParent =
+            dynamic_cast<const C_TblTreItem * const>(pc_FirstParent->pc_Parent);
+         if ((pc_SecondParent != NULL) && (pc_SecondParent->pc_Parent != NULL))
          {
-            const C_TblTreItem * const pc_ThirdParent = pc_SecondParent->pc_Parent;
-            if (pc_ThirdParent->pc_Parent != NULL)
+            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            const C_TblTreItem * const pc_ThirdParent =
+               dynamic_cast<const C_TblTreItem * const>(pc_SecondParent->pc_Parent);
+            if ((pc_ThirdParent != NULL) && (pc_ThirdParent->pc_Parent != NULL))
             {
-               const C_TblTreItem * const pc_FourthParent = pc_ThirdParent->pc_Parent;
-               if (pc_FourthParent->pc_Parent != NULL)
+               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               const C_TblTreItem * const pc_FourthParent =
+                  dynamic_cast<const C_TblTreItem * const>(pc_ThirdParent->pc_Parent);
+               if ((pc_FourthParent != NULL) && (pc_FourthParent->pc_Parent != NULL))
                {
                   //Should not happen
                   tgl_assert(false);
@@ -1520,14 +1536,19 @@ const
 
    if (pc_TreeItem != NULL)
    {
-      const C_TblTreItem * const pc_FirstParent = pc_TreeItem->pc_Parent;
-      if (pc_FirstParent->pc_Parent != NULL)
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_TblTreItem * const pc_FirstParent = dynamic_cast<const C_TblTreItem * const>(pc_TreeItem->pc_Parent);
+      if ((pc_FirstParent != NULL) && (pc_FirstParent->pc_Parent != NULL))
       {
-         const C_TblTreItem * const pc_SecondParent = pc_FirstParent->pc_Parent;
-         if (pc_SecondParent->pc_Parent != NULL)
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         const C_TblTreItem * const pc_SecondParent =
+            dynamic_cast<const C_TblTreItem * const>(pc_FirstParent->pc_Parent);
+         if ((pc_SecondParent != NULL) && (pc_SecondParent->pc_Parent != NULL))
          {
-            const C_TblTreItem * const pc_ThirdParent = pc_SecondParent->pc_Parent;
-            if (pc_ThirdParent->pc_Parent != NULL)
+            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            const C_TblTreItem * const pc_ThirdParent =
+               dynamic_cast<const C_TblTreItem * const>(pc_SecondParent->pc_Parent);
+            if ((pc_ThirdParent != NULL) && (pc_ThirdParent->pc_Parent != NULL))
             {
                //Should not happen
                tgl_assert(false);
@@ -1582,20 +1603,29 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetD
 
    if (pc_TreeItem != NULL)
    {
-      const C_TblTreItem * const pc_FirstParent = pc_TreeItem->pc_Parent;
-      if (pc_FirstParent->pc_Parent != NULL)
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_TblTreItem * const pc_FirstParent = dynamic_cast<const C_TblTreItem * const>(pc_TreeItem->pc_Parent);
+      if ((pc_FirstParent != NULL) && (pc_FirstParent->pc_Parent != NULL))
       {
-         const C_TblTreItem * const pc_SecondParent = pc_FirstParent->pc_Parent;
-         if (pc_SecondParent->pc_Parent != NULL)
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         const C_TblTreItem * const pc_SecondParent =
+            dynamic_cast<const C_TblTreItem * const>(pc_FirstParent->pc_Parent);
+         if ((pc_SecondParent != NULL) && (pc_SecondParent->pc_Parent != NULL))
          {
-            const C_TblTreItem * const pc_ThirdParent = pc_SecondParent->pc_Parent;
-            if (pc_ThirdParent->pc_Parent != NULL)
+            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            const C_TblTreItem * const pc_ThirdParent =
+               dynamic_cast<const C_TblTreItem * const>(pc_SecondParent->pc_Parent);
+            if ((pc_ThirdParent != NULL) && (pc_ThirdParent->pc_Parent != NULL))
             {
-               const C_TblTreItem * const pc_FourthParent = pc_ThirdParent->pc_Parent;
-               if (pc_FourthParent->pc_Parent != NULL)
+               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               const C_TblTreItem * const pc_FourthParent =
+                  dynamic_cast<const C_TblTreItem * const>(pc_ThirdParent->pc_Parent);
+               if ((pc_FourthParent != NULL) && (pc_FourthParent->pc_Parent != NULL))
                {
-                  const C_TblTreItem * const pc_FifthParent = pc_FourthParent->pc_Parent;
-                  if (pc_FifthParent->pc_Parent != NULL)
+                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                  const C_TblTreItem * const pc_FifthParent =
+                     dynamic_cast<const C_TblTreItem * const>(pc_FourthParent->pc_Parent);
+                  if ((pc_FifthParent != NULL) && (pc_FifthParent->pc_Parent != NULL))
                   {
                      //Should not happen
                      tgl_assert(false);
@@ -1673,17 +1703,24 @@ const
 
    if (pc_TreeItem != NULL)
    {
-      const C_TblTreItem * const pc_FirstParent = pc_TreeItem->pc_Parent;
-      if (pc_FirstParent->pc_Parent != NULL)
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_TblTreItem * const pc_FirstParent = dynamic_cast<const C_TblTreItem * const>(pc_TreeItem->pc_Parent);
+      if ((pc_FirstParent != NULL) && (pc_FirstParent->pc_Parent != NULL))
       {
-         const C_TblTreItem * const pc_SecondParent = pc_FirstParent->pc_Parent;
-         if (pc_SecondParent->pc_Parent != NULL)
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         const C_TblTreItem * const pc_SecondParent =
+            dynamic_cast<const C_TblTreItem * const>(pc_FirstParent->pc_Parent);
+         if ((pc_SecondParent != NULL) && (pc_SecondParent->pc_Parent != NULL))
          {
-            const C_TblTreItem * const pc_ThirdParent = pc_SecondParent->pc_Parent;
-            if (pc_ThirdParent->pc_Parent != NULL)
+            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            const C_TblTreItem * const pc_ThirdParent =
+               dynamic_cast<const C_TblTreItem * const>(pc_SecondParent->pc_Parent);
+            if ((pc_ThirdParent != NULL) && (pc_ThirdParent->pc_Parent != NULL))
             {
-               const C_TblTreItem * const pc_FourthParent = pc_ThirdParent->pc_Parent;
-               if (pc_FourthParent->pc_Parent != NULL)
+               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               const C_TblTreItem * const pc_FourthParent =
+                  dynamic_cast<const C_TblTreItem * const>(pc_ThirdParent->pc_Parent);
+               if ((pc_FourthParent != NULL) && (pc_FourthParent->pc_Parent != NULL))
                {
                   //Should not happen
                   tgl_assert(false);
@@ -1774,7 +1811,7 @@ void C_TblTreDataElementModel::mh_CleanUp(QMap<std::vector<uint32>, C_TblTreData
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_TblTreDataElementModel::mh_Contains(const QMap<std::vector<uint32>, C_TblTreDataElementModelState> & orc_Map,
-                                           const C_TblTreItem * const opc_Item)
+                                           const C_TblTreSimpleItem * const opc_Item)
 {
    bool q_Retval = false;
 

@@ -54,12 +54,15 @@ public:
                        const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
                        const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
                        C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
-                       QTreeWidget * const opc_MessageTreeWidget);
+                       QTreeWidget * const opc_MessageTreeWidget,
+                       const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType);
    void DoDeleteMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                         C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                         QTreeWidget * const opc_MessageTreeWidget);
    void DoAddSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                     const stw_types::uint32 & oru32_SignalIndex, const stw_types::uint16 ou16_StartBit,
+                    const stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType oe_MultiplexerType,
+                    const stw_types::uint16 ou16_MultiplexerValue,
                     C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                     QTreeWidget * const opc_MessageTreeWidget);
    void DoDeleteSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,

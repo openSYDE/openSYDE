@@ -81,21 +81,24 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
    }
    else
    {
-      QComboBox * pc_ComboBox;
+      C_OgeCbxTableBase * pc_ComboBox;
       QStringList c_StringList;
+      QStringList c_StringListValues;
+      QStringList c_StringListStrings;
       switch (C_TblDelegate::mh_GetInteractionElementValue(orc_Index))
       {
       case eURIEL_LINE_EDIT:
          pc_Retval = m_CreateLineEdit(opc_Parent);
+         // extra connection with model via commitData not necessary here
          break;
       case eURIEL_COMBO_BOX:
          pc_ComboBox = m_CreateComboBox(opc_Parent);
-         c_StringList = orc_Index.data(msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST).toStringList();
-         for (QStringList::const_iterator c_ItComboBoxValue = c_StringList.begin();
-              c_ItComboBoxValue != c_StringList.end(); ++c_ItComboBoxValue)
-         {
-            pc_ComboBox->addItem(*c_ItComboBoxValue);
-         }
+         c_StringListValues = orc_Index.data(msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST).toStringList();
+         c_StringListStrings = orc_Index.data(msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST).toStringList();
+         pc_ComboBox->InitFromStringList(c_StringListStrings, c_StringListValues);
+         // connect combo box with model (commit on text change)
+         //lint -e{64, 918, 929, 1025, 1703} Qt interface (function not recognized because of C++1 usage)
+         connect(pc_ComboBox, &QComboBox::currentTextChanged, this, &C_TblDelegate::m_CommitData);
          pc_Retval = pc_ComboBox;
          break;
       case eURIEL_GENERIC_SPIN_BOX:
@@ -140,7 +143,7 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
 void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    C_TblEditLineEditBase * pc_LineEdit;
-   QComboBox * pc_ComboBox;
+   C_OgeCbxTableBase * pc_ComboBox;
 
    switch (C_TblDelegate::mh_GetInteractionElementValue(orc_Index))
    {
@@ -163,10 +166,15 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
       break;
    case eURIEL_COMBO_BOX:
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      pc_ComboBox = dynamic_cast<QComboBox *>(opc_Editor);
+      pc_ComboBox = dynamic_cast<C_OgeCbxTableBase *>(opc_Editor);
       if (pc_ComboBox != NULL)
       {
-         pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toInt());
+         bool q_Ok;
+         const sint64 s64_Val = orc_Index.data(static_cast<sintn>(Qt::EditRole)).toLongLong(&q_Ok);
+         if (q_Ok)
+         {
+            pc_ComboBox->SetValue(s64_Val);
+         }
       }
       break;
    case eURIEL_GENERIC_SPIN_BOX:
@@ -192,7 +200,7 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
                                  const QModelIndex & orc_Index) const
 {
    C_TblEditLineEditBase * pc_LineEdit;
-   QComboBox * pc_ComboBox;
+   C_OgeCbxTableBase * pc_ComboBox;
 
    switch (C_TblDelegate::mh_GetInteractionElementValue(orc_Index))
    {
@@ -218,10 +226,11 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
       break;
    case eURIEL_COMBO_BOX:
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      pc_ComboBox = dynamic_cast<QComboBox *>(opc_Editor);
+      pc_ComboBox = dynamic_cast<C_OgeCbxTableBase *>(opc_Editor);
       if (pc_ComboBox != NULL)
       {
-         opc_Model->setData(orc_Index, pc_ComboBox->currentIndex(), static_cast<sintn>(Qt::EditRole));
+         opc_Model->setData(orc_Index, static_cast<sint64>(pc_ComboBox->GetValueForCurrentIndex()),
+                            static_cast<sintn>(Qt::EditRole));
       }
       break;
    case eURIEL_GENERIC_SPIN_BOX:
@@ -277,7 +286,7 @@ void C_TblDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewIt
    Generic combo box interaction element
 */
 //----------------------------------------------------------------------------------------------------------------------
-QComboBox * C_TblDelegate::m_CreateComboBox(QWidget * const opc_Parent) const
+C_OgeCbxTableBase * C_TblDelegate::m_CreateComboBox(QWidget * const opc_Parent) const
 {
    return new C_CamOgeCbxTableSmall(opc_Parent);
 }
@@ -371,6 +380,9 @@ QWidget * C_TblDelegate::m_CreateGenericEditor(QWidget * const opc_Parent, const
       //Init type
       pc_SpinBoxGroup->Init(orc_Min, orc_Max, of64_Factor, of64_Offset, oru32_ArrayIndex);
       pc_Retval = pc_SpinBoxGroup;
+      // connect spin box with model (commit on value change)
+      //lint -e{64, 918, 929, 1025, 1703} Qt interface (function not recognized because of C++11 usage)
+      connect(pc_SpinBoxGroup, &C_OgeWiSpinBoxGroup::SigValueChanged, this, &C_TblDelegate::m_CommitData);
    }
    return pc_Retval;
 }
@@ -397,6 +409,21 @@ void C_TblDelegate::m_SetGenericEditorDataVariable(QWidget * const opc_Editor, c
          pc_SpinBox->SelectAll();
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot to emit commitData signal from sender widget.
+
+   The signal commitData must be emitted when the editor widget has completed editing the data,
+   and wants to write it back into the model.
+   Adopted from Star Delegate Example of Qt Documentation.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblDelegate::m_CommitData(void)
+{
+   QWidget * const pc_Editor = qobject_cast<QWidget * const>(this->sender());
+
+   Q_EMIT (this->commitData(pc_Editor));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

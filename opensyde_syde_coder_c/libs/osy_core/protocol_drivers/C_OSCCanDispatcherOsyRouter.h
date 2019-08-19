@@ -11,7 +11,7 @@
 #ifndef C_OSCCANDISPATCHEROSYROUTER_H
 #define C_OSCCANDISPATCHEROSYROUTER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <list>
 
 #include "stwtypes.h"
@@ -21,12 +21,12 @@
 #include "CCANDispatcher.h"
 #include "C_OSCProtocolDriverOsy.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCCanDispatcherOsyRouter :
    public stw_can::C_CAN_Dispatcher
@@ -67,7 +67,7 @@ private:
    std::list<stw_can::T_STWCAN_Msg_RX> mc_AsyncMessages;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

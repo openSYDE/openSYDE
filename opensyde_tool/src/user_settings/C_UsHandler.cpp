@@ -1616,22 +1616,20 @@ void C_UsHandler::SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewNam
 
    \param[in] orc_ViewName      Project system view name (identifier)
    \param[in] orc_DashboardName Dashboard name (identifier)
-   \param[in] os32_TabIndex     Current tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSvDashboardMainTab(const QString & orc_ViewName, const QString & orc_DashboardName,
-                                            const sint32 os32_TabIndex)
+void C_UsHandler::SetProjSvDashboardMainTab(const QString & orc_ViewName, const QString & orc_DashboardName)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
       C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
-      rc_View.SetDashboardMainTab(orc_DashboardName, os32_TabIndex);
+      rc_View.SetDashboardMainTab(orc_DashboardName);
    }
    else
    {
       C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
-      c_View.SetDashboardMainTab(orc_DashboardName, os32_TabIndex);
+      c_View.SetDashboardMainTab(orc_DashboardName);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
 }

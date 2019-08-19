@@ -12,7 +12,7 @@
 #define C_SYVDAITTAMODEL_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QAbstractTableModel>
+#include "C_TblModelAction.h"
 #include <QIcon>
 #include "stwtypes.h"
 #include "C_PuiSvDbWidgetBase.h"
@@ -25,7 +25,7 @@ namespace stw_opensyde_gui_logic
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SyvDaItTaModel :
-   public QAbstractTableModel
+   public C_TblModelAction
 {
    Q_OBJECT
 
@@ -68,9 +68,13 @@ public:
 
    //lint -restore
 
+   //Common interface
+   virtual void CopySelectedItems(const std::vector<stw_types::uint32> & orc_SelectedIndices) const override;
+   void MoveItems(const QModelIndexList & orc_Indices, const bool oq_Up);
+
    // Change data count:
-   void AddItem(const QModelIndexList & orc_Indices,
-                const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId);
+   stw_types::uint32 AddItem(const QModelIndexList & orc_Indices,
+                             const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId);
    void RemoveItems(const QModelIndexList & orc_Indices,
                     std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> & orc_RemovedDataElements);
 
@@ -81,7 +85,18 @@ public:
 
    static const stw_types::uint32 hu32_MaxElements;
 
+protected:
+   virtual stw_types::uint32 m_AddNewItem(const stw_types::uint32 ou32_SelectedIndex) override;
+   virtual std::vector<stw_types::uint32> m_PasteItems(const stw_types::uint32 ou32_SelectedIndex) override;
+   virtual stw_types::uint32 m_GetSizeItems(void) const override;
+   virtual void m_DeleteItem(const stw_types::uint32 ou32_Index) override;
+   virtual void m_BeginRemoveRows(const stw_types::uint32 ou32_FirstIndex, const stw_types::uint32 ou32_LastIndex);
+   virtual void m_EndRemoveRows(const stw_types::uint32 ou32_FirstIndex, const stw_types::uint32 ou32_LastIndex);
+   virtual void m_MoveItem(const stw_types::uint32 ou32_SourceIndex, const stw_types::uint32 ou32_TargetIndex) override;
+
 private:
+   stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId mc_AddDataPoolElementId;
+   std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> mc_RemovedDataPoolElementIds;
    stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const mpc_Data;
    std::vector<std::vector<stw_types::float64> > mc_UnscaledLastDataValues;
    std::vector<std::vector<stw_types::float64> > mc_UnscaledMinValues;
@@ -103,8 +118,13 @@ private:
 
    QColor mc_TextColor;
 
+   static C_PuiSvDbNodeDataElementConfig mh_GetConfigForNewItem(
+      const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId);
+   stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId m_RemoveItem(const stw_types::uint32 ou32_Index,
+                                                                           std::vector<C_PuiSvDbNodeDataElementConfig> & orc_AdaptedItems);
    stw_types::float32 GetPercentage(const stw_types::uint32 ou32_Index) const;
    QString GetValue(const stw_types::uint32 ou32_Index) const;
+   static std::vector<stw_types::uint32> mh_GetSelectedRows(const QModelIndexList & orc_Indices);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

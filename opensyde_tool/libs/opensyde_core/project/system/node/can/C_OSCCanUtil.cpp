@@ -52,13 +52,7 @@ bool C_OSCCanUtil::h_IsSignalInMessage(const uint8 ou8_Dlc, const C_OSCCanSignal
 {
    bool q_Return = false;
    const uint16 u16_LastBit = orc_Signal.GetDataBytesBitPosOfSignalBit(orc_Signal.u16_ComBitLength - 1U);
-   uint16 u16_NeededBytes = u16_LastBit / 8U;
-
-   if ((u16_LastBit % 8U) != 0U)
-   {
-      // Round up
-      ++u16_NeededBytes;
-   }
+   const uint16 u16_NeededBytes = (u16_LastBit / 8U) + 1U;
 
    if (u16_NeededBytes <= ou8_Dlc)
    {

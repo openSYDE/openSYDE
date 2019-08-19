@@ -11,16 +11,16 @@
 #ifndef C_OSCPARAMSETINTERPRETEDLIST_H
 #define C_OSCPARAMSETINTERPRETEDLIST_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include "C_OSCParamSetInterpretedElement.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///Data class, containing the interpreted entries for one list in a parameter set file
 class C_OSCParamSetInterpretedList
@@ -32,7 +32,7 @@ public:
    std::vector<C_OSCParamSetInterpretedElement> c_Elements; ///< Interpreted elements of this list
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -139,6 +139,8 @@ private:
    void m_FixNameIssues(void);
    void m_FixAddressIssues(void);
    void m_FixCommInconsistencyErrors(void);
+
+   stw_types::sint32 m_VerifyLoadedSystemDefintion(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

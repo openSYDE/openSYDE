@@ -165,7 +165,12 @@ sint32 C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_AddDataPool(void) co
 
    c_NewDatapool.c_Comment = c_Comment.toStdString().c_str();
 
-   s32_Return = C_PuiSdHandler::h_GetInstance()->AddDataPool(this->mu32_NodeIndex, c_NewDatapool, c_UIDataPool,
+   // set the default safety flag to true if protocol is a safety protocol
+   c_NewDatapool.q_IsSafety = ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN_SAFETY) ||
+                              (this->me_Protocol == C_OSCCanProtocol::eECES));
+
+   s32_Return = C_PuiSdHandler::h_GetInstance()->AddDataPool(this->mu32_NodeIndex,
+                                                             c_NewDatapool, c_UIDataPool,
                                                              this->me_Protocol);
 
    return s32_Return;

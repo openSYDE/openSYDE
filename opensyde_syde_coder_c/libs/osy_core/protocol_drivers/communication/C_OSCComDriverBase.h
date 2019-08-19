@@ -11,7 +11,7 @@
 #ifndef C_OSCCOMDRIVERBASE_H
 #define C_OSCCOMDRIVERBASE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <vector>
 #include <list>
@@ -21,12 +21,12 @@
 #include "CCANDispatcher.h"
 #include "C_OSCComMessageLogger.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCComDriverBaseCanMessage
 {
@@ -97,10 +97,10 @@ private:
    stw_types::uint32 mu32_CanMessageBits;
    stw_types::sint32 ms32_CanBitrate;
 
-   stw_types::uint32 mu32_CanTxErrrors;
+   stw_types::uint32 mu32_CanTxErrors;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

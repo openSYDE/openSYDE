@@ -59,10 +59,10 @@ private:
    void m_ConfigureDllClicked(void);
    void m_ConcreteDllClicked(void) const;
    void m_OtherDllClicked(void) const;
-   void m_ShowCustomDllPath(const bool oq_Active) const;
    void m_UpdateCANDllPath(void) const;
    void m_OnExpand(const bool oq_Expand) const;
    void m_OnBrowse(void);
+   void m_InsertPathVar(const QString & orc_Variable) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -48,7 +48,8 @@ C_PuiSvDashboard::C_PuiSvDashboard(void) :
    C_PuiBsElements(),
    mc_Name("Dashboard"),
    mc_Comment(""),
-   mq_Active(true)
+   mq_Active(true),
+   ms32_TabIndex(-1)
 {
 }
 
@@ -67,6 +68,7 @@ void C_PuiSvDashboard::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(this->mc_Comment.toStdString().c_str(),
                                       this->mc_Comment.length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_Active, sizeof(this->mq_Active), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->ms32_TabIndex, sizeof(this->ms32_TabIndex), oru32_HashValue);
    for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_Charts.size(); ++u32_ItWidget)
    {
       const C_PuiSvDbChart & rc_Widget = this->mc_Charts[u32_ItWidget];
@@ -182,6 +184,29 @@ bool C_PuiSvDashboard::GetActive(void) const
 void C_PuiSvDashboard::SetActive(const bool oq_Value)
 {
    this->mq_Active = oq_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current tab index
+
+   \return
+   Current current tab index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvDashboard::GetTabIndex(void) const
+{
+   return this->ms32_TabIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current tab index
+
+   \param[in] oq_Value New current tab index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::SetTabIndex(const sint32 os32_Value)
+{
+   this->ms32_TabIndex = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

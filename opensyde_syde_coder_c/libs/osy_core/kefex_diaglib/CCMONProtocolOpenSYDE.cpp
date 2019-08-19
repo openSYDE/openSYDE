@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
@@ -22,7 +22,7 @@
 #include "stwerrors.h"
 #include "CCMONProtocolOpenSYDE.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_errors;
@@ -30,7 +30,7 @@ using namespace stw_cmon_protocol;
 using namespace stw_scl;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //have the protocol constants here as copies, so we can put this class into a library of its own
 // without having to add all the protocol header files
 
@@ -145,17 +145,17 @@ using namespace stw_can;
 #define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART2 (0x217U)
 #define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART3 (0x218U)
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert the openSYDE address information to text
 
    \param[in]     ort_CanAddressInformation   Address information
@@ -163,7 +163,7 @@ using namespace stw_can;
    \return
    Text interpretation of address information
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_AddressInformationToText(
    const C_CMONProtocolOpenSYDE::T_CanAddressInformation & ort_CanAddressInformation) const
 {
@@ -204,7 +204,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_AddressInformationToText(
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert 24bit openSYDE data pool identifier code to text
 
    Return as "<dpindex>.<listindex>.<elementindex>"
@@ -218,7 +218,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_AddressInformationToText(
    \return
    Text interpretation of data pool data identifier
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_DataPoolIdentifierToText(
    const uint32 ou32_DataPoolIdentifier,
    const bool oq_IsResponse,
@@ -246,7 +246,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataPoolIdentifierToText(
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Disassemble CAN-ID
 
    \param[in]      ou32_CanId                  CAN-ID to decode
@@ -256,7 +256,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataPoolIdentifierToText(
    C_NO_ERR    disassembly successful
    C_CONFIG    invalid addressing/routing configuration
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CMONProtocolOpenSYDE::mh_DisassembleCanId(const uint32 ou32_CanId,
                                                    T_CanAddressInformation & or_CanAddressInformation)
 {
@@ -317,18 +317,18 @@ sint32 C_CMONProtocolOpenSYDE::mh_DisassembleCanId(const uint32 ou32_CanId,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    constructor
 
    Initialize class members
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CMONProtocolOpenSYDE::C_CMONProtocolOpenSYDE(void) :
    C_CMONProtocolBase()
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert openSYDE service identifier to text
 
    Assumptions (responsibility of caller):
@@ -342,7 +342,7 @@ C_CMONProtocolOpenSYDE::C_CMONProtocolOpenSYDE(void) :
    \return
    Text interpretation of service identifier
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_ServiceIdToText(const uint8 ou8_ServiceData,
                                                       const bool oq_IsNegativeResponse) const
 {
@@ -427,7 +427,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceIdToText(const uint8 ou8_ServiceDat
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert openSYDE session identifier to text
 
    \param[in]     ou8_SessionId        session ID
@@ -435,7 +435,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceIdToText(const uint8 ou8_ServiceDat
    \return
    Text interpretation of session ID
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_SessionIdToText(const uint8 ou8_SessionId) const
 {
    C_SCLString c_Text;
@@ -460,7 +460,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_SessionIdToText(const uint8 ou8_SessionId)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert openSYDE service identifier data to text
 
    Assumptions (responsibility of caller):
@@ -475,7 +475,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_SessionIdToText(const uint8 ou8_SessionId)
    \return
    Text interpretation of service identifier
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8_ServiceData,
                                                         const uint8 ou8_ServiceSize,
                                                         const T_CanAddressInformation & ort_CanAddressInformation) const
@@ -845,7 +845,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert openSYDE negative response code to text
 
    \param[in]     ou8_NrCode      negative response code
@@ -853,7 +853,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
    \return
    Text interpretation of negative response code
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_NegativeResponseCodeToText(const uint8 ou8_NrCode) const
 {
    C_SCLString c_Text;
@@ -931,7 +931,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_NegativeResponseCodeToText(const uint8 ou8
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data as ASCII text if representable
 
    Will add printable characters as such.
@@ -943,7 +943,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_NegativeResponseCodeToText(const uint8 ou8
    \return
    Text interpretation of data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_GetSupposedlyAsciiText(const uint8 ou8_NumBytes, const uint8 * const opu8_Data)
    const
 {
@@ -967,7 +967,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_GetSupposedlyAsciiText(const uint8 ou8_Num
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert three byte version to string
 
    Always prints as decimal
@@ -977,7 +977,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_GetSupposedlyAsciiText(const uint8 ou8_Num
    \return
    Text interpretation of data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::mh_ThreeByteVersionToString(const uint8 * const opu8_Version)
 {
    C_SCLString c_Text;
@@ -985,7 +985,7 @@ C_SCLString C_CMONProtocolOpenSYDE::mh_ThreeByteVersionToString(const uint8 * co
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert openSYDE data identifier code and data to text
 
    \param[in]     ou16_DataIdentifier      data identifier
@@ -997,7 +997,7 @@ C_SCLString C_CMONProtocolOpenSYDE::mh_ThreeByteVersionToString(const uint8 * co
    \return
    Text interpretation of data identifier
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 ou16_DataIdentifier,
                                                                   const bool oq_IsResponse,
                                                                   const uint8 ou8_PayloadSize,
@@ -1211,7 +1211,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 o
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert openSYDE routine identifier code to text
 
    \param[in]     ou16_RoutineIdentifier        routine identifier
@@ -1224,7 +1224,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 o
    \return
    Text interpretation of routine data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_RoutineDataToText(const uint16 ou16_RoutineIdentifier,
                                                         const bool oq_IsResponse,
                                                         const uint8 ou8_DataSize,
@@ -1377,7 +1377,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_RoutineDataToText(const uint16 ou16_Routin
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert openSYDE CAN message to text representation.
 
    \param[in]     orc_Msg              message to convert
@@ -1385,7 +1385,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_RoutineDataToText(const uint16 ou16_Routin
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    C_SCLString c_Text;
@@ -1598,13 +1598,13 @@ C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get raw data as text
 
    \return
    Text representation of raw data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_RawDataToString(const uint8 ou8_NumBytes, const uint8 * const opu8_Data) const
 {
    uint8 u8_Index;
@@ -1621,17 +1621,17 @@ C_SCLString C_CMONProtocolOpenSYDE::m_RawDataToString(const uint8 ou8_NumBytes, 
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get name of protocol as string
 
    \return
    Text representation of protocol name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::GetProtocolName(void) const
 {
    return "STW openSYDE";
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 

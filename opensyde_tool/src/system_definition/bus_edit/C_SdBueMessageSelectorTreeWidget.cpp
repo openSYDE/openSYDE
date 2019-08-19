@@ -28,6 +28,8 @@
 #include "constants.h"
 #include "TGLUtils.h"
 #include "C_SdUtil.h"
+#include "C_GtGetText.h"
+#include "C_OgeWiCustomMessage.h"
 #include "C_SdBueMessageSelectorTreeWidget.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdClipBoardHelper.h"
@@ -39,8 +41,9 @@ using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_tgl;
 using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
+using namespace stw_opensyde_gui_logic;
+using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -280,15 +283,13 @@ void C_SdBueMessageSelectorTreeWidget::Add(void)
                const uint32 u32_ItSignal = pc_Message->c_Signals.size();
                const uint16 u16_StartBit = C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(c_MessageId);
 
-               if (u32_ItSignal < 64U)
-               {
-                  //Core
-                  this->mpc_UndoManager->DoAddSignal(c_MessageId, u32_ItSignal, u16_StartBit,
-                                                     this->mpc_MessageSyncManager,
-                                                     this);
+               //Core
+               this->mpc_UndoManager->DoAddSignal(c_MessageId, u32_ItSignal, u16_StartBit,
+                                                  C_OSCCanSignal::eMUX_DEFAULT, 0,
+                                                  this->mpc_MessageSyncManager,
+                                                  this);
 
-                  this->SelectSignal(c_MessageId, u32_ItSignal, false);
-               }
+               this->SelectSignal(c_MessageId, u32_ItSignal, false);
             }
          }
       }
@@ -313,7 +314,7 @@ void C_SdBueMessageSelectorTreeWidget::AddMessage(void)
          this->mpc_UndoManager->DoAddMessage(c_MessageId, this->mpc_MessageSyncManager, this);
 
          this->SelectMessage(c_MessageId, false);
-         Q_EMIT this->SigSelectName();
+         Q_EMIT (this->SigSelectName());
       }
    }
 }
@@ -350,18 +351,16 @@ void C_SdBueMessageSelectorTreeWidget::AddSignal(void)
             if (pc_Message != NULL)
             {
                const uint32 u32_ItSignal = pc_Message->c_Signals.size();
-               //Maximum allowed signals
-               if (u32_ItSignal < 64U)
-               {
-                  const uint16 u16_StartBit = C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(c_MessageId);
 
-                  //Core
-                  this->mpc_UndoManager->DoAddSignal(c_MessageId, u32_ItSignal, u16_StartBit,
-                                                     this->mpc_MessageSyncManager,
-                                                     this);
-                  this->SelectSignal(c_MessageId, u32_ItSignal, false);
-                  Q_EMIT this->SigSelectName();
-               }
+               const uint16 u16_StartBit = C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(c_MessageId);
+
+               //Core
+               this->mpc_UndoManager->DoAddSignal(c_MessageId, u32_ItSignal, u16_StartBit,
+                                                  C_OSCCanSignal::eMUX_DEFAULT, 0,
+                                                  this->mpc_MessageSyncManager,
+                                                  this);
+               this->SelectSignal(c_MessageId, u32_ItSignal, false);
+               Q_EMIT (this->SigSelectName());
             }
          }
       }
@@ -371,12 +370,16 @@ void C_SdBueMessageSelectorTreeWidget::AddSignal(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new signal
 
-   \param[in] orc_MessageId      Message identification indices
-   \param[in] ou16_StartBit      Start bit for new signal
+   \param[in] orc_MessageId            Message identification indices
+   \param[in] ou16_StartBit            Start bit for new signal
+   \param[in] oq_MultiplexedSignal     Flag if signal shall be a multiplexed signal
+   \param[in] ou16_MultiplexValue    Concrete multiplexed value if oq_MultiplexedSignal is true
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::AddSignalWithStartBit(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                             const uint16 ou16_StartBit)
+                                                             const uint16 ou16_StartBit,
+                                                             const bool oq_MultiplexedSignal,
+                                                             const uint16 ou16_MultiplexValue)
 {
    tgl_assert(this->mpc_UndoManager != NULL);
    if (this->mpc_UndoManager != NULL)
@@ -386,15 +389,22 @@ void C_SdBueMessageSelectorTreeWidget::AddSignalWithStartBit(const C_OSCCanMessa
       {
          const uint32 u32_ItSignal = pc_Message->c_Signals.size();
 
-         //Maximum allowed signals
-         if (u32_ItSignal < 64U)
+         //Core
+         if (oq_MultiplexedSignal == true)
          {
-            //Core
-            this->mpc_UndoManager->DoAddSignal(orc_MessageId, u32_ItSignal, ou16_StartBit, this->mpc_MessageSyncManager,
+            this->mpc_UndoManager->DoAddSignal(orc_MessageId, u32_ItSignal, ou16_StartBit,
+                                               C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL,
+                                               ou16_MultiplexValue, this->mpc_MessageSyncManager,
                                                this);
-            this->SelectSignal(orc_MessageId, u32_ItSignal, false);
-            Q_EMIT this->SigSelectName();
          }
+         else
+         {
+            this->mpc_UndoManager->DoAddSignal(orc_MessageId, u32_ItSignal, ou16_StartBit, C_OSCCanSignal::eMUX_DEFAULT,
+                                               0, this->mpc_MessageSyncManager,
+                                               this);
+         }
+         this->SelectSignal(orc_MessageId, u32_ItSignal, false);
+         Q_EMIT (this->SigSelectName());
       }
    }
 }
@@ -788,44 +798,16 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
          const bool q_Result = this->m_GetHighestSelected(c_Selection);
          if (q_Result == true)
          {
+            bool q_Continue = false;
+            bool q_IsOtherMessage = false;
+            uint32 u32_InternalMessageIndex = 0UL;
             if (c_Selection.parent().isValid() == true)
             {
                //Paste Signals in the same message
                if (c_Selection.parent().row() >= 0)
                {
-                  const uint32 u32_InternalMessageIndex = static_cast<uint32>(c_Selection.parent().row());
-                  if (u32_InternalMessageIndex < this->mc_UniqueMessageIds.size())
-                  {
-                     const C_OSCCanMessage * const pc_Message =
-                        C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_UniqueMessageIds[
-                                                                          u32_InternalMessageIndex]);
-                     if (pc_Message != NULL)
-                     {
-                        const uint32 u32_SignalIndex = pc_Message->c_Signals.size();
-                        if ((u32_SignalIndex + c_Signals.size()) <= 64U)
-                        {
-                           //Reset colors
-                           c_UISignals.clear();
-                           c_UISignals.resize(c_Signals.size());
-
-                           //Deactivate start bit adaptation for now
-                           //C_SdBueMessageSelectorTreeWidget::mh_AdaptSignalStartBits(
-                           //   this->mc_UniqueMessageIds[u32_InternalMessageIndex], c_Signals);
-
-                           this->mpc_UndoManager->DoPasteSignals(this->mc_UniqueMessageIds[u32_InternalMessageIndex],
-                                                                 u32_SignalIndex, c_Signals, c_OSCSignalCommons,
-                                                                 c_UISignalCommons, c_UISignals,
-                                                                 this->mpc_MessageSyncManager,
-                                                                 this);
-
-                           if (this->mc_UniqueMessageIds.size() > 0)
-                           {
-                              this->SelectSignal(this->mc_UniqueMessageIds[u32_InternalMessageIndex], u32_SignalIndex,
-                                                 false);
-                           }
-                        }
-                     }
-                  }
+                  u32_InternalMessageIndex = static_cast<uint32>(c_Selection.parent().row());
+                  q_Continue = true;
                }
             }
             else
@@ -833,33 +815,66 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
                // Paste Signals in an other Message
                if (c_Selection.row() >= 0)
                {
-                  const uint32 u32_InternalMessageIndex = static_cast<uint32>(c_Selection.row());
-                  if (u32_InternalMessageIndex < this->mc_UniqueMessageIds.size())
+                  u32_InternalMessageIndex = static_cast<uint32>(c_Selection.row());
+                  q_IsOtherMessage = true;
+                  q_Continue = true;
+               }
+            }
+            if ((q_Continue) && (u32_InternalMessageIndex < this->mc_UniqueMessageIds.size()))
+            {
+               const C_OSCCanMessage * const pc_Message =
+                  C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_UniqueMessageIds[
+                                                                    u32_InternalMessageIndex]);
+               if (pc_Message != NULL)
+               {
+                  const bool q_ContainsMultiplexer = C_OSCCanMessage::h_ContainsMultiplexer(c_Signals);
+                  if (pc_Message->IsMultiplexed() && (q_ContainsMultiplexer))
                   {
-                     const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(
-                        this->mc_UniqueMessageIds[u32_InternalMessageIndex]);
+                     C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+                     c_Message.SetHeading(C_GtGetText::h_GetText("Paste signal"));
+                     c_Message.SetDescription(C_GtGetText::h_GetText("Could not paste the copied signals.\n"
+                                                                     "At least one of the copied signals is a multiplexer signal,"
+                                                                     " the message already contains one multiplexer signal"
+                                                                     " and only one multiplexer signal per message is allowed."));
+                     c_Message.Execute();
+                  }
+                  else
+                  {
+                     const uint32 u32_SignalIndex = pc_Message->c_Signals.size();
 
-                     if (pc_Message != NULL)
+                     //For other message the current signal colors might not work
+                     if (q_IsOtherMessage)
                      {
-                        const uint32 u32_SignalIndex = pc_Message->c_Signals.size();
+                        //Reset colors
+                        c_UISignals.clear();
+                        c_UISignals.resize(c_Signals.size());
+                     }
 
-                        if ((u32_SignalIndex + c_Signals.size()) <= 64U)
+                     //Deactivate start bit adaptation for now
+                     //C_SdBueMessageSelectorTreeWidget::mh_AdaptSignalStartBits(
+                     //   this->mc_UniqueMessageIds[u32_InternalMessageIndex], c_Signals);
+
+                     this->mpc_UndoManager->DoPasteSignals(this->mc_UniqueMessageIds[u32_InternalMessageIndex],
+                                                           u32_SignalIndex, c_Signals, c_OSCSignalCommons,
+                                                           c_UISignalCommons, c_UISignals,
+                                                           this->mpc_MessageSyncManager,
+                                                           this, this->me_ProtocolType);
+
+                     if (this->mc_UniqueMessageIds.size() > 0)
+                     {
+                        this->SelectSignal(this->mc_UniqueMessageIds[u32_InternalMessageIndex], u32_SignalIndex,
+                                           false);
+                     }
+                     if ((q_ContainsMultiplexer) && (this->mpc_MessageSyncManager != NULL))
+                     {
+                        //Adapt parent
+                        if (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE)
                         {
-                           //Deactivate start bit adaptation for now
-                           //C_SdBueMessageSelectorTreeWidget::mh_AdaptSignalStartBits(
-                           //   this->mc_UniqueMessageIds[u32_InternalMessageIndex], c_Signals);
-
-                           this->mpc_UndoManager->DoPasteSignals(this->mc_UniqueMessageIds[u32_InternalMessageIndex],
-                                                                 u32_SignalIndex, c_Signals, c_OSCSignalCommons,
-                                                                 c_UISignalCommons, c_UISignals,
-                                                                 this->mpc_MessageSyncManager,
-                                                                 this);
-
-                           if (this->mc_UniqueMessageIds.size() > 0)
-                           {
-                              this->SelectSignal(this->mc_UniqueMessageIds[u32_InternalMessageIndex], u32_SignalIndex,
-                                                 false);
-                           }
+                           C_OSCCanMessage c_Copy = *pc_Message;
+                           c_Copy.e_TxMethod = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
+                           this->mpc_MessageSyncManager->
+                           SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
+                              this->mc_UniqueMessageIds[u32_InternalMessageIndex], c_Copy);
                         }
                      }
                   }
@@ -930,18 +945,15 @@ void C_SdBueMessageSelectorTreeWidget::PasteSignal(const C_OSCCanMessageIdentifi
             {
                const uint32 u32_SignalIndex = pc_Message->c_Signals.size();
 
-               if ((u32_SignalIndex + c_Signals.size()) <= 64U)
-               {
-                  //Reset colors
-                  c_UISignals.clear();
-                  c_UISignals.resize(c_Signals.size());
-                  c_Signals[0].u16_ComBitStart = ou16_StartBit;
-                  this->mpc_UndoManager->DoPasteSignals(orc_MessageId,
-                                                        u32_SignalIndex, c_Signals, c_OSCSignalCommons,
-                                                        c_UISignalCommons, c_UISignals, this->mpc_MessageSyncManager,
-                                                        this);
-                  this->SelectSignal(orc_MessageId, u32_SignalIndex, false);
-               }
+               //Reset colors
+               c_UISignals.clear();
+               c_UISignals.resize(c_Signals.size());
+               c_Signals[0].u16_ComBitStart = ou16_StartBit;
+               this->mpc_UndoManager->DoPasteSignals(orc_MessageId,
+                                                     u32_SignalIndex, c_Signals, c_OSCSignalCommons,
+                                                     c_UISignalCommons, c_UISignals, this->mpc_MessageSyncManager,
+                                                     this, this->me_ProtocolType);
+               this->SelectSignal(orc_MessageId, u32_SignalIndex, false);
             }
          }
       }
@@ -1071,22 +1083,16 @@ void C_SdBueMessageSelectorTreeWidget::InternalAddSignal(const C_OSCCanMessageId
       m_UpdateUniqueMessageIdsSignals(u32_InternalMessageIndex);
       if (m_MapSignalDataIndexToInternalIndex(u32_InternalMessageIndex, oru32_SignalIndex, u32_SignalIndex) == C_NO_ERR)
       {
-         //Get signal for name
-         const C_OSCNodeDataPoolListElement * const pc_Signal =
-            C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(orc_MessageId, oru32_SignalIndex);
-         if (pc_Signal != NULL)
-         {
-            //Ui
-            m_InsertSignal(this->topLevelItem(u32_InternalMessageIndex), u32_SignalIndex,
-                           pc_Signal->c_Name.c_str());
-            //Ui update trigger
-            this->updateGeometry();
-            //Error handling
-            RecheckErrorGlobal(false);
-            //Signal
-            Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
-            Q_EMIT this->SigErrorChanged();
-         }
+         //Ui
+         m_InsertSignal(this->topLevelItem(u32_InternalMessageIndex), u32_SignalIndex,
+                        C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(orc_MessageId, oru32_SignalIndex));
+         //Ui update trigger
+         this->updateGeometry();
+         //Error handling
+         RecheckErrorGlobal(false);
+         //Signal
+         Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
+         Q_EMIT this->SigErrorChanged();
       }
    }
 }
@@ -1192,13 +1198,14 @@ void C_SdBueMessageSelectorTreeWidget::OnSignalNameChange(const C_OSCCanMessageI
 
             if (m_MapSignalInternalIndexToDataIndex(u32_InternalMessageIndex, u32_ItChild, u32_SignalIndex) == C_NO_ERR)
             {
-               const C_OSCNodeDataPoolListElement * const pc_OSCSignalData =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(
-                     this->mc_UniqueMessageIds[u32_InternalMessageIndex],
-                     u32_SignalIndex);
-               if ((pc_ChildItem != NULL) && (pc_OSCSignalData != NULL))
+               if (pc_ChildItem != NULL)
                {
-                  pc_ChildItem->setText(0, pc_OSCSignalData->c_Name.c_str());
+                  pc_ChildItem->setText(0,
+                                        C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(this->
+                                                                                                 mc_UniqueMessageIds[
+                                                                                                    u32_InternalMessageIndex
+                                                                                                 ],
+                                                                                                 u32_SignalIndex));
                }
             }
          }
@@ -1657,8 +1664,7 @@ void C_SdBueMessageSelectorTreeWidget::dropEvent(QDropEvent * const opc_Event)
                                        const C_OSCCanMessage * const pc_TargetMsg =
                                           C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_TargetMessageIds[0]);
 
-                                       if ((pc_TargetMsg != NULL) &&
-                                           ((pc_TargetMsg->c_Signals.size() + c_SourceSignalIndices.size()) <= 64))
+                                       if (pc_TargetMsg != NULL)
                                        {
                                           this->mpc_UndoManager->DoMoveSignal(c_SourceMessageIds, c_SourceSignalIndices,
                                                                               c_TargetMessageIds,
@@ -1894,13 +1900,9 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_Mess
          {
             if (m_MapSignalInternalIndexToDataIndex(oru32_MessageIdIndex, u32_Counter, u32_SignalDataIndex) == C_NO_ERR)
             {
-               const C_OSCNodeDataPoolListElement * const pc_SignalData =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(rc_MessageId, u32_SignalDataIndex);
-               if (pc_SignalData != NULL)
-               {
-                  this->m_InsertSignal(pc_Message, u32_Counter,
-                                       pc_SignalData->c_Name.c_str());
-               }
+               this->m_InsertSignal(pc_Message, u32_Counter,
+                                    C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(rc_MessageId,
+                                                                                             u32_SignalDataIndex));
             }
          }
          //lint -e593 Qt parent handling will take care of it

@@ -39,6 +39,9 @@ public:
    static void h_SetValueInContent(const stw_types::float64 of64_Value,
                                    stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
                                    const stw_types::uint32 ou32_ArrayIndex = 0U);
+   static void h_SetValueInContentS64(const stw_types::sint64 os64_Value,
+                                      stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
+                                      const stw_types::uint32 ou32_ArrayIndex = 0U);
    static void h_SetScaledValueInContent(const stw_types::float64 of64_ScaledValue,
                                          stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
                                          const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset,

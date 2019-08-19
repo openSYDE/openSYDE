@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,14 +30,14 @@
 #include "C_OSCIpDispatcherLinuxSock.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 #define INVALID_SOCKET     (-1)
 
 //export a few WinSock constants here
@@ -50,33 +50,33 @@ static sintn m_WsInvalidSocket(void)
    return -1;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 static sint32 m_WsFionBio(void)
 {
    return FIONBIO; //lint !e1960 !e970 !e1924 !e569
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 static sint32 m_WsFionRead(void)
 {
    return FIONREAD; //lint !e1960 !e970 !e1924
 }
 */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 std::map<C_OSCIpDispatcherLinuxSock::C_BufferIdentifier,
          std::list<std::vector<stw_types::uint8> > > C_OSCIpDispatcherLinuxSock::mhc_TcpBuffer;
 C_TGLCriticalSection C_OSCIpDispatcherLinuxSock::mhc_LockBuffer;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current smaller than orc_Cmp
 
    \param[in] orc_Cmp Compared instance
@@ -85,7 +85,7 @@ C_TGLCriticalSection C_OSCIpDispatcherLinuxSock::mhc_LockBuffer;
    Current smaller than orc_Cmp
    Else false
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCIpDispatcherLinuxSock::C_BufferIdentifier::operator <(
    const C_OSCIpDispatcherLinuxSock::C_BufferIdentifier & orc_Cmp) const
 {
@@ -136,23 +136,23 @@ bool C_OSCIpDispatcherLinuxSock::C_BufferIdentifier::operator <(
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set up class
 
    Initialize class elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCIpDispatcherLinuxSock::C_OSCIpDispatcherLinuxSock(void) :
    C_OSCIpDispatcher()
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up class
 
    Release allocated ressources
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCIpDispatcherLinuxSock::~C_OSCIpDispatcherLinuxSock(void)
 {
    //make sure to release resources in case the user forgot to
@@ -163,7 +163,7 @@ C_OSCIpDispatcherLinuxSock::~C_OSCIpDispatcherLinuxSock(void)
    this->CloseUdp();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init TCP communication
 
    Jobs to perform:
@@ -180,7 +180,7 @@ C_OSCIpDispatcherLinuxSock::~C_OSCIpDispatcherLinuxSock(void)
    \return
    C_NO_ERR   Connection created
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & oru32_Handle)
 {
    C_TcpConnection c_NewConnection;
@@ -194,7 +194,7 @@ sint32 C_OSCIpDispatcherLinuxSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & 
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: get IP of all local interfaces
 
    Gets list of IP addresses of all local IP interfaces.
@@ -205,7 +205,7 @@ sint32 C_OSCIpDispatcherLinuxSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & 
    C_NO_ERR     IPs listed
    C_NOACT      could not get IP information
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::m_GetAllInstalledInterfaceIps(void)
 {
    sintn sn_Ret;
@@ -256,7 +256,7 @@ sint32 C_OSCIpDispatcherLinuxSock::m_GetAllInstalledInterfaceIps(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: connect TCP socket to server
 
    Jobs to perform:
@@ -271,7 +271,7 @@ sint32 C_OSCIpDispatcherLinuxSock::m_GetAllInstalledInterfaceIps(void)
    C_NO_ERR   connected ...
    C_BUSY     connection failed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::m_ConnectTcp(C_TcpConnection & orc_Connection) const
 {
    sintn sn_Return;
@@ -404,7 +404,7 @@ sint32 C_OSCIpDispatcherLinuxSock::m_ConnectTcp(C_TcpConnection & orc_Connection
    return (q_Error == true) ? C_BUSY : C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: configure UDP socket
 
    \param[in]   oq_ServerPort    true: set up server socket
@@ -416,7 +416,7 @@ sint32 C_OSCIpDispatcherLinuxSock::m_ConnectTcp(C_TcpConnection & orc_Connection
    C_NO_ERR   socket set up
    C_NOACT    could not set up socket
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::m_ConfigureUdpSocket(const bool oq_ServerPort, const uint32 ou32_IpToBindTo,
                                                       sintn & orsn_Socket) const
 {
@@ -500,7 +500,7 @@ sint32 C_OSCIpDispatcherLinuxSock::m_ConfigureUdpSocket(const bool oq_ServerPort
    return (q_Error == true) ? C_NOACT : C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: compose textual representation of IP
 
    Format: xxx.xxx.xxx.xxx
@@ -508,7 +508,7 @@ sint32 C_OSCIpDispatcherLinuxSock::m_ConfigureUdpSocket(const bool oq_ServerPort
    \return
    test representation of IP
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCIpDispatcherLinuxSock::mh_IpToText(const uint8 (&orau8_Ip)[4])
 {
    C_SCLString c_Text;
@@ -517,7 +517,7 @@ C_SCLString C_OSCIpDispatcherLinuxSock::mh_IpToText(const uint8 (&orau8_Ip)[4])
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize UDP communication
 
    Jobs to perform:
@@ -531,7 +531,7 @@ C_SCLString C_OSCIpDispatcherLinuxSock::mh_IpToText(const uint8 (&orau8_Ip)[4])
    C_NO_ERR   connected ...
    C_NOACT    connection failed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::InitUdp(void)
 {
    bool q_Error = false;
@@ -579,7 +579,7 @@ sint32 C_OSCIpDispatcherLinuxSock::InitUdp(void)
    return (q_Error == true) ? C_NOACT : C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks the connection of the TCP socket
 
    \param[in]   ou32_Handle   handle obtained by InitTcp()
@@ -589,7 +589,7 @@ sint32 C_OSCIpDispatcherLinuxSock::InitUdp(void)
    C_NOACT    is not connected
    C_RANGE    invalid handle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::IsTcpConnected(const uint32 ou32_Handle)
 {
    sint32 s32_Return = C_NOACT;
@@ -634,7 +634,7 @@ sint32 C_OSCIpDispatcherLinuxSock::IsTcpConnected(const uint32 ou32_Handle)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reconnect TCP socket
 
    This function can be used by a client to reconnect after the connection was lost (e.g. dropped by server).
@@ -651,7 +651,7 @@ sint32 C_OSCIpDispatcherLinuxSock::IsTcpConnected(const uint32 ou32_Handle)
    C_BUSY     connection failed
    C_RANGE    invalid handle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::ReConnectTcp(const uint32 ou32_Handle)
 {
    sint32 s32_Return;
@@ -681,7 +681,7 @@ sint32 C_OSCIpDispatcherLinuxSock::ReConnectTcp(const uint32 ou32_Handle)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Close TCP communication
 
    Jobs to perform:
@@ -693,7 +693,7 @@ sint32 C_OSCIpDispatcherLinuxSock::ReConnectTcp(const uint32 ou32_Handle)
    C_NO_ERR   disconnected ...
    C_RANGE    handle invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::CloseTcp(const uint32 ou32_Handle)
 {
    sint32 s32_Return;
@@ -726,7 +726,7 @@ sint32 C_OSCIpDispatcherLinuxSock::CloseTcp(const uint32 ou32_Handle)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Close UDP communication
 
    Jobs to perform:
@@ -735,7 +735,7 @@ sint32 C_OSCIpDispatcherLinuxSock::CloseTcp(const uint32 ou32_Handle)
    \return
    C_NO_ERR   disconnected ...
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::CloseUdp(void)
 {
    for (uint32 u32_Interface = 0U; u32_Interface < mc_SocketsUdpClient.size(); u32_Interface++)
@@ -754,7 +754,7 @@ sint32 C_OSCIpDispatcherLinuxSock::CloseUdp(void)
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send package on TCP socket
 
    Jobs to perform:
@@ -769,7 +769,7 @@ sint32 C_OSCIpDispatcherLinuxSock::CloseUdp(void)
    C_RD_WR    error sending data
    C_RANGE    handle invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::SendTcp(const uint32 ou32_Handle, const std::vector<uint8> & orc_Data)
 {
    sint32 s32_Return;
@@ -825,7 +825,7 @@ sint32 C_OSCIpDispatcherLinuxSock::SendTcp(const uint32 ou32_Handle, const std::
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read data from TCP socket
 
    Jobs to perform:
@@ -845,7 +845,7 @@ sint32 C_OSCIpDispatcherLinuxSock::SendTcp(const uint32 ou32_Handle, const std::
    C_RD_WR    error reading data
    C_RANGE    handle invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::ReadTcp(const uint32 ou32_Handle, std::vector<uint8> & orc_Data)
 {
    sint32 s32_Return;
@@ -906,7 +906,7 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadTcp(const uint32 ou32_Handle, std::vector
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read data from TCP socket
 
    Jobs to perform:
@@ -933,7 +933,7 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadTcp(const uint32 ou32_Handle, std::vector
    C_RANGE    handle invalid
    C_WARN     data is not for the server with the node identifier and bus identifier
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::ReadTcp(const uint32 ou32_Handle, const uint8 ou8_ClientBusIdentifier,
                                          const uint8 ou8_ClientNodeIdentifier, const uint8 ou8_ServerBusIdentifier,
                                          const uint8 ou8_ServerNodeIdentifier, std::vector<uint8> & orc_Data)
@@ -1002,7 +1002,7 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadTcp(const uint32 ou32_Handle, const uint8
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read data from TCP buffer of dispatcher
 
    Jobs to perform:
@@ -1022,7 +1022,7 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadTcp(const uint32 ou32_Handle, const uint8
    C_NO_ERR   data read successfully
    C_NOACT    no data for these identifier
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdentifier,
                                                const uint8 ou8_ClientNodeIdentifier,
                                                const uint8 ou8_ServerBusIdentifier,
@@ -1058,7 +1058,7 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdenti
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send broadcast package on UDP request socket
 
    Jobs to perform:
@@ -1071,7 +1071,7 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdenti
    C_CONFIG   required socket not initialized
    C_RD_WR    error sending data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::SendUdp(const std::vector<uint8> & orc_Data)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1114,7 +1114,7 @@ sint32 C_OSCIpDispatcherLinuxSock::SendUdp(const std::vector<uint8> & orc_Data)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read package from UDP socket
 
    Jobs to perform:
@@ -1132,7 +1132,7 @@ sint32 C_OSCIpDispatcherLinuxSock::SendUdp(const std::vector<uint8> & orc_Data)
    C_CONFIG   required socket not initialized
    C_NOACT    no data received
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&orau8_Ip)[4])
 {
    sint32 s32_Return = C_NOACT;

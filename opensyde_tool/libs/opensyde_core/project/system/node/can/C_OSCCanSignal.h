@@ -32,6 +32,14 @@ public:
       eBYTE_ORDER_MOTOROLA ///< Byte order type motorola (big endian)
    };
 
+   enum E_MultiplexerType ///< Enum for multiplexer signal types
+   {
+      eMUX_DEFAULT,            ///< Non multiplexed signal
+      eMUX_MULTIPLEXER_SIGNAL, ///< Multiplexer signal which defines the multiplex group by its value. Maximum one
+      ///< multiplexer per message!
+      eMUX_MULTIPLEXED_SIGNAL ///< Signal presence depends on the multiplex value
+   };
+
    C_OSCCanSignal(void);
 
    bool operator !=(const C_OSCCanSignal & orc_Cmp) const;
@@ -50,6 +58,9 @@ public:
    ///< Reserved for other protocols
    stw_types::uint32 u32_ComDataElementIndex; ///< Index of data element this signal refers to.
    ///< List index is implicit through convention.
+   E_MultiplexerType e_MultiplexerType;  ///< Signal multiplexer type
+   stw_types::uint16 u16_MultiplexValue; ///< Only used if eMULTIPLEXED_SIGNAL
+   ///< Multiplexer value if this signal should be present and represents the associated multiplex group
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

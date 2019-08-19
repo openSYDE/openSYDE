@@ -97,6 +97,16 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::Add(void)
       {
          //Layer 2 -> all
       }
+      //Restrict signals
+      if (this->mc_LastMessageId.e_ComProtocol != C_OSCCanProtocol::eLAYER2)
+      {
+         for (uint32 u32_ItSig = 0; u32_ItSig < this->mc_Message.c_Signals.size(); ++u32_ItSig)
+         {
+            C_OSCCanSignal & rc_Signal = this->mc_Message.c_Signals[u32_ItSig];
+            rc_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_DEFAULT;
+            rc_Signal.u16_MultiplexValue = 0;
+         }
+      }
       //Cycle time
       if (this->mc_Message.u32_CycleTimeMs == 0)
       {

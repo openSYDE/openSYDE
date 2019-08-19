@@ -83,7 +83,7 @@ void C_SdManUnoTopologySetupStyleCommand::m_Restore(const QMap<uint64,
 
    if (pc_Snapshot != NULL)
    {
-      vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+      const vector<QGraphicsItem *> c_Items = m_GetSceneItems();
       QMap<uint64, C_PuiBsTemporaryDataID>::const_iterator c_Entry;
 
       for (vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)

@@ -27,7 +27,6 @@
 #include "TGLTime.h"
 #include "C_OSCUtils.h"
 #include "C_OSCLoggingHandler.h"
-#include "C_UtiFindNameHelper.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
@@ -870,7 +869,7 @@ QString C_Uti::h_ConvertVersionToSTWStyle(const QString & orc_Version)
 
    Warning: assuming orc_AbsoluteBaseDir is not an empty string and no file.
 
-   \param[in] orc_AbsoluteBaseDir         Base path if relative
+   \param[in] orc_AbsoluteBaseDir         Base path if relative and could itself be relative
    \param[in] orc_RelativeOrAbsoluteFile  Path which might be relative or absolute (and could be empty)
 
    \return
@@ -885,12 +884,23 @@ QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QStrin
        (QDir::isAbsolutePath(orc_RelativeOrAbsolutePath) == false) &&
        (QFileInfo(orc_BaseDir).isFile() == false))
    {
-      c_Retval = QDir::cleanPath(orc_BaseDir + "/" + orc_RelativeOrAbsolutePath);
+      c_Retval = orc_BaseDir + "/" + orc_RelativeOrAbsolutePath;
+
+      // do some path beautifying
+      if (c_Retval.contains("%") == false)
+      {
+         // clean path only if there are no path variables
+         // (else %{BLUB}/../folder would be cleaned to folder which is wrong)
+         c_Retval = QDir::cleanPath(c_Retval);
+      }
    }
    else
    {
       c_Retval = orc_RelativeOrAbsolutePath;
    }
+
+   // remove double slashes
+   c_Retval.replace("//", "/");
 
    return c_Retval;
 }
@@ -1110,6 +1120,8 @@ bool C_Uti::h_CheckSortedAscending(const std::vector<uint32> & orc_Indices)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Always get absolute path from path relative to executable.
 
+   Empty input results in exe path!
+
    \param[in] orc_Path Absolute or relative path
 
    \return
@@ -1170,6 +1182,56 @@ bool C_Uti::h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & or
    }
 
    return oq_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if path contains project independent variables (e.g. %{OPENSYDE_BINARY}) and resolve them.
+
+   Do not call this function for replacing every path variable!
+   This functionality can be found in a utility class that knows project stuff.
+
+   \param[in]       orc_Path     path that probably contains variables
+
+   \return
+   Resolved path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_Path)
+{
+   QString c_Return = orc_Path;
+   C_SCLString c_Help;
+
+   if (c_Return.contains(mc_PATH_VARIABLE_OPENSYDE_BIN) == true)
+   {
+      c_Return.replace(mc_PATH_VARIABLE_OPENSYDE_BIN, C_Uti::h_GetExePath() + '/');
+   }
+
+   if (c_Return.contains(mc_PATH_VARIABLE_USER_NAME) == true)
+   {
+      tgl_assert(TGL_GetSystemUserName(c_Help));
+      c_Return.replace(mc_PATH_VARIABLE_USER_NAME, c_Help.c_str());
+   }
+
+   if (c_Return.contains(mc_PATH_VARIABLE_COMPUTER_NAME) == true)
+   {
+      // find out computer name is analogue to find out user name, but TGLUtils do not offer this
+      QString c_UserName;
+      charn acn_WinUserName[255];
+      uint32 u32_Size = sizeof(acn_WinUserName);
+      const bool q_Return = (GetComputerNameA(acn_WinUserName, &u32_Size) == 0) ? false : true;
+      if (q_Return == true)
+      {
+         c_UserName = acn_WinUserName;
+      }
+      else
+      {
+         c_UserName = "?\?\?\?\?";
+      }
+
+      c_Return.replace(mc_PATH_VARIABLE_COMPUTER_NAME, c_UserName);
+   }
+
+   return c_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

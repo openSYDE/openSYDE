@@ -20,7 +20,7 @@
 #include "C_GtGetText.h"
 #include "C_PuiProject.h"
 #include "C_SyvUpHexFileView.h"
-#include "C_ImpUtil.h"
+#include "C_PuiUtil.h"
 #include "ui_C_SyvUpHexFileView.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -60,7 +60,7 @@ C_SyvUpHexFileView::C_SyvUpHexFileView(stw_opensyde_gui_elements::C_OgePopUpDial
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvUpHexFileView),
    mrc_ParentDialog(orc_Parent),
-   mc_File(orc_File)
+   mc_AbsoluteFilePath(orc_File)
 {
    const QFileInfo c_Info(orc_File);
 
@@ -142,19 +142,18 @@ void C_SyvUpHexFileView::m_LoadInfo(void) const
    QString c_Text = "<html><body>";
    C_OsyHexFile c_HexFile;
    uint32 u32_Result;
-   const QString c_Path = C_ImpUtil::h_GetAbsolutePathFromProject(this->mc_File); //Application is relative to project
 
-   u32_Result = c_HexFile.LoadFromFile(c_Path.toStdString().c_str());
+   u32_Result = c_HexFile.LoadFromFile(this->mc_AbsoluteFilePath.toStdString().c_str());
    if (u32_Result == stw_hex_file::NO_ERR)
    {
-      mh_AddFileSection(c_Path, c_Text);
+      mh_AddFileSection(this->mc_AbsoluteFilePath, c_Text);
       mh_AddDataInformation(c_HexFile, c_Text);
       mh_AddApplicationInformation(c_HexFile, c_Text);
    }
    else
    {
       c_Text += C_GtGetText::h_GetText("Could not read ");
-      c_Text += c_Path;
+      c_Text += this->mc_AbsoluteFilePath;
       c_Text += ".<br>";
       c_Text += C_GtGetText::h_GetText("Please make sure it is an existing and valid HEX file.");
    }

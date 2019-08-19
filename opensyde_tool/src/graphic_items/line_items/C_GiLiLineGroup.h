@@ -16,9 +16,10 @@
 #include "stwtypes.h"
 
 #include "C_GiLiLine.h"
+#include "C_GiBiBase.h"
+#include "C_PuiBsLineBase.h"
 #include "C_GiBiCustomMouseItem.h"
 #include "C_GiLiInteractionPoint.h"
-#include "C_PuiBsLineBase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -30,6 +31,7 @@ namespace stw_opensyde_gui
 class C_GiLiLineGroup :
    public C_GiBiConnectableItem,
    public C_GiBiCustomMouseItem,
+   public C_GiBiBase,
    public QGraphicsItemGroup
 {
    Q_OBJECT
@@ -47,6 +49,9 @@ public:
    virtual void SetTemporaryCursor(const QCursor & orc_TemporaryCursor) override;
    virtual void SetDefaultCursor(const QCursor & orc_Value) override;
    virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem);
+
+   //GI base
+   virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
 
    // Wrapper calls for C_GiLiLine
    virtual void SetWidth(const stw_types::sint32 & ors32_Width);

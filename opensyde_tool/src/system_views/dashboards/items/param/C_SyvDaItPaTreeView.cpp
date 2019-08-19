@@ -20,7 +20,7 @@
 #include "C_OgePopUpDialog.h"
 #include "C_SyvDaItPaArWidget.h"
 #include "C_SyvDaItPaTreeView.h"
-#include "C_SdNdeDataPoolListTableHeaderView.h"
+#include "C_SyvDaItTableHeaderView.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -55,7 +55,7 @@ C_SyvDaItPaTreeView::C_SyvDaItPaTreeView(QWidget * const opc_Parent) :
    mq_IgnoreChanges(false)
 {
    //Header
-   QHeaderView * const pc_Tmp = new C_SdNdeDataPoolListTableHeaderView(Qt::Horizontal, this);
+   QHeaderView * const pc_Tmp = new C_SyvDaItTableHeaderView(Qt::Horizontal, this);
 
    this->setHeader(pc_Tmp);
    //Make sure to install event filter to have handling for mouse move events

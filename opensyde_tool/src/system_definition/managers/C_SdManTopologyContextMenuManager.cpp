@@ -58,10 +58,6 @@ C_SdManTopologyContextMenuManager::C_SdManTopologyContextMenuManager() :
                                                                            "Interface Assignment"),
                                                                         this,
                                                                         &C_SdManTopologyContextMenuManager::m_InterfaceAssignment);
-
-   //move to right place
-   this->mc_ContextMenu.insertAction(this->mpc_ActionOrderObjects, this->mpc_ActionInterfaceAssignment);
-   m_InsertBendLineActions(this->mpc_ActionOrderObjects);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -96,7 +92,8 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       break;
    // check for bus
    case msn_GRAPHICS_ITEM_BUS:         // buses have the same functionality
@@ -105,7 +102,8 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       this->mpc_ActionEdit->setText(C_GtGetText::h_GetText("Edit Bus Properties"));
       this->mpc_ActionEdit->setVisible(true);
       break;
@@ -118,17 +116,20 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       break;
    case msn_GRAPHICS_ITEM_BOUNDARY:    // boundary and text element have the same functionality
    case msn_GRAPHICS_ITEM_TEXTELEMENT: // boundary and text element have the same functionality
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       break;
    case msn_GRAPHICS_ITEM_TEXTELEMENT_BUS:
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       this->mpc_ActionEdit->setText(C_GtGetText::h_GetText("Edit Bus Properties"));
       this->mpc_ActionEdit->setVisible(true);
       break;
@@ -136,7 +137,8 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       break;
    }
 

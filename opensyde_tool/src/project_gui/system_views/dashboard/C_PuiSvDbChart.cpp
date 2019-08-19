@@ -38,7 +38,8 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbChart::C_PuiSvDbChart() :
-   C_PuiSvDbWidgetBase()
+   C_PuiSvDbWidgetBase(),
+   e_SettingZoomMode(C_PuiSvDbChart::eSETTING_ZM_XY)
 {
 }
 
@@ -57,6 +58,8 @@ void C_PuiSvDbChart::CalcHash(stw_types::uint32 & oru32_HashValue) const
       const bool q_Data = this->c_DataPoolElementsActive[u32_ItActive];
       stw_scl::C_SCLChecksums::CalcCRC32(&q_Data, sizeof(q_Data), oru32_HashValue);
    }
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_SettingZoomMode, sizeof(this->e_SettingZoomMode), oru32_HashValue);
+
    C_PuiSvDbWidgetBase::CalcHash(oru32_HashValue);
 }
 

@@ -50,6 +50,9 @@ public:
    C_SebScene(QObject * const opc_Parent = NULL);
    virtual ~C_SebScene();
 
+   void FilterChangableZValues(QList<QGraphicsItem *> & orc_ZValues) const;
+   stw_types::float64 GetHighestUsedZValueList(const QList<QGraphicsItem *> & orc_Items) const;
+
    void SetDrawingBackground(const bool oq_Active);
    QRectF GetMinimumSceneRect(void) const;
 
@@ -145,6 +148,7 @@ protected:
 
    // delete functions
    void m_Delete(const bool oq_NoUserConfirm = false);
+   void m_CopyItemsToCopyPasteManager(const QList<QGraphicsItem *> & orc_SelectedItems);
    void m_Clear(void);
    void m_RemoveLineGroupOfScene(C_GiLiLineGroup * const opc_Item);
    void m_RemoveRectBaseGroupOfScene(C_GiBiRectBaseGroup * const opc_Item);
@@ -211,8 +215,6 @@ private:
                 const stw_opensyde_gui_logic::E_Alignment & ore_Alignment);
    // ZOrder functions
    void m_BringToFront(void);
-   void m_BringForward(void);
-   void m_SendBackward(void);
    void m_SendToBack(void);
    //Setup style
    void m_SetupStyle(QGraphicsItem * const opc_Item);
@@ -229,8 +231,6 @@ private:
    QImage mc_ImgDrawBackground;
    QImage mc_ImgDrawBackgroundDark;
    QRectF mc_MinimumSceneRect;
-   stw_types::float64 mf64_ZOrderHigh;
-   stw_types::float64 mf64_ZOrderLow;
    bool mq_RubberBandActive;
    bool mq_LeftButtonPressed;
    bool mq_DrawCustomBackground;

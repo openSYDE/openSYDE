@@ -11,7 +11,7 @@
 #ifndef C_OSCEXPORTDATAPOOLH
 #define C_OSCEXPORTDATAPOOLH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 
 #include "stwtypes.h"
@@ -19,12 +19,12 @@
 #include "CSCLStringList.h"
 #include "C_OSCNodeDataPool.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCExportDataPool
 {
@@ -37,25 +37,28 @@ public:
                                                const C_OSCNodeDataPool & orc_DataPool,
                                                const stw_types::uint8 ou8_DataPoolIndex, const bool oq_IsRemote,
                                                const stw_types::uint8 ou8_DataPoolIndexRemote,
-                                               const stw_types::uint8 ou8_ProcessId);
+                                               const stw_types::uint8 ou8_ProcessId,
+                                               const stw_scl::C_SCLString & orc_ExportToolInfo = "");
 
 private:
    static const bool mhq_IS_HEADER_FILE = false;
    static const bool mhq_IS_IMPLEMENTATION_FILE = true;
 
-   static stw_types::sint32 mh_CreateImplementationFile(const stw_scl::C_SCLString & orc_Path,
+   static stw_types::sint32 mh_CreateImplementationFile(const stw_scl::C_SCLString & orc_ExportToolInfo,
+                                                        const stw_scl::C_SCLString & orc_Path,
                                                         const C_OSCNodeDataPool & orc_DataPool,
                                                         const stw_types::uint8 ou8_DataPoolIndex,
                                                         const stw_scl::C_SCLString & orc_ProjectId,
                                                         const stw_types::uint8 ou8_DataPoolIndexRemote,
                                                         const stw_types::uint8 ou8_ProcessId, const bool oq_IsRemote);
-   static stw_types::sint32 mh_CreateHeaderFile(const stw_scl::C_SCLString & orc_Path,
+   static stw_types::sint32 mh_CreateHeaderFile(const stw_scl::C_SCLString & orc_ExportToolInfo,
+                                                const stw_scl::C_SCLString & orc_Path,
                                                 const C_OSCNodeDataPool & orc_DataPool,
                                                 const stw_types::uint8 ou8_DataPoolIndex,
                                                 const stw_scl::C_SCLString & orc_ProjectId, const bool oq_IsRemote);
 
-   static void mh_AddHeader(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
-                            const bool oq_FileType);
+   static void mh_AddHeader(const stw_scl::C_SCLString & orc_ExportToolInfo, stw_scl::C_SCLStringList & orc_Data,
+                            const C_OSCNodeDataPool & orc_DataPool, const bool oq_FileType);
    static void mh_AddIncludes(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                               const bool oq_FileType);
    static void mh_AddDefines(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
@@ -83,7 +86,7 @@ private:
                                                  const stw_types::uint32 ou32_ArraySize, const bool oq_IsArray);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

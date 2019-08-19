@@ -81,18 +81,21 @@ void C_SyvDaUnoManager::DoDelete(const QList<QGraphicsItem *> & orc_Items)
    \param[in] ore_Type                  Type
    \param[in] oru64_UniqueID            Unique ID
    \param[in] orc_NewPos                Position
+   \param[in] of64_ZValue               Z value
+   \param[in] orq_DarkModeDefault       Dark mode flag
    \param[in] orc_AdditionalInformation Additional string information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoManager::DoAddGeneric(const C_PuiSvDbDataElement::E_Type & ore_Type, const uint64 & oru64_UniqueID,
-                                     const QPointF & orc_NewPos, const bool & orq_DarkModeDefault,
-                                     const QString & orc_AdditionalInformation)
+                                     const QPointF & orc_NewPos, const float64 of64_ZValue,
+                                     const bool & orq_DarkModeDefault, const QString & orc_AdditionalInformation)
 {
    std::vector<uint64> c_IDs;
    C_SyvDaUnoAddCommand * pc_AddCommand;
 
    c_IDs.push_back(oru64_UniqueID);
-   pc_AddCommand = new C_SyvDaUnoAddCommand(this->mpc_Scene, c_IDs, ore_Type, orc_NewPos, orc_AdditionalInformation,
+   pc_AddCommand = new C_SyvDaUnoAddCommand(this->mpc_Scene, c_IDs, ore_Type, orc_NewPos, of64_ZValue,
+                                            orc_AdditionalInformation,
                                             NULL, false, orq_DarkModeDefault);
    this->DoPush(pc_AddCommand);
 }
@@ -100,21 +103,23 @@ void C_SyvDaUnoManager::DoAddGeneric(const C_PuiSvDbDataElement::E_Type & ore_Ty
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new data based on a snapshot and reserved IDs
 
-   \param[in] oru64_UniqueIDs   Reserved unique IDs for snapshot data
-   \param[in] orc_Snapshot      Snapshot data
-   \param[in] orc_RestoredRails Rails to restore if possible
-   \param[in] orc_NewPos        New position
+   \param[in] oru64_UniqueIDs        Reserved unique IDs for snapshot data
+   \param[in] orc_Snapshot           Snapshot data
+   \param[in] orc_RestoredRails      Rails to restore if possible
+   \param[in] orc_NewPos             New position
+   \param[in] of64_HighestUsedZValue Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoManager::DoAddSnapshot(const std::vector<uint64> & oru64_UniqueIDs,
-                                      const C_PuiSvDashboard & orc_Snapshot,
+                                      const C_SyvDaDashboardSnapshot & orc_Snapshot,
                                       const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
                                                  C_PuiSvReadDataConfiguration> & orc_RestoredRails,
-                                      const QPointF & orc_NewPos)
+                                      const QPointF & orc_NewPos,
+                                      const float64 of64_HighestUsedZValue)
 {
    C_SyvDaUnoAddSnapshotCommand * pc_AddCommand;
 
    pc_AddCommand = new C_SyvDaUnoAddSnapshotCommand(this->mpc_Scene, orc_Snapshot, oru64_UniqueIDs, orc_RestoredRails,
-                                                    orc_NewPos);
+                                                    orc_NewPos, of64_HighestUsedZValue);
    this->DoPush(pc_AddCommand);
 }

@@ -47,6 +47,8 @@ public:
    void SetComment(const QString & orc_Value);
    bool GetActive(void) const;
    void SetActive(const bool oq_Value);
+   stw_types::sint32 GetTabIndex(void) const;
+   void SetTabIndex(const stw_types::sint32 os32_Value);
    const std::vector<C_PuiSvDbChart> & GetCharts(void) const;
    void SetCharts(const std::vector<C_PuiSvDbChart> & orc_Value);
    const C_PuiSvDbChart * GetChart(const stw_types::uint32 ou32_Index) const;
@@ -207,10 +209,7 @@ public:
    virtual void Clear(void);
    virtual stw_types::uint32 Count(void) const;
 
-private:
-   QString mc_Name;
-   QString mc_Comment;
-   bool mq_Active;
+protected:
    std::vector<C_PuiSvDbChart> mc_Charts;
    std::vector<C_PuiSvDbLabel> mc_Labels;
    std::vector<C_PuiSvDbPieChart> mc_PieCharts;
@@ -220,6 +219,12 @@ private:
    std::vector<C_PuiSvDbTable> mc_Tables;
    std::vector<C_PuiSvDbToggle> mc_Toggles;
    std::vector<C_PuiSvDbParam> mc_ParamWidgets;
+
+private:
+   QString mc_Name;
+   QString mc_Comment;
+   bool mq_Active;
+   stw_types::sint32 ms32_TabIndex;
 
    void m_GetAllWidgetItems(std::vector<C_PuiSvDbWidgetBase *> & orc_Output);
    static void mh_MarkInvalid(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId);

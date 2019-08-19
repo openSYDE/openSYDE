@@ -15,6 +15,8 @@
 #include <QGraphicsScene>
 #include <QVector>
 #include <set>
+#include <vector>
+#include <array>
 #include <QCursor>
 #include <QObject>
 #include <QAction>
@@ -46,7 +48,9 @@ public:
 
    void SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value);
    void SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value);
-   void SetMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void SetMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                   const bool oq_MultiplexedMessage, const stw_types::uint16 ou16_MultiplexValue);
+   void SetMultiplexValue(const stw_types::uint16 ou16_MultiplexValue);
    void SetSignal(const stw_types::uint32 ou32_SignalIndex);
    void Clear(void);
    void DisplayToolTip(const QPointF & orc_ScenePos);
@@ -65,6 +69,8 @@ Q_SIGNALS:
 
    void SigAddSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint16 ou16_StartBit);
+   void SigAddSignalMultiplexed(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                const stw_types::uint16 ou16_StartBit, const stw_types::uint16 ou16_MultiplexValue);
    void SigCopySignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                       const stw_types::uint32 ou32_SignalIndex);
    void SigCutSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -113,7 +119,8 @@ private:
 
    C_SdBueMlvSignalManager::C_SignalItemColors m_GetNextNotUsedColors(void);
    C_SdBueMlvSignalManager::C_SignalItemColors m_GetConcreteColors(const stw_types::uint8 ou8_Index);
-   void m_SetColorsUsed(const C_SdBueMlvSignalManager::C_SignalItemColors & orc_Colors, const bool oq_Used);
+   void m_SetColorsUnused(const C_SdBueMlvSignalManager::C_SignalItemColors & orc_Colors);
+   void m_PrepareNextColorSection(void);
 
    void m_SceneRectChanged(void);
    void m_SearchClickedItem(const QPointF & orc_Pos);
@@ -128,6 +135,7 @@ private:
    void m_OnCustomContextMenuRequested(const QGraphicsSceneContextMenuEvent * const opc_Event);
 
    void m_ActionAdd(void);
+   void m_ActionAddMultiplexed(void);
    void m_ActionCopy(void);
    void m_ActionPaste(void);
    void m_ActionCut(void);
@@ -135,6 +143,7 @@ private:
 
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
    QAction * mpc_Add;
+   QAction * mpc_AddMultiplexed;
    QAction * mpc_Copy;
    QAction * mpc_Cut;
    QAction * mpc_Paste;
@@ -143,8 +152,10 @@ private:
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_MessageSyncManager;
    stw_opensyde_core::C_OSCCanProtocol::E_Type me_Protocol;
 
-   // identification informations about the message
+   // identification information about the message
    stw_opensyde_core::C_OSCCanMessageIdentificationIndices mc_MessageId;
+   bool mq_MultiplexedMessage;
+   stw_types::uint16 mu16_MultiplexerValue;
    stw_types::uint16 mu16_MaximumCountBits;
 
    stw_types::float64 mf64_SingleItemWidth;
@@ -184,7 +195,7 @@ private:
 
    // Color configuration for the signals
    static const C_SdBueMlvSignalManager::C_SignalItemColors mhac_SignalsColors[64];
-   bool maq_SingalsColorsUsed[64];
+   std::vector<std::array<bool, 64> > mc_SignalsColorsUsed;
 
    // ECeS hint
    C_SdBueMlvBaseItem * mapc_ECeSHints[2];

@@ -112,10 +112,7 @@ void C_SdNdeDbViewWidget::InitStaticNames(void) const
                                                                    "   Application developed by using the openSYDE \"code generation\" feature.\n"
                                                                    "   Available for devices with programming support. \n\n"
                                                                    " - Binary\n"
-                                                                   "   Any kind of application or data created by another tool chain.\n\n"
-                                                                   " - File Container \n"
-                                                                   "   A file container for any number of files you want to transfer to your file based device.\n"
-                                                                   "   Available for file based devices. \n"));
+                                                                   "   Any kind of application or data created by another tool chain."));
 
    this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
                                                          C_GtGetText::h_GetText("Add new Data Block."));
@@ -173,23 +170,28 @@ void C_SdNdeDbViewWidget::ShowApplication(const uint32 ou32_ApplicationIndex) co
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::AddApp(void)
 {
-   bool q_Continue;
+   bool q_Continue = true;
 
    // check if empty path (new unsaved project)
    if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
    {
+      // warn user
       C_OgeWiCustomMessage c_MessageBox(this);
-      c_MessageBox.SetType(C_OgeWiCustomMessage::eINFORMATION);
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Add Datablocks"));
+      c_MessageBox.SetType(C_OgeWiCustomMessage::eWARNING);
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                     "Datablocks cannot be added if the project is not saved yet. Please save the project and retry."));
-      c_MessageBox.Execute();
-      q_Continue = false;
+                                     "This project is not saved yet. Adding Data Blocks might cause "
+                                     "problems with file or directory paths."));
+      c_MessageBox.SetDetails(C_GtGetText::h_GetText(
+                                 "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
+      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+      c_MessageBox.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+      if (c_MessageBox.Execute() != C_OgeWiCustomMessage::eOK)
+      {
+         q_Continue = false;
+      }
    }
-   else
-   {
-      q_Continue = true;
-   }
+
    if (q_Continue)
    {
       const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -445,7 +447,7 @@ void C_SdNdeDbViewWidget::m_AddFromTSP(void)
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eINFORMATION);
       c_Message.SetHeading(C_GtGetText::h_GetText("Add new Data Blocks"));
       c_Message.SetDescription(QString(C_GtGetText::h_GetText(
-                                          "Successfully created %1 Data Blocks.")).arg(
+                                          "Successfully created %1 Data Block(s).")).arg(
                                   pc_Dialog->GetTSPApplicationCount()));
       for (uint32 u32_It = 0; u32_It < pc_Dialog->GetTSPApplicationCount(); ++u32_It)
       {

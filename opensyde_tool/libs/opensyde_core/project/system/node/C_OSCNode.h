@@ -68,11 +68,11 @@ public:
                                        const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
                                        const stw_types::uint32 & oru32_MessageIndex,
                                        const stw_types::uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal);
-   stw_types::sint32 SetSignalCommon(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                     const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
-                                     const stw_types::uint32 & oru32_MessageIndex,
-                                     const stw_types::uint32 & oru32_SignalIndex,
-                                     const C_OSCNodeDataPoolListElement & orc_SignalData);
+   stw_types::sint32 SetSignalMUXValue(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
+                                       const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                       const stw_types::uint32 & oru32_MessageIndex,
+                                       const stw_types::uint32 & oru32_SignalIndex,
+                                       const stw_types::uint16 ou16_MultiplexValue);
    stw_types::sint32 DeleteSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
                                   const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
                                   const stw_types::uint32 & oru32_MessageIndex,

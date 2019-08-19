@@ -65,3 +65,16 @@ C_GiRectBaseGroup::C_GiRectBaseGroup(const sint32 & ors32_Index, const E_Type & 
 C_GiRectBaseGroup::~C_GiRectBaseGroup(void)
 {
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiRectBaseGroup::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiBiRectBaseGroup::SetZValueCustom(of64_ZValue);
+   //Apply to data
+   this->UpdateData();
+}

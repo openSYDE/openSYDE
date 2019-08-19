@@ -24,6 +24,7 @@
 #include "TGLTime.h"
 #include "C_Uti.h"
 #include "C_OgeWiUtil.h"
+#include "C_CamUti.h"
 #include "C_UsHandler.h"
 #include "C_CamProHandler.h"
 #include "C_CamDbHandler.h"
@@ -486,10 +487,16 @@ void C_CamMainWindow::m_StopLogging(void)
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMainWindow::m_InitCan(sint32 & ors32_Bitrate)
 {
-   QString c_DllPath = C_Uti::h_GetAbsolutePathFromExe(C_CamProHandler::h_GetInstance()->GetCANDllPath());
+   QString c_DllPath;
    sint32 s32_Return = C_RD_WR;
    QFileInfo c_File;
 
+   // Get absolute DLL path (resolve variables and make absolute if it is relative ant not empty)
+   c_DllPath = C_CamProHandler::h_GetInstance()->GetCANDllPath();
+   if (c_DllPath.isEmpty() == false)
+   {
+      c_DllPath = C_CamUti::h_GetResolvedAbsolutePathFromExe(c_DllPath);
+   }
    c_File.setFile(c_DllPath);
 
    if ((c_File.exists() == true) &&
@@ -959,7 +966,7 @@ void C_CamMainWindow::m_RegisterCyclicMessage(const uint32 ou32_MessageIndex, co
    {
       //Prepare necessary parameter
       stw_opensyde_core::C_OSCComDriverBaseCanMessage c_Message;
-      c_Message.c_Msg = *pc_Message;
+      c_Message.c_Msg = pc_Message->ToCANMessage();
       c_Message.u32_Interval = pc_Message->u32_CyclicTriggerTime;
       c_Message.u32_TimeToSend = 0UL;
       //Send
@@ -989,7 +996,7 @@ void C_CamMainWindow::m_SendMessage(const uint32 ou32_MessageIndex, const stw_ty
    {
       //Prepare necessary parameter
       stw_opensyde_core::C_OSCComDriverBaseCanMessage c_Message;
-      c_Message.c_Msg = *pc_Message;
+      c_Message.c_Msg = pc_Message->ToCANMessage();
       c_Message.u32_Interval = 0UL;
       c_Message.u32_TimeToSend = ou32_TimeToSend;
       //Send

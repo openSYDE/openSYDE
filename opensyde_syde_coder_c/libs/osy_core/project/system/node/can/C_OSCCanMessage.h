@@ -11,19 +11,20 @@
 #ifndef C_OSCCANMESSAGE_H
 #define C_OSCCANMESSAGE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <set>
 
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "C_OSCCanSignal.h"
 #include "C_OSCNodeDataPoolList.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCCanMessage
 {
@@ -38,7 +39,14 @@ public:
                                  bool * const opq_BorderConflict, bool * const opq_NameConflict,
                                  bool * const opq_NameInvalid, bool * const opq_MinOverMax,
                                  bool * const opq_ValueBelowMin, bool * const opq_ValueOverMax,
+                                 bool * const opq_NoMultiplexerButMultiplexed,
+                                 bool * const opq_MultiplexedValueOutOfRange,
                                  const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset) const;
+
+   bool IsMultiplexed(stw_types::uint32 * const opu32_MultiplexerIndex = NULL) const;
+   static bool h_ContainsMultiplexer(const std::vector<C_OSCCanSignal> & orc_Signals,
+                                     stw_types::uint32 * const opu32_MultiplexerIndex = NULL);
+   void GetMultiplexerValues(std::set<stw_types::uint16> & orc_Values) const;
 
    enum E_TxMethodType ///< Transmission trigger type
    {
@@ -72,7 +80,7 @@ private:
                                                     const stw_types::uint32 & oru32_SignalIndex) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

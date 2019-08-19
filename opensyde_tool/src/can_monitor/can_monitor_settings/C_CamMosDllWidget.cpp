@@ -119,6 +119,7 @@ void C_CamMosDllWidget::OnCommunicationStarted(const bool oq_Online) const
    this->mpc_Ui->pc_RadioButtonOther->setDisabled(oq_Online);
    this->mpc_Ui->pc_RadioButtonPeak->setDisabled(oq_Online);
    this->mpc_Ui->pc_RadioButtonVector->setDisabled(oq_Online);
+   this->mpc_Ui->pc_WidgetCustomDll->setDisabled(oq_Online);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -142,6 +143,7 @@ void C_CamMosDllWidget::m_InitUi(void)
    this->mpc_Ui->pc_LabelCustomDllPath->setText(C_GtGetText::h_GetText("DLL path"));
    this->mpc_Ui->pc_RadioButtonOther->setText(C_GtGetText::h_GetText("Other"));
    this->mpc_Ui->pc_PushButtonBrowse->setText("");
+   this->mpc_Ui->pc_PushButtonVariables->setText("");
 
    // initialize button icon
    QIcon c_Icon;
@@ -163,7 +165,7 @@ void C_CamMosDllWidget::m_InitUi(void)
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_RadioButtonOther, "DarkBackground", true);
 
    // hide line edit
-   this->m_ShowCustomDllPath(false);
+   this->mpc_Ui->pc_WidgetCustomDll->setVisible(false);
 
    // connects
    connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigExpandSection,
@@ -176,9 +178,13 @@ void C_CamMosDllWidget::m_InitUi(void)
            this, &C_CamMosDllWidget::m_ConcreteDllClicked);
    connect(this->mpc_Ui->pc_RadioButtonOther, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
            this, &C_CamMosDllWidget::m_OtherDllClicked);
-   connect(this->mpc_Ui->pc_LineEditCustomDllPath, &C_CamOgeLeDarkBrowse::editingFinished, this,
+   connect(this->mpc_Ui->pc_LineEditCustomDllPath, &C_CamOgeLeFilePath::editingFinished, this,
            &C_CamMosDllWidget::m_UpdateCANDllPath);
+
+   // path actions
    connect(this->mpc_Ui->pc_PushButtonBrowse, &C_CamOgePubDarkBrowse::clicked, this, &C_CamMosDllWidget::m_OnBrowse);
+   connect(this->mpc_Ui->pc_PushButtonVariables, &C_CamOgePubPathVariables::SigVariableSelected,
+           this, &C_CamMosDllWidget::m_InsertPathVar);
 
    // button configure
    connect(this->mpc_Ui->pc_PushButtonConfigure, &QPushButton::clicked,
@@ -203,22 +209,22 @@ void C_CamMosDllWidget::m_LoadConfig(void) const
    case C_CamProHandler::ePEAK:
       // PEAK
       this->mpc_Ui->pc_RadioButtonPeak->setChecked(true);
-      this->m_ShowCustomDllPath(false);
+      this->mpc_Ui->pc_WidgetCustomDll->setVisible(false);
       break;
    case C_CamProHandler::eVECTOR:
       // Vector
       this->mpc_Ui->pc_RadioButtonVector->setChecked(true);
-      this->m_ShowCustomDllPath(false);
+      this->mpc_Ui->pc_WidgetCustomDll->setVisible(false);
       break;
    case C_CamProHandler::eOTHER:
       // Other
       this->mpc_Ui->pc_RadioButtonOther->setChecked(true);
-      this->m_ShowCustomDllPath(true);
+      this->mpc_Ui->pc_WidgetCustomDll->setVisible(true);
       break;
    default:
       // Default is PEAK
       this->mpc_Ui->pc_RadioButtonPeak->setChecked(true);
-      this->m_ShowCustomDllPath(false);
+      this->mpc_Ui->pc_WidgetCustomDll->setVisible(false);
       break;
    }
 
@@ -227,12 +233,10 @@ void C_CamMosDllWidget::m_LoadConfig(void) const
    if (c_Path == "")
    {
       this->mpc_Ui->pc_LineEditCustomDllPath->SetPath("");
-      this->mpc_Ui->pc_LineEditCustomDllPath->SetToolTipInformation("", "");
    }
    else
    {
-      this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path);
-      this->mpc_Ui->pc_LineEditCustomDllPath->SetToolTipInformation("", C_Uti::h_GetAbsolutePathFromExe(c_Path));
+      this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
    }
 }
 
@@ -244,7 +248,14 @@ void C_CamMosDllWidget::m_LoadConfig(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_ConfigureDllClicked(void)
 {
-   const QString c_Path = C_Uti::h_GetAbsolutePathFromExe(C_CamProHandler::h_GetInstance()->GetCANDllPath());
+   QString c_Path;
+
+   // Get absolute DLL path (resolve variables and make absolute if it is relative ant not empty)
+   c_Path = C_CamProHandler::h_GetInstance()->GetCANDllPath();
+   if (c_Path.isEmpty() == false)
+   {
+      c_Path = C_CamUti::h_GetResolvedAbsolutePathFromExe(c_Path);
+   }
 
    if (QFile::exists(c_Path) == true)
    {
@@ -283,7 +294,7 @@ void C_CamMosDllWidget::m_ConfigureDllClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_ConcreteDllClicked(void) const
 {
-   this->m_ShowCustomDllPath(false);
+   this->mpc_Ui->pc_WidgetCustomDll->setVisible(false);
    this->m_UpdateCANDllPath();
 }
 
@@ -293,18 +304,12 @@ void C_CamMosDllWidget::m_ConcreteDllClicked(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_OtherDllClicked(void) const
 {
-   this->m_ShowCustomDllPath(true);
+   this->mpc_Ui->pc_WidgetCustomDll->setVisible(true);
+   if (this->mpc_Ui->pc_LineEditCustomDllPath->GetPath().isEmpty() == true)
+   {
+      this->mpc_Ui->pc_LineEditCustomDllPath->setFocus();
+   }
    this->m_UpdateCANDllPath();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show DLL path line edit and description label.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDllWidget::m_ShowCustomDllPath(const bool oq_Active) const
-{
-   this->mpc_Ui->pc_WidgetCustomDll->setVisible(oq_Active);
-   this->mpc_Ui->pc_LineEditCustomDllPath->setFocus();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -325,9 +330,6 @@ void C_CamMosDllWidget::m_UpdateCANDllPath(void) const
 
       // remember path in data handling
       C_CamProHandler::h_GetInstance()->SetCustomCANDllPath(c_Path);
-
-      // update line edit tool tip
-      this->mpc_Ui->pc_LineEditCustomDllPath->SetToolTipInformation("", C_Uti::h_GetAbsolutePathFromExe(c_Path));
 
       // set type
       e_Type = C_CamProHandler::E_CANDllType::eOTHER;
@@ -384,7 +386,19 @@ void C_CamMosDllWidget::m_OnBrowse(void)
    {
       c_Path = c_Dialog.selectedFiles().at(0);
       c_Path = C_CamUti::h_AskUserToSaveRelativePath(this, c_Path, C_Uti::h_GetExePath());
-      this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path);
+      this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
       this->m_UpdateCANDllPath();
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Insert selected path variable in DLL path string.
+
+   \param[in]       orc_Variable     path variable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosDllWidget::m_InsertPathVar(const QString & orc_Variable) const
+{
+   this->mpc_Ui->pc_LineEditCustomDllPath->InsertVariable(orc_Variable);
+   this->m_UpdateCANDllPath();
 }

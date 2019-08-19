@@ -44,7 +44,8 @@ using namespace stw_opensyde_gui_logic;
 C_SdNdeDataPoolListsTreeDelegate::C_SdNdeDataPoolListsTreeDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mu32_NodeIndex(0UL),
-   mu32_DataPoolIndex(0UL)
+   mu32_DataPoolIndex(0UL),
+   msn_MaximumHeight(500)
 {
 }
 
@@ -85,7 +86,8 @@ QSize C_SdNdeDataPoolListsTreeDelegate::sizeHint(const QStyleOptionViewItem & or
          const stw_types::sint32 s32_Height = C_SdNdeDataPoolUtil::h_GetTableSize(this->mu32_NodeIndex,
                                                                                   this->mu32_DataPoolIndex,
                                                                                   static_cast<uint32>(orc_Index.parent()
-                                                                                                      .row()));
+                                                                                                      .row()),
+                                                                                  this->msn_MaximumHeight);
          c_Retval.setHeight(s32_Height);
       }
       else
@@ -96,4 +98,18 @@ QSize C_SdNdeDataPoolListsTreeDelegate::sizeHint(const QStyleOptionViewItem & or
       }
    }
    return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Sets the maximum height for the calculation of the table size in sizeHint
+
+   \param[in]     sn_Height       Maximum height of entire tree widget
+
+   \created     20.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeDataPoolListsTreeDelegate::SetMaximumHeight(const sintn sn_Height)
+{
+   this->msn_MaximumHeight = sn_Height;
 }

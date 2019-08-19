@@ -10,7 +10,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -19,29 +19,29 @@
 #include "TGLUtils.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set up class
 
    Initializes class elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDataDealer::C_OSCDataDealer(void) :
    mpc_Node(NULL),
    mu32_NodeIndex(0U),
@@ -49,7 +49,7 @@ C_OSCDataDealer::C_OSCDataDealer(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set up class
 
    Initializes class elements
@@ -58,7 +58,7 @@ C_OSCDataDealer::C_OSCDataDealer(void) :
    \param[in]     ou32_NodeIndex    Index of node of data dealer
    \param[in]     opc_DiagProtocol  Pointer to used diagnostic protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDataDealer::C_OSCDataDealer(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
                                  C_OSCDiagProtocolBase * const opc_DiagProtocol) :
    mpc_Node(opc_Node),
@@ -68,24 +68,24 @@ C_OSCDataDealer::C_OSCDataDealer(C_OSCNode * const opc_Node, const uint32 ou32_N
    this->m_Init();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up class
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDataDealer::~C_OSCDataDealer(void)
 {
    mpc_Node = NULL;
    mpc_DiagProtocol = NULL;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initializing the data dealer if the default constructor was used
 
    \param[in]     opc_Node                      Pointer to node of data dealer
    \param[in]     ou32_NodeIndex                Index of node of data dealer
    \param[in]     opc_DiagProtocol              Pointer to used diagnostic protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealer::Initialize(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
                                  C_OSCDiagProtocolBase * const opc_DiagProtocol)
 {
@@ -95,19 +95,19 @@ void C_OSCDataDealer::Initialize(C_OSCNode * const opc_Node, const uint32 ou32_N
    this->m_Init();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the associated node index
 
    \return
    Node index
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCDataDealer::GetNodeIndex(void) const
 {
    return this->mu32_NodeIndex;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read data from server's data pool
 
    Read data pool data from server and place in local data pool.
@@ -131,7 +131,7 @@ uint32 C_OSCDataDealer::GetNodeIndex(void) const
    C_WARN      error response received
    C_OVERFLOW  size of data received from server does not match size of specified data pool element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                      const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
 {
@@ -195,7 +195,7 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write data to server's data pool
 
    Write data from local data pool data to server's data pool.
@@ -221,7 +221,7 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
    C_WARN      error response received
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                       const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
 {
@@ -280,7 +280,7 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read data from server's NVM
 
    Read NVM data from server and place in local data pool.
@@ -307,7 +307,7 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
    C_WARN      error response reveived
    C_COM       expected server response not received because of communication error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                 const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
 {
@@ -354,7 +354,7 @@ sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write data to server's NVM
 
    Write data from local data pool data to server's NVM.
@@ -387,7 +387,7 @@ sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16
    C_WARN      error response reveived
    C_COM       expected server response not received because of communication error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                  const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
 {
@@ -437,7 +437,7 @@ sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou1
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handler for reception of async response
 
    Called by the DataDealer after it has placed the data in the data pool content structure associated with
@@ -449,7 +449,7 @@ sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou1
    \param[in]  ou16_ListIndex      list index that data was received for
    \param[in]  ou16_ElementIndex   element index that data was received for
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                     const uint16 ou16_ElementIndex)
 {
@@ -460,7 +460,7 @@ void C_OSCDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolInde
    osc_write_log_warning("Asynchronous communication", c_Info);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handler for reception of async error response
 
    Called by the DataDealer after it has received an error response for a cyclic transmission.
@@ -472,7 +472,7 @@ void C_OSCDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolInde
    \param[in]  ou16_ElementIndex   element index that data was received for
    \param[in]  ou8_ErrorCode       received error code
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                          const uint16 ou16_ElementIndex, const uint8 ou8_ErrorCode)
 {
@@ -483,7 +483,7 @@ void C_OSCDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoo
    osc_write_log_warning("Asynchronous communication", c_Info);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handler for reception of async response
 
    Called by the DataDealer after it has placed the data in the data pool content structure associated with
@@ -495,7 +495,7 @@ void C_OSCDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoo
    \param[in]  ou16_ListIndex      list index that data was received for
    \param[in]  ou16_ElementIndex   element index that data was received for
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                        const uint16 ou16_ElementIndex)
 {
@@ -506,10 +506,10 @@ void C_OSCDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPoolI
    osc_write_log_warning("Asynchronous communication", c_Info);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialization of the data dealer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealer::m_Init(void)
 {
    if (this->mpc_DiagProtocol != NULL)
@@ -519,7 +519,7 @@ void C_OSCDataDealer::m_Init(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handling an async received read datapool data event
 
    Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventReceived.
@@ -536,7 +536,7 @@ void C_OSCDataDealer::m_Init(void)
    \param[in]     ou8_ElementIndex     Element index
    \param[in]     orc_Value            Value of element stored in uint8 vector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance, const uint8 ou8_DataPoolIndex,
                                                        const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex,
                                                        const std::vector<uint8> & orc_Value)
@@ -551,7 +551,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handling an async received read datapool data event
 
    Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventReceived.
@@ -567,7 +567,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance
    \param[in]     ou8_ElementIndex     Element index
    \param[in]     orc_Value            Value of element stored in uint8 vector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                       const uint16 ou16_ElementIndex,
                                                       const std::vector<uint8> & orc_Value)
@@ -627,7 +627,7 @@ void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIn
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handling an async received negative read datapool data event
 
    Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventErrorReceived.
@@ -643,7 +643,7 @@ void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIn
    \param[in]     ou8_ListIndex        List index
    \param[in]     ou8_ElementIndex     Element index
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Instance, const uint8 ou8_DataPoolIndex,
                                                             const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex,
                                                             const uint8 ou8_NrCode)
@@ -658,7 +658,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Ins
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handling an async received negative read datapool data event
 
    Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventErrorReceived.
@@ -669,7 +669,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Ins
    Here:
    Check whether this is something we know about and inform application.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealer::m_ReadDataPoolDataEventErrorReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                            const uint16 ou16_ElementIndex, const uint8 ou8_NrCode)
 {

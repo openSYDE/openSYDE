@@ -651,7 +651,6 @@ SOURCES += ../src/main.cpp\
     ../src/system_views/system_setup/C_SyvSeContextMenuManager.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxDefaultCheckedDisabled.cpp \
     ../libs/opensyde_core/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.cpp \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLePropertiesToolTip.cpp \
     ../src/user_settings/C_UsNode.cpp \
     ../src/user_settings/C_UsNodeDatapool.cpp \
     ../src/system_views/C_SyvUtil.cpp \
@@ -882,12 +881,29 @@ SOURCES += ../src/main.cpp\
     ../src/project_gui/system_definition/C_PuiSdHandlerBusLogic.cpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerNodeLogic.cpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerData.cpp \
+    ../src/system_views/dashboards/C_SyvDaDashboardSnapshot.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.cpp \
     ../src/system_views/system_update/C_SyvUpFileSizeInformation.cpp \
     ../src/table_base/tree_base/C_TblTreDelegateUtil.cpp \
     ../src/user_settings/C_UsSystemViewNode.cpp \
     ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.cpp \
-    ../src/opensyde_gui_elements/C_OgeTreeWidgetToolTipBase.cpp
+    ../src/opensyde_gui_elements/C_OgeTreeWidgetToolTipBase.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubPathVariables.cpp \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePathBase.cpp \
+    ../src/opensyde_gui_elements/menu/C_OgeMuSections.cpp \
+    ../src/scene_base/undo/C_SebUnoZOrderSortHelper.cpp \
+    ../src/graphic_items/base_items/C_GiBiBase.cpp \
+    ../src/project_gui/C_PuiUtil.cpp \
+    ../src/system_views/dashboards/items/C_SyvDaItTableHeaderView.cpp \
+    ../src/table_base/tree_base/C_TblTreSimpleItem.cpp \
+    ../src/table_base/tree_base/C_TblTreSimpleModel.cpp \
+    ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSection2.cpp \
+    ../src/opensyde_gui_elements/label/C_OgeLabNavigationSubHeading.cpp \
+    ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationHeadingBackground.cpp \
+    ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSectionSelected.cpp \
+    ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/gui/precomp_headers.h
 
@@ -1533,7 +1549,6 @@ HEADERS  += \
     ../src/opensyde_gui_elements/check_box/C_OgeChxDefaultCheckedDisabled.h \
     ../libs/opensyde_core/ip_dispatcher/dispatcher/C_OSCIpDispatcher.h \
     ../libs/opensyde_core/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.h \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLePropertiesToolTip.h \
     ../src/user_settings/C_UsNode.h \
     ../src/user_settings/C_UsNodeDatapool.h \
     ../src/system_views/C_SyvUtil.h \
@@ -1775,12 +1790,29 @@ HEADERS  += \
     ../src/project_gui/system_definition/C_PuiSdHandlerBusLogic.h \
     ../src/project_gui/system_definition/C_PuiSdHandlerNodeLogic.h \
     ../src/project_gui/system_definition/C_PuiSdHandlerData.h \
+    ../src/system_views/dashboards/C_SyvDaDashboardSnapshot.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.h \
     ../src/system_views/system_update/C_SyvUpFileSizeInformation.h \
     ../src/table_base/tree_base/C_TblTreDelegateUtil.h \
     ../src/user_settings/C_UsSystemViewNode.h \
     ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.h \
-    ../src/opensyde_gui_elements/C_OgeTreeWidgetToolTipBase.h
+    ../src/opensyde_gui_elements/C_OgeTreeWidgetToolTipBase.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubPathVariables.h \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePathBase.h \
+    ../src/opensyde_gui_elements/menu/C_OgeMuSections.h \
+    ../src/scene_base/undo/C_SebUnoZOrderSortHelper.h \
+    ../src/graphic_items/base_items/C_GiBiBase.h \
+    ../src/project_gui/C_PuiUtil.h \
+    ../src/system_views/dashboards/items/C_SyvDaItTableHeaderView.h \
+    ../src/table_base/tree_base/C_TblTreSimpleItem.h \
+    ../src/table_base/tree_base/C_TblTreSimpleModel.h \
+    ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSection2.h \
+    ../src/opensyde_gui_elements/label/C_OgeLabNavigationSubHeading.h \
+    ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationHeadingBackground.h \
+    ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSectionSelected.h \
+    ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h
 
 FORMS    += \
     ../src/system_definition/C_SdTopologyWidget.ui \
@@ -1908,7 +1940,8 @@ FORMS    += \
     ../src/system_views/system_update/C_SyvUpInformationWidget.ui \
     ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.ui \
     ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.ui \
-    ../src/system_views/dashboards/C_SyvDaDashboardInteraction.ui
+    ../src/system_views/dashboards/C_SyvDaDashboardInteraction.ui \
+    ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.ui
 
 INCLUDEPATH += ../src \
                ../src/com_import_export \
@@ -1921,6 +1954,7 @@ INCLUDEPATH += ../src \
                ../src/opensyde_gui_elements/splitter \
                ../src/opensyde_gui_elements/label \
                ../src/opensyde_gui_elements/line_edit \
+               ../src/opensyde_gui_elements/menu \
                ../src/opensyde_gui_elements/push_button \
                ../src/opensyde_gui_elements/radio_button \
                ../src/opensyde_gui_elements/scroll_area \

@@ -62,7 +62,7 @@ C_SebUnoAddDeleteBaseCommand::C_SebUnoAddDeleteBaseCommand(QGraphicsScene * cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, QMap<C_PuiBsTemporaryDataID,
                                                                                      uint64> & orc_MapTypeAndIndexToID,
-                                                 const C_PuiBsElements & orc_AllElements)
+                                                 const C_PuiBsElements & orc_AllElements) const
 {
    std::vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
    C_GiBiArrow * pc_LineArrow;

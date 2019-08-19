@@ -70,7 +70,8 @@ void C_CamGenTableModel::UpdateMessageKey(const uint32 ou32_MessageIndex)
 
    c_Roles.push_back(static_cast<sintn>(Qt::DisplayRole));
 
-   Q_EMIT this->dataChanged(this->index(ou32_MessageIndex, s32_Col), this->index(ou32_MessageIndex, s32_Col), c_Roles);
+   Q_EMIT (this->dataChanged(this->index(ou32_MessageIndex, s32_Col),
+                             this->index(ou32_MessageIndex, s32_Col), c_Roles));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,7 +87,8 @@ void C_CamGenTableModel::UpdateMessageData(const uint32 ou32_MessageIndex)
 
    c_Roles.push_back(static_cast<sintn>(Qt::DisplayRole));
 
-   Q_EMIT this->dataChanged(this->index(ou32_MessageIndex, s32_Col), this->index(ou32_MessageIndex, s32_Col), c_Roles);
+   Q_EMIT (this->dataChanged(this->index(ou32_MessageIndex, s32_Col),
+                             this->index(ou32_MessageIndex, s32_Col), c_Roles));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -259,15 +261,15 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                if (osn_Role == msn_USER_ROLE_SORT)
                {
                   //Use simple unit value for sorting (better than string)
-                  c_Retval = static_cast<uint64>(pc_Message->u32_ID);
+                  c_Retval = static_cast<uint64>(pc_Message->u32_Id);
                }
                else
                {
-                  c_Retval = mh_HandleHexValue(static_cast<uint64>(pc_Message->u32_ID), osn_Role);
+                  c_Retval = mh_HandleHexValue(static_cast<uint64>(pc_Message->u32_Id), osn_Role);
                }
                break;
             case eDLC:
-               c_Retval = static_cast<uint64>(pc_Message->u8_DLC);
+               c_Retval = static_cast<uint64>(pc_Message->u16_Dlc);
                break;
             case eDATA:
                //Don't set any data as this column is handled differently
@@ -276,10 +278,10 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                   //For sorting!
                   uint64 u64_Result = 0ULL;
                   //Right align all filled bytes
-                  for (uint8 u8_ItByte = 0U; u8_ItByte < pc_Message->u8_DLC; ++u8_ItByte)
+                  for (uint16 u16_ItByte = 0U; u16_ItByte < pc_Message->u16_Dlc; ++u16_ItByte)
                   {
-                     u64_Result += static_cast<uint64>(pc_Message->au8_Data[static_cast<uint32>(u8_ItByte)]) <<
-                                   (56U - (u8_ItByte * 8U));
+                     u64_Result += static_cast<uint64>(pc_Message->c_Bytes[static_cast<uint32>(u16_ItByte)]) <<
+                                   (56U - (u16_ItByte * 8U));
                   }
                   c_Retval = u64_Result;
                }
@@ -355,7 +357,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
             {
                QBitArray c_Array;
                //No markings
-               c_Array.resize(static_cast<sintn>(pc_Message->u8_DLC));
+               c_Array.resize(static_cast<sintn>(pc_Message->u16_Dlc));
                c_Retval = c_Array;
             }
          }
@@ -364,13 +366,13 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
             if (e_Col == eDATA)
             {
                QString c_Tmp;
-               for (uint8 u8_It = 0U; u8_It < pc_Message->u8_DLC; ++u8_It)
+               for (uint16 u16_It = 0U; u16_It < pc_Message->u16_Dlc; ++u16_It)
                {
                   if (c_Tmp.isEmpty() == false)
                   {
                      c_Tmp += " ";
                   }
-                  c_Tmp += QString("%1").arg(pc_Message->au8_Data[u8_It], 2, 16, QChar('0')).toUpper();
+                  c_Tmp += QString("%1").arg(pc_Message->c_Bytes[u16_It], 2, 16, QChar('0')).toUpper();
                }
                c_Retval = c_Tmp;
             }
@@ -380,7 +382,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
             if (e_Col == eDATA)
             {
                QByteArray c_Array;
-               c_Array.resize(static_cast<sintn>(pc_Message->u8_DLC));
+               c_Array.resize(static_cast<sintn>(pc_Message->u16_Dlc));
                //No transparency
                c_Array.fill(static_cast<charn>(0));
                c_Retval = c_Array;
@@ -403,7 +405,8 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             }
          }
-         else if (osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST)
+         else if ((osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST) ||
+                  (osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST))
          {
             QStringList c_Tmp;
             switch (e_Col)
@@ -636,10 +639,15 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
                {
                   m_CheckAndHandleRegisterCyclicMessage(u32_Index, true);
                }
-               //Special for DLC: notify signal table!
+               //Special for DLC: update Data column and notify signal table!
                if (e_Col == eDLC)
                {
-                  Q_EMIT this->SigUpdateMessageDLC(u32_Index);
+                  const sint32 s32_Col = C_CamGenTableModel::h_EnumToColumn(eDATA);
+                  const QModelIndex c_Temp = orc_Index.sibling(orc_Index.row(), s32_Col);
+
+                  Q_EMIT (this->SigUpdateMessageDLC(u32_Index));
+                  //lint -e{1793} Qt example
+                  Q_EMIT (this->dataChanged(c_Temp, c_Temp, QVector<stw_types::sintn>() << osn_Role));
                }
             }
          }
@@ -696,7 +704,7 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
                      //Special for cyclic trigger: change the current message as necessary (no two signals necessary)
                      if (e_Col == eCYCLIC_TRIGGER)
                      {
-                        Q_EMIT this->SigRegisterCyclicMessage(u32_Index, q_Val);
+                        Q_EMIT (this->SigRegisterCyclicMessage(u32_Index, q_Val));
                      }
                   }
                   q_Retval = true;
@@ -712,7 +720,7 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
          if (q_Retval == true)
          {
             //lint -e{1793} Qt example
-            Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
+            Q_EMIT (this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role));
          }
       }
    }
@@ -918,7 +926,7 @@ std::vector<uint32> C_CamGenTableModel::AddSpecificNewItems(const std::vector<ui
 {
    std::vector<uint32> c_Retval;
    c_Retval = m_AddNewMessages(m_GetLastSelectedIndex(orc_SelectedIndex), orc_Messages);
-   Q_EMIT this->SigItemCountChanged(this->m_GetSizeItems());
+   Q_EMIT (this->SigItemCountChanged(this->m_GetSizeItems()));
    return c_Retval;
 }
 
@@ -942,7 +950,7 @@ uint32 C_CamGenTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
    //Initial name
    c_NewMessage.c_Name = "New message";
    //initial DLC
-   c_NewMessage.u8_DLC = 8;
+   c_NewMessage.u16_Dlc = 8U;
    c_Messages.push_back(c_NewMessage);
    c_Items = m_AddNewMessages(ou32_SelectedIndex, c_Messages);
    if (c_Items.size() > 0UL)
@@ -1011,7 +1019,7 @@ void C_CamGenTableModel::m_DeleteItem(const uint32 ou32_Index)
    \param[in] ou32_TargetIndex Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex) const
+void C_CamGenTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex)
 {
    tgl_assert(C_CamProHandler::h_GetInstance()->MoveMessage(ou32_SourceIndex, ou32_TargetIndex) == C_NO_ERR);
 }
@@ -1072,6 +1080,6 @@ void C_CamGenTableModel::m_CheckAndHandleRegisterCyclicMessage(const uint32 ou32
    //Only send this signal if the message is currently cyclic
    if ((pc_Message != NULL) && (pc_Message->q_DoCyclicTrigger == true))
    {
-      Q_EMIT this->SigRegisterCyclicMessage(ou32_MessageIndex, oq_Active);
+      Q_EMIT (this->SigRegisterCyclicMessage(ou32_MessageIndex, oq_Active));
    }
 }

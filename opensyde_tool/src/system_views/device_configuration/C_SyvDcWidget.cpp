@@ -71,7 +71,7 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDcWidget),
    mpc_ParentDialog(&orc_Parent),
-   mpc_DcSequences(new C_SyvDcSequences()),
+   mpc_DcSequences(NULL),
    mu32_ViewIndex(ou32_ViewIndex),
    mu32_TempBitrate(0U),
    mq_SameBitrates(false),
@@ -144,17 +144,6 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
    qRegisterMetaType<uint32>("uint32");
    qRegisterMetaType<sint32>("sint32");
    qRegisterMetaType<uint8>("uint8");
-   connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfCanOpenSydeDevicesProgress, this,
-           &C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig, Qt::QueuedConnection);
-   connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfEthOpenSydeDevicesProgress, this,
-           &C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig, Qt::QueuedConnection);
-
-   connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfCanStwFlashloaderDevicesProgress, this,
-           &C_SyvDcWidget::m_UpdateProgressOfStwFlashloaderConfig, Qt::QueuedConnection);
-   connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfOpenSydeDevicesState, this,
-           &C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig, Qt::QueuedConnection);
-   connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfCanStwFlashloaderDevicesState, this,
-           &C_SyvDcWidget::m_UpdateStateOfStwFlashloaderConfig, Qt::QueuedConnection);
 
    connect(this->mpc_Ui->pc_ListWidgetExistingNodesAssignment, &C_SyvDcExistingNodeList::SigConnect, this,
            &C_SyvDcWidget::m_AssignmentConnect);
@@ -205,6 +194,21 @@ C_SyvDcWidget::~C_SyvDcWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::CleanUp(void)
 {
+   if (this->mpc_DcSequences != NULL)
+   {
+      disconnect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfCanOpenSydeDevicesProgress, this,
+                 &C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig);
+      disconnect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfEthOpenSydeDevicesProgress, this,
+                 &C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig);
+
+      disconnect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfCanStwFlashloaderDevicesProgress, this,
+                 &C_SyvDcWidget::m_UpdateProgressOfStwFlashloaderConfig);
+      disconnect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfOpenSydeDevicesState, this,
+                 &C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig);
+      disconnect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfCanStwFlashloaderDevicesState, this,
+                 &C_SyvDcWidget::m_UpdateStateOfStwFlashloaderConfig);
+   }
+
    //Stop timer just in case
    this->mc_Timer.stop();
    delete mpc_DcSequences;
@@ -317,66 +321,75 @@ void C_SyvDcWidget::keyPressEvent(QKeyEvent * const opc_Event)
 sint32 C_SyvDcWidget::m_InitSequence(void)
 {
    QString c_Message;
-   sint32 s32_Retval;
+   sint32 s32_Retval = C_NO_ERR;
 
    // Sequence initialization
-   if (this->mpc_DcSequences != NULL)
+   if (this->mpc_DcSequences == NULL)
+   {
+      this->mpc_DcSequences = new C_SyvDcSequences();
+
+      connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfCanOpenSydeDevicesProgress, this,
+              &C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig, Qt::QueuedConnection);
+      connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfEthOpenSydeDevicesProgress, this,
+              &C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig, Qt::QueuedConnection);
+
+      connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfCanStwFlashloaderDevicesProgress, this,
+              &C_SyvDcWidget::m_UpdateProgressOfStwFlashloaderConfig, Qt::QueuedConnection);
+      connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfOpenSydeDevicesState, this,
+              &C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig, Qt::QueuedConnection);
+      connect(this->mpc_DcSequences, &C_SyvDcSequences::SigRunConfCanStwFlashloaderDevicesState, this,
+              &C_SyvDcWidget::m_UpdateStateOfStwFlashloaderConfig, Qt::QueuedConnection);
+   }
+
+   if (this->mpc_DcSequences != NULL) // required anyway by PC lint
    {
       if (this->mpc_DcSequences->IsInitialized() == false)
       {
          s32_Retval = this->mpc_DcSequences->InitDcSequences(this->mu32_ViewIndex);
       }
-      else
-      {
-         s32_Retval = C_NO_ERR;
-      }
-
-      switch (s32_Retval)
-      {
-      case C_NO_ERR:
-         break;
-      case C_CONFIG:
-         c_Message = QString(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
-         break;
-      case C_RD_WR:
-         c_Message =
-            QString(C_GtGetText::h_GetText("Configured communication DLL does not exist or DLL could not be opened."));
-         break;
-      case C_OVERFLOW:
-         c_Message =
-            QString(C_GtGetText::h_GetText(
-                       "Unknown transport protocol or unknown diagnostic server for at least one node."));
-         break;
-      case C_NOACT:
-         c_Message = QString(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
-         break;
-      case C_COM:
-         c_Message =
-            QString(C_GtGetText::h_GetText(
-                       "CAN initialization failed. Check your PC CAN interface configuration "
-                       "(System View setup - double-click on PC)."));
-         break;
-      case C_CHECKSUM:
-         c_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
-         break;
-      case C_RANGE:
-         c_Message = QString(C_GtGetText::h_GetText("Routing configuration failed."));
-         break;
-      case C_UNKNOWN_ERR:
-         c_Message = QString(C_GtGetText::h_GetText("Wrapped error of internal function call."));
-         break;
-      case C_WARN:
-         c_Message = QString(C_GtGetText::h_GetText("Internal error."));
-         break;
-      default:
-         c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
-         break;
-      }
    }
-   else
+
+   switch (s32_Retval)
    {
-      c_Message = QString(C_GtGetText::h_GetText("Internal error. Sequence not available."));
-      s32_Retval = C_CONFIG;
+   case C_NO_ERR:
+      break;
+   case C_CONFIG:
+      c_Message = QString(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
+      break;
+   case C_RD_WR:
+      c_Message =
+         QString(C_GtGetText::h_GetText("Configured communication DLL does not exist or DLL could not be opened."));
+      break;
+   case C_OVERFLOW:
+      c_Message =
+         QString(C_GtGetText::h_GetText(
+                    "Unknown transport protocol or unknown diagnostic server for at least one node."));
+      break;
+   case C_NOACT:
+      c_Message = QString(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
+      break;
+   case C_COM:
+      // TODO BAY: Adapt text in case of Ethernet
+      c_Message =
+         QString(C_GtGetText::h_GetText(
+                    "CAN initialization failed. Check your PC CAN interface configuration "
+                    "(System View setup - double-click on PC)."));
+      break;
+   case C_CHECKSUM:
+      c_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
+      break;
+   case C_RANGE:
+      c_Message = QString(C_GtGetText::h_GetText("Routing configuration failed."));
+      break;
+   case C_UNKNOWN_ERR:
+      c_Message = QString(C_GtGetText::h_GetText("Wrapped error of internal function call."));
+      break;
+   case C_WARN:
+      c_Message = QString(C_GtGetText::h_GetText("Internal error."));
+      break;
+   default:
+      c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+      break;
    }
 
    if (s32_Retval != C_NO_ERR)
@@ -808,6 +821,7 @@ void C_SyvDcWidget::m_BackToScan(void)
 
    this->mc_ServerStates.clear();
 
+   this->CleanUp();
    m_InitScanScreen();
 }
 
@@ -966,7 +980,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OSCNodeComInterfaceSe
       orc_Text += "<tr>";
       orc_Text += "<td width=\"40%\">" +
                   QString(C_GtGetText::h_GetText("CAN-Bitrate: ")) + QString::number(ou32_Bitrate / 1000U) +
-                  QString(" kBit/s ") + "</td>";
+                  QString(" kbit/s ") + "</td>";
       orc_Text += "<td width=\"20%\">" +
                   this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETCANBITRATE, orc_ServerIdOnConfiguredBus,
                                                      orc_IntfSetting.e_InterfaceType,
@@ -1918,7 +1932,7 @@ void C_SyvDcWidget::m_InitModeComboBox(void)
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDcWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
 {
-   const QString c_Text = QString::number(ou32_Bitrate) + QString(" KBit/s");
+   const QString c_Text = QString::number(ou32_Bitrate) + QString(" kbit/s");
 
    return c_Text;
 }
@@ -1928,7 +1942,7 @@ uint32 C_SyvDcWidget::m_GetBitrateFromComboBoxString(const QString & orc_Entry) 
 {
    QString c_Bitrate = orc_Entry;
    // In case of an error it returns 0
-   const uint32 u32_Bitrate = c_Bitrate.remove(" KBit/s").toInt();
+   const uint32 u32_Bitrate = c_Bitrate.remove(" kbit/s").toInt();
 
    return u32_Bitrate;
 }
@@ -2553,18 +2567,15 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcWidget::m_CheckQuitPossible(void) const
 {
-   bool q_Retval;
+   bool q_Retval = false;
    sint32 s32_Result;
 
-   if ((this->mpc_DcSequences != NULL) &&
+   if ((this->mpc_DcSequences == NULL) ||
        (this->mpc_DcSequences->GetResults(s32_Result) == C_NO_ERR))
    {
       q_Retval = true;
    }
-   else
-   {
-      q_Retval = false;
-   }
+
    return q_Retval;
 }
 

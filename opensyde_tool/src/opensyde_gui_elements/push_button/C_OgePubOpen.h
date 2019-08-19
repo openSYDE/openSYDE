@@ -12,7 +12,7 @@
 #define C_OGEPUBOPEN_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QPushButton>
+#include "C_OgePubToolTipBase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
@@ -22,7 +22,7 @@ namespace stw_opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgePubOpen :
-   public QPushButton
+   public C_OgePubToolTipBase
 {
    Q_OBJECT
 

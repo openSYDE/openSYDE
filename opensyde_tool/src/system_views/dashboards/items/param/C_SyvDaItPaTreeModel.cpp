@@ -550,38 +550,38 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
 
    if (this->mpc_InvisibleRootItem != NULL)
    {
-      for (std::vector<C_TblTreItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
+      for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
            c_ItAll != this->mpc_InvisibleRootItem->c_Children.end(); ++c_ItAll)
       {
          //Top level
-         const C_TblTreItem * const pc_AllNode = *c_ItAll;
+         const C_TblTreSimpleItem * const pc_AllNode = *c_ItAll;
          if (pc_AllNode != NULL)
          {
             uint32 u32_ItNode = 0UL;
             QModelIndex c_AllBase = this->index(0, 0);
-            for (std::vector<C_TblTreItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
+            for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
                  c_ItNode != pc_AllNode->c_Children.end(); ++c_ItNode)
             {
                //Node level
-               const C_TblTreItem * const pc_Node = *c_ItNode;
+               const C_TblTreSimpleItem * const pc_Node = *c_ItNode;
                if (pc_Node != NULL)
                {
                   uint32 u32_ItDp = 0UL;
                   QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllBase);
-                  for (std::vector<C_TblTreItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
+                  for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
                        c_ItDp != pc_Node->c_Children.end(); ++c_ItDp)
                   {
                      //Data pool level
-                     const C_TblTreItem * const pc_Dp = *c_ItDp;
+                     const C_TblTreSimpleItem * const pc_Dp = *c_ItDp;
                      if (pc_Dp != NULL)
                      {
                         uint32 u32_ItLi = 0UL;
                         QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
-                        for (std::vector<C_TblTreItem *>::const_iterator c_ItLi = pc_Dp->c_Children.begin();
+                        for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItLi = pc_Dp->c_Children.begin();
                              c_ItLi != pc_Dp->c_Children.end(); ++c_ItLi)
                         {
                            //List level
-                           const C_TblTreItem * const pc_Li = *c_ItLi;
+                           const C_TblTreSimpleItem * const pc_Li = *c_ItLi;
                            if (pc_Li != NULL)
                            {
                               QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
@@ -629,11 +629,12 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
    if ((oru32_ValidLayers <= 4UL) && (this->mpc_InvisibleRootItem != NULL))
    {
       uint32 u32_ItAll = 0UL;
-      for (std::vector<C_TblTreItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
+      for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
            c_ItAll != this->mpc_InvisibleRootItem->c_Children.end(); ++c_ItAll)
       {
          //Top level
-         const C_TblTreItem * const pc_AllNode = *c_ItAll;
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         const C_TblTreItem * const pc_AllNode = dynamic_cast<const C_TblTreItem * const>(*c_ItAll);
          if (pc_AllNode != NULL)
          {
             QModelIndex c_AllNode = this->index(static_cast<sintn>(u32_ItAll), 0);
@@ -644,11 +645,12 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
             else
             {
                uint32 u32_ItNode = 0UL;
-               for (std::vector<C_TblTreItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
+               for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
                     c_ItNode != pc_AllNode->c_Children.end(); ++c_ItNode)
                {
                   //Node level
-                  const C_TblTreItem * const pc_Node = *c_ItNode;
+                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                  const C_TblTreItem * const pc_Node = dynamic_cast<const C_TblTreItem * const>(*c_ItNode);
                   if ((pc_Node != NULL) && (pc_Node->u32_Index == orc_Id.u32_NodeIndex))
                   {
                      QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllNode);
@@ -659,11 +661,12 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                      else
                      {
                         uint32 u32_ItDp = 0UL;
-                        for (std::vector<C_TblTreItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
+                        for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
                              c_ItDp != pc_Node->c_Children.end(); ++c_ItDp)
                         {
                            //Datapool level
-                           const C_TblTreItem * const pc_Dp = *c_ItDp;
+                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           const C_TblTreItem * const pc_Dp = dynamic_cast<const C_TblTreItem * const>(*c_ItDp);
                            if ((pc_Dp != NULL) && (pc_Dp->u32_Index == orc_Id.u32_DataPoolIndex))
                            {
                               QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
@@ -674,11 +677,14 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                               else
                               {
                                  uint32 u32_ItLi = 0UL;
-                                 for (std::vector<C_TblTreItem *>::const_iterator c_ItLi = pc_Dp->c_Children.begin();
+                                 for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItLi =
+                                         pc_Dp->c_Children.begin();
                                       c_ItLi != pc_Dp->c_Children.end(); ++c_ItLi)
                                  {
                                     //List level
-                                    const C_TblTreItem * const pc_Li = *c_ItLi;
+                                    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                                    const C_TblTreItem * const pc_Li =
+                                       dynamic_cast<const C_TblTreItem * const>(*c_ItLi);
                                     if ((pc_Li != NULL) && (pc_Li->u32_Index == orc_Id.u32_ListIndex))
                                     {
                                        QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
@@ -689,12 +695,14 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                                        else
                                        {
                                           uint32 u32_ItEl = 0UL;
-                                          for (std::vector<C_TblTreItem *>::const_iterator c_ItEl =
+                                          for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItEl =
                                                   pc_Li->c_Children.begin();
                                                c_ItEl != pc_Li->c_Children.end(); ++c_ItEl)
                                           {
                                              //Element level
-                                             const C_TblTreItem * const pc_El = *c_ItEl;
+                                             //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                                             const C_TblTreItem * const pc_El =
+                                                dynamic_cast<const C_TblTreItem * const>(*c_ItEl);
                                              if ((pc_El != NULL) && (pc_El->u32_Index == orc_Id.u32_ElementIndex))
                                              {
                                                 QModelIndex c_El = this->index(static_cast<sintn>(u32_ItEl), 0, c_Li);
@@ -2052,7 +2060,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                      if ((pc_Element != NULL) && (u32_Index < pc_ParamData->c_ListValues.size()))
                      {
                         const C_OSCNodeDataPoolContent & rc_Value = pc_ParamData->c_ListValues[u32_Index];
-                        if ((rc_Value >= pc_Element->c_MinValue) && (rc_Value >= pc_Element->c_MinValue))
+                        if ((rc_Value >= pc_Element->c_MinValue) && (rc_Value <= pc_Element->c_MaxValue))
                         {
                            //No error
                            c_Retval = c_Default;
@@ -2574,20 +2582,29 @@ void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OSCNod
          static_cast<const C_TblTreItem * const>(orc_Index.internalPointer());
       if (pc_TreeItem != NULL)
       {
-         const C_TblTreItem * const pc_FirstParent = pc_TreeItem->pc_Parent;
-         if (pc_FirstParent->pc_Parent != NULL)
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         const C_TblTreItem * const pc_FirstParent = dynamic_cast<const C_TblTreItem * const>(pc_TreeItem->pc_Parent);
+         if ((pc_FirstParent != NULL) && (pc_FirstParent->pc_Parent != NULL))
          {
-            const C_TblTreItem * const pc_SecondParent = pc_FirstParent->pc_Parent;
-            if (pc_SecondParent->pc_Parent != NULL)
+            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            const C_TblTreItem * const pc_SecondParent =
+               dynamic_cast<const C_TblTreItem * const>(pc_FirstParent->pc_Parent);
+            if ((pc_SecondParent != NULL) && (pc_SecondParent->pc_Parent != NULL))
             {
-               const C_TblTreItem * const pc_ThirdParent = pc_SecondParent->pc_Parent;
-               if (pc_ThirdParent->pc_Parent != NULL)
+               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               const C_TblTreItem * const pc_ThirdParent =
+                  dynamic_cast<const C_TblTreItem * const>(pc_SecondParent->pc_Parent);
+               if ((pc_ThirdParent != NULL) && (pc_ThirdParent->pc_Parent != NULL))
                {
-                  const C_TblTreItem * const pc_FourthParent = pc_ThirdParent->pc_Parent;
-                  if (pc_FourthParent->pc_Parent != NULL)
+                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                  const C_TblTreItem * const pc_FourthParent =
+                     dynamic_cast<const C_TblTreItem * const>(pc_ThirdParent->pc_Parent);
+                  if ((pc_FourthParent != NULL) && (pc_FourthParent->pc_Parent != NULL))
                   {
-                     const C_TblTreItem * const pc_FifthParent = pc_FourthParent->pc_Parent;
-                     if (pc_FifthParent->pc_Parent != NULL)
+                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     const C_TblTreItem * const pc_FifthParent =
+                        dynamic_cast<const C_TblTreItem * const>(pc_FourthParent->pc_Parent);
+                     if ((pc_FifthParent != NULL) && (pc_FifthParent->pc_Parent != NULL))
                      {
                         //Should not happen
                         tgl_assert(false);
@@ -2915,7 +2932,7 @@ void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, con
       //Name
       if (pc_View != NULL)
       {
-         opc_TreeNode->c_Name = QString(C_GtGetText::h_GetText("View #%1 - %2")).arg(ou32_ViewIndex + 1).arg(
+         opc_TreeNode->c_Name = QString(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(ou32_ViewIndex + 1).arg(
             pc_View->GetName());
       }
       //Icon
@@ -3393,33 +3410,37 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
    if (this->mpc_InvisibleRootItem != NULL)
    {
       //Node
-      for (std::vector<C_TblTreItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
+      for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
            (c_ItAll != this->mpc_InvisibleRootItem->c_Children.end()) && (q_Found == false);
            ++c_ItAll)
       {
-         const C_TblTreItem * const pc_AllNode = *c_ItAll;
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         const C_TblTreItem * const pc_AllNode = dynamic_cast<const C_TblTreItem * const>(*c_ItAll);
          if (pc_AllNode != NULL)
          {
             //Node
-            for (std::vector<C_TblTreItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
+            for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
                  (c_ItNode != pc_AllNode->c_Children.end()) && (q_Found == false); ++c_ItNode)
             {
-               const C_TblTreItem * const pc_Node = *c_ItNode;
+               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               const C_TblTreItem * const pc_Node = dynamic_cast<const C_TblTreItem * const>(*c_ItNode);
                if (pc_Node != NULL)
                {
                   //Datapool
-                  for (std::vector<C_TblTreItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
+                  for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
                        (c_ItDp != pc_Node->c_Children.end()) && (q_Found == false); ++c_ItDp)
                   {
-                     const C_TblTreItem * const pc_Dp = *c_ItDp;
+                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     const C_TblTreItem * const pc_Dp = dynamic_cast<const C_TblTreItem * const>(*c_ItDp);
                      if (pc_Dp != NULL)
                      {
                         //List
-                        for (std::vector<C_TblTreItem *>::const_iterator c_ItList = pc_Dp->c_Children.begin();
+                        for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItList = pc_Dp->c_Children.begin();
                              (c_ItList != pc_Dp->c_Children.end()) && (q_Found == false);
                              ++c_ItList)
                         {
-                           const C_TblTreItem * const pc_List = *c_ItList;
+                           //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                           const C_TblTreItem * const pc_List = dynamic_cast<const C_TblTreItem * const>(*c_ItList);
                            if (pc_List != NULL)
                            {
                               //Check match

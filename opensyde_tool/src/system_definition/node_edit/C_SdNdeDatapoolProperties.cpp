@@ -342,7 +342,7 @@ void C_SdNdeDatapoolProperties::InitStaticNames(void)
                                                         "Symbolic Datapool name. Unique within a node."
                                                         "\nFollowing C naming conventions are required:"
                                                         "\n - must not be empty"
-                                                        "\n - only alphanumeric characters + \"_\""
+                                                        "\n - only alphanumeric characters and \"_\""
                                                         "\n - should not be longer than 31 characters"));
 
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
@@ -595,8 +595,6 @@ void C_SdNdeDatapoolProperties::m_ApplyType(const bool oq_SharedDatapool)
       this->mpc_Ui->pc_SizeGroup->setVisible(false);
       this->mpc_Ui->pc_SizeInfoUsageGroup->setVisible(false);
       this->mpc_Ui->pc_SizeInfoReservedGroup->setVisible(false);
-      //option is not needed for com datapools
-      this->mpc_Ui->pc_CheckBoxSafety->setChecked(false);
       this->mpc_Ui->pc_LabDatapoolType->setText(C_GtGetText::h_GetText("COMM"));
    }
 

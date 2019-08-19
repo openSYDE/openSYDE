@@ -440,10 +440,12 @@ void C_SdNdeDataPoolListTableWidget::m_AdjustToItems(const bool & orq_Initial)
    {
       //Configure
       const sint32 s32_Height = C_SdNdeDataPoolUtil::h_GetTableSize(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                                    this->mu32_ListIndex);
+                                                                    this->mu32_ListIndex,
+                                                                    this->mpc_TreeWidget->height());
       //Change size (necessary to reach minimum!)
       this->setMinimumHeight(s32_Height);
       this->setMaximumHeight(s32_Height);
+
       if (orq_Initial == false)
       {
          this->mpc_TreeWidget->adjustSize();

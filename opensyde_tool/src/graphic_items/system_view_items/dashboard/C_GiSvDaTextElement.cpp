@@ -143,3 +143,16 @@ void C_GiSvDaTextElement::DeleteData(void)
                                                                   static_cast<uint32>(this->ms32_Index));
    }
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaTextElement::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiBiTextElement::SetZValueCustom(of64_ZValue);
+   //Apply to data
+   this->UpdateData();
+}

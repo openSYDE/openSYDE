@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -22,26 +22,26 @@
 #include "C_OSCImportEdsDcf.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Import EDS or DCF file
 
    Some assumptions:
@@ -64,7 +64,7 @@ using namespace stw_opensyde_core;
    C_NOACT  Node Id not allowed
    C_CONFIG Parsing error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::h_Import(const C_SCLString & orc_FilePath, const uint8 ou8_NodeId,
                                    std::vector<C_OSCCanMessage> & orc_OSCRxMessageData,
                                    std::vector<C_OSCNodeDataPoolListElement> & orc_OSCRxSignalData,
@@ -138,15 +138,15 @@ sint32 C_OSCImportEdsDcf::h_Import(const C_SCLString & orc_FilePath, const uint8
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCImportEdsDcf::C_OSCImportEdsDcf(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get CO object by object ID
 
    \param[in] orc_Objects All CO objects
@@ -156,7 +156,7 @@ C_OSCImportEdsDcf::C_OSCImportEdsDcf(void)
    NULL Object not found
    Else Valid object
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCCanOpenObject * C_OSCImportEdsDcf::mh_GetCOObject(
    const stw_scl::SCLDynamicArray<C_OSCCanOpenObject> & orc_COObjects, const uint32 ou32_Id, const sint32 os32_SubIndex)
 {
@@ -175,7 +175,7 @@ const C_OSCCanOpenObject * C_OSCImportEdsDcf::mh_GetCOObject(
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load core messages data
 
    \param[in]  ou32_StartingId      Starting ID for message section
@@ -190,7 +190,7 @@ const C_OSCCanOpenObject * C_OSCImportEdsDcf::mh_GetCOObject(
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const uint8 ou8_NodeId,
                                            const stw_scl::SCLDynamicArray<C_OSCCanOpenObject> & orc_COObjects,
                                            const std::vector<uint32> & orc_Dummies,
@@ -354,7 +354,7 @@ sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const u
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load core signal data
 
    \param[in]  ou32_COMessageId     ID for CO message section
@@ -368,7 +368,7 @@ sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const u
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_ParseSignals(const uint32 ou32_COMessageId, const uint8 ou8_NodeId,
                                           const stw_scl::SCLDynamicArray<C_OSCCanOpenObject> & orc_COObjects,
                                           const std::vector<uint32> & orc_Dummies, C_OSCCanMessage & orc_OSCMessageData,
@@ -571,7 +571,7 @@ sint32 C_OSCImportEdsDcf::mh_ParseSignals(const uint32 ou32_COMessageId, const u
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get value of CO Object
 
    \param[in]  orc_COObject CO object
@@ -580,7 +580,7 @@ sint32 C_OSCImportEdsDcf::mh_ParseSignals(const uint32 ou32_COMessageId, const u
    \return
    CO object value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCImportEdsDcf::mh_GetCOObjectValue(const C_OSCCanOpenObject & orc_COObject, const bool oq_IsEds)
 {
    C_SCLString c_Retval;
@@ -597,7 +597,7 @@ C_SCLString C_OSCImportEdsDcf::mh_GetCOObjectValue(const C_OSCCanOpenObject & or
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert string to integer value
 
    \param[in]  orc_COValue CO object value
@@ -608,7 +608,7 @@ C_SCLString C_OSCImportEdsDcf::mh_GetCOObjectValue(const C_OSCCanOpenObject & or
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_GetIntegerValue(const C_SCLString & orc_COValue, const uint8 ou8_NodeId,
                                              uint32 & oru32_Value)
 {
@@ -682,7 +682,7 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValue(const C_SCLString & orc_COValue, co
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert string to integer value
 
    \param[in]  orc_COValue CO object value
@@ -692,7 +692,7 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValue(const C_SCLString & orc_COValue, co
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_GetIntegerValueSimple(const C_SCLString & orc_COValue, uint32 & oru32_Value)
 {
    sint32 s32_Retval;
@@ -725,7 +725,7 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValueSimple(const C_SCLString & orc_COVal
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add user notification  for import section
 
    \param[in]     ou32_COObjectId     CO object ID
@@ -735,7 +735,7 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValueSimple(const C_SCLString & orc_COVal
    \param[in]     oq_IsError          Optional CO object sub section ID
    \param[in,out] opc_ImportMessages  Import result messages
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCImportEdsDcf::mh_AddUserMessage(const uint32 ou32_COObjectId, const C_SCLString & orc_COSectionName,
                                           const C_SCLString & orc_ErrorMessage, const sint32 os32_COSubSectionId,
                                           const bool oq_IsError, std::vector<C_SCLString> * const opc_ImportMessages)
@@ -780,7 +780,7 @@ void C_OSCImportEdsDcf::mh_AddUserMessage(const uint32 ou32_COObjectId, const C_
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculate min max based on current type and number of bits
 
    \param[in,out] orc_Element     Data pool element
@@ -791,7 +791,7 @@ void C_OSCImportEdsDcf::mh_AddUserMessage(const uint32 ou32_COObjectId, const C_
    C_RANGE  Operation failure: parameter invalid
    C_CONFIG Operation failure: Element invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_CalcMinMax(C_OSCNodeDataPoolListElement & orc_Element, const uint16 ou16_NumberBits)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -972,13 +972,13 @@ sint32 C_OSCImportEdsDcf::mh_CalcMinMax(C_OSCNodeDataPoolListElement & orc_Eleme
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load dummy data types
 
    \param[in]  orc_FilePath Ini file path
    \param[out] orc_Dummies  Found and valid dummy data types
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCImportEdsDcf::mh_LoadDummies(const C_SCLString & orc_FilePath, std::vector<uint32> & orc_Dummies)
 {
    try

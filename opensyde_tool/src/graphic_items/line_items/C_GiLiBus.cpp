@@ -174,7 +174,7 @@ QString C_GiLiBus::GetBitrate(const bool oq_WithComma) const
       {
          c_Bitrate = ", ";
       }
-      c_Bitrate += "Bitrate: " + QString::number(pc_Bus->u64_BitRate / 1000ULL) + " kBit/s";
+      c_Bitrate += "Bitrate: " + QString::number(pc_Bus->u64_BitRate / 1000ULL) + " kbit/s";
    }
 
    return c_Bitrate;
@@ -257,7 +257,7 @@ void C_GiLiBus::GenerateHint(void)
 
       if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
       {
-         c_ToolTip.append(QString("\nBitrate: %1 kBit/s").arg(QString::number(pc_Bus->u64_BitRate /
+         c_ToolTip.append(QString("\nBitrate: %1 kbit/s").arg(QString::number(pc_Bus->u64_BitRate /
                                                                               static_cast<uint64>(1000))));
       }
    }
@@ -319,6 +319,21 @@ void C_GiLiBus::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
    {
       this->ApplyStyle(pc_Item->GetColor(), pc_Item->GetWidth());
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiLiBus::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiLiLineGroup::SetZValueCustom(of64_ZValue);
+   //Apply to data
+   this->UpdateData();
+   //Signal update
+   Q_EMIT this->SigChangedZOrder();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

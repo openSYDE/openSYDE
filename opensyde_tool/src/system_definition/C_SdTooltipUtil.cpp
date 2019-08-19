@@ -210,6 +210,25 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
    c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Start Bit: "));
    c_ToolTipContent.append(QString::number(orc_Signal.u16_ComBitStart));
 
+   if (orc_Signal.e_MultiplexerType != C_OSCCanSignal::eMUX_DEFAULT)
+   {
+      c_ToolTipContent.append("\n");
+      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Multiplexer Type: "));
+
+      if (orc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+      {
+         c_ToolTipContent.append(C_GtGetText::h_GetText("Multiplexed Signal"));
+         c_ToolTipContent.append("\n");
+         c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Multiplexer Value: "));
+         c_ToolTipContent.append(QString::number(orc_Signal.u16_MultiplexValue));
+      }
+      else
+      {
+         // Multiplexer signal
+         c_ToolTipContent.append(C_GtGetText::h_GetText("Multiplexer Signal"));
+      }
+   }
+
    return c_ToolTipContent;
 }
 

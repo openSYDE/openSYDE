@@ -43,8 +43,7 @@ public:
    virtual ~C_SdManUnoTopologyManager(void);
 
    virtual void AdaptZOrder(const QList<QGraphicsItem *> & orc_SelectedItems, const QList<QGraphicsItem *> & orc_Items,
-                            const stw_types::float64 of64_Diff, stw_types::float64 & orf64_ZOrderHigh,
-                            stw_types::float64 & orf64_ZOrderLow) override;
+                            const bool oq_BringToFront) override;
    virtual void DoDelete(const QList<QGraphicsItem *> & orc_Items) override;
    void DoAddGeneric(const C_SdManUnoTopologyAddCommand::E_ElementType & ore_Type,
                      const stw_types::uint64 & oru64_UniqueID, const QPointF & orc_NewPos,
@@ -74,7 +73,8 @@ public:
                                                   const stw_types::uint8 & oru8_Node1NodeID,
                                                   const stw_types::uint8 & oru8_Node2NodeID);
    void DoAddSnapshot(const std::vector<stw_types::uint64> & oru64_UniqueIDs,
-                      const C_SdTopologyDataSnapshot & orc_Snapshot, const QPointF & orc_NewPos);
+                      const C_SdTopologyDataSnapshot & orc_Snapshot, const QPointF & orc_NewPos,
+                      const stw_types::float64 of64_HighestUsedZValue);
    void DoReconnectNode(const stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                         const stw_opensyde_gui::C_GiNode * const opc_StartingNode,
                         const stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
@@ -95,6 +95,7 @@ protected:
 private:
    void m_MergeWithPrev(QUndoCommand * const opc_Command);
    void m_OnErrorChange(void);
+   void m_DoPushAndSignalError(QUndoCommand * const opc_UndoCommand);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

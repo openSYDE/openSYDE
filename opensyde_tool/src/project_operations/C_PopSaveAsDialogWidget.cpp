@@ -78,6 +78,9 @@ C_PopSaveAsDialogWidget::C_PopSaveAsDialogWidget(stw_opensyde_gui_elements::C_Og
    // no strange cursor
    QApplication::restoreOverrideCursor();
 
+   // Remove "..." string
+   this->mpc_Ui->pc_PushButtonBrowse->setText("");
+
    connect(this->mpc_Ui->pc_PushButtonBrowse, &QPushButton::clicked, this, &C_PopSaveAsDialogWidget::m_OnBrowse);
    connect(this->mpc_Ui->pc_PushButtonSave, &QPushButton::clicked, this, &C_PopSaveAsDialogWidget::m_OnSave);
    connect(this->mpc_Ui->pc_PushButtonCancel, &C_OgePubCancel::clicked, this, &C_PopSaveAsDialogWidget::m_OnCancel);
@@ -108,7 +111,6 @@ void C_PopSaveAsDialogWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxVersion->addItem(C_GtGetText::h_GetText("V2"));
    this->mpc_Ui->pc_LineEditName->setPlaceholderText(C_GtGetText::h_GetText(""));
    this->mpc_Ui->pc_LineEditPath->setPlaceholderText(C_GtGetText::h_GetText(""));
-   this->mpc_Ui->pc_PushButtonBrowse->setText(C_GtGetText::h_GetText("..."));
    this->mpc_Ui->pc_PushButtonSave->setText(C_GtGetText::h_GetText("Save"));
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
    //Tool tips
@@ -175,10 +177,10 @@ void C_PopSaveAsDialogWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 void C_PopSaveAsDialogWidget::m_InitDefaultProjectName(void) const
 {
    const QString c_ProjectPath = C_PuiProject::h_GetInstance()->GetPath();
-   const QFileInfo c_ProjectFileInfo(c_ProjectPath);
+   const QFileInfo c_ProjectFileInfo(m_GetValidPath(c_ProjectPath));
    QString c_Proposal;
 
-   this->mpc_Ui->pc_LineEditPath->SetPath(m_GetValidPath(c_ProjectFileInfo.absoluteDir().absolutePath()));
+   this->mpc_Ui->pc_LineEditPath->SetPath(c_ProjectFileInfo.absoluteDir().absolutePath());
 
    if (c_ProjectPath.compare("") == 0)
    {
@@ -186,7 +188,6 @@ void C_PopSaveAsDialogWidget::m_InitDefaultProjectName(void) const
    }
    else
    {
-      //Translation: 1: Project name
       c_Proposal = QString("Copy_of_%1").arg(C_PuiProject::h_GetInstance()->GetName());
    }
    this->mpc_Ui->pc_LineEditName->setText(c_Proposal);
@@ -323,7 +324,7 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
          C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_Box.SetHeading(C_GtGetText::h_GetText("Project save"));
          c_Box.SetDescription(C_GtGetText::h_GetText(
-                                 "Project name is invalid. Only alphanumeric characters + \"_\" are allowed."));
+                                 "Project name is invalid. Only alphanumeric characters and \"_\" are allowed."));
          c_Box.Execute();
       }
    }

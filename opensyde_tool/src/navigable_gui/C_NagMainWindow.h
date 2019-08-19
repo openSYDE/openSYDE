@@ -59,6 +59,7 @@ private Q_SLOTS:
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
+   virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void closeEvent(QCloseEvent * const opc_Event) override;
    virtual void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
@@ -71,6 +72,7 @@ private:
    C_NagMainWindow(const C_NagMainWindow &);
    C_NagMainWindow & operator =(const C_NagMainWindow &);
 
+   void m_LoadInitialProject(void);
    void m_PrepareForSpecificWidget(const bool oq_DeleteActualWidget = true);
    void m_SetNewSpecificWidget(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode = 0,
                                QString oc_ItemName = "", const QString & orc_SubSubModeName = "",
@@ -111,6 +113,7 @@ private:
    C_NagUseCaseWidget * mpc_ActiveWidget;
    stw_opensyde_gui_logic::C_SyvManager mc_SystemViewManager;
 
+   bool mq_InitialProjectLoaded;
    bool mq_BlockDragAndDrop;
    bool mq_StartView;
    bool mq_ChangeUseCase;
@@ -123,7 +126,7 @@ private:
    stw_types::uint32 mu32_SdIndex;
    stw_types::uint32 mu32_SdFlag;
 
-   // Special case: Switching from main widget to system definition, restore previous position
+   // Special case: Switching from main widget to system commissioning, restore previous position
    stw_types::sint32 ms32_SvSubMode;
    stw_types::uint32 mu32_SvIndex;
    stw_types::uint32 mu32_SvFlag;

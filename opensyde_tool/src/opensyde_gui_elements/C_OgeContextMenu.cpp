@@ -68,7 +68,7 @@ C_OgeContextMenu::C_OgeContextMenu(QWidget * const opc_Parent) :
       // cannot be negative)
       // compare to https://bugreports.qt.io/browse/QTBUG-58602
       c_Color = mc_STYLE_GUIDE_COLOR_31;
-      c_Color.setAlpha(50); // lower than for tool-tip because blur-radius is needed to be small
+      c_Color.setAlpha(110); // lower than for tool-tip because blur-radius is needed to be small
       pc_Shadow->setColor(c_Color);
       this->setGraphicsEffect(pc_Shadow);
       //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management

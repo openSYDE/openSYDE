@@ -119,6 +119,7 @@ void C_SdManUnoTopologyAddCommand::m_AddNew(void)
       {
          C_GiNode * pc_Node;
          C_GiLiBus * pc_Bus;
+         stw_types::float64 f64_BusZValue;
          C_GiTextElementBus * pc_TextElementBus;
 
          switch (this->me_Type)
@@ -127,26 +128,27 @@ void C_SdManUnoTopologyAddCommand::m_AddNew(void)
             pc_Scene->AddNode(this->mc_AdditionalInformation, this->mc_NewPos, &(c_IDs[0]));
             break;
          case E_ElementType::eCAN_BUS:
-            pc_TextElementBus = pc_Scene->AddTextElementBus(&(c_IDs[1]));
+            pc_TextElementBus = pc_Scene->AddTextElementBus(&(c_IDs[1]), f64_BusZValue);
             if (this->mq_ForceUseAdditionalInformation == true)
             {
-               pc_Scene->AddCanBus(this->mc_NewPos, &(c_IDs[0]), pc_TextElementBus, &this->mc_AdditionalInformation);
+               pc_Scene->AddCanBus(this->mc_NewPos, &(c_IDs[0]), f64_BusZValue, pc_TextElementBus,
+                                   &this->mc_AdditionalInformation);
             }
             else
             {
-               pc_Scene->AddCanBus(this->mc_NewPos, &(c_IDs[0]), pc_TextElementBus);
+               pc_Scene->AddCanBus(this->mc_NewPos, &(c_IDs[0]), f64_BusZValue, pc_TextElementBus);
             }
             break;
          case E_ElementType::eETHERNET_BUS:
-            pc_TextElementBus = pc_Scene->AddTextElementBus(&(c_IDs[1]));
+            pc_TextElementBus = pc_Scene->AddTextElementBus(&(c_IDs[1]), f64_BusZValue);
             if (this->mq_ForceUseAdditionalInformation == true)
             {
-               pc_Scene->AddEthernetBus(this->mc_NewPos, &(c_IDs[0]), pc_TextElementBus,
+               pc_Scene->AddEthernetBus(this->mc_NewPos, &(c_IDs[0]), f64_BusZValue, pc_TextElementBus,
                                         &this->mc_AdditionalInformation);
             }
             else
             {
-               pc_Scene->AddEthernetBus(this->mc_NewPos, &(c_IDs[0]), pc_TextElementBus);
+               pc_Scene->AddEthernetBus(this->mc_NewPos, &(c_IDs[0]), f64_BusZValue, pc_TextElementBus);
             }
             break;
          case E_ElementType::eLINE_ARROW:

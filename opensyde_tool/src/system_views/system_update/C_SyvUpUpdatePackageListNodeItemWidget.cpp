@@ -23,7 +23,7 @@
 #include "C_PuiSvHandler.h"
 #include "TGLUtils.h"
 #include "C_Uti.h"
-#include "C_ImpUtil.h"
+#include "C_PuiUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -224,6 +224,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::SetAppNumber(const stw_types::uint3
    this->SetBackgroundColor(0);
 
    this->m_UpdateTitle();
+   this->m_UpdateToolTip();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -715,7 +716,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::m_UpdateAbsolutePath(void)
    }
    else
    {
-      this->mc_AbsoluteFilePath = C_ImpUtil::h_GetAbsolutePathFromProject(this->mc_FilePath);
+      this->mc_AbsoluteFilePath = C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mc_FilePath);
    }
 }
 
@@ -754,7 +755,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::m_UpdateToolTip(void)
 
    c_Content += C_GtGetText::h_GetText("\nFile size: ");
    c_Content += QString::number(this->mu32_FileSize);
-   c_Content += C_GtGetText::h_GetText(" KB");
+   c_Content += C_GtGetText::h_GetText(" kB");
 
    this->SetToolTipInformation(this->mc_Title, c_Content);
 }

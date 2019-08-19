@@ -43,7 +43,6 @@ using namespace stw_types;
    \param[in,out] opc_Parent      Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-
 C_GiLiLineConnection::C_GiLiLineConnection(const sint32 & ors32_LineIndex, QGraphicsItem * const opc_Parent) :
    C_GiLiSimpleLine(opc_Parent),
    ms32_LineIndex(ors32_LineIndex),
@@ -65,7 +64,6 @@ C_GiLiLineConnection::C_GiLiLineConnection(const sint32 & ors32_LineIndex, QGrap
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-
 C_GiLiLineConnection::~C_GiLiLineConnection()
 {
 }
@@ -78,7 +76,6 @@ C_GiLiLineConnection::~C_GiLiLineConnection()
    \param[in] orc_Line New line
 */
 //----------------------------------------------------------------------------------------------------------------------
-
 void C_GiLiLineConnection::AdaptLine(const QLineF & orc_Line)
 {
    C_GiLiSimpleLine::setLine(orc_Line);
@@ -90,7 +87,6 @@ void C_GiLiLineConnection::AdaptLine(const QLineF & orc_Line)
    \param[in] ors32_LineIndex Index of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-
 void C_GiLiLineConnection::SetLineIndex(const stw_types::sint32 & ors32_LineIndex)
 {
    this->ms32_LineIndex = ors32_LineIndex;
@@ -100,7 +96,6 @@ void C_GiLiLineConnection::SetLineIndex(const stw_types::sint32 & ors32_LineInde
 /*! \brief   Get line index
 */
 //----------------------------------------------------------------------------------------------------------------------
-
 stw_types::sint32 C_GiLiLineConnection::GetLineIndex(void) const
 {
    return this->ms32_LineIndex;
@@ -178,7 +173,6 @@ QPainterPath C_GiLiLineConnection::shape() const
    \param[out] orc_Closest    Closest point in shape
 */
 //----------------------------------------------------------------------------------------------------------------------
-
 void C_GiLiLineConnection::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
    C_GiBiConnectableItem::h_DistToLine(this->mapToScene(this->line().p1()), this->mapToScene(this->line().p2()),

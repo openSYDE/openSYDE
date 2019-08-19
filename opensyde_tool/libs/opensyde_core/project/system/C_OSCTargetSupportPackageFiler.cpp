@@ -372,6 +372,22 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
       }
       else
       {
+         // generated code structure version (optional attribute)
+         if (orc_XMLParser.AttributeExists("generated-code-version") == true)
+         {
+            c_Application.u16_GenCodeVersion =
+               static_cast<uint16>(orc_XMLParser.GetAttributeUint32("generated-code-version"));
+         }
+         else
+         {
+            // probably deprecated TSP -> default to first version
+            // (note: if not programmable this is not reached and therefore defaults to its initial value 0,
+            // but this does not harm as "code-generation-version" makes no sense in this case)
+            osc_write_log_warning("Loading target support package",
+                                  "XML attribute \"generated-code-version\" not found.");
+            c_Application.u16_GenCodeVersion = 1U;
+         }
+
          // code generation type
          c_Text = orc_XMLParser.SelectNodeChild("type");
          if (c_Text != "type")

@@ -35,9 +35,12 @@ public:
    virtual QSize sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const override;
    //lint -restore
 
+   void SetMaximumHeight(const stw_types::sintn sn_Height);
+
 private:
    stw_types::uint32 mu32_NodeIndex;
    stw_types::uint32 mu32_DataPoolIndex;
+   stw_types::sintn msn_MaximumHeight;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -80,9 +80,9 @@ C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const o
    {
       QColor c_Color;
       QGraphicsDropShadowEffect * pc_Shadow = new QGraphicsDropShadowEffect(this->mpc_Ui->pc_GroupBoxPopUp);
-      pc_Shadow->setBlurRadius(40.0);
+      pc_Shadow->setBlurRadius(15.0);
       pc_Shadow->setOffset(0.0);
-      c_Color = mc_STYLE_GUIDE_COLOR_34;
+      c_Color = mc_STYLE_GUIDE_COLOR_33;
       c_Color.setAlpha(128);
       pc_Shadow->setColor(c_Color);
       this->mpc_Ui->pc_GroupBoxPopUp->setGraphicsEffect(pc_Shadow);

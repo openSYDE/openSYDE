@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -17,39 +17,39 @@
 #include "CSCLChecksums.h"
 #include "C_OSCUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanMessageContainer::C_OSCCanMessageContainer(void) :
    q_IsComProtocolUsedByInterface(false)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessageContainer::CalcHash(uint32 & oru32_HashValue) const
 {
    uint32 u32_Tmp;
@@ -74,12 +74,12 @@ void C_OSCCanMessageContainer::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&u32_Tmp, sizeof(u32_Tmp), oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Recalculate all data element indices
 
    Based on assumption data elements are sorted in data pool by message and signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessageContainer::ReCalcDataElementIndices(void)
 {
    std::vector<C_OSCCanMessage> * pc_ComMessages;
@@ -109,7 +109,7 @@ void C_OSCCanMessageContainer::ReCalcDataElementIndices(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get start of message in data pool list element vector
 
    \param[in] orq_IsTx           Flag if message is tx (else rx)
@@ -118,7 +118,7 @@ void C_OSCCanMessageContainer::ReCalcDataElementIndices(void)
    \return
    Data pool list element index of message start
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCCanMessageContainer::GetMessageSignalDataStartIndex(const bool & orq_IsTx,
                                                                 const uint32 & oru32_MessageIndex) const
 {
@@ -140,7 +140,7 @@ uint32 C_OSCCanMessageContainer::GetMessageSignalDataStartIndex(const bool & orq
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Request reference to either list
 
    \param[in] orq_IsTx Flag if tx message vector was requested (else rx message vector is output)
@@ -148,7 +148,7 @@ uint32 C_OSCCanMessageContainer::GetMessageSignalDataStartIndex(const bool & orq
    \return
    Either tx or rx list (as requested)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessagesConst(const bool & orq_IsTx) const
 {
    if (orq_IsTx == true)
@@ -161,7 +161,7 @@ const std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessagesConst(
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Request reference to either list
 
    \param[in] orq_IsTx Flag if tx message vector was requested (else rx message vector is output)
@@ -169,7 +169,7 @@ const std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessagesConst(
    \return
    Either tx or rx list (as requested)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool & orq_IsTx)
 {
    if (orq_IsTx == true)
@@ -182,7 +182,7 @@ std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool 
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check message error
 
    IMPORTANT: some error types (e.g. name & id conflict) can only be checked via system definition
@@ -199,7 +199,7 @@ std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool 
    \param[out] opq_SignalInvalid                    An error found for a signal
    \param[in]  ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolList * const opc_List,
                                                       const uint32 & oru32_MessageIndex, const bool & orq_IsTx,
                                                       bool * const opq_NameConflict, bool * const opq_NameInvalid,
@@ -380,7 +380,7 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check messages error
 
    IMPORTANT: some error types (e.g. name & id conflict) can only be checked via system definition
@@ -395,7 +395,7 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
    true  Error
    false No error detected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc_ListTx,
                                                const C_OSCNodeDataPoolList & orc_ListRx,
                                                const uint32 ou32_CANMessageValidSignalsDLCOffset,
@@ -451,14 +451,14 @@ bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc
    return q_Error;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check whether container contains at least one TX or RX message
 
    \return
    true   at least one TX or RX message is defined
    false  else
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanMessageContainer::ContainsAtLeastOneMessage(void) const
 {
    bool q_Result = false;

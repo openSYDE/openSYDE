@@ -25,7 +25,7 @@
 #include "C_GiSvNodeSyvUpdate.h"
 #include "C_OSCLoggingHandler.h"
 #include "TGLUtils.h"
-#include "C_ImpUtil.h"
+#include "C_PuiUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -451,13 +451,13 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                   {
                      const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItApplication];
                      c_FinalApplicationPaths.push_back(
-                        C_Uti::h_ConcatPathIfNecessary(
-                           C_ImpUtil::h_GetAbsolutePathFromProject(rc_Application.c_ProjectPath.c_str()),
-                           rc_Application.c_ResultPath.c_str()));
+                        C_PuiUtil::h_GetResolvedAbsPathFromDbProject(rc_Application.c_ProjectPath.c_str(),
+                                                                     rc_Application.c_ResultPath.c_str()));
                   }
                   else
                   {
-                     c_FinalApplicationPaths.push_back(rc_ViewApplicationPath);
+                     c_FinalApplicationPaths.push_back(C_PuiUtil::h_GetResolvedAbsPathFromProject(
+                                                          rc_ViewApplicationPath));
                   }
                }
 
@@ -466,22 +466,11 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                this->mc_HexAppInfoAmiguous.reserve(pc_Node->c_Applications.size());
                for (uint32 u32_ItFile = 0; u32_ItFile < pc_Node->c_Applications.size(); ++u32_ItFile)
                {
-                  const QString & rc_ApplicationPath = c_FinalApplicationPaths[u32_ItFile];
-                  const QFileInfo c_FileInfo(rc_ApplicationPath);
+                  const stw_scl::C_SCLString c_Path = c_FinalApplicationPaths[u32_ItFile].toStdString().c_str();
+                  // c_Path is already absolute and placeholder variables got resolved!
                   C_OsyHexFile c_HexFile;
                   uint32 u32_Result;
-                  stw_scl::C_SCLString c_Path;
-                  if (c_FileInfo.isAbsolute() == true)
-                  {
-                     c_Path = rc_ApplicationPath.toStdString().c_str();
-                  }
-                  else
-                  {
-                     c_Path =
-                        (C_PuiProject::h_GetInstance()->GetFolderPath() + '/' +
-                         rc_ApplicationPath).toStdString().c_str();
-                  }
-                  //Application is relative to project files
+
                   u32_Result = c_HexFile.LoadFromFile(c_Path.c_str());
                   if (u32_Result == stw_hex_file::NO_ERR)
                   {

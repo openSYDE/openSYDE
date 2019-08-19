@@ -234,7 +234,7 @@ void C_OgeWiHover::ApplyDarkMode(const bool oq_Active)
    }
    else
    {
-      c_Color = mc_STYLE_GUIDE_COLOR_34;
+      c_Color = mc_STYLE_GUIDE_COLOR_33;
    }
    c_Color.setAlpha(128);
    pc_Shadow->setColor(c_Color);

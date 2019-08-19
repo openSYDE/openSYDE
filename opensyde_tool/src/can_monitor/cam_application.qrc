@@ -1,5 +1,24 @@
 <RCC>
     <qresource prefix="/">
+        <file>styles/CheckBox.qss</file>
+        <file>styles/Color.qss</file>
+        <file>styles/ComboBox.qss</file>
+        <file>styles/Font.qss</file>
+        <file>styles/GroupBox.qss</file>
+        <file>styles/Label.qss</file>
+        <file>styles/LineEdit.qss</file>
+        <file>styles/Menu.qss</file>
+        <file>styles/PushButton.qss</file>
+        <file>styles/RadioButton.qss</file>
+        <file>styles/ScrollArea.qss</file>
+        <file>styles/ScrollBar.qss</file>
+        <file>styles/SpinBox.qss</file>
+        <file>styles/TableView.qss</file>
+        <file>styles/TextBrowser.qss</file>
+        <file>styles/TextEdit.qss</file>
+        <file>styles/ToolButton.qss</file>
+        <file>styles/TreeView.qss</file>
+        <file>styles/Widget.qss</file>
         <file>images/IconToggleToStatePlaying.svg</file>
         <file>images/IconClear.svg</file>
         <file>images/IconToggleToUniqueOff.svg</file>
@@ -9,9 +28,6 @@
         <file>images/IconStopDisabled.svg</file>
         <file>images/ScrollDown.svg</file>
         <file>images/ScrollUp.svg</file>
-        <file>styles/Color.qss</file>
-        <file>styles/Font.qss</file>
-        <file>styles/Widget.qss</file>
         <file>images/IconNumberFormatDec.svg</file>
         <file>images/IconNumberFormatHex.svg</file>
         <file>images/IconTimeModeAbsolute.svg</file>
@@ -30,25 +46,16 @@
         <file>images/IconConfig.svg</file>
         <file>images/IconFilter.svg</file>
         <file>images/IconLogging.svg</file>
-        <file>styles/ComboBox.qss</file>
-        <file>styles/TreeView.qss</file>
         <file>images/GroupBoxDownArrow.png</file>
         <file>images/GroupBoxDownArrowDisabled.png</file>
         <file>images/IconHelp.svg</file>
         <file>images/STW_Logo_Dark.png</file>
-        <file>styles/PushButton.qss</file>
-        <file>styles/RadioButton.qss</file>
-        <file>styles/LineEdit.qss</file>
-        <file>styles/Menu.qss</file>
         <file>images/Error_Icon_MessageBox.svg</file>
         <file>images/Info_Icon_MessageBox.svg</file>
         <file>images/Question_Icon_MessageBox.svg</file>
         <file>images/Warning_Icon_MessageBox.svg</file>
-        <file>styles/GroupBox.qss</file>
         <file>images/IconArrowBottomMessageBox.svg</file>
         <file>images/IconArrowUpMessageBox.svg</file>
-        <file>styles/ScrollBar.qss</file>
-        <file>styles/TextBrowser.qss</file>
         <file>images/IconArrowSmallCloseGray.png</file>
         <file>images/IconArrowSmallOpen.png</file>
         <file>images/IconMessageInactive.svg</file>
@@ -64,7 +71,6 @@
         <file>images/IconEdit.svg</file>
         <file>images/IconEditDisabled.svg</file>
         <file>images/IconEditHovered.svg</file>
-        <file>styles/CheckBox.qss</file>
         <file>images/CheckBoxActiveDisabledWithoutBackground.svg</file>
         <file>images/CheckBoxActiveWithoutBackground.svg</file>
         <file>images/IconCopy.svg</file>
@@ -76,7 +82,6 @@
         <file>images/IconAddEnabled.svg</file>
         <file>images/IconOpenProject.svg</file>
         <file>images/IconSave.svg</file>
-        <file>styles/TableView.qss</file>
         <file>images/IconCheckboxEnabledOn18x18.svg</file>
         <file>images/IconSelected.svg</file>
         <file>images/IconTimeModeAbsoluteHover.svg</file>
@@ -101,8 +106,6 @@
         <file>images/IconWipeAwayEnabled.svg</file>
         <file>images/IconWipeAwayHover.svg</file>
         <file>images/IconWipeAwayPressed.svg</file>
-        <file>styles/Label.qss</file>
-        <file>styles/TextEdit.qss</file>
         <file>images/IconAddDataBase.svg</file>
         <file>images/CheckBoxDisabledGrayWithoutBackground.svg</file>
         <file>images/ScrollDown.png</file>
@@ -130,7 +133,6 @@
         <file>images/IconFileQueue.svg</file>
         <file>images/IconNothing.svg</file>
         <file>images/CAN_Monitor_logo.png</file>
-        <file>styles/SpinBox.qss</file>
         <file>images/IconSpinBoxUpDisabled.svg</file>
         <file>images/IconSpinBoxUp.svg</file>
         <file>images/IconSpinBoxDownDisabled.svg</file>
@@ -144,7 +146,6 @@
         <file>images/IconAddDataBaseBlue.svg</file>
         <file>images/IconAddDataBaseBluePressed.svg</file>
         <file>images/IconAddDataBaseBlueHover.svg</file>
-        <file>styles/ScrollArea.qss</file>
         <file>images/IconGroupBoxDownArrow.svg</file>
         <file>images/IconRadioButtonInactive.svg</file>
         <file>images/IconRadioButtonActive.svg</file>
@@ -159,11 +160,12 @@
         <file>images/ToggleOffSignalTable.svg</file>
         <file>images/ToggleOnSignalTable.svg</file>
         <file>images/IconRadioButtonActiveDisabled.svg</file>
-        <file>styles/ToolButton.qss</file>
         <file>images/CheckBoxDisabledNotChecked.svg</file>
         <file>images/IconCheckboxDisabledOn18x18.svg</file>
         <file>images/IconArrowDownBright.svg</file>
         <file>images/IconArrowDownDisabled.svg</file>
         <file>images/IconArrowUpDisabled.svg</file>
+        <file>images/IconPathVariables.svg</file>
+        <file>images/IconPathVariablesDisabled.svg</file>
     </qresource>
 </RCC>

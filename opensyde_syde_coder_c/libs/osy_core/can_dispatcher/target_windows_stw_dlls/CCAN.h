@@ -12,7 +12,7 @@
 #ifndef CCANH
 #define CCANH
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CCANDLL.h"
 #include "CCANDispatcher.h"
@@ -23,7 +23,7 @@
 namespace stw_can
 {
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 #ifndef STWCAN_PACKAGE
 #ifdef __BORLANDC__
 //maybe we want this module to be put into a VCL package ...
@@ -33,7 +33,7 @@ namespace stw_can
 #endif
 #endif
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 ///high level interface to STW CANDLLs
 class STWCAN_PACKAGE C_CAN : public C_CAN_Dispatcher
 {
@@ -104,7 +104,7 @@ public:
    stw_types::uint32 GetLimitRXID(void) const;
 };
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 //error codes:
 const stw_types::sint32 CAN_COMP_ERR_DLL_NOT_OPENED       =   -201;
 const stw_types::sint32 CAN_COMP_ERR_DLL_ALREADY_CLOSED   =   -203;
@@ -114,9 +114,9 @@ const stw_types::sint32 CAN_COMP_ERR_DLL_FORMAT           =   -206;
 
 const stw_types::uint32 CAN_RX_ID_INVALID = 0xFFFFFFFFUL;
 
-/* -- Function Prototypes ------------------------------------------------- */
+/* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 }
 

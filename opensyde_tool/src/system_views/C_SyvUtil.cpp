@@ -442,7 +442,7 @@ void C_SyvUtil::h_GetViewDisplayName(const uint32 ou32_ViewIndex, const sint32 o
          orc_SubSubMode = "";
          break;
       }
-      orc_SubMode = QString(C_GtGetText::h_GetText("View #%1 - %2")).arg(ou32_ViewIndex + 1UL).arg(pc_View->GetName());
+      orc_SubMode = QString(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(ou32_ViewIndex + 1UL).arg(pc_View->GetName());
    }
 }
 

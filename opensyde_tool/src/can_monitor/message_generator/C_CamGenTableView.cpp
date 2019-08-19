@@ -904,9 +904,9 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
             {
                //Copy values
                c_NewMessage.SetMessageBoolValue(C_CamProMessageData::eGBODS_EXTENDED, pc_Message->q_IsExtended);
-               c_NewMessage.u8_DLC = static_cast<uint8>(pc_Message->u16_Dlc);
+               c_NewMessage.u16_Dlc = pc_Message->u16_Dlc;
                c_NewMessage.u32_CyclicTriggerTime = pc_Message->u32_CycleTimeMs;
-               c_NewMessage.u32_ID = pc_Message->u32_CanId;
+               c_NewMessage.u32_Id = pc_Message->u32_CanId;
 
                //Cyclic
                if (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_CYCLIC)
@@ -954,9 +954,9 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
             {
                //Copy values
                c_NewMessage.SetMessageBoolValue(C_CamProMessageData::eGBODS_EXTENDED, pc_Message->q_IsExtended);
-               c_NewMessage.u8_DLC = static_cast<uint8>(pc_Message->u16_Dlc);
+               c_NewMessage.u16_Dlc = static_cast<uint8>(pc_Message->u16_Dlc);
                c_NewMessage.u32_CyclicTriggerTime = pc_Message->u32_CycleTimeMs;
-               c_NewMessage.u32_ID = pc_Message->u32_CanId;
+               c_NewMessage.u32_Id = pc_Message->u32_CanId;
 
                //Cyclic
                if (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_CYCLIC)

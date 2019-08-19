@@ -12,7 +12,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -27,35 +27,35 @@ using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_can;
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables --------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ----------------------------------- */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Init instance.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CAN_RXFilter::C_CAN_RXFilter(void)
 {
    this->PassAll(); //default: let all messages pass
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set filters to let all messages pass.
 
    Shortcut utility: Set filters to let all messages pass.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CAN_RXFilter::PassAll(void)
 {
    u32_Code = 0U;
@@ -68,7 +68,7 @@ void C_CAN_RXFilter::PassAll(void)
    q_RTR = false;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set filters to let one ID pass.
 
    Shortcut utility: Set filters to let exactly one ID pass.
@@ -79,7 +79,7 @@ void C_CAN_RXFilter::PassAll(void)
    \param[in]   oq_RTR    true  -> ID must be an RTR ID
                           false -> ID must not be an RTR ID
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CAN_RXFilter::PassOneID(const uint32 ou32_ID, const bool oq_ExtID, const bool oq_RTR)
 {
    u32_Code = ou32_ID;
@@ -91,7 +91,7 @@ void C_CAN_RXFilter::PassOneID(const uint32 ou32_ID, const bool oq_ExtID, const 
    q_RTRMustMatch = true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check whether message can pass filter
 
    Check whether CAN message can pass the configured filter.
@@ -102,7 +102,7 @@ void C_CAN_RXFilter::PassOneID(const uint32 ou32_ID, const bool oq_ExtID, const 
    true    -> message can pass filter      \n
    false   -> message can not pass filter
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CAN_RXFilter::DoesMessagePass(const T_STWCAN_Msg_RX & orc_Message) const
 {
    bool q_Pass;
@@ -113,12 +113,12 @@ bool C_CAN_RXFilter::DoesMessagePass(const T_STWCAN_Msg_RX & orc_Message) const
    return q_Pass;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Init instance.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CAN_RXQueue::C_CAN_RXQueue(void)
 {
    //set a default that should be fine for many application cases:
@@ -126,7 +126,7 @@ C_CAN_RXQueue::C_CAN_RXQueue(void)
    ms32_Status = C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   add element to queue
 
    Add one more element to queue.
@@ -138,7 +138,7 @@ C_CAN_RXQueue::C_CAN_RXQueue(void)
    C_OVERFLOW  maximum configured size reached -> not added  \n
    C_NOACT     could not add new element -> not added
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_RXQueue::Push(const T_STWCAN_Msg_RX & orc_Message)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -162,7 +162,7 @@ sint32 C_CAN_RXQueue::Push(const T_STWCAN_Msg_RX & orc_Message)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   get oldest element from queue
 
    Get oldest element from queue.
@@ -173,7 +173,7 @@ sint32 C_CAN_RXQueue::Push(const T_STWCAN_Msg_RX & orc_Message)
    C_NO_ERR    element read                            \n
    C_NOACT     no element available
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_RXQueue::Pop(T_STWCAN_Msg_RX & orc_Message)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -190,7 +190,7 @@ sint32 C_CAN_RXQueue::Pop(T_STWCAN_Msg_RX & orc_Message)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set maximum queue size
 
    Set the maximum possible number of queue entries.
@@ -198,7 +198,7 @@ sint32 C_CAN_RXQueue::Pop(T_STWCAN_Msg_RX & orc_Message)
 
    \param[in]   ou32_MaxSize  maximum number of entries in queue
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CAN_RXQueue::SetMaxSize(const uint32 ou32_MaxSize)
 {
    mu32_MaxSize = ou32_MaxSize;
@@ -208,7 +208,7 @@ void C_CAN_RXQueue::SetMaxSize(const uint32 ou32_MaxSize)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get maximum queue size
 
    Get the configured maximum possible number of queue entries.
@@ -216,13 +216,13 @@ void C_CAN_RXQueue::SetMaxSize(const uint32 ou32_MaxSize)
    \return
    Configured maximum
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_CAN_RXQueue::GetMaxSize(void) const
 {
    return mu32_MaxSize;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get actual queue size
 
    Get the actual queue size (i.e. number of entries in the queue).
@@ -230,24 +230,24 @@ uint32 C_CAN_RXQueue::GetMaxSize(void) const
    \return
    Actual queue size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_CAN_RXQueue::GetSize(void) const
 {
    return static_cast<uint32>(mc_Messages.size());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear all queue entries
 
    Clear all queue entries.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CAN_RXQueue::Clear(void)
 {
    mc_Messages.clear();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get queue status
 
    Read queue status.
@@ -258,7 +258,7 @@ void C_CAN_RXQueue::Clear(void)
    C_OVERFLOW -> overflow in queue    \n
    C_NOACT    -> internal problem (e.g. out of memory)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_RXQueue::GetStatus(void)
 {
    sint32 s32_Return = ms32_Status;
@@ -267,45 +267,45 @@ sint32 C_CAN_RXQueue::GetStatus(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Init instance.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CAN_Dispatcher::C_CAN_Dispatcher(void) :
    C_CAN_Base()
 {
    //nothing to do yet
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Init instance.
 
    \param[in]  ou8_CommChannel  communication driver channel
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CAN_Dispatcher::C_CAN_Dispatcher(const uint8 ou8_CommChannel) :
    C_CAN_Base(ou8_CommChannel)
 {
    //nothing to do yet
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   destructor
 
    Clean up instance.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CAN_Dispatcher::~C_CAN_Dispatcher(void)
 {
    //nothing more than base class destrcutor to do yet ...
    //RX-queue will clean up itself
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reception handler call.
 
    Check for incoming messages apply RX filters and place messages that pass into registered RX FIFOs.
@@ -317,7 +317,7 @@ C_CAN_Dispatcher::~C_CAN_Dispatcher(void)
    the return value to report newly received messages as some other client could have called DispatchIncoming()
    in the meantime resulting in messages being placed in the registered RX-Queue even though this function returns 0.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_Dispatcher::DispatchIncoming(void)
 {
    T_STWCAN_Msg_RX t_Msg;
@@ -349,7 +349,7 @@ sint32 C_CAN_Dispatcher::DispatchIncoming(void)
    return s32_NumMessages;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register RX client.
 
    Register interest in received messages. Optionally an RX filter can be specified.
@@ -366,7 +366,7 @@ sint32 C_CAN_Dispatcher::DispatchIncoming(void)
    C_NO_ERR   -> installed (or reconfigured)
    C_OVERFLOW -> too many clients installed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_Dispatcher::RegisterClient(uint16 & oru16_Handle, const C_CAN_RXFilter * const opc_RXFilter,
                                         const uint32 & oru32_BufferSize)
 {
@@ -415,7 +415,7 @@ sint32 C_CAN_Dispatcher::RegisterClient(uint16 & oru16_Handle, const C_CAN_RXFil
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   De-register RX client.
 
    Remove client from list of registered clients.
@@ -426,7 +426,7 @@ sint32 C_CAN_Dispatcher::RegisterClient(uint16 & oru16_Handle, const C_CAN_RXFil
    C_NO_ERR   -> reference to client removed      \n
    C_NOACT    -> client not found -> not removed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_Dispatcher::RemoveClient(const uint16 ou16_Handle)
 {
    uint16 u16_Index;
@@ -454,7 +454,7 @@ sint32 C_CAN_Dispatcher::RemoveClient(const uint16 ou16_Handle)
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CAN_Dispatcher::m_ResyncShortcutPointers(void)
 {
@@ -497,7 +497,7 @@ void C_CAN_Dispatcher::m_ResyncShortcutPointers(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read message from queue
 
    Pop newest message from queue.
@@ -511,7 +511,7 @@ void C_CAN_Dispatcher::m_ResyncShortcutPointers(void)
    C_RANGE    -> invalid ou16_Handle         \n
    C_NOACT    -> no new message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_Dispatcher::ReadFromQueue(const uint16 ou16_Handle, T_STWCAN_Msg_RX & orc_Message)
 {
    sint32 s32_Return;
@@ -531,7 +531,7 @@ sint32 C_CAN_Dispatcher::ReadFromQueue(const uint16 ou16_Handle, T_STWCAN_Msg_RX
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear receive queue
 
    Dump all messages of receive queue
@@ -542,7 +542,7 @@ sint32 C_CAN_Dispatcher::ReadFromQueue(const uint16 ou16_Handle, T_STWCAN_Msg_RX
    C_NO_ERR   -> all queue elements dumped   \n
    C_RANGE    -> invalid ou16_Handle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_Dispatcher::ClearQueue(const uint16 ou16_Handle)
 {
    sint32 s32_Return = C_RANGE;
@@ -558,7 +558,7 @@ sint32 C_CAN_Dispatcher::ClearQueue(const uint16 ou16_Handle)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read message
 
    Dispatch incoming messages then pop newest message from queue.
@@ -571,14 +571,14 @@ sint32 C_CAN_Dispatcher::ClearQueue(const uint16 ou16_Handle)
    C_RANGE    -> invalid ou16_Handle         \n
    C_WARN     -> no new message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_Dispatcher::CAN_Read_Msg(const uint16 ou16_Handle, T_STWCAN_Msg_RX & orc_Message)
 {
    this->DispatchIncoming();
    return ReadFromQueue(ou16_Handle, orc_Message);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read message
 
    Dispatch a maximum of one incoming message then return it.
@@ -590,7 +590,7 @@ sint32 C_CAN_Dispatcher::CAN_Read_Msg(const uint16 ou16_Handle, T_STWCAN_Msg_RX 
    C_NO_ERR   -> reference message read      \n
    C_WARN     -> no new message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_Dispatcher::CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message)
 {
    sint32 s32_Return;
@@ -618,7 +618,7 @@ sint32 C_CAN_Dispatcher::CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set a new filter configuration.
 
    Set a filter to be used for the specified queue.
@@ -631,7 +631,7 @@ sint32 C_CAN_Dispatcher::CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message)
    C_NO_ERR   -> installed (or reconfigured)
    C_RANGE    -> invalid handle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN_Dispatcher::SetRXFilter(const uint16 ou16_Handle, const C_CAN_RXFilter & orc_RXFilter)
 {
    if (ou16_Handle >= mc_ClientsByHandle.GetLength())

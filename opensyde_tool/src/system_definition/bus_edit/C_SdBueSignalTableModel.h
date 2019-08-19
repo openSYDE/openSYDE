@@ -35,6 +35,7 @@ public:
       eMESSAGE,
       eNAME,
       eCOMMENT,
+      eMULTIPLEXING,
       eSTART_BIT,
       eLENGTH,
       eBYTE_ORDER,

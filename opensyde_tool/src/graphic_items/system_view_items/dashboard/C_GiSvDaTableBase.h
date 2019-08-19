@@ -70,9 +70,13 @@ private:
    QAction * mpc_AddSeperator;
    QAction * mpc_ConfigDataElement;
    QAction * mpc_RemoveDataElement;
+   QAction * mpc_MoveUpDataElement;
+   QAction * mpc_MoveDownDataElement;
    QAction * mpc_MiscSeperator;
 
    void m_AddNewDataElement(void);
+   void m_MoveDataElementUp(void);
+   void m_MoveDataElementDown(void);
    void m_RemoveDataElement(void);
    void m_RegisterDataElementRail(
       const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const;

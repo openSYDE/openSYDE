@@ -64,7 +64,6 @@ C_NagViewItem::C_NagViewItem(QWidget * const opc_Parent) :
 
    this->setAttribute(Qt::WA_Hover, true);
 
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Active", false);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Dragged", false);
 
    //Remove debug text
@@ -205,7 +204,7 @@ void C_NagViewItem::UpdateName(void) const
 
    if (pc_View != NULL)
    {
-      const QString c_Name = QString(C_GtGetText::h_GetText("View #%1 - %2")).arg(this->mu32_ViewIndex + 1UL).arg(
+      const QString c_Name = QString(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(this->mu32_ViewIndex + 1UL).arg(
          pc_View->GetName());
       this->mpc_Ui->pc_LabelHeading->setText(c_Name);
    }
@@ -300,7 +299,7 @@ void C_NagViewItem::Init(const uint32 ou32_ViewIndex)
 void C_NagViewItem::SetActive(const bool oq_Active, const sint32 os32_SubMode)
 {
    this->mq_Active = oq_Active;
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Active", oq_Active);
+   this->mpc_Ui->pc_GroupBoxActive->SetActive(oq_Active);
    if (oq_Active == true)
    {
       switch (os32_SubMode)

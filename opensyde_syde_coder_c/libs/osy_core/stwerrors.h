@@ -11,12 +11,12 @@
 #ifndef STWERRORSH
 #define STWERRORSH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #ifdef __cplusplus
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 //C++ style constants:
 namespace stw_errors
@@ -39,9 +39,9 @@ const stw_types::sint32 C_CONFIG      = static_cast<stw_types::sint32>(-10); ///
 const stw_types::sint32 C_CHECKSUM    = static_cast<stw_types::sint32>(-11); ///< checksum error
 const stw_types::sint32 C_TIMEOUT     = static_cast<stw_types::sint32>(-12); ///< timeout error
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 #else
 //C style defines:

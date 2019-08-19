@@ -41,7 +41,7 @@ Q_SIGNALS:
    void SigAfterSetEditorData(QLineEdit * const opc_Widget) const;
 
 protected:
-   virtual QComboBox * m_CreateComboBox(QWidget * const opc_Parent) const override;
+   virtual stw_opensyde_gui_elements::C_OgeCbxTableBase * m_CreateComboBox(QWidget * const opc_Parent) const override;
 
 private:
    void m_AfterSetEditorData(QLineEdit * const opc_Widget) const;

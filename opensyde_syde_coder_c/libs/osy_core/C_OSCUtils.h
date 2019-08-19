@@ -11,17 +11,17 @@
 #ifndef OSCUTILS_H
 #define OSCUTILS_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "stwtypes.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 ///openSYDE utility functions
 class C_OSCUtils
 {
@@ -32,6 +32,7 @@ public:
    static stw_types::sint32 h_CreateFolderRecursively(const stw_scl::C_SCLString & orc_Folder);
    static stw_scl::C_SCLString h_NiceifyStringForFileName(const stw_scl::C_SCLString & orc_String);
    static stw_scl::C_SCLString h_NiceifyStringForCComment(const stw_scl::C_SCLString & orc_String);
+   static bool h_IsStringNiceifiedForFileName(const stw_scl::C_SCLString & orc_String);
 
    static bool h_IsScalingActive(const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset);
    static stw_types::float64 h_GetValueScaled(const stw_types::float64 of64_Value, const stw_types::float64 of64_Factor,
@@ -44,7 +45,7 @@ private:
    static const stw_types::float64 mhf64_Epsilon;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

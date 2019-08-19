@@ -32,12 +32,6 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeLoggerData::C_CamMetTreeLoggerData(void) :
-   C_OSCComMessageLoggerData(),
-   sn_GrayOutValueMsg(0),
-   sn_GrayOutValueData(0),
-   u32_DataChangedTimeStamp(0U)
+   C_OSCComMessageLoggerData()
 {
-   // Handling of maximum 8 data bytes
-   c_GrayOutValueDataBytes.resize(8);
-   c_DataBytesChangedTimeStamps.resize(8);
 }

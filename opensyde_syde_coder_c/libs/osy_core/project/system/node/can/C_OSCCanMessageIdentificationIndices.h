@@ -11,17 +11,17 @@
 #ifndef C_OSCCANMESSAGEIDENTIFICATIONINDICES_H
 #define C_OSCCANMESSAGEIDENTIFICATIONINDICES_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <ostream>
 #include "stwtypes.h"
 #include "C_OSCCanProtocol.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCCanMessageIdentificationIndices
 {
@@ -41,7 +41,7 @@ public:
    stw_types::uint32 u32_MessageIndex;     ///< Message index
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 extern std::ostream & operator <<(std::ostream & orc_Stream,
                                   const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_Id);

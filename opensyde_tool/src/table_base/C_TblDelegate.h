@@ -12,10 +12,10 @@
 #define C_TBLDELEGATE_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QComboBox>
 #include <QStyledItemDelegate>
 
 #include "constants.h"
+#include "C_OgeCbxTableBase.h"
 #include "C_OgeWiSpinBoxGroup.h"
 #include "C_TblEditLineEditBase.h"
 
@@ -46,7 +46,7 @@ public:
    //lint -restore
 
 protected:
-   virtual QComboBox * m_CreateComboBox(QWidget * const opc_Parent) const;
+   virtual stw_opensyde_gui_elements::C_OgeCbxTableBase * m_CreateComboBox(QWidget * const opc_Parent) const;
    virtual stw_opensyde_gui::C_TblEditLineEditBase * m_CreateLineEdit(QWidget * const opc_Parent) const;
    virtual stw_opensyde_gui_elements::C_OgeWiSpinBoxGroup * m_CreateSpinBox(QWidget * const opc_Parent) const;
 
@@ -60,6 +60,7 @@ private:
                                    const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset,
                                    const stw_types::uint32 & oru32_ArrayIndex) const;
    void m_SetGenericEditorDataVariable(QWidget * const opc_Editor, const QModelIndex & orc_Index) const;
+   void m_CommitData(void);
    static void mh_SetModelGenericDataVariable(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                               const QModelIndex & orc_Index);
 };

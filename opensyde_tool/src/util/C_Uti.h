@@ -81,6 +81,7 @@ public:
    static QString h_GetAbsolutePathFromExe(const QString & orc_Path);
    static bool h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & orc_AbsoluteReferenceDir,
                                      QString & orc_PathAbsolute, QString & orc_PathRelative);
+   static QString h_ResolveProjIndependentPlaceholderVariables(const QString & orc_Path);
 
 private:
    C_Uti(void);

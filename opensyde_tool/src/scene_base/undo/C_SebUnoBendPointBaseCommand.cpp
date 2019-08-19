@@ -69,7 +69,7 @@ C_SebUnoBendPointBaseCommand::~C_SebUnoBendPointBaseCommand()
 void C_SebUnoBendPointBaseCommand::m_DeleteBend(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SebScene * const pc_Scene = dynamic_cast<C_SebScene * const>(mpc_Scene);
+   const C_SebScene * const pc_Scene = dynamic_cast<const C_SebScene * const>(mpc_Scene);
 
    if (pc_Scene != NULL)
    {

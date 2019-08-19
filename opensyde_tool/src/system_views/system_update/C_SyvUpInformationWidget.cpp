@@ -505,12 +505,19 @@ void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progr
                                                                                                   u32_ItFile);
             if (u32_Counter == this->mu32_ItFile)
             {
+               const uint64 u64_OverallFilesSize = this->mc_FileSizeInformation.GetOverallFilesSize();
                //Match
                //Adapt to progress
                u64_FlashedBytes += (u64_CurFileSize * static_cast<uint64>(ou16_Progress100)) / 100ULL;
                //Calculate overall progress
-               u16_ActualProgress =
-                  static_cast<uint16>((u64_FlashedBytes * 100ULL) / this->mc_FileSizeInformation.GetOverallFilesSize());
+               if (u64_OverallFilesSize != 0U)
+               {
+                  u16_ActualProgress = static_cast<uint16>((u64_FlashedBytes * 100ULL) / u64_OverallFilesSize);
+               }
+               else
+               {
+                  u16_ActualProgress = 100U;
+               }
                //Stop iteration
                q_Stop = true;
             }
@@ -536,12 +543,19 @@ void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progr
                                                                                                   u32_ItFile);
             if (u32_Counter == this->mu32_ItParamFile)
             {
+               const uint64 u64_OverallFilesSize = this->mc_FileSizeInformation.GetOverallFilesSize();
                //Match
                //Adapt to progress
                u64_FlashedBytes += (u64_CurFileSize * static_cast<uint64>(ou16_Progress100)) / 100ULL;
                //Calculate overall progress
-               u16_ActualProgress =
-                  static_cast<uint16>((u64_FlashedBytes * 100ULL) / this->mc_FileSizeInformation.GetOverallFilesSize());
+               if (u64_OverallFilesSize != 0U)
+               {
+                  u16_ActualProgress = static_cast<uint16>((u64_FlashedBytes * 100ULL) / u64_OverallFilesSize);
+               }
+               else
+               {
+                  u16_ActualProgress = 100U;
+               }
                //Stop iteration
                q_Stop = true;
             }
@@ -722,7 +736,7 @@ void C_SyvUpInformationWidget::m_UpdateDataTransfer(const uint64 & oru64_Overall
    }
    else if (this->mc_FileSizeInformation.GetOverallFilesSize() > 1024ULL)
    {
-      //KB
+      //kB
       c_Unit = "kB";
       c_Progress = QString::number(f64_OverallFlashedBytes / 1024.0, 'f', 1);
       c_Complete = QString::number(f64_OverallFilesSize / static_cast<float32>(1024ULL), 'f', 1);
@@ -883,7 +897,7 @@ void C_SyvUpInformationWidget::m_UpdateDataRate()
       }
       else if (u64_NumberOfFlashedBytesThisSecond > 1024ULL)
       {
-         //KB
+         //kB
          c_Unit = "kB";
          c_DataTransferRate = QString::number(f64_NumberOfFlashedBytesThisSecond / 1024.0, 'f', 0);
       }
@@ -894,7 +908,7 @@ void C_SyvUpInformationWidget::m_UpdateDataRate()
          c_DataTransferRate = QString::number(f64_NumberOfFlashedBytesThisSecond, 'f', 0);
       }
       this->mc_DataRateBytesPerSecond =
-         QString(C_GtGetText::h_GetText("%1 %2/sec")).arg(c_DataTransferRate).arg(c_Unit);
+         QString(C_GtGetText::h_GetText("%1 %2/s")).arg(c_DataTransferRate).arg(c_Unit);
 
       m_UpdateLabel();
    }

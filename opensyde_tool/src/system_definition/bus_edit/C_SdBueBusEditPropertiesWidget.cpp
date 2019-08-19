@@ -112,7 +112,7 @@ void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
                                                         "Symbolic bus name. Unique within Network Topology.\n"
                                                         "\nC naming conventions must be followed:"
                                                         "\n - must not be empty"
-                                                        "\n - only alphanumeric characters + \"_\""
+                                                        "\n - only alphanumeric characters and \"_\""
                                                         "\n - should not be longer than 31 characters"));
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this bus."));
@@ -342,7 +342,7 @@ void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
       //Bit rate
       if (c_NewBus.e_Type == C_OSCSystemBus::eCAN)
       {
-         // Bitrate is shown as kBit/s
+         // Bitrate is shown as kbit/s
          c_NewBus.u64_BitRate =
             static_cast<uint64>(this->m_GetBitrateFromComboBoxString(this->mpc_Ui->pc_ComboBoxBitRate->currentText())) *
             1000ULL;
@@ -361,7 +361,7 @@ void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SdBueBusEditPropertiesWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
 {
-   const QString c_Text = QString::number(ou32_Bitrate) + QString(" KBit/s");
+   const QString c_Text = QString::number(ou32_Bitrate) + QString(" kbit/s");
 
    return c_Text;
 }
@@ -371,7 +371,7 @@ uint32 C_SdBueBusEditPropertiesWidget::m_GetBitrateFromComboBoxString(const QStr
 {
    QString c_Bitrate = orc_Entry;
    // In case of an error it returns 0
-   const uint32 u32_Bitrate = c_Bitrate.remove(" KBit/s").toInt();
+   const uint32 u32_Bitrate = c_Bitrate.remove(" kbit/s").toInt();
 
    return u32_Bitrate;
 }
@@ -516,7 +516,8 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
       {
          m_TrimmBusName();
          m_RegisterChange();
-         Q_EMIT this->SigNameChanged(this->mpc_Ui->pc_LineEditBusName->text());
+         Q_EMIT (this->SigNameChanged(C_GtGetText::h_GetText(
+                                         "NETWORK TOPOLOGY"), this->mpc_Ui->pc_LineEditBusName->text(), false));
       }
       hq_InProgress = false;
    }

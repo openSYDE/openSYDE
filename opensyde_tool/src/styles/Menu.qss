@@ -21,4 +21,18 @@ stw_opensyde_gui_elements--C_OgeContextMenu::separator
 margin-top: 4px;
 margin-bottom: 4px;
 }
+
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeMuSections
+{
+border-style: solid;
+border-width: 1px;
+}
+
+stw_opensyde_gui_elements--C_OgeMuSections::item
+{
+padding: 5px;
+padding-left: 10px;
+}
+
 /* --------------------------------------------------------------------- */

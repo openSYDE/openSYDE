@@ -33,6 +33,7 @@ public:
    stw_scl::C_SCLString c_CodeGeneratorPath; ///< alternative code generator
    stw_scl::C_SCLString c_ProjectFolder;     ///< project subfolder (relative to root of template archive)
    stw_scl::C_SCLString c_GeneratePath;      ///< application code generation path (relative to projectfolder)
+   stw_types::uint16 u16_GenCodeVersion;     ///< Version of structure of generated code
    stw_scl::C_SCLString c_ResultPath;        ///< application result path (relative to projectfolder)
 };
 

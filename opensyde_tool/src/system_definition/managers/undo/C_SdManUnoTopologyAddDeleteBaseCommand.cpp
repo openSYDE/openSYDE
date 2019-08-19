@@ -155,7 +155,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_Restore(void)
 
    if (pc_Scene != NULL)
    {
-      pc_Scene->CopyFromSnapshotToScene(this->mc_DataBackup, NULL, &(this->mc_MapTypeAndIndexToID));
+      pc_Scene->CopyFromSnapshotToScene(this->mc_DataBackup, &(this->mc_MapTypeAndIndexToID));
       Q_EMIT this->SigErrorChange();
    }
 }
@@ -206,6 +206,28 @@ sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetLineArrowType(void) const
 sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetTextElementType(void) const
 {
    return static_cast<sint32>(C_PuiSdDataElement::eTEXT_ELEMENT);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply position offset
+
+   \param[in] orc_NewPos Offset
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::SetDataPositionOffset(const QPointF & orc_NewPos)
+{
+   this->mc_DataBackup.SetDataPositionOffset(orc_NewPos);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply Z value offset
+
+   \param[in] of64_HighestUsedZValue Highest used Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyAddDeleteBaseCommand::SetDataZOffset(const float64 of64_HighestUsedZValue)
+{
+   this->mc_DataBackup.SetDataZOffset(of64_HighestUsedZValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -288,13 +310,14 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusTextEl
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
 {
-   vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
+   const vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
    C_GiNode * pc_Node;
    C_GiLiBus * pc_Bus;
    C_GiLiBusConnector * pc_BusConnector;
    C_GiTextElementBus * pc_TextElementBus;
    C_PuiSdDataElement * pc_Data;
    C_GiUnique * pc_Unique;
+
    QMap<uint32, uint32> c_MapOldIndexToNewIndex;
 
    this->m_Clear();
@@ -302,7 +325,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
    //Base elements
    m_StoreCommon(this->mc_DataBackup, this->mc_MapTypeAndIndexToID, C_PuiSdHandler::h_GetInstance()->c_Elements);
    //Other elements
-   for (vector<QGraphicsItem *>::iterator c_ItRelatedItem = c_RelatedItems.begin();
+   for (vector<QGraphicsItem *>::const_iterator c_ItRelatedItem = c_RelatedItems.begin();
         c_ItRelatedItem != c_RelatedItems.end(); ++c_ItRelatedItem)
    {
       //lint -e{740}  no problem because of common base class
@@ -510,8 +533,8 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_Delete(void)
 
    if (pc_Scene != NULL)
    {
-      vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
-      for (vector<QGraphicsItem *>::iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
+      const vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
+      for (vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
       {
          pc_Scene->DeleteItem(*c_ItItem);
       }

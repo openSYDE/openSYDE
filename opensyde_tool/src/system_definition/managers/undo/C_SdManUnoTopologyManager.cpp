@@ -69,14 +69,11 @@ C_SdManUnoTopologyManager::~C_SdManUnoTopologyManager(void)
 
    \param[in]     orc_SelectedItems All selected items
    \param[in]     orc_Items         All items
-   \param[in]     of64_Diff         Difference to add to all selected items
-   \param[in,out] orf64_ZOrderHigh  Reference to highest z value
-   \param[in,out] orf64_ZOrderLow   Reference to lowest z value
+   \param[in]     oq_BringToFront   Flag if this is the bring to front action (otherwise send to back assumed)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_SelectedItems,
-                                            const QList<QGraphicsItem *> & orc_Items, const float64 of64_Diff,
-                                            float64 & orf64_ZOrderHigh, float64 & orf64_ZOrderLow)
+                                            const QList<QGraphicsItem *> & orc_Items, const bool oq_BringToFront)
 {
    QMap<QGraphicsItem *, float64> c_Changes;
    vector<uint64> c_IDs;
@@ -84,9 +81,8 @@ void C_SdManUnoTopologyManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_S
    QList<QGraphicsItem *> c_List;
    C_SdManUnoTopologyZOrderCommand * pc_ZOrderCommand;
 
-   C_SdManUnoTopologyZOrderCommand::h_AdaptZOrder(this->mpc_Scene, orc_SelectedItems, of64_Diff,
-                                                  orf64_ZOrderHigh,
-                                                  orf64_ZOrderLow, c_Changes);
+   C_SdManUnoTopologyZOrderCommand::h_AdaptZOrder(this->mpc_Scene, orc_Items, orc_SelectedItems, oq_BringToFront,
+                                                  c_Changes);
    C_SdManUnoTopologyZOrderCommand::h_CheckZOrderPriority(orc_SelectedItems, orc_Items, c_Changes);
 
    for (QMap<QGraphicsItem *, float64>::const_iterator c_ItChanges = c_Changes.begin();
@@ -130,10 +126,7 @@ void C_SdManUnoTopologyManager::DoDelete(const QList<QGraphicsItem *> & orc_Item
       connect(pc_DeleteCommand,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
               &C_SdManUnoTopologyManager::m_OnErrorChange);
-      this->m_PrepareAction();
-      this->push(pc_DeleteCommand);
-      Q_EMIT this->SigErrorChanged();
-      this->m_CleanupAction();
+      this->m_DoPushAndSignalError(pc_DeleteCommand);
    }
 }
 
@@ -218,10 +211,7 @@ void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID,
                                                     u64_NodeID, u64_BusID, oru8_InterfaceNumber, oru8_NodeId);
    connect(pc_AddCommand,
            &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this, &C_SdManUnoTopologyManager::m_OnErrorChange);
-   this->m_PrepareAction();
-   this->push(pc_AddCommand);
-   Q_EMIT this->SigErrorChanged();
-   this->m_CleanupAction();
+   this->m_DoPushAndSignalError(pc_AddCommand);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -288,7 +278,7 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
               &C_SdManUnoTopologyManager::m_OnErrorChange);
-      this->DoPush(pc_UndoCommand);
+      this->m_DoPushAndSignalError(pc_UndoCommand);
    }
 }
 
@@ -341,24 +331,27 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
               &C_SdManUnoTopologyManager::m_OnErrorChange);
-      this->DoPush(pc_UndoCommand);
+      this->m_DoPushAndSignalError(pc_UndoCommand);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new data based on a snapshot and reserved IDs
 
-   \param[in]     oru64_UniqueIDs      Reserved unique IDs for snapshot data
-   \param[in]     orc_Snapshot         Snapshot data
+   \param[in]     oru64_UniqueIDs        Reserved unique IDs for snapshot data
+   \param[in]     orc_Snapshot           Snapshot data
+   \param[in]     orc_NewPos             Position offset for all items
+   \param[in]     of64_HighestUsedZValue Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_UniqueIDs,
-                                              const C_SdTopologyDataSnapshot & orc_Snapshot, const QPointF & orc_NewPos)
+                                              const C_SdTopologyDataSnapshot & orc_Snapshot, const QPointF & orc_NewPos,
+                                              const float64 of64_HighestUsedZValue)
 {
    C_SdManUnoTopologyAddSnapshotCommand * pc_AddCommand;
 
    pc_AddCommand = new C_SdManUnoTopologyAddSnapshotCommand(this->mpc_Scene, orc_Snapshot,
-                                                            oru64_UniqueIDs, orc_NewPos);
+                                                            oru64_UniqueIDs, orc_NewPos, of64_HighestUsedZValue);
    connect(pc_AddCommand,
            &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this, &C_SdManUnoTopologyManager::m_OnErrorChange);
    this->DoPush(pc_AddCommand);
@@ -521,4 +514,18 @@ void C_SdManUnoTopologyManager::m_MergeWithPrev(QUndoCommand * const opc_Command
 void C_SdManUnoTopologyManager::m_OnErrorChange(void)
 {
    Q_EMIT this->SigErrorChanged();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add newest command to undo stack and signal error
+
+   \param[in,out] opc_UndoCommand New undo command to add to the stack
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManUnoTopologyManager::m_DoPushAndSignalError(QUndoCommand * const opc_UndoCommand)
+{
+   this->m_PrepareAction();
+   this->push(opc_UndoCommand);
+   Q_EMIT this->SigErrorChanged();
+   this->m_CleanupAction();
 }

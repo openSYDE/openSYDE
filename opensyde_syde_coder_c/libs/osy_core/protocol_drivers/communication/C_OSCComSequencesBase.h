@@ -11,7 +11,7 @@
 #ifndef C_OSCCOMSEQUENCESBASE_H
 #define C_OSCCOMSEQUENCESBASE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 
 #include "stwtypes.h"
@@ -21,12 +21,12 @@
 
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCComSequencesBase
 {
@@ -34,7 +34,7 @@ public:
    C_OSCComSequencesBase(const bool oq_RoutingActive);
    virtual ~C_OSCComSequencesBase(void);
 
-   virtual stw_types::sint32 Init(const C_OSCSystemDefinition & orc_SystemDefinition,
+   virtual stw_types::sint32 Init(C_OSCSystemDefinition & orc_SystemDefinition,
                                   const stw_types::uint32 ou32_ActiveBusIndex,
                                   const std::vector<stw_types::uint8> & orc_ActiveNodes,
                                   stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
@@ -49,11 +49,14 @@ public:
    bool IsAtLeastOneStwFlashloaderNodeActive(void) const;
    bool IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void) const;
 
+   bool IsEthToEthRoutingNecessary(const stw_types::uint32 ou32_RouterNodeIndex) const;
+   stw_types::uint32 GetMinimumFlashloaderResetWaitTime(void) const;
+
 protected:
    C_OSCComDriverFlash * const mpc_ComDriver;
 
    //class configuration parameters:
-   const C_OSCSystemDefinition * mpc_SystemDefinition;
+   C_OSCSystemDefinition * mpc_SystemDefinition;
    stw_types::uint32 mu32_ActiveBusIndex;
    std::vector<stw_types::uint8> mc_ActiveNodes;
    std::vector<stw_types::uint8> mc_TimeoutNodes; // Flag if a node had a timeout and is not reachable
@@ -83,7 +86,7 @@ private:
    const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

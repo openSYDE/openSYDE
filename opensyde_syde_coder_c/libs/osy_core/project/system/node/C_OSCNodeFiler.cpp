@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -22,25 +22,25 @@
 #include "C_OSCNodeDataPoolFiler.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node file
 
    \param[out]    orc_Node      Data storage
@@ -50,7 +50,7 @@ using namespace stw_opensyde_core;
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & orc_FilePath)
 {
    C_OSCXMLParser c_XMLParser;
@@ -77,7 +77,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node
 
    Load node data from XML file
@@ -92,7 +92,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & 
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
                                   const stw_scl::C_SCLString & orc_BasePath)
 {
@@ -136,7 +136,7 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node
 
    Save node to XML file
@@ -149,7 +149,7 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
    C_NO_ERR   data saved
    C_CONFIG   file could not be created
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLString & orc_FilePath,
                                       std::vector<C_SCLString> * const opc_CreatedFiles)
 {
@@ -179,7 +179,7 @@ sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLStr
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node
 
    Save node to XML file
@@ -195,7 +195,7 @@ sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLStr
    C_NO_ERR   data saved
    C_CONFIG   file could not be created
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
                                   const stw_scl::C_SCLString & orc_BasePath,
                                   std::vector<C_SCLString> * const opc_CreatedFiles)
@@ -218,7 +218,7 @@ sint32 C_OSCNodeFiler::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node com protocols
 
    Load node data from XML file
@@ -234,7 +234,7 @@ sint32 C_OSCNodeFiler::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & orc_NodeComProtocols,
                                               const std::vector<C_OSCNodeDataPool> & orc_NodeDataPools,
                                               C_OSCXMLParserBase & orc_XMLParser,
@@ -303,7 +303,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & or
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node com protocols
 
    Save node to XML file
@@ -320,7 +320,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & or
    C_NO_ERR   data saved
    C_CONFIG   file could not be created
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol> & orc_NodeComProtocols,
                                               const std::vector<C_OSCNodeDataPool> & orc_NodeDataPools,
                                               C_OSCXMLParserBase & orc_XMLParser,
@@ -374,7 +374,7 @@ sint32 C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get automatically generated folder name
 
    \param[in] orc_NodeName Node name
@@ -382,25 +382,25 @@ sint32 C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
    \return
    Automatically generated folder name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeFiler::h_GetFolderName(const C_SCLString & orc_NodeName)
 {
    return "node_" + C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(orc_NodeName);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get automatically generated file name
 
    \return
    Automatically generated file name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeFiler::h_GetFileName(void)
 {
    return "node_core.xml";
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node properties
 
    Load node data from XML file
@@ -414,7 +414,7 @@ C_SCLString C_OSCNodeFiler::h_GetFileName(void)
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodeProperties, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -651,7 +651,7 @@ sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropertie
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node properties
 
    Save node to XML file
@@ -661,7 +661,7 @@ sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropertie
    \param[in]     orc_NodeProperties data storage
    \param[in,out] orc_XMLParser      XML with core active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodeProperties,
                                        C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -745,7 +745,7 @@ void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePrope
    tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node STW flashloader settings
 
    Load node data from XML file
@@ -759,7 +759,7 @@ void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePrope
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSettings & orc_StwFlashloaderSettings,
                                                     C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -850,7 +850,7 @@ sint32 C_OSCNodeFiler::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSetti
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node STW flashloader settings
 
    Save node to XML file
@@ -860,7 +860,7 @@ sint32 C_OSCNodeFiler::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSetti
    \param[in]     orc_StwFlashloaderSettings data storage
    \param[in,out] orc_XMLParser              XML with core active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFiler::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderSettings & orc_StwFlashloaderSettings,
                                                   C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -886,7 +886,7 @@ void C_OSCNodeFiler::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderS
    tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node applications
 
    Load node data from XML file
@@ -900,7 +900,7 @@ void C_OSCNodeFiler::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderS
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & orc_NodeApplications,
                                            C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -942,6 +942,17 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
             else
             {
                c_CurApplication.u8_ProcessId = 0U;
+            }
+
+            if (orc_XMLParser.AttributeExists("generated-code-version"))
+            {
+               c_CurApplication.u16_GenCodeVersion =
+                  static_cast<uint16>(orc_XMLParser.GetAttributeUint32("generated-code-version"));
+            }
+            else
+            {
+               // probably deprecated project -> default to first version
+               c_CurApplication.u16_GenCodeVersion = 1U;
             }
 
             //Type
@@ -1070,7 +1081,7 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node applications
 
    Save node to XML file
@@ -1080,7 +1091,7 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
    \param[in]     orc_NodeApplications data storage
    \param[in,out] orc_XMLParser        XML with core active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication> & orc_NodeApplications,
                                          C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -1092,6 +1103,8 @@ void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication>
       orc_XMLParser.CreateAndSelectNodeChild("application");
       orc_XMLParser.SetAttributeBool("active", rc_CurApplication.q_Active);
       orc_XMLParser.SetAttributeUint32("process-id", static_cast<uint32>(rc_CurApplication.u8_ProcessId));
+      orc_XMLParser.SetAttributeUint32("generated-code-version",
+                                       static_cast<uint32>(rc_CurApplication.u16_GenCodeVersion));
       orc_XMLParser.CreateNodeChild("type", C_OSCNodeApplication::h_ApplicationToString(rc_CurApplication.e_Type));
       orc_XMLParser.CreateNodeChild("name", rc_CurApplication.c_Name);
       orc_XMLParser.CreateNodeChild("comment", rc_CurApplication.c_Comment);
@@ -1107,7 +1120,7 @@ void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication>
    tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pools
 
    Load node data from XML file
@@ -1122,7 +1135,7 @@ void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication>
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::mh_LoadDataPools(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
                                         const stw_scl::C_SCLString & orc_BasePath)
 {
@@ -1201,7 +1214,7 @@ sint32 C_OSCNodeFiler::mh_LoadDataPools(C_OSCNode & orc_Node, C_OSCXMLParserBase
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node data pools
 
    Save node to XML file
@@ -1217,7 +1230,7 @@ sint32 C_OSCNodeFiler::mh_LoadDataPools(C_OSCNode & orc_Node, C_OSCXMLParserBase
    C_NO_ERR   data saved
    C_CONFIG   file could not be created
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & orc_NodeDataPools,
                                         C_OSCXMLParserBase & orc_XMLParser, const stw_scl::C_SCLString & orc_BasePath,
                                         std::vector<C_SCLString> * const opc_CreatedFiles)
@@ -1258,7 +1271,7 @@ sint32 C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform diagnostic server type to string
 
    \param[in] ore_DiagnosticProtocol Diagnostic protocol type
@@ -1266,7 +1279,7 @@ sint32 C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
    \return
    Stringified diagnostic server type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeFiler::mh_DiagnosticServerToString(
    const C_OSCNodeProperties::E_DiagnosticServerProtocol & ore_DiagnosticProtocol)
 {
@@ -1290,7 +1303,7 @@ C_SCLString C_OSCNodeFiler::mh_DiagnosticServerToString(
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to diagnostic server type
 
    \param[in]  orc_String String to interpret
@@ -1300,7 +1313,7 @@ C_SCLString C_OSCNodeFiler::mh_DiagnosticServerToString(
    C_NO_ERR   no error
    C_RANGE    String unknown
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::mh_StringToDiagnosticServer(const C_SCLString & orc_String,
                                                    C_OSCNodeProperties::E_DiagnosticServerProtocol & ore_Type)
 {
@@ -1328,7 +1341,7 @@ sint32 C_OSCNodeFiler::mh_StringToDiagnosticServer(const C_SCLString & orc_Strin
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform flash loader type to string
 
    \param[in] ore_FlashLoader Flash loader type
@@ -1336,7 +1349,7 @@ sint32 C_OSCNodeFiler::mh_StringToDiagnosticServer(const C_SCLString & orc_Strin
    \return
    Stringified flash loader type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeFiler::mh_FlashLoaderToString(const C_OSCNodeProperties::E_FlashLoaderProtocol & ore_FlashLoader)
 {
    C_SCLString c_Retval;
@@ -1359,7 +1372,7 @@ C_SCLString C_OSCNodeFiler::mh_FlashLoaderToString(const C_OSCNodeProperties::E_
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to flash loader type
 
    \param[in]  orc_String String to interpret
@@ -1369,7 +1382,7 @@ C_SCLString C_OSCNodeFiler::mh_FlashLoaderToString(const C_OSCNodeProperties::E_
    C_NO_ERR   no error
    C_RANGE    String unknown
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::mh_StringToFlashLoader(const C_SCLString & orc_String,
                                               C_OSCNodeProperties::E_FlashLoaderProtocol & ore_Type)
 {

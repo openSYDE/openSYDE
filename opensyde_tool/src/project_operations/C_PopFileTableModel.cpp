@@ -237,7 +237,7 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                   const uint64 u64_SizeByte = C_PuiProject::h_GetProjectSize(rc_RecentFilePaths);
                   const float64 f64_SizeFloat = std::ceil(static_cast<float64>(u64_SizeByte) / 1024.0);
 
-                  c_TooltipContent.append(QString(C_GtGetText::h_GetText("\nSize: %L1 KB")).arg(static_cast<uint64>(
+                  c_TooltipContent.append(QString(C_GtGetText::h_GetText("\nSize: %L1 kB")).arg(static_cast<uint64>(
                                                                                                    f64_SizeFloat)));
                }
                c_TooltipContent.append("\n\n" + rc_RecentFilePaths);

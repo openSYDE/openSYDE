@@ -12,8 +12,7 @@
 #define C_TBLTREMODEL_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QAbstractItemModel>
-#include "C_TblTreItem.h"
+#include "C_TblTreSimpleModel.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -23,22 +22,13 @@ namespace stw_opensyde_gui_logic
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_TblTreModel :
-   public QAbstractItemModel
+   public C_TblTreSimpleModel
 {
 public:
    C_TblTreModel(QObject * const opc_Parent = NULL);
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
-   // Basic functionality:
-   //lint -e{1735} Suppression, because default parameters are identical
-   virtual QModelIndex index(const stw_types::sintn osn_Row, const stw_types::sintn osn_Column,
-                             const QModelIndex & orc_Parent = QModelIndex()) const override;
-   //lint -e{1735} Suppression, because default parameters are identical
-   virtual QModelIndex parent(const QModelIndex & orc_Index) const override;
-
-   //lint -e{1735} Suppression, because default parameters are identical
-   virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
 
    //lint -e{1735} Suppression, because default parameters are identical
    virtual QVariant data(const QModelIndex & orc_Index, const stw_types::sintn osn_Role =
@@ -46,9 +36,6 @@ public:
 
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
    //lint -restore
-
-protected:
-   C_TblTreItem * mpc_InvisibleRootItem;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

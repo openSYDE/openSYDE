@@ -28,7 +28,7 @@
 #include "C_OSCCanSignal.h"
 #include "C_OSCNodeDataPoolContent.h"
 #include "TGLFile.h"
-#include "Status.h"
+#include "DBC/Status.h"
 #include "TGLUtils.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_OSCLoggingHandler.h"
@@ -66,7 +66,7 @@ C_CieExportDbc::C_ExportStatistic C_CieExportDbc::mhc_ExportStatistic; // for pu
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   short description of function
+/*! \brief   Export DBC network from CIE data structure.
 
    Assumptions:
    * DBC network must have at least one node
@@ -351,7 +351,6 @@ sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENod
          }
          else
          {
-            // 2018-06-19 AST, SSI, DPO:
             // Convention is that a CAN message can only have one (!) transmitter.
             // DBC library supports more than one transmitter, maybe in case by activating
             // different nodes, but this is not supported in openSYDE.
@@ -374,7 +373,14 @@ sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENod
          {
             // new CAN message
             Vector::DBC::Message c_DBCMessage;
-            c_DBCMessage.id = u32_CanId;
+            if (c_CanMessage.q_IsExtended == true)
+            {
+               c_DBCMessage.id = u32_CanId | 0x80000000UL;
+            }
+            else
+            {
+               c_DBCMessage.id = u32_CanId;
+            }
             c_DBCMessage.size = c_CanMessage.u16_Dlc;
             c_DBCMessage.comment = mh_EscapeCriticalSymbols(c_CanMessage.c_Comment).c_str();
             c_DBCMessage.name = c_CanMessage.c_Name.c_str();
@@ -435,6 +441,26 @@ sint32 C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CIECanS
       // set start bit pos and length
       c_DBCSignal.startBit = c_CIESignal.u16_ComBitStart;
       c_DBCSignal.bitSize = c_CIESignal.u16_ComBitLength;
+
+      // set multiplexing information
+      switch (c_CIESignal.e_MultiplexerType)
+      {
+      case C_OSCCanSignal::eMUX_DEFAULT:
+         c_DBCSignal.multiplexedSignal = false;
+         c_DBCSignal.multiplexorSwitch = false;
+         c_DBCSignal.multiplexerSwitchValue = 0;
+         break;
+      case C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL:
+         c_DBCSignal.multiplexedSignal = false;
+         c_DBCSignal.multiplexorSwitch = true;
+         c_DBCSignal.multiplexerSwitchValue = 0;
+         break;
+      case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
+         c_DBCSignal.multiplexedSignal = true;
+         c_DBCSignal.multiplexorSwitch = false;
+         c_DBCSignal.multiplexerSwitchValue = c_CIESignal.u16_MultiplexValue;
+         break;
+      }
 
       // set signal values
       C_CieConverter::C_CIEDataPoolElement & c_Element = c_CIESignal.c_Element;
@@ -838,7 +864,7 @@ sint32 C_CieExportDbc::mh_CheckDbcFileStatus(const Vector::DBC::Status & orc_Sta
       }
       if (orc_Status == Vector::DBC::Status::MalformedExtendedMultiplexor)
       {
-         c_Message = "\"Incorrect format of Extended Multiplexor (SG_MUL_VAL)\".";
+         c_Message = "\"Incorrect format of Extended Multiplexer (SG_MUL_VAL)\".";
          mhc_WarningMessages.Append(c_Message);
          osc_write_log_warning("DBC file export", c_Message);
       }

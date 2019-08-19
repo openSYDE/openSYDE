@@ -99,6 +99,7 @@ private:
    void m_HandleMessages(void);
    void m_UpdateUi(const std::list<stw_opensyde_gui_logic::C_CamMetTreeLoggerData> & orc_Data);
    void m_SetChildColumns(const std::vector<stw_types::sint32> & orc_Indices);
+   void m_SetChildColumns(const QModelIndex & orc_ModelIndex);
    void m_SetAllChildren(void);
    void m_RepositionButtons(void);
    void m_DoScrollTop(void);
@@ -111,6 +112,11 @@ private:
    void m_SetColumnPositionIndices(const std::vector<stw_types::sint32> & orc_NewColPositionIndices);
    bool m_ColumnsSortedAsExpected(const std::vector<stw_types::sint32> & orc_NewColPositionIndices) const;
    void m_HandleSorting(void);
+   static void mh_DrawL(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const stw_types::sint32 os32_Offset);
+   static void mh_DrawPlus(QPainter * const opc_Painter, const QPoint & orc_TopLeft,
+                           const stw_types::sint32 os32_Offset);
+   static void mh_DrawVLine(QPainter * const opc_Painter, const QPoint & orc_TopLeft,
+                            const stw_types::sint32 os32_Offset);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

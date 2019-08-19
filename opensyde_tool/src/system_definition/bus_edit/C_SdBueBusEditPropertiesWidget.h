@@ -68,7 +68,8 @@ private:
 Q_SIGNALS:
    //lint -restore
    void SigChanged(void);
-   void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName = "");
+   void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName,
+                       const bool oq_CombineItemAndSubSubName);
 };
 }
 

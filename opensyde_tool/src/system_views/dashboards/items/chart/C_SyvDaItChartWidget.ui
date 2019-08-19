@@ -51,7 +51,69 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="stw_opensyde_gui::C_SyvDaItChartDataSelectorWidget" name="pc_ChartSelectorWidget" native="true"/>
+          <widget class="QWidget" name="widget" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="stw_opensyde_gui::C_SyvDaItChartDataSelectorWidget" name="pc_ChartSelectorWidget" native="true"/>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_34" stretch="1">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>10</number>
+              </property>
+              <item>
+               <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="pc_FramSperator1_2">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>1</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>1</height>
+                 </size>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="stw_opensyde_gui::C_SyvDaItChartSettingsWidget" name="pc_SettingsWidget" native="true"/>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </item>
@@ -145,6 +207,18 @@
    <class>stw_opensyde_gui::C_SyvDaItChartDataSelectorWidget</class>
    <extends>QWidget</extends>
    <header>C_SyvDaItChartDataSelectorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>
+   <extends>QFrame</extends>
+   <header>C_OgeFrameSeparator.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SyvDaItChartSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SyvDaItChartSettingsWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

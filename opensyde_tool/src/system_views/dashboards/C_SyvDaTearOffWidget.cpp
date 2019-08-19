@@ -136,6 +136,9 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const st
    connect(this->mpc_Ui->pc_WidgetTab, &C_OgeWiDashboardTab::SigEditPropertiesAction, this,
            &C_SyvDaTearOffWidget::m_OnEditProperties);
 
+   connect(this->mpc_Dashboard, &C_SyvDaDashboardWidget::SigTriggerUpdateTransmissionConfiguration, this,
+           &C_SyvDaTearOffWidget::SigTriggerUpdateTransmissionConfiguration);
+
    // Manual datapool element handling
    connect(this->mpc_Dashboard, &C_SyvDaDashboardWidget::SigDataPoolWrite, this,
            &C_SyvDaTearOffWidget::SigDataPoolWrite);

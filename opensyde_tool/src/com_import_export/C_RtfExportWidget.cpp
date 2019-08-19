@@ -34,12 +34,10 @@
 #include "C_OSCProject.h"
 #include "C_PuiProject.h"
 #include "C_Uti.h"
+#include "C_PuiUtil.h"
 #include "C_SdTopologyWidget.h"
-#include "TGLFile.h"
 #include "C_OgeWiCustomMessage.h"
 #include "ui_C_RtfExportWidget.h"
-#include "C_Uti.h"
-#include "C_ImpUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -80,19 +78,12 @@ C_RtfExportWidget::C_RtfExportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog
 
    InitStaticNames();
 
-   orc_Parent.setFocus(); // set focus to widget and not to edit field at the beginning because we want to see the
-                          // minimized paths
-
-   // set hint for optional entries to appropriate labels
-   this->mpc_Ui->pc_EditCompany->setPlaceholderText(C_GtGetText::h_GetText("optional"));
-   this->mpc_Ui->pc_EditLogoPath->setPlaceholderText(C_GtGetText::h_GetText("optional"));
-
    // register the widget for showing
    this->mrc_ParentDialog.SetWidget(this);
 
-   // set main title
-   this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("SYSTEM DEFINITION")));
-   this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
+   // Remove "..." string
+   this->mpc_Ui->pc_PushButtonLogoPath->setText("");
+   this->mpc_Ui->pc_PushButtonRtfPath->setText("");
 
    // connects
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this,
@@ -122,31 +113,43 @@ C_RtfExportWidget::~C_RtfExportWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::InitStaticNames(void) const
 {
+   // set main title
+   this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("SYSTEM DEFINITION")));
+   this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
+
+   // labels and buttons
    this->mpc_Ui->pc_LabelHeadingReport->setText(C_GtGetText::h_GetText("Report Settings"));
    this->mpc_Ui->pc_LabelPath->setText(C_GtGetText::h_GetText("Path"));
    this->mpc_Ui->pc_LabelCompany->setText(C_GtGetText::h_GetText("Company Name"));
    this->mpc_Ui->pc_LabelLogo->setText(C_GtGetText::h_GetText("Company Logo"));
-   this->mpc_Ui->pc_PushButtonRtfPath->setText(C_GtGetText::h_GetText("..."));
-   this->mpc_Ui->pc_PushButtonLogoPath->setText(C_GtGetText::h_GetText("..."));
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("Generate Report"));
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
 
+   // set hint for optional entries to appropriate labels
+   this->mpc_Ui->pc_EditCompany->setPlaceholderText(C_GtGetText::h_GetText("optional"));
+   this->mpc_Ui->pc_EditLogoPath->setPlaceholderText(C_GtGetText::h_GetText("optional"));
+
    // Tool tips
+   this->mpc_Ui->pc_LabelPath->SetToolTipInformation(
+      C_GtGetText::h_GetText("RTF File Path"),
+      C_GtGetText::h_GetText("Full path to save RTF file documentation (*.rtf)."));
 
-   this->mpc_Ui->pc_LabelPath->SetToolTipInformation(C_GtGetText::h_GetText("RTF File Path"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Full path to save RTF file documentation (*.rtf)."));
+   this->mpc_Ui->pc_LabelCompany->SetToolTipInformation(
+      C_GtGetText::h_GetText("Company Name"),
+      C_GtGetText::h_GetText("The company name for that the RTF file export is created for.\n(optional parameter)"));
 
-   this->mpc_Ui->pc_LabelCompany->SetToolTipInformation(C_GtGetText::h_GetText("Company Name"),
-                                                        C_GtGetText::h_GetText(
-                                                           "The company name for that the RTF file export is created for.\n"
-                                                           "(optional parameter)"));
+   this->mpc_Ui->pc_LabelLogo->SetToolTipInformation(
+      C_GtGetText::h_GetText("Company Logo"),
+      C_GtGetText::h_GetText(
+         "Location of the file containing the logo of the company for that the RTF file export is created for.\n"
+         "File format is JPG or PNG. \n(optional parameter)"));
 
-   this->mpc_Ui->pc_LabelLogo->SetToolTipInformation(C_GtGetText::h_GetText("Company Logo"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Location of the file containing the logo of the company for that the RTF file export is created for.\n"
-                                                        "File format is JPG or PNG. \n"
-                                                        "(optional parameter)"));
+   this->mpc_Ui->pc_PushButtonLogoPath->SetToolTipInformation(
+      C_GtGetText::h_GetText("Browse"),
+      C_GtGetText::h_GetText("Browse for company logo file."));
+   this->mpc_Ui->pc_PushButtonRtfPath->SetToolTipInformation(
+      C_GtGetText::h_GetText("Browse"),
+      C_GtGetText::h_GetText("Browse for export path."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -170,7 +173,7 @@ sint32 C_RtfExportWidget::GetRtfPath(C_SCLString & orc_RtfPath) const
    sint32 s32_Return = C_CONFIG;
 
    // get full RTF path of widget Ui
-   orc_RtfPath = C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
+   orc_RtfPath = C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
 
    // check if directory exists
    if (TGL_DirectoryExists(TGL_ExtractFilePath(orc_RtfPath)) == true)
@@ -247,7 +250,7 @@ sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) 
    if (orc_CompanyLogoPath != "")
    {
       // make absolute path if necessary
-      orc_CompanyLogoPath = C_ImpUtil::h_GetAbsolutePathFromProject(orc_CompanyLogoPath.c_str()).toStdString().c_str();
+      orc_CompanyLogoPath = C_PuiUtil::h_GetAbsolutePathFromProject(orc_CompanyLogoPath.c_str()).toStdString().c_str();
 
       // check if file exists
       if (TGL_FileExists(orc_CompanyLogoPath) == true)
@@ -415,17 +418,8 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
 
       // fill up information for DocuCreator
       C_ExportXmlStructure c_ConfigXml;
-
       QString c_SysDefPathTmp; // get path of system definition file '.syde_sysdef'
-      C_PuiProject::h_AdaptProjectPathToSystemDefinition(
-         C_PuiProject::h_GetInstance()->GetPath(), c_SysDefPathTmp);
-
-      QString c_DevIniPathTmp = C_Uti::h_GetExePath(); // get device ini location by project path
-      QDir c_DirTmp(c_DevIniPathTmp);
-      tgl_assert(c_DirTmp.cdUp() == true);       // go one directory up
-      c_DevIniPathTmp = c_DirTmp.absolutePath(); // get current path
-      c_DevIniPathTmp += "/devices/devices.ini"; // add device ini location
-
+      C_PuiProject::h_AdaptProjectPathToSystemDefinition(C_PuiProject::h_GetInstance()->GetPath(), c_SysDefPathTmp);
       QDateTime c_CurrentTime(QDateTime::currentDateTime());
 
       // Project
@@ -435,7 +429,7 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       c_ConfigXml.c_Created = C_SCLString(c_CurrentTime.toString("dd.MM.yyyy hh:mm").toStdString().c_str());
       c_ConfigXml.c_Author = C_PuiProject::h_GetInstance()->c_Editor;
       c_ConfigXml.c_SysDefPath = c_SysDefPathTmp.toStdString().c_str();
-      c_ConfigXml.c_DevicesIniPath = c_DevIniPathTmp.toStdString().c_str();
+      c_ConfigXml.c_DevicesIniPath = C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str();
       c_ConfigXml.c_OutputPath = orc_RtfPath;
       c_ConfigXml.c_NetworkTopologyImage = c_PathNetworkTopologyScreenshot.toStdString().c_str();
       // openSYDE
@@ -683,7 +677,7 @@ void C_RtfExportWidget::m_RtfPathClicked(void)
 {
    QString c_Folder; // for default folder
    C_SCLString c_Tmp =
-      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
+      C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
 
    if (TGL_DirectoryExists(TGL_ExtractFilePath(c_Tmp)) == true)
    {
@@ -717,7 +711,7 @@ void C_RtfExportWidget::m_LogoPathClicked(void)
    QString c_Folder; // for default folder
 
    C_SCLString c_Tmp =
-      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditLogoPath->GetPath()).toStdString().c_str();
+      C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditLogoPath->GetPath()).toStdString().c_str();
 
    if (TGL_DirectoryExists(TGL_ExtractFilePath(c_Tmp)) == true)
    {
@@ -808,7 +802,7 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
       }
       else if (s32_Return == stw_errors::C_CHECKSUM)
       {
-         c_Description = "File name invalid. Only alphanumeric characters + \"_\" are allowed.";
+         c_Description = "File name invalid. Only alphanumeric characters and \"_\" are allowed.";
       }
       else
       {

@@ -55,11 +55,14 @@
       <widget class="stw_opensyde_gui_elements::C_OgeGbxMouseMove" name="pc_GroupBoxBackground">
        <property name="minimumSize">
         <size>
-         <width>500</width>
+         <width>450</width>
          <height>200</height>
         </size>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -70,44 +73,51 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WidgetFrame" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout" stretch="3,2">
-           <item>
-            <widget class="QLabel" name="pc_LabelIcon">
-             <property name="text">
-              <string>Icon</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-             </property>
-             <property name="margin">
-              <number>12</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,1,0,0">
+         <layout class="QVBoxLayout" name="pc_WidgetFrame">
           <property name="leftMargin">
-           <number>18</number>
+           <number>15</number>
           </property>
           <property name="topMargin">
-           <number>18</number>
+           <number>24</number>
+          </property>
+          <property name="rightMargin">
+           <number>12</number>
+          </property>
+          <property name="bottomMargin">
+           <number>9</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="pc_LabelIcon">
+            <property name="text">
+             <string>Icon</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="margin">
+             <number>12</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,0,1,0,0">
+          <property name="topMargin">
+           <number>39</number>
           </property>
           <property name="rightMargin">
            <number>15</number>
@@ -127,6 +137,22 @@
              <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>12</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="stw_opensyde_gui_elements::C_OgeLabDescriptionMessage" name="pc_LabelDescription">
@@ -222,7 +248,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>100</height>
+              <height>77</height>
              </size>
             </property>
            </widget>
@@ -235,7 +261,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>0</width>
-              <height>2</height>
+              <height>9</height>
              </size>
             </property>
            </spacer>
@@ -265,11 +291,17 @@
              </spacer>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_ButtonCancel">
+             <widget class="stw_opensyde_gui_elements::C_OgePubMessageCancel" name="pc_ButtonCancel">
               <property name="minimumSize">
                <size>
                 <width>120</width>
-                <height>35</height>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -278,11 +310,17 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_ButtonNo">
+             <widget class="stw_opensyde_gui_elements::C_OgePubMessageCancel" name="pc_ButtonNo">
               <property name="minimumSize">
                <size>
                 <width>120</width>
-                <height>35</height>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -291,17 +329,17 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_ButtonOk">
+             <widget class="stw_opensyde_gui_elements::C_OgePubMessageOk" name="pc_ButtonOk">
               <property name="minimumSize">
                <size>
                 <width>120</width>
-                <height>35</height>
+                <height>30</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>35</height>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -348,16 +386,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubDialog.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeTebMessageDetails</class>
    <extends>QTextBrowser</extends>
    <header>C_OgeTebMessageDetails.h</header>
@@ -379,15 +407,19 @@
    <header>C_OgeLabDescriptionMessage.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
-   <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
    <extends>QPushButton</extends>
    <header>C_OgePubSvgIconOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubMessageOk</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubMessageOk.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubMessageCancel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubMessageCancel.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

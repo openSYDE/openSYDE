@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 
 #include <sstream>   //for std::istringstream
@@ -21,16 +21,16 @@
 #include "CSCLIniFile.h"
 #include "TGLFile.h"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_opensyde_core;
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_TextAndSize
 {
 public:
@@ -43,9 +43,9 @@ public:
    bool q_IsString;
 };
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables --------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 static const uint8 mu8_NUM_DATA_TYPES = 0x24U;
 
 static const C_TextAndSize mac_TextAndSizeTable[mu8_NUM_DATA_TYPES] =
@@ -89,11 +89,11 @@ static const C_TextAndSize mac_TextAndSizeTable[mu8_NUM_DATA_TYPES] =
    { "IDENTITY",        0,             false, false, false, false }  //23
 };
 
-/* -- Module Global Function Prototypes ----------------------------------- */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   compare two object dictionary entries
 
    Compare two object dictionary entries. The index is the sorting criterion.
@@ -103,7 +103,7 @@ static const C_TextAndSize mac_TextAndSizeTable[mu8_NUM_DATA_TYPES] =
    \return
    true   -> index of true is <  index of orc_Object
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::operator <(const C_OSCCanOpenObject & orc_Object) const
 {
    if (u16_Index != orc_Object.u16_Index)
@@ -121,7 +121,7 @@ bool C_OSCCanOpenObject::operator <(const C_OSCCanOpenObject & orc_Object) const
    return (u8_SubIndex < orc_Object.u8_SubIndex);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data from CANopen EDS file
 
    Load CANopen EDS file and store contents in c_Objects.
@@ -135,7 +135,7 @@ bool C_OSCCanOpenObject::operator <(const C_OSCCanOpenObject & orc_Object) const
    C_CONFIG    could not parse file (is it a valid EDS file ?)
                 use GetLastErrorText() to get details
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanOpenObjectDictionary::LoadFromFile(const C_SCLString & orc_File)
 {
    sint32 s32_Return;
@@ -181,7 +181,7 @@ sint32 C_OSCCanOpenObjectDictionary::LoadFromFile(const C_SCLString & orc_File)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get EDS/DCF data from one block
 
    Does not try to read invalid EDS files; this could result in some subsequent inconsistencies.
@@ -196,7 +196,7 @@ sint32 C_OSCCanOpenObjectDictionary::LoadFromFile(const C_SCLString & orc_File)
    C_CONFIG    inconsistency between object list in block and stated number of entries
                invalid file contents
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanOpenObjectDictionary::m_AppendEDSBlock(const C_SCLString & orc_Blockname, C_SCLIniFile & orc_IniFile)
 {
    uint16 u16_NumEntries;
@@ -290,7 +290,7 @@ sint32 C_OSCCanOpenObjectDictionary::m_AppendEDSBlock(const C_SCLString & orc_Bl
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: get information from one EDS/DCF section
 
    \param[in]     ou16_Index         index of object
@@ -303,7 +303,7 @@ sint32 C_OSCCanOpenObjectDictionary::m_AppendEDSBlock(const C_SCLString & orc_Bl
    C_NO_ERR    data read and placed into orc_Object
    C_CONFIG    invalid data (see mc_LastError for details)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanOpenObjectDictionary::m_GetObjectDescription(const uint16 ou16_Index, const uint8 ou8_SubIndex,
                                                             const bool oq_IsSubIndex,
                                                             const C_SCLStringList & orc_SectionValues,
@@ -375,26 +375,21 @@ sint32 C_OSCCanOpenObjectDictionary::m_GetObjectDescription(const uint16 ou16_In
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 uint16 C_OSCCanOpenObject::GetSize(void) const
 {
    return this->mu16_Size;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCCanOpenObject::SetSize(const uint16 ou16_Size)
 {
    this->mu16_Size = ou16_Size;
-
-   if ((u8_DataType >= mu8_NUM_DATA_TYPES) || (u8_DataType == hu8_DATA_TYPE_INVALID))
-   {
-      return;
-   }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get name and size of object
 
    \param[out]  opc_Text    type of object in text form
@@ -404,7 +399,7 @@ void C_OSCCanOpenObject::SetSize(const uint16 ou16_Size)
    true:   object has access type RO, RW, RWW, RWR or CONST
    false:  object has none of those access types
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanOpenObject::DataTypeToTextAndSize(C_SCLString * const opc_Text, uint8 * const opu8_Size) const
 {
    if ((u8_DataType < mu8_NUM_DATA_TYPES) && (u8_DataType > hu8_DATA_TYPE_INVALID))
@@ -431,14 +426,14 @@ void C_OSCCanOpenObject::DataTypeToTextAndSize(C_SCLString * const opc_Text, uin
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check whether object may be read from
 
    \return
    true:   object has access type RO, RW, RWW, RWR or CONST
    false:  object has none of those access types
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsReadable(void) const
 {
    C_SCLString c_Help = c_Access.UpperCase();
@@ -446,14 +441,14 @@ bool C_OSCCanOpenObject::IsReadable(void) const
    return ((c_Help  == "RO") || (c_Help == "RW") || (c_Help == "RWW") || (c_Help == "RWR") || (c_Help == "CONST"));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check whether object may be written to
 
    \return
    true:   object has access type RW, RWW, RWR or WO
    false:  object has none of those access types
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsWriteable(void) const
 {
    C_SCLString c_Help = c_Access.UpperCase();
@@ -461,14 +456,14 @@ bool C_OSCCanOpenObject::IsWriteable(void) const
    return ((c_Help == "RW") || (c_Help == "RWW") || (c_Help == "RWR") || (c_Help == "WO"));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check whether object is of signed integer type
 
    \return
    true:   object is of signed integer type
    false:  it is not
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsIntegerDataType(void) const
 {
    if ((u8_DataType >= mu8_NUM_DATA_TYPES) || (u8_DataType == hu8_DATA_TYPE_INVALID))
@@ -478,14 +473,14 @@ bool C_OSCCanOpenObject::IsIntegerDataType(void) const
    return mac_TextAndSizeTable[u8_DataType].q_IsInteger;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check whether object is of unsigned type
 
    \return
    true:   object is of unsigned type
    false:  it is not
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsUnsignedDataType(void) const
 {
    if ((u8_DataType >= mu8_NUM_DATA_TYPES) || (u8_DataType == hu8_DATA_TYPE_INVALID))
@@ -495,14 +490,14 @@ bool C_OSCCanOpenObject::IsUnsignedDataType(void) const
    return mac_TextAndSizeTable[u8_DataType].q_IsUnsigned;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check whether object is of REAL32 or REAL64 type
 
    \return
    true:   object is of REAL32 or REAL64 type
    false:  it is not
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsFloatDataType(void) const
 {
    if ((u8_DataType >= mu8_NUM_DATA_TYPES) || (u8_DataType == hu8_DATA_TYPE_INVALID))
@@ -512,14 +507,14 @@ bool C_OSCCanOpenObject::IsFloatDataType(void) const
    return mac_TextAndSizeTable[u8_DataType].q_IsFloat;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check whether object is of VISIBLE_STRING or UNICODE_STRING type
 
    \return
    true:   object is of VISIBLE_STRING or UNICODE_STRING type
    false:  it is not
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsStringDataType(void) const
 {
    if ((u8_DataType >= mu8_NUM_DATA_TYPES) || (u8_DataType == hu8_DATA_TYPE_INVALID))
@@ -529,11 +524,11 @@ bool C_OSCCanOpenObject::IsStringDataType(void) const
    return mac_TextAndSizeTable[u8_DataType].q_IsString;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_OSCCanOpenObjectDictionary::GetLastErrorText(void) const
 {
    return mc_LastError;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

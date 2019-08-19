@@ -68,10 +68,9 @@ public:
                                   const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
                                   const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
                                   const C_PuiSdNodeCanSignal & orc_UISignal) const;
-   stw_types::sint32 SetCanSignalCommon(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                        const stw_types::uint32 & oru32_SignalIndex,
-                                        const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
-                                        const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon) const;
+   stw_types::sint32 SetCanSignalMUXValue(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                          const stw_types::uint32 & oru32_SignalIndex,
+                                          const stw_types::uint16 ou16_MultiplexValue) const;
    stw_types::sint32 SetCanSignalPosition(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                           const stw_types::uint32 & oru32_SignalIndex,
                                           const stw_opensyde_core::C_OSCCanSignal & orc_OSCSignal,

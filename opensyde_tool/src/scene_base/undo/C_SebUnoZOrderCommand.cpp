@@ -14,6 +14,8 @@
 
 #include "stwtypes.h"
 #include "gitypes.h"
+#include "C_GiBiBase.h"
+#include "C_SebUnoZOrderSortHelper.h"
 #include "C_SebUnoZOrderCommand.h"
 #include "C_SebScene.h"
 
@@ -73,14 +75,7 @@ C_SebUnoZOrderCommand::~C_SebUnoZOrderCommand()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderCommand::undo(void)
 {
-   vector<QGraphicsItem *> c_AffectedItems = this->m_GetSceneItems();
-   if (c_AffectedItems.size() == this->mc_OldZValues.size())
-   {
-      for (uint32 u32_ItAffectedItem = 0; u32_ItAffectedItem < c_AffectedItems.size(); ++u32_ItAffectedItem)
-      {
-         c_AffectedItems[u32_ItAffectedItem]->setZValue(this->mc_OldZValues[u32_ItAffectedItem]);
-      }
-   }
+   this->ApplyZValues(this->mc_OldZValues);
    QUndoCommand::undo();
 }
 
@@ -90,57 +85,159 @@ void C_SebUnoZOrderCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderCommand::redo(void)
 {
-   vector<QGraphicsItem *> c_AffectedItems = this->m_GetSceneItems();
-   if (c_AffectedItems.size() == this->mc_NewZValues.size())
-   {
-      for (uint32 u32_ItAffectedItem = 0; u32_ItAffectedItem < c_AffectedItems.size(); ++u32_ItAffectedItem)
-      {
-         c_AffectedItems[u32_ItAffectedItem]->setZValue(this->mc_NewZValues[u32_ItAffectedItem]);
-      }
-   }
+   this->ApplyZValues(this->mc_NewZValues);
    QUndoCommand::redo();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt z order of selected items
 
+   \param[in]     opc_Scene         Pointer to currently active scene
+   \param[in]     orc_Items         All items
    \param[in]     orc_SelectedItems All selected items
-   \param[in]     of64_Diff         Difference to add to all selected items
-   \param[in,out] orf64_ZOrderHigh  Reference to highest z value
-   \param[in,out] orf64_ZOrderLow   Reference to lowest z value
+   \param[in]     oq_BringToFront   Flag if this is the bring to front action (otherwise send to back assumed)
    \param[in,out] orc_NewZValues    Storage for a map of all new z values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebUnoZOrderCommand::h_AdaptZOrder(QGraphicsScene * const opc_Scene,
-                                          const QList<QGraphicsItem *> & orc_SelectedItems, const float64 of64_Diff,
-                                          float64 & orf64_ZOrderHigh, float64 & orf64_ZOrderLow, QMap<QGraphicsItem *,
-                                                                                                      float64> & orc_NewZValues)
+void C_SebUnoZOrderCommand::h_AdaptZOrder(const QGraphicsScene * const opc_Scene,
+                                          const QList<QGraphicsItem *> & orc_Items,
+                                          const QList<QGraphicsItem *> & orc_SelectedItems, const bool oq_BringToFront,
+                                          QMap<QGraphicsItem *, float64> & orc_NewZValues)
 {
-   QList<QGraphicsItem *>::const_iterator c_ItItem;
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_SebScene * const pc_Scene = dynamic_cast<C_SebScene * const>(opc_Scene);
+   const C_SebScene * const pc_Scene = dynamic_cast<const C_SebScene * const>(opc_Scene);
 
    if (pc_Scene != NULL)
    {
-      // adapt the z order value
-      for (c_ItItem = orc_SelectedItems.begin(); c_ItItem != orc_SelectedItems.end(); ++c_ItItem)
+      QList<QGraphicsItem *> c_SelectedItems = orc_SelectedItems;
+      //Step 1: filter all relevant items for z order
+      pc_Scene->FilterChangableZValues(c_SelectedItems);
+      //Step 2: sort all items via z order
+      C_SebUnoZOrderSortHelper::h_SortZValues(c_SelectedItems);
+      //Step 3: create map for target z values
+      C_SebUnoZOrderCommand::mh_CreateZValueMap(opc_Scene, orc_Items, c_SelectedItems, oq_BringToFront, orc_NewZValues);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Central call to change Z values
+
+   \param[in] orc_Values New Z values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SebUnoZOrderCommand::ApplyZValues(const std::vector<float64> & orc_Values) const
+{
+   const vector<QGraphicsItem *> c_AffectedItems = this->m_GetSceneItems();
+
+   if (c_AffectedItems.size() == orc_Values.size())
+   {
+      for (uint32 u32_ItAffectedItem = 0; u32_ItAffectedItem < c_AffectedItems.size(); ++u32_ItAffectedItem)
       {
-         if (pc_Scene->IsZOrderChangeable(*c_ItItem) == true)
+         //lint -e{740}  no problem because of common base class
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         C_GiBiBase * const pc_GiBase = dynamic_cast<C_GiBiBase * const>(c_AffectedItems[u32_ItAffectedItem]);
+         if (pc_GiBase != NULL)
          {
-            float64 f64_NewZValue = (*c_ItItem)->zValue() + of64_Diff;
+            pc_GiBase->SetZValueCustom(orc_Values[u32_ItAffectedItem]);
+         }
+         else
+         {
+            c_AffectedItems[u32_ItAffectedItem]->setZValue(orc_Values[u32_ItAffectedItem]);
+         }
+      }
+   }
+}
 
-            orc_NewZValues.insert((*c_ItItem), f64_NewZValue);
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create z order map of selected items
 
-            // adapt the upper and lower limits
-            if (f64_NewZValue < orf64_ZOrderLow)
+   \param[in]     opc_Scene         Pointer to currently active scene
+   \param[in]     orc_Items         All items
+   \param[in]     orc_SelectedItems All selected items (sorted via z order!)
+   \param[in]     oq_BringToFront   Flag if this is the bring to front action (otherwise send to back assumed)
+   \param[in,out] orc_NewZValues    Storage for a map of all new z values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SebUnoZOrderCommand::mh_CreateZValueMap(const QGraphicsScene * const opc_Scene,
+                                               const QList<QGraphicsItem *> & orc_Items,
+                                               const QList<QGraphicsItem *> & orc_SelectedItems,
+                                               const bool oq_BringToFront, QMap<QGraphicsItem *,
+                                                                                float64> & orc_NewZValues)
+{
+   if (oq_BringToFront)
+   {
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_SebScene * const pc_Scene = dynamic_cast<const C_SebScene * const>(opc_Scene);
+
+      if (pc_Scene != NULL)
+      {
+         float64 f64_Value = pc_Scene->GetHighestUsedZValueList(orc_Items);
+         //Start with first item -> most obscured one
+         for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_SelectedItems.begin();
+              c_ItItem != orc_SelectedItems.end(); ++c_ItItem)
+         {
+            //Iterate to next higher z value (the first one is already used!)
+            ++f64_Value;
+
+            //Insert new unused value
+            orc_NewZValues.insert((*c_ItItem), f64_Value);
+         }
+      }
+   }
+   else
+   {
+      float64 f64_Value = C_SebUnoZOrderCommand::mh_GetLowestUsedZValueList(opc_Scene, orc_Items);
+      //Start with last item -> most visible one
+      for (QList<QGraphicsItem *>::const_reverse_iterator c_ItItem = orc_SelectedItems.rbegin();
+           c_ItItem != orc_SelectedItems.rend(); ++c_ItItem)
+      {
+         //Iterate to next lower z value (the first one is already used!)
+         --f64_Value;
+
+         //Insert new unused value
+         orc_NewZValues.insert((*c_ItItem), f64_Value);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get lowest used Z value of all provided items
+
+   \param[in,out] opc_Scene Pointer to currently active scene
+   \param[in]     orc_Items Items to get lowest Z value for
+
+   \return
+   Lowest used Z value of all scene items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+float64 C_SebUnoZOrderCommand::mh_GetLowestUsedZValueList(const QGraphicsScene * const opc_Scene,
+                                                          const QList<QGraphicsItem *> & orc_Items)
+{
+   bool q_NothingFound = true;
+   float64 f64_Retval = std::numeric_limits<float64>::max();
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   const C_SebScene * const pc_Scene = dynamic_cast<const C_SebScene * const>(opc_Scene);
+
+   if (pc_Scene != NULL)
+   {
+      for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_Items.begin(); c_ItItem != orc_Items.end(); ++c_ItItem)
+      {
+         const QGraphicsItem * const pc_Item = *c_ItItem;
+         if ((pc_Item != NULL) && (pc_Scene->IsZOrderChangeable(pc_Item) == true))
+         {
+            // search the lowest z value of all items
+            if (pc_Item->zValue() < f64_Retval)
             {
-               orf64_ZOrderLow = f64_NewZValue;
-            }
-            if (f64_NewZValue > orf64_ZOrderHigh)
-            {
-               orf64_ZOrderHigh = f64_NewZValue;
+               f64_Retval = pc_Item->zValue();
+               q_NothingFound = false;
             }
          }
       }
    }
+   //Avoid using extreme values
+   if (q_NothingFound)
+   {
+      f64_Retval = 0.0;
+   }
+   return f64_Retval;
 }

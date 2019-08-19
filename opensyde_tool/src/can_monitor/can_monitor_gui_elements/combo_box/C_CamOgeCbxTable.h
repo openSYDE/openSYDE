@@ -12,7 +12,7 @@
 #define C_CAMOGECBXTABLE_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_OgeCbxResizingView.h"
+#include "C_OgeCbxTableBase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
@@ -22,7 +22,7 @@ namespace stw_opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamOgeCbxTable :
-   public C_OgeCbxResizingView
+   public C_OgeCbxTableBase
 {
    Q_OBJECT
 

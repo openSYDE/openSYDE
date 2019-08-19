@@ -10,7 +10,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -26,7 +26,7 @@
 #include "stwtypes.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 
@@ -39,7 +39,7 @@ using ::vsnprintf;
 }
 #endif
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //unfortunately the 64bit printf specifier is not fully portable :-(
 #ifdef _WIN32
 //MS-VC, Borland C++, MinGW (MinGW also uses the MSVCRT.dll !)
@@ -77,15 +77,15 @@ const uint8 mau8_ConvTable[256] =
    0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU, 0xFFU
 };
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 void C_SCLString::m_ThrowIfOutOfRange(const sint32 os32_Index) const
 {
@@ -95,31 +95,31 @@ void C_SCLString::m_ThrowIfOutOfRange(const sint32 os32_Index) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to "".
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(void) :
    c_String("")
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to opcn_InitValue.
 
    \param[in]  opcn_InitValue      pointer to zero-terminated initial string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const charn * const opcn_InitValue)
 {
    c_String.operator = (opcn_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to opcn_InitValue.
@@ -129,7 +129,7 @@ C_SCLString::C_SCLString(const charn * const opcn_InitValue)
 
    \param[in]  opwcn_InitValue      pointer to zero-terminated initial string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const wchar_t * const opwcn_InitValue)
 {
    charn * pcn_Chars;
@@ -148,20 +148,20 @@ C_SCLString::C_SCLString(const wchar_t * const opwcn_InitValue)
    delete[] pcn_Chars;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to oc_InitValue.
 
    \param[in]  orc_InitValue      initial string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const C_SCLString & orc_InitValue)
 {
    c_String.operator = (orc_InitValue.c_str());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to opcn_InitValue. Number of bytes to use can be specified.
@@ -169,130 +169,130 @@ C_SCLString::C_SCLString(const C_SCLString & orc_InitValue)
    \param[in]  opcn_InitValue   pointer to string data
    \param[in]  oun_Length       number of bytes from opcn_InitValue to use
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const charn * const opcn_InitValue, const uintn oun_Length)
 {
    (void)c_String.assign(opcn_InitValue, oun_Length);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to contain one character.
 
    \param[in]  ocn_InitValue    initial character
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const charn ocn_InitValue)
 {
    this->StringPrintFormatted("%c", ocn_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  os16_InitValue    numeric init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const sint16 os16_InitValue)
 {
    this->StringPrintFormatted("%d", os16_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  ou16_InitValue    numeric init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const uint16 ou16_InitValue)
 {
    this->StringPrintFormatted("%u", ou16_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  osn_InitValue    numeric init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const sintn osn_InitValue)
 {
    this->StringPrintFormatted("%d", osn_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  oun_InitValue    numeric init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const uintn oun_InitValue)
 {
    this->StringPrintFormatted("%u", oun_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  os32_InitValue    numeric init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const sint32 os32_InitValue)
 {
    this->StringPrintFormatted("%d", os32_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  ou32_InitValue    numeric init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const uint32 ou32_InitValue)
 {
    this->StringPrintFormatted("%u", ou32_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  os64_InitValue    numeric init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const sint64 os64_InitValue)
 {
    this->StringPrintFormatted(macn_PRINTF_SPEC_64BITS, os64_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  ou64_InitValue    numeric init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const uint64 ou64_InitValue)
 {
    this->StringPrintFormatted(macn_PRINTF_SPEC_64BITU, ou64_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
    Initialize string data to string representation of float-value.
@@ -314,23 +314,23 @@ C_SCLString::C_SCLString(const uint64 ou64_InitValue)
 
    \param[in]  of64_InitValue    numeric init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const float64 of64_InitValue)
 {
    this->StringPrintFormatted("%f", of64_InitValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Destructor.
 
    Nothing to do explicitly.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString::~C_SCLString(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Assignment operator.
 
    Assign string to instance's string data.
@@ -340,7 +340,7 @@ C_SCLString::~C_SCLString(void)
    \return
    reference to new string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString & C_SCLString::operator =(const C_SCLString & orc_Source)
 {
    if (this != &orc_Source)
@@ -350,7 +350,7 @@ C_SCLString & C_SCLString::operator =(const C_SCLString & orc_Source)
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Append operator.
 
    Append string to instance's string data.
@@ -360,14 +360,14 @@ C_SCLString & C_SCLString::operator =(const C_SCLString & orc_Source)
    \return
    reference to new combined string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString & C_SCLString::operator +=(const C_SCLString & orc_Source)
 {
    c_String.operator +=(orc_Source.c_str());
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Add operator.
 
    Concatenate 2 strings and return combined strings.
@@ -378,7 +378,7 @@ C_SCLString & C_SCLString::operator +=(const C_SCLString & orc_Source)
    \return
    new combined string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString SCL_PACKAGE stw_scl::operator +(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
 {
    std::string c_Temp;
@@ -387,7 +387,7 @@ C_SCLString SCL_PACKAGE stw_scl::operator +(const C_SCLString & orc_Par1, const 
    return c_Temp.c_str();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Compare equals operator.
 
    Compare 2 strings.
@@ -399,13 +399,13 @@ C_SCLString SCL_PACKAGE stw_scl::operator +(const C_SCLString & orc_Par1, const 
    true    -> both strings are identical   \n
    false   -> strings are not identical
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator ==(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
 {
    return ((orc_Par1.AsStdString()->compare(orc_Par2.c_str())) == 0) ? true : false;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Compare not equals operator.
 
    Compare 2 strings.
@@ -417,13 +417,13 @@ bool SCL_PACKAGE stw_scl::operator ==(const C_SCLString & orc_Par1, const C_SCLS
    true     -> strings are not identical    \n
    false    -> both strings are identical
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator !=(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
 {
    return (orc_Par1 == orc_Par2) ? false : true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Less than operator.
 
    Compare whether oc_Par1 is less than oc_Par2.
@@ -436,13 +436,13 @@ bool SCL_PACKAGE stw_scl::operator !=(const C_SCLString & orc_Par1, const C_SCLS
    true     -> orc_Par1 <  orc_Par2
    false    -> orc_Par1 >= orc_Par2
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator <(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
 {
    return (orc_Par1.AsStdString()->compare(orc_Par2.c_str()) < 0) ? true : false;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Greater than operator.
 
    Compare whether oc_Par1 is greater than oc_Par2.
@@ -455,13 +455,13 @@ bool SCL_PACKAGE stw_scl::operator <(const C_SCLString & orc_Par1, const C_SCLSt
    true     -> orc_Par1 >  orc_Par2
    false    -> orc_Par1 <= orc_Par2
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator >(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
 {
    return (orc_Par1.AsStdString()->compare(orc_Par2.c_str()) > 0) ? true : false;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Less equals operator.
 
    Compare whether oc_Par1 is less than oc_Par2.
@@ -474,13 +474,13 @@ bool SCL_PACKAGE stw_scl::operator >(const C_SCLString & orc_Par1, const C_SCLSt
    true     -> orc_Par1 <= orc_Par2
    false    -> orc_Par1 >  orc_Par2
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator <=(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
 {
    return (orc_Par1 > orc_Par2) ? false : true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Greater equals operator.
 
    Compare whether oc_Par1 is greater than or equal to oc_Par2.
@@ -493,13 +493,13 @@ bool SCL_PACKAGE stw_scl::operator <=(const C_SCLString & orc_Par1, const C_SCLS
    true     -> orc_Par1 >= orc_Par2
    false    -> orc_Par1 <  orc_Par2
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator >=(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
 {
    return (orc_Par1 < orc_Par2) ? false : true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Compare string with other string
 
    Compare our data with data of a specified string.
@@ -511,13 +511,13 @@ bool SCL_PACKAGE stw_scl::operator >=(const C_SCLString & orc_Par1, const C_SCLS
    <0: "this" string is < than orc_Source
    >0: "this" string is > than orc_Source
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SCLString::AnsiCompare(const C_SCLString & orc_Source) const
 {
    return (c_String.compare(orc_Source.c_str()));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Compare string with other string and ignore case
 
    Compare our data with data of a specified string.
@@ -530,7 +530,7 @@ sintn C_SCLString::AnsiCompare(const C_SCLString & orc_Source) const
    <0: "this" string is < than orc_Source
    >0: "this" string is > than orc_Source
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SCLString::AnsiCompareIC(const C_SCLString & orc_Source) const
 {
    C_SCLString c_Help;
@@ -539,7 +539,7 @@ sintn C_SCLString::AnsiCompareIC(const C_SCLString & orc_Source) const
    return (c_Help.c_String.compare(orc_Source.UpperCase().c_str()));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Compose a string consisting an array of defined characters
 
    Create a string consisting of "ou32_Count" characters of type "ocn_Char"
@@ -550,7 +550,7 @@ sintn C_SCLString::AnsiCompareIC(const C_SCLString & orc_Source) const
    \return
    String consisting of ou32_Count characters of type ocn_Char
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::StringOfChar(const charn ocn_Char, const uint32 ou32_Count)
 {
    std::string c_StdString;
@@ -560,7 +560,7 @@ C_SCLString C_SCLString::StringOfChar(const charn ocn_Char, const uint32 ou32_Co
    return c_SCLString;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Utility: get number of required characters for "printf"
 
    Return number of required characters for "printfing".
@@ -576,13 +576,13 @@ C_SCLString C_SCLString::StringOfChar(const charn ocn_Char, const uint32 ou32_Co
    \return
    number of characters required (without terminating zero)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SCLString::mh_GetRequiredPrintfSize(const charn * const opcn_Format, va_list opv_Args)
 {
    return std::vsnprintf(NULL, 0U, opcn_Format, opv_Args);
 } //lint !e952 //va_list can be const on some targets but not all
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SCLString::m_SNPrintf(const stw_types::sintn osn_Size, const stw_types::charn * const opcn_Format,
                                           va_list opv_Args)
@@ -593,7 +593,7 @@ void C_SCLString::m_SNPrintf(const stw_types::sintn osn_Size, const stw_types::c
    delete[] pcn_Buffer;
 } //lint !e952 //va_list can be const on some targets but not all
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SCLString::m_CatSNPrintf(const stw_types::sintn osn_Size, const stw_types::charn * const opcn_Format,
                                           va_list opv_Args)
@@ -604,7 +604,7 @@ void C_SCLString::m_CatSNPrintf(const stw_types::sintn osn_Size, const stw_types
    delete[] pcn_Buffer;
 } //lint !e952 //va_list can be const on some targets but not all
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Print formatted text to string
 
    Alias for C_SCLString::PrintFormatted.
@@ -616,7 +616,7 @@ void C_SCLString::m_CatSNPrintf(const stw_types::sintn osn_Size, const stw_types
    \return
    number of characters in resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SCLString::printf(const charn * const opcn_Format, ...) //lint !e1960 !e1916
 {
    sintn sn_Length;
@@ -633,7 +633,7 @@ sintn C_SCLString::printf(const charn * const opcn_Format, ...) //lint !e1960 !e
    return sn_Length;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Print formatted text to string
 
    Alias for C_SCLString::StringPrintFormatted.
@@ -645,7 +645,7 @@ sintn C_SCLString::printf(const charn * const opcn_Format, ...) //lint !e1960 !e
    \return
    resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString & C_SCLString::sprintf(const charn * const opcn_Format, ...) //lint !e1960 !e1916
 {
    va_list pv_Args;
@@ -662,7 +662,7 @@ C_SCLString & C_SCLString::sprintf(const charn * const opcn_Format, ...) //lint 
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Print formatted text to string
 
    Print formatted data to "this" string.
@@ -674,7 +674,7 @@ C_SCLString & C_SCLString::sprintf(const charn * const opcn_Format, ...) //lint 
    \return
    number of characters in resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SCLString::PrintFormatted(const charn * const opcn_Format, ...) //lint !e1960 !e1916
 {
    sintn sn_Length;
@@ -691,7 +691,7 @@ sintn C_SCLString::PrintFormatted(const charn * const opcn_Format, ...) //lint !
    return sn_Length;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Print formatted text to string
 
    Print formatted data to "this" string.
@@ -703,7 +703,7 @@ sintn C_SCLString::PrintFormatted(const charn * const opcn_Format, ...) //lint !
    \return
    resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString & C_SCLString::StringPrintFormatted(const charn * const opcn_Format, ...) //lint !e1960 !e1916
 {
    va_list pv_Args;
@@ -720,7 +720,7 @@ C_SCLString & C_SCLString::StringPrintFormatted(const charn * const opcn_Format,
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Print formatted text to string
 
    Print formatted data to "this" string.
@@ -733,7 +733,7 @@ C_SCLString & C_SCLString::StringPrintFormatted(const charn * const opcn_Format,
    \return
    length of string after adding new text
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SCLString::cat_printf(const charn * const opcn_Format, ...) //lint !e1960 !e1916
 {
    sintn sn_Length;
@@ -751,7 +751,7 @@ sintn C_SCLString::cat_printf(const charn * const opcn_Format, ...) //lint !e196
    return sn_Length;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Print formatted text to string
 
    Print formatted data to "this" string.
@@ -764,7 +764,7 @@ sintn C_SCLString::cat_printf(const charn * const opcn_Format, ...) //lint !e196
    \return
    Resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString & C_SCLString::cat_sprintf(const charn * const opcn_Format, ...) //lint !e1960 !e1916
 {
    va_list pv_Args;
@@ -781,7 +781,7 @@ C_SCLString & C_SCLString::cat_sprintf(const charn * const opcn_Format, ...) //l
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert integer to hexadecimal string
 
    Compose string from integer value data.
@@ -796,7 +796,7 @@ C_SCLString & C_SCLString::cat_sprintf(const charn * const opcn_Format, ...) //l
    \return
    Resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToHex(const sintn osn_Value, const uint32 ou32_Digits)
 {
    C_SCLString c_HelperString;
@@ -809,7 +809,7 @@ C_SCLString C_SCLString::IntToHex(const sintn osn_Value, const uint32 ou32_Digit
    return c_HelperString;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert integer to hexadecimal string
 
    Compose string from integer value data.
@@ -824,7 +824,7 @@ C_SCLString C_SCLString::IntToHex(const sintn osn_Value, const uint32 ou32_Digit
    \return
    Resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToHex(const sint64 os64_Value, const uint32 ou32_Digits)
 {
    C_SCLString c_HelperString;
@@ -837,7 +837,7 @@ C_SCLString C_SCLString::IntToHex(const sint64 os64_Value, const uint32 ou32_Dig
    return c_HelperString;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Insert string into existing string data
 
    Insert string into existing string at specified position.
@@ -848,7 +848,7 @@ C_SCLString C_SCLString::IntToHex(const sint64 os64_Value, const uint32 ou32_Dig
    \return
    Resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString & C_SCLString::Insert(const C_SCLString & orc_Source, const uint32 ou32_Index)
 {
    uint32 u32_Index = ou32_Index;
@@ -865,7 +865,7 @@ C_SCLString & C_SCLString::Insert(const C_SCLString & orc_Source, const uint32 o
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Delete characters from existing string
 
    Delete characters from existing string.
@@ -879,7 +879,7 @@ C_SCLString & C_SCLString::Insert(const C_SCLString & orc_Source, const uint32 o
    \return
    Resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString & C_SCLString::Delete(const uint32 ou32_Index, const uint32 ou32_Count)
 {
    if ((ou32_Index > 0) && (ou32_Index <= this->Length()))
@@ -889,7 +889,7 @@ C_SCLString & C_SCLString::Delete(const uint32 ou32_Index, const uint32 ou32_Cou
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Change length of string.
 
    Resize string.
@@ -901,14 +901,14 @@ C_SCLString & C_SCLString::Delete(const uint32 ou32_Index, const uint32 ou32_Cou
    \return
    Resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString & C_SCLString::SetLength(const uint32 ou32_NewLength)
 {
    c_String.resize(ou32_NewLength);
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get first position of specified string in existing string
 
    Return first position of specified string in existing string data
@@ -923,7 +923,7 @@ C_SCLString & C_SCLString::SetLength(const uint32 ou32_NewLength)
    0: string not found
    >0: position of string in exsiting string (1 = beginning of string)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SCLString::Pos(const C_SCLString & orc_SubString) const
 {
    sintn sn_Return;
@@ -941,7 +941,7 @@ uint32 C_SCLString::Pos(const C_SCLString & orc_SubString) const
    return u32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get last position of specified string in existing string
 
    Return last position of specified string in existing string data
@@ -956,7 +956,7 @@ uint32 C_SCLString::Pos(const C_SCLString & orc_SubString) const
    0: string not found
    >0: last position of string in exsiting string (1 = beginning of string)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SCLString::LastPos(const C_SCLString & orc_SubString) const
 {
    sintn sn_Return;
@@ -974,7 +974,7 @@ uint32 C_SCLString::LastPos(const C_SCLString & orc_SubString) const
    return u32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Remove whitespaces around string
 
    Remove the following whitespaces around string data:
@@ -992,7 +992,7 @@ uint32 C_SCLString::LastPos(const C_SCLString & orc_SubString) const
    \return
    String with outer whitespaces removed.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::Trim(void) const
 {
    std::string c_Temp = c_String; //copy over so we can call ::erase
@@ -1001,7 +1001,7 @@ C_SCLString C_SCLString::Trim(void) const
    return c_Temp.c_str();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Remove whitespaces at the beginning of string
 
    Remove the following whitespaces at the beginning of string data:
@@ -1017,7 +1017,7 @@ C_SCLString C_SCLString::Trim(void) const
    \return
    String with beginning whitespaces removed.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::TrimLeft(void) const
 {
    std::string::size_type un_Pos = c_String.find_first_not_of(" \t\r\n\v\f");
@@ -1030,7 +1030,7 @@ C_SCLString C_SCLString::TrimLeft(void) const
    return "";
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Remove whitespaces at the end of string
 
    Remove the following whitespaces at the end of string data:
@@ -1046,7 +1046,7 @@ C_SCLString C_SCLString::TrimLeft(void) const
    \return
    String with trailing whitespaces removed.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::TrimRight(void) const
 {
    std::string c_Return = c_String; //copy over so we can call ::erase
@@ -1054,7 +1054,7 @@ C_SCLString C_SCLString::TrimRight(void) const
    return c_Return.c_str();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert string to lower case letters
 
    Convert all upper case letters to lower case letters.
@@ -1063,7 +1063,7 @@ C_SCLString C_SCLString::TrimRight(void) const
    \return
    Resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::LowerCase(void) const
 {
    C_SCLString c_Result;
@@ -1080,7 +1080,7 @@ C_SCLString C_SCLString::LowerCase(void) const
    return c_Result;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert string to upper case letters
 
    Convert all lower case letters to upper case letters.
@@ -1089,7 +1089,7 @@ C_SCLString C_SCLString::LowerCase(void) const
    \return
    Resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::UpperCase(void) const
 {
    C_SCLString c_Result;
@@ -1106,7 +1106,7 @@ C_SCLString C_SCLString::UpperCase(void) const
    return c_Result;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Extract part of the string
 
    Get a part of the string.
@@ -1119,7 +1119,7 @@ C_SCLString C_SCLString::UpperCase(void) const
    Resulting string
    if index is zero: ""
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::SubString(const uint32 ou32_Index, const uint32 ou32_Count) const
 {
    std::string c_Temp;
@@ -1134,7 +1134,7 @@ C_SCLString C_SCLString::SubString(const uint32 ou32_Index, const uint32 ou32_Co
    return c_Temp.c_str();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert string to sint32 number
 
    Convert string to sint32 values.
@@ -1148,7 +1148,7 @@ C_SCLString C_SCLString::SubString(const uint32 ou32_Index, const uint32 ou32_Co
    \return
    string as number
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SCLString::ToInt(void) const
 {
    sint32 s32_Return = 0;
@@ -1199,7 +1199,7 @@ sintn C_SCLString::ToInt(void) const
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_SCLString::m_StrTos32(const charn * const opcn_String, const bool oq_Hex)
 {
@@ -1257,7 +1257,7 @@ sint32 C_SCLString::m_StrTos32(const charn * const opcn_String, const bool oq_He
    return s32_Result;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint64 C_SCLString::m_StrTos64(const charn * const opcn_String, const bool oq_Hex)
 {
@@ -1315,7 +1315,7 @@ sint64 C_SCLString::m_StrTos64(const charn * const opcn_String, const bool oq_He
    return s64_Result;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert string to sint64 number
 
    Convert string to sint64 values.
@@ -1329,7 +1329,7 @@ sint64 C_SCLString::m_StrTos64(const charn * const opcn_String, const bool oq_He
    \return
    string as number
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint64 C_SCLString::ToInt64(void) const
 {
    sint64 s64_Return = 0;
@@ -1380,7 +1380,7 @@ sint64 C_SCLString::ToInt64(void) const
    return s64_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert string to sintn number. Apply default if conversion fails.
 
    Try to convert string to sintn value.
@@ -1397,7 +1397,7 @@ sint64 C_SCLString::ToInt64(void) const
    \return
    string as number (or default)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SCLString::ToIntDef(const sintn osn_Default) const
 {
    sint32 s32_Return;
@@ -1413,7 +1413,7 @@ sintn C_SCLString::ToIntDef(const sintn osn_Default) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert string to float64 number
 
    Try to convert string to a float64 value.
@@ -1424,7 +1424,7 @@ sintn C_SCLString::ToIntDef(const sintn osn_Default) const
    \return
    string as float64
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_SCLString::ToDouble(void) const
 {
    float64 f64_Return;
@@ -1451,7 +1451,7 @@ float64 C_SCLString::ToDouble(void) const
    return f64_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get character at position.
 
    Return character at specified position.
@@ -1462,14 +1462,14 @@ float64 C_SCLString::ToDouble(void) const
    \return
    character at position
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 charn C_SCLString::operator [](const sintn osn_Index) const
 {
    m_ThrowIfOutOfRange(osn_Index);
    return c_String.operator [] (static_cast<uintn>(osn_Index) - 1U);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get const character at position.
 
    Return character at specified position.
@@ -1480,14 +1480,14 @@ charn C_SCLString::operator [](const sintn osn_Index) const
    \return
    character at position
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 charn & C_SCLString::operator [](const sintn osn_Index)
 {
    m_ThrowIfOutOfRange(osn_Index);
    return c_String.operator [] (static_cast<uintn>(osn_Index) - 1U);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get string data as std::string
 
    Returns the std::string encapsulated by C_SCLString.
@@ -1495,13 +1495,13 @@ charn & C_SCLString::operator [](const sintn osn_Index)
    \return
    String data as std::string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::string * C_SCLString::AsStdString(void)
 {
    return &c_String;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get string data as const std::string
 
    Returns the std::string encapsulated by C_SCLString.
@@ -1509,13 +1509,13 @@ std::string * C_SCLString::AsStdString(void)
    \return
    String data as std::string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::string * C_SCLString::AsStdString(void) const
 {
    return &c_String;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert sint64 value to string
 
    Converts sint64 number to string.
@@ -1525,7 +1525,7 @@ const std::string * C_SCLString::AsStdString(void) const
    \return
    value converted to string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const sint64 os64_Value)
 {
    C_SCLString c_Text(os64_Value);
@@ -1533,7 +1533,7 @@ C_SCLString C_SCLString::IntToStr(const sint64 os64_Value)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert uint64 value to string
 
    Converts uint64 number to string.
@@ -1543,7 +1543,7 @@ C_SCLString C_SCLString::IntToStr(const sint64 os64_Value)
    \return
    value converted to string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const uint64 ou64_Value)
 {
    C_SCLString c_Text(ou64_Value);
@@ -1551,7 +1551,7 @@ C_SCLString C_SCLString::IntToStr(const uint64 ou64_Value)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert sint32 value to string
 
    Converts sint32 number to string.
@@ -1561,7 +1561,7 @@ C_SCLString C_SCLString::IntToStr(const uint64 ou64_Value)
    \return
    value converted to string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const sint32 os32_Value)
 {
    C_SCLString c_Text(os32_Value);
@@ -1569,7 +1569,7 @@ C_SCLString C_SCLString::IntToStr(const sint32 os32_Value)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert uint32 value to string
 
    Converts uint32 number to string.
@@ -1579,7 +1579,7 @@ C_SCLString C_SCLString::IntToStr(const sint32 os32_Value)
    \return
    value converted to string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const uint32 ou32_Value)
 {
    C_SCLString c_Text(ou32_Value);
@@ -1587,7 +1587,7 @@ C_SCLString C_SCLString::IntToStr(const uint32 ou32_Value)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert sintn value to string
 
    Converts sintn number to string.
@@ -1597,7 +1597,7 @@ C_SCLString C_SCLString::IntToStr(const uint32 ou32_Value)
    \return
    value converted to string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const sintn osn_Value)
 {
    C_SCLString c_Text(osn_Value);
@@ -1605,7 +1605,7 @@ C_SCLString C_SCLString::IntToStr(const sintn osn_Value)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert uintn value to string
 
    Converts uintn number to string.
@@ -1615,7 +1615,7 @@ C_SCLString C_SCLString::IntToStr(const sintn osn_Value)
    \return
    value converted to string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const uintn oun_Value)
 {
    C_SCLString c_Text(oun_Value);
@@ -1623,7 +1623,7 @@ C_SCLString C_SCLString::IntToStr(const uintn oun_Value)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert float32 value to string
 
    Converts float32 number to string.
@@ -1634,7 +1634,7 @@ C_SCLString C_SCLString::IntToStr(const uintn oun_Value)
    \return
    value converted to string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::FloatToStr(const float32 of32_Value)
 {
    C_SCLString c_Text(static_cast<float64>(of32_Value));
@@ -1642,7 +1642,7 @@ C_SCLString C_SCLString::FloatToStr(const float32 of32_Value)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert of64_Value value to string
 
    Converts of64_Value number to string.
@@ -1653,7 +1653,7 @@ C_SCLString C_SCLString::FloatToStr(const float32 of32_Value)
    \return
    value converted to string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::FloatToStr(const float64 of64_Value)
 {
    C_SCLString c_Text(of64_Value);
@@ -1661,7 +1661,7 @@ C_SCLString C_SCLString::FloatToStr(const float64 of64_Value)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get pointer to raw string data
 
    Return pointer to ram string data.
@@ -1669,13 +1669,13 @@ C_SCLString C_SCLString::FloatToStr(const float64 of64_Value)
    \return
    pointer to data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const charn * C_SCLString::c_str(void) const
 {
    return c_String.c_str();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get pointer to raw string data
 
    Return pointer to ram string data.
@@ -1683,39 +1683,39 @@ const charn * C_SCLString::c_str(void) const
    \return
    pointer to data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const void * C_SCLString::data(void) const
 {
    return c_String.data();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get number of characters in string
 
    Returns the number of characters in the string (i.e.: number of characters before '\0').
 
    \return  number of characters in string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SCLString::Length(void) const
 {
    return static_cast<uint32>(c_String.length());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Check whether string contains any characters
 
    \return
    true: no characters in string
    false: more than zero characters in string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SCLString::IsEmpty(void) const
 {
    return c_String.empty();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get index of rightmost character that contains any of the delimiter characters.
 
    \param[in]    orc_Delimiters   string containing all possible delimiters
@@ -1723,7 +1723,7 @@ bool C_SCLString::IsEmpty(void) const
    \return
    1-based rightmost position that contains any of the characters on orc_Delimiters (0 if not found)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SCLString::LastDelimiter(const C_SCLString & orc_Delimiters) const
 {
    sint32 s32_Pos;
@@ -1744,7 +1744,7 @@ uint32 C_SCLString::LastDelimiter(const C_SCLString & orc_Delimiters) const
    return u32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Convert float64 to a C_SCLString with a configurable number of digits.
 
    Will always use the point (".") as decimal separator.
@@ -1755,7 +1755,7 @@ uint32 C_SCLString::LastDelimiter(const C_SCLString & orc_Delimiters) const
    \return
    resulting string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLString::FloatToStr(const float64 of64_Value, const sint32 os32_Digits)
 {
    C_SCLString c_Help;
@@ -1764,7 +1764,7 @@ C_SCLString C_SCLString::FloatToStr(const float64 of64_Value, const sint32 os32_
    return c_Help;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Tokenize string.
 
    Parses string data for token-separated fields.
@@ -1775,7 +1775,7 @@ C_SCLString C_SCLString::FloatToStr(const float64 of64_Value, const sint32 os32_
    \param[in]    orc_Delimiters       token delimiters (e.g. ";.-" or simply ";")
    \param[out]   orc_TokenizedData    array containing parsed tokens
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLString::Tokenize(const C_SCLString & orc_Delimiters, SCLDynamicArray<C_SCLString> & orc_TokenizedData) const
 {
    C_SCLString c_Text;

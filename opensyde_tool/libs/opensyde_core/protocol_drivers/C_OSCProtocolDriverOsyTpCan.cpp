@@ -360,7 +360,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFlowControl(const T_STWCAN_M
             //set total timeout value for sending all CFs (kicks in if the TX buffer of the CAN dispatcher is full)
             //N_As is ISO 15765-2 is per CAN frame (and quite high at 1000ms ...)
             //For the total transfer we use the total number of CAN frames, assume the lowest supported bitrate
-            // in openSYDE (100kBit/s) and an alien busload of 50%
+            // in openSYDE (100 kbit/s) and an alien busload of 50%
             //So we'll have around 2 ms/message
             //But we'll add a lower limit of 100ms to compensate for client side timing constraints
             mc_TxService.u32_SendCfTimeout = static_cast<uint32>((mc_TxService.c_ServiceData.c_Data.size() / 7U) * 2U);

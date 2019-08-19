@@ -39,7 +39,7 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamOgeCbxTable::C_CamOgeCbxTable(QWidget * const opc_Parent) :
-   C_OgeCbxResizingView(opc_Parent)
+   C_OgeCbxTableBase(opc_Parent)
 {
    //this code allows to handle the QAbstractItemView::item in stylesheets
    C_OgeCbxIconDelegate * const pc_ItemDelegate = new C_OgeCbxIconDelegate();

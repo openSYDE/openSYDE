@@ -10,7 +10,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <map>
@@ -23,45 +23,45 @@
 #include "TGLUtils.h"
 #include "C_OSCUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
 using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 C_OSCDeviceManager C_OSCSystemDefinition::hc_Devices;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCSystemDefinition::C_OSCSystemDefinition(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 
    Clean up.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCSystemDefinition::~C_OSCSystemDefinition(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
@@ -69,7 +69,7 @@ C_OSCSystemDefinition::~C_OSCSystemDefinition(void)
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinition::CalcHash(uint32 & oru32_HashValue) const
 {
    uint32 u32_Counter;
@@ -86,18 +86,18 @@ void C_OSCSystemDefinition::CalcHash(uint32 & oru32_HashValue) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add bus
 
    \param[in] orc_Bus Bus value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinition::AddBus(const C_OSCSystemBus & orc_Bus)
 {
    tgl_assert(this->InsertBus(this->c_Buses.size(), orc_Bus) == C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert bus
 
    \param[in] ou32_BusIndex  Bus index
@@ -107,7 +107,7 @@ void C_OSCSystemDefinition::AddBus(const C_OSCSystemBus & orc_Bus)
    C_NO_ERR Done
    C_RANGE  Bus index invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::InsertBus(const uint32 ou32_BusIndex, const C_OSCSystemBus & orc_Bus)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -146,7 +146,7 @@ sint32 C_OSCSystemDefinition::InsertBus(const uint32 ou32_BusIndex, const C_OSCS
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete bus
 
    \param[in] ou32_BusIndex  Bus index
@@ -155,7 +155,7 @@ sint32 C_OSCSystemDefinition::InsertBus(const uint32 ou32_BusIndex, const C_OSCS
    C_NO_ERR Done
    C_RANGE  Bus index invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::DeleteBus(const uint32 ou32_BusIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -198,7 +198,7 @@ sint32 C_OSCSystemDefinition::DeleteBus(const uint32 ou32_BusIndex)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new connection from specified node to specified bus using specified interface number
 
    \param[in] ou32_NodeIndex   Node to connect from
@@ -209,7 +209,7 @@ sint32 C_OSCSystemDefinition::DeleteBus(const uint32 ou32_BusIndex)
    C_NO_ERR Done
    C_RANGE  Either node or bus or both do not exist
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::AddConnection(const uint32 ou32_NodeIndex, const uint32 ou32_BusIndex,
                                             const uint8 ou8_Interface)
 {
@@ -237,7 +237,7 @@ sint32 C_OSCSystemDefinition::AddConnection(const uint32 ou32_NodeIndex, const u
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if com interface of node allows specified connection
 
    \param[in] ou32_NodeIndex Node index
@@ -248,7 +248,7 @@ sint32 C_OSCSystemDefinition::AddConnection(const uint32 ou32_NodeIndex, const u
    false Conflict
    true  Default
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCSystemDefinition::CheckInterfaceIsAvailable(const uint32 ou32_NodeIndex, const uint32 ou32_ComIndex,
                                                       const uint8 ou8_ComNodeID) const
 {
@@ -300,7 +300,7 @@ bool C_OSCSystemDefinition::CheckInterfaceIsAvailable(const uint32 ou32_NodeInde
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any bus uses the provided bus id
 
    \param[in] ou8_BusId            Bus id to check for
@@ -311,7 +311,7 @@ bool C_OSCSystemDefinition::CheckInterfaceIsAvailable(const uint32 ou32_NodeInde
    true  Available
    false Already in use
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCSystemDefinition::CheckBusIdAvailable(const uint8 ou8_BusId, const uint32 * const opu32_BusIndexToSkip) const
 {
    bool q_Retval = true;
@@ -338,7 +338,7 @@ bool C_OSCSystemDefinition::CheckBusIdAvailable(const uint8 ou8_BusId, const uin
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get new unused bus id
 
    \param[out] oru8_BusId Bus id result value
@@ -347,7 +347,7 @@ bool C_OSCSystemDefinition::CheckBusIdAvailable(const uint8 ou8_BusId, const uin
    C_NO_ERR Valid bus id found
    C_NOACT  No valid bus id found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -374,7 +374,7 @@ sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check error for node
 
    \param[in]     ou32_NodeIndex                Node index
@@ -392,7 +392,7 @@ sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool * const opq_NameConflict,
                                              bool * const opq_NameInvalid, bool * const opq_NodeIdInvalid,
                                              bool * const opq_DataPoolsInvalid, bool * const opq_ApplicationsInvalid,
@@ -628,7 +628,7 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check error for bus & connected node data pools
 
    \param[in]     ou32_BusIndex        Bus index
@@ -641,7 +641,7 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
    C_NO_ERR Done
    C_RANGE  Bus does not exist
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * const opq_NameConflict,
                                             bool * const opq_NameInvalid, bool * const opq_IdInvalid,
                                             bool * const opq_DataPoolsInvalid) const
@@ -832,7 +832,7 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message id valid
 
    \param[in]  ou32_BusIndex   Bus index
@@ -845,7 +845,7 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
    C_NO_ERR Done
    C_RANGE  Bus does not exist
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::CheckMessageIdBus(const uint32 ou32_BusIndex, const uint32 ou32_MessageId,
                                                 bool & orq_Valid,
                                                 const C_OSCCanMessageIdentificationIndices * const opc_SkipMessage)
@@ -904,7 +904,7 @@ const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message id valid
 
    \param[in]  ou32_BusIndex   Bus index
@@ -917,7 +917,7 @@ const
    C_NO_ERR Done
    C_RANGE  Bus does not exist
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::CheckMessageNameBus(const uint32 ou32_BusIndex, const C_SCLString & orc_MessageName,
                                                   bool & orq_Valid,
                                                   const C_OSCCanMessageIdentificationIndices * const opc_SkipMessage)
@@ -976,7 +976,7 @@ const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if specified messages match
 
    \param[in]  orc_MessageId1            First message identification indices
@@ -988,7 +988,7 @@ const
    C_NO_ERR Done
    C_RANGE  Nodes or Datapools or Lists or Messages do not exist
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinition::CheckMessageMatch(const C_OSCCanMessageIdentificationIndices & orc_MessageId1,
                                                 const C_OSCCanMessageIdentificationIndices & orc_MessageId2,
                                                 bool & orq_IsMatch, const bool oq_IgnoreMessageDirection) const
@@ -1197,14 +1197,14 @@ sint32 C_OSCSystemDefinition::CheckMessageMatch(const C_OSCCanMessageIdentificat
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all node indexes which are connected to the bus
 
    \param[in]     ou32_BusIndex        Bus index
    \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
    \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinition::GetNodeIndexesOfBus(const uint32 ou32_BusIndex, std::vector<uint32> & orc_NodeIndexes,
                                                 std::vector<uint32> & orc_InterfaceIndexes) const
 {
@@ -1236,7 +1236,7 @@ void C_OSCSystemDefinition::GetNodeIndexesOfBus(const uint32 ou32_BusIndex, std:
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get message receivers indices
 
    \param[in]  ou32_BusIndex        Bus index
@@ -1244,7 +1244,7 @@ void C_OSCSystemDefinition::GetNodeIndexesOfBus(const uint32 ou32_BusIndex, std:
    \param[out] orc_NodeIndices      Node receivers indices
    \param[out] orc_InterfaceIndices Node receivers interfaces indices
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinition::GetMessageReceiversIndices(const uint32 ou32_BusIndex, const C_SCLString & orc_MessageName,
                                                        std::vector<uint32> & orc_NodeIndices,
                                                        std::vector<uint32> & orc_InterfaceIndices) const
@@ -1316,7 +1316,7 @@ void C_OSCSystemDefinition::GetMessageReceiversIndices(const uint32 ou32_BusInde
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get message transmitters indices
 
    \param[in]  ou32_BusIndex        Bus index
@@ -1324,7 +1324,7 @@ void C_OSCSystemDefinition::GetMessageReceiversIndices(const uint32 ou32_BusInde
    \param[out] orc_NodeIndices      Node transmitters indices
    \param[out] orc_InterfaceIndices Node transmitters interfaces indices
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinition::GetMessageTransmittersIndices(const uint32 ou32_BusIndex,
                                                           const C_SCLString & orc_MessageName,
                                                           std::vector<uint32> & orc_NodeIndices,
@@ -1397,7 +1397,7 @@ void C_OSCSystemDefinition::GetMessageTransmittersIndices(const uint32 ou32_BusI
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append a new node at the end of the nodes.
 
    * appends node at the end of the node list
@@ -1408,7 +1408,7 @@ void C_OSCSystemDefinition::GetMessageTransmittersIndices(const uint32 ou32_BusI
 
    \param[in,out] orc_Node  node value (out: with added pointer to device type)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinition::AddNode(C_OSCNode & orc_Node)
 {
    orc_Node.pc_DeviceDefinition = C_OSCSystemDefinition::hc_Devices.LookForDevice(orc_Node.c_DeviceType);
@@ -1416,7 +1416,7 @@ void C_OSCSystemDefinition::AddNode(C_OSCNode & orc_Node)
    this->c_Nodes.push_back(orc_Node);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get hash for datapool
 
    \param[in] ou32_NodeIndex     Node index
@@ -1425,7 +1425,7 @@ void C_OSCSystemDefinition::AddNode(C_OSCNode & orc_Node)
    \return
    Hash for datapool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCSystemDefinition::m_GetDataPoolHash(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex) const
 {
    uint32 u32_Retval = 0xFFFFFFFFUL;
@@ -1442,7 +1442,7 @@ uint32 C_OSCSystemDefinition::m_GetDataPoolHash(const uint32 ou32_NodeIndex, con
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get hash for protocol
 
    \param[in] ou32_NodeIndex     Node index
@@ -1451,7 +1451,7 @@ uint32 C_OSCSystemDefinition::m_GetDataPoolHash(const uint32 ou32_NodeIndex, con
    \return
    Hash for protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCSystemDefinition::m_GetRelatedProtocolHash(const uint32 ou32_NodeIndex,
                                                        const uint32 ou32_DataPoolIndex) const
 {

@@ -52,6 +52,7 @@ public:
 
    QString GetDataElementName(void) const;
    QString GetDataElementUnit(void) const;
+   bool GetDataElementToggledState(void) const;
    void SetDataElementUnit(const QString & orc_DisplayName, const QString & orc_Unit);
 
    void SetDataElementSelected(const bool oq_Selected);

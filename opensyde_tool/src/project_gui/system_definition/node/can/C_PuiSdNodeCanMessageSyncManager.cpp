@@ -515,18 +515,16 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignal(const C_OSCCanMessageIdent
 
    \param[in] orc_MessageId       Message identification indices
    \param[in] oru32_SignalIndex   Signal index
-   \param[in] orc_OSCSignalCommon Signal data (osc common)
-   \param[in] orc_UISignalCommon  Signal data (ui common)
+   \param[in] ou16_MultiplexValue New multiplex value
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignalCommon(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                            const uint32 & oru32_SignalIndex,
-                                                            const C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
-                                                            const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon)
+sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignalMUXValue(
+   const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 & oru32_SignalIndex,
+   const stw_types::uint16 ou16_MultiplexValue)
 const
 {
    sint32 s32_Retval = C_RANGE;
@@ -536,9 +534,8 @@ const
    for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
-      s32_Retval = C_PuiSdHandler::h_GetInstance()->SetCanSignalCommon(c_MatchingMessageIds[u32_ItMessageId],
-                                                                       oru32_SignalIndex, orc_OSCSignalCommon,
-                                                                       orc_UISignalCommon);
+      s32_Retval = C_PuiSdHandler::h_GetInstance()->SetCanSignalMUXValue(c_MatchingMessageIds[u32_ItMessageId],
+                                                                         oru32_SignalIndex, ou16_MultiplexValue);
       //Stop on error
       if (s32_Retval != C_NO_ERR)
       {

@@ -64,6 +64,9 @@ public:
 
    void HandleMouseMoveToolTip(const QPointF & orc_ScenePos);
 
+   //GI base
+   virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

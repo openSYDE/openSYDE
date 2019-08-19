@@ -18,12 +18,12 @@
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "TGLUtils.h"
+#include "C_PuiUtil.h"
 #include "C_PuiSvData.h"
 #include "C_PuiSdUtil.h"
 #include "CSCLChecksums.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_PuiSdHandler.h"
-#include "C_PuiProject.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -556,7 +556,7 @@ sint32 C_PuiSvData::GetUpdateRate(const uint8 ou8_RailIndex, uint16 & oru16_Valu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set device config screen selected bit rate
 
-   \param[in] ou32_Value New device config screen selected bit rate in kBit/s
+   \param[in] ou32_Value New device config screen selected bit rate in kbit/s
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetDeviceConfigSelectedBitRate(const uint32 ou32_Value)
@@ -807,6 +807,33 @@ sint32 C_PuiSvData::SetDashboardActive(const uint32 ou32_DashboardIndex, const b
    {
       C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[ou32_DashboardIndex];
       rc_Dashboard.SetActive(oq_Active);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current tab index
+
+   \param[in] ou32_DashboardIndex Dashboard index
+   \param[in] oq_Value            New current tab index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetDashboardTabIndex(const uint32 ou32_DashboardIndex, const sint32 os32_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_DashboardIndex < this->mc_Dashboards.size())
+   {
+      C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[ou32_DashboardIndex];
+      rc_Dashboard.SetTabIndex(os32_Value);
    }
    else
    {
@@ -2682,8 +2709,8 @@ void C_PuiSvData::InitFromSystemDefintion(void)
             {
                const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItAppl];
 
-               c_ApplPaths.push_back(C_Uti::h_ConcatPathIfNecessary(rc_Application.c_ProjectPath.c_str(),
-                                                                    rc_Application.c_ResultPath.c_str()));
+               c_ApplPaths.push_back(C_PuiUtil::h_MakeIndependentOfDbProjectPath(rc_Application.c_ProjectPath.c_str(),
+                                                                                 rc_Application.c_ResultPath.c_str()));
             }
             c_Info.SetPaths(c_ApplPaths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
 

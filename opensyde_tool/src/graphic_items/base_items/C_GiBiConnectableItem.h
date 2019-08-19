@@ -45,7 +45,8 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void ChangedGraphic(void);
+   void SigChangedGraphic(void);
+   void SigChangedZOrder(void);
 
 private:
    //Avoid call

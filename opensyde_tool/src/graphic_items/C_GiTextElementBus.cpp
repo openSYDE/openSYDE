@@ -287,6 +287,19 @@ void C_GiTextElementBus::HandleMouseMoveToolTip(const QPointF & orc_ScenePos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiTextElementBus::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiBiTextElement::SetZValueCustom(of64_ZValue);
+   //Apply to data
+   this->UpdateData();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten hover leave event slot
 
    Here: Hide tool tip

@@ -11,18 +11,18 @@
 #ifndef C_OSYCODEEXPORTBASEH
 #define C_OSYCODEEXPORTBASEH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "C_OSCSystemDefinition.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OsyCodeExportBase
 {
@@ -65,7 +65,6 @@ protected:
    //parameters from command line:
    stw_scl::C_SCLString mc_SystemDefinitionFilePath;
    stw_scl::C_SCLString mc_OutputPath;
-   stw_scl::C_SCLString mc_DeviceDefinitionPath;
    stw_scl::C_SCLString mc_DeviceName;      //name of device for which to create code ("" -> all)
    stw_scl::C_SCLString mc_ApplicationName; //name of application for which to create code ("" -> all)
    bool mq_EraseTargetFolder;
@@ -112,6 +111,6 @@ protected:
    virtual void m_PrintBanner(void) = 0;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 
 #endif

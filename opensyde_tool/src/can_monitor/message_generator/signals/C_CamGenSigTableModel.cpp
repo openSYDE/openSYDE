@@ -227,22 +227,31 @@ sintn C_CamGenSigTableModel::rowCount(const QModelIndex & orc_Parent) const
       if (this->m_CheckInterpretedMode())
       {
          const C_OSCCanMessage * const pc_OsyMessage = m_GetMessageInterpretedOsy();
-         if (pc_OsyMessage != NULL)
+         const C_CieConverter::C_CIECanMessage * const pc_DbcMessage = m_GetMessageInterpretedDbc();
+         if ((pc_OsyMessage != NULL) || (pc_DbcMessage != NULL))
          {
-            sn_Retval = pc_OsyMessage->c_Signals.size();
-         }
-         else
-         {
-            const C_CieConverter::C_CIECanMessage * const pc_DbcMessage = m_GetMessageInterpretedDbc();
-            if (pc_DbcMessage != NULL)
+            const bool q_IsMultiplexed = C_CamGenSigTableModel::mh_IsMultiplexed(pc_OsyMessage, pc_DbcMessage);
+            if (q_IsMultiplexed)
             {
-               sn_Retval = pc_DbcMessage->c_Signals.size();
+               const uint16 u16_MuxValue = C_CamGenSigTableModel::m_GetMultiplexerValue(pc_OsyMessage, pc_DbcMessage);
+               sn_Retval = C_CamGenSigTableModel::mh_GetNumRowsForMuxValue(pc_OsyMessage, pc_DbcMessage, u16_MuxValue);
             }
             else
             {
-               //Default
-               sn_Retval = 0;
+               if (pc_OsyMessage != NULL)
+               {
+                  sn_Retval = pc_OsyMessage->c_Signals.size();
+               }
+               else
+               {
+                  sn_Retval = pc_DbcMessage->c_Signals.size();
+               }
             }
+         }
+         else
+         {
+            //Default
+            sn_Retval = 0;
          }
       }
       else
@@ -251,7 +260,7 @@ sintn C_CamGenSigTableModel::rowCount(const QModelIndex & orc_Parent) const
             this->mu32_MessageIndex);
          if (pc_Message != NULL)
          {
-            sn_Retval = static_cast<sintn>(pc_Message->u8_DLC);
+            sn_Retval = static_cast<sintn>(pc_Message->u16_Dlc);
          }
          else
          {
@@ -299,7 +308,7 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
       }
       else
       {
-         const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+         const uint32 u32_Index = this->m_TranslateRowToIndex(orc_Index.row());
          if (this->m_CheckInterpretedMode())
          {
             if (e_Col == eRAW)
@@ -491,11 +500,11 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
                      {
                         c_Retval =
-                           QString("0x%1").arg(QString("%1").arg(pc_Message->au8_Data[u32_Index], 0, 16).toUpper());
+                           QString("0x%1").arg(QString("%1").arg(pc_Message->c_Bytes[u32_Index], 0, 16).toUpper());
                      }
                      else
                      {
-                        c_Retval = static_cast<uint64>(pc_Message->au8_Data[u32_Index]);
+                        c_Retval = static_cast<uint64>(pc_Message->c_Bytes[u32_Index]);
                      }
                   }
                   break;
@@ -594,7 +603,7 @@ bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVarian
    {
       if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
       {
-         const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+         const uint32 u32_Index = this->m_TranslateRowToIndex(orc_Index.row());
          const C_CamGenSigTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
          //Deactivate message as it is sent now
          Q_EMIT this->SigTriggerModelUpdateCyclicMessage(this->mu32_MessageIndex, false);
@@ -652,8 +661,17 @@ bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVarian
                   }
                   else if (pc_DbcSignal != NULL)
                   {
-                     f64_Factor = pc_DbcSignal->c_Element.f64_Factor;
-                     f64_Offset = pc_DbcSignal->c_Element.f64_Offset;
+                     //Value table needs raw value
+                     if (pc_DbcSignal->c_ValueDescription.size() > 0UL)
+                     {
+                        f64_Factor = 1.0;
+                        f64_Offset = 0.0;
+                     }
+                     else
+                     {
+                        f64_Factor = pc_DbcSignal->c_Element.f64_Factor;
+                        f64_Offset = pc_DbcSignal->c_Element.f64_Offset;
+                     }
                   }
                   else
                   {
@@ -684,6 +702,10 @@ bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVarian
                   c_Signal = *pc_OsySignal;
                }
             }
+            if (c_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+            {
+               this->beginResetModel();
+            }
             //Handle encoding
             if (pc_Message != NULL)
             {
@@ -695,21 +717,29 @@ bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVarian
                tgl_assert(C_CamProHandler::h_GetInstance()->SetMessageDataBytes(this->mu32_MessageIndex,
                                                                                 c_RawData) == C_NO_ERR);
                q_Retval = true;
-               //Signal the other column raw->notify physical & vice versa
-               if (e_Col == C_CamGenSigTableModel::ePHYSICAL)
+               if (c_Signal.e_MultiplexerType != C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
                {
-                  const QModelIndex c_Index =
-                     this->index(orc_Index.row(), C_CamGenSigTableModel::h_EnumToColumn(
-                                    C_CamGenSigTableModel::eRAW));
-                  Q_EMIT this->dataChanged(c_Index, c_Index, QVector<stw_types::sintn>() << osn_Role);
+                  //Signal the other column raw->notify physical & vice versa
+                  if (e_Col == C_CamGenSigTableModel::ePHYSICAL)
+                  {
+                     const QModelIndex c_Index =
+                        this->index(orc_Index.row(), C_CamGenSigTableModel::h_EnumToColumn(
+                                       C_CamGenSigTableModel::eRAW));
+                     Q_EMIT this->dataChanged(c_Index, c_Index, QVector<stw_types::sintn>() << osn_Role);
+                  }
+                  else
+                  {
+                     const QModelIndex c_Index =
+                        this->index(orc_Index.row(), C_CamGenSigTableModel::h_EnumToColumn(
+                                       C_CamGenSigTableModel::ePHYSICAL));
+                     Q_EMIT this->dataChanged(c_Index, c_Index, QVector<stw_types::sintn>() << osn_Role);
+                  }
                }
-               else
-               {
-                  const QModelIndex c_Index =
-                     this->index(orc_Index.row(), C_CamGenSigTableModel::h_EnumToColumn(
-                                    C_CamGenSigTableModel::ePHYSICAL));
-                  Q_EMIT this->dataChanged(c_Index, c_Index, QVector<stw_types::sintn>() << osn_Role);
-               }
+            }
+            if (c_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+            {
+               this->endResetModel();
+               Q_EMIT (this->SigResetPermanentEditors());
             }
          }
          else
@@ -795,7 +825,7 @@ Qt::ItemFlags C_CamGenSigTableModel::flags(const QModelIndex & orc_Index) const
          //Handle checkable flag
          if (orc_Index.row() >= 0)
          {
-            const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+            const uint32 u32_Index = this->m_TranslateRowToIndex(orc_Index.row());
             const C_OSCNodeDataPoolListElement * const pc_OsySignalCommon = m_GetSignalInterpretedOsyCommon(u32_Index);
             const C_OSCCanSignal * const pc_OsySignal = m_GetSignalInterpretedOsy(u32_Index);
             if ((pc_OsySignal != NULL) && (pc_OsySignalCommon != NULL))
@@ -1209,7 +1239,7 @@ QVariant C_CamGenSigTableModel::m_HandleColRawInterpreted(const uint32 ou32_Inde
                if (pc_Message != NULL)
                {
                   const std::vector<uint8> c_RawData = C_CamGenSigUtil::h_ConvertRawDataFormat(*pc_Message);
-                  const C_OSCNodeDataPoolContent c_ConvertedContent = C_CamGenSigTableModel::mh_DecodeRawToContentDbc(
+                  C_OSCNodeDataPoolContent c_ConvertedContent = C_CamGenSigTableModel::mh_DecodeRawToContentDbc(
                      c_RawData, *pc_DbcSignal);
                   if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
                   {
@@ -1438,7 +1468,7 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
             if (pc_Message != NULL)
             {
                const std::vector<uint8> c_RawData = C_CamGenSigUtil::h_ConvertRawDataFormat(*pc_Message);
-               const C_OSCNodeDataPoolContent c_ConvertedContent = C_CamGenSigTableModel::mh_DecodeRawToContentDbc(
+               C_OSCNodeDataPoolContent c_ConvertedContent = C_CamGenSigTableModel::mh_DecodeRawToContentDbc(
                   c_RawData, *pc_DbcSignal);
                if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
                {
@@ -1451,16 +1481,26 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
                }
                else
                {
-                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent,
-                                                                                         pc_DbcSignal->c_Element.f64_Factor,
-                                                                                         pc_DbcSignal->c_Element.f64_Offset,
-                                                                                         0UL);
+                  //Value table needs raw value
+                  if (pc_DbcSignal->c_ValueDescription.size() > 0UL)
+                  {
+                     c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent, 1.0,
+                                                                                            0.0, 0UL);
+                  }
+                  else
+                  {
+                     c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent,
+                                                                                            pc_DbcSignal->c_Element.f64_Factor,
+                                                                                            pc_DbcSignal->c_Element.f64_Offset,
+                                                                                            0UL);
+                  }
                }
             }
          }
       }
    }
-   else if (osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST)
+   else if ((osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST) ||
+            (osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST))
    {
       //Combo box values (DBC only)
       const C_CieConverter::C_CIECanSignal * const pc_DbcSignal = m_GetSignalInterpretedDbc(ou32_Index);
@@ -1501,7 +1541,14 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
             //Smaller or equal as zero is also a valid index (+1 might have unintended effects with u64 max)
             if (u64_Counter <= u64_AllowedNumValues)
             {
-               c_Strings.push_back(c_It->second.c_str());
+               if (osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST)
+               {
+                  c_Strings.push_back(c_It->second.c_str());
+               }
+               else
+               {
+                  c_Strings.push_back(QString::number(c_It->first));
+               }
                //Keep track of number of added values (don't allow index out of range)
                ++u64_Counter;
             }
@@ -1960,4 +2007,307 @@ uint64 C_CamGenSigTableModel::mh_GetMax(const uint16 ou16_Bit)
       osc_write_log_warning("Message signal edit", "Signals over 64 bit are not supported");
    }
    return u64_Max;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if message is multiplexed
+
+   \param[in] opc_OsyMessage OSY message
+   \param[in] opc_DbcMessage DBC message
+
+   \retval true  Is multiplexed
+   \retval false Not multiplexed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamGenSigTableModel::mh_IsMultiplexed(const C_OSCCanMessage * const opc_OsyMessage,
+                                             const C_CieConverter::C_CIECanMessage * const opc_DbcMessage)
+{
+   bool q_IsMultiplexed;
+
+   if (opc_OsyMessage != NULL)
+   {
+      q_IsMultiplexed = opc_OsyMessage->IsMultiplexed();
+   }
+   else if (opc_DbcMessage != NULL)
+   {
+      q_IsMultiplexed = false;
+      for (uint32 u32_ItSig = 0UL; u32_ItSig < opc_DbcMessage->c_Signals.size(); ++u32_ItSig)
+      {
+         const C_CieConverter::C_CIECanSignal & rc_Sig = opc_DbcMessage->c_Signals[u32_ItSig];
+         if (rc_Sig.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+         {
+            q_IsMultiplexed = true;
+            break;
+         }
+      }
+   }
+   else
+   {
+      q_IsMultiplexed = false;
+   }
+   return q_IsMultiplexed;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get multiplexer value if any
+
+   \param[in] opc_OsyMessage OSY message
+   \param[in] opc_DbcMessage DBC message
+
+   \return
+   Multiplexer value if any
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint16 C_CamGenSigTableModel::m_GetMultiplexerValue(const C_OSCCanMessage * const opc_OsyMessage,
+                                                    const C_CieConverter::C_CIECanMessage * const opc_DbcMessage) const
+{
+   uint16 u16_Retval = 0;
+   const C_CamProMessageData * const pc_Message =
+      C_CamProHandler::h_GetInstance()->GetMessageConst(
+         this->mu32_MessageIndex);
+
+   if (pc_Message != NULL)
+   {
+      const std::vector<uint8> c_RawData =
+         C_CamGenSigUtil::h_ConvertRawDataFormat(*pc_Message);
+
+      if (opc_OsyMessage != NULL)
+      {
+         for (uint32 u32_ItSig = 0UL; u32_ItSig < opc_OsyMessage->c_Signals.size(); ++u32_ItSig)
+         {
+            const C_OSCCanSignal & rc_Sig = opc_OsyMessage->c_Signals[u32_ItSig];
+            if (rc_Sig.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+            {
+               const C_OSCNodeDataPoolListElement * const pc_OsySignalCommon =
+                  m_GetSignalInterpretedOsyCommon(u32_ItSig);
+               if (pc_OsySignalCommon != NULL)
+               {
+                  sint64 s64_Tmp;
+                  const C_OSCNodeDataPoolContent c_ConvertedContent =
+                     C_CamGenSigUtil::h_DecodeRawToContentSignal(
+                        c_RawData, rc_Sig, pc_OsySignalCommon->c_MinValue);
+                  C_SdNdeDataPoolContentUtil::h_GetAnyValueAsSint64(c_ConvertedContent, s64_Tmp, 0UL);
+                  u16_Retval = static_cast<sint32>(s64_Tmp);
+               }
+               break;
+            }
+         }
+      }
+      else if (opc_DbcMessage != NULL)
+      {
+         for (uint32 u32_ItSig = 0UL; u32_ItSig < opc_DbcMessage->c_Signals.size(); ++u32_ItSig)
+         {
+            const C_CieConverter::C_CIECanSignal & rc_Sig = opc_DbcMessage->c_Signals[u32_ItSig];
+            if (rc_Sig.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+            {
+               sint64 s64_Tmp;
+               const C_OSCNodeDataPoolContent c_ConvertedContent = C_CamGenSigTableModel::mh_DecodeRawToContentDbc(
+                  c_RawData, rc_Sig);
+               C_SdNdeDataPoolContentUtil::h_GetAnyValueAsSint64(c_ConvertedContent, s64_Tmp, 0UL);
+               u16_Retval = static_cast<sint32>(s64_Tmp);
+               break;
+            }
+         }
+      }
+      else
+      {
+         //Nothing to do
+      }
+   }
+   return u16_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get number of signals for the current mux value
+
+   \param[in] opc_OsyMessage OSY message
+   \param[in] opc_DbcMessage DBC message
+   \param[in] ou16_MuxValue  Current mux value
+
+   \return
+   Number of signals for the current mux value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_CamGenSigTableModel::mh_GetNumRowsForMuxValue(const C_OSCCanMessage * const opc_OsyMessage,
+                                                       const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
+                                                       const uint16 ou16_MuxValue)
+{
+   sint32 s32_Retval = 0;
+
+   if (opc_OsyMessage != NULL)
+   {
+      for (uint32 u32_ItSig = 0UL; u32_ItSig < opc_OsyMessage->c_Signals.size(); ++u32_ItSig)
+      {
+         const C_OSCCanSignal & rc_Sig = opc_OsyMessage->c_Signals[u32_ItSig];
+         if (rc_Sig.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+         {
+            if (rc_Sig.u16_MultiplexValue == ou16_MuxValue)
+            {
+               //Count
+               ++s32_Retval;
+            }
+         }
+         else
+         {
+            //Count
+            ++s32_Retval;
+         }
+      }
+   }
+   else if (opc_DbcMessage != NULL)
+   {
+      for (uint32 u32_ItSig = 0UL; u32_ItSig < opc_DbcMessage->c_Signals.size(); ++u32_ItSig)
+      {
+         const C_CieConverter::C_CIECanSignal & rc_Sig = opc_DbcMessage->c_Signals[u32_ItSig];
+         if (rc_Sig.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+         {
+            if (rc_Sig.u16_MultiplexValue == ou16_MuxValue)
+            {
+               //Count
+               ++s32_Retval;
+            }
+         }
+         else
+         {
+            //Count
+            ++s32_Retval;
+         }
+      }
+   }
+   else
+   {
+      //Nothing to do
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Translate row index in message index
+
+   \param[in] os32_Row Row
+
+   \return
+   Index in message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_CamGenSigTableModel::m_TranslateRowToIndex(const sint32 os32_Row) const
+{
+   //Default
+   uint32 u32_Retval = static_cast<uint32>(os32_Row);
+   const C_OSCCanMessage * const pc_OsyMessage = m_GetMessageInterpretedOsy();
+   const C_CieConverter::C_CIECanMessage * const pc_DbcMessage = m_GetMessageInterpretedDbc();
+
+   if ((pc_OsyMessage != NULL) || (pc_DbcMessage != NULL))
+   {
+      const bool q_IsMultiplexed = C_CamGenSigTableModel::mh_IsMultiplexed(pc_OsyMessage, pc_DbcMessage);
+      if (q_IsMultiplexed)
+      {
+         const uint16 u16_MuxValue = C_CamGenSigTableModel::m_GetMultiplexerValue(pc_OsyMessage, pc_DbcMessage);
+         std::vector<uint16> c_StartBits = C_CamGenSigTableModel::mh_GetStartBits(pc_OsyMessage, pc_DbcMessage,
+                                                                                  u16_MuxValue);
+         //Sort
+         //lint -e{864} Call as expected by interface
+         std::sort(c_StartBits.begin(), c_StartBits.end());
+         //Get index for start bit
+         if (pc_OsyMessage != NULL)
+         {
+            const uint16 u16_SearchedStartBit = c_StartBits[static_cast<uint32>(os32_Row)];
+            for (uint32 u32_ItSig = 0UL; u32_ItSig < pc_OsyMessage->c_Signals.size(); ++u32_ItSig)
+            {
+               const C_OSCCanSignal & rc_Sig = pc_OsyMessage->c_Signals[u32_ItSig];
+               if (rc_Sig.u16_ComBitStart == u16_SearchedStartBit)
+               {
+                  //Also check if it is actually part of the current message
+                  if ((rc_Sig.e_MultiplexerType != C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) ||
+                      (rc_Sig.u16_MultiplexValue == u16_MuxValue))
+                  {
+                     u32_Retval = u32_ItSig;
+                     break;
+                  }
+               }
+            }
+         }
+         else if (pc_DbcMessage != NULL)
+         {
+            const uint16 u16_SearchedStartBit = c_StartBits[static_cast<uint32>(os32_Row)];
+            for (uint32 u32_ItSig = 0UL; u32_ItSig < pc_DbcMessage->c_Signals.size(); ++u32_ItSig)
+            {
+               const C_CieConverter::C_CIECanSignal & rc_Sig = pc_DbcMessage->c_Signals[u32_ItSig];
+               if (rc_Sig.u16_ComBitStart == u16_SearchedStartBit)
+               {
+                  //Also check if it is actually part of the current message
+                  if ((rc_Sig.e_MultiplexerType != C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) ||
+                      (rc_Sig.u16_MultiplexValue == u16_MuxValue))
+                  {
+                     u32_Retval = u32_ItSig;
+                     break;
+                  }
+               }
+            }
+         }
+         else
+         {
+         }
+      }
+   }
+
+   return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get start bit locations for the current mux value
+
+   \param[in] opc_OsyMessage OSY message
+   \param[in] opc_DbcMessage DBC message
+   \param[in] os32_MuxValue  Current mux value
+
+   \return
+   Start bit locations for the current mux value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<uint16> C_CamGenSigTableModel::mh_GetStartBits(const C_OSCCanMessage * const opc_OsyMessage,
+                                                           const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
+                                                           const uint16 ou16_MuxValue)
+{
+   std::vector<uint16> c_Retval;
+   if (opc_OsyMessage != NULL)
+   {
+      for (uint32 u32_ItSig = 0UL; u32_ItSig < opc_OsyMessage->c_Signals.size(); ++u32_ItSig)
+      {
+         const C_OSCCanSignal & rc_Sig = opc_OsyMessage->c_Signals[u32_ItSig];
+         if (rc_Sig.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+         {
+            if (rc_Sig.u16_MultiplexValue == ou16_MuxValue)
+            {
+               c_Retval.push_back(rc_Sig.u16_ComBitStart);
+            }
+         }
+         else
+         {
+            c_Retval.push_back(rc_Sig.u16_ComBitStart);
+         }
+      }
+   }
+   else if (opc_DbcMessage != NULL)
+   {
+      for (uint32 u32_ItSig = 0UL; u32_ItSig < opc_DbcMessage->c_Signals.size(); ++u32_ItSig)
+      {
+         const C_CieConverter::C_CIECanSignal & rc_Sig = opc_DbcMessage->c_Signals[u32_ItSig];
+         if (rc_Sig.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+         {
+            if (rc_Sig.u16_MultiplexValue == ou16_MuxValue)
+            {
+               c_Retval.push_back(rc_Sig.u16_ComBitStart);
+            }
+         }
+         else
+         {
+            c_Retval.push_back(rc_Sig.u16_ComBitStart);
+         }
+      }
+   }
+   else
+   {
+   }
+   return c_Retval;
 }

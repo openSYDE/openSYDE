@@ -83,6 +83,7 @@ void C_OSCExportDataPool::h_GetFileName(const C_OSCNodeDataPool & orc_DataPool, 
    \param[in] oq_IsRemote              true: create source code for a "remote" data pool
    \param[in] ou8_DataPoolIndexRemote  index of data pool within remote process
    \param[in] ou8_ProcessId            ID of process owning this data pool
+   \param[in] orc_ExportToolInfo       information about calling executable (name + version)
 
    \return
    C_NO_ERR Operation success
@@ -91,7 +92,8 @@ void C_OSCExportDataPool::h_GetFileName(const C_OSCNodeDataPool & orc_DataPool, 
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, const C_OSCNodeDataPool & orc_DataPool,
                                                const uint8 ou8_DataPoolIndex, const bool oq_IsRemote,
-                                               const uint8 ou8_DataPoolIndexRemote, const uint8 ou8_ProcessId)
+                                               const uint8 ou8_DataPoolIndexRemote, const uint8 ou8_ProcessId,
+                                               const C_SCLString & orc_ExportToolInfo)
 {
    sint32 s32_Retval;
    uint32 u32_HashValue = 0U;
@@ -101,12 +103,14 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
    const C_SCLString c_ProjectId = C_SCLString::IntToStr(u32_HashValue);
 
    // create header file
-   s32_Retval = mh_CreateHeaderFile(orc_Path, orc_DataPool, ou8_DataPoolIndex, c_ProjectId, oq_IsRemote);
+   s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, orc_DataPool, ou8_DataPoolIndex, c_ProjectId,
+                                    oq_IsRemote);
 
    // create implementation file
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = mh_CreateImplementationFile(orc_Path, orc_DataPool, ou8_DataPoolIndex, c_ProjectId,
+      s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, orc_DataPool, ou8_DataPoolIndex,
+                                               c_ProjectId,
                                                ou8_DataPoolIndexRemote, ou8_ProcessId, oq_IsRemote);
    }
 
@@ -116,6 +120,7 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create header file
 
+   \param[in] orc_ExportToolInfo       information about calling executable (name + version)
    \param[in] orc_Path                 storage path for created file
    \param[in] orc_DataPool             data pool configuration
    \param[in] ou8_DataPoolIndex        index of data pool
@@ -127,15 +132,15 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
    C_RD_WR  Operation failure: cannot store file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_Path, const C_OSCNodeDataPool & orc_DataPool,
-                                                const uint8 ou8_DataPoolIndex, const C_SCLString & orc_ProjectId,
-                                                const bool oq_IsRemote)
+sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportToolInfo, const C_SCLString & orc_Path,
+                                                const C_OSCNodeDataPool & orc_DataPool, const uint8 ou8_DataPoolIndex,
+                                                const C_SCLString & orc_ProjectId, const bool oq_IsRemote)
 {
    sint32 s32_Retval;
    C_SCLStringList c_Data;
 
    // add header
-   mh_AddHeader(c_Data, orc_DataPool, mhq_IS_HEADER_FILE);
+   mh_AddHeader(orc_ExportToolInfo, c_Data, orc_DataPool, mhq_IS_HEADER_FILE);
 
    // add includes
    mh_AddIncludes(c_Data, orc_DataPool, mhq_IS_HEADER_FILE);
@@ -164,6 +169,7 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_Path, co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create implementation file
 
+   \param[in] orc_ExportToolInfo       information about calling executable (name + version)
    \param[in] orc_Path                 storage path for created file
    \param[in] orc_DataPool             data pool configuration
    \param[in] ou8_DataPoolIndex        index of data pool
@@ -177,7 +183,8 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_Path, co
    C_RD_WR  Operation failure: cannot store file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_Path,
+sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_ExportToolInfo,
+                                                        const C_SCLString & orc_Path,
                                                         const C_OSCNodeDataPool & orc_DataPool,
                                                         const uint8 ou8_DataPoolIndex,
                                                         const C_SCLString & orc_ProjectId,
@@ -188,7 +195,7 @@ sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_
    C_SCLStringList c_Data;
 
    // add header
-   mh_AddHeader(c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE);
+   mh_AddHeader(orc_ExportToolInfo, c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE);
 
    // add includes
    mh_AddIncludes(c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE);
@@ -217,13 +224,14 @@ sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add file header
 
+  \param[in]   orc_ExportToolInfo       information about calling executable (name + version)
    \param[out] orc_Data                 converted data to string list
    \param[in]  orc_DataPool             data pool configuration
    \param[in]  oq_FileType              .c or .h file selected
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCExportDataPool::mh_AddHeader(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
-                                       const bool oq_FileType)
+void C_OSCExportDataPool::mh_AddHeader(const C_SCLString & orc_ExportToolInfo, C_SCLStringList & orc_Data,
+                                       const C_OSCNodeDataPool & orc_DataPool, const bool oq_FileType)
 {
    orc_Data.Append(
       "//----------------------------------------------------------------------------------------------------------------------");
@@ -232,13 +240,20 @@ void C_OSCExportDataPool::mh_AddHeader(C_SCLStringList & orc_Data, const C_OSCNo
    if (oq_FileType == mhq_IS_IMPLEMENTATION_FILE)
    {
       orc_Data.Append("   \\brief       openSYDE Data Pool definition (Source file with constant definitions)");
+      if (orc_DataPool.c_Comment.IsEmpty() == false)
+      {
+         orc_Data.Append("");
+         orc_Data.Append("   " + C_OSCUtils::h_NiceifyStringForCComment(orc_DataPool.c_Comment));
+      }
       orc_Data.Append("");
-      orc_Data.Append("   " + C_OSCUtils::h_NiceifyStringForCComment(orc_DataPool.c_Comment));
+      orc_Data.Append("   This file was generated by openSYDE " + orc_ExportToolInfo + ".");
    }
    else
    {
       orc_Data.Append(
          "   \\brief       openSYDE Data Pool definition (Header file with constant and global definitions)");
+      orc_Data.Append("");
+      orc_Data.Append("   This file was generated by openSYDE " + orc_ExportToolInfo + ".");
    }
    orc_Data.Append("*/");
    orc_Data.Append(

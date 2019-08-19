@@ -65,7 +65,7 @@ public:
    bool GetNavigationExpandedStatus(void) const;
 
    // Dashboard
-   void SetDashboardMainTab(const QString & orc_DashboardName, const stw_types::sint32 os32_TabIndex);
+   void SetDashboardMainTab(const QString & orc_DashboardName);
    void SetDashboardTearOffPosition(const QString & orc_DashboardName, const QPoint & orc_Position,
                                     const QSize & orc_Size, const bool oq_TornOffWindowMinimized,
                                     const bool oq_TornOffWindowMaximized);

@@ -126,10 +126,9 @@ public:
                                   const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
                                   const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
                                   const C_PuiSdNodeCanSignal & orc_UISignal);
-   stw_types::sint32 SetCanSignalCommon(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                        const stw_types::uint32 & oru32_SignalIndex,
-                                        const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
-                                        const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon);
+   stw_types::sint32 SetCanSignalMUXValue(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                          const stw_types::uint32 & oru32_SignalIndex,
+                                          const stw_types::uint16 ou16_MultiplexValue);
    stw_types::sint32 SetCanSignalPosition(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                           const stw_types::uint32 & oru32_SignalIndex,
                                           const stw_opensyde_core::C_OSCCanSignal & orc_OSCSignal,
@@ -139,11 +138,17 @@ public:
    stw_types::sint32 AddCanMessage(const stw_types::uint32 & oru32_NodeIndex,
                                    const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
                                    const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
-                                   const stw_opensyde_core::C_OSCCanMessage & orc_Message,
-                                   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals, const bool & orq_AutomatedPropertiesAdaption);
+                                   const stw_opensyde_core::C_OSCCanMessage & orc_Message, const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement>
+                                   & orc_OSCSignalCommons,
+                                   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
+                                   const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
+                                   const bool & orq_AutomatedPropertiesAdaption);
    stw_types::sint32 InsertCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                      const stw_opensyde_core::C_OSCCanMessage & orc_Message,
-                                      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals, const bool & orq_AutomatedPropertiesAdaption);
+                                      const stw_opensyde_core::C_OSCCanMessage & orc_Message, const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement>
+                                      & orc_OSCSignalCommons,
+                                      const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
+                                      const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
+                                      const bool & orq_AutomatedPropertiesAdaption);
    stw_types::sint32 DeleteCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    stw_types::sint32 AddCanSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                   const stw_opensyde_core::C_OSCCanSignal & orc_Signal,
@@ -167,6 +172,8 @@ public:
                                        bool & orq_IsMatch, const bool oq_IgnoreMessageDirection = false) const;
 
    //Misc util
+   QString GetCanSignalDisplayName(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                   const stw_types::uint32 & oru32_SignalIndex) const;
    QString GetNamespace(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id) const;
    QString GetSignalNamespace(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id) const;
 

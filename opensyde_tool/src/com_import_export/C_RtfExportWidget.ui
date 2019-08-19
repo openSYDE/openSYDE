@@ -148,39 +148,49 @@
             <property name="verticalSpacing">
              <number>12</number>
             </property>
+            <item row="1" column="1">
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>15</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
             <item row="0" column="2">
              <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_EditRtfPath">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
               <property name="minimumSize">
                <size>
-                <width>550</width>
+                <width>0</width>
                 <height>30</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>550</width>
+                <width>16777215</width>
                 <height>30</height>
                </size>
               </property>
              </widget>
             </item>
-            <item row="0" column="4">
-             <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonRtfPath">
+            <item row="0" column="3">
+             <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonRtfPath">
               <property name="minimumSize">
                <size>
-                <width>50</width>
+                <width>33</width>
                 <height>30</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>50</width>
+                <width>33</width>
                 <height>30</height>
                </size>
               </property>
@@ -192,17 +202,17 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="4">
-             <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonLogoPath">
+            <item row="2" column="3">
+             <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonLogoPath">
               <property name="minimumSize">
                <size>
-                <width>50</width>
+                <width>33</width>
                 <height>30</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>50</width>
+                <width>33</width>
                 <height>30</height>
                </size>
               </property>
@@ -216,82 +226,6 @@
             </item>
             <item row="0" column="1">
              <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>15</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="3">
-             <spacer name="horizontalSpacer_8">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>5</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="2" column="2">
-             <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_EditLogoPath">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>550</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>550</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::StrongFocus</enum>
-              </property>
-              <property name="cursorPosition">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <spacer name="horizontalSpacer_6">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>15</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="1" column="1">
-             <spacer name="horizontalSpacer_11">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -345,7 +279,7 @@
                  <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
+                 <enum>QSizePolicy::Expanding</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -356,6 +290,44 @@
                </spacer>
               </item>
              </layout>
+            </item>
+            <item row="2" column="2">
+             <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_EditLogoPath">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::StrongFocus</enum>
+              </property>
+              <property name="cursorPosition">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <spacer name="horizontalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>15</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
             <item row="1" column="0">
              <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -440,38 +412,6 @@
                </spacer>
               </item>
              </layout>
-            </item>
-            <item row="1" column="3">
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>5</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="2" column="3">
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>5</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </item>
@@ -640,11 +580,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubConfigure.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLeFilePath</class>
    <extends>QLineEdit</extends>
    <header>C_OgeLeFilePath.h</header>
@@ -654,15 +589,20 @@
    <extends>QLineEdit</extends>
    <header>C_OgeLeProperties.h</header>
   </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubOpen</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubOpen.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>pc_PushButtonOk</tabstop>
   <tabstop>pc_EditRtfPath</tabstop>
   <tabstop>pc_PushButtonRtfPath</tabstop>
   <tabstop>pc_EditCompany</tabstop>
   <tabstop>pc_EditLogoPath</tabstop>
   <tabstop>pc_PushButtonLogoPath</tabstop>
   <tabstop>pc_PushButtonCancel</tabstop>
-  <tabstop>pc_PushButtonOk</tabstop>
  </tabstops>
  <resources/>
  <connections/>

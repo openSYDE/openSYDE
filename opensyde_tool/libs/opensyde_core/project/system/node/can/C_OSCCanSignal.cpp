@@ -39,7 +39,9 @@ C_OSCCanSignal::C_OSCCanSignal(void) :
    e_ComByteOrder(eBYTE_ORDER_INTEL),
    u16_ComBitLength(8),
    u16_ComBitStart(0),
-   u32_ComDataElementIndex(0)
+   u32_ComDataElementIndex(0),
+   e_MultiplexerType(eMUX_DEFAULT),
+   u16_MultiplexValue(0)
 {
 }
 
@@ -80,10 +82,12 @@ bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
 void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_ComByteOrder, sizeof(this->e_ComByteOrder), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_MultiplexerType, sizeof(this->e_MultiplexerType), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_ComBitLength, sizeof(this->u16_ComBitLength), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_ComBitStart, sizeof(this->u16_ComBitStart), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_ComDataElementIndex, sizeof(this->u32_ComDataElementIndex),
                                       oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_MultiplexValue, sizeof(this->u16_MultiplexValue), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

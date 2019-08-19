@@ -45,10 +45,9 @@ public:
    void SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value);
    void SetSignalId(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                     const stw_types::uint32 ou32_SignalIndex);
-   void ReloadPosition(const bool & orq_SignalErrorChange = true);
+   void ReloadPosition(void);
    stw_opensyde_core::C_OSCCanMessageIdentificationIndices GetMessageId(void) const;
    stw_types::uint32 GetSignalIndex(void) const;
-   void SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Type);
    void SelectName(void) const;
 
 private:
@@ -56,28 +55,67 @@ private:
    C_SdBueSignalPropertiesWidget(const C_SdBueSignalPropertiesWidget &);
    C_SdBueSignalPropertiesWidget & operator =(const C_SdBueSignalPropertiesWidget &);
 
+   enum E_Change
+   {
+      eCHA_NAME,
+      eCHA_COMMENT,
+      eCHA_AUTO_MIN_MAX,
+      eCHA_MIN,
+      eCHA_MAX,
+      eCHA_FACTOR,
+      eCHA_OFFSET,
+      eCHA_INIT,
+      eCHA_UNIT,
+      eCHA_BYTE_ORDER,
+      eCHA_VALUE_TYPE,
+      eCHA_MLV,
+      eCHA_LENGTH,
+      eCHA_START_BIT,
+      eCHA_MUX_TYPE,
+      eCHA_MUX_VALUE
+   };
+
+   enum E_Type
+   {
+      eTY_UNSIGNED = 0,
+      eTY_SIGNED = 1,
+      eTY_FLOAT32 = 2,
+      eTY_FLOAT64 = 3
+   };
+
    Ui::C_SdBueSignalPropertiesWidget * mpc_Ui;
+
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_MessageSyncManager;
    stw_opensyde_core::C_OSCCanMessageIdentificationIndices mc_MessageId;
    stw_types::uint32 mu32_SignalIndex;
-   bool mq_DataChangesAllowed;
-   bool mq_PositionUpdate;
+   E_Type me_DataType;
+   stw_opensyde_core::C_OSCCanSignal mc_DataOSCSignal;
+   stw_opensyde_gui_logic::C_PuiSdNodeCanSignal mc_DataUiSignal;
+   stw_opensyde_core::C_OSCNodeDataPoolListElement mc_DataOSCSignalCommon;
+   stw_opensyde_gui_logic::C_PuiSdNodeDataPoolListElement mc_DataUiSignalCommon;
 
    void m_CheckSignalName(const bool & orq_SignalErrorChange = true);
+   void m_CheckMUXType(const bool & orq_SignalErrorChange = true);
+   void m_CheckMUXValue(const bool & orq_SignalErrorChange = true);
    void m_CheckMessagePosition(const bool & orq_SignalErrorChange = true);
    void m_CheckMinMaxAndInitValue(const bool & orq_SignalErrorChange = true);
-   void m_TrimmMessageName(void) const;
-   void m_RegisterChange(void);
-   void m_OnTextChanged(void);
-   void m_RegisterNameChange(void);
-   void m_RegisterScalingChange(void);
-   void m_RegisterPositionChange(void);
-   void m_RegisterMinMaxAndInitChange(void);
+   void m_HandleNameChangeWithoutSignal(void);
+   void m_HandleNameChangeWithSignal(void);
+   void m_HandleCommentChange(void);
    void m_LoadFromData(void);
-   void m_HandleAutoMinMaxCheckBox(const bool & orq_AutoMinMaxActive);
-   void m_HandleValueType(const stw_types::sint32 & ors32_Index);
-   void m_HandleValueLengthChange(const stw_types::sint32 & ors32_Value);
-   void m_UpdateAutoMinMax(void);
+   void m_HandleAutoMinMaxCheckBoxChange(void);
+   void m_HandleMinChange(void);
+   void m_HandleMaxChange(void);
+   void m_HandleFactorChange(void);
+   void m_HandleOffsetChange(void);
+   void m_HandleInitChange(void);
+   void m_HandleUnitChange(void);
+   void m_HandleByteOrderChange(void);
+   void m_HandleValueTypeChange(void);
+   void m_HandleValueLengthChange(void);
+   void m_HandleStartBitChange(void);
+   void m_HandleMuxTypeChange(void);
+   void m_HandleMuxValueChange(void);
    static void mh_AdaptValueToSignalLength(const stw_types::uint16 ou16_BitLength,
                                            stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content);
    stw_types::sint32 m_LoadGeneric(stw_opensyde_gui_elements::C_OgeWiSpinBoxGroup * const opc_Widget,
@@ -94,11 +132,27 @@ private:
                                    stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content,
                                    const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset) const;
    stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type m_GetCurrentType(void) const;
-   void m_ReInitMinMaxAndInit(const stw_types::float64 * const opf64_Factor = NULL,
-                              const stw_types::float64 * const opf64_Offset = NULL) const;
-   void m_SaveToData(void);
-   void m_ConnectPositionUpdate(void);
-   void m_DisconnectPositionUpdate(void);
+   void m_SaveToData(const E_Change oe_Change);
+   stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType m_GetMuxType(void) const;
+   void m_InitComboBox(const stw_opensyde_core::C_OSCCanMessage & orc_Message,
+                       const stw_types::uint32 ou32_SignalIndex) const;
+   void m_HandleMuxValueRange(void) const;
+
+   void m_HandleAnyChange(const E_Change oe_Change, const bool oq_AllowSignalsToInformOtherWidgets = true);
+   void m_ApplyNewValueFromUI(const E_Change oe_Change);
+   void m_AdaptOtherValues(const E_Change oe_Change, std::list<E_Change> & orc_Changes,
+                           std::list<E_Change> & orc_ErrorChanges, QString & orc_UserNotificationText,
+                           QString & orc_UserNotificationAdditionalInformation);
+   void m_InitializeDataWithPotentialNewType(const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_Type);
+   void m_HandleMinValueRange(void);
+   void m_HandleMaxValueRange(void);
+   void m_HandleInitValueRange(void);
+   void m_UpdateOtherSignalsForChange(const E_Change oe_Change) const;
+   void m_UpdateUIForChange(const E_Change oe_Change);
+   void m_UpdateErrorForChange(const E_Change oe_Change);
+   void m_SendSignalForChange(const E_Change oe_Change);
+   void m_ConnectAll(void);
+   void m_DisconnectAll(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -106,12 +160,9 @@ private:
 Q_SIGNALS:
    //lint -restore
    void SigChanged(void);
-   void SigNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                       const stw_types::uint32 ou32_SignalIndex);
-   void SigPositionChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                           const stw_types::uint32 ou32_SignalIndex);
-   void SigTypeChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                       const stw_types::uint32 ou32_SignalIndex);
+   void SigNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void SigUpdateMlv(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                     const stw_types::uint32 ou32_SignalIndex);
    void SigRecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
 };
 }

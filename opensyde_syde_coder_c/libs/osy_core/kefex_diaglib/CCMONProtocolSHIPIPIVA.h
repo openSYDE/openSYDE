@@ -22,12 +22,12 @@
 #endif
 #endif
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 namespace stw_cmon_protocol
 {
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
 class C_CMONProtocolSIPPayload
@@ -44,7 +44,7 @@ public:
    stw_scl::C_SCLString Decode(const stw_types::uint8 * const opu8_Data, const bool oq_Decimal) const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
 class C_CMONProtocolSIPASPDescription
@@ -59,7 +59,7 @@ public:
    void Set(const stw_scl::C_SCLString & orc_ShortName, const stw_types::uint16 ou16_Length);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
 class C_CMONProtocolSIPASNDescription
@@ -77,7 +77,7 @@ public:
             const stw_scl::C_SCLString & orc_ASPPrefix = "", const stw_types::uint16 ou16_Length = 0);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
 class C_CMONProtocolSIPASADescription
@@ -88,7 +88,7 @@ public:
    stw_scl::SCLDynamicArray<C_CMONProtocolSIPASNDescription> c_ASNs;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///Interpretation of SHIP-IP!/IVA protocol:
 class CMONPROTOCOL_PACKAGE C_CMONProtocolSHIP_IP_IVA : public C_CMONProtocolKEFEX_IVA
@@ -129,7 +129,7 @@ public:
    virtual stw_scl::C_SCLString GetProtocolName(void) const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 }
 

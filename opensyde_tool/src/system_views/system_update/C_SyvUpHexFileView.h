@@ -49,7 +49,7 @@ private:
    Ui::C_SyvUpHexFileView * mpc_Ui;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
-   const QString mc_File;
+   const QString mc_AbsoluteFilePath;
    static const QString mhc_StartTD;
    static const QString mhc_ContinueTD;
 

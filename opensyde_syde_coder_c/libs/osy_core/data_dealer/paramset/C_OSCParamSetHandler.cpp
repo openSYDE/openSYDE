@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "TGLUtils.h"
@@ -21,27 +21,34 @@
 #include "C_OSCParamSetInterpretedNodeFiler.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
-C_OSCParamSetHandler C_OSCParamSetHandler::mhc_Singleton;
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCParamSetHandler::C_OSCParamSetHandler(void)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create clean file from internally stored content without adding a CRC
 
    \param[in] orc_FilePath Parameter file path
@@ -53,7 +60,7 @@ C_OSCParamSetHandler C_OSCParamSetHandler::mhc_Singleton;
    C_CONFIG   Internal data invalid
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCParamSetHandler::CreateCleanFileWithoutCRC(const C_SCLString & orc_FilePath,
                                                        const bool oq_InterpretedDataOnly)
 {
@@ -90,7 +97,7 @@ sint32 C_OSCParamSetHandler::CreateCleanFileWithoutCRC(const C_SCLString & orc_F
       }
       else
       {
-         s32_Return = C_CONFIG;
+         tgl_assert(false);
       }
    }
    else
@@ -100,14 +107,16 @@ sint32 C_OSCParamSetHandler::CreateCleanFileWithoutCRC(const C_SCLString & orc_F
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read file and update internally stored content (cleared at start)
 
-   \param[in]     orc_FilePath           Parameter file path
-   \param[in]     oq_IgnoreCrc           Flag to ignore CRC if set to true
-   \param[in]     oq_InterpretedDataOnly Flag to load only the interpreted data and not the raw data
-   \param[in,out] opu16_FileCrc          Optional storage for read file CRC
-                                         (only set if no err and oq_IgnoreCrc is false)
+   \param[in]     orc_FilePath               Parameter file path
+   \param[in]     oq_IgnoreCrc               Flag to ignore CRC if set to true
+   \param[in]     oq_InterpretedDataOnly     Flag to load only the interpreted data and not the raw data
+   \param[in,out] opu16_FileCrc              Optional storage for read file CRC
+                                             (only set if no err and oq_IgnoreCrc is false)
+   \param[in,out] opq_MissingOptionalContent Optional flag for indication of optional content missing
+                                             Warning: only valid if C_NO_ERR
 
    \return
    C_NO_ERR   data read
@@ -116,9 +125,10 @@ sint32 C_OSCParamSetHandler::CreateCleanFileWithoutCRC(const C_SCLString & orc_F
    C_CHECKSUM specified file is present but checksum is invalid
    C_CONFIG   file does not contain essential information
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bool oq_IgnoreCrc,
-                                      const bool oq_InterpretedDataOnly, uint16 * const opu16_FileCrc)
+                                      const bool oq_InterpretedDataOnly, uint16 * const opu16_FileCrc,
+                                      bool * const opq_MissingOptionalContent)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -143,11 +153,17 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
             s32_Retval = C_OSCParamSetRawNodeFiler::h_CheckFileVersion(*pc_Parser);
             if (s32_Retval == C_NO_ERR)
             {
-               C_OSCParamSetRawNodeFiler::h_LoadFileInfo(*pc_Parser, this->mc_Data.c_FileInfo);
-               s32_Retval = this->m_LoadNodes(*pc_Parser, oq_InterpretedDataOnly);
+               bool q_MissingOptionalContent = false;
+               C_OSCParamSetRawNodeFiler::h_LoadFileInfo(*pc_Parser, this->mc_Data.c_FileInfo,
+                                                         q_MissingOptionalContent);
+               s32_Retval = this->m_LoadNodes(*pc_Parser, oq_InterpretedDataOnly, q_MissingOptionalContent);
                if ((opu16_FileCrc != NULL) && (s32_Retval == C_NO_ERR))
                {
                   *opu16_FileCrc = static_cast<uint16>(pc_Parser->GetAttributeUint32("file_crc"));
+               }
+               if (opq_MissingOptionalContent != NULL)
+               {
+                  *opq_MissingOptionalContent = q_MissingOptionalContent;
                }
             }
          }
@@ -172,7 +188,7 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update/add CRC for provided file
 
    \param[in] orc_FilePath Parameter file path
@@ -183,23 +199,23 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
    C_RD_WR  Error accessing file system
    C_RANGE  File does not exist
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCParamSetHandler::UpdateCRCForFile(const C_SCLString & orc_FilePath) const
 {
    return C_OSCParamSetFilerBase::h_AddCRC(orc_FilePath);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear internally stored content
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetHandler::ClearContent(void)
 {
    this->mc_RawNodes.clear();
    this->mc_Data.Clear();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add raw data for node (Node name used as ID)
 
    \param[in] orc_Content Raw data for node (Node name used as ID)
@@ -208,7 +224,7 @@ void C_OSCParamSetHandler::ClearContent(void)
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCParamSetHandler::AddRawDataForNode(const C_OSCParamSetRawNode & orc_Content)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -228,18 +244,18 @@ sint32 C_OSCParamSetHandler::AddRawDataForNode(const C_OSCParamSetRawNode & orc_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add some general information for one param set file
 
    \param[in] orc_FileInfo Optional general file information
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetHandler::AddInterpretedFileData(const C_OSCParamSetInterpretedFileInfoData & orc_FileInfo)
 {
    this->mc_Data.AddInterpretedFileData(orc_FileInfo);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add interpreted data for node (Node name used as ID)
 
    \param[in] orc_Content Interpreted data for node (Node name used as ID)
@@ -248,7 +264,7 @@ void C_OSCParamSetHandler::AddInterpretedFileData(const C_OSCParamSetInterpreted
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCParamSetHandler::AddInterpretedDataForNode(const C_OSCParamSetInterpretedNode & orc_Content)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -270,7 +286,7 @@ sint32 C_OSCParamSetHandler::AddInterpretedDataForNode(const C_OSCParamSetInterp
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get raw node data for specified node
 
    \param[in] orc_NodeName Node name to look for
@@ -279,7 +295,7 @@ sint32 C_OSCParamSetHandler::AddInterpretedDataForNode(const C_OSCParamSetInterp
    NULL Raw node data not found
    Else Valid raw node data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCParamSetRawNode * C_OSCParamSetHandler::GetRawDataForNode(const C_SCLString & orc_NodeName) const
 {
    const C_OSCParamSetRawNode * pc_Retval = NULL;
@@ -296,54 +312,74 @@ const C_OSCParamSetRawNode * C_OSCParamSetHandler::GetRawDataForNode(const C_SCL
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get interpreted data
 
    \return
    Pointer to vector with interpreted data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCParamSetInterpretedData & C_OSCParamSetHandler::GetInterpretedData(void) const
 {
    return this->mc_Data;
 }
 
-//-----------------------------------------------------------------------------
-/*! \brief   Get singleton instance
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of nodes
+
+   Get number of nodes that the file contains data for
 
    \return
-   Singleton instance
+   Number of nodes
 */
-//-----------------------------------------------------------------------------
-C_OSCParamSetHandler & C_OSCParamSetHandler::h_GetInstance(void)
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCParamSetHandler::GetNumberOfNodes(void) const
 {
-   return mhc_Singleton;
+   return this->mc_RawNodes.size();
 }
 
-//-----------------------------------------------------------------------------
-/*! \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get raw data for one node
+
+   Get raw data for specified node.
+
+   \param[in]  ou32_NodeIndex   index of node
+
+   \return
+   NULL  Raw node data not found
+   Else  Valid raw node data
 */
-//-----------------------------------------------------------------------------
-C_OSCParamSetHandler::C_OSCParamSetHandler(void)
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCParamSetRawNode * C_OSCParamSetHandler::GetRawDataForNode(const uint32 ou32_NodeIndex) const
 {
+   const C_OSCParamSetRawNode * pc_Result = NULL;
+
+   if (ou32_NodeIndex < this->mc_RawNodes.size())
+   {
+      pc_Result = &this->mc_RawNodes[ou32_NodeIndex];
+   }
+   return pc_Result;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
    post-condition: the passed XML parser has the active node set to the same "opensyde-parameter-sets"
 
-   \param[in,out] orc_XMLParser            XML with specified node active
-   \param[in]     oq_InterpretedDataOnly   Flag to load only the interpreted data and not the raw data
+   \param[in,out] orc_XMLParser              XML with specified node active
+   \param[in]     oq_InterpretedDataOnly     Flag to load only the interpreted data and not the raw data
+   \param[in,out] orq_MissingOptionalContent Flag for indication of optional content missing
+                                             Warning: flag is never set to false if optional content is present
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
-sint32 C_OSCParamSetHandler::m_LoadNodes(C_OSCXMLParser & orc_XMLParser, const bool oq_InterpretedDataOnly)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCParamSetHandler::m_LoadNodes(C_OSCXMLParser & orc_XMLParser, const bool oq_InterpretedDataOnly,
+                                         bool & orq_MissingOptionalContent)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -360,7 +396,8 @@ sint32 C_OSCParamSetHandler::m_LoadNodes(C_OSCXMLParser & orc_XMLParser, const b
             //Content
             if (oq_InterpretedDataOnly == false)
             {
-               s32_Retval = C_OSCParamSetRawNodeFiler::h_LoadRawNode(c_RawItem, orc_XMLParser);
+               s32_Retval = C_OSCParamSetRawNodeFiler::h_LoadRawNode(c_RawItem, orc_XMLParser,
+                                                                     orq_MissingOptionalContent);
                if (s32_Retval == C_NO_ERR)
                {
                   this->mc_RawNodes.push_back(c_RawItem);
@@ -374,7 +411,8 @@ sint32 C_OSCParamSetHandler::m_LoadNodes(C_OSCXMLParser & orc_XMLParser, const b
 
             if (s32_Retval == C_NO_ERR)
             {
-               s32_Retval = C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(c_InterpretedItem, orc_XMLParser);
+               s32_Retval = C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(c_InterpretedItem, orc_XMLParser,
+                                                                                     orq_MissingOptionalContent);
                if (s32_Retval == C_NO_ERR)
                {
                   this->mc_Data.c_InterpretedNodes.push_back(c_InterpretedItem);

@@ -17,7 +17,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 
 #ifdef __BORLANDC__ //putting the pragmas in the config-header will not work
@@ -29,23 +29,23 @@
 #include "stwerrors.h"
 #include "CCANDLL.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 static const uint32 mu32_XTD_ID = 0x80000000UL; // MSB flag for 29Bit ID
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //lint -esym(1565,"stw_can::C_CAN_DLL::mt_Lock") //properly initialized by constructor
 C_CAN_DLL::C_CAN_DLL(const charn * const opcn_DLLPath)
@@ -58,7 +58,7 @@ C_CAN_DLL::C_CAN_DLL(const charn * const opcn_DLLPath)
    (void)m_Init(opcn_DLLPath);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_CAN_DLL::~C_CAN_DLL()
 {
@@ -66,7 +66,7 @@ C_CAN_DLL::~C_CAN_DLL()
    DeleteCriticalSection(&mt_Lock);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::m_Init(const charn * const opcn_DLLPath)
 {
@@ -175,7 +175,7 @@ sint32 C_CAN_DLL::m_Init(const charn * const opcn_DLLPath)
    return (0); // Dll loaded
 } // End of Init_Dll
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CAN_DLL::m_ClearFunctionPointers(void)
 {
@@ -226,7 +226,7 @@ void C_CAN_DLL::m_ClearFunctionPointers(void)
    mq_TCPFunctionsAvailable = false;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CAN_DLL::m_Exit(void)
 {
@@ -238,7 +238,7 @@ void C_CAN_DLL::m_Exit(void)
    }
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Init(void)
 {
@@ -254,7 +254,7 @@ sint32 C_CAN_DLL::CAN_Init(void)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Reset(void)
 {
@@ -270,7 +270,7 @@ sint32 C_CAN_DLL::CAN_Reset(void)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Exit(void)
 {
@@ -286,7 +286,7 @@ sint32 C_CAN_DLL::CAN_Exit(void)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Bitrate(const sint32 os32_BitrateKBitS)
 {
@@ -302,7 +302,7 @@ sint32 C_CAN_DLL::CAN_Bitrate(const sint32 os32_BitrateKBitS)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Read_Msg(STW_CAN_MSG & orc_Message)
 {
@@ -318,7 +318,7 @@ sint32 C_CAN_DLL::CAN_Read_Msg(STW_CAN_MSG & orc_Message)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Send_Msg(const STW_CAN_MSG & orc_Message)
 {
@@ -334,7 +334,7 @@ sint32 C_CAN_DLL::CAN_Send_Msg(const STW_CAN_MSG & orc_Message)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Read_extMsg(STW_CAN_EXTMSG & orc_Message)
 {
@@ -350,7 +350,7 @@ sint32 C_CAN_DLL::CAN_Read_extMsg(STW_CAN_EXTMSG & orc_Message)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Send_extMsg(const STW_CAN_EXTMSG & orc_Message)
 {
@@ -366,7 +366,7 @@ sint32 C_CAN_DLL::CAN_Send_extMsg(const STW_CAN_EXTMSG & orc_Message)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Send_RTR(const STW_CAN_MSG & orc_Message)
 {
@@ -382,7 +382,7 @@ sint32 C_CAN_DLL::CAN_Send_RTR(const STW_CAN_MSG & orc_Message)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Send_extRTR(const STW_CAN_EXTMSG & orc_Message)
 {
@@ -398,7 +398,7 @@ sint32 C_CAN_DLL::CAN_Send_extRTR(const STW_CAN_EXTMSG & orc_Message)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_InterfaceSetup(const HWND opv_Handle)
 {
@@ -412,7 +412,7 @@ sint32 C_CAN_DLL::CAN_InterfaceSetup(const HWND opv_Handle)
    return 0;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Status(STW_CAN_STATUS & orc_Status)
 {
@@ -428,7 +428,7 @@ sint32 C_CAN_DLL::CAN_Status(STW_CAN_STATUS & orc_Status)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_DLL_Info(STW_CAN_DLL_INFO & orc_Info)
 {
@@ -444,7 +444,7 @@ sint32 C_CAN_DLL::CAN_DLL_Info(STW_CAN_DLL_INFO & orc_Info)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CAN_Init_One_ID(const sint32 os32_BitrateKBitS, const uint32 ou32_ID)
 {
@@ -460,7 +460,7 @@ sint32 C_CAN_DLL::CAN_Init_One_ID(const sint32 os32_BitrateKBitS, const uint32 o
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Init(const uint8 ou8_Channel)
 {
@@ -476,7 +476,7 @@ sint32 C_CAN_DLL::CANext_Init(const uint8 ou8_Channel)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Exit(const uint8 ou8_Channel)
 {
@@ -492,7 +492,7 @@ sint32 C_CAN_DLL::CANext_Exit(const uint8 ou8_Channel)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Bitrate(const uint8 ou8_Channel, const sint32 os32_BitrateKBitS)
 {
@@ -508,7 +508,7 @@ sint32 C_CAN_DLL::CANext_Bitrate(const uint8 ou8_Channel, const sint32 os32_Bitr
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Read_Msg(const uint8 ou8_Channel, T_STWCAN_Msg_RX & orc_Message)
 {
@@ -524,7 +524,7 @@ sint32 C_CAN_DLL::CANext_Read_Msg(const uint8 ou8_Channel, T_STWCAN_Msg_RX & orc
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Send_Msg(const uint8 ou8_Channel, const T_STWCAN_Msg_TX & orc_Message)
 {
@@ -540,7 +540,7 @@ sint32 C_CAN_DLL::CANext_Send_Msg(const uint8 ou8_Channel, const T_STWCAN_Msg_TX
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_InterfaceSetup(const uint8 ou8_Channel)
 {
@@ -556,7 +556,7 @@ sint32 C_CAN_DLL::CANext_InterfaceSetup(const uint8 ou8_Channel)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Status(const uint8 ou8_Channel, T_STWCAN_Status & orc_Status)
 {
@@ -572,7 +572,7 @@ sint32 C_CAN_DLL::CANext_Status(const uint8 ou8_Channel, T_STWCAN_Status & orc_S
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Init_One_ID(const uint8 ou8_Channel, const sint32 os32_BitrateKBitS, const uint32 ou32_ID)
 {
@@ -588,7 +588,7 @@ sint32 C_CAN_DLL::CANext_Init_One_ID(const uint8 ou8_Channel, const sint32 os32_
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_DLL_Info(const uint8 ou8_Channel, T_STWCAN_DLLInfo & orc_Info)
 {
@@ -604,7 +604,7 @@ sint32 C_CAN_DLL::CANext_DLL_Info(const uint8 ou8_Channel, T_STWCAN_DLLInfo & or
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Get_Num_Channels(void)
 {
@@ -620,7 +620,7 @@ sint32 C_CAN_DLL::CANext_Get_Num_Channels(void)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Get_System_Time(uint64 & oru64_SystemTimeUs)
 {
@@ -636,7 +636,7 @@ sint32 C_CAN_DLL::CANext_Get_System_Time(uint64 & oru64_SystemTimeUs)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANTAPI_Connect(const uint8 * const opu8_Number, const uint32 ou32_TimeOut)
 {
@@ -652,7 +652,7 @@ sint32 C_CAN_DLL::CANTAPI_Connect(const uint8 * const opu8_Number, const uint32 
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANTAPI_Disconnect(const uint32 ou32_TimeOut)
 {
@@ -668,7 +668,7 @@ sint32 C_CAN_DLL::CANTAPI_Disconnect(const uint32 ou32_TimeOut)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::SER_Get_TX_Buf_Count(uint32 & oru32_NumBytes, uint32 & oru32_MaxBufSize)
 {
@@ -684,7 +684,7 @@ sint32 C_CAN_DLL::SER_Get_TX_Buf_Count(uint32 & oru32_NumBytes, uint32 & oru32_M
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::SER_Get_RX_Buf_Count(uint32 & oru32_NumBytes, uint32 & oru32_MaxBufSize)
 {
@@ -700,7 +700,7 @@ sint32 C_CAN_DLL::SER_Get_RX_Buf_Count(uint32 & oru32_NumBytes, uint32 & oru32_M
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::SER_Send_Bytes(const uint8 * const opu8_Data, const uint32 ou32_NumBytes)
 {
@@ -716,7 +716,7 @@ sint32 C_CAN_DLL::SER_Send_Bytes(const uint8 * const opu8_Data, const uint32 ou3
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::SER_Read_Bytes(uint8 * const opu8_Data, uint32 & oru32_NumBytes)
 {
@@ -732,7 +732,7 @@ sint32 C_CAN_DLL::SER_Read_Bytes(uint8 * const opu8_Data, uint32 & oru32_NumByte
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Get_Num_Supported_Bitrates(uint32 & oru32_MultiplicationFactor)
 {
@@ -748,7 +748,7 @@ sint32 C_CAN_DLL::CANext_Get_Num_Supported_Bitrates(uint32 & oru32_Multiplicatio
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANext_Get_Supported_Bitrate(const uint16 ou16_BitrateIndex, uint32 & oru32_Bitrate)
 {
@@ -764,7 +764,7 @@ sint32 C_CAN_DLL::CANext_Get_Supported_Bitrate(const uint16 ou16_BitrateIndex, u
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANtcp_Read_Device_List_From_Server(const uint8 ou8_Channel, uint32 & oru32_NoOfDevices,
                                                       uint32 & oru32_MaxLen)
@@ -781,7 +781,7 @@ sint32 C_CAN_DLL::CANtcp_Read_Device_List_From_Server(const uint8 ou8_Channel, u
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN_DLL::CANtcp_Get_Device_Name(const uint8 ou8_Channel, const uint32 ou32_Index,
                                          charn * const opcn_DeviceName)
@@ -798,7 +798,7 @@ sint32 C_CAN_DLL::CANtcp_Get_Device_Name(const uint8 ou8_Channel, const uint32 o
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CAN_DLL::STWCANMSG_to_CANMSGRX(T_STWCAN_Msg_RX & orc_Target, const STW_CAN_MSG & orc_Source)
 {
@@ -811,7 +811,7 @@ void C_CAN_DLL::STWCANMSG_to_CANMSGRX(T_STWCAN_Msg_RX & orc_Target, const STW_CA
    orc_Target.u64_TimeStamp = 0U;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CAN_DLL::STWCANEXTMSG_to_CANMSGRX(T_STWCAN_Msg_RX & orc_Target, const STW_CAN_EXTMSG & orc_Source)
 {
@@ -824,7 +824,7 @@ void C_CAN_DLL::STWCANEXTMSG_to_CANMSGRX(T_STWCAN_Msg_RX & orc_Target, const STW
    orc_Target.u64_TimeStamp = 0U;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CAN_DLL::CANMSGTX_to_STWCANMSG(STW_CAN_MSG & orc_Target, const T_STWCAN_Msg_TX & orc_Source)
 {
@@ -834,7 +834,7 @@ void C_CAN_DLL::CANMSGTX_to_STWCANMSG(STW_CAN_MSG & orc_Target, const T_STWCAN_M
    (void)memcpy(orc_Target.msg, orc_Source.au8_Data, 8U);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CAN_DLL::CANMSGTX_to_STWCANEXTMSG(STW_CAN_EXTMSG & orc_Target, const T_STWCAN_Msg_TX & orc_Source)
 {
@@ -845,4 +845,4 @@ void C_CAN_DLL::CANMSGTX_to_STWCANEXTMSG(STW_CAN_EXTMSG & orc_Target, const T_ST
    (void)memcpy(orc_Target.msg, orc_Source.au8_Data, 8U);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

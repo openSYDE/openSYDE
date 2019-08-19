@@ -663,6 +663,7 @@ void C_SdNdeDataPoolListHeaderWidget::m_UpdateUi(void)
       //Size & address
       if (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM)
       {
+         const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
          const uint32 u32_Usage = this->mpc_Ui->pc_UsageWidget->SetUsage(pc_List->u32_NvMSize,
                                                                          pc_List->GetNumBytesUsed());
          this->mpc_Ui->pc_UsageWidget->update();
@@ -675,7 +676,18 @@ void C_SdNdeDataPoolListHeaderWidget::m_UpdateUi(void)
          //May be used later
          this->mpc_Ui->pc_GroupBoxAddress->setVisible(false);
 
+         //Size max
+         tgl_assert(pc_Device != NULL);
+         if (pc_Device != NULL)
+         {
+            const uint32 u32_Maximum = pc_Device->u32_UserEepromSizeBytes;
+            this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(static_cast<sintn>(u32_Maximum));
+         }
+
+         //Size value
          this->mpc_Ui->pc_SpinBoxSize->setValue(pc_List->u32_NvMSize);
+
+         //User info
          this->mpc_Ui->pc_LabelStartAddress->setText(QString(C_GtGetText::h_GetText("Start address: %1 (%2)")).arg(
                                                         pc_List->u32_NvMStartAddress).arg(pc_Node->
                                                                                           GetListAbsoluteAddress(this->

@@ -49,7 +49,7 @@ C_GiBiConnectableItem::C_GiBiConnectableItem()
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiConnectableItem::TriggerSigChangedGraphic()
 {
-   Q_EMIT this->ChangedGraphic();
+   Q_EMIT this->SigChangedGraphic();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

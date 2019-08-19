@@ -47,20 +47,26 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     orc_IDs                 Affected unique IDs
    \param[in]     orc_RestoredRails       Rails to restore if possible
    \param[in]     orc_NewPos              New position
+   \param[in]     of64_HighestUsedZValue  Highest used Z value
    \param[in,out] opc_Parent              Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoAddSnapshotCommand::C_SyvDaUnoAddSnapshotCommand(QGraphicsScene * const opc_Scene,
-                                                           const C_PuiSvDashboard & orc_InitialSnapshotData,
+                                                           const C_SyvDaDashboardSnapshot & orc_InitialSnapshotData,
                                                            const std::vector<uint64> & orc_IDs,
                                                            const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
                                                                       C_PuiSvReadDataConfiguration> & orc_RestoredRails,
                                                            const QPointF & orc_NewPos,
+                                                           const float64 of64_HighestUsedZValue,
                                                            QUndoCommand * const opc_Parent) :
    C_SyvDaUnoAddBaseCommand(opc_Scene, orc_IDs, "Paste drawing element(s)",
-                            opc_Parent, orc_InitialSnapshotData),
-   mc_NewPos(orc_NewPos)
+                            opc_Parent, orc_InitialSnapshotData)
 {
+   //Handle pos
+   this->SetDataPositionOffset(orc_NewPos);
+   //Handle Z
+   this->SetDataZOffset(of64_HighestUsedZValue);
+   //Handle rails
    for (QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
              C_PuiSvReadDataConfiguration>::const_iterator c_It = orc_RestoredRails.begin();
         c_It != orc_RestoredRails.end(); ++c_It)
@@ -202,7 +208,7 @@ void C_SyvDaUnoAddSnapshotCommand::m_AddNew(void)
          {
             m_RestoreReadRailsOnly();
          }
-         pc_Scene->CopyFromSnapshotToScene(c_InitialData, &(this->mc_NewPos), &c_IDMap);
+         pc_Scene->CopyFromSnapshotToScene(c_InitialData, &c_IDMap);
       }
    }
 }

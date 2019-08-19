@@ -30,8 +30,6 @@ public:
 
    bool q_TornOff; ///< True:  dashboard torn off
    ///< False: dashboard integrated into main window
-   stw_types::sint32 s32_MainWindowTabIndex; ///< Tab index (-1 if invalid)
-   ///< Only valid if not torn off
    QPoint c_TornOffWindowPosition; ///< Torn off window position
    ///< Only valid if torn off
    QSize c_TornOffWindowSize; ///< Torn off window size

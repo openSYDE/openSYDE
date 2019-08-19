@@ -282,14 +282,11 @@ void C_SebUnoBaseManager::DoAlign(const QList<QGraphicsItem *> & orc_Items, cons
 
    \param[in]     orc_SelectedItems All selected items
    \param[in]     orc_Items         All items
-   \param[in]     of64_Diff         Difference to add to all selected items
-   \param[in,out] orf64_ZOrderHigh  Reference to highest z value
-   \param[in,out] orf64_ZOrderLow   Reference to lowest z value
+   \param[in]     oq_BringToFront   Flag if this is the bring to front action (otherwise send to back assumed)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_SelectedItems,
-                                      const QList<QGraphicsItem *> & orc_Items, const float64 of64_Diff,
-                                      float64 & orf64_ZOrderHigh, float64 & orf64_ZOrderLow)
+                                      const QList<QGraphicsItem *> & orc_Items, const bool oq_BringToFront)
 {
    QMap<QGraphicsItem *, float64> c_Changes;
    vector<uint64> c_IDs;
@@ -299,13 +296,10 @@ void C_SebUnoBaseManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_Selecte
 
    Q_UNUSED(orc_Items)
 
-   C_SebUnoZOrderCommand::h_AdaptZOrder(this->mpc_Scene, orc_SelectedItems, of64_Diff,
-                                        orf64_ZOrderHigh,
-                                        orf64_ZOrderLow, c_Changes);
+   C_SebUnoZOrderCommand::h_AdaptZOrder(this->mpc_Scene, orc_Items, orc_SelectedItems, oq_BringToFront, c_Changes);
 
    for (QMap<QGraphicsItem *, float64>::const_iterator c_ItChanges = c_Changes.begin();
-        c_ItChanges != c_Changes.end();
-        ++c_ItChanges)
+        c_ItChanges != c_Changes.end(); ++c_ItChanges)
    {
       c_List.push_back(c_ItChanges.key());
       c_Values.push_back(c_ItChanges.value());

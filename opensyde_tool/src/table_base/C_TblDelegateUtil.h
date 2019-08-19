@@ -45,6 +45,11 @@ public:
 
 private:
    C_TblDelegateUtil(void);
+   static stw_types::sint32 mh_GetSegmentWidth(const QPoint & orc_TopLeft, const QRect & orc_CompleteCell,
+                                               QString & orc_DrawnText, const QFont & orc_Font,
+                                               const stw_types::sint32 os32_CellWidth,
+                                               const stw_types::sint32 os32_MarginFront,
+                                               const stw_types::sint32 os32_MarginBack, bool & orq_Changed);
    static QStringList mhc_CreateAndStandardizeStringList(const QString & orc_Input, bool & orq_IsHex);
    static QColor mh_GetColorTransparent(const QColor & orc_ColorBase, const stw_types::charn ocn_Transparency);
 };

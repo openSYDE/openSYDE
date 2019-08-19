@@ -655,7 +655,7 @@ void C_GiNode::GenerateHint(void)
                                  //Bus + Node Id Info
                                  if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
                                  {
-                                    c_BusName.append(QString(" (Node ID: %1, Bitrate: %2 kBit/s);").
+                                    c_BusName.append(QString(" (Node ID: %1, Bitrate: %2 kbit/s);").
                                                      arg(QString::number(rc_Conn.u8_NodeID),
                                                          QString::number(pc_Bus->u64_BitRate / 1000ULL)));
                                  }
@@ -958,7 +958,13 @@ bool C_GiNode::m_UpdateError(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiNode::m_GetErrorStatus(void) const
 {
-   return this->mpc_ConflictIcon->isVisible();
+   bool q_Retval = true;
+
+   if (this->mpc_ConflictIcon != NULL)
+   {
+      q_Retval = this->mpc_ConflictIcon->isVisible();
+   }
+   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1086,6 +1092,18 @@ void C_GiNode::SetDrawWhiteFilter(const bool oq_Active)
    this->mpc_Boundary->SetDrawWhiteFilter(oq_Active);
 
    this->CheckNodeForChanges();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiNode::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiRectBaseGroup::SetZValueCustom(of64_ZValue);
+   Q_EMIT this->SigChangedZOrder();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

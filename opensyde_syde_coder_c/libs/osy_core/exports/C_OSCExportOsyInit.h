@@ -11,7 +11,7 @@
 #ifndef C_OSCEXPORTOSYINITH
 #define C_OSCEXPORTOSYINITH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 
 #include "stwtypes.h"
@@ -19,12 +19,12 @@
 #include "CSCLStringList.h"
 #include "C_OSCNode.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 ///Code exporter for server side DPD and DPH init structures
 class C_OSCExportOsyInit
 {
@@ -33,7 +33,8 @@ public:
    virtual ~C_OSCExportOsyInit(void);
 
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_FilePath, const C_OSCNode & orc_Node,
-                                               const bool oq_RunsDpd, const stw_types::uint16 ou16_ApplicationIndex);
+                                               const bool oq_RunsDpd, const stw_types::uint16 ou16_ApplicationIndex,
+                                               const stw_scl::C_SCLString & orc_ExportToolInfo = "");
 
 private:
    static bool mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSettings & orc_Settings);
@@ -41,7 +42,7 @@ private:
    static stw_types::uint32 mh_GetSizeOfLargestDataPoolElement(const std::vector<C_OSCNodeDataPool> & orc_DataPools);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

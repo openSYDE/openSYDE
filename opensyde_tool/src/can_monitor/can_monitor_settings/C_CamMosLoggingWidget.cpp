@@ -128,6 +128,7 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
 
    // initialize button
    this->mpc_Ui->pc_PubBrowse->setText("");
+   this->mpc_Ui->pc_PubVariables->setText("");
 
    // connections
    connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigExpandSection,
@@ -136,10 +137,9 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
            &C_CamMosLoggingWidget::m_OnToggled);
    connect(C_CamProHandler::h_GetInstance(), &C_CamProHandler::SigNewConfiguration,
            this, &C_CamMosLoggingWidget::m_LoadConfig);
-   connect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeDarkBrowse::editingFinished,
+   connect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeFilePath::editingFinished,
            this, &C_CamMosLoggingWidget::m_OnFolderEdited);
-   connect(this->mpc_Ui->pc_LeFile, &C_CamOgeLeDarkBrowse::editingFinished,
-           this, &C_CamMosLoggingWidget::m_OnFileNameEdited);
+   connect(this->mpc_Ui->pc_LeFile, &C_OgeLeDark::editingFinished, this, &C_CamMosLoggingWidget::m_OnFileNameEdited);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_CbxOverwrite, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
            this, &C_CamMosLoggingWidget::m_OnOverwriteModeSelected);
@@ -147,6 +147,8 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_CbxFormat, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
            this, &C_CamMosLoggingWidget::m_OnFormatSelected);
    connect(this->mpc_Ui->pc_PubBrowse, &C_CamOgePubDarkBrowse::clicked, this, &C_CamMosLoggingWidget::m_OnBrowse);
+   connect(this->mpc_Ui->pc_PubVariables, &C_CamOgePubPathVariables::SigVariableSelected,
+           this, &C_CamMosLoggingWidget::m_InsertPathVar);
 
    //lint -e{429}  no memory leak because of the parent of pc_Completer & pc_ItemDelegate and the Qt memory management
 }
@@ -243,13 +245,12 @@ void C_CamMosLoggingWidget::m_LoadConfig(void) const
    {
       QString c_DefaultDir = "./CANlogs";
       C_CamProHandler::h_GetInstance()->SetLoggingDirectory(c_DefaultDir);
-      this->mpc_Ui->pc_LeFolder->SetPath(c_DefaultDir);
-      this->mpc_Ui->pc_LeFolder->SetToolTipInformation("", C_CamUti::h_GetAbsPathFromProj(c_DefaultDir));
+      this->mpc_Ui->pc_LeFolder->SetPath(c_DefaultDir, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
    }
    else
    {
-      this->mpc_Ui->pc_LeFolder->SetPath(c_LoggingData.c_Directory);
-      this->mpc_Ui->pc_LeFolder->SetToolTipInformation("", C_CamUti::h_GetAbsPathFromProj(c_LoggingData.c_Directory));
+      this->mpc_Ui->pc_LeFolder->SetPath(c_LoggingData.c_Directory,
+                                         C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
    }
 
    // remaining values
@@ -298,9 +299,6 @@ void C_CamMosLoggingWidget::m_OnFolderEdited(void) const
 
    // update data handling
    C_CamProHandler::h_GetInstance()->SetLoggingDirectory(c_Path);
-
-   // update tool tip
-   this->mpc_Ui->pc_LeFolder->SetToolTipInformation("", C_CamUti::h_GetAbsPathFromProj(c_Path));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -348,7 +346,8 @@ void C_CamMosLoggingWidget::m_OnFormatSelected(const sint32 os32_Index) const
 void C_CamMosLoggingWidget::m_OnBrowse(void)
 {
    QString c_Path;
-   QString c_Folder = C_CamUti::h_GetAbsPathFromProj(C_CamProHandler::h_GetInstance()->GetLoggingData().c_Directory);
+   QString c_Folder =
+      C_CamUti::h_GetResolvedAbsolutePathFromProj(C_CamProHandler::h_GetInstance()->GetLoggingData().c_Directory);
 
    if (c_Folder == "")
    {
@@ -369,9 +368,21 @@ void C_CamMosLoggingWidget::m_OnBrowse(void)
    {
       c_Path =
          C_CamUti::h_AskUserToSaveRelativePath(this, c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
-      this->mpc_Ui->pc_LeFolder->SetPath(c_Path);
+      this->mpc_Ui->pc_LeFolder->SetPath(c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
       m_OnFolderEdited();
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Insert selected path variable in log directory path string.
+
+   \param[in]       orc_Variable     path variable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosLoggingWidget::m_InsertPathVar(const QString & orc_Variable) const
+{
+   this->mpc_Ui->pc_LeFolder->InsertVariable(orc_Variable);
+   this->m_OnFolderEdited();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -410,7 +421,8 @@ void C_CamMosLoggingWidget::m_CheckAndStartLogging()
    bool q_Continue = true;
 
    // glue together file path
-   QString c_FilePath = C_CamUti::h_GetAbsPathFromProj(c_LoggingData.c_Directory) + "/" + c_LoggingData.c_FileName;
+   QString c_FilePath =
+      C_CamUti::h_GetResolvedAbsolutePathFromProj(c_LoggingData.c_Directory) + "/" + c_LoggingData.c_FileName;
 
    // eventually add timestamp
    if (c_LoggingData.e_OverwriteMode == C_CamProLoggingData::eADD_TIMESTAMP)

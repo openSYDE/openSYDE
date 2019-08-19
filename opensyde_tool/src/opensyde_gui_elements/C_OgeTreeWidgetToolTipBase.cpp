@@ -15,7 +15,6 @@
 #include <QEvent>
 #include <QHelpEvent>
 #include <QHeaderView>
-#include "constants.h"
 #include "C_OgeTreeWidgetToolTipBase.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */

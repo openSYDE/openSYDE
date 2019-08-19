@@ -157,7 +157,7 @@ void C_SdNdeDbWidget::InitStaticNames(void) const
                                                         "Symbolic Data Block name. Unique within node\n"
                                                         "\nFollowing C naming conventions are required:"
                                                         "\n - must not be empty"
-                                                        "\n - only alphanumeric characters + \"_\""
+                                                        "\n - only alphanumeric characters and \"_\""
                                                         "\n - should not be longer than 31 characters"));
    this->mpc_Ui->pc_LabelType->SetToolTipInformation(C_GtGetText::h_GetText("Type"),
                                                      C_GtGetText::h_GetText("Type of Data Block."));

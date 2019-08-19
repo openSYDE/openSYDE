@@ -14,7 +14,9 @@
 
 #include <limits>
 #include <QFileInfo>
+
 #include "C_Uti.h"
+#include "C_PuiUtil.h"
 #include "stwtypes.h"
 #include "C_PuiSvPc.h"
 #include "CSCLChecksums.h"
@@ -187,7 +189,7 @@ QString C_PuiSvPc::GetCustomCANDllPath() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the absolute CAN DLL path
+/*! \brief   Returns the absolute CAN DLL path or empty string if the path is empty
 
    \return
    Absolute CAN DLL path
@@ -195,19 +197,14 @@ QString C_PuiSvPc::GetCustomCANDllPath() const
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvPc::GetCANDllAbsolute(void) const
 {
-   QString c_Retval = this->GetCANDll();
+   QString c_Return = this->GetCANDll();
 
-   if (c_Retval.compare("") != 0)
+   if (this->GetCANDll().isEmpty() == false)
    {
-      const QFileInfo c_Info(c_Retval);
-
-      if (c_Info.isRelative() == true)
-      {
-         c_Retval = C_Uti::h_GetExePath() + '\\' + c_Retval;
-      }
+      // resolve variables and make absolute if it is relative
+      c_Return = C_PuiUtil::h_GetResolvedAbsPathFromExe(this->GetCANDll());
    }
-
-   return c_Retval;
+   return c_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

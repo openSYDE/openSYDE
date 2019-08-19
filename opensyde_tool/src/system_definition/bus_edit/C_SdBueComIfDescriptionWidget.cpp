@@ -150,6 +150,8 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
    // MLV actions
    connect(this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SigAddSignal, this,
            &C_SdBueComIfDescriptionWidget::AddSignal);
+   connect(this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SigAddSignalMultiplexed, this,
+           &C_SdBueComIfDescriptionWidget::AddSignalMultiplexed);
    connect(this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SigCopySignal, this,
            &C_SdBueComIfDescriptionWidget::CopySignal);
    connect(this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SigCutSignal, this,
@@ -168,38 +170,7 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueComIfDescriptionWidget::~C_SdBueComIfDescriptionWidget(void)
 {
-   if (this->mq_IndexValid == true)
-   {
-      bool q_Continue = false;
-      if (this->mq_ModeSingleNode == false)
-      {
-         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
-         if ((pc_Bus != NULL) && (pc_Bus->e_Type == C_OSCSystemBus::eCAN))
-         {
-            q_Continue = true;
-         }
-      }
-      else
-      {
-         //For node case this is not easy to detect if user ever clicked on comm interface description tab...
-         q_Continue = true;
-      }
-      if (q_Continue == true)
-      {
-         //Store splitter position
-         const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
-
-         if (c_Sizes.size() > 0)
-         {
-            const sintn sn_Size = c_Sizes.at(0);
-            //Avoid saving invalid values
-            if (sn_Size > 0)
-            {
-               C_UsHandler::h_GetInstance()->SetSdBusEditTreeSplitterX(sn_Size);
-            }
-         }
-      }
-   }
+   this->TriggerSaveOfSplitterUserSettings();
    m_SaveMessageUserSettings();
    delete mpc_Ui;
 }
@@ -343,6 +314,8 @@ void C_SdBueComIfDescriptionWidget::Reload(void)
    this->mpc_Ui->pc_MsgSigEditWidget->SetComProtocol(e_Protocol);
 
    //Show messages
+   //Handle button
+   this->mpc_Ui->pc_MessageSelectorWidget->SelectMessagesWithoutSignal();
    m_OnMessagesSelected();
 }
 
@@ -469,6 +442,21 @@ void C_SdBueComIfDescriptionWidget::AddSignal(const C_OSCCanMessageIdentificatio
                                               const uint16 ou16_StartBit) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->AddSignal(orc_MessageId, ou16_StartBit);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new signal
+
+   \param[in] orc_MessageId            Message identification indices
+   \param[in] ou16_StartBit            Start bit for new signal
+   \param[in] ou16_MultiplexValue    Concrete multiplexed value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueComIfDescriptionWidget::AddSignalMultiplexed(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                                         const uint16 ou16_StartBit,
+                                                         const uint16 ou16_MultiplexValue) const
+{
+   this->mpc_Ui->pc_MessageSelectorWidget->AddSignalMultiplexed(orc_MessageId, ou16_StartBit, ou16_MultiplexValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -734,6 +722,46 @@ void C_SdBueComIfDescriptionWidget::TriggerLoadOfSplitterUserSettings(void) cons
    const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdBusEditTreeSplitterX();
 
    this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger save of splitter user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueComIfDescriptionWidget::TriggerSaveOfSplitterUserSettings(void) const
+{
+   if (this->mq_IndexValid == true)
+   {
+      bool q_Continue = false;
+      if (this->mq_ModeSingleNode == false)
+      {
+         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
+         if ((pc_Bus != NULL) && (pc_Bus->e_Type == C_OSCSystemBus::eCAN))
+         {
+            q_Continue = true;
+         }
+      }
+      else
+      {
+         //For node case this is not easy to detect if user ever clicked on comm interface description tab...
+         q_Continue = true;
+      }
+      if (q_Continue == true)
+      {
+         //Store splitter position
+         const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
+
+         if (c_Sizes.size() > 0)
+         {
+            const sintn sn_Size = c_Sizes.at(0);
+            //Avoid saving invalid values
+            if (sn_Size > 0)
+            {
+               C_UsHandler::h_GetInstance()->SetSdBusEditTreeSplitterX(sn_Size);
+            }
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -27,6 +27,7 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiProject.h"
+#include "C_PuiUtil.h"
 #include "C_ImpUtil.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_UsHandler.h"
@@ -1105,7 +1106,10 @@ void C_SyvUpUpdatePackageNodeWidget::dropEvent(QDropEvent * const opc_Event)
             c_FilePathsDatablocks[0] =
                C_ImpUtil::h_AskUserToSaveRelativePath(this, c_FilePathsDatablocks[0], c_Folder);
 
-            this->AdaptFile(c_FilePathsDatablocks[0], pc_App);
+            if (c_FilePathsDatablocks[0] != "")
+            {
+               this->AdaptFile(c_FilePathsDatablocks[0], pc_App);
+            }
          }
          else
          {
@@ -1118,38 +1122,43 @@ void C_SyvUpUpdatePackageNodeWidget::dropEvent(QDropEvent * const opc_Event)
             c_PathsParamAndFile.append(c_FilePathsFileBased);
             // Ask
             c_PathsParamAndFile = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_PathsParamAndFile, c_Folder);
-            // Re-split paths
-            tgl_assert(c_PathsParamAndFile.size() == (c_FilePathsParamsetFiles.size() + c_FilePathsFileBased.size()));
-            c_FilePathsParamsetFiles = c_PathsParamAndFile.mid(0, c_FilePathsParamsetFiles.size());
-            c_FilePathsFileBased = c_PathsParamAndFile.mid(c_FilePathsParamsetFiles.size(), -1);
 
-            if ((pc_App != NULL) &&
-                (c_FilePathsFileBased.size() == 1) &&
-                (c_FilePathsParamsetFiles.size() == 0))
+            if (c_PathsParamAndFile.size() > 0)
             {
-               // Replace one file based entry
-               this->AdaptFile(c_FilePathsFileBased[0], pc_App);
-            }
-            else if ((pc_App != NULL) &&
-                     (c_FilePathsFileBased.size() == 0) &&
-                     (c_FilePathsParamsetFiles.size() == 1))
-            {
-               // Replace one parameter set image entry
-               this->AdaptFile(c_FilePathsParamsetFiles[0], pc_App);
-            }
-            else
-            {
-               sintn sn_FileCounter;
-               // Add all files as new
-               for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsFileBased.size(); ++sn_FileCounter)
+               // Re-split paths
+               tgl_assert(c_PathsParamAndFile.size() ==
+                          (c_FilePathsParamsetFiles.size() + c_FilePathsFileBased.size()));
+               c_FilePathsParamsetFiles = c_PathsParamAndFile.mid(0, c_FilePathsParamsetFiles.size());
+               c_FilePathsFileBased = c_PathsParamAndFile.mid(c_FilePathsParamsetFiles.size(), -1);
+
+               if ((pc_App != NULL) &&
+                   (c_FilePathsFileBased.size() == 1) &&
+                   (c_FilePathsParamsetFiles.size() == 0))
                {
-                  // Add new file. If list does not support adding new files, nothing will happen
-                  this->AddNewFile(c_FilePathsFileBased[sn_FileCounter], false);
+                  // Replace one file based entry
+                  this->AdaptFile(c_FilePathsFileBased[0], pc_App);
                }
-               for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsParamsetFiles.size(); ++sn_FileCounter)
+               else if ((pc_App != NULL) &&
+                        (c_FilePathsFileBased.size() == 0) &&
+                        (c_FilePathsParamsetFiles.size() == 1))
                {
-                  // Add new file. If list does not support adding new files, nothing will happen
-                  this->AddNewFile(c_FilePathsParamsetFiles[sn_FileCounter], true);
+                  // Replace one parameter set image entry
+                  this->AdaptFile(c_FilePathsParamsetFiles[0], pc_App);
+               }
+               else
+               {
+                  sintn sn_FileCounter;
+                  // Add all files as new
+                  for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsFileBased.size(); ++sn_FileCounter)
+                  {
+                     // Add new file. If list does not support adding new files, nothing will happen
+                     this->AddNewFile(c_FilePathsFileBased[sn_FileCounter], false);
+                  }
+                  for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsParamsetFiles.size(); ++sn_FileCounter)
+                  {
+                     // Add new file. If list does not support adding new files, nothing will happen
+                     this->AddNewFile(c_FilePathsParamsetFiles[sn_FileCounter], true);
+                  }
                }
             }
          }
@@ -1356,14 +1365,14 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckFileAlreadyContained(const QString &
    if ((pc_Node != NULL) &&
        (pc_View != NULL))
    {
-      const QString c_AbsoluteFile = C_ImpUtil::h_GetAbsolutePathFromProject(orc_File);
+      const QString c_AbsoluteFile = C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File);
       std::vector<QString> c_Paths;
 
       // compare with existing data block files
       c_Paths = pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex)->GetPaths(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
       for (std::vector<QString>::const_iterator c_It = c_Paths.begin(); c_It != c_Paths.end(); ++c_It)
       {
-         if (c_AbsoluteFile == C_ImpUtil::h_GetAbsolutePathFromProject(*c_It))
+         if (c_AbsoluteFile == C_PuiUtil::h_GetResolvedAbsPathFromProject(*c_It))
          {
             q_Retval = true;
             break;
@@ -1377,7 +1386,7 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckFileAlreadyContained(const QString &
             pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex)->GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED);
          for (std::vector<QString>::const_iterator c_It = c_Paths.begin(); c_It != c_Paths.end(); ++c_It)
          {
-            if (c_AbsoluteFile == C_ImpUtil::h_GetAbsolutePathFromProject(*c_It))
+            if (c_AbsoluteFile == C_PuiUtil::h_GetAbsolutePathFromProject(*c_It)) // variables resolve not necessary
             {
                q_Retval = true;
                break;
@@ -1393,7 +1402,7 @@ bool C_SyvUpUpdatePackageNodeWidget::m_CheckFileAlreadyContained(const QString &
       c_Message.SetHeading(C_GtGetText::h_GetText("Add file"));
       c_Message.SetDescription(QString(C_GtGetText::h_GetText("The file %1 is already contained in the Update Package "
                                                               "for this node and therefore not added again.")).
-                               arg(C_ImpUtil::h_GetAbsolutePathFromProject(orc_File)));
+                               arg(C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File)));
       c_Message.Execute();
    }
 

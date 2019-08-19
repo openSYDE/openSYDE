@@ -90,7 +90,7 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
    \param[in]     ou32_FilterId           Filter id for all relevant IDs
                                           The MSB is the flag for 11 Bit (= 0) or 29 Bit (= 1)
                                           Bits 29 and 30 are reserved (shall be set to zero)
-   \param[in]     ou32_FilterMask         Mask that is applied to both the received CAN frame identifiers an the
+   \param[in]     ou32_FilterMask         Mask that is applied to both the received CAN frame identifiers and the
                                           FilterId before comparison.
                                           Bits 29, 30 and 31 are reserved (shall be set to zero)
 */

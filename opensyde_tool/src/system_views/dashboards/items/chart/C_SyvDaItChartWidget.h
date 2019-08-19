@@ -107,6 +107,15 @@ private:
    stw_types::float64 mf64_MaxTime;
    stw_types::float64 mf64_MaxValue;
    stw_types::float64 mf64_MinValue;
+   bool mq_ValueZoomed;
+   stw_types::float64 mf64_ZoomFactor;
+   stw_types::float64 mf64_ScrollOffsetX;
+   stw_types::float64 mf64_ScrollOffsetY;
+   stw_types::float64 mf64_MaxValueZoomed;
+   stw_types::float64 mf64_MinValueZoomed;
+   stw_types::float64 mf64_ReferenceMaxValueZoomed;
+   stw_types::float64 mf64_ReferenceMinValueZoomed;
+   stw_types::float64 mf64_ReferenceRangeZoomed;
    stw_types::uint32 mu32_TimeStampOfStart;
    const stw_types::float64 mf64_DefaultTimeSlot;
    stw_types::float64 mf64_CurrentTimeSlot;
@@ -130,6 +139,10 @@ private:
    QColor m_GetColor(void);
    void m_DataItemToggled(const stw_types::uint32 ou32_DataPoolElementConfigIndex, const bool oq_Checked);
    void m_DataItemSelected(const stw_types::uint32 ou32_DataPoolElementConfigIndex);
+   void m_SettingZoomModeChanged(const stw_opensyde_gui_logic::C_PuiSvDbChart::E_SettingZoomMode oe_SettingZoomMode);
+   void m_YZoomed(const stw_types::float64 of64_Factor);
+   void m_Scrolled(const stw_types::float64 of64_X, const stw_types::float64 of64_Y);
+   void m_ZoomReseted(void);
 
    //Avoid call
    C_SyvDaItChartWidget(const C_SyvDaItChartWidget &);

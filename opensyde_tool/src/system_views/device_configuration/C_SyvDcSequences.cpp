@@ -436,7 +436,7 @@ sint32 C_SyvDcSequences::FillDeviceConfig(C_SyvDcDeviceConfiguation & orc_Config
 
    Concrete implementation is in function m_RunScanCanEnterFlashloader
 
-   \param[in]     ou32_UsedBitrate   Bitrate in kBit/s of the previous configuration of the devices
+   \param[in]     ou32_UsedBitrate   Bitrate in kbit/s of the previous configuration of the devices
 
    \return
    C_NO_ERR   started sequence
@@ -915,7 +915,7 @@ sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(const bool oq_ToFlashloader) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the new CAN bitrate
 
-   \param[in] ou32_Bitrate      Bitrate in kBit/s
+   \param[in] ou32_Bitrate      Bitrate in kbit/s
 
    \return
    C_NO_ERR    Bitrate set

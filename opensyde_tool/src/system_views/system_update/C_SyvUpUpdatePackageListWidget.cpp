@@ -21,6 +21,7 @@
 #include "C_SyvUpUpdatePackageListWidget.h"
 
 #include "TGLUtils.h"
+#include "C_Uti.h"
 #include "C_OgeWiUtil.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSdHandler.h"
@@ -1358,15 +1359,15 @@ void C_SyvUpUpdatePackageListWidget::m_AddNewFile(const QString & orc_DialogCapt
 
    if (this->mpc_SelectedNode != NULL)
    {
-      const QString c_ProjectPath = C_PuiProject::h_GetInstance()->GetFolderPath();
       const QString c_Folder = this->m_GetDialogPath();
       QStringList c_Files = QFileDialog::getOpenFileNames(this, orc_DialogCaption, c_Folder, orc_DialogFilter);
 
       if (c_Files.isEmpty() == false)
       {
          // check if relative path is possible and appreciated
-         c_Files = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Files, c_ProjectPath);
-         tgl_assert(c_Files.isEmpty() == false);
+         c_Files =
+            C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Files, C_PuiProject::h_GetInstance()->GetFolderPath());
+
          if (c_Files.isEmpty() == false)
          {
             for (sint32 s32_Pos = 0; s32_Pos < c_Files.size(); ++s32_Pos)
@@ -1377,9 +1378,10 @@ void C_SyvUpUpdatePackageListWidget::m_AddNewFile(const QString & orc_DialogCapt
                // add file
                this->mpc_SelectedNode->AddNewFile(c_Files[s32_Pos], q_ParamsetFile);
             }
+
+            // remember last path
+            this->mc_LastPath = TGL_ExtractFilePath(c_Files.last().toStdString().c_str()).c_str();
          }
-         // remember last path
-         this->mc_LastPath = TGL_ExtractFilePath(c_Files.last().toStdString().c_str()).c_str();
       }
    }
 
@@ -1397,7 +1399,6 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
    if (this->mpc_SelectedNode != NULL)
    {
       QString c_Filter = "";
-      const QString c_ProjectPath = C_PuiProject::h_GetInstance()->GetFolderPath();
       const QString c_Folder = this->m_GetDialogPath();
       QString c_File = "";
       bool q_HexFile = false;
@@ -1446,10 +1447,14 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
                this->mc_LastPath = TGL_ExtractFilePath(c_File.toStdString().c_str()).c_str();
 
                // check if relative path is possible and appreciated
-               c_File = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_File, c_ProjectPath);
+               c_File = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_File,
+                                                               C_PuiProject::h_GetInstance()->GetFolderPath());
 
-               // adapt file
-               this->m_AdaptFile(c_File);
+               if (c_File != "")
+               {
+                  // adapt file
+                  this->m_AdaptFile(c_File);
+               }
             }
          }
       }
@@ -1660,10 +1665,16 @@ QString C_SyvUpUpdatePackageListWidget::m_GetDialogPath(void)
    {
       c_Folder = this->mc_LastPath;
    }
-   // third favorite: project path (defaults to exe if project is not saved yet)
+   // third favorite: project path
    else
    {
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
+
+      // default to exe if path is empty (i.e. project is not saved yet)
+      if (c_Folder.isEmpty() == true)
+      {
+         c_Folder = C_Uti::h_GetExePath();
+      }
    }
 
    return c_Folder;

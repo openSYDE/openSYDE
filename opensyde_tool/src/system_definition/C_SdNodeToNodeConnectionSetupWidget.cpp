@@ -492,7 +492,7 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
                   if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
                   {
                      c_Text += " (" + QString::number(pc_Bus->u64_BitRate / 1000ULL);
-                     c_Text += " kBit/s)";
+                     c_Text += " kbit/s)";
                   }
 
                   if ((q_ExistingBusRestricted == false) ||

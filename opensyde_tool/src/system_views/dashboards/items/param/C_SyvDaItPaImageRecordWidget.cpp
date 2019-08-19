@@ -108,19 +108,20 @@ C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw_opensyde_gui_elem
 
    //Remove debug text
    this->mpc_Ui->pc_GroupBoxUserComment->setTitle("");
+   this->mpc_Ui->pc_PushButtonBrowse->setText("");
 
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_SyvDaItPaImageRecordWidget::m_OkClicked);
    connect(this->mpc_Ui->pc_BushButtonCancel, &QPushButton::clicked,
            this, &C_SyvDaItPaImageRecordWidget::m_OnCancel);
-   connect(this->mpc_ParentDialog, &C_OgePopUpDialog::SigCloseIgnored, this,
-           &C_SyvDaItPaImageRecordWidget::m_OnCancel);
+   connect(this->mpc_ParentDialog, &C_OgePopUpDialog::SigCloseIgnored,
+           this, &C_SyvDaItPaImageRecordWidget::m_OnCancel);
    connect(this->mpc_Ui->pc_PushButtonBrowse, &QPushButton::clicked, this, &C_SyvDaItPaImageRecordWidget::m_OnBrowse);
    connect(this->mpc_Ui->pc_PbConfirm, &QPushButton::clicked, this, &C_SyvDaItPaImageRecordWidget::m_ConfirmClicked);
 
-   connect(this->mpc_Ui->pc_CbConfirm, &stw_opensyde_gui_elements::C_OgeChxProperties::stateChanged, this,
-           &C_SyvDaItPaImageRecordWidget::m_ConfirmCheckBoxChanged);
-   connect(this->mpc_Ui->pc_LineEditPath, &stw_opensyde_gui_elements::C_OgeLeProperties::textChanged,
+   connect(this->mpc_Ui->pc_CbConfirm, &C_OgeChxProperties::stateChanged,
+           this, &C_SyvDaItPaImageRecordWidget::m_ConfirmCheckBoxChanged);
+   connect(this->mpc_Ui->pc_LineEditPath, &C_OgeLeFilePath::editingFinished,
            this, &C_SyvDaItPaImageRecordWidget::m_FilePathChanged);
 
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_SyvDaItPaImageRecordWidget::m_Timer);
@@ -163,7 +164,6 @@ void C_SyvDaItPaImageRecordWidget::InitText(void)
    this->mpc_Ui->pc_CommentText->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
    this->mpc_Ui->pc_LabelHeadingConfirm->setText(C_GtGetText::h_GetText("Read Parameter Lists"));
    this->mpc_Ui->pc_LineEditPath->setPlaceholderText(C_GtGetText::h_GetText(""));
-   this->mpc_Ui->pc_PushButtonBrowse->setText(C_GtGetText::h_GetText("..."));
    this->mpc_Ui->pc_LabelMultipleNodes->setText(C_GtGetText::h_GetText(
                                                    "Attention: Recording for multiple nodes will result in one file per node."
                                                    " Name format: \"<SelectedPathAndFileName>_<NodeName>.syde_psi\""));
@@ -171,6 +171,10 @@ void C_SyvDaItPaImageRecordWidget::InitText(void)
    this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Read Parameters")));
    this->mpc_Ui->pc_CbConfirm->setText(QString(C_GtGetText::h_GetText(
                                                   "Confirmed, all required parameter lists are included")));
+
+   this->mpc_Ui->pc_PushButtonBrowse->SetToolTipInformation(
+      C_GtGetText::h_GetText("Browse"),
+      C_GtGetText::h_GetText("Browse for location where to save recorded parameter set image file."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -183,7 +187,7 @@ void C_SyvDaItPaImageRecordWidget::SaveUserSettings(void) const
    QString c_Name;
    QString c_Path;
 
-   m_SplitNameAndPath(this->mpc_Ui->pc_LineEditPath->text(), c_Name, c_Path);
+   m_SplitNameAndPath(this->mc_FilePath, c_Name, c_Path);
 
    C_UsHandler::h_GetInstance()->SetProjSvParamRecord(this->mc_ViewName, c_Path, c_Name);
 }
@@ -214,38 +218,19 @@ void C_SyvDaItPaImageRecordWidget::keyPressEvent(QKeyEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_OnBrowse(void)
 {
-   QString c_Folder = m_GetValidPath(this->mpc_Ui->pc_LineEditPath->text());
+   QString c_Folder = C_Uti::h_GetAbsolutePathFromExe(this->mpc_Ui->pc_LineEditPath->GetPath());
 
    const QString c_Path =
-      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Location for Parameter Set Image File"),
+      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select File for Parameter Set Image"),
                                      c_Folder, C_GtGetText::h_GetText(
                                         "openSYDE parameter set image (*") + mhc_FILE_EXTENSION + ")",
                                      "", QFileDialog::DontConfirmOverwrite); // overwrite is handled later
 
    if (c_Path.compare("") != 0)
    {
-      this->mpc_Ui->pc_LineEditPath->setText(c_Path);
+      this->mpc_Ui->pc_LineEditPath->SetPath(c_Path);
+      this->mc_FilePath = C_Uti::h_GetAbsolutePathFromExe(c_Path);
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Replace empty path if necessary
-
-   \param[in] orc_Path Some path
-
-   \return
-   Non empty path
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItPaImageRecordWidget::m_GetValidPath(const QString & orc_Path) const
-{
-   QString c_Retval = orc_Path;
-
-   if (c_Retval.compare("") == 0)
-   {
-      c_Retval = C_Uti::h_GetExePath();
-   }
-   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -271,7 +256,12 @@ void C_SyvDaItPaImageRecordWidget::m_SplitNameAndPath(const QString & orc_FullPa
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_FilePathChanged(void)
 {
-   this->mc_FilePath = this->mpc_Ui->pc_LineEditPath->text();
+   this->mc_FilePath = this->mpc_Ui->pc_LineEditPath->GetPath();
+
+   if (this->mc_FilePath.isEmpty() == false)
+   {
+      this->mc_FilePath = C_Uti::h_GetAbsolutePathFromExe(this->mc_FilePath);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -314,14 +304,14 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                if (((c_File.exists() == true) && (this->mc_AllNodeIndexes.size() == 1UL)) ||
                    (c_ConflictedFiles.size() > 0UL))
                {
-                  QString c_Details;
+                  QString c_Details = C_GtGetText::h_GetText("The following file(s) already exist: \n");
                   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
                   C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
 
                   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File save"));
                   c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                                  "Do you really want to overwrite the existing file(s)?"));
-                  //Append conflicted files as details if necessary
+                  //Append conflicted files as details
                   if (c_ConflictedFiles.size() > 0UL)
                   {
                      for (uint32 u32_ItFile = 0UL; u32_ItFile < c_ConflictedFiles.size(); ++u32_ItFile)
@@ -329,10 +319,16 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                         c_Details += c_ConflictedFiles[u32_ItFile];
                         c_Details += "\n";
                      }
-                     c_MessageBox.SetDetails(c_Details);
                   }
+                  else
+                  {
+                     c_Details += this->mc_FilePath;
+                  }
+                  c_MessageBox.SetDetails(c_Details);
                   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
                   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
+                  c_MessageBox.SetCustomMinHeight(280);
+                  c_MessageBox.SetCustomMinWidth(800);
                   e_ReturnMessageBox = c_MessageBox.Execute();
 
                   switch (e_ReturnMessageBox)
@@ -406,7 +402,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
                c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                      "File name invalid. Only alphanumeric characters + \"_\" are allowed.")));
+                                                      "File name invalid. Only alphanumeric characters and \"_\" are "
+                                                      "allowed.")));
                c_MessageBox.Execute();
             }
          }
@@ -425,7 +422,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
       {
          C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
-         c_MessageBox.SetDescription(C_GtGetText::h_GetText("The specified file path does not exist."));
+         c_MessageBox.SetDescription(C_GtGetText::h_GetText("The specified directory does not exist."));
          c_MessageBox.SetDetails(QString("Invalid path: \"%1\"").arg(this->mc_FilePath));
          c_MessageBox.Execute();
       }
@@ -434,8 +431,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
    {
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                     "The specified file does not exist in the path. Make the specified file available."));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText("The file path is empty. Please enter valid file path."));
       c_MessageBox.Execute();
    }
 }
@@ -1105,10 +1101,8 @@ void C_SyvDaItPaImageRecordWidget::m_LoadUserSettings(void)
       c_Path = c_Path + "/";
    }
 
-   this->mpc_Ui->pc_LineEditPath->setText(c_Path + c_Name);
-
-   //Trigger filepath check
-   m_FilePathChanged();
+   this->mpc_Ui->pc_LineEditPath->SetPath(c_Path + c_Name);
+   this->mc_FilePath = C_Uti::h_GetAbsolutePathFromExe(c_Path + c_Name);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -7,36 +7,36 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 
 #include "C_OSCComLoggerProtocols.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_can;
 using namespace stw_opensyde_core;
 using namespace stw_cmon_protocol;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComLoggerProtocols::C_OSCComLoggerProtocols(void) :
    C_CMONProtocols()
 {
@@ -44,7 +44,7 @@ C_OSCComLoggerProtocols::C_OSCComLoggerProtocols(void) :
    this->mapc_Protocols[CMONL7ProtocolOpenSYDE] = &mc_ProtocolOpenSYDEExtended;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Converts a CAN message to a protocol specific string
 
    If the message does not match the configured protocol, an empty string will be returned.
@@ -56,7 +56,7 @@ C_OSCComLoggerProtocols::C_OSCComLoggerProtocols(void) :
    Protocol specific string of CAN message
    Empty string in case of no matching message to the configured protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCComLoggerProtocols::MessageToStringProtocolOnly(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    C_SCLString c_Text = "";
@@ -69,23 +69,23 @@ C_SCLString C_OSCComLoggerProtocols::MessageToStringProtocolOnly(const T_STWCAN_
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds an openSYDE system definition configuration for analyzing
 
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComLoggerProtocols::AddOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
 {
    this->mc_ProtocolOpenSYDEExtended.AddOsySysDef(opc_SysDefConfig);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Removes an openSYDE system definition configuration
 
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComLoggerProtocols::RemoveOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
 {
    this->mc_ProtocolOpenSYDEExtended.RemoveOsySysDef(opc_SysDefConfig);

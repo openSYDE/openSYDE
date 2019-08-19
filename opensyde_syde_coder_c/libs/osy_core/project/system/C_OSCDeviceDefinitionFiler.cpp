@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -21,28 +21,28 @@
 #include "C_OSCXMLParser.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 const uint16 C_OSCDeviceDefinitionFiler::mhu16_FILE_VERSION = 0x0001U;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeAvailability(const C_OSCXMLParser & orc_Parser,
                                                               bool & orq_ProtocolSupportedCan,
@@ -60,7 +60,7 @@ void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeAvailability(const C_OSCXMLPars
    orq_ProtocolSupportedEthernet = (q_Support && q_Ethernet);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the openSYDE flashloader parameter
 
    The parent "opensyde" in "protocols-flashloader" must be selected
@@ -69,7 +69,7 @@ void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeAvailability(const C_OSCXMLPars
    \param[out]    orc_RequestDownloadTimeout    Parameter for Request Download Timeout
    \param[out]    orc_TransferDataTimeout       Parameter for Transfer Data Timeout
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeFlashloaderParameter(const C_OSCXMLParser & orc_Parser,
                                                                       uint32 & oru32_RequestDownloadTimeout,
                                                                       uint32 & oru32_TransferDataTimeout,
@@ -101,7 +101,7 @@ void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeFlashloaderParameter(const C_OS
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCDeviceDefinitionFiler::mh_ParseSTWFlashloaderAvailability(const C_OSCXMLParser & orc_Parser,
                                                                     bool & orq_ProtocolSupportedCan)
@@ -115,7 +115,7 @@ void C_OSCDeviceDefinitionFiler::mh_ParseSTWFlashloaderAvailability(const C_OSCX
    orq_ProtocolSupportedCan = (q_Support && q_Can);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load device definition
 
    Load data from specified file and place it in device definition instance
@@ -129,7 +129,7 @@ void C_OSCDeviceDefinitionFiler::mh_ParseSTWFlashloaderAvailability(const C_OSCX
    C_NOACT    specified file is invalid (invalid XML file)
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefinition,
                                           const stw_scl::C_SCLString & orc_Path)
 {
@@ -369,6 +369,18 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
             else
             {
                //get sub-node
+               c_Text = c_XML.SelectNodeChild("flashloader-reset-wait-time");
+               if (c_Text != "flashloader-reset-wait-time")
+               {
+                  //Optional: Use default values
+               }
+               else
+               {
+                  orc_DeviceDefinition.u32_FlashloaderResetWaitTime = c_XML.GetAttributeUint32("value");
+                  c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                  tgl_assert(c_Text == "protocols-flashloader");
+               }
+               //get sub-node
                c_Text = c_XML.SelectNodeChild("stw-flashloader");
                if (c_Text != "stw-flashloader")
                {
@@ -432,7 +444,7 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save device definition
 
    Save device definition data into specified file.
@@ -446,7 +458,7 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
    C_RD_WR    could not erase pre-existing file before saving
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDeviceDefinitionFiler::h_Save(const C_OSCDeviceDefinition & orc_DeviceDefinition,
                                           const C_SCLString & orc_Path)
 {
@@ -503,6 +515,9 @@ sint32 C_OSCDeviceDefinitionFiler::h_Save(const C_OSCDeviceDefinition & orc_Devi
       c_XML.SelectNodeParent();
 
       c_XML.CreateAndSelectNodeChild("protocols-flashloader");
+      c_XML.CreateAndSelectNodeChild("flashloader-reset-wait-time");
+      c_XML.SetAttributeUint32("value", orc_DeviceDefinition.u32_FlashloaderResetWaitTime);
+      c_XML.SelectNodeParent();
       c_XML.CreateAndSelectNodeChild("stw-flashloader");
       c_XML.SetAttributeBool("support", orc_DeviceDefinition.q_FlashloaderStwCan);
       c_XML.SetAttributeBool("can", orc_DeviceDefinition.q_FlashloaderStwCan);

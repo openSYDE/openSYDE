@@ -136,6 +136,8 @@ C_SdBueMlvGraphicsScene::C_SdBueMlvGraphicsScene(QObject * const opc_Parent) :
    mpc_MessageSyncManager(NULL),
    me_Protocol(C_OSCCanProtocol::eLAYER2),
    mc_MessageId(),
+   mq_MultiplexedMessage(false),
+   mu16_MultiplexerValue(0),
    mu16_MaximumCountBits(64U),
    mf64_SingleItemWidth(50.0),
    mf64_SingleItemHeight(50.0),
@@ -146,11 +148,8 @@ C_SdBueMlvGraphicsScene::C_SdBueMlvGraphicsScene(QObject * const opc_Parent) :
    ms32_LastGridIndex(-1),
    mq_SignalChanged(false)
 {
-   //Init?
-   for (uint32 u32_ItFree = 0UL; u32_ItFree < 64; ++u32_ItFree)
-   {
-      this->maq_SingalsColorsUsed[u32_ItFree] = false;
-   }
+   //Init
+   this->m_PrepareNextColorSection();
 
    this->m_InitBorderItems();
    this->m_InitEmptyItems();
@@ -202,10 +201,13 @@ void C_SdBueMlvGraphicsScene::SetComProtocol(const stw_opensyde_core::C_OSCCanPr
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the actual message to work with
 
-   \param[in]  orc_MessageId   Message identification indices
+   \param[in]  orc_MessageId           Message identification indices
+   \param[in]  oq_MultiplexedMessage   Flag if CAN message has multiplexer signal with at least one multiplexed signal
+   \param[in]  ou16_MultiplexValue     Value of the multiplexer signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                         const bool oq_MultiplexedMessage, const uint16 ou16_MultiplexValue)
 {
    const C_OSCCanMessage * const pc_Message =
       stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
@@ -218,6 +220,11 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
 
       // save the identification information
       this->mc_MessageId = orc_MessageId;
+      this->mq_MultiplexedMessage = oq_MultiplexedMessage;
+      this->mu16_MultiplexerValue = ou16_MultiplexValue;
+
+      this->mpc_AddMultiplexed->setVisible(this->mq_MultiplexedMessage);
+
       if (this->me_Protocol == C_OSCCanProtocol::eECES)
       {
          // special case DLC is always 8, but byte 7 and byte 8 are reserved for message counter and CRC
@@ -269,11 +276,41 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
       // add the signals
       for (u32_Counter = 0; u32_Counter < pc_Message->c_Signals.size(); ++u32_Counter)
       {
-         this->m_AddSignal(u32_Counter);
+         const C_OSCCanSignal & rc_Sig = pc_Message->c_Signals[u32_Counter];
+
+         if (this->mq_MultiplexedMessage == false)
+         {
+            if (rc_Sig.e_MultiplexerType != C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+            {
+               // No multiplexing active, add all signals except invalid multiplexed signals
+               this->m_AddSignal(u32_Counter);
+            }
+         }
+         else
+         {
+            // Multiplexed message. Add always the non multiplexed signals, the multiplexer signal and the
+            // multiplexed signal which has the same multiplexer value as the selected value
+            if ((rc_Sig.e_MultiplexerType != C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) ||
+                (rc_Sig.u16_MultiplexValue == this->mu16_MultiplexerValue))
+            {
+               this->m_AddSignal(u32_Counter);
+            }
+         }
       }
 
       this->m_UpdateSignalManager();
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual multiplex value to work with
+
+   \param[in]  ou16_MultiplexValue     Value of the multiplexer signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMlvGraphicsScene::SetMultiplexValue(const uint16 ou16_MultiplexValue)
+{
+   this->SetMessage(this->mc_MessageId, this->mq_MultiplexedMessage, ou16_MultiplexValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -396,11 +433,11 @@ void C_SdBueMlvGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent * const o
       if ((this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZELEFT_INTEL) ||
           (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZERIGHT_INTEL))
       {
-         Q_EMIT this->SigChangeCursor(Qt::SizeHorCursor);
+         Q_EMIT (this->SigChangeCursor(Qt::SizeHorCursor));
       }
       else if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_MOVE)
       {
-         Q_EMIT this->SigChangeCursor(Qt::SizeAllCursor);
+         Q_EMIT (this->SigChangeCursor(Qt::SizeAllCursor));
       }
       else
       {
@@ -588,13 +625,13 @@ void C_SdBueMlvGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const
    {
       // signal was changed. save the changes and send the information about the change
       this->mpc_ActualSignal->SaveSignal();
-      Q_EMIT this->SigMessageUpdated();
+      Q_EMIT (this->SigMessageUpdated());
       this->mq_SignalChanged = false;
    }
 
    if (this->mpc_ActualSignal != NULL)
    {
-      Q_EMIT this->SigSignalActivated(this->mpc_ActualSignal->GetSignalIndex());
+      Q_EMIT (this->SigSignalActivated(this->mpc_ActualSignal->GetSignalIndex()));
    }
 
    // reset the configuration
@@ -602,7 +639,7 @@ void C_SdBueMlvGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const
    this->me_InteractionMode = C_SdBueMlvSignalManager::eIAM_NONE;
    this->ms32_LastGridIndex = -1;
 
-   Q_EMIT this->SigChangeCursor(Qt::ArrowCursor);
+   Q_EMIT (this->SigChangeCursor(Qt::ArrowCursor));
 
    QGraphicsScene::mouseReleaseEvent(opc_Event);
 }
@@ -740,7 +777,7 @@ void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
    connect(pc_Item, &C_SdBueMlvSignalManager::SigChangeCursor, this, &C_SdBueMlvGraphicsScene::m_ChangeCursor);
    connect(pc_Item, &C_SdBueMlvSignalManager::SigHideToolTip, this, &C_SdBueMlvGraphicsScene::m_HandleHideToolTip);
 
-   // set the informations only when the signals are connected
+   // set the information only when the signals are connected
    pc_Item->LoadSignal(ou32_SignalIndex, c_ColorConfig);
 
    if (pc_SignalUiItem != NULL)
@@ -755,6 +792,11 @@ void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
    this->m_AddSignalToGridMapping(pc_Item);
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes a signal
+
+   \param[in]     ou32_SignalIndex    Index of the signal
+*/
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_RemoveSignal(const uint32 ou32_SignalIndex)
 {
@@ -774,7 +816,7 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignal(const uint32 ou32_SignalIndex)
          this->mc_VecSignals.erase(pc_ItItem);
 
          // remove the color
-         this->m_SetColorsUsed(pc_Item->GetColorConfiguration(), false);
+         this->m_SetColorsUnused(pc_Item->GetColorConfiguration());
 
          // update the mapping
          this->m_RemoveSignalFromGridMapping(pc_Item);
@@ -1060,49 +1102,86 @@ void C_SdBueMlvGraphicsScene::m_RemoveItemSlot(C_SdBueMlvSignalItem * const opc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get a not already used random color
+
+   There are 64 different colors. The colors will be selected by a random number. If all 64 colors are already used,
+   a new section with the same 64 colors are used, which will be selected randomly again.
+
+   New sections will be generated as long as necessary. No limitations.
+
+   \return
+   Found random signal color item
+*/
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNotUsedColors(void)
 {
    sintn sn_ColorCounter;
    uint32 u32_ItFree;
+   uint32 u32_SectionNumber;
+   bool q_FreeColorFound = false;
+   bool q_RandomColorFound = false;
 
    C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig;
 
    srand(time(NULL));
 
-   for (u32_ItFree = 0UL; u32_ItFree < 64; ++u32_ItFree)
+   // Check for a free color in the already existing sections
+   // Use the oldest section, if a free color is available
+   for (u32_SectionNumber = 0U; u32_SectionNumber < this->mc_SignalsColorsUsed.size(); ++u32_SectionNumber)
    {
-      if (this->maq_SingalsColorsUsed[u32_ItFree] == false)
+      for (u32_ItFree = 0UL; u32_ItFree < 64U; ++u32_ItFree)
+      {
+         if (this->mc_SignalsColorsUsed[u32_SectionNumber][u32_ItFree] == false)
+         {
+            q_FreeColorFound = true;
+            break;
+         }
+      }
+
+      if (q_FreeColorFound == true)
       {
          break;
       }
    }
-   //Don't start searching if there are no more free colors
-   tgl_assert(u32_ItFree < 64);
-   if (u32_ItFree < 64)
+
+   if (q_FreeColorFound == false)
    {
-      bool q_ColorFound = false;
-      // search a not used color with a random number
-      do
-      {
-         sn_ColorCounter = rand() % 64;
-         if (u32_ItFree == 64)
-         {
-            break;
-         }
-         if (this->maq_SingalsColorsUsed[sn_ColorCounter] == false)
-         {
-            c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SignalsColors[sn_ColorCounter];
-            // set the color variant as used
-            this->maq_SingalsColorsUsed[sn_ColorCounter] = true;
-            q_ColorFound = true;
-         }
-      }
-      while (q_ColorFound == false);
+      // No free colors in any section. Create a new one.
+      this->m_PrepareNextColorSection();
+
+      // u32_SectionNumber must be match with new added section
+      tgl_assert(u32_SectionNumber < this->mc_SignalsColorsUsed.size());
    }
+
+   // search a not used color with a random number in a section with at least one free entry
+   do
+   {
+      sn_ColorCounter = rand() % 64;
+
+      if (this->mc_SignalsColorsUsed[u32_SectionNumber][sn_ColorCounter] == false)
+      {
+         c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SignalsColors[sn_ColorCounter];
+         // set the color variant as used
+         this->mc_SignalsColorsUsed[u32_SectionNumber][sn_ColorCounter] = true;
+         q_RandomColorFound = true;
+      }
+   }
+   while (q_RandomColorFound == false);
 
    return c_ColorConfig;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns specific color
+
+   The color will be marked as used in the first section which has the specific color not used already.
+   If no section has the marked as unused, a new section will be added.
+
+   \param[in]       ou8_Index     Index of color
+
+   \return
+   Specific signal item color with specific index
+*/
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcreteColors(const uint8 ou8_Index)
 {
@@ -1110,14 +1189,38 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcre
 
    C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig;
 
-   // search a the color to set the flag
+   // search the color to set the flag
    for (u32_ColorCounter = 0U; u32_ColorCounter < 64U; ++u32_ColorCounter)
    {
       if (ou8_Index == C_SdBueMlvGraphicsScene::mhac_SignalsColors[u32_ColorCounter].u8_Index)
       {
+         uint32 u32_SectionCounter;
+         bool q_FreeSectionFound = false;
+
          c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SignalsColors[u32_ColorCounter];
-         // set the color variant as used
-         this->maq_SingalsColorsUsed[u32_ColorCounter] = true;
+
+         // Search for a free entry in all sections
+         for (u32_SectionCounter = 0U; u32_SectionCounter < this->mc_SignalsColorsUsed.size(); ++u32_SectionCounter)
+         {
+            if (this->mc_SignalsColorsUsed[u32_SectionCounter][u32_ColorCounter] == false)
+            {
+               // set the color variant as used
+               this->mc_SignalsColorsUsed[u32_SectionCounter][u32_ColorCounter] = true;
+               q_FreeSectionFound = true;
+               break;
+            }
+         }
+
+         if (q_FreeSectionFound == false)
+         {
+            // No free entry in the already existing sections, create a new one.
+            this->m_PrepareNextColorSection();
+
+            // u32_SectionNumber must be match with new added section
+            tgl_assert(u32_SectionCounter < this->mc_SignalsColorsUsed.size());
+            this->mc_SignalsColorsUsed[u32_SectionCounter][u32_ColorCounter] = true;
+         }
+
          break;
       }
    }
@@ -1126,20 +1229,75 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcre
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::m_SetColorsUsed(const C_SdBueMlvSignalManager::C_SignalItemColors & orc_Colors,
-                                              const bool oq_Used)
+/*! \brief  Sets the used flag for a specific color to false
+
+   In case of multiple sections, the color will be set to unused in the latest section.
+   If the section is not the first section and has no further active colors, the section will be removed.
+
+   \param[in]       orc_Colors     Color configuration to set unused
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMlvGraphicsScene::m_SetColorsUnused(const C_SdBueMlvSignalManager::C_SignalItemColors & orc_Colors)
 {
    uint32 u32_ColorCounter;
 
-   // search a the color to set the flag
-   for (u32_ColorCounter = 0U; u32_ColorCounter < 64U; ++u32_ColorCounter)
+   std::vector<std::array<bool, 64> >::reverse_iterator c_ItSection;
+
+   // Search the color to reset the flag
+   // Search the sections from behind to reduce the number of sections if possible
+   for (c_ItSection = this->mc_SignalsColorsUsed.rbegin(); c_ItSection != this->mc_SignalsColorsUsed.rend();
+        ++c_ItSection)
    {
-      if (C_SdBueMlvGraphicsScene::mhac_SignalsColors[u32_ColorCounter].u8_Index == orc_Colors.u8_Index)
+      bool q_ColorFound = false;
+      bool q_OtherColorUsed = false;
+
+      for (u32_ColorCounter = 0U; u32_ColorCounter < 64U; ++u32_ColorCounter)
       {
-         this->maq_SingalsColorsUsed[u32_ColorCounter] = oq_Used;
+         if ((C_SdBueMlvGraphicsScene::mhac_SignalsColors[u32_ColorCounter].u8_Index == orc_Colors.u8_Index) &&
+             ((*c_ItSection)[u32_ColorCounter] == true))
+         {
+            // Set the used color to unused
+            (*c_ItSection)[u32_ColorCounter] = false;
+            q_ColorFound = true;
+         }
+         else if ((*c_ItSection)[u32_ColorCounter] == true)
+         {
+            // Check if any other color is used in the section too
+            q_OtherColorUsed = true;
+         }
+         else
+         {
+            // Nothing to do
+         }
+      }
+
+      if (q_ColorFound == true)
+      {
+         if ((q_OtherColorUsed == false) &&
+             (this->mc_SignalsColorsUsed.size() > 1))
+         {
+            // Color was disabled and no further active colors in this section and it is not the last section.
+            // It can be removed.
+
+            // the erase function needs the base iterator, but the base iterator has an offset of -1
+            std::advance(c_ItSection, 1);
+            this->mc_SignalsColorsUsed.erase(c_ItSection.base());
+         }
+
          break;
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Prepares the next section with 64 bool values for the used color configuration
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMlvGraphicsScene::m_PrepareNextColorSection(void)
+{
+   std::array<bool, 64> c_SingalsColorsUsed;
+   c_SingalsColorsUsed.fill(false);
+   this->mc_SignalsColorsUsed.push_back(c_SingalsColorsUsed);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1216,7 +1374,7 @@ void C_SdBueMlvGraphicsScene::m_ChangeCursor(const Qt::CursorShape oe_Cursor)
    // forward this signal only if no interaction mode is active
    if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_NONE)
    {
-      Q_EMIT this->SigChangeCursor(oe_Cursor);
+      Q_EMIT (this->SigChangeCursor(oe_Cursor));
    }
 }
 
@@ -1250,7 +1408,7 @@ sint32 C_SdBueMlvGraphicsScene::m_GetGridIndex(const QPointF & orc_Pos) const
 void C_SdBueMlvGraphicsScene::m_HandleHideToolTip(void)
 {
    this->mpc_HoveredSignal = NULL;
-   Q_EMIT this->SigHideToolTip();
+   Q_EMIT (this->SigHideToolTip());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1263,6 +1421,9 @@ void C_SdBueMlvGraphicsScene::m_SetupContextMenu(void)
 
    this->mpc_Add = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Add new Signal"), this,
                                                     &C_SdBueMlvGraphicsScene::m_ActionAdd);
+
+   this->mpc_AddMultiplexed = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Add new multiplexed Signal"),
+                                                               this, &C_SdBueMlvGraphicsScene::m_ActionAddMultiplexed);
 
    this->mpc_ContextMenu->addSeparator();
 
@@ -1315,7 +1476,21 @@ void C_SdBueMlvGraphicsScene::m_ActionAdd(void)
       s32_Counter = 0;
    }
 
-   Q_EMIT this->SigAddSignal(this->mc_MessageId, static_cast<uint16>(s32_Counter));
+   Q_EMIT (this->SigAddSignal(this->mc_MessageId, static_cast<uint16>(s32_Counter)));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMlvGraphicsScene::m_ActionAddMultiplexed(void)
+{
+   sint32 s32_Counter = this->m_GetGridIndex(this->mc_LastMousePos);
+
+   if (s32_Counter < 0)
+   {
+      s32_Counter = 0;
+   }
+
+   Q_EMIT (this->SigAddSignalMultiplexed(this->mc_MessageId, static_cast<uint16>(s32_Counter),
+                                         this->mu16_MultiplexerValue));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1323,7 +1498,7 @@ void C_SdBueMlvGraphicsScene::m_ActionCopy(void)
 {
    if (this->mpc_ActualSignal != NULL)
    {
-      Q_EMIT this->SigCopySignal(this->mc_MessageId, this->mpc_ActualSignal->GetSignalIndex());
+      Q_EMIT (this->SigCopySignal(this->mc_MessageId, this->mpc_ActualSignal->GetSignalIndex()));
    }
 }
 
@@ -1339,7 +1514,7 @@ void C_SdBueMlvGraphicsScene::m_ActionPaste(void)
 
    if (this->mc_VecSignals.size() < 64)
    {
-      Q_EMIT this->SigPasteSignal(this->mc_MessageId, static_cast<uint16>(s32_Counter));
+      Q_EMIT (this->SigPasteSignal(this->mc_MessageId, static_cast<uint16>(s32_Counter)));
    }
 }
 
@@ -1348,7 +1523,7 @@ void C_SdBueMlvGraphicsScene::m_ActionCut(void)
 {
    if (this->mpc_ActualSignal != NULL)
    {
-      Q_EMIT this->SigCutSignal(this->mc_MessageId, this->mpc_ActualSignal->GetSignalIndex());
+      Q_EMIT (this->SigCutSignal(this->mc_MessageId, this->mpc_ActualSignal->GetSignalIndex()));
    }
 }
 
@@ -1357,6 +1532,6 @@ void C_SdBueMlvGraphicsScene::m_ActionDelete(void)
 {
    if (this->mpc_ActualSignal != NULL)
    {
-      Q_EMIT this->SigDeleteSignal(this->mc_MessageId, this->mpc_ActualSignal->GetSignalIndex());
+      Q_EMIT (this->SigDeleteSignal(this->mc_MessageId, this->mpc_ActualSignal->GetSignalIndex()));
    }
 }

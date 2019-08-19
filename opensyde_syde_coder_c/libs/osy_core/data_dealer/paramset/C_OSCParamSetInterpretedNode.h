@@ -11,15 +11,15 @@
 #ifndef C_OSCPARAMSETINTERPRETEDNODE_H
 #define C_OSCPARAMSETINTERPRETEDNODE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OSCParamSetInterpretedDataPool.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///Data class, containing all interpreted entries for one node in a parameter set file
 class C_OSCParamSetInterpretedNode
@@ -31,7 +31,7 @@ public:
    std::vector<C_OSCParamSetInterpretedDataPool> c_DataPools; ///< Interpreted data pools, used by this parameter set
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -29,14 +29,12 @@ public:
    C_SdManUnoTopologyAddSnapshotCommand(QGraphicsScene * const opc_Scene,
                                         const C_SdTopologyDataSnapshot & orc_InitialSnapshotData,
                                         const std::vector<stw_types::uint64> & orc_IDs, const QPointF & orc_NewPos,
+                                        const stw_types::float64 of64_HighestUsedZValue,
                                         QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SdManUnoTopologyAddSnapshotCommand(void);
 
 protected:
    virtual void m_AddNew(void);
-
-private:
-   const QPointF mc_NewPos;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -125,6 +125,8 @@ private:
    const C_CieConverter::C_CIECanMessage * m_CheckDbcFile(const stw_can::T_STWCAN_Msg_RX & orc_Msg);
    bool m_InterpretDbcFile(const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
                            stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData) const;
+   static void mh_InterpretDbcFileCanSignal(stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData,
+                                            const C_CieConverter::C_CIECanSignal & orc_DbcSignal);
 
    static void mh_ThreadFunc(void * const opv_Instance);
    void m_ThreadFunc(void);

@@ -61,6 +61,9 @@ protected:
    virtual stw_types::sint32 GetLineArrowType(void) const;
    virtual stw_types::sint32 GetTextElementType(void) const;
 
+   void SetDataPositionOffset(const QPointF & orc_NewPos);
+   void SetDataZOffset(const stw_types::float64 of64_HighestUsedZValue);
+
 private:
    QMap<C_PuiBsTemporaryDataID, stw_types::uint64> mc_MapTypeAndIndexToID;
    C_SdTopologyDataSnapshot mc_DataBackup;

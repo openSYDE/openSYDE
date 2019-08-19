@@ -25,9 +25,22 @@ namespace stw_opensyde_gui
 class C_GiCustomFunctions
 {
 public:
+   enum E_AspectRatioMovement
+   {
+      eARM_TOP_LEFT,
+      eARM_TOP_RIGHT,
+      eARM_BOTTOM_LEFT,
+      eARM_BOTTOM_RIGHT
+   };
+
    static QVariant h_ItemChange(const QGraphicsItem::GraphicsItemChange oe_Change, const QVariant & orc_Value,
-                                const QGraphicsItem * const opc_GraphicsItem, bool * const opq_Changed = NULL);
-   static void h_AdaptMouseRangePos(QPointF & orc_Pos, const QPointF & orc_Offset = QPointF(0.0, 0.0));
+                                const QGraphicsItem * const opc_GraphicsItem, bool * const opq_Changed = NULL,
+                                const QPointF & orc_Offset = QPointF(0.0, 0.0));
+   static void h_AdaptMouseRangePos(QPointF & orc_Pos, const QPointF & orc_Offset = QPointF(0.0, 0.0),
+                                    bool * const opq_Changed = NULL);
+   static QPointF h_AdaptDeltaForAspectRatio(const stw_types::float64 of64_AspectRatio,
+                                             const E_AspectRatioMovement oe_AspectRatioMovement,
+                                             const QPointF & orc_Delta);
 
    static const stw_types::float64 hf64_SceneMinBorderSize;
 };

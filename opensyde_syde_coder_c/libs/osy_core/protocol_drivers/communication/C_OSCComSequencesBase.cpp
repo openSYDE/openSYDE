@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -19,30 +19,30 @@
 #include "TGLUtils.h"
 #include "C_OSCRoutingRoute.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
    \param[in]  oq_RoutingActive     Flag for activating routing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive) :
    mpc_ComDriver(new C_OSCComDriverFlash(oq_RoutingActive, &mh_MyXflReportProgress, this)),
    mpc_SystemDefinition(NULL),
@@ -53,19 +53,19 @@ C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive) :
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   destructor
 
    Tear down class
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
 {
    delete this->mpc_ComDriver;
    mpc_SystemDefinition = NULL;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize class parameters to use for communication
 
    Set parameters required for processes:
@@ -102,8 +102,8 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
    C_DEFAULT     Parameter ou32_ActiveBusIndex invalid
    C_RANGE       Routing configuration failed (can all nodes marked as active be reached from the defined bus ?)
 */
-//-----------------------------------------------------------------------------
-sint32 C_OSCComSequencesBase::Init(const C_OSCSystemDefinition & orc_SystemDefinition, const uint32 ou32_ActiveBusIndex,
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComSequencesBase::Init(C_OSCSystemDefinition & orc_SystemDefinition, const uint32 ou32_ActiveBusIndex,
                                    const std::vector<uint8> & orc_ActiveNodes,
                                    stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
                                    C_OSCIpDispatcher * const opc_IpDispatcher)
@@ -141,19 +141,19 @@ sint32 C_OSCComSequencesBase::Init(const C_OSCSystemDefinition & orc_SystemDefin
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get is initialized flag
 
    \return
    Is initialized flag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComSequencesBase::IsInitialized(void) const
 {
    return this->mpc_ComDriver->IsInitialized();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the node index by the server id
 
    \param[in]     orc_ServerId         Server id
@@ -163,14 +163,14 @@ bool C_OSCComSequencesBase::IsInitialized(void) const
    true     Node index found
    false    Node index not found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComSequencesBase::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                          uint32 & oru32_NodeIndex) const
 {
    return this->mpc_ComDriver->GetNodeIndex(orc_ServerId, oru32_NodeIndex);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the information if at least one openSYDE device is active
 
    Init function must be called first.
@@ -179,13 +179,13 @@ bool C_OSCComSequencesBase::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc_
    true     At least one device found
    false    No device found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComSequencesBase::IsAtLeastOneOpenSydeNodeActive(void) const
 {
    return this->mq_OpenSydeDevicesActive;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the information if at least one STW flashloader device is active
 
    Init function must be called first.
@@ -194,13 +194,13 @@ bool C_OSCComSequencesBase::IsAtLeastOneOpenSydeNodeActive(void) const
    true     At least one device found
    false    No device found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActive(void) const
 {
    return this->mq_StwFlashloaderDevicesActive;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the information if at least one STW flashloader device is on the local bus active
 
    Init function must be called first.
@@ -209,13 +209,42 @@ bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActive(void) const
    true     At least one device found
    false    No device found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void) const
 {
    return this->mq_StwFlashloaderDevicesActiveOnLocalBus;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if a specific node must be capable of Ethernet to Ethernet routing
+
+   \param[in]       ou32_RouterNodeIndex     Node to check if node must be capable of Ethernet to Ethernet routing
+                                             for at least one route
+
+   \retval   true     Ethernet to Ethernet Routing must be supported by router node
+   \retval   false    Ethernet to Ethernet Routing must not be supported by router node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCComSequencesBase::IsEthToEthRoutingNecessary(const uint32 ou32_RouterNodeIndex) const
+{
+   return this->mpc_ComDriver->IsEthToEthRoutingNecessary(ou32_RouterNodeIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the minimum Flashloader reset wait time in ms
+
+   Default minimum value is 500 ms.
+
+   \return
+   Time in ms all nodes needs at least to get from application to the Flashloader
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(void) const
+{
+   return this->mpc_ComDriver->GetMinimumFlashloaderResetWaitTime();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the node is reachable on the current route
 
    \param[in]     ou32_NodeIndex         Index of current node
@@ -224,7 +253,7 @@ bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void)
    true     Node is reachable on the current route
    false    Node is not reachable on the current route
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComSequencesBase::mq_IsNodeReachable(const uint32 ou32_NodeIndex) const
 {
    bool q_Return;
@@ -257,7 +286,7 @@ bool C_OSCComSequencesBase::mq_IsNodeReachable(const uint32 ou32_NodeIndex) cons
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   report progress of STW Flashloader operation to application
 
    Report progress information from STW Flashloader driver via virtual function.
@@ -271,7 +300,7 @@ bool C_OSCComSequencesBase::mq_IsNodeReachable(const uint32 ou32_NodeIndex) cons
    C_NO_ERR    continue operation
    else        abort operation (not honored at each position)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, const uint8 ou8_Progress,
                                                      const C_SCLString & orc_Text)
 {
@@ -279,7 +308,7 @@ sint32 C_OSCComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, 
    return reinterpret_cast<C_OSCComSequencesBase *>(opv_Instance)->m_MyXflReportProgress(ou8_Progress, orc_Text);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   report progress of STW Flashloader operation to application
 
    Report progress information from STW Flashloader driver via virtual function.
@@ -292,21 +321,21 @@ sint32 C_OSCComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, 
    C_NO_ERR    continue operation
    else        abort operation (not honored at each position)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComSequencesBase::m_MyXflReportProgress(const uint8 ou8_Progress, const C_SCLString & orc_Text)
 {
    //invoke virtual function:
    return this->m_XflReportProgress(ou8_Progress, orc_Text);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the information if at least one openSYDE device is active
 
    \return
    true     At least one device found
    false    No device found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComSequencesBase::m_IsAtLeastOneOpenSydeNodeActive(void) const
 {
    bool q_Return = false;
@@ -329,16 +358,17 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneOpenSydeNodeActive(void) const
    }
 
    return q_Return;
+   //lint -e{1763} False positive; we do not provide write access to class elements
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the information if at least one STW flashloader device is active
 
    \return
    true     At least one device found
    false    No device found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeActive(void) const
 {
    bool q_Return = false;
@@ -361,9 +391,10 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeActive(void) const
    }
 
    return q_Return;
+   //lint -e{1763} False positive; we do not provide write access to class elements
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the information if at least one STW flashloader device is active on the local bus
 
    \param[out]    orc_StwFlashloaderDeviceOnLocalBus     The first found STW flashloader node on the local bus
@@ -372,7 +403,7 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeActive(void) const
    true     At least one device found
    false    No device found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeOnLocalBusActive(
    C_OSCProtocolDriverOsyNode & orc_StwFlashloaderDeviceOnLocalBus) const
 {
@@ -423,4 +454,5 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeOnLocalBusActive(
    }
 
    return q_Return;
+   //lint -e{1763} False positive; we do not provide write access to class elements
 }

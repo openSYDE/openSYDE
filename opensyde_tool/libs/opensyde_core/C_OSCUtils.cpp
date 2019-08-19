@@ -277,6 +277,37 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if string is niceified for a file names
+
+   See description of h_NiceifyStringForFileName. If the string has at least one character which would be replaced
+   by h_NiceifyStringForFileName, the function returns false
+
+   TODO: Somehow by accident h_NiceifyStringForCComment was used instead of h_NiceifyStringForFileName. The problem is
+         that using h_NiceifyStringForFileName does not work because it is for file names and not for paths, so "\"
+         and ":" are not allowed. Nicefying for C Comment suffices in many cases, the only problem is that so
+         allowed-path-handling in openSYDE GUI is not homogeneous, because there also exist cases where only C names
+         are allowed for paths (which is very restrictive and could be improved).
+
+   \param[in]     orc_String         Original string
+
+   \retval   true    The string is niceified and is valid
+   \retval   false   The string is not nice and is not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCUtils::h_IsStringNiceifiedForFileName(const C_SCLString & orc_String)
+{
+   bool q_Return = true;
+   const C_SCLString c_Temp = h_NiceifyStringForCComment(orc_String);
+
+   if (c_Temp != orc_String)
+   {
+      q_Return = false;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if scaling active
 
    \param[in] of64_Factor Factor

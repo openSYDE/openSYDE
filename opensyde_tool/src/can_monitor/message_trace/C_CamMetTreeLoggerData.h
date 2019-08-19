@@ -12,11 +12,8 @@
 #define C_CAMMETTREELOGGERDATA_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <vector>
-
-#include "stwtypes.h"
-
 #include "C_OSCComMessageLoggerData.h"
+#include "C_CamMetTreeLoggerDataGreyOutInformation.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -32,13 +29,7 @@ public:
    C_CamMetTreeLoggerData(void);
 
    // For usage of concrete data model or widget. Will not be set by C_SyvComMessageMonitor
-   stw_types::sintn sn_GrayOutValueMsg;
-   stw_types::sintn sn_GrayOutValueData;
-   stw_types::uint32 u32_DataChangedTimeStamp;                  ///< Time stamp of last changed data bytes of CAN
-                                                                // message
-   std::vector<stw_types::sintn> c_GrayOutValueDataBytes;       ///< Gray out values for each data byte of CAN message
-   std::vector<stw_types::uint32> c_DataBytesChangedTimeStamps; ///< Time stamp of last change for each data byte of CAN
-                                                                // message
+   C_CamMetTreeLoggerDataGreyOutInformation c_GreyOutInformation;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

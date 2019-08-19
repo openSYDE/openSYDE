@@ -50,9 +50,8 @@ C_SdBueUnoSignalMoveCommand::C_SdBueUnoSignalMoveCommand(
    const C_OSCCanMessageIdentificationIndices & orc_TargetMessageId, const uint32 & oru32_TargetSignalIndex,
    C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
    C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, QUndoCommand * const opc_Parent) :
-   C_SdBueUnoSignalAddDeleteBaseCommand(orc_SourceMessageId, oru32_SourceSignalIndex, 0U, opc_MessageSyncManager,
-                                        opc_MessageTreeWidget,
-                                        "Move Signal",
+   C_SdBueUnoSignalAddDeleteBaseCommand(orc_SourceMessageId, oru32_SourceSignalIndex, 0U, C_OSCCanSignal::eMUX_DEFAULT,
+                                        0, opc_MessageSyncManager, opc_MessageTreeWidget, "Move Signal",
                                         opc_Parent),
    mu64_SourceUniqueId(0ULL),
    mu32_SourceSignalIndex(oru32_SourceSignalIndex),

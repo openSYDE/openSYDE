@@ -359,7 +359,8 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
                h_WriteLog("Setup CAN", "CAN DLL loaded.");
                q_CanLoaded = true;
                // initialize CAN dispatcher
-               s32_Return = c_CanDispatcher.CAN_Init();
+               s32_Return = c_CanDispatcher.CAN_Init(static_cast<sint32>(c_SystemDefinition.c_Buses[u32_ActiveBusIndex].
+                                                                         u64_BitRate / 1000ULL));
                break;
             case CAN_COMP_ERR_DLL_ALREADY_OPENED:
                e_Result = eERR_DLL_ALREADY_OPENED;

@@ -121,8 +121,10 @@ protected:
       \param[in] ou32_TargetIndex Target index
    */
    //-----------------------------------------------------------------------------
-   virtual void m_MoveItem(const stw_types::uint32 ou32_SourceIndex,
-                           const stw_types::uint32 ou32_TargetIndex) const = 0;
+   virtual void m_MoveItem(const stw_types::uint32 ou32_SourceIndex, const stw_types::uint32 ou32_TargetIndex) = 0;
+
+   virtual void m_BeginRemoveRows(const stw_types::uint32 ou32_FirstIndex, const stw_types::uint32 ou32_LastIndex);
+   virtual void m_EndRemoveRows(const stw_types::uint32 ou32_FirstIndex, const stw_types::uint32 ou32_LastIndex);
 
    static QVariant mh_HandleHexValue(const stw_types::uint64 ou64_Value, const stw_types::sintn osn_Role);
    static QString mh_GetValueAsHex(const stw_types::uint64 ou64_Value);
@@ -132,7 +134,7 @@ protected:
 
 private:
    void m_MoveItems(const std::vector<stw_types::uint32> & orc_ContiguousIndices,
-                    const stw_types::uint32 ou32_TargetIndex) const;
+                    const stw_types::uint32 ou32_TargetIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

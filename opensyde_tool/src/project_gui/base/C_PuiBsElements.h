@@ -35,6 +35,8 @@ public:
    void ReplaceSnapshotElements(C_PuiBsElements & orc_Snapshot) const;
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
    virtual stw_types::uint32 Count(void) const;
+   virtual void SetDataPositionOffset(const QPointF & orc_NewPos);
+   virtual void SetDataZOffset(const stw_types::float64 of64_HighestUsedZValue);
 
    //Add
    void AddBoundary(const C_PuiBsBoundary & orc_Data);

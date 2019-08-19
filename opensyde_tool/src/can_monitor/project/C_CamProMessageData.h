@@ -12,6 +12,7 @@
 #define C_CAMPROMESSAGEDATA_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <array>
 #include <QString>
 #include "stw_can.h"
 #include "stwtypes.h"
@@ -24,8 +25,7 @@ namespace stw_opensyde_gui_logic
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-class C_CamProMessageData :
-   public stw_can::T_STWCAN_Msg_TX
+class C_CamProMessageData
 {
 public:
    C_CamProMessageData(void);
@@ -36,8 +36,14 @@ public:
    stw_types::uint32 u32_CyclicTriggerTime;
    stw_scl::C_SCLString c_Key;
    stw_types::uint32 u32_KeyPressOffset;
+   bool q_IsExtended;
+   bool q_IsRTR;
+   stw_types::uint16 u16_Dlc;
+   stw_types::uint32 u32_Id;
+   std::vector<stw_types::uint8> c_Bytes;
 
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   stw_can::T_STWCAN_Msg_TX ToCANMessage(void) const;
 
    enum E_GenericUint32DataSelector
    {
@@ -71,6 +77,7 @@ public:
    void SetMessageBoolValue(const C_CamProMessageData::E_GenericBoolDataSelector oe_Selector, const bool oq_Value);
    void SetMessageKey(const QString & orc_Key, const stw_types::uint32 ou32_Offset);
    stw_types::sint32 SetMessageDataBytes(const std::vector<stw_types::uint8> & orc_DataBytes);
+   static stw_types::uint8 h_GetBoolValue(const bool oq_Value);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

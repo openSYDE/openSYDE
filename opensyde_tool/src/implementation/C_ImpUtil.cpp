@@ -18,21 +18,23 @@
 #include <QProcess>
 #include <QTextStream>
 #include <QApplication>
+
 #include "C_ImpUtil.h"
 #include "TGLUtils.h"
+#include "TGLFile.h"
 #include "stwerrors.h"
+#include "constants.h"
 #include "C_GtGetText.h"
 #include "C_UsHandler.h"
 #include "C_PuiProject.h"
 #include "C_PuiSdHandler.h"
 #include "C_OSCExportNode.h"
-#include "TGLFile.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
-#include "constants.h"
 #include "C_Uti.h"
 #include "C_PopUtil.h"
 #include "C_OSCUtils.h"
+#include "C_PuiUtil.h"
 #include "C_ImpCodeGenerationReportWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -438,11 +440,15 @@ sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vect
             {
                const QString c_CompleteExportFolderName =
                   h_GetAbsoluteGeneratedDir(pc_Application, c_Node.c_Properties.c_Name);
+               const QString c_CompleteCodeGenerator =
+                  C_PuiUtil::h_GetResolvedAbsPathFromExe(
+                     pc_Application->c_CodeGeneratorPath.c_str(),
+                     C_PuiUtil::h_GetResolvedAbsPathFromProject(pc_Application->c_ProjectPath.c_str()));
 
                std::vector<QString> c_Files;
-               s32_Retval = mh_ExecuteCodeGenerator(c_Node.c_Properties.c_Name.c_str(),
-                                                    pc_Application->c_Name.c_str(), c_CompleteExportFolderName, c_Files,
-                                                    pc_Application->c_CodeGeneratorPath.c_str(), orq_Erase);
+               s32_Retval = mh_ExecuteCodeGenerator(c_Node.c_Properties.c_Name.c_str(), pc_Application->c_Name.c_str(),
+                                                    c_CompleteExportFolderName, c_Files, c_CompleteCodeGenerator,
+                                                    orq_Erase);
                if (s32_Retval == C_NO_ERR)
                {
                   // Insert headings for node and Data Block name and path
@@ -596,34 +602,20 @@ QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication * const 
                                              const C_SCLString & orc_NodeName)
 {
    QString c_Return;
-   QDir c_GenerateDir;
+   QString c_GenerateDir = opc_Application->c_GeneratePath.c_str();
 
    // check generate path: empty? --> use default relative path
-   if (opc_Application->c_GeneratePath == "")
+   if (c_GenerateDir.isEmpty() == true)
    {
       C_SCLString c_Temp = "./opensyde_generated/";
       c_Temp += C_OSCUtils::h_NiceifyStringForFileName(orc_NodeName);
       c_Temp += "/";
       c_Temp += C_OSCUtils::h_NiceifyStringForFileName(opc_Application->c_Name);
-      c_GenerateDir.setPath(c_Temp.c_str());
-   }
-   else
-   {
-      c_GenerateDir.setPath(opc_Application->c_GeneratePath.c_str());
+      c_GenerateDir = c_Temp.c_str();
    }
 
-   // check generate path: absolute?
-   if (c_GenerateDir.isRelative() == true)
-
-   {
-      // concatenate paths
-      c_GenerateDir.setPath(QDir::cleanPath(
-                               C_ImpUtil::h_GetAbsolutePathFromProject(opc_Application->c_ProjectPath.c_str()) +
-                               QDir::separator() + c_GenerateDir.path()));
-   }
-
-   // return absolute path as Qt interprets it (i.e. to openSYDE.exe if relative)
-   c_Return = c_GenerateDir.absolutePath();
+   // resolve path variables and make absolute
+   c_Return = C_PuiUtil::h_GetResolvedAbsPathFromDbProject(opc_Application->c_ProjectPath.c_str(), c_GenerateDir);
 
    return c_Return;
 }
@@ -652,8 +644,8 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
          c_Message.SetHeading(C_GtGetText::h_GetText("Code generation"));
          c_Message.SetDescription(C_GtGetText::h_GetText("Code cannot be generated without a valid project path."));
          c_Message.SetDetails(C_GtGetText::h_GetText(
-                                 "The location where generated code get exported to. The path must be set. "
-                                 "Save the project to set the path."));
+                                 "The path where the generated code is saved must be set. "
+                                 "Save the project to set a default path."));
          c_Message.Execute();
          q_Return = false;
       }
@@ -668,32 +660,12 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Always get absolute path from path relative to openSYDE project.
-
-   \param[in]     orc_Path    Absolute or relative path
-
-   \return
-   Absolute path
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_ImpUtil::h_GetAbsolutePathFromProject(const QString & orc_Path)
-{
-   QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath(); // always absolute or empty
-
-   if (c_Folder == "")
-   {
-      // default: relative to executable path
-      c_Folder = C_Uti::h_GetExePath();
-   }
-
-   return C_Uti::h_ConcatPathIfNecessary(c_Folder, orc_Path);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle paths after file save dialog.
 
    Check if path could be made relative and ask user if she wants to save the path
    relative or absolute.
+   The function checks orc_Path for valid characters. See C_OSCUtils::h_IsStringNiceifiedForFileName for
+   details of the check. If the check fails an empty string will be returned.
 
    Note: If one of the paths is empty this simply returns the given path.
    If the reference path is a file path (ending on File.txt), behavior is undefined
@@ -705,18 +677,29 @@ QString C_ImpUtil::h_GetAbsolutePathFromProject(const QString & orc_Path)
    \param[in]     orc_Path                   relative or absolute path of file or directory
    \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
 
-   \return
-   path the user wants to save or input path if relativeness is not possible
+   \retval   String with path    Path the user wants to save or input path if relativeness is not possible
+   \retval   Empty string        orc_Path has at least one invalid character
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QString & orc_Path,
                                                const QString & orc_AbsoluteReferenceDir)
 {
-   QString c_Return = orc_Path;
+   QString c_Return;
    QString c_PathRelative;
    QString c_PathAbsolute;
 
-   if (C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, c_PathAbsolute, c_PathRelative) == true)
+   // Check first if path is a valid path with no unwanted characters
+   if (C_OSCUtils::h_IsStringNiceifiedForFileName(orc_Path.toStdString().c_str()) == false)
+   {
+      C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Path"));
+      c_Message.SetDescription(C_GtGetText::h_GetText("The path contains invalid characters."));
+      c_Message.SetDetails(QString(C_GtGetText::h_GetText("Path: %1")).arg(orc_Path));
+      c_Message.Execute();
+
+      c_Return = "";
+   }
+   else if (C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, c_PathAbsolute, c_PathRelative) == true)
    {
       // ask user
       C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eQUESTION);
@@ -736,6 +719,11 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
          c_Return = c_PathAbsolute;
       }
    }
+   else
+   {
+      // Nothing to do
+      c_Return = orc_Path;
+   }
 
    return c_Return;
 }
@@ -749,8 +737,8 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
    \param[in]     orc_Paths                  relative or absolute paths of files or directories
    \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
 
-   \return
-   paths the user wants to save or input paths if relativeness is not possible at all
+   \retval   Strings with paths  Paths the user wants to save or input paths if relativeness is not possible at all
+   \retval   Empty list          At least one string in orc_Paths has at least one invalid character
 */
 //----------------------------------------------------------------------------------------------------------------------
 QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QStringList & orc_Paths,
@@ -764,16 +752,43 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
    if (orc_Paths.size() == 1)
    {
       c_Return[0] = C_ImpUtil::h_AskUserToSaveRelativePath(opc_Parent, orc_Paths[0], orc_AbsoluteReferenceDir);
+
+      if (c_Return[0] == "")
+      {
+         c_Return.clear();
+      }
    }
    else if (orc_Paths.isEmpty() == false)
    {
+      sint32 s32_Pos;
       QStringList c_PathsRelative;
       QStringList c_PathsAbsolute;
+      QString c_InvalidPaths = "";
       QString c_Details;
       bool q_RelativePossible = false;
 
+      // Check first if all paths are valid paths with no unwanted characters
+      for (s32_Pos = 0; s32_Pos < c_Return.size(); ++s32_Pos)
+      {
+         if (C_OSCUtils::h_IsStringNiceifiedForFileName(c_Return[s32_Pos].toStdString().c_str()) == false)
+         {
+            c_InvalidPaths += "- " + c_Return[s32_Pos] + "\n";
+         }
+      }
+
+      if (c_InvalidPaths.size() > 0)
+      {
+         C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Paths"));
+         c_Message.SetDescription(C_GtGetText::h_GetText("At least one path contains invalid characters."));
+         c_Message.SetDetails(QString(C_GtGetText::h_GetText("Paths:\n%1")).arg(c_InvalidPaths));
+         c_Message.Execute();
+
+         c_Return.clear();
+      }
+
       // make all paths relative
-      for (sint32 s32_Pos = 0; s32_Pos < c_Return.size(); ++s32_Pos)
+      for (s32_Pos = 0; s32_Pos < c_Return.size(); ++s32_Pos)
       {
          if (C_Uti::h_IsPathRelativeToDir(c_Return[s32_Pos], orc_AbsoluteReferenceDir, c_PathAbsolute,
                                           c_PathRelative) == true)
@@ -820,6 +835,7 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
 
    return c_Return;
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get active window handle if already existing
 
@@ -919,7 +935,8 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
       - same return values
       - create in directory of executable a file mygenerator_file_list.txt containing generated files
 
-   The paths that are used as command line arguments are all transformed to absolute paths.
+   The paths provided as arguments must be absolute.
+   Path checks are done by QProcess or by executable.
 
    \param[in]     orc_NodeName         name of node to generate code for
    \param[in]     orc_AppName          name of application to generate code for
@@ -947,35 +964,24 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
    QProcess * pc_Process = new QProcess(new QObject());
    QFile c_FileListFile;
    C_SCLString c_ErrorText;
-
-   // note: path checks are done by QProcess or by executable
-
-   // use QFileInfo and QDir to get absolute paths in arguments
    QString c_SysDefPath;
 
+   // get system definition path (always absolute because pui project get path is always absolute)
    C_PuiProject::h_AdaptProjectPathToSystemDefinition(C_PuiProject::h_GetInstance()->GetPath(), c_SysDefPath);
-   QFileInfo c_SysDefFile(c_SysDefPath);
-   QFileInfo c_DevicesIniFile(C_Uti::h_GetExePath() + "/../devices/devices.ini");
-   QDir c_ExportFolder(orc_ExportFolder);
 
    // build file list file path from executable (file which contains information which files were generated)
    QFileInfo c_CodeGenFileInfo(orc_CodeGenerator);
-
-   if (c_CodeGenFileInfo.isRelative()) // relative code generator is relative to openSYDE.exe
-   {
-      c_CodeGenFileInfo.setFile(C_Uti::h_GetExePath() + "/" + orc_CodeGenerator);
-   }
-
+   tgl_assert(c_CodeGenFileInfo.isAbsolute());
    c_FileListFile.setFileName(
       c_CodeGenFileInfo.absolutePath() + "/" + c_CodeGenFileInfo.completeBaseName() + "_file_list.txt");
 
    // provide arguments
    c_Arguments.push_back("-s"); // system definition
-   c_Arguments.push_back(c_SysDefFile.absoluteFilePath());
+   c_Arguments.push_back(c_SysDefPath);
    c_Arguments.push_back("-d"); // devices ini file
-   c_Arguments.push_back(c_DevicesIniFile.absoluteFilePath());
+   c_Arguments.push_back(C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini"));
    c_Arguments.push_back("-o"); // export folder
-   c_Arguments.push_back(c_ExportFolder.absolutePath());
+   c_Arguments.push_back(orc_ExportFolder);
    c_Arguments.push_back("-n"); // node name
    c_Arguments.push_back(orc_NodeName);
    c_Arguments.push_back("-a"); // application name

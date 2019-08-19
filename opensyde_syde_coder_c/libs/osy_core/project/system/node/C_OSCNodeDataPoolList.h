@@ -11,7 +11,7 @@
 #ifndef C_OSCNODEDATAPOOLLIST_H
 #define C_OSCNODEDATAPOOLLIST_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <iostream>
 #include <vector>
 #include "stwtypes.h"
@@ -19,12 +19,12 @@
 #include "C_OSCNodeDataPoolListElement.h"
 #include "C_OSCNodeDataPoolDataSet.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCNodeDataPoolList
 {
@@ -62,7 +62,7 @@ public:
    std::vector<C_OSCNodeDataPoolDataSet> c_DataSets;     ///< Data sets
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

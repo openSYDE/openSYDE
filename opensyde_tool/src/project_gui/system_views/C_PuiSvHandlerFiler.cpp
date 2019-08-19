@@ -309,6 +309,14 @@ sint32 C_PuiSvHandlerFiler::h_LoadDashboard(C_PuiSvDashboard & orc_Dashboard, C_
       s32_Retval = C_PuiBsElementsFiler::h_LoadBaseElements(orc_Dashboard, orc_XMLParser);
    }
    orc_Dashboard.SetActive(orc_XMLParser.GetAttributeBool("active"));
+   if (orc_XMLParser.AttributeExists("tab-index"))
+   {
+      orc_Dashboard.SetTabIndex(orc_XMLParser.GetAttributeSint32("tab-index"));
+   }
+   else
+   {
+      orc_Dashboard.SetTabIndex(-1);
+   }
    return s32_Retval;
 }
 
@@ -322,6 +330,7 @@ sint32 C_PuiSvHandlerFiler::h_LoadDashboard(C_PuiSvDashboard & orc_Dashboard, C_
 void C_PuiSvHandlerFiler::h_SaveDashboard(const C_PuiSvDashboard & orc_Dashboard, C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeBool("active", orc_Dashboard.GetActive());
+   orc_XMLParser.SetAttributeSint32("tab-index", orc_Dashboard.GetTabIndex());
    orc_XMLParser.CreateNodeChild("name", orc_Dashboard.GetName().toStdString().c_str());
    orc_XMLParser.CreateNodeChild("comment", orc_Dashboard.GetComment().toStdString().c_str());
    mh_SaveCharts(orc_Dashboard.GetCharts(), orc_XMLParser);
@@ -1140,6 +1149,18 @@ sint32 C_PuiSvHandlerFiler::mh_LoadCharts(std::vector<C_PuiSvDbChart> & orc_Widg
             {
                // Size shall be identical
                c_Box.c_DataPoolElementsActive.resize(c_Box.c_DataPoolElementsConfig.size(), true);
+            }
+
+            if (orc_XMLParser.SelectNodeChild("zoom-mode") == "zoom-mode")
+            {
+               if (C_PuiSvHandlerFiler::mh_StringToChartSettingZoomMode(orc_XMLParser.GetNodeContent().c_str(),
+                                                                        c_Box.e_SettingZoomMode) != C_NO_ERR)
+               {
+                  s32_Retval = C_CONFIG;
+               }
+
+               //Return
+               tgl_assert(orc_XMLParser.SelectNodeParent() == "chart");
             }
 
             orc_Widgets.push_back(c_Box);
@@ -2542,6 +2563,43 @@ sint32 C_PuiSvHandlerFiler::mh_StringToSourceType(const QString & orc_String,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform string to source type
+
+   \param[in]  orc_String String to interpret
+   \param[out] ore_Type   Source type
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandlerFiler::mh_StringToChartSettingZoomMode(const QString & orc_String,
+                                                            C_PuiSvDbChart::E_SettingZoomMode & ore_ZoomMode)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_String.compare("setting_zm_xy") == 0)
+   {
+      ore_ZoomMode = C_PuiSvDbChart::eSETTING_ZM_XY;
+   }
+   else if (orc_String.compare("setting_zm_x") == 0)
+   {
+      ore_ZoomMode = C_PuiSvDbChart::eSETTING_ZM_X;
+   }
+   else if (orc_String.compare("setting_zm_y") == 0)
+   {
+      ore_ZoomMode = C_PuiSvDbChart::eSETTING_ZM_Y;
+   }
+   else
+   {
+      //Default
+      ore_ZoomMode = C_PuiSvDbChart::eSETTING_ZM_XY;
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node active flags
 
    \param[in]     orc_NodeActiveFlags Node active flags
@@ -2806,8 +2864,14 @@ void C_PuiSvHandlerFiler::mh_SaveCharts(const std::vector<C_PuiSvDbChart> & orc_
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "active-flags");
       }
+
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "chart");
+
+      orc_XMLParser.CreateNodeChild("zoom-mode",
+                                    C_PuiSvHandlerFiler::mh_ChartZoomModeToString(
+                                       rc_Chart.e_SettingZoomMode).toStdString().c_str());
+
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "charts");
    }
@@ -3570,4 +3634,33 @@ C_PuiSvData::E_DeviceConfigurationMode C_PuiSvHandlerFiler::mh_StringToDeviceCon
    }
 
    return e_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform chart zoom mode to string
+
+   \param[in] oe_Type Zoom mode setting
+
+   \return
+   Stringified zoom mode setting
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSvHandlerFiler::mh_ChartZoomModeToString(const C_PuiSvDbChart::E_SettingZoomMode oe_ZoomMode)
+{
+   QString c_Retval;
+
+   switch (oe_ZoomMode)
+   {
+   case C_PuiSvDbChart::eSETTING_ZM_XY:
+      c_Retval = "setting_zm_xy";
+      break;
+   case C_PuiSvDbChart::eSETTING_ZM_X:
+      c_Retval = "setting_zm_x";
+      break;
+   case C_PuiSvDbChart::eSETTING_ZM_Y:
+      c_Retval = "setting_zm_y";
+      break;
+   }
+
+   return c_Retval;
 }

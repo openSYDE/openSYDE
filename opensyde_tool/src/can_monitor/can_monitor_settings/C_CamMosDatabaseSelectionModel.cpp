@@ -306,7 +306,7 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblTreItem * C_CamMosDatabaseSelectionModel::m_CreateAndFillDatabaseNode(const QString & orc_File,
-                                                                           C_TblTreItem * const opc_ParentItem)
+                                                                           C_TblTreSimpleItem * const opc_ParentItem)
 {
    C_TblTreItem * const pc_Retval = new C_TblTreItem();
    const QFileInfo c_FileInfo(orc_File);
@@ -331,7 +331,7 @@ C_TblTreItem * C_CamMosDatabaseSelectionModel::m_CreateAndFillDatabaseNode(const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OSCCanMessage & orc_Message,
-                                                                C_TblTreItem * const opc_ParentItem)
+                                                                C_TblTreSimpleItem * const opc_ParentItem)
 {
    C_TblTreItem * const pc_MessageItem = new C_TblTreItem();
 

@@ -699,7 +699,7 @@ void C_CamMosFilterTableModel::m_DeleteItem(const uint32 ou32_Index)
    \param[in] ou32_TargetIndex Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex) const
+void C_CamMosFilterTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex)
 {
    // nothing needs to be done here
    Q_UNUSED(ou32_SourceIndex)

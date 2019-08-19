@@ -11,19 +11,19 @@
 #ifndef C_OSCDEVICEDEFINITIONH
 #define C_OSCDEVICEDEFINITIONH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "C_OSCSystemBus.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///container for definition of one openSYDE device
 class C_OSCDeviceDefinition
@@ -49,7 +49,7 @@ public:
    ///is programming supported enabled?
    bool q_ProgrammingSupport;
 
-   std::vector<stw_types::uint16> c_SupportedBitrates; ///< supported CAN bitrates in kBit/s
+   std::vector<stw_types::uint16> c_SupportedBitrates; ///< supported CAN bitrates in kbit/s
 
    ///is the KEFEX protocol supported (on CAN bus) ?
    bool q_DiagnosticProtocolKefex;
@@ -66,6 +66,8 @@ public:
    bool q_FlashloaderOpenSydeEthernet;
    ///is the device file based or address based?
    bool q_FlashloaderOpenSydeIsFileBased;
+   ///the minimum time in ms the node needs to restart from application to the Flashloader. Default is 500ms.
+   stw_types::uint32 u32_FlashloaderResetWaitTime;
    ///the maximum time in ms it can take to erase one continuous area in flash
    stw_types::uint32 u32_FlashloaderOpenSydeRequestDownloadTimeout;
    ///the maximum time in ms it can take to write up to 4kB of data to flash
@@ -75,7 +77,7 @@ public:
    stw_types::uint32 u32_UserEepromSizeBytes;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

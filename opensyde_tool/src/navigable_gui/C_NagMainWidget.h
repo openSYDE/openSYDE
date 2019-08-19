@@ -39,9 +39,9 @@ public:
    virtual ~C_NagMainWidget();
 
    void InitText(void) const;
-   void OnSaveProjAs(void);
-   void UpdateRecentProjects(void);
    void LoadProject(const QString & orc_FilePath);
+   void UpdateRecentProjects(void);
+   void OnSaveProjAs(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -75,6 +75,7 @@ private:
    void m_UpdateCurrProjInfo(void);
    void m_OnNewProj(void);
    void m_OnOpenProj(void);
+   void m_OnSaveProj(void);
    void m_OnEdit(void) const;
    void m_OnEditFinished(void);
    void m_OnClear(void);

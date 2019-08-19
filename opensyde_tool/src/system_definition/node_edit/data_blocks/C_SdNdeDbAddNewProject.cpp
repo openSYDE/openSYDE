@@ -20,6 +20,7 @@
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "C_ImpUtil.h"
+#include "C_PuiUtil.h"
 #include "C_OSCUtils.h"
 #include "C_GtGetText.h"
 #include "C_OSCZipFile.h"
@@ -80,6 +81,10 @@ C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32 ou32_NodeIndex,
    // register the widget for showing
    this->mrc_ParentDialog.SetWidget(this);
 
+   // Remove "..." string
+   this->mpc_Ui->pc_PushButtonCreateIn->setText("");
+   this->mpc_Ui->pc_PushButtonTSP->setText("");
+
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_SdNdeDbAddNewProject::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this, &C_SdNdeDbAddNewProject::m_CancelClicked);
    connect(this->mpc_Ui->pc_PushButtonTSP, &QPushButton::clicked, this,
@@ -114,16 +119,21 @@ void C_SdNdeDbAddNewProject::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
 
    //tooltips
-   this->mpc_Ui->pc_LabelTSP->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                       "openSYDE Target Support Package"),
-                                                    C_GtGetText::h_GetText(
-                                                       "openSYDE Target Support Package provided by target deployment"));
+   this->mpc_Ui->pc_LabelTSP->SetToolTipInformation(
+      C_GtGetText::h_GetText("openSYDE Target Support Package"),
+      C_GtGetText::h_GetText("openSYDE Target Support Package provided by target deployment"));
 
-   this->mpc_Ui->pc_LabelCreateIn->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                            "Create In Directory"),
-                                                         C_GtGetText::h_GetText(
-                                                            "Location where the openSYDE Target Support Package should "
-                                                            "be extracted at."));
+   this->mpc_Ui->pc_LabelCreateIn->SetToolTipInformation(
+      C_GtGetText::h_GetText("Create In Directory"),
+      C_GtGetText::h_GetText("Location where the openSYDE Target Support Package should be extracted at."));
+
+   this->mpc_Ui->pc_PushButtonTSP->SetToolTipInformation(
+      C_GtGetText::h_GetText("Browse"),
+      C_GtGetText::h_GetText("Browse for openSYDE Target Support Package."));
+
+   this->mpc_Ui->pc_PushButtonCreateIn->SetToolTipInformation(
+      C_GtGetText::h_GetText("Browse"),
+      C_GtGetText::h_GetText("Browse for location where openSYDE Target Support Package should be extracted at."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -135,7 +145,7 @@ void C_SdNdeDbAddNewProject::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDbAddNewProject::GetTSPPath(void) const
 {
-   return C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath());
+   return C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -189,8 +199,9 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex,
          C_Uti::h_ConcatPathIfNecessary(this->mpc_Ui->pc_LineEditCreateIn->GetPath(),
                                         rc_SelectedApp.c_ProjectFolder.c_str()).toStdString().c_str();
       orc_Application.c_IDECall = rc_SelectedApp.c_IdeCall;
+      orc_Application.u16_GenCodeVersion = rc_SelectedApp.u16_GenCodeVersion;
 
-      //Handle default code generator flag!
+      //Handle default code generator flag
       if (rc_SelectedApp.q_IsStandardSydeCoderC == true)
       {
          c_CodeGeneratorPath = C_ImpUtil::h_GetSydeCoderCPath();
@@ -299,7 +310,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
    else
    {
       QDir c_CreateInFolder(
-         C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath()));
+         C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath()));
       const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
       if (this->mpc_Ui->pc_LineEditTSP->GetPath() == "")
@@ -357,7 +368,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
                c_Message2.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
                c_Message2.SetDescription(
                   QString(C_GtGetText::h_GetText("Could not clear directory \"%1\".")).
-                  arg(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath())));
+                  arg(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath())));
                QApplication::restoreOverrideCursor();
                c_Message2.Execute();
             }
@@ -377,13 +388,13 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
    }
    if (q_Continue == true)
    {
-      const QFileInfo c_TSPFileInfo(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()));
+      const QFileInfo c_TSPFileInfo(this->GetTSPPath()); // file path -> use absoluteDir() to get directory of file
       stw_scl::C_SCLString c_ErrorText;
       const QString c_Path =
          QDir::cleanPath(c_TSPFileInfo.absoluteDir().absoluteFilePath(this->mc_Package.c_TemplatePath.c_str()));
       QApplication::setOverrideCursor(Qt::WaitCursor);
       if (C_OSCZipFile::h_UnpackZipFile(c_Path.toStdString().c_str(),
-                                        C_ImpUtil::h_GetAbsolutePathFromProject(
+                                        C_PuiUtil::h_GetAbsolutePathFromProject(
                                            this->mpc_Ui->pc_LineEditCreateIn->GetPath()).toStdString().c_str(),
                                         &c_ErrorText) == C_NO_ERR)
       {
@@ -396,7 +407,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
          c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
          c_Message.SetDescription(QString(C_GtGetText::h_GetText("Could not extract openSYDE Target Support Package "
                                                                  "from file \"%1\" to directory \"%2\".")).arg(c_Path).
-                                  arg(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->
+                                  arg(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->
                                                                               GetPath())));
          c_Message.SetCustomMinWidth(800);
          c_Message.SetDetails(c_ErrorText.c_str());
@@ -424,7 +435,7 @@ void C_SdNdeDbAddNewProject::m_TSPButtonClicked(void)
    QString c_FolderName; // for default folder
    QString c_FilePath = "";
    const QString c_Suffix = "syde_tsp";
-   const QFileInfo c_File(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()));
+   const QFileInfo c_File(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()));
    const QString c_FilterName = QString(C_GtGetText::h_GetText("openSYDE Target Support Package file")) +
                                 " (*." + c_Suffix + ")";
 
@@ -461,7 +472,7 @@ void C_SdNdeDbAddNewProject::m_CreateInButtonClicked(void)
 {
    QString c_FolderName; // for default folder
 
-   const QDir c_Folder(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath()));
+   const QDir c_Folder(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath()));
 
    if (c_Folder.exists() == true)
    {
@@ -480,7 +491,11 @@ void C_SdNdeDbAddNewProject::m_CreateInButtonClicked(void)
    {
       // check if relative path is possible and appreciated
       c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
-      this->mpc_Ui->pc_LineEditCreateIn->SetPath(c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
+
+      if (c_Path != "")
+      {
+         this->mpc_Ui->pc_LineEditCreateIn->SetPath(c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
+      }
    }
 }
 
@@ -492,7 +507,7 @@ void C_SdNdeDbAddNewProject::m_OnLoadTSP(void)
 {
    this->ms32_TSPReadResult = C_OSCTargetSupportPackageFiler::h_Load(
       this->mc_Package,
-      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()).toStdString().c_str());
+      C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()).toStdString().c_str());
 
    if (this->ms32_TSPReadResult == C_NO_ERR)
    {

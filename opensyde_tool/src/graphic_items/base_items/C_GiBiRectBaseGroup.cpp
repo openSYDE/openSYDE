@@ -305,7 +305,7 @@ void C_GiBiRectBaseGroup::m_BiggestItemChanged(void)
    this->m_UpdateActionPoints();
 
    // inform the other elements
-   Q_EMIT this->ChangedGraphic();
+   Q_EMIT this->SigChangedGraphic();
 
    this->update();
 }
@@ -420,6 +420,17 @@ void C_GiBiRectBaseGroup::FindClosestPoint(const QPointF & orc_ScenePoint, QPoin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiBiRectBaseGroup::SetZValueCustom(const float64 of64_ZValue)
+{
+   this->setZValue(of64_ZValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   De- or activates the resizing of a node
 
    \param[in]     oq_Active      True activates the resizing, false deactivates the resizing
@@ -467,6 +478,7 @@ QSizeF C_GiBiRectBaseGroup::GetSize(void) const
 void C_GiBiRectBaseGroup::LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsBox & orc_Data)
 {
    this->m_SetAdaptedPos(orc_Data.c_UIPosition);
+   //Don't trigger data update at this point
    this->setZValue(orc_Data.f64_ZOrder);
 }
 
@@ -513,11 +525,9 @@ void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSiz
    this->prepareGeometryChange();
 
    // check new geometry
-   if (c_Pos.x() < C_GiCustomFunctions::hf64_SceneMinBorderSize)
+   if (c_Pos.x() < (C_GiCustomFunctions::hf64_SceneMinBorderSize + mf64_BOUNDINGRECT_BORDER))
    {
-      const float64 f64_Diff = c_Pos.x() - C_GiCustomFunctions::hf64_SceneMinBorderSize;
-
-      c_Pos.setX(C_GiCustomFunctions::hf64_SceneMinBorderSize);
+      c_Pos.setX(C_GiCustomFunctions::hf64_SceneMinBorderSize + mf64_BOUNDINGRECT_BORDER);
 
       if (this->mq_KeepAspectRatio == false)
       {
@@ -525,14 +535,12 @@ void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSiz
       }
       else
       {
-         c_Size.setWidth(this->m_GetBiggestSubItemBoundingRect().width() - f64_Diff);
+         //Don't change size to keep aspect ratio
       }
    }
-   if (c_Pos.y() < C_GiCustomFunctions::hf64_SceneMinBorderSize)
+   if (c_Pos.y() < (C_GiCustomFunctions::hf64_SceneMinBorderSize + mf64_BOUNDINGRECT_BORDER))
    {
-      const float64 f64_Diff = c_Pos.y() - C_GiCustomFunctions::hf64_SceneMinBorderSize;
-
-      c_Pos.setY(C_GiCustomFunctions::hf64_SceneMinBorderSize);
+      c_Pos.setY(C_GiCustomFunctions::hf64_SceneMinBorderSize + mf64_BOUNDINGRECT_BORDER);
 
       if (this->mq_KeepAspectRatio == false)
       {
@@ -540,7 +548,7 @@ void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSiz
       }
       else
       {
-         c_Size.setHeight(this->m_GetBiggestSubItemBoundingRect().height() - f64_Diff);
+         //Don't change size to keep aspect ratio
       }
    }
    if (c_Size.width() < this->mf64_MinWidth)
@@ -574,7 +582,7 @@ void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSiz
    this->m_UpdateActionPoints();
 
    // inform the other elements
-   Q_EMIT this->ChangedGraphic();
+   Q_EMIT this->SigChangedGraphic();
 
    this->update();
 }
@@ -624,7 +632,11 @@ void C_GiBiRectBaseGroup::UpdateTransform(const QTransform & orc_Transform)
 //----------------------------------------------------------------------------------------------------------------------
 QVariant C_GiBiRectBaseGroup::itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value)
 {
-   QVariant c_Return = C_GiCustomFunctions::h_ItemChange(oe_Change, orc_Value, this);
+   QVariant c_Return;
+
+   //Don't pass bounding rect offset -> currently does worse on border handling
+   //Not passing the offset probably just allows a buffer so this function does not adapt the change "the wrong way"
+   c_Return = C_GiCustomFunctions::h_ItemChange(oe_Change, orc_Value, this, NULL);
 
    c_Return = QGraphicsItemGroup::itemChange(oe_Change, c_Return);
 
@@ -670,7 +682,7 @@ QVariant C_GiBiRectBaseGroup::itemChange(const GraphicsItemChange oe_Change, con
    case ItemTransformHasChanged:            // use the same signal
    case ItemScaleHasChanged:                // use the same signal
    case ItemTransformOriginPointHasChanged: // use the same signal
-      Q_EMIT this->ChangedGraphic();
+      Q_EMIT this->SigChangedGraphic();
       break;
    default:
       break;
@@ -774,66 +786,25 @@ void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Ev
 
       if (this->mq_KeepAspectRatio == true)
       {
+         C_GiCustomFunctions::E_AspectRatioMovement e_AspectRatioMovement;
          if (this->msn_ActiveResizeMode == msn_IndexBottomLeft)
          {
-            // adapt the difference to the aspect ratio
-            if ((c_Delta.x() * -1.0) > c_Delta.y())
-            {
-               if (C_OSCUtils::h_IsFloat64NearlyEqual(this->mf64_AspectRatio, 0.0) == false)
-               {
-                  c_Delta.setY((c_Delta.x() * -1.0) / this->mf64_AspectRatio);
-               }
-            }
-            else
-            {
-               c_Delta.setX((c_Delta.y() * -1.0) * this->mf64_AspectRatio);
-            }
+            e_AspectRatioMovement = C_GiCustomFunctions::eARM_BOTTOM_LEFT;
          }
          else if (this->msn_ActiveResizeMode == msn_IndexTopRight)
          {
-            // adapt the difference to the aspect ratio
-            if (c_Delta.x() > (c_Delta.y() * -1.0))
-            {
-               if (C_OSCUtils::h_IsFloat64NearlyEqual(this->mf64_AspectRatio, 0.0) == false)
-               {
-                  c_Delta.setY((c_Delta.x() * -1.0) / this->mf64_AspectRatio);
-               }
-            }
-            else
-            {
-               c_Delta.setX((c_Delta.y() * -1.0) * this->mf64_AspectRatio);
-            }
+            e_AspectRatioMovement = C_GiCustomFunctions::eARM_TOP_RIGHT;
          }
          else if (this->msn_ActiveResizeMode == msn_IndexTopLeft)
          {
-            // adapt the difference to the aspect ratio
-            if (c_Delta.x() < c_Delta.y())
-            {
-               if (C_OSCUtils::h_IsFloat64NearlyEqual(this->mf64_AspectRatio, 0.0) == false)
-               {
-                  c_Delta.setY(c_Delta.x() / this->mf64_AspectRatio);
-               }
-            }
-            else
-            {
-               c_Delta.setX(c_Delta.y() * this->mf64_AspectRatio);
-            }
+            e_AspectRatioMovement = C_GiCustomFunctions::eARM_TOP_LEFT;
          }
          else
          {
-            // adapt the difference to the aspect ratio
-            if (c_Delta.x() > c_Delta.y())
-            {
-               if (C_OSCUtils::h_IsFloat64NearlyEqual(this->mf64_AspectRatio, 0.0) == false)
-               {
-                  c_Delta.setY(c_Delta.x() / this->mf64_AspectRatio);
-               }
-            }
-            else
-            {
-               c_Delta.setX(c_Delta.y() * this->mf64_AspectRatio);
-            }
+            e_AspectRatioMovement = C_GiCustomFunctions::eARM_BOTTOM_RIGHT;
          }
+         c_Delta = C_GiCustomFunctions::h_AdaptDeltaForAspectRatio(this->mf64_AspectRatio, e_AspectRatioMovement,
+                                                                   c_Delta);
       }
 
       // adapt size and position

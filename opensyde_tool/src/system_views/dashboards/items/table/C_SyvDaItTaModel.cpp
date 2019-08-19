@@ -61,7 +61,7 @@ const uint32 C_SyvDaItTaModel::hu32_MaxElements = static_cast<uint32>(std::numer
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTaModel::C_SyvDaItTaModel(C_PuiSvDbDataElementHandler * const opc_Data, QObject * const opc_Parent) :
-   QAbstractTableModel(opc_Parent),
+   C_TblModelAction(opc_Parent),
    mpc_Data(opc_Data)
 {
    // Default icons
@@ -964,97 +964,53 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
    return c_Retval;
 }
 
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handle copy items action
+
+   This is not yet implemented and needs to be implemented by inheritors,
+   because a generic function would not make anything easier as any copy action depends on the data.
+
+   \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDaItTaModel::CopySelectedItems(const std::vector<uint32> & orc_SelectedIndices) const
+{
+   //Copy paste not supported
+   Q_UNUSED(orc_SelectedIndices)
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle move selected items action
+
+   Warning 1: This function currently can only handle shifts by ONE up or down
+
+   \param[in] orc_SelectedIndices Selected indices
+   \param[in] oq_Up               Flag to switch to move one step up or down
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaModel::MoveItems(const QModelIndexList & orc_Indices, const bool oq_Up)
+{
+   this->MoveSelectedItems(C_SyvDaItTaModel::mh_GetSelectedRows(orc_Indices), oq_Up);
+   //Reinitialize static content
+   InitMinMaxAndName();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new data element
 
    \param[in] orc_Indices           Item(s) after that the new element should be added (usually only one item)
    \param[in] orc_DataPoolElementId New data element ID
+
+   \return
+   Index of new item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaModel::AddItem(const QModelIndexList & orc_Indices,
-                               const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
+uint32 C_SyvDaItTaModel::AddItem(const QModelIndexList & orc_Indices,
+                                 const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
-
-   if ((pc_TableWidget != NULL) && (orc_DataPoolElementId.GetIsValid() == true))
-   {
-      const C_OSCNodeDataPoolListElement * const pc_Element =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
-                                                                    orc_DataPoolElementId.u32_DataPoolIndex,
-                                                                    orc_DataPoolElementId.u32_ListIndex,
-                                                                    orc_DataPoolElementId.u32_ElementIndex);
-      const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
-      if (((pc_Item != NULL) && (pc_Item->c_DataPoolElementsConfig.size() < C_SyvDaItTaModel::hu32_MaxElements)) &&
-          (pc_Element != NULL))
-      {
-         C_PuiSvDbNodeDataElementConfig c_NewConfig;
-         C_PuiSvDbTable c_Copy = *pc_Item;
-         bool q_ChangeRowCount;
-         sint32 s32_InsertAt;
-
-         //Check if new row
-         if (pc_Item->c_DataPoolElementsConfig.size() > 0)
-         {
-            q_ChangeRowCount = true;
-         }
-         else
-         {
-            q_ChangeRowCount = false;
-         }
-
-         // get location where to insert new row (after selected vs. at the end)
-         if ((orc_Indices.isEmpty() == false) && (q_ChangeRowCount == true))
-         {
-            // insert after (+1) last selected row (last())
-            s32_InsertAt = orc_Indices.last().row() + 1;
-         }
-         else
-         {
-            // insert at the end
-            s32_InsertAt = pc_Item->c_DataPoolElementsConfig.size();
-         }
-
-         if (q_ChangeRowCount == true)
-         {
-            //New row
-            beginInsertRows(QModelIndex(), s32_InsertAt, s32_InsertAt);
-         }
-         else
-         {
-            //Existing row changed
-            beginResetModel();
-         }
-         //Add new item
-         c_NewConfig.c_ElementId = orc_DataPoolElementId;
-         c_NewConfig.c_ElementScaling.q_UseDefault = true;
-         c_NewConfig.c_ElementScaling.f64_Offset = pc_Element->f64_Offset;
-         c_NewConfig.c_ElementScaling.f64_Factor = pc_Element->f64_Factor;
-         c_NewConfig.c_ElementScaling.c_Unit = pc_Element->c_Unit.c_str();
-         //Apply
-         c_Copy.c_DataPoolElementsConfig.insert(c_Copy.c_DataPoolElementsConfig.begin() + s32_InsertAt, c_NewConfig);
-         tgl_assert(pc_TableWidget->SetTableItem(c_Copy) == C_NO_ERR);
-         //Register
-         if (this->mpc_Data->IsDataElementRegistered(orc_DataPoolElementId) == false)
-         {
-            tgl_assert(this->mpc_Data->RegisterDataPoolElement(orc_DataPoolElementId,
-                                                               c_NewConfig.c_ElementScaling) == C_NO_ERR);
-         }
-         //Reinitialize static content
-         InitMinMaxAndName();
-         if (q_ChangeRowCount == true)
-         {
-            //New row
-            endInsertRows();
-         }
-         else
-         {
-            //Existing row changed
-            endResetModel();
-         }
-      }
-   }
+   this->mc_AddDataPoolElementId = orc_DataPoolElementId;
+   return this->AddNewItem(C_SyvDaItTaModel::mh_GetSelectedRows(orc_Indices));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1067,69 +1023,11 @@ void C_SyvDaItTaModel::AddItem(const QModelIndexList & orc_Indices,
 void C_SyvDaItTaModel::RemoveItems(const QModelIndexList & orc_Indices,
                                    std::vector<C_PuiSvDbNodeDataPoolListElementId> & orc_RemovedDataElements)
 {
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
-
-   if (pc_TableWidget != NULL)
-   {
-      const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
-      if ((pc_Item != NULL) && (pc_Item->c_DataPoolElementsConfig.size() > 0))
-      {
-         std::vector<uint32> c_TableRows;
-         //Step 1: extract rows
-         this->GetUniqueRows(orc_Indices, c_TableRows);
-         if (c_TableRows.size() > 0)
-         {
-            std::vector<uint32> c_DataRows = c_TableRows;
-            C_PuiSvDbTable c_Copy = *pc_Item;
-            this->beginResetModel();
-            //Step 2: Remove rows and store the according data element
-            orc_RemovedDataElements.reserve(c_TableRows.size());
-            for (uint32 u32_ItRow = 0; u32_ItRow < c_TableRows.size(); ++u32_ItRow)
-            {
-               const C_PuiSvDbNodeDataPoolListElementId * const pc_CurId =
-                  this->GetDataPoolElementIndex(c_TableRows[u32_ItRow]);
-               if (pc_CurId != NULL)
-               {
-                  bool q_Found = false;
-                  //Adapt indices to deleted one (only necessary for the next ones)
-                  for (uint32 u32_ItDataIndex = u32_ItRow; u32_ItDataIndex < c_DataRows.size(); ++u32_ItDataIndex)
-                  {
-                     uint32 & ru32_CurElement = c_DataRows[u32_ItDataIndex];
-                     //Do NOT include the to be deleted one
-                     if (ru32_CurElement > c_DataRows[u32_ItRow])
-                     {
-                        ru32_CurElement = ru32_CurElement - 1UL;
-                     }
-                  }
-                  //Remove
-                  c_Copy.c_DataPoolElementsConfig.erase(c_Copy.c_DataPoolElementsConfig.begin() +
-                                                        c_DataRows[u32_ItRow]);
-                  orc_RemovedDataElements.push_back(*pc_CurId);
-                  //Check other usages
-                  for (uint32 u32_ItConfig = 0; u32_ItConfig < c_Copy.c_DataPoolElementsConfig.size(); ++u32_ItConfig)
-                  {
-                     const C_PuiSvDbNodeDataElementConfig & rc_Config = c_Copy.c_DataPoolElementsConfig[u32_ItConfig];
-                     if ((rc_Config.c_ElementId.GetIsValid() == true) && (rc_Config.c_ElementId == *pc_CurId))
-                     {
-                        q_Found = true;
-                     }
-                  }
-                  if (q_Found == false)
-                  {
-                     //Remove completely if no usages
-                     this->mpc_Data->RemoveDataPoolElement(*pc_CurId);
-                  }
-               }
-            }
-            tgl_assert(pc_TableWidget->SetTableItem(c_Copy) == C_NO_ERR);
-            //Reinitialize static content
-            InitMinMaxAndName();
-            this->endResetModel();
-         }
-      }
-   }
+   this->mc_RemovedDataPoolElementIds.clear();
+   this->DeleteSelectedItems(C_SyvDaItTaModel::mh_GetSelectedRows(orc_Indices));
+   orc_RemovedDataElements = this->mc_RemovedDataPoolElementIds;
+   //Reinitialize static content
+   InitMinMaxAndName();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1234,6 +1132,328 @@ const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItTaModel::GetDataPoolElementI
    return pc_Retval;
 }
 
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handle add new item action
+
+   \param[in] ou32_SelectedIndex Index to insert item at
+
+   \return
+   Index of new item
+*/
+//-----------------------------------------------------------------------------
+uint32 C_SyvDaItTaModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
+{
+   uint32 u32_Retval = 0UL;
+
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+
+   if ((pc_TableWidget != NULL) && (this->mc_AddDataPoolElementId.GetIsValid() == true))
+   {
+      const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
+      if ((pc_Item != NULL) && (pc_Item->c_DataPoolElementsConfig.size() < C_SyvDaItTaModel::hu32_MaxElements))
+      {
+         const C_PuiSvDbNodeDataElementConfig c_NewConfig = C_SyvDaItTaModel::mh_GetConfigForNewItem(
+            this->mc_AddDataPoolElementId);
+         C_PuiSvDbTable c_Copy = *pc_Item;
+         bool q_ChangeRowCount;
+         sint32 s32_InsertAt;
+
+         //Check if new row
+         if (pc_Item->c_DataPoolElementsConfig.size() > 0)
+         {
+            q_ChangeRowCount = true;
+         }
+         else
+         {
+            q_ChangeRowCount = false;
+         }
+
+         if (q_ChangeRowCount == true)
+         {
+            // get location where to insert new row
+            // use valid index
+            if (ou32_SelectedIndex < m_GetSizeItems())
+            {
+               s32_InsertAt = ou32_SelectedIndex + 1UL;
+            }
+            else
+            {
+               s32_InsertAt = m_GetSizeItems();
+            }
+            u32_Retval = static_cast<uint32>(s32_InsertAt);
+         }
+         else
+         {
+            //Always insert if start if first item
+            s32_InsertAt = 0;
+            u32_Retval = 0UL;
+         }
+
+         if (q_ChangeRowCount == true)
+         {
+            //New row
+            beginInsertRows(QModelIndex(), s32_InsertAt, s32_InsertAt);
+         }
+         else
+         {
+            //Existing row changed
+            beginResetModel();
+         }
+         //Add new item
+         c_Copy.c_DataPoolElementsConfig.insert(c_Copy.c_DataPoolElementsConfig.begin() + s32_InsertAt, c_NewConfig);
+         //Apply
+         tgl_assert(pc_TableWidget->SetTableItem(c_Copy) == C_NO_ERR);
+         //Register
+         if ((this->mpc_Data != NULL) &&
+             (this->mpc_Data->IsDataElementRegistered(this->mc_AddDataPoolElementId) == false))
+         {
+            tgl_assert(this->mpc_Data->RegisterDataPoolElement(this->mc_AddDataPoolElementId,
+                                                               c_NewConfig.c_ElementScaling) == C_NO_ERR);
+         }
+         //Reinitialize static content
+         InitMinMaxAndName();
+         if (q_ChangeRowCount == true)
+         {
+            //New row
+            endInsertRows();
+         }
+         else
+         {
+            //Existing row changed
+            endResetModel();
+         }
+      }
+   }
+   return u32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handle paste items action
+
+   \param[in] ou32_SelectedIndex Index to insert item at
+
+   \return
+   Indices of new items
+*/
+//-----------------------------------------------------------------------------
+std::vector<uint32> C_SyvDaItTaModel::m_PasteItems(const uint32 ou32_SelectedIndex)
+{
+   std::vector<uint32> c_Retval;
+   //Paste not supported
+   Q_UNUSED(ou32_SelectedIndex)
+   return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get size of item container, i.e. number of items.
+
+   \return
+   Size of item container
+*/
+//-----------------------------------------------------------------------------
+uint32 C_SyvDaItTaModel::m_GetSizeItems(void) const
+{
+   uint32 u32_Retval = 0UL;
+
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   const stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<const stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+
+   if (pc_TableWidget != NULL)
+   {
+      const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
+      if (pc_Item != NULL)
+      {
+         u32_Retval = pc_Item->c_DataPoolElementsConfig.size();
+      }
+   }
+
+   return u32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Delete specific item
+
+   Warning: not expected to fail
+
+   \param[in] ou32_Index Index to delete
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDaItTaModel::m_DeleteItem(const uint32 ou32_Index)
+{
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+
+   if (pc_TableWidget != NULL)
+   {
+      const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
+      if ((pc_Item != NULL) && (pc_Item->c_DataPoolElementsConfig.size() > 0))
+      {
+         C_PuiSvDbTable c_Copy = *pc_Item;
+         //Step 2: Remove rows and store the according data element index
+         const C_PuiSvDbNodeDataPoolListElementId c_Item = this->m_RemoveItem(ou32_Index,
+                                                                              c_Copy.c_DataPoolElementsConfig);
+         this->mc_RemovedDataPoolElementIds.push_back(c_Item);
+         tgl_assert(pc_TableWidget->SetTableItem(c_Copy) == C_NO_ERR);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Trigger table signal for start of remove action
+
+   \param[in] ou32_FirstIndex Lowest index of this section of removed items
+   \param[in] ou32_LastIndex  Highest index of this section of removed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaModel::m_BeginRemoveRows(const uint32 ou32_FirstIndex, const uint32 ou32_LastIndex)
+{
+   const uint32 u32_DeletedItemCount = ou32_LastIndex - ou32_FirstIndex;
+
+   if (this->m_GetSizeItems() == u32_DeletedItemCount)
+   {
+      this->beginResetModel();
+   }
+   else
+   {
+      C_TblModelAction::m_BeginRemoveRows(ou32_FirstIndex, ou32_LastIndex);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Trigger table signal for end of remove action
+
+   \param[in] ou32_FirstIndex Lowest index of this section of removed items
+   \param[in] ou32_LastIndex  Highest index of this section of removed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaModel::m_EndRemoveRows(const uint32 ou32_FirstIndex, const uint32 ou32_LastIndex)
+{
+   const uint32 u32_DeletedItemCount = ou32_LastIndex - ou32_FirstIndex;
+
+   if (this->m_GetSizeItems() == u32_DeletedItemCount)
+   {
+      this->endResetModel();
+   }
+   else
+   {
+      C_TblModelAction::m_EndRemoveRows(ou32_FirstIndex, ou32_LastIndex);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Move specific item
+
+   For implementation: First delete ou32_SourceIndex then insert ou32_TargetIndex
+   Warning: not expected to fail
+
+   \param[in] ou32_SourceIndex Source index
+   \param[in] ou32_TargetIndex Target index
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDaItTaModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex)
+{
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+
+   if (pc_TableWidget != NULL)
+   {
+      const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
+      if ((pc_Item != NULL) && (ou32_SourceIndex < pc_Item->c_DataPoolElementsConfig.size()))
+      {
+         const C_PuiSvDbNodeDataElementConfig c_NewConfig = pc_Item->c_DataPoolElementsConfig[ou32_SourceIndex];
+         C_PuiSvDbTable c_Copy = *pc_Item;
+
+         //Delete
+         c_Copy.c_DataPoolElementsConfig.erase(c_Copy.c_DataPoolElementsConfig.begin() + ou32_SourceIndex);
+         //Add new item
+         c_Copy.c_DataPoolElementsConfig.insert(c_Copy.c_DataPoolElementsConfig.begin() + ou32_TargetIndex,
+                                                c_NewConfig);
+         //Apply
+         tgl_assert(pc_TableWidget->SetTableItem(c_Copy) == C_NO_ERR);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get prepare configuration for new item
+
+   \param[in] orc_DataPoolElementId New item ID
+
+   \return
+   Prepare configuration for new item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDbNodeDataElementConfig C_SyvDaItTaModel::mh_GetConfigForNewItem(
+   const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
+{
+   C_PuiSvDbNodeDataElementConfig c_NewConfig;
+   const C_OSCNodeDataPoolListElement * const pc_Element =
+      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
+                                                                 orc_DataPoolElementId.u32_DataPoolIndex,
+                                                                 orc_DataPoolElementId.u32_ListIndex,
+                                                                 orc_DataPoolElementId.u32_ElementIndex);
+
+   c_NewConfig.c_ElementId = orc_DataPoolElementId;
+   c_NewConfig.c_ElementScaling.q_UseDefault = true;
+   if (pc_Element != NULL)
+   {
+      c_NewConfig.c_ElementScaling.f64_Offset = pc_Element->f64_Offset;
+      c_NewConfig.c_ElementScaling.f64_Factor = pc_Element->f64_Factor;
+      c_NewConfig.c_ElementScaling.c_Unit = pc_Element->c_Unit.c_str();
+   }
+   return c_NewConfig;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delete item in the provided array and unregister index if not used after this move
+
+   \param[in]     ou32_Index       Index to delete
+   \param[in,out] orc_AdaptedItems Items to change
+
+   \return
+   Deleted index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDbNodeDataPoolListElementId C_SyvDaItTaModel::m_RemoveItem(const uint32 ou32_Index,
+                                                                  std::vector<C_PuiSvDbNodeDataElementConfig> & orc_AdaptedItems)
+{
+   C_PuiSvDbNodeDataPoolListElementId c_Retval;
+   const C_PuiSvDbNodeDataPoolListElementId * const pc_CurId = this->GetDataPoolElementIndex(ou32_Index);
+
+   if (pc_CurId != NULL)
+   {
+      bool q_Found = false;
+      c_Retval = *pc_CurId;
+      //Remove
+      orc_AdaptedItems.erase(orc_AdaptedItems.begin() + ou32_Index);
+      //Check other usages
+      for (uint32 u32_ItConfig = 0; u32_ItConfig < orc_AdaptedItems.size(); ++u32_ItConfig)
+      {
+         const C_PuiSvDbNodeDataElementConfig & rc_Config = orc_AdaptedItems[u32_ItConfig];
+         if ((rc_Config.c_ElementId.GetIsValid() == true) && (rc_Config.c_ElementId == *pc_CurId))
+         {
+            q_Found = true;
+         }
+      }
+      if ((q_Found == false) && (this->mpc_Data != NULL))
+      {
+         //Remove completely if no usages
+         this->mpc_Data->RemoveDataPoolElement(*pc_CurId);
+      }
+   }
+   return c_Retval;
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get value in percent
 
@@ -1330,5 +1550,25 @@ QString C_SyvDaItTaModel::GetValue(const uint32 ou32_Index) const
       }
    }
 
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all row indices from the selected indices (unique)
+
+   \param[in] orc_Indices Model indices
+
+   \return
+   Unique row indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<uint32> C_SyvDaItTaModel::mh_GetSelectedRows(const QModelIndexList & orc_Indices)
+{
+   std::vector<uint32> c_Retval;
+   for (QModelIndexList::const_iterator c_It = orc_Indices.begin(); c_It != orc_Indices.end(); ++c_It)
+   {
+      c_Retval.push_back(c_It->row());
+   }
+   C_Uti::h_Uniqueify(c_Retval);
    return c_Retval;
 }

@@ -40,7 +40,6 @@ public:
    static QString h_GetAbsoluteGeneratedDir(const stw_opensyde_core::C_OSCNodeApplication * const opc_Application,
                                             const stw_scl::C_SCLString & orc_NodeName);
    static bool h_CheckProjForCodeGeneration(QWidget * const opc_Parent);
-   static QString h_GetAbsolutePathFromProject(const QString & orc_Path);
    static QString h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QString & orc_Path,
                                               const QString & orc_AbsoluteReferenceDir);
    static QStringList h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QStringList & orc_Paths,

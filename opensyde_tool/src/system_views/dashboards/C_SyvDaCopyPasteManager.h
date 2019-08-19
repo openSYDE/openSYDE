@@ -12,7 +12,7 @@
 #define C_SYVDACOPYPASTEMANAGER_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_PuiSvDashboard.h"
+#include "C_SyvDaDashboardSnapshot.h"
 #include "C_SebBaseCopyPasteManager.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -31,7 +31,9 @@ public:
    virtual const C_PuiBsElements * GetSnapshot(QWidget * const opc_Parent) override;
    void PrepareCopyFromSceneToManager(const stw_types::uint32 ou32_ViewIndex,
                                       const stw_types::uint32 ou32_DashboardIndex);
-   virtual void CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems) override;
+   virtual void CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems,
+                                       const QMap<const QGraphicsItem *, stw_types::float64> & orc_NormalizedZValues)
+   override;
    virtual bool CheckValidContentAndPrepareData(void) override;
 
    static const QString hc_ClipBoardBaseTagName;
@@ -42,7 +44,7 @@ protected:
 private:
    stw_types::uint32 mu32_ViewIndex;
    stw_types::uint32 mu32_DashboardIndex;
-   C_PuiSvDashboard mc_LastKnownData;
+   C_SyvDaDashboardSnapshot mc_LastKnownData;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

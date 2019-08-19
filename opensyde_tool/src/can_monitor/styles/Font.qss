@@ -56,7 +56,9 @@ stw_opensyde_gui_elements--C_OgeTedToolTipContent,
 stw_opensyde_gui_elements--C_OgeContextMenu,
 stw_opensyde_gui_elements--C_OgeLabGroupItemValue,
 stw_opensyde_gui_elements--C_OgeCbxText,
-stw_opensyde_gui_elements--C_CamOgeMuRecentProjects::item
+stw_opensyde_gui_elements--C_CamOgeMuRecentProjects::item,
+stw_opensyde_gui_elements--C_OgeMuSections::item,
+stw_opensyde_gui_elements--C_OgeMuSections QLabel
 {
 font-family:"Segoe UI";
 font-size:12px;
@@ -77,7 +79,7 @@ stw_opensyde_gui--C_CamGenSigTableView::item,
 stw_opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="13"][SemiBold="false"][Bold="false"],
 stw_opensyde_gui_elements--C_OgeLeDark,
-stw_opensyde_gui_elements--C_CamOgeLeDarkBrowse,
+stw_opensyde_gui_elements--C_CamOgeLeFilePath,
 QAbstractItemView[View="CompleterDark"],
 stw_opensyde_gui_elements--C_CamOgeCbxDark,
 stw_opensyde_gui_elements--C_CamOgeCbxDark QListView,
@@ -94,7 +96,9 @@ font-weight:normal;
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="13"][SemiBold="true"][Bold="false"],
 stw_opensyde_gui_elements--C_OgePubProjAction,
 stw_opensyde_gui_elements--C_OgePubCancel,
-stw_opensyde_gui_elements--C_OgePubDialog
+stw_opensyde_gui_elements--C_OgePubDialog,
+stw_opensyde_gui_elements--C_OgePubMessageOk,
+stw_opensyde_gui_elements--C_OgePubMessageCancel
 {
 font-family:"Segoe UI Semibold";
 font-size:13px;

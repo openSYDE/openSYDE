@@ -7,7 +7,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cstdio>
@@ -18,32 +18,32 @@
 #include "C_OSCUtils.h"
 #include "C_OSCComMessageLoggerFileBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
    \param[in]  orc_FilePath      Complete path with file name of logging file
    \param[in]  orc_ProtocolName  Name of current set protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLoggerFileBase::C_OSCComMessageLoggerFileBase(const stw_scl::C_SCLString & orc_FilePath,
                                                              const C_SCLString & orc_ProtocolName) :
    mc_FilePath(orc_FilePath),
@@ -51,15 +51,15 @@ C_OSCComMessageLoggerFileBase::C_OSCComMessageLoggerFileBase(const stw_scl::C_SC
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLoggerFileBase::~C_OSCComMessageLoggerFileBase(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates, if necessary, and opens file and adds the default header of the file.
 
    Base implementation only creates the folders and deletes an already existing file
@@ -68,7 +68,7 @@ C_OSCComMessageLoggerFileBase::~C_OSCComMessageLoggerFileBase(void)
    C_NO_ERR    No errors
    C_RD_WR     Error on creating folders or deleting old file
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComMessageLoggerFileBase::OpenFile(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -100,12 +100,12 @@ sint32 C_OSCComMessageLoggerFileBase::OpenFile(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the current protocol name
 
    \param[in]     orc_ProtocolName         Current protocol name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLoggerFileBase::SetProtocolName(const C_SCLString & orc_ProtocolName)
 {
    this->mc_ProtocolName = orc_ProtocolName;

@@ -300,6 +300,18 @@ QString C_SyvDaItChartDataItemWidget::GetDataElementUnit(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the toggled state if the element is active or not
+
+   \retval   true    Element is enabled
+   \retval   false   Element is disabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaItChartDataItemWidget::GetDataElementToggledState(void) const
+{
+   return this->mpc_Ui->pc_CheckBoxDataSerieActive->isChecked();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a new unit
 
    \param[in]     orc_Unit                Element unit
@@ -427,7 +439,7 @@ void C_SyvDaItChartDataItemWidget::mousePressEvent(QMouseEvent * const opc_Event
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::m_DataItemToggled(const bool oq_Checked)
 {
-   Q_EMIT this->SigDataItemToggled(this->mu32_DataPoolElementConfigIndex, oq_Checked);
+   Q_EMIT (this->SigDataItemToggled(this->mu32_DataPoolElementConfigIndex, oq_Checked));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

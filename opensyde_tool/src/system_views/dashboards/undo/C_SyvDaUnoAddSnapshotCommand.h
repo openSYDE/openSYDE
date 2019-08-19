@@ -26,11 +26,12 @@ class C_SyvDaUnoAddSnapshotCommand :
    public C_SyvDaUnoAddBaseCommand
 {
 public:
-   C_SyvDaUnoAddSnapshotCommand(QGraphicsScene * const opc_Scene, const C_PuiSvDashboard & orc_InitialSnapshotData,
+   C_SyvDaUnoAddSnapshotCommand(QGraphicsScene * const opc_Scene,
+                                const C_SyvDaDashboardSnapshot & orc_InitialSnapshotData,
                                 const std::vector<stw_types::uint64> & orc_IDs,
                                 const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
                                            C_PuiSvReadDataConfiguration> & orc_RestoredRails,
-                                const QPointF & orc_NewPos,
+                                const QPointF & orc_NewPos, const stw_types::float64 of64_HighestUsedZValue,
                                 QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SyvDaUnoAddSnapshotCommand(void);
 
@@ -38,8 +39,6 @@ protected:
    virtual void m_AddNew(void);
 
 private:
-   const QPointF mc_NewPos;
-
    void m_InitialReadRailHandling(void);
 };
 

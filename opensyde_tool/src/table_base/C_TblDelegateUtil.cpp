@@ -38,10 +38,19 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Paint marked section
 
-   \param[in,out] opc_Painter  Painter
-   \param[in]     orc_CellRect Cell rectangle to draw in
-   \param[in]     orc_Index    Index
-   \param[in]     oq_Selected  Flag if item is selected
+   \param[in,out] opc_Painter                  Painter
+   \param[in]     orc_CellRect                 Cell rectangle to draw in
+   \param[in]     orc_Index                    Index
+   \param[in]     oq_Selected                  Flag if item is selected
+   \param[in]     orc_DefaultBackgroundColor   Default background color
+   \param[in]     orc_DefaultBorderColor       Default border color
+   \param[in]     orc_DefaultFont              Default font
+   \param[in]     orc_HighlightForegroundColor Highlight foreground color
+   \param[in]     orc_HighlightBackgroundColor Highlight background color
+   \param[in]     orc_HighlightBorderColor     Highlight border color
+   \param[in]     orc_HighlightFont            Highlight font
+   \param[in]     osn_HexSpacing               In between spacing when using HEX format
+   \param[in]     osn_DecimalSpacing           In between spacing when using decimal format
 
    \return
    True  Section painted
@@ -127,25 +136,25 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
          for (sint32 s32_ItLits = 0UL; s32_ItLits < c_List.size(); ++s32_ItLits)
          {
             //Next byte value
-            const QString c_NewItem = c_List.at(s32_ItLits);
+            const QString & rc_NewItem = c_List.at(s32_ItLits);
             //Check if highlighted
             if (c_Array.at(s32_ItLits) == true)
             {
                //While processing the highlighted section append to the second vector/string
                q_Start = false;
-               c_P2.append(c_NewItem);
+               c_P2.append(rc_NewItem);
             }
             else
             {
                //While not reaching the start of the highlighted section append to the first vector/string
                if (q_Start == true)
                {
-                  c_P1.append(c_NewItem);
+                  c_P1.append(rc_NewItem);
                }
                else
                {
                   //Beyond reaching the end of the highlighted section append to the last vector/string
-                  c_P3.append(c_NewItem);
+                  c_P3.append(rc_NewItem);
                }
             }
          }
@@ -261,42 +270,30 @@ bool C_TblDelegateUtil::h_PaintStringWithRestriction(QPainter * const opc_Painte
                                                      const sint32 os32_CellWidth, const sint32 os32_MarginFront,
                                                      const sint32 os32_MarginBack)
 {
-   bool q_Retval = false;
-   QTextOption c_Option;
-   const QFontMetrics c_Metrics(orc_Font);
+   bool q_Retval;
+   const QTextOption c_Option(orc_Alignment);
    QString c_DrawnText = orc_Text;
-   sint32 s32_SegmentWidth = os32_CellWidth;
-   QRect c_RectSegment;
-
-   //If user does not specify anything use the metrics width instead
-   if (s32_SegmentWidth < 0)
-   {
-      s32_SegmentWidth = os32_MarginFront + c_Metrics.width(c_DrawnText) + os32_MarginBack;
-   }
-
-   //Check if the segment width does exceed the complete cell boundaries
-   if ((static_cast<sint32>(orc_TopLeft.x()) + s32_SegmentWidth) >
-       static_cast<sint32>(orc_CompleteCell.topLeft().x() + orc_CompleteCell.width()))
-   {
-      s32_SegmentWidth =
-         static_cast<sint32>((orc_CompleteCell.topLeft().x() + orc_CompleteCell.width()) - orc_TopLeft.x()) -
-         os32_MarginFront;
-      c_DrawnText = C_Uti::h_AdaptStringToSize(c_DrawnText, c_Metrics, static_cast<sintn>(s32_SegmentWidth));
-      q_Retval = true;
-   }
-
+   const sint32 s32_SegmentWidth = C_TblDelegateUtil::mh_GetSegmentWidth(orc_TopLeft, orc_CompleteCell, c_DrawnText,
+                                                                         orc_Font, os32_CellWidth, os32_MarginFront,
+                                                                         os32_MarginBack, q_Retval);
    //Rect segment to draw in
-   c_RectSegment = QRect(orc_TopLeft, QSize(s32_SegmentWidth, orc_CompleteCell.height()));
+   const QRect c_RectSegment(orc_TopLeft, QSize(s32_SegmentWidth, orc_CompleteCell.height()));
+
    //Background
-   opc_Painter->setPen(orc_Border);
-   opc_Painter->setBrush(orc_Background);
-   opc_Painter->drawRect(c_RectSegment);
+   if ((orc_Border.alpha() > 0) || (orc_Background.alpha() > 0))
+   {
+      opc_Painter->setPen(orc_Border);
+      opc_Painter->setBrush(orc_Background);
+      opc_Painter->drawRect(c_RectSegment);
+   }
    //Foreground
-   opc_Painter->setPen(orc_Foreground);
-   opc_Painter->setBrush(Qt::NoBrush);
-   opc_Painter->setFont(orc_Font);
-   c_Option.setAlignment(orc_Alignment);
-   opc_Painter->drawText(c_RectSegment.adjusted(os32_MarginFront, 0, 0, 0), c_DrawnText, c_Option);
+   if (orc_Foreground.alpha() > 0)
+   {
+      opc_Painter->setPen(orc_Foreground);
+      opc_Painter->setBrush(Qt::NoBrush);
+      opc_Painter->setFont(orc_Font);
+      opc_Painter->drawText(c_RectSegment.adjusted(os32_MarginFront, 0, 0, 0), c_DrawnText, c_Option);
+   }
    //Update point
    orc_TopLeft.setX(orc_TopLeft.x() + static_cast<sintn>(s32_SegmentWidth));
    return q_Retval;
@@ -308,6 +305,51 @@ bool C_TblDelegateUtil::h_PaintStringWithRestriction(QPainter * const opc_Painte
 //----------------------------------------------------------------------------------------------------------------------
 C_TblDelegateUtil::C_TblDelegateUtil(void)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get segment width for the current text, restricted to the cell width
+
+   \param[in]     orc_TopLeft      Top left of current position to draw at (updated if anything gets drawn
+   \param[in]     orc_CompleteCell Complete cell to always draw in
+   \param[in,out] orc_DrawnText    Text to draw
+   \param[in]     orc_Font         Font
+   \param[in]     os32_CellWidth   Cell width to use if possible
+   \param[in]     os32_MarginFront Margin at front if any
+   \param[in]     os32_MarginBack  Margin at back if any
+   \param[in,out] orq_Changed      Flag if cell end was reached
+
+   \return
+   Calculated segment width
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_TblDelegateUtil::mh_GetSegmentWidth(const QPoint & orc_TopLeft, const QRect & orc_CompleteCell,
+                                             QString & orc_DrawnText, const QFont & orc_Font,
+                                             const sint32 os32_CellWidth, const sint32 os32_MarginFront,
+                                             const sint32 os32_MarginBack, bool & orq_Changed)
+{
+   sint32 s32_SegmentWidth = os32_CellWidth;
+   const QFontMetrics c_Metrics(orc_Font);
+
+   //Default
+   orq_Changed = false;
+
+   //If user does not specify anything use the metrics width instead
+   if (s32_SegmentWidth < 0)
+   {
+      s32_SegmentWidth = os32_MarginFront + c_Metrics.width(orc_DrawnText) + os32_MarginBack;
+   }
+   //Check if the segment width does exceed the complete cell boundaries
+   if ((static_cast<sint32>(orc_TopLeft.x()) + s32_SegmentWidth) >
+       static_cast<sint32>(orc_CompleteCell.topLeft().x() + orc_CompleteCell.width()))
+   {
+      s32_SegmentWidth =
+         static_cast<sint32>((orc_CompleteCell.topLeft().x() + orc_CompleteCell.width()) - orc_TopLeft.x()) -
+         os32_MarginFront;
+      orc_DrawnText = C_Uti::h_AdaptStringToSize(orc_DrawnText, c_Metrics, static_cast<sintn>(s32_SegmentWidth));
+      orq_Changed = true;
+   }
+   return s32_SegmentWidth;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -45,6 +45,9 @@ using namespace stw_opensyde_core;
    \param[in]     orc_MessageId          Message identification indices
    \param[in]     oru32_SignalIndex      Signal index
    \param[in]     ou16_StartBit          Start bit of signal
+   \param[in]     oe_MultiplexerType     Multiplexer signal type
+   \param[in]     ou16_MultiplexerValue  Multiplexer value (only relevant if
+                                         oe_MultiplexerType is eMUX_MULTIPLEXED_SIGNAL)
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
    \param[in]     orc_Text               Optional command text for informational display
@@ -53,7 +56,8 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoSignalAddDeleteBaseCommand::C_SdBueUnoSignalAddDeleteBaseCommand(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 & oru32_SignalIndex,
-   const uint16 ou16_StartBit, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+   const uint16 ou16_StartBit, const C_OSCCanSignal::E_MultiplexerType oe_MultiplexerType,
+   const uint16 ou16_MultiplexerValue, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
    C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, const QString & orc_Text,
    QUndoCommand * const opc_Parent) :
    C_SdBueUnoMessageBaseCommand(orc_MessageId, opc_MessageSyncManager, opc_MessageTreeWidget, orc_Text, opc_Parent),
@@ -65,6 +69,11 @@ C_SdBueUnoSignalAddDeleteBaseCommand::C_SdBueUnoSignalAddDeleteBaseCommand(
    this->mc_OSCSignalCommon.c_DataSetValues[0] = this->mc_OSCSignalCommon.c_MinValue;
    this->mc_Signal.u16_ComBitStart = ou16_StartBit;
    this->mc_Signal.u16_ComBitLength = mu16_BUS_DEFAULT_SIGNAL_LENGTH;
+   this->mc_Signal.e_MultiplexerType = oe_MultiplexerType;
+   if (oe_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+   {
+      this->mc_Signal.u16_MultiplexValue = ou16_MultiplexerValue;
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

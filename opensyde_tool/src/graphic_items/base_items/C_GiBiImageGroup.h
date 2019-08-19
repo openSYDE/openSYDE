@@ -39,6 +39,9 @@ public:
 
    virtual stw_types::sintn type() const override;
 
+   //GI base
+   virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
+
 protected:
    void m_UpdateData(stw_opensyde_gui_logic::C_PuiBsImage & orc_Data) const;
 };

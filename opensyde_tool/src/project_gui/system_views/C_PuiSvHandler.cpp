@@ -459,6 +459,35 @@ sint32 C_PuiSvHandler::SetDashboardActive(const uint32 ou32_ViewIndex, const uin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboard current tab index
+
+   \param[in] ou32_ViewIndex      View index
+   \param[in] ou32_DashboardIndex Dashboard index
+   \param[in] oq_Value            New current tab index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::SetDashboardTabIndex(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
+                                            const sint32 os32_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_ViewIndex < this->mc_Views.size())
+   {
+      C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+      s32_Retval = rc_View.SetDashboardTabIndex(ou32_DashboardIndex, os32_Value);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard widget box
 
    \param[in] ou32_ViewIndex      View index
@@ -695,7 +724,7 @@ sint32 C_PuiSvHandler::SetViewUpdateRateSlow(const uint32 ou32_ViewIndex, const 
 /*! \brief   Set view device config screen selected bit rate
 
    \param[in] ou32_ViewIndex View index
-   \param[in] ou32_Value     New device config screen selected bit rate in kBit/s
+   \param[in] ou32_Value     New device config screen selected bit rate in kbit/s
 
    \return
    C_NO_ERR Operation success

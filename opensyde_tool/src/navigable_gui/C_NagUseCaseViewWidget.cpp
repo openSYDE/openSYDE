@@ -56,7 +56,8 @@ C_NagUseCaseViewWidget::C_NagUseCaseViewWidget(QWidget * const opc_Parent) :
    mpc_Ui(new Ui::C_NagUseCaseViewWidget),
    mpc_Widget(NULL),
    ms32_Mode(ms32_MODE_SYSDEF),
-   ms32_Submode(ms32_SUBMODE_SYSDEF_TOPOLOGY)
+   ms32_Submode(ms32_SUBMODE_SYSDEF_TOPOLOGY),
+   mq_CombineItemAndSubSubName(false)
 {
    mpc_Ui->setupUi(this);
 
@@ -169,9 +170,19 @@ void C_NagUseCaseViewWidget::m_HandleSubSections(void) const
    }
    else
    {
-      this->mpc_Ui->pc_GroupBoxSubSubMode->setVisible(true);
-      this->mpc_Ui->pc_LabelMidSection->setText(this->mc_ItemName);
-      this->mpc_Ui->pc_LabelSubmode->setText(this->mc_ItemSubSubName);
+      if (this->mq_CombineItemAndSubSubName)
+      {
+         const QString c_Text = QString(C_GtGetText::h_GetText("%1 | %2")).arg(this->mc_ItemName).arg(
+            this->mc_ItemSubSubName);
+         this->mpc_Ui->pc_GroupBoxSubSubMode->setVisible(false);
+         this->mpc_Ui->pc_LabelSubmode->setText(c_Text);
+      }
+      else
+      {
+         this->mpc_Ui->pc_GroupBoxSubSubMode->setVisible(true);
+         this->mpc_Ui->pc_LabelMidSection->setText(this->mc_ItemName);
+         this->mpc_Ui->pc_LabelSubmode->setText(this->mc_ItemSubSubName);
+      }
    }
 }
 
@@ -180,16 +191,18 @@ void C_NagUseCaseViewWidget::m_HandleSubSections(void) const
 
    This functions does not delete the widget! It removes the parent.
 
-   \param[in]   opc_widget         Widget
-   \param[in]   os32_Mode          Actual mode
-   \param[in]   os32_SubMode       Actual sub mode
-   \param[in]   orc_ItemName       Item name for showing
-   \param[in]   orc_ItemSubSubName Selected sub sub mode name
+   \param[in]   opc_Widget                  Widget
+   \param[in]   os32_Mode                   Actual mode
+   \param[in]   os32_SubMode                Actual sub mode
+   \param[in]   orc_ItemName                Item name for showing
+   \param[in]   orc_ItemSubSubName          Selected sub sub mode name
+   \param[in]   oq_CombineItemAndSubSubName Flag if sub sub item name and item name should be combined to one label
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseViewWidget::SetUseCaseWidget(C_NagUseCaseWidget * const opc_Widget, const sint32 os32_Mode,
                                               const stw_types::sint32 os32_SubMode, const QString & orc_ItemName,
-                                              const QString & orc_ItemSubSubName)
+                                              const QString & orc_ItemSubSubName,
+                                              const bool oq_CombineItemAndSubSubName)
 {
    sintn sn_Index;
 
@@ -223,6 +236,7 @@ void C_NagUseCaseViewWidget::SetUseCaseWidget(C_NagUseCaseWidget * const opc_Wid
       this->ms32_Submode = os32_SubMode;
       this->mc_ItemName = orc_ItemName;
       this->mc_ItemSubSubName = orc_ItemSubSubName;
+      this->mq_CombineItemAndSubSubName = oq_CombineItemAndSubSubName;
       this->InitText();
       this->InitBackground();
    }
@@ -259,16 +273,19 @@ void C_NagUseCaseViewWidget::RemoveUseCaseWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the parameters of the item
 
-   \param[in]   os32_SubMode    Actual sub mode
-   \param[in]   orc_ItemName    Item name for showing
-   \param[in]   orc_ItemSubName Selected sub sub mode name
+   \param[in]   os32_SubMode                Actual sub mode
+   \param[in]   orc_ItemName                Item name for showing
+   \param[in]   orc_ItemSubName             Selected sub sub mode name
+   \param[in]   oq_CombineItemAndSubSubName Flag if sub sub item name and item name should be combined to one label
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseViewWidget::UpdateUseCaseWidget(const stw_types::sint32 os32_SubMode, const QString & orc_ItemName,
-                                                 const QString & orc_ItemSubName)
+                                                 const QString & orc_ItemSubName,
+                                                 const bool oq_CombineItemAndSubSubName)
 {
    this->mc_ItemName = orc_ItemName;
    this->mc_ItemSubSubName = orc_ItemSubName;
+   this->mq_CombineItemAndSubSubName = oq_CombineItemAndSubSubName;
    this->ms32_Submode = os32_SubMode;
 
    this->InitText();
@@ -278,13 +295,16 @@ void C_NagUseCaseViewWidget::UpdateUseCaseWidget(const stw_types::sint32 os32_Su
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the name of the item
 
-   \param[in]   orc_ItemName    Item name for showing
-   \param[in]   orc_ItemSubName Selected sub sub mode name
+   \param[in]   orc_ItemName                Item name for showing
+   \param[in]   orc_ItemSubName             Selected sub sub mode name
+   \param[in]   oq_CombineItemAndSubSubName Flag if sub sub item name and item name should be combined to one label
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagUseCaseViewWidget::UpdateItemName(const QString & orc_ItemName, const QString & orc_ItemSubName)
+void C_NagUseCaseViewWidget::UpdateItemName(const QString & orc_ItemName, const QString & orc_ItemSubName,
+                                            const bool oq_CombineItemAndSubSubName)
 {
    this->mc_ItemName = orc_ItemName;
    this->mc_ItemSubSubName = orc_ItemSubName;
+   this->mq_CombineItemAndSubSubName = oq_CombineItemAndSubSubName;
    m_HandleSubSections();
 }

@@ -58,7 +58,8 @@ Q_SIGNALS:
    //lint -restore
    void SigChanged(void);
    void SigErrorChange(void);
-   void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName = "");
+   void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName = "",
+                       const bool oq_CombineItemAndSubSubName = false);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions

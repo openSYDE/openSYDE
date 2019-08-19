@@ -38,8 +38,8 @@ public:
    virtual void redo(void) override = 0;
 
 protected:
-   std::vector<QGraphicsItem *> m_GetSceneItems(void);
-   QGraphicsItem * m_GetSceneItem(const stw_types::uint64 & oru64_ID);
+   std::vector<QGraphicsItem *> m_GetSceneItems(void) const;
+   QGraphicsItem * m_GetSceneItem(const stw_types::uint64 & oru64_ID) const;
    bool m_MergePossible(const C_SebUnoBaseCommand * const opc_Command) const;
 
    QGraphicsScene * const mpc_Scene;

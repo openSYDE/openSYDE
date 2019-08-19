@@ -2582,80 +2582,14 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
 
          tgl_assert(this->mc_Routes.size() == this->mu32_ActiveNodeCount);
 
-         // Initialize all Ethernet connections with IP to IP routing
+         // Initialize all Ethernet connections without routing
          for (u32_ItActiveNode = 0; u32_ItActiveNode < this->mu32_ActiveNodeCount; ++u32_ItActiveNode)
          {
-            if (this->mc_Routes[u32_ItActiveNode].c_VecRoutePoints.size() != 0)
+            // These connections will be used by Ethernet to CAN routing too
+            if (this->mc_Routes[u32_ItActiveNode].c_VecRoutePoints.size() == 0)
             {
-               uint32 u32_Ip2IpRouterActiveNodeClientSide;
-               uint32 u32_Ip2IpRouterActiveNodeTargetSide;
-
-               s32_Retval = m_GetActiveIndexOfIp2IpRouter(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeClientSide,
-                                                          u32_Ip2IpRouterActiveNodeTargetSide);
-
-               if (s32_Retval == C_NO_ERR)
-               {
-                  // Exist a dispatcher handle for this router server
-                  std::map<uint32, uint32>::const_iterator c_IterUniqueIp2IpRouters = c_ActiveNodeIp2IpRouters.find(
-                     u32_Ip2IpRouterActiveNodeTargetSide);
-
-                  if (c_IterUniqueIp2IpRouters == c_ActiveNodeIp2IpRouters.end())
-                  {
-                     // New dispatcher handle necessary
-                     s32_Retval = this->m_InitTcp(
-                        mc_ServerIpAddresses[u32_Ip2IpRouterActiveNodeClientSide].au8_IpAddress,
-                        c_IpDispatcherHandles[u32_ItActiveNode]);
-
-                     // Save the associated position of the dispatcher handle for this specific router
-                     c_ActiveNodeIp2IpRouters.insert(
-                        std::pair<uint32, uint32>(u32_Ip2IpRouterActiveNodeTargetSide, u32_ItActiveNode));
-                  }
-                  else
-                  {
-                     // Reuse the dispatcher handle of the same router
-                     tgl_assert(c_IterUniqueIp2IpRouters->second < c_IpDispatcherHandles.size());
-                     c_IpDispatcherHandles[u32_ItActiveNode] = c_IpDispatcherHandles[c_IterUniqueIp2IpRouters->second];
-                  }
-
-                  // Save the associated IP to IP router of the active node for later stopping the route
-                  this->mc_ActiveNodeIp2IpDispatcher.insert(
-                     std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeTargetSide));
-               }
-               else if (s32_Retval == C_NOACT)
-               {
-                  uint32 u32_Ip2CanRouterActiveNode;
-
-                  // No error, no IP to IP routing, check for IP to CAN routing
-                  s32_Retval = this->m_GetActiveIndexOfIp2CanRouter(u32_ItActiveNode, u32_Ip2CanRouterActiveNode);
-
-                  if (s32_Retval == C_NO_ERR)
-                  {
-                     // IP to CAN routing has only one dispatcher and must be reused
-                     c_IpDispatcherHandles[u32_ItActiveNode] = u32_Ip2CanRouterActiveNode;
-
-                     // Save the associated IP to CAN router of the active node for later stopping the route
-                     this->mc_ActiveNodeIp2CanDispatcher.insert(
-                        std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2CanRouterActiveNode));
-                  }
-                  else if (s32_Retval == C_NOACT)
-                  {
-                     // No error, but no initialization here too
-                     s32_Retval = C_NO_ERR;
-                  }
-                  else
-                  {
-                     osc_write_log_error("Ethernet initialization",
-                                         "Could not get index of IP to CAN router. Error Code: " +
-                                         C_SCLString::IntToStr(s32_Retval));
-                  }
-               }
-               else
-               {
-                  osc_write_log_error("Ethernet initialization",
-                                      "Could not get index of IP to IP router. Error Code: " +
-                                      C_SCLString::IntToStr(s32_Retval));
-               }
-
+               s32_Retval = this->m_InitTcp(mc_ServerIpAddresses[u32_ItActiveNode].au8_IpAddress,
+                                            c_IpDispatcherHandles[u32_ItActiveNode]);
                if (s32_Retval != C_NO_ERR)
                {
                   break;
@@ -2665,14 +2599,90 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
 
          if (s32_Retval == C_NO_ERR)
          {
-            // Initialize all Ethernet connections without routing
+            // Initialize all Ethernet connections with IP to IP routing
             for (u32_ItActiveNode = 0; u32_ItActiveNode < this->mu32_ActiveNodeCount; ++u32_ItActiveNode)
             {
-               // These connections will be used by Ethernet to CAN routing too
-               if (this->mc_Routes[u32_ItActiveNode].c_VecRoutePoints.size() == 0)
+               if (this->mc_Routes[u32_ItActiveNode].c_VecRoutePoints.size() != 0)
                {
-                  s32_Retval = this->m_InitTcp(mc_ServerIpAddresses[u32_ItActiveNode].au8_IpAddress,
-                                               c_IpDispatcherHandles[u32_ItActiveNode]);
+                  uint32 u32_Ip2IpRouterActiveNodeClientSide;
+                  uint32 u32_Ip2IpRouterActiveNodeTargetSide;
+
+                  s32_Retval = m_GetActiveIndexOfIp2IpRouter(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeClientSide,
+                                                             u32_Ip2IpRouterActiveNodeTargetSide);
+
+                  if (s32_Retval == C_NO_ERR)
+                  {
+                     // Exist a dispatcher handle for this router server
+                     std::map<uint32, uint32>::const_iterator c_IterUniqueIp2IpRouters = c_ActiveNodeIp2IpRouters.find(
+                        u32_Ip2IpRouterActiveNodeTargetSide);
+
+                     if (c_IterUniqueIp2IpRouters == c_ActiveNodeIp2IpRouters.end())
+                     {
+                        // New dispatcher handle necessary
+                        s32_Retval = this->m_InitTcp(
+                           mc_ServerIpAddresses[u32_Ip2IpRouterActiveNodeClientSide].au8_IpAddress,
+                           c_IpDispatcherHandles[u32_ItActiveNode]);
+
+                        // Save the associated position of the dispatcher handle for this specific router
+                        c_ActiveNodeIp2IpRouters.insert(
+                           std::pair<uint32, uint32>(u32_Ip2IpRouterActiveNodeTargetSide, u32_ItActiveNode));
+                     }
+                     else
+                     {
+                        uint32 u32_Handle;
+
+                        // Reuse the dispatcher handle of the same router
+                        tgl_assert(c_IterUniqueIp2IpRouters->second < c_IpDispatcherHandles.size());
+
+                        u32_Handle = c_IpDispatcherHandles[c_IterUniqueIp2IpRouters->second];
+                        c_IpDispatcherHandles[u32_ItActiveNode] = u32_Handle;
+                     }
+
+                     // Save the associated IP to IP router of the active node for later stopping the route
+                     this->mc_ActiveNodeIp2IpDispatcher.insert(
+                        std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeTargetSide));
+                  }
+                  else if (s32_Retval == C_NOACT)
+                  {
+                     uint32 u32_Ip2CanRouterActiveNode;
+
+                     // No error, no IP to IP routing, check for IP to CAN routing
+                     s32_Retval = this->m_GetActiveIndexOfIp2CanRouter(u32_ItActiveNode, u32_Ip2CanRouterActiveNode);
+
+                     if (s32_Retval == C_NO_ERR)
+                     {
+                        uint32 u32_Handle;
+
+                        // Reuse the dispatcher handle of the same router
+                        tgl_assert(u32_Ip2CanRouterActiveNode < c_IpDispatcherHandles.size());
+
+                        // IP to CAN routing has only one dispatcher and must be reused
+                        u32_Handle = c_IpDispatcherHandles[u32_Ip2CanRouterActiveNode];
+                        c_IpDispatcherHandles[u32_ItActiveNode] = u32_Handle;
+
+                        // Save the associated IP to CAN router of the active node for later stopping the route
+                        this->mc_ActiveNodeIp2CanDispatcher.insert(
+                           std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2CanRouterActiveNode));
+                     }
+                     else if (s32_Retval == C_NOACT)
+                     {
+                        // No error, but no initialization here too
+                        s32_Retval = C_NO_ERR;
+                     }
+                     else
+                     {
+                        osc_write_log_error("Ethernet initialization",
+                                            "Could not get index of IP to CAN router. Error Code: " +
+                                            C_SCLString::IntToStr(s32_Retval));
+                     }
+                  }
+                  else
+                  {
+                     osc_write_log_error("Ethernet initialization",
+                                         "Could not get index of IP to IP router. Error Code: " +
+                                         C_SCLString::IntToStr(s32_Retval));
+                  }
+
                   if (s32_Retval != C_NO_ERR)
                   {
                      break;

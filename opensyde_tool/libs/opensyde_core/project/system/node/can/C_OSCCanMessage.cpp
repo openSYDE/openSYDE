@@ -12,6 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <limits>
 #include <map>
 
 #include "C_OSCCanMessage.h"
@@ -97,6 +98,8 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
    bool q_Retval;
    bool q_LayoutConflict;
    bool q_NameConflict;
+   bool q_NoMultiplexerButMultiplexed;
+   bool q_MultiplexedValueOutOfRange;
    //Get Hash for all relevant data
    const std::vector<uint32> c_Hashes = this->m_GetSignalHashes(opc_List, oru32_SignalIndex);
    static std::map<std::vector<uint32>, bool> hc_PreviousResults;
@@ -112,11 +115,14 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
       bool q_ValueOverMax;
       this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, &q_BorderConflict,
                                      &q_NameConflict, &q_NameInvalid, &q_MinOverMax, &q_ValueBelowMin,
-                                     &q_ValueOverMax, ou32_CANMessageValidSignalsDLCOffset);
-      if (((((((q_LayoutConflict == false) && (q_BorderConflict == false)) &&
-              (q_NameConflict == false)) &&
-             (q_NameInvalid == false)) && (q_MinOverMax == false)) && (q_ValueBelowMin == false)) &&
-          (q_ValueOverMax == false))
+                                     &q_ValueOverMax, &q_NoMultiplexerButMultiplexed, &q_MultiplexedValueOutOfRange,
+                                     ou32_CANMessageValidSignalsDLCOffset);
+      if (((((((q_MultiplexedValueOutOfRange == false) && ((q_NoMultiplexerButMultiplexed == false) &&
+                                                           ((q_LayoutConflict == false) &&
+                                                            (q_BorderConflict == false))) &&
+               (q_NameConflict == false)) &&
+              (q_NameInvalid == false)) && (q_MinOverMax == false)) && (q_ValueBelowMin == false)) &&
+           (q_ValueOverMax == false)))
       {
          q_Retval = false;
       }
@@ -139,8 +145,10 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
    {
       //Do separate conflict checks, then reuse previous non conflict value
       this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, NULL, &q_NameConflict, NULL, NULL,
-                                     NULL, NULL, ou32_CANMessageValidSignalsDLCOffset);
-      if ((q_NameConflict == true) || (q_LayoutConflict == true))
+                                     NULL, NULL, &q_NoMultiplexerButMultiplexed, &q_MultiplexedValueOutOfRange,
+                                     ou32_CANMessageValidSignalsDLCOffset);
+      if ((((q_NameConflict == true) || (q_LayoutConflict == true)) || (q_NoMultiplexerButMultiplexed == true)) ||
+          (q_MultiplexedValueOutOfRange == true))
       {
          q_Retval = true;
       }
@@ -166,6 +174,8 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
    \param[out] opq_MinOverMax                       Minimum value over maximum value
    \param[out] opq_ValueBelowMin                    Init value below minimum
    \param[out] opq_ValueOverMax                     Init value over maximum
+   \param[out] opq_NoMultiplexerButMultiplexed      Multiplexed signal(s) but no multiplexer
+   \param[out] opq_MultiplexedValueOutOfRange       Multiplexed signal multiplexer value out of range of multiplexer
    \param[in]  ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -174,6 +184,8 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
                                                bool * const opq_BorderConflict, bool * const opq_NameConflict,
                                                bool * const opq_NameInvalid, bool * const opq_MinOverMax,
                                                bool * const opq_ValueBelowMin, bool * const opq_ValueOverMax,
+                                               bool * const opq_NoMultiplexerButMultiplexed,
+                                               bool * const opq_MultiplexedValueOutOfRange,
                                                const uint32 ou32_CANMessageValidSignalsDLCOffset) const
 {
    if (opq_LayoutConflict != NULL)
@@ -198,19 +210,27 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
             //Skip current signal
             if (u32_ItSignal != oru32_SignalIndex)
             {
-               std::set<uint16> c_CurrentSetPositions;
-               rc_CurrentSignal.GetDataBytesBitPositionsOfSignal(c_CurrentSetPositions);
-               for (std::set<uint16>::const_iterator c_ItCurrentPosition = c_CurrentSetPositions.begin();
-                    c_ItCurrentPosition != c_CurrentSetPositions.end();
-                    ++c_ItCurrentPosition)
+               //Check relevant conflict
+               //Basically: Not relevant if both are multiplexed and have different multiplexer values
+               if ((((rc_CheckedSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                     (rc_CurrentSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)) &&
+                    (rc_CheckedSignal.u16_MultiplexValue != rc_CurrentSignal.u16_MultiplexValue)) == false)
                {
-                  for (std::set<uint16>::const_iterator c_ItCheckedPosition = c_CheckedSetPositions.begin();
-                       c_ItCheckedPosition != c_CheckedSetPositions.end();
-                       ++c_ItCheckedPosition)
+                  std::set<uint16> c_CurrentSetPositions;
+                  rc_CurrentSignal.GetDataBytesBitPositionsOfSignal(c_CurrentSetPositions);
+                  for (std::set<uint16>::const_iterator c_ItCurrentPosition = c_CurrentSetPositions.begin();
+                       c_ItCurrentPosition != c_CurrentSetPositions.end();
+                       ++c_ItCurrentPosition)
                   {
-                     if (*c_ItCurrentPosition == *c_ItCheckedPosition)
+                     for (std::set<uint16>::const_iterator c_ItCheckedPosition = c_CheckedSetPositions.begin();
+                          c_ItCheckedPosition != c_CheckedSetPositions.end();
+                          ++c_ItCheckedPosition)
                      {
-                        *opq_LayoutConflict = true;
+                        if (*c_ItCurrentPosition == *c_ItCheckedPosition)
+                        {
+                           //Conflict
+                           *opq_LayoutConflict = true;
+                        }
                      }
                   }
                }
@@ -278,6 +298,119 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
                }
             }
          }
+      }
+      if (opq_NoMultiplexerButMultiplexed != NULL)
+      {
+         *opq_NoMultiplexerButMultiplexed = false;
+         //Check contains multiplexer
+         if (C_OSCCanMessage::h_ContainsMultiplexer(this->c_Signals) == false)
+         {
+            //Check is multiplexed
+            if (rc_CheckedSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+            {
+               *opq_NoMultiplexerButMultiplexed = true;
+            }
+         }
+      }
+      if (opq_MultiplexedValueOutOfRange != NULL)
+      {
+         *opq_MultiplexedValueOutOfRange = false;
+         //Only relevant for multiplexed signals
+         if (rc_CheckedSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+         {
+            //Find multiplexer
+            for (uint32 u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
+            {
+               const C_OSCCanSignal & rc_SignalData = c_Signals[u32_ItSignal];
+               //Skip current signal
+               if (u32_ItSignal != oru32_SignalIndex)
+               {
+                  if (rc_SignalData.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+                  {
+                     //Check range
+                     const uint64 u64_MaxValue =
+                        (rc_SignalData.u16_ComBitLength >=
+                         64) ? std::numeric_limits<uint64>::max() : ((1ULL << rc_SignalData.u16_ComBitLength) - 1ULL);
+                     if (rc_CheckedSignal.u16_MultiplexValue > u64_MaxValue)
+                     {
+                        *opq_MultiplexedValueOutOfRange = true;
+                     }
+                     //Should only be one
+                     break;
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Gets the information if the CAN message is multiplexed
+
+   A multiplexer signal must be defined to be a multiplexed CAN message.
+   This multiplexer must be unique, therefore the first found multiplexer is also the only multiplexer.
+
+   \param[out] u32_MultiplexerIndex    Index of first found multiplexer
+
+   \retval   true    CAN message is multiplexed, has a multiplexer signal
+   \retval   false   CAN message is not multiplexed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanMessage::IsMultiplexed(uint32 * const opu32_MultiplexerIndex) const
+{
+   return C_OSCCanMessage::h_ContainsMultiplexer(this->c_Signals, opu32_MultiplexerIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if any of the specified signals is a multiplexer signal
+
+   \param[in]  orc_Signals             Signals to check
+   \param[out] u32_MultiplexerIndex    Index of first (!) found multiplexer
+
+   \retval   true    Contains multiplexer signal
+   \retval   false   No multiplexer signal found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanMessage::h_ContainsMultiplexer(const std::vector<C_OSCCanSignal> & orc_Signals,
+                                            uint32 * const opu32_MultiplexerIndex)
+{
+   bool q_Return = false;
+   uint32 u32_SignalCounter;
+
+   for (u32_SignalCounter = 0U; u32_SignalCounter < orc_Signals.size(); ++u32_SignalCounter)
+   {
+      const C_OSCCanSignal & rc_Signal = orc_Signals[u32_SignalCounter];
+      if (rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         if (opu32_MultiplexerIndex != NULL)
+         {
+            *opu32_MultiplexerIndex = u32_SignalCounter;
+         }
+         q_Return = true;
+         break;
+      }
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns all possible multiplexer values
+
+   \param[out]      orc_Values   All multiplexer values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCCanMessage::GetMultiplexerValues(std::set<uint16> & orc_Values) const
+{
+   orc_Values.clear();
+   uint32 u32_SignalCounter;
+
+   for (u32_SignalCounter = 0U; u32_SignalCounter < this->c_Signals.size(); ++u32_SignalCounter)
+   {
+      if (this->c_Signals[u32_SignalCounter].e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+      {
+         orc_Values.insert(this->c_Signals[u32_SignalCounter].u16_MultiplexValue);
       }
    }
 }

@@ -32,7 +32,9 @@ public:
    C_SdManTopologyCopyPasteManager(void);
    virtual ~C_SdManTopologyCopyPasteManager(void);
    virtual const C_PuiBsElements * GetSnapshot(QWidget * const opc_Parent) override;
-   virtual void CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems) override;
+   virtual void CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems,
+                                       const QMap<const QGraphicsItem *, stw_types::float64> & orc_NormalizedZValues)
+   override;
    virtual bool CheckValidContentAndPrepareData(void) override;
 
 protected:

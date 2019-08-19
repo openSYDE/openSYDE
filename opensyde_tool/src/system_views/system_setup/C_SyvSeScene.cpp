@@ -60,7 +60,7 @@ C_SyvSeScene::C_SyvSeScene(const uint32 ou32_ViewIndex, QObject * const opc_Pare
    mpc_SelectedBusConnectorItem(NULL),
    mc_UndoManager(this)
 {
-   // Init base scene. Initializing all parts which can not be initilized in the base constructor
+   // Init base scene. Initializing all parts which can not be initialized in the base constructor
    this->m_InitSceneUndoManager();
    this->m_InitSceneContextMenuManager();
 
@@ -579,7 +579,7 @@ void C_SyvSeScene::m_SelectionChanged(void)
             this->mpc_SelectedBusConnectorItem = dynamic_cast<C_GiSvPcBusConnector *>(c_SelectedItems[0]);
             if (this->mpc_SelectedBusConnectorItem != NULL)
             {
-               this->mpc_SelectedBusConnectorItem->setZValue(mf64_ZORDER_MAX);
+               this->mpc_SelectedBusConnectorItem->SetZValueCustom(mf64_ZORDER_MAX);
                this->mpc_SelectedBusConnectorItem->SetResizing(true);
             }
          }

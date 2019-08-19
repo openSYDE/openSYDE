@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -19,27 +19,27 @@
 #include "C_OSCUtils.h"
 #include "TGLFile.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::float64 C_OSCUtils::mhf64_Epsilon = 1e-5;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   CheckValidCName
 
    Function adapted from KEFEX to openSYDE (KFXCheckValidCName)
@@ -55,7 +55,7 @@ const stw_types::float64 C_OSCUtils::mhf64_Epsilon = 1e-5;
    true  -> OK
    false -> violation of rules
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const stw_types::uint16 ou16_MaxLength)
 {
    uint32 u32_Index;
@@ -85,7 +85,7 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
    return true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Compare to float64s for near equality
 
    \param[in] orf64_Float1 Float 1 to compare
@@ -95,14 +95,14 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
    true  Equal
    false Not equal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCUtils::h_IsFloat64NearlyEqual(const float64 & orf64_Float1, const float64 & orf64_Float2)
 {
    //From Marshall Cline's C++ FAQ Lite document
    return std::abs(orf64_Float1 - orf64_Float2) <= (C_OSCUtils::mhf64_Epsilon * std::abs(orf64_Float1));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Compare to float32s for near equality
 
    \param[in] orf32_Float1 Float 1 to compare
@@ -112,7 +112,7 @@ bool C_OSCUtils::h_IsFloat64NearlyEqual(const float64 & orf64_Float1, const floa
    true  Equal
    false Not equal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const float32 & orf32_Float2)
 {
    //From Marshall Cline's C++ FAQ Lite document
@@ -120,7 +120,7 @@ bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const floa
           (static_cast<float32>(C_OSCUtils::mhf64_Epsilon) * std::abs(orf32_Float1));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   create target folder (from bottom-up if required)
 
    Nice and simple logic grabbed from
@@ -132,7 +132,7 @@ bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const floa
    C_NO_ERR  folder created
    C_NOACT   could not create folder
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
 {
    size_t un_CharIndex = 0U;
@@ -155,7 +155,7 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Replace special characters in string
 
    Aims:
@@ -191,7 +191,7 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
    \return
    Niceified string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_String)
 {
    C_SCLString c_Result;
@@ -226,7 +226,7 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
    return c_Result;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Replace non-C characters in string
 
    Aims:
@@ -243,7 +243,7 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
    \return
    Niceified string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_String)
 {
    C_SCLString c_Result = orc_String;
@@ -276,7 +276,32 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
    return c_Result;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if string is niceified for a file names
+
+   See description of h_NiceifyStringForFileName. If the string has at least one character which would be replaced
+   by h_NiceifyStringForFileName, the function returns false
+
+   \param[in]     orc_String         Original string
+
+   \retval   true    The string is niceified and is valid
+   \retval   false   The string is not nice and is not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCUtils::h_IsStringNiceifiedForFileName(const C_SCLString & orc_String)
+{
+   bool q_Return = true;
+   const C_SCLString c_Temp = h_NiceifyStringForCComment(orc_String);
+
+   if (c_Temp != orc_String)
+   {
+      q_Return = false;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if scaling active
 
    \param[in] of64_Factor Factor
@@ -286,14 +311,14 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
    True  Scaling active
    False Scaling inactive
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64_Offset)
 {
    return ((C_OSCUtils::h_IsFloat64NearlyEqual(of64_Factor, 1.0) == false) ||
            (C_OSCUtils::h_IsFloat64NearlyEqual(of64_Offset, 0.0) == false));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Scales a value
 
    returns ((value * factor) + offset)
@@ -305,7 +330,7 @@ bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64
    \return
    Scaled value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of64_Factor, const float64 of64_Offset)
 {
    float64 f64_Result;
@@ -316,7 +341,7 @@ float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of6
    return f64_Result;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates a scaled value back to the unscaled value
 
    returns ((value - of64_Offset) - offset)
@@ -328,7 +353,7 @@ float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of6
    \return
    Origin value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 of64_Factor, const float64 of64_Offset)
 {
    float64 f64_Result;

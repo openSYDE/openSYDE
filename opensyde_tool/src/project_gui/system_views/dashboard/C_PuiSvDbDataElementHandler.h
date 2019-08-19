@@ -72,12 +72,12 @@ public:
                                       const stw_types::uint8 ou8_DLC) = 0;
 
 protected:
-   stw_types::sint32 m_GetLastValue(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
-                                    std::vector<stw_types::float64> & orc_Values,
-                                    std::vector<QString> * const opc_StringifiedValues = NULL,
-                                    const bool oq_UseScaling = true);
-   stw_types::sint32 m_GetLastValue(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
-                                    stw_types::float64 & orf64_Value, const bool oq_UseScaling = true);
+   virtual stw_types::sint32 m_GetLastValue(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
+                                            std::vector<stw_types::float64> & orc_Values,
+                                            std::vector<QString> * const opc_StringifiedValues,
+                                            const bool oq_UseScaling);
+   virtual stw_types::sint32 m_GetLastValue(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
+                                            stw_types::float64 & orf64_Value, const bool oq_UseScaling);
    stw_types::sint32 m_GetAllValues(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
                                     QVector<stw_types::float64> & orc_Values,
                                     QVector<stw_types::uint32> & orc_Timestamps, const bool oq_UseScaling = true);

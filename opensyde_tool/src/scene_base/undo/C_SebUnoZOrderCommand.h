@@ -33,14 +33,22 @@ public:
    virtual ~C_SebUnoZOrderCommand(void);
    virtual void undo(void) override;
    virtual void redo(void) override;
-   static void h_AdaptZOrder(QGraphicsScene * const opc_Scene, const QList<QGraphicsItem *> & orc_SelectedItems,
-                             const stw_types::float64 of64_Diff, stw_types::float64 & orf64_ZOrderHigh,
-                             stw_types::float64 & orf64_ZOrderLow, QMap<QGraphicsItem *,
-                                                                        stw_types::float64> & orc_NewZValues);
+   static void h_AdaptZOrder(const QGraphicsScene * const opc_Scene, const QList<QGraphicsItem *> & orc_Items,
+                             const QList<QGraphicsItem *> & orc_SelectedItems, const bool oq_BringToFront,
+                             QMap<QGraphicsItem *,
+                                  stw_types::float64> & orc_NewZValues);
 
 private:
    std::vector<stw_types::float64> mc_OldZValues;
    const std::vector<stw_types::float64> mc_NewZValues;
+
+   void ApplyZValues(const std::vector<stw_types::float64> & orc_Values) const;
+   static void mh_CreateZValueMap(const QGraphicsScene * const opc_Scene, const QList<QGraphicsItem *> & orc_Items,
+                                  const QList<QGraphicsItem *> & orc_SelectedItems, const bool oq_BringToFront,
+                                  QMap<QGraphicsItem *,
+                                       stw_types::float64> & orc_NewZValues);
+   static stw_types::float64 mh_GetLowestUsedZValueList(const QGraphicsScene * const opc_Scene,
+                                                        const QList<QGraphicsItem *> & orc_Items);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

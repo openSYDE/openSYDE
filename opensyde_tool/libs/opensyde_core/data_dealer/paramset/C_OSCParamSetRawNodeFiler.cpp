@@ -18,6 +18,7 @@
 #include "stwerrors.h"
 #include "C_OSCChecksummedXML.h"
 #include "C_OSCParamSetRawNodeFiler.h"
+#include "C_OSCLoggingHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
@@ -145,6 +146,7 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntries(std::vector<C_OSCParamSetRawEnt
       }
       else
       {
+         osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"raw\".\"raw-entry\" node.");
          s32_Retval = C_CONFIG;
       }
       //Return
@@ -216,6 +218,8 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
       }
       catch (...)
       {
+         osc_write_log_error("Loading Dataset data", "Node \"node\".\"raw\".\"raw-entry\".\"address\" contains non-integer value (" +
+                             orc_XMLParser.GetNodeContent() + ").");
          s32_Retval = C_CONFIG;
       }
       //Return
@@ -223,57 +227,70 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
    }
    else
    {
+      osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"raw\".\"raw-entry\".\"address\" node.");
       s32_Retval = C_CONFIG;
    }
-   if ((orc_XMLParser.SelectNodeChild("value") == "value") && (s32_Retval == C_NO_ERR))
+   if (s32_Retval == C_NO_ERR)
    {
-      const C_SCLString c_Content = orc_XMLParser.GetNodeContent();
-      SCLDynamicArray<C_SCLString> c_Tokens;
-      c_Content.Tokenize(";", c_Tokens);
-      orc_Entry.c_Bytes.reserve(c_Tokens.GetLength());
-      for (sint32 s32_It = 0; (s32_It < c_Tokens.GetLength()) && (s32_Retval == C_NO_ERR); ++s32_It)
+      if (orc_XMLParser.SelectNodeChild("value") == "value")
       {
-         const C_SCLString & rc_Token = c_Tokens[s32_It];
+         const C_SCLString c_Content = orc_XMLParser.GetNodeContent();
+         SCLDynamicArray<C_SCLString> c_Tokens;
+         c_Content.Tokenize(";", c_Tokens);
+         orc_Entry.c_Bytes.reserve(c_Tokens.GetLength());
+         for (sint32 s32_It = 0; (s32_It < c_Tokens.GetLength()) && (s32_Retval == C_NO_ERR); ++s32_It)
+         {
+            const C_SCLString & rc_Token = c_Tokens[s32_It];
+            try
+            {
+               orc_Entry.c_Bytes.push_back(static_cast<uint8>(rc_Token.ToInt()));
+            }
+            catch (...)
+            {
+               osc_write_log_error("Loading Dataset data", "Node \"node\".\"raw\".\"raw-entry\".\"value\" contains non-integer value (" +
+                                   rc_Token + ").");
+
+
+               s32_Retval = C_CONFIG;
+            }
+         }
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "raw-entry");
+      }
+      else
+      {
+         osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"raw\".\"raw-entry\".\"value\" node.");
+         s32_Retval = C_CONFIG;
+      }
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      if (orc_XMLParser.SelectNodeChild("size") == "size")
+      {
+         uint32 u32_Size = 0;
          try
          {
-            orc_Entry.c_Bytes.push_back(static_cast<uint8>(rc_Token.ToInt()));
+            u32_Size = static_cast<uint32>(orc_XMLParser.GetNodeContent().ToInt64());
          }
          catch (...)
          {
             s32_Retval = C_CONFIG;
          }
+         if (s32_Retval == C_NO_ERR)
+         {
+            if (u32_Size != orc_Entry.c_Bytes.size())
+            {
+               s32_Retval = C_CONFIG;
+            }
+         }
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "raw-entry");
       }
-      //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "raw-entry");
-   }
-   else
-   {
-      s32_Retval = C_CONFIG;
-   }
-   if ((orc_XMLParser.SelectNodeChild("size") == "size") && (s32_Retval == C_NO_ERR))
-   {
-      uint32 u32_Size = 0;
-      try
+      else
       {
-         u32_Size = static_cast<uint32>(orc_XMLParser.GetNodeContent().ToInt64());
-      }
-      catch (...)
-      {
+         osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"raw\".\"raw-entry\".\"size\" node.");
          s32_Retval = C_CONFIG;
       }
-      if (s32_Retval == C_NO_ERR)
-      {
-         if (u32_Size != orc_Entry.c_Bytes.size())
-         {
-            s32_Retval = C_CONFIG;
-         }
-      }
-      //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "raw-entry");
-   }
-   else
-   {
-      s32_Retval = C_CONFIG;
    }
 
    return s32_Retval;

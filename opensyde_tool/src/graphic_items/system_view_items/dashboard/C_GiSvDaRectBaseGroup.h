@@ -88,6 +88,9 @@ public:
 
    virtual void GenerateHint(void);
 
+   //GI base
+   virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 
@@ -105,6 +108,12 @@ Q_SIGNALS:
 protected:
    const stw_opensyde_gui_logic::C_PuiSvDashboard * GetSvDashboard(void) const;
 
+   virtual stw_types::sint32 m_GetLastValue(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
+                                            std::vector<stw_types::float64> & orc_Values,
+                                            std::vector<QString> * const opc_StringifiedValues,
+                                            const bool oq_UseScaling) override;
+   virtual stw_types::sint32 m_GetLastValue(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
+                                            stw_types::float64 & orf64_Value, const bool oq_UseScaling) override;
    virtual void m_ResizeUpdateItems(const stw_types::float64 of64_DiffWidth, const stw_types::float64 of64_DiffHeight);
    virtual void m_ForceWidgetResize(const QSizeF & orc_NewSize);
 
@@ -174,6 +183,7 @@ private:
    void m_InitConflictIcon(void);
    void m_InitButton(void);
    void m_ManualRead(void);
+   bool m_IsOnTrigger(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;
    void m_HandleGenericButtonClick(void);
    void m_UpdateErrorIconToolTip(void);
    void m_ManualOperationStarted(void);

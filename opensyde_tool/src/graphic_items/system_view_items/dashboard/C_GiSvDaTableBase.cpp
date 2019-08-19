@@ -71,6 +71,8 @@ C_GiSvDaTableBase::C_GiSvDaTableBase(const uint32 & oru32_ViewIndex, const uint3
    mpc_AddSeperator(NULL),
    mpc_ConfigDataElement(NULL),
    mpc_RemoveDataElement(NULL),
+   mpc_MoveUpDataElement(NULL),
+   mpc_MoveDownDataElement(NULL),
    mpc_MiscSeperator(NULL)
 {
    this->mpc_TableWidget = new C_SyvDaItTaView(this);
@@ -382,6 +384,20 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
          // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
          this->mpc_RemoveDataElement->setVisible(false);
       }
+      if (mpc_MoveUpDataElement == NULL)
+      {
+         mpc_MoveUpDataElement =
+            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Move selected data element up"));
+         // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+         this->mpc_MoveUpDataElement->setVisible(false);
+      }
+      if (mpc_MoveDownDataElement == NULL)
+      {
+         mpc_MoveDownDataElement =
+            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Move selected data element down"));
+         // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
+         this->mpc_MoveDownDataElement->setVisible(false);
+      }
       if (mpc_MiscSeperator == NULL)
       {
          mpc_MiscSeperator = opc_ContextMenuManager->RegisterSeperator();
@@ -412,6 +428,16 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
                this->mpc_ConfigDataElement->setEnabled(false);
             }
          }
+         if (this->mpc_MoveDownDataElement != NULL)
+         {
+            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_MoveDownDataElement);
+            connect(mpc_MoveDownDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementDown);
+         }
+         if (this->mpc_MoveUpDataElement != NULL)
+         {
+            opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_MoveUpDataElement);
+            connect(mpc_MoveUpDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementUp);
+         }
          if (this->mpc_RemoveDataElement != NULL)
          {
             opc_ContextMenuManager->SetVisibleWithAutoHide(this->mpc_RemoveDataElement);
@@ -431,6 +457,14 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
       if (mpc_ConfigDataElement != NULL)
       {
          disconnect(mpc_ConfigDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::CallProperties);
+      }
+      if (this->mpc_MoveDownDataElement != NULL)
+      {
+         disconnect(mpc_MoveDownDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementDown);
+      }
+      if (this->mpc_MoveUpDataElement != NULL)
+      {
+         disconnect(mpc_MoveUpDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementUp);
       }
       if (mpc_RemoveDataElement != NULL)
       {
@@ -746,6 +780,30 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Move selected items up
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaTableBase::m_MoveDataElementUp(void)
+{
+   if (this->mpc_TableWidget != NULL)
+   {
+      this->mpc_TableWidget->MoveSelected(true);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Move selected items down
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaTableBase::m_MoveDataElementDown(void)
+{
+   if (this->mpc_TableWidget != NULL)
+   {
+      this->mpc_TableWidget->MoveSelected(false);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove data element
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -765,11 +823,12 @@ void C_GiSvDaTableBase::m_RemoveDataElement(void)
       {
          for (uint32 u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
          {
-            const C_PuiSvDbNodeDataPoolListElementId & orc_RemovedItem = c_RemovedDataElements[u32_ItDataElement];
-            if ((orc_RemovedItem.GetIsValid() == true) && (pc_View->CheckReadUsage(orc_RemovedItem) == false))
+            const C_PuiSvDbNodeDataPoolListElementId & rc_RemovedItem = c_RemovedDataElements[u32_ItDataElement];
+            if ((rc_RemovedItem.GetIsValid() == true) && (pc_View->CheckReadUsage(rc_RemovedItem) == false))
             {
-               tgl_assert(C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
-                                                                                  orc_RemovedItem) == C_NO_ERR);
+               //Allow error as the returned vector might not be unique (same id can occur multiple times)
+               C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
+                                                                       rc_RemovedItem);
             }
          }
       }

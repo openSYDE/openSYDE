@@ -97,14 +97,12 @@ const
    this->mpc_Ui->pc_HorizontalSlider->SetDisplayStyle(oe_Type);
 
    //Min
-   this->mpc_Ui->pc_LabelMin->setText("0");
    this->mpc_Ui->pc_LabelMin->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
    c_Font = this->mpc_Ui->pc_LabelMin->font();
    c_Font.setFamily("Segoe UI");
    this->mpc_Ui->pc_LabelMin->setFont(c_Font);
 
    //Max
-   this->mpc_Ui->pc_LabelMax->setText("99");
    this->mpc_Ui->pc_LabelMax->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
    c_Font = this->mpc_Ui->pc_LabelMax->font();
    c_Font.setFamily("Segoe UI");

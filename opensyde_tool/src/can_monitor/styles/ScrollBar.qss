@@ -47,7 +47,8 @@ min-height: 15px;
 /* --------------------------------------------------------------------- */
 stw_opensyde_gui--C_CamGenTableView QScrollBar,
 stw_opensyde_gui--C_CamGenSigTableView QScrollBar,
-stw_opensyde_gui--C_CamMetWidget QScrollBar,
+stw_opensyde_gui--C_CamMetWidget QAbstractItemView QScrollBar,
+stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar,
 QAbstractItemView[View="CompleterDark"] QScrollBar
 {
 border-style:none;
@@ -156,16 +157,18 @@ stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar:vertica
 {
 width:9px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
 padding-right:2px;
+padding-left:2px;
 padding-top:1px;
 padding-bottom:1px;
 }
 /*--------- horizontal not tested/used yet*/
 stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView QScrollBar:horizontal,
-stw_opensyde_gui_elements--C_CamOgeCbxTableSmall QAbstractItemView QScrollBar:vertical,
+stw_opensyde_gui_elements--C_CamOgeCbxTableSmall QAbstractItemView QScrollBar:horizontal,
 stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar:horizontal
 {
 height:9px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
 padding-bottom:2px;
+padding-top: 2px;
 padding-left:1px;
 padding-right:1px;
 }

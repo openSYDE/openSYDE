@@ -98,6 +98,8 @@ public:
    stw_types::sint32 SetDashboardName(const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Name);
    stw_types::sint32 SetDashboardComment(const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Comment);
    stw_types::sint32 SetDashboardActive(const stw_types::uint32 ou32_DashboardIndex, const bool oq_Active);
+   stw_types::sint32 SetDashboardTabIndex(const stw_types::uint32 ou32_DashboardIndex,
+                                          const stw_types::sint32 os32_Value);
    stw_types::sint32 SetDashboardWidget(const stw_types::uint32 ou32_DashboardIndex,
                                         const stw_types::uint32 ou32_WidgetIndex,
                                         const C_PuiSvDbWidgetBase * const opc_Box,

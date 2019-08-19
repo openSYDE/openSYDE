@@ -53,13 +53,16 @@ public:
 
    void AddNode(const QString & orc_NodeType, const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID);
    void AddCanBus(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID,
-                  C_GiTextElementBus * const opc_TextElementBus, const QString * const opc_NameProposal = NULL);
+                  const stw_types::float64 of64_ZValue, C_GiTextElementBus * const opc_TextElementBus,
+                  const QString * const opc_NameProposal = NULL);
    void AddEthernetBus(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID,
-                       C_GiTextElementBus * const opc_TextElementBus, const QString * const opc_NameProposal = NULL);
+                       const stw_types::float64 of64_ZValue, C_GiTextElementBus * const opc_TextElementBus,
+                       const QString * const opc_NameProposal = NULL);
    void AddBoundary(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID);
    void AddTextElement(const QString & orc_Text, const QPointF & orc_Pos,
                        const stw_types::uint64 * const opu64_UniqueID);
-   C_GiTextElementBus * AddTextElementBus(const stw_types::uint64 * const opu64_UniqueID);
+   C_GiTextElementBus * AddTextElementBus(const stw_types::uint64 * const opu64_UniqueID,
+                                          stw_types::float64 & orf64_BusZValue);
    void AddLine(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID);
    void AddImage(const QString & orc_FilePath, const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID);
    void AddBusConnector(C_GiNode * const opc_Node, const C_GiLiBus * const opc_Bus,
@@ -70,7 +73,6 @@ public:
    //lint -e{1735} Suppression, because default parameters are identical
    virtual void CopyFromManagerToScene(const QPointF * const opc_Pos = NULL) override;
    void CopyFromSnapshotToScene(const stw_opensyde_gui_logic::C_SdTopologyDataSnapshot & orc_Snapshot,
-                                const QPointF * const opc_Pos = NULL,
                                 const QMap<stw_opensyde_gui_logic::C_PuiBsTemporaryDataID,
                                            stw_types::uint64> * const opc_IDMap =
                                    NULL);
@@ -201,11 +203,11 @@ private:
    void m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Item);
    void m_LoadSnapshot(const QVector<stw_types::uint32> & orc_NodeIndices,
                        const QVector<stw_types::uint32> & orc_BusIndices,
-                       const QVector<stw_types::uint32> & orc_OtherStartIndices, const QPointF * const opc_Offset,
-                       const bool & orq_Selection, const std::vector<
+                       const QVector<stw_types::uint32> & orc_OtherStartIndices, const bool & orq_Selection, const std::vector<
                           stw_opensyde_gui_logic::C_PuiSdCompleteBusConnectionData
                           > * const opc_AdditionalConnectionData,
-                       const QMap<stw_opensyde_gui_logic::C_PuiBsTemporaryDataID, stw_types::uint64> * const opc_IDMap);
+                       const QMap<stw_opensyde_gui_logic::C_PuiBsTemporaryDataID,
+                                  stw_types::uint64> * const opc_IDMap);
    static void mh_AddAndUpdateHigher(QVector<stw_types::uint32> & orc_Vec, const stw_types::uint32 & oru32_New);
    void m_BusConnectorReconnectionStart(const C_GiLiBusConnector::E_ConnectState & ore_ConnectState,
                                         const QGraphicsItem * const opc_Item = NULL,

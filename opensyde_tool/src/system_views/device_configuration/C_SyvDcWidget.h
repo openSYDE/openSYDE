@@ -178,7 +178,7 @@ private:
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_logic::C_SyvDcSequences * mpc_DcSequences;
    const stw_types::uint32 mu32_ViewIndex;
-   stw_types::uint32 mu32_TempBitrate; // In KBit/s
+   stw_types::uint32 mu32_TempBitrate; // In kbit/s
    bool mq_SameBitrates;
    stw_types::uint32 mu32_BusIndex;
    stw_types::uint8 mu8_BusId;

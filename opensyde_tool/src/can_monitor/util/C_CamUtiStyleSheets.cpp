@@ -44,7 +44,8 @@ const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui_elements--C_OgeTebMessageDetails QScrollBar",
    "stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar",
    "stw_opensyde_gui--C_CamMetWidget QScrollBar",
-   "QAbstractItemView[View=\"CompleterDark\"] QScrollBar"
+   "QAbstractItemView[View=\"CompleterDark\"] QScrollBar",
+   "stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar"
 }
    );
 //lint -e{36,155}  c++11 feature

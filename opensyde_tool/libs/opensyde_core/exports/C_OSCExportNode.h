@@ -30,7 +30,8 @@ public:
    static stw_types::sint32 h_CreateSourceCode(const C_OSCNode & orc_Node,
                                                const stw_types::uint16 ou16_ApplicationIndex,
                                                const stw_scl::C_SCLString & orc_Path,
-                                               std::vector<stw_scl::C_SCLString> & orc_Files);
+                                               std::vector<stw_scl::C_SCLString> & orc_Files,
+                                               const stw_scl::C_SCLString & orc_ExportToolInfo = "");
 
 private:
    static stw_types::sint32 mh_CheckPrerequisites(const C_OSCNode & orc_Node);

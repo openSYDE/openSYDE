@@ -38,13 +38,14 @@ public:
    virtual ~C_NagUseCaseViewWidget();
 
    void SetUseCaseWidget(C_NagUseCaseWidget * const opc_Widget, const stw_types::sint32 os32_Mode,
-                         const stw_types::sint32 os32_SubMode = 0, const QString & orc_ItemName = "",
-                         const QString & orc_ItemSubSubName = "");
+                         const stw_types::sint32 os32_SubMode, const QString & orc_ItemName,
+                         const QString & orc_ItemSubSubName, const bool oq_CombineItemAndSubSubName);
    void RemoveUseCaseWidget(void);
 
    void UpdateUseCaseWidget(const stw_types::sint32 os32_SubMode, const QString & orc_ItemName,
-                            const QString & orc_ItemSubName);
-   void UpdateItemName(const QString & orc_ItemName, const QString & orc_ItemSubName);
+                            const QString & orc_ItemSubName, const bool oq_CombineItemAndSubSubName);
+   void UpdateItemName(const QString & orc_ItemName, const QString & orc_ItemSubName,
+                       const bool oq_CombineItemAndSubSubName);
 
    void InitText(void) const;
    void InitBackground(void);
@@ -64,6 +65,7 @@ private:
    stw_types::sint32 ms32_Submode;
    QString mc_ItemName;
    QString mc_ItemSubSubName;
+   bool mq_CombineItemAndSubSubName;
    static const QString mhc_SVGIconPath;
 };
 

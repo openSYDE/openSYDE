@@ -29,21 +29,21 @@
 #ifndef C_OSCDIAGPROTOCOLKFXH
 #define C_OSCDIAGPROTOCOLKFXH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "C_OSCDiagProtocolBase.h"
 #include "CSCLString.h"
 #include "CKFXCommunicationKEFEX.h"
 #include "CKFXCommConfiguration.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///interface class
 class C_OSCDiagProtocolKfx :
    public C_OSCDiagProtocolBase
@@ -132,7 +132,12 @@ public:
    virtual stw_types::sint32 NvmWriteFinalizeTransaction(void);
 
    virtual stw_types::sint32 DataPoolReadVersion(const stw_types::uint8 ou8_DataPoolIndex,
-                                                 stw_types::uint8(&orau8_Version)[3]);
+                                                 stw_types::uint8(&orau8_Version)[3],
+                                                 stw_types::uint8 * const opu8_NrCode);
+   virtual stw_types::sint32 DataPoolReadMetaData(const stw_types::uint8 ou8_DataPoolIndex,
+                                                  stw_types::uint8(&orau8_Version)[3],
+                                                  stw_scl::C_SCLString & orc_Name,
+                                                  stw_types::uint8 * const opu8_NrCode);
    virtual stw_types::sint32 NvmNotifyOfChanges(const stw_types::uint8 ou8_DataPoolIndex,
                                                 const stw_types::uint8 ou8_ListIndex, bool & orq_ApplicationAcknowledge,
                                                 stw_types::uint8 * const opu8_NrCode);
@@ -145,7 +150,7 @@ public:
    stw_types::sint32 Logoff(const bool oq_WaitForHandshake);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

@@ -227,16 +227,16 @@ void C_SyvDaDashboardSelectorTabWidget::SetViewIndex(const uint32 ou32_Value)
                if (c_DashboardUserSettings.q_TornOff == false)
                {
                   //Check if index is currently available
-                  if (c_DashboardUserSettings.s32_MainWindowTabIndex <= this->count())
+                  if (rc_CurDashboard.GetTabIndex() <= this->count())
                   {
                      //Check if index valid at all
-                     if (c_DashboardUserSettings.s32_MainWindowTabIndex < 0)
+                     if (rc_CurDashboard.GetTabIndex() < 0)
                      {
                         m_AddSpecificTab(c_Iteration[u32_ItDashboard]);
                      }
                      else
                      {
-                        m_AddSpecificTab(c_Iteration[u32_ItDashboard], c_DashboardUserSettings.s32_MainWindowTabIndex);
+                        m_AddSpecificTab(c_Iteration[u32_ItDashboard], rc_CurDashboard.GetTabIndex());
                      }
                   }
                   else
@@ -695,6 +695,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_WidgetComeBack(C_SyvDaTearOffWidget * 
                  &C_SyvDaDashboardSelectorTabWidget::SigDataPoolRead);
       disconnect(opc_Widget, &C_SyvDaTearOffWidget::SigNvmReadList, this,
                  &C_SyvDaDashboardSelectorTabWidget::SigNvmReadList);
+      disconnect(opc_Widget, &C_SyvDaTearOffWidget::SigTriggerUpdateTransmissionConfiguration, this,
+                 &C_SyvDaDashboardSelectorTabWidget::UpdateTransmissionConfiguration);
       //Error
       disconnect(opc_Widget, &C_SyvDaTearOffWidget::SigErrorChange, this,
                  &C_SyvDaDashboardSelectorTabWidget::SigErrorChange);
@@ -1298,6 +1300,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_TearOffWidget(const uint32 ou32_DataIn
                  &C_SyvDaDashboardSelectorTabWidget::SigDataPoolRead);
          connect(pc_Widget, &C_SyvDaTearOffWidget::SigNvmReadList, this,
                  &C_SyvDaDashboardSelectorTabWidget::SigNvmReadList);
+         connect(pc_Widget, &C_SyvDaTearOffWidget::SigTriggerUpdateTransmissionConfiguration, this,
+                 &C_SyvDaDashboardSelectorTabWidget::UpdateTransmissionConfiguration);
          //Error
          connect(pc_Widget, &C_SyvDaTearOffWidget::SigErrorChange, this,
                  &C_SyvDaDashboardSelectorTabWidget::SigErrorChange);
@@ -1525,8 +1529,12 @@ void C_SyvDaDashboardSelectorTabWidget::m_StoreUserSettings(void)
             const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(pc_Widget->GetDataIndex());
             if (pc_Dashboard != NULL)
             {
+               //User settings
                C_UsHandler::h_GetInstance()->SetProjSvDashboardMainTab(pc_View->GetName(),
-                                                                       pc_Dashboard->GetName(), s32_Counter);
+                                                                       pc_Dashboard->GetName());
+               //Data
+               C_PuiSvHandler::h_GetInstance()->SetDashboardTabIndex(this->mu32_ViewIndex,
+                                                                     pc_Widget->GetDataIndex(), s32_Counter);
             }
          }
       }
@@ -1547,6 +1555,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_Connect(C_SyvDaDashboardWidget * const
    {
       connect(opc_Widget, &C_SyvDaDashboardWidget::SigErrorChange, this,
               &C_SyvDaDashboardSelectorTabWidget::SigErrorChange);
+      connect(opc_Widget, &C_SyvDaDashboardWidget::SigTriggerUpdateTransmissionConfiguration, this,
+              &C_SyvDaDashboardSelectorTabWidget::UpdateTransmissionConfiguration);
       connect(opc_Widget, &C_SyvDaDashboardWidget::SigDataPoolWrite, this,
               &C_SyvDaDashboardSelectorTabWidget::SigDataPoolWrite);
       connect(opc_Widget, &C_SyvDaDashboardWidget::SigDataPoolRead, this,
@@ -1568,6 +1578,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_Disconnect(C_SyvDaDashboardWidget * co
    {
       disconnect(opc_Widget, &C_SyvDaDashboardWidget::SigErrorChange, this,
                  &C_SyvDaDashboardSelectorTabWidget::SigErrorChange);
+      disconnect(opc_Widget, &C_SyvDaDashboardWidget::SigTriggerUpdateTransmissionConfiguration, this,
+                 &C_SyvDaDashboardSelectorTabWidget::UpdateTransmissionConfiguration);
       disconnect(opc_Widget, &C_SyvDaDashboardWidget::SigDataPoolWrite, this,
                  &C_SyvDaDashboardSelectorTabWidget::SigDataPoolWrite);
       disconnect(opc_Widget, &C_SyvDaDashboardWidget::SigDataPoolRead, this,

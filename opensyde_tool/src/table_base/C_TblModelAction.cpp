@@ -156,9 +156,11 @@ uint32 C_TblModelAction::DeleteSelectedItems(const std::vector<uint32> & orc_Sel
          c_ContiguousSections[static_cast<std::vector<uint32>::size_type>(u32_ItSection - 1UL)];
       if (rc_Section.size() > 0UL)
       {
+         const uint32 u32_FirstDeletedIndex = rc_Section[0UL];
+         const uint32 u32_LastDeletedIndex =
+            rc_Section[static_cast<std::vector<uint32>::size_type>(rc_Section.size() - 1UL)];
+         this->m_BeginRemoveRows(u32_FirstDeletedIndex, u32_LastDeletedIndex);
          //Remove all items in the current section (from back to front -> easier to keep next index valid)
-         this->beginRemoveRows(QModelIndex(), rc_Section[0UL],
-                               rc_Section[static_cast<std::vector<uint32>::size_type>(rc_Section.size() - 1UL)]);
          for (uint32 u32_ItItem = rc_Section.size(); u32_ItItem > 0UL; --u32_ItItem)
          {
             //Only remove item if its index is in range (as its a public interface its probably better to check)
@@ -167,7 +169,7 @@ uint32 C_TblModelAction::DeleteSelectedItems(const std::vector<uint32> & orc_Sel
                this->m_DeleteItem(rc_Section[static_cast<std::vector<uint32>::size_type>(u32_ItItem - 1UL)]);
             }
          }
-         this->endRemoveRows();
+         this->m_EndRemoveRows(u32_FirstDeletedIndex, u32_LastDeletedIndex);
       }
    }
    //If there is at least one item in the input both of these operations should not fail
@@ -346,6 +348,32 @@ void C_TblModelAction::ReloadAll(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Trigger table signal for start of remove action
+
+   \param[in] ou32_FirstIndex Lowest index of this section of removed items
+   \param[in] ou32_LastIndex  Highest index of this section of removed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblModelAction::m_BeginRemoveRows(const uint32 ou32_FirstIndex, const uint32 ou32_LastIndex)
+{
+   this->beginRemoveRows(QModelIndex(), ou32_FirstIndex, ou32_LastIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Trigger table signal for end of remove action
+
+   \param[in] ou32_FirstIndex Lowest index of this section of removed items
+   \param[in] ou32_LastIndex  Highest index of this section of removed items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblModelAction::m_EndRemoveRows(const uint32 ou32_FirstIndex, const uint32 ou32_LastIndex)
+{
+   Q_UNUSED(ou32_FirstIndex)
+   Q_UNUSED(ou32_LastIndex)
+   this->endRemoveRows();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle hex value entry display & edit role
 
    \param[in] ou64_Value Value
@@ -473,8 +501,7 @@ uint32 C_TblModelAction::m_GetLastSelectedIndex(const std::vector<uint32> & orc_
    \param[in] ou32_TargetIndex      Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblModelAction::m_MoveItems(const std::vector<uint32> & orc_ContiguousIndices,
-                                   const uint32 ou32_TargetIndex) const
+void C_TblModelAction::m_MoveItems(const std::vector<uint32> & orc_ContiguousIndices, const uint32 ou32_TargetIndex)
 {
    if (orc_ContiguousIndices.size() > 0UL)
    {

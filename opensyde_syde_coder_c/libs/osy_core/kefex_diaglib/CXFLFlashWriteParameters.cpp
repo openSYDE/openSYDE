@@ -7,7 +7,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -25,24 +25,24 @@
 #include "CSCLString.h"
 #include "CSCLIniFile.h"
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_diag_lib;
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables --------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ----------------------------------- */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 C_XFLFlashWriteParameters::C_XFLFlashWriteParameters(void) :
    u16_Version(0U),
    e_EraseMode(eXFL_ERASE_MODE_AUTOMATIC),
@@ -68,14 +68,14 @@ C_XFLFlashWriteParameters::C_XFLFlashWriteParameters(void) :
    au8_DivertUserID[1] = 0U;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLFlashWriteParameters::~C_XFLFlashWriteParameters(void)
 {
    //nothing special to do here, just provide it so inheriting classes may reimplement the destructor
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   load flashing parameters from an INI file
 
    Note: will not load all parameters !
@@ -113,7 +113,7 @@ C_XFLFlashWriteParameters::~C_XFLFlashWriteParameters(void)
    \return
    C_NO_ERR     data loaded
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
 {
    sint32 i;
@@ -160,7 +160,7 @@ void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_
    c_HexFile = orc_IniFile.ReadString(orc_Section, "Filename", "");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   save flashing parameters to an INI file
 
    Note: will not save all parameters !
@@ -196,7 +196,7 @@ void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_
    C_NO_ERR     data stored   \n
    else         could not write values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWriteParameters::SaveToIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section) const
 {
    sint32 i;
@@ -237,5 +237,5 @@ sint32 C_XFLFlashWriteParameters::SaveToIni(C_SCLIniFile & orc_IniFile, const C_
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 

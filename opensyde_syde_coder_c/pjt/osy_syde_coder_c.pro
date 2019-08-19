@@ -49,8 +49,8 @@ SOURCES += \
     ../libs/osy_core/project/system/node/C_OSCNodeOpenSydeServerSettings.cpp \
     ../libs/osy_core/project/system/node/C_OSCNodeProperties.cpp \
     ../libs/osy_core/project/system/node/C_OSCNodeStwFlashloaderSettings.cpp \
-    ../libs/osy_core/project/system/C_OSCDeviceDefinition.cpp \
     ../libs/osy_core/project/system/C_OSCDeviceDefinitionFiler.cpp \
+    ../libs/osy_core/project/system/C_OSCDeviceDefinition.cpp \
     ../libs/osy_core/project/system/C_OSCDeviceGroup.cpp \
     ../libs/osy_core/project/system/C_OSCDeviceManager.cpp \
     ../libs/osy_core/project/system/C_OSCSystemBus.cpp \
@@ -161,7 +161,8 @@ HEADERS += \
     ../libs/osy_core/project/system/node/C_OSCNodeCommFiler.h \
     ../libs/osy_core/project/system/node/C_OSCNodeDataPoolId.h \
     ../libs/osy_core/project/system/C_OSCTargetSupportPackage.h \
-    ../libs/osy_core/project/system/C_OSCTargetSupportPackageFiler.h
+    ../libs/osy_core/project/system/C_OSCTargetSupportPackageFiler.h \
+    ../src/C_OSCExportCommunicationStackV2.h
 
 #regular (non-library) header paths (also lists the system ones so QtCreator parser sees them)
 INCLUDEPATH += ../src \

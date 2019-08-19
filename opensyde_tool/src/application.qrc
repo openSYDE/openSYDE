@@ -261,12 +261,12 @@
         <file>images/main_page_and_navi_bar/Icon_new_project.svg</file>
         <file>images/main_page_and_navi_bar/Icon_open_list.svg</file>
         <file>images/main_page_and_navi_bar/Icon_open_project.svg</file>
-        <file>images/main_page_and_navi_bar/Icon_save_as.svg</file>
+        <file>images/main_page_and_navi_bar/Icon_save.svg</file>
         <file>images/IconSystemCommissioningGray.svg</file>
         <file>images/IconSystemDefinitionGray.svg</file>
         <file>images/main_page_and_navi_bar/Icon_new_project_disabled.svg</file>
         <file>images/main_page_and_navi_bar/Icon_open_project_disabled.svg</file>
-        <file>images/main_page_and_navi_bar/Icon_save_as_disabled.svg</file>
+        <file>images/main_page_and_navi_bar/Icon_save_disabled.svg</file>
         <file>images/main_page_and_navi_bar/Icon_delete_hover.svg</file>
         <file>images/main_page_and_navi_bar/Icon_duplicate_hover.svg</file>
         <file>images/main_page_and_navi_bar/Icon_edit_hover.svg</file>
@@ -488,5 +488,10 @@
         <file>images/system_views/IconFileDataBlock.svg</file>
         <file>images/system_views/IconFileParamSetImage.svg</file>
         <file>images/DeleteSearchInput.svg</file>
+        <file>images/IconBrowse.svg</file>
+        <file>images/IconPathVariables.svg</file>
+        <file>images/IconRevert.svg</file>
+        <file>images/main_page_and_navi_bar/Icon_save_as.svg</file>
+        <file>images/main_page_and_navi_bar/Icon_save_as_disabled.svg</file>
     </qresource>
 </RCC>

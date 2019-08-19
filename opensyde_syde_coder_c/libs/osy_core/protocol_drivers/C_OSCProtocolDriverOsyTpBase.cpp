@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -18,37 +18,37 @@
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Initialize with default values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyNode::C_OSCProtocolDriverOsyNode(void) :
    u8_BusIdentifier(0U),
    u8_NodeIdentifier(0U)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Initialize with specified values
@@ -56,14 +56,14 @@ C_OSCProtocolDriverOsyNode::C_OSCProtocolDriverOsyNode(void) :
    \param[in] ou8_BusIdentifier    bus ID init value
    \param[in] ou8_NodeIdentifier   node ID init value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyNode::C_OSCProtocolDriverOsyNode(const uint8 ou8_BusIdentifier, const uint8 ou8_NodeIdentifier) :
    u8_BusIdentifier(ou8_BusIdentifier),
    u8_NodeIdentifier(ou8_NodeIdentifier)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
@@ -72,7 +72,7 @@ C_OSCProtocolDriverOsyNode::C_OSCProtocolDriverOsyNode(const uint8 ou8_BusIdenti
    Current equal to orc_Cmp
    Else false
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCProtocolDriverOsyNode::operator ==(const C_OSCProtocolDriverOsyNode & orc_Cmp) const
 {
    bool q_Return = true;
@@ -86,7 +86,7 @@ bool C_OSCProtocolDriverOsyNode::operator ==(const C_OSCProtocolDriverOsyNode & 
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current is not equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
@@ -95,7 +95,7 @@ bool C_OSCProtocolDriverOsyNode::operator ==(const C_OSCProtocolDriverOsyNode & 
    Current not equal to orc_Cmp
    Else false
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCProtocolDriverOsyNode::operator !=(const C_OSCProtocolDriverOsyNode & orc_Cmp) const
 {
    bool q_Return = true;
@@ -109,7 +109,7 @@ bool C_OSCProtocolDriverOsyNode::operator !=(const C_OSCProtocolDriverOsyNode & 
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Less operator.
 
    \param[in] orc_Cmp Compared instance
@@ -118,7 +118,7 @@ bool C_OSCProtocolDriverOsyNode::operator !=(const C_OSCProtocolDriverOsyNode & 
    true     Current smaller than orc_Cmp
    false    Else
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCProtocolDriverOsyNode::operator <(const C_OSCProtocolDriverOsyNode & orc_Cmp) const
 {
    bool q_Return;
@@ -140,7 +140,7 @@ bool C_OSCProtocolDriverOsyNode::operator <(const C_OSCProtocolDriverOsyNode & o
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   add new service to TX queue
 
    Add specified service to TX queue for outgoing requests.
@@ -154,7 +154,7 @@ bool C_OSCProtocolDriverOsyNode::operator <(const C_OSCProtocolDriverOsyNode & o
    C_OVERFLOW  TX queue is already full
    C_NOACT     could not add to queue (out of memory; should not happen in real life)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::m_AddToTxQueue(const C_OSCProtocolDriverOsyService & orc_Service)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -186,7 +186,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToTxQueue(const C_OSCProtocolDriverOsy
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   add new service to RX queue
 
    Add specified service to RX queue for incoming responses.
@@ -200,7 +200,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToTxQueue(const C_OSCProtocolDriverOsy
    C_OVERFLOW  RX queue is already full
    C_NOACT     could not add to queue (out of memory; should not happen in real life)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::m_AddToRxQueue(const C_OSCProtocolDriverOsyService & orc_Service)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -232,7 +232,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToRxQueue(const C_OSCProtocolDriverOsy
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   get "oldest" entry from TX queue
 
    Get service from TX queue for outgoing requests.
@@ -244,7 +244,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToRxQueue(const C_OSCProtocolDriverOsy
    C_NO_ERR    service read; data in orc_Service
    C_NOACT     queue is empty
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromTxQueue(C_OSCProtocolDriverOsyService & orc_Service)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -263,7 +263,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromTxQueue(C_OSCProtocolDriverOsyServ
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   get "oldest" entry from RX queue
 
    Get service from RX queue for incoming responses.
@@ -275,7 +275,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromTxQueue(C_OSCProtocolDriverOsyServ
    C_NO_ERR    service read; data in orc_Service
    C_NOACT     queue is empty
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromRxQueue(C_OSCProtocolDriverOsyService & orc_Service)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -294,13 +294,13 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromRxQueue(C_OSCProtocolDriverOsyServ
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear RX and TX service queues
 
    Remove all elements from TX and TX service queues
    During the operation each of the queues will be locked by a critical section.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpBase::ClearServiceQueues(void)
 {
    mc_CsRxQueue.Acquire();
@@ -311,57 +311,57 @@ void C_OSCProtocolDriverOsyTpBase::ClearServiceQueues(void)
    mc_CsTxQueue.Release();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set timeout for waiting for broadcast responses
 
    Set time period to wait when collecting responses to broadcast requests.
 
    \param[in]    ou32_TimeoutMs   number of ms to wait for responses
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpBase::SetBroadcastTimeout(const uint32 ou32_TimeoutMs)
 {
    mu32_BroadcastTimeoutMs = ou32_TimeoutMs;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Initialize class fields
 
    \param[in]  ou16_MaxServiceQueueSize  maximum number of service queue entries for TX and RX queue
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpBase::C_OSCProtocolDriverOsyTpBase(const uint16 ou16_MaxServiceQueueSize) :
    mu16_MaxServiceQueueSize(ou16_MaxServiceQueueSize),
    mu32_BroadcastTimeoutMs(1000U)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   destructor
 
    Clean up
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpBase::~C_OSCProtocolDriverOsyTpBase(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks the connection of the TCP socket
 
    \return
    C_NO_ERR   is connected
    C_NOACT    is not connected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::IsConnected(void)
 {
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   re-connect to device
 
    Re-connect to device.
@@ -372,26 +372,26 @@ sint32 C_OSCProtocolDriverOsyTpBase::IsConnected(void)
    C_NO_ERR    re-connection established (or not required)
    C_BUSY      re-connection failed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::ReConnect(void)
 {
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Disconnect from server
 
    \return
    C_NO_ERR    disconnect established (or not required)
    C_NOACT     disconnect failed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::Disconnect(void)
 {
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send service request
 
    Add service request to TX queue for sending.
@@ -405,13 +405,13 @@ sint32 C_OSCProtocolDriverOsyTpBase::Disconnect(void)
    C_OVERFLOW  TX queue is already full
    C_NOACT     could not add to queue (out of memory; should not happen in real life)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::SendRequest(const C_OSCProtocolDriverOsyService & orc_Request)
 {
    return m_AddToTxQueue(orc_Request);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read service response from RX queue
 
    Get "oldest" incoming service request from RX queue.
@@ -423,13 +423,13 @@ sint32 C_OSCProtocolDriverOsyTpBase::SendRequest(const C_OSCProtocolDriverOsySer
    C_NO_ERR    service read; date in orc_Service
    C_NOACT     queue is empty
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::ReadResponse(C_OSCProtocolDriverOsyService & orc_Response)
 {
    return m_GetFromRxQueue(orc_Response);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Make server and client identifiers known to TP.
 
    * remember IDs
@@ -446,7 +446,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::ReadResponse(C_OSCProtocolDriverOsyService 
    C_NO_ERR   no problems
    C_RANGE    client and/or server identifier out of range
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::SetNodeIdentifiers(const C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,
                                                         const C_OSCProtocolDriverOsyNode & orc_ServerIdentifier)
 {
@@ -467,4 +467,18 @@ sint32 C_OSCProtocolDriverOsyTpBase::SetNodeIdentifiers(const C_OSCProtocolDrive
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read used server and client identifiers
+
+   \param[out]  orc_ClientIdentifier   configured client (i.e.: our own) identifier
+   \param[out]  orc_ServerIdentifier   configured server identifier
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCProtocolDriverOsyTpBase::GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,
+                                                      C_OSCProtocolDriverOsyNode & orc_ServerIdentifier)
+{
+   orc_ClientIdentifier = mc_ClientId;
+   orc_ServerIdentifier = mc_ServerId;
 }

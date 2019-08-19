@@ -68,6 +68,8 @@ Q_SIGNALS:
 
    void SigAddSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint16 ou16_StartBit);
+   void SigAddSignalMultiplexed(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                const stw_types::uint16 ou16_StartBit, const stw_types::uint16 ou16_MultiplexValue);
    void SigCopySignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                       const stw_types::uint32 ou32_SignalIndex);
    void SigCutSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -95,8 +97,7 @@ private:
    const;
    void m_OnSignalUpdatedViaSelector(void);
    void m_OnSignalActivated(const stw_types::uint32 ou32_SignalIndex);
-   void m_OnSignalNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                              const stw_types::uint32 ou32_SignalIndex);
+   void m_OnSignalNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_OnSignalTypeChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                               const stw_types::uint32 ou32_SignalIndex) const;
    void m_RecheckErrorGlobal(void);

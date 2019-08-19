@@ -105,6 +105,7 @@ void C_GiNodeBoundary::paint(QPainter * const opc_Painter, const QStyleOptionGra
    QPen c_Pen;
 
    QRect c_Rect = this->boundingRect().toAlignedRect();
+   sintn sn_Width;
    const float64 f64_HalfRectHeight = static_cast<float64>(c_Rect.height()) / 1.2;
    //Text should not be painted center aligned
    c_Rect.setHeight(static_cast<sintn>(f64_HalfRectHeight));
@@ -121,9 +122,10 @@ void C_GiNodeBoundary::paint(QPainter * const opc_Painter, const QStyleOptionGra
    }
    opc_Painter->setPen(c_Pen);
    opc_Painter->setFont(this->mc_Font);
+   sn_Width = c_Rect.width() - 20;
    opc_Painter->drawText(c_Rect, static_cast<sintn>(Qt::AlignCenter),
                          stw_opensyde_gui_logic::C_Uti::h_AdaptStringToSize(this->mc_Text, opc_Painter->fontMetrics(),
-                                                                            static_cast<float64>(c_Rect.width())));
+                                                                            static_cast<float64>(sn_Width)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

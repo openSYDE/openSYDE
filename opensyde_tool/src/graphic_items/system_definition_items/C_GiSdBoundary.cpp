@@ -85,5 +85,18 @@ void C_GiSdBoundary::UpdateData(void)
 void C_GiSdBoundary::DeleteData(void)
 {
    C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.erase(
-      C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.begin() + ms32_Index);
+            C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.begin() + ms32_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSdBoundary::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiBiBoundary::SetZValueCustom(of64_ZValue);
+   //Apply to data
+   this->UpdateData();
 }

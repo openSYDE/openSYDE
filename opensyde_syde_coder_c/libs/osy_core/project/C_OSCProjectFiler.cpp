@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cstdio>
@@ -22,26 +22,26 @@
 #include "C_OSCXMLParser.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save project
 
    Save project data to XML file.
@@ -62,7 +62,7 @@ using namespace stw_tgl;
                no write access to file)
    C_RANGE    orc_Path is empty
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProjectFiler::h_Save(C_OSCProject & orc_Project, const C_SCLString & orc_Path,
                                  const C_SCLString & orc_OpenSYDEVersion)
 {
@@ -104,7 +104,7 @@ sint32 C_OSCProjectFiler::h_Save(C_OSCProject & orc_Project, const C_SCLString &
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load project
 
    Load project data from XML file.
@@ -118,7 +118,7 @@ sint32 C_OSCProjectFiler::h_Save(C_OSCProject & orc_Project, const C_SCLString &
    C_NOACT    specified file is present but structure is invalid (e.g. invalid XML file)
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProjectFiler::h_Load(C_OSCProject & orc_Project, const C_SCLString & orc_Path)
 {
    sint32 s32_Retval;
@@ -191,7 +191,7 @@ sint32 C_OSCProjectFiler::h_Load(C_OSCProject & orc_Project, const C_SCLString &
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save project
 
    Warning: no error handling (job of caller)
@@ -209,7 +209,7 @@ sint32 C_OSCProjectFiler::h_Load(C_OSCProject & orc_Project, const C_SCLString &
    C_NO_ERR   data was written
    C_NOACT    could not write to file
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProjectFiler::m_SaveInternal(C_OSCProject & orc_Project, const C_SCLString & orc_Path,
                                          const C_SCLString & orc_OpenSYDEVersion, const bool oq_New)
 {

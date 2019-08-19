@@ -53,11 +53,11 @@ protected:
    void m_LoadProject(void);
    void m_LoadSubset(const QVector<stw_types::uint32> & orc_NodeIndices,
                      const QVector<stw_types::uint32> & orc_BusIndices,
-                     const QVector<stw_types::uint32> & orc_OtherStartIndices, const QPointF * const opc_Offset,
-                     const bool & orq_Selection, const std::vector<
+                     const QVector<stw_types::uint32> & orc_OtherStartIndices, const bool & orq_Selection, const std::vector<
                         stw_opensyde_gui_logic::C_PuiSdCompleteBusConnectionData
                         > * const opc_AdditionalConnectionData,
-                     const QMap<stw_opensyde_gui_logic::C_PuiBsTemporaryDataID, stw_types::uint64> * const opc_IDMap);
+                     const QMap<stw_opensyde_gui_logic::C_PuiBsTemporaryDataID,
+                                stw_types::uint64> * const opc_IDMap);
    stw_types::uint64 m_GetNewUniqueBusConnectorID(const QMap<
                                                      stw_opensyde_gui_logic::C_PuiBsTemporaryDataID,
                                                      stw_types::uint64> * const opc_IDMap = NULL,

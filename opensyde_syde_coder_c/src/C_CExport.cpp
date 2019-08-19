@@ -79,8 +79,9 @@ C_OsyCodeExportBase::E_ResultCode C_CExport::m_CreateApplicationCode(const C_OSC
                                                                      const C_SCLString & orc_OutputPath,
                                                                      std::vector<C_SCLString> & orc_CreatedFiles)
 {
+   const C_SCLString c_SydeCoderCInfo = stw_tgl::TGL_ExtractFileName(mc_ExeName) + " " + mc_ExeVersion;
    const sint32 s32_Return = C_OSCExportNode::h_CreateSourceCode(orc_Node, ou16_ApplicationIndex, orc_OutputPath,
-                                                                 orc_CreatedFiles);
+                                                                 orc_CreatedFiles, c_SydeCoderCInfo);
 
    return (s32_Return == C_NO_ERR) ? eRESULT_OK : eRESULT_CODE_GENERATION_ERROR;
 }

@@ -47,6 +47,9 @@ public:
 
    virtual void Clear(void);
    virtual stw_types::uint32 Count(void) const;
+
+   virtual void SetDataPositionOffset(const QPointF & orc_NewPos) override;
+   virtual void SetDataZOffset(const stw_types::float64 of64_HighestUsedZValue) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -79,6 +79,7 @@ public:
 
 Q_SIGNALS:
    //lint -restore
+   void SigResetPermanentEditors(void);
    void SigUpdateMessageData(const stw_types::uint32 ou32_MessageIndex);
    void SigTriggerModelUpdateCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
 
@@ -104,6 +105,16 @@ private:
       const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_InitValue, const stw_types::uint16 ou16_BitLength,
       const bool oq_IsMin);
    static stw_types::uint64 mh_GetMax(const stw_types::uint16 ou16_Bit);
+   static bool mh_IsMultiplexed(const stw_opensyde_core::C_OSCCanMessage * const opc_OsyMessage,
+                                const C_CieConverter::C_CIECanMessage * const opc_DbcMessage);
+   stw_types::uint16 m_GetMultiplexerValue(const stw_opensyde_core::C_OSCCanMessage * const opc_OsyMessage,
+                                           const C_CieConverter::C_CIECanMessage * const opc_DbcMessage) const;
+   static stw_types::sint32 mh_GetNumRowsForMuxValue(const stw_opensyde_core::C_OSCCanMessage * const opc_OsyMessage,
+                                                     const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
+                                                     const stw_types::uint16 ou16_MuxValue);
+   stw_types::uint32 m_TranslateRowToIndex(const stw_types::sint32 os32_Row) const;
+   static std::vector<stw_types::uint16> mh_GetStartBits(const stw_opensyde_core::C_OSCCanMessage * const opc_OsyMessage,
+      const C_CieConverter::C_CIECanMessage * const opc_DbcMessage, const stw_types::uint16 ou16_MuxValue);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

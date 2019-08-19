@@ -79,8 +79,7 @@ protected:
    virtual std::vector<stw_types::uint32> m_PasteItems(const stw_types::uint32 ou32_SelectedIndex) override;
    virtual stw_types::uint32 m_GetSizeItems(void) const override;
    virtual void m_DeleteItem(const stw_types::uint32 ou32_Index) override;
-   virtual void m_MoveItem(const stw_types::uint32 ou32_SourceIndex,
-                           const stw_types::uint32 ou32_TargetIndex) const override;
+   virtual void m_MoveItem(const stw_types::uint32 ou32_SourceIndex, const stw_types::uint32 ou32_TargetIndex) override;
 
 private:
    QList<stw_opensyde_gui_logic::C_CamProFilterItemData> mc_FilterItemsData;

@@ -18,7 +18,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -31,41 +31,39 @@
 #include "C_OSCParamSetInterpretedNodeFiler.h"
 #include "C_OSCDataDealerNvmSafe.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
-C_OSCDataDealerNvmSafe::E_ParameterSetFileState C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState =
-   C_OSCDataDealerNvmSafe::ePSFS_IDLE;
-stw_scl::C_SCLString C_OSCDataDealerNvmSafe::mhc_ParameterSetFilePath = "";
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set up class
 
    Initializes class elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDataDealerNvmSafe::C_OSCDataDealerNvmSafe(void) :
    C_OSCDataDealerNvm(),
-   me_CreateParameterSetWorkflowState(C_OSCDataDealerNvmSafe::eCPSFS_IDLE)
+   me_CreateParameterSetWorkflowState(C_OSCDataDealerNvmSafe::eCPSFS_IDLE),
+   me_ParameterSetFileState(C_OSCDataDealerNvmSafe::ePSFS_IDLE)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set up class
 
    Initializes class elements
@@ -74,23 +72,24 @@ C_OSCDataDealerNvmSafe::C_OSCDataDealerNvmSafe(void) :
    \param[in]     ou32_NodeIndex    Index of node of data dealer
    \param[in]     opc_DiagProtocol  Pointer to used diagnostic protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDataDealerNvmSafe::C_OSCDataDealerNvmSafe(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
                                                C_OSCDiagProtocolBase * const opc_DiagProtocol) :
    C_OSCDataDealerNvm(opc_Node, ou32_NodeIndex, opc_DiagProtocol),
-   me_CreateParameterSetWorkflowState(C_OSCDataDealerNvmSafe::eCPSFS_IDLE)
+   me_CreateParameterSetWorkflowState(C_OSCDataDealerNvmSafe::eCPSFS_IDLE),
+   me_ParameterSetFileState(C_OSCDataDealerNvmSafe::ePSFS_IDLE)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up class
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDataDealerNvmSafe::~C_OSCDataDealerNvmSafe(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking all CRCs of "NVM" datapool lists of one node
 
    The function calculates and checks the CRCs over all datapool lists with the flag q_NvMCRCActive is set to true
@@ -105,7 +104,7 @@ C_OSCDataDealerNvmSafe::~C_OSCDataDealerNvmSafe(void)
                at least one of its list has the flag q_NvMCRCActive set to false
    C_CONFIG    No diagnostic protocol are known (was this class properly Initialize()d ?)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckCrcs(const C_OSCNode & orc_Node) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -167,7 +166,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckCrcs(const C_OSCNode & orc_Node) cons
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Writing of changed NVM values
 
    The function writes all values of all datapool elements of all lists of all datapools of
@@ -193,7 +192,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckCrcs(const C_OSCNode & orc_Node) cons
    C_RD_WR     unexpected content in server response
    C_COM       expected server response not received because of communication error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
    std::vector<C_OSCNodeDataPoolListElementId> & orc_ChangedElements,
    const std::vector<C_OSCNodeDataPoolListId> * const opc_AdditionalListsToUpdate, uint8 * const opu8_NrCode)
@@ -388,7 +387,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reads values of all changed lists of ECU
 
    The function reads the values of all datapool elements of all datapool lists that
@@ -414,7 +413,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
    C_WARN      Server sent error response
    C_COM       expected server response not received because of communication error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCopy), uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -494,7 +493,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCo
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the CRCs of changed lists and writes them to the ECU
 
    The function calculates the CRCs over all datapool lists read by the preceding call to
@@ -521,7 +520,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCo
    C_RD_WR     unexpected content in server response
    C_COM       expected server response not received because of communication error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteCrcs(uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -688,22 +687,18 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteCrcs(uint8 * const opu8_NrCode)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear internally stored content
-
-   Note: this function handles a file step and there is only one parameter set file for each parametrization process,
-         so this function needs to only be called once,
-         so all participating data dealers can continue with the next step (if there is any)
 */
-//-----------------------------------------------------------------------------
-void C_OSCDataDealerNvmSafe::h_NvmSafeClearInternalContent(void)
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCDataDealerNvmSafe::NvmSafeClearInternalContent(void)
 {
    //Update state
-   C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_DATA_RESET;
-   C_OSCParamSetHandler::h_GetInstance().ClearContent();
+   this->me_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_DATA_RESET;
+   this->mc_ImageFileHandler.ClearContent();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create parameter set file based on current ECU values
 
    Note: Not set CRCs are supported
@@ -723,7 +718,7 @@ void C_OSCDataDealerNvmSafe::h_NvmSafeClearInternalContent(void)
    C_WARN     Server communication protocol service error response was received
    C_COM      expected server response not received because of communication error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OSCNodeDataPoolListId> & orc_ListIds,
                                                           uint8 * const opu8_NrCode)
 {
@@ -731,7 +726,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
 
    //Reset state
    this->me_CreateParameterSetWorkflowState = C_OSCDataDealerNvmSafe::eCPSFS_IDLE;
-   if (C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_DATA_RESET)
+   if (C_OSCDataDealerNvmSafe::me_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_DATA_RESET)
    {
       if (orc_ListIds.size() > 0)
       {
@@ -874,6 +869,8 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
                               c_DataPoolInfo.u32_DataPoolCrc = 0;
                               rc_DataPool.CalcDefinitionHash(c_DataPoolInfo.u32_DataPoolCrc);
                               c_DataPoolInfo.c_Name = rc_DataPool.c_Name;
+                              c_DataPoolInfo.u32_NvMSize = rc_DataPool.u32_NvMSize;
+                              c_DataPoolInfo.u32_NvMStartAddress = rc_DataPool.u32_NvMStartAddress;
                               c_DataPoolInfo.au8_Version[0] = rc_DataPool.au8_Version[0];
                               c_DataPoolInfo.au8_Version[1] = rc_DataPool.au8_Version[1];
                               c_DataPoolInfo.au8_Version[2] = rc_DataPool.au8_Version[2];
@@ -902,10 +899,9 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
                   //Write data
                   if (s32_Retval == C_NO_ERR)
                   {
-                     if (C_OSCParamSetHandler::h_GetInstance().AddRawDataForNode(c_RawNode) == C_NO_ERR)
+                     if (this->mc_ImageFileHandler.AddRawDataForNode(c_RawNode) == C_NO_ERR)
                      {
-                        if (C_OSCParamSetHandler::h_GetInstance().AddInterpretedDataForNode(c_InterpretedNode) ==
-                            C_NO_ERR)
+                        if (this->mc_ImageFileHandler.AddInterpretedDataForNode(c_InterpretedNode) == C_NO_ERR)
                         {
                            //Finished
                            //Update state
@@ -942,7 +938,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create clean file from internally stored content without adding a CRC
 
    Note: this function handles a file step and there is only one parameter set file for each parametrization process,
@@ -955,28 +951,27 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
    \return
    C_NO_ERR   data saved
    C_OVERFLOW Wrong sequence of function calls
-   C_CONFIG   Internal data invalid
    C_BUSY     file already exists
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
-//-----------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(const C_SCLString & orc_Path,
-                                                                  const C_OSCParamSetInterpretedFileInfoData & orc_FileInfo)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCDataDealerNvmSafe::NvmSafeCreateCleanFileWithoutCRC(const C_SCLString & orc_Path,
+                                                                const C_OSCParamSetInterpretedFileInfoData & orc_FileInfo)
 {
    sint32 s32_Retval;
 
    if (TGL_FileExists(orc_Path) == false)
    {
-      if (C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_DATA_RESET)
+      if (this->me_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_DATA_RESET)
       {
-         C_OSCParamSetHandler::h_GetInstance().AddInterpretedFileData(orc_FileInfo);
-         s32_Retval = C_OSCParamSetHandler::h_GetInstance().CreateCleanFileWithoutCRC(orc_Path);
+         this->mc_ImageFileHandler.AddInterpretedFileData(orc_FileInfo);
+         s32_Retval = this->mc_ImageFileHandler.CreateCleanFileWithoutCRC(orc_Path);
          if (s32_Retval == C_NO_ERR)
          {
             //Update internal variable
-            C_OSCDataDealerNvmSafe::mhc_ParameterSetFilePath = orc_Path;
+            this->mc_ParameterSetFilePath = orc_Path;
             //Update state
-            C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_FILE_CREATED;
+            this->me_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_FILE_CREATED;
          }
       }
       else
@@ -991,7 +986,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(const C_SCLStr
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read file and update internally stored content (cleared at start)
 
    Warning: CRC is not checked
@@ -1010,20 +1005,20 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(const C_SCLStr
               specified file is present but structure is invalid (e.g. invalid XML file)
    C_CONFIG   file does not contain essential information
 */
-//-----------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithoutCRC(const C_SCLString & orc_Path)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCDataDealerNvmSafe::NvmSafeReadFileWithoutCRC(const C_SCLString & orc_Path)
 {
    sint32 s32_Retval;
 
-   if (C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_FILE_CREATED)
+   if (this->me_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_FILE_CREATED)
    {
-      if (C_OSCDataDealerNvmSafe::mhc_ParameterSetFilePath == orc_Path)
+      if (this->mc_ParameterSetFilePath == orc_Path)
       {
-         s32_Retval = C_OSCParamSetHandler::h_GetInstance().ReadFile(orc_Path, true);
+         s32_Retval = this->mc_ImageFileHandler.ReadFile(orc_Path, true);
          if (s32_Retval == C_NO_ERR)
          {
             //Update state
-            C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_FILE_READ_WITHOUT_CRC;
+            this->me_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_FILE_READ_WITHOUT_CRC;
          }
       }
       else
@@ -1038,7 +1033,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithoutCRC(const C_SCLString & o
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   The function reads the contents of a parameter set file without checking the file CRC
 
    \param[in]  orc_Path          File path
@@ -1051,7 +1046,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithoutCRC(const C_SCLString & o
    C_CONFIG   Mismatch of data with current node
                or no valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckParameterFileContents(const C_SCLString & orc_Path,
                                                                  std::vector<C_OSCNodeDataPoolListId> & orc_DataPoolLists)
 {
@@ -1060,12 +1055,12 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckParameterFileContents(const C_SCLStri
    orc_DataPoolLists.clear();
    if (this->me_CreateParameterSetWorkflowState == C_OSCDataDealerNvmSafe::eCPSFS_FILE_CREATED)
    {
-      if (C_OSCDataDealerNvmSafe::mhc_ParameterSetFilePath == orc_Path)
+      if (C_OSCDataDealerNvmSafe::mc_ParameterSetFilePath == orc_Path)
       {
          if (this->mpc_Node != NULL)
          {
-            const C_OSCParamSetRawNode * const pc_Node =
-               C_OSCParamSetHandler::h_GetInstance().GetRawDataForNode(this->mpc_Node->c_Properties.c_Name);
+            const C_OSCParamSetRawNode * const pc_Node = this->mc_ImageFileHandler.GetRawDataForNode(
+               this->mpc_Node->c_Properties.c_Name);
             if (pc_Node != NULL)
             {
                if (m_CheckParameterFileContent(*pc_Node) == C_NO_ERR)
@@ -1188,7 +1183,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckParameterFileContents(const C_SCLStri
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update/add CRC for provided file
 
    Note: this function handles a file step and there is only one parameter set file for each parametrization process,
@@ -1204,20 +1199,20 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckParameterFileContents(const C_SCLStri
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
 */
-//-----------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvmSafe::h_NvmSafeUpdateCRCForFile(const C_SCLString & orc_Path)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCDataDealerNvmSafe::NvmSafeUpdateCRCForFile(const C_SCLString & orc_Path)
 {
    sint32 s32_Retval;
 
-   if (C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_FILE_READ_WITHOUT_CRC)
+   if (this->me_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_FILE_READ_WITHOUT_CRC)
    {
-      if (C_OSCDataDealerNvmSafe::mhc_ParameterSetFilePath == orc_Path)
+      if (this->mc_ParameterSetFilePath == orc_Path)
       {
-         s32_Retval = C_OSCParamSetHandler::h_GetInstance().UpdateCRCForFile(orc_Path);
+         s32_Retval = this->mc_ImageFileHandler.UpdateCRCForFile(orc_Path);
          if (s32_Retval == C_NO_ERR)
          {
             //Update state
-            C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_IDLE;
+            this->me_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_IDLE;
          }
          else
          {
@@ -1236,8 +1231,11 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeUpdateCRCForFile(const C_SCLString & orc
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read file and update internally stored content (cleared at start)
+
+   After loading this functions checks whether the file contains data for exactly one node.
+   Otherwise it will fail.
 
    \param[in] orc_Path   Parameter set file path
 
@@ -1245,17 +1243,33 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeUpdateCRCForFile(const C_SCLString & orc
    C_NO_ERR   data read
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
+   C_CONFIG   file does not contain data for exactly one node (zero or more than one)
    C_CHECKSUM specified file is present but checksum is invalid
 */
-//-----------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithCRC(const C_SCLString & orc_Path)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCDataDealerNvmSafe::NvmSafeReadFileWithCRC(const C_SCLString & orc_Path)
 {
-   sint32 s32_Retval = C_OSCParamSetHandler::h_GetInstance().ReadFile(orc_Path, false);
+   sint32 s32_Retval = this->mc_ImageFileHandler.ReadFile(orc_Path, false);
 
    if (s32_Retval == C_NO_ERR)
    {
-      //Update state
-      C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_FILE_READ_WITH_CRC;
+      //data for one file contained ?
+      if (this->mc_ImageFileHandler.GetNumberOfNodes() != 1U)
+      {
+         C_SCLString c_Error;
+         c_Error.PrintFormatted(
+            "File \"%s\"  Expected: contains parameters for one device  Found: contains parameters for %d devices\n",
+            orc_Path.c_str(), this->mc_ImageFileHandler.GetNumberOfNodes());
+         this->mc_ImageFileHandler.ClearContent();
+         s32_Retval = C_CONFIG;
+         osc_write_log_error("Loading parameter set file", c_Error);
+      }
+      else
+      {
+         //Update state
+         this->me_ParameterSetFileState = C_OSCDataDealerNvmSafe::ePSFS_FILE_READ_WITH_CRC;
+         this->mc_ParameterSetFilePath = orc_Path;
+      }
    }
    else if (s32_Retval == C_CHECKSUM)
    {
@@ -1268,8 +1282,12 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithCRC(const C_SCLString & orc_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*! \brief   The function reads a parameter set file and writes the contained values and CRCs to the ECU's NVM
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read a parameter set file and writes the contained values and CRCs to the ECU's NVM
+
+   Sequence:
+   * read parameter set file
+   * write to NVM
 
    \param[in]  orc_Path           File path
    \param[out] ors32_ResultDetail Result detail
@@ -1277,19 +1295,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithCRC(const C_SCLString & orc_
    \return
    Return     Error Detail
    C_NO_ERR   1            File successfully written to ECU
-   C_OVERFLOW 1            The device name from the parameter set file does not match the device name
-                            of the device definition associated with "C_OSCDataDealer"
-              2            One of data pools for which data is contained in the parameter set file
-                            is not part of the device definition associated with
-              3            The data pool version of one of the data pools
-                            for which data is contained in the parameter set files
-                            does not match the definition of the corresponding data pool
-                            that is part of the device definition associated with "C_OSCDataDealer"
-              4            The data pool structure CRC of one of the data pools
-                            for which data is contained in the parameter set files
-                            does not match the CRC of the corresponding data pool structure
-                            that is part of the device definition associated with "C_OSCDataDealer"
-              5            Wrong sequence of function calls
+   C_OVERFLOW 5            Wrong sequence of function calls
               6            Path mismatch with previous function call
    C_CONFIG   1            No valid diagnostic protocol is set in "C_OSCDataDealer"
               2            No valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
@@ -1297,7 +1303,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithCRC(const C_SCLString & orc_
    C_TIMEOUT  1            Communication protocol service has timed out
    C_WARN     1            Communication protocol service error response was received
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteParameterSetFile(const C_SCLString & orc_Path, sint32 & ors32_ResultDetail)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1307,101 +1313,53 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteParameterSetFile(const C_SCLString & 
    {
       if (this->mpc_DiagProtocol != NULL)
       {
-         if (C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_FILE_READ_WITH_CRC)
+         if (C_OSCDataDealerNvmSafe::me_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_FILE_READ_WITH_CRC)
          {
-            if (C_OSCDataDealerNvmSafe::mhc_ParameterSetFilePath == orc_Path)
+            if (C_OSCDataDealerNvmSafe::mc_ParameterSetFilePath == orc_Path)
             {
-               const C_OSCParamSetRawNode * const pc_Node = C_OSCParamSetHandler::h_GetInstance().GetRawDataForNode(
-                  this->mpc_Node->c_Properties.c_Name);
-
+               //when we get here we can be sure there was data for exactly one node contained in the file
+               // as this is checked by NvmSafeReadFileWithCRC
+               const C_OSCParamSetRawNode * const pc_Node = this->mc_ImageFileHandler.GetRawDataForNode(0U);
+               tgl_assert(pc_Node != NULL);
                if (pc_Node != NULL)
                {
-                  s32_Retval = m_CheckParameterFileContent(*pc_Node);
-                  if (s32_Retval == C_NO_ERR)
+                  //write the actual values:
+                  for (uint32 u32_ItEntry = 0; u32_ItEntry < pc_Node->c_Entries.size(); u32_ItEntry++)
                   {
-                     for (uint32 u32_ItEntry = 0;
-                          (u32_ItEntry < pc_Node->c_Entries.size()) && (s32_Retval == C_NO_ERR);
-                          ++u32_ItEntry)
-                     {
-                        const C_OSCParamSetRawEntry & rc_Entry = pc_Node->c_Entries[u32_ItEntry];
-                        s32_Retval =
-                           this->mpc_DiagProtocol->NvmWrite(rc_Entry.u32_StartAddress, rc_Entry.c_Bytes, NULL);
-                     }
-                     if (s32_Retval != C_NO_ERR)
-                     {
-                        //Map error codes
-                        switch (s32_Retval)
-                        {
-                        case C_TIMEOUT:
-                           s32_Retval = C_TIMEOUT;
-                           ors32_ResultDetail = 1;
-                           break;
-                        case C_NOACT:
-                           s32_Retval = C_NOACT;
-                           ors32_ResultDetail = 1;
-                           break;
-                        case C_RANGE:
-                        case C_CONFIG:
-                        case C_RD_WR:
-                        case C_WARN:
-                           s32_Retval = C_WARN;
-                           ors32_ResultDetail = 1;
-                           break;
-                        case C_NO_ERR: //unexpected
-                        default:
-                           //Not documented error was returned by function
-                           s32_Retval = C_UNKNOWN_ERR;
-                           osc_write_log_info("parametrization",
-                                              "Not documented error was returned by NvmWrite");
-                           break;
-                        }
-                     }
-
-                     if (s32_Retval == C_NO_ERR)
-                     {
-                        //Finished
-                        ors32_ResultDetail = 1;
-                     }
-                  }
-                  else
-                  {
+                     const C_OSCParamSetRawEntry & rc_Entry = pc_Node->c_Entries[u32_ItEntry];
+                     s32_Retval = this->mpc_DiagProtocol->NvmWrite(rc_Entry.u32_StartAddress, rc_Entry.c_Bytes, NULL);
                      //Map error codes
                      switch (s32_Retval)
                      {
-                     case C_CONFIG:
-                        s32_Retval = C_CONFIG;
-                        ors32_ResultDetail = 2;
-                        break;
-                     case C_RANGE:
-                        s32_Retval = C_OVERFLOW;
+                     case C_TIMEOUT:
                         ors32_ResultDetail = 1;
                         break;
-                     case C_TIMEOUT:
-                        s32_Retval = C_OVERFLOW;
-                        ors32_ResultDetail = 2;
+                     case C_NOACT:
+                     case C_CONFIG:
+                        s32_Retval = C_NOACT;
+                        ors32_ResultDetail = 1;
                         break;
-                     case C_CHECKSUM:
-                        s32_Retval = C_OVERFLOW;
-                        ors32_ResultDetail = 4;
-                        break;
+                     case C_RANGE:
                      case C_RD_WR:
-                        s32_Retval = C_OVERFLOW;
-                        ors32_ResultDetail = 3;
+                     case C_WARN:
+                        s32_Retval = C_WARN;
+                        ors32_ResultDetail = 1;
                         break;
                      case C_NO_ERR: //unexpected
+                        ors32_ResultDetail = 1;
+                        break;
                      default:
                         //Not documented error was returned by function
                         s32_Retval = C_UNKNOWN_ERR;
-                        osc_write_log_info("parametrization",
-                                           "Not documented error was returned by m_CheckParameterFileContent");
+                        osc_write_log_info("Parametrization", "Not documented error was returned by NvmWrite");
+                        break;
+                     }
+
+                     if (s32_Retval != C_NO_ERR)
+                     {
                         break;
                      }
                   }
-               }
-               else
-               {
-                  s32_Retval = C_OVERFLOW;
-                  ors32_ResultDetail = 1;
                }
             }
             else
@@ -1431,13 +1389,13 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteParameterSetFile(const C_SCLString & 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create interpreted list
 
    \param[in]  orc_List            List data
    \param[out] orc_InterpretedList New interpreted list
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDataDealerNvmSafe::mh_CreateInterpretedList(const C_OSCNodeDataPoolList & orc_List,
                                                       C_OSCParamSetInterpretedList & orc_InterpretedList)
 {
@@ -1453,24 +1411,7 @@ void C_OSCDataDealerNvmSafe::mh_CreateInterpretedList(const C_OSCNodeDataPoolLis
    }
 }
 
-//-----------------------------------------------------------------------------
-/*! \brief   Copy bytes from source vector and append them to the target vector
-
-   Info: Performance not considered
-
-   \param[in]     orc_Source Source storage
-   \param[in,out] orc_Target Target storage
-*/
-//-----------------------------------------------------------------------------
-void C_OSCDataDealerNvmSafe::mh_AppendBytes(const std::vector<uint8> & orc_Source, std::vector<uint8> & orc_Target)
-{
-   for (uint32 u32_ItSource = 0; u32_ItSource < orc_Source.size(); ++u32_ItSource)
-   {
-      orc_Target.push_back(orc_Source[u32_ItSource]);
-   }
-}
-
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if raw node parameters match internal node
 
    \param[in] orc_Node Raw node parameters to check
@@ -1483,7 +1424,7 @@ void C_OSCDataDealerNvmSafe::mh_AppendBytes(const std::vector<uint8> & orc_Sourc
    C_CHECKSUM Data pool CRC mismatch
    C_RD_WR    Data pool version mismatch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRawNode & orc_Node)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1493,21 +1434,21 @@ sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRa
       if ((this->mpc_Node->c_Properties.c_Name == orc_Node.c_Name) && (orc_Node.c_DataPools.size() > 0))
       {
          //Check all data pool info segments
-         for (uint32 u32_ItReadDataPool = 0;
+         for (uint32 u32_ItReadDataPool = 0U;
               (u32_ItReadDataPool < orc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR);
               ++u32_ItReadDataPool)
          {
             const C_OSCParamSetDataPoolInfo & rc_DataPoolInfo = orc_Node.c_DataPools[u32_ItReadDataPool];
             bool q_Found = false;
             //Find matching data pool
-            for (uint32 u32_ItNodeDataPool = 0;
+            for (uint32 u32_ItNodeDataPool = 0U;
                  (u32_ItNodeDataPool < this->mpc_Node->c_DataPools.size()) && (s32_Retval == C_NO_ERR);
                  ++u32_ItNodeDataPool)
             {
                const C_OSCNodeDataPool & rc_NodeDataPool = this->mpc_Node->c_DataPools[u32_ItNodeDataPool];
                if (rc_NodeDataPool.c_Name == rc_DataPoolInfo.c_Name)
                {
-                  uint32 u32_Crc = 0;
+                  uint32 u32_Crc = 0U;
                   rc_NodeDataPool.CalcDefinitionHash(u32_Crc);
                   q_Found = true;
                   //Check content
@@ -1545,7 +1486,7 @@ sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRa
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create raw entry for list and write bytes to interpreted data
 
    \param[in]  orc_List    List to set raw entry from
@@ -1565,7 +1506,7 @@ sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRa
    C_CHECKSUM Checksum of read datapool list is invalid
    C_COM      expected server response not received because of communication error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::m_CreateRawEntryAndPrepareInterpretedData(C_OSCNodeDataPoolList & orc_List,
                                                                          C_OSCParamSetRawEntry & orc_Entry,
                                                                          uint8 * const opu8_NrCode)

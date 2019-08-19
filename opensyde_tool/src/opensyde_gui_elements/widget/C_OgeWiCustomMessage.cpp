@@ -96,9 +96,11 @@ C_OgeWiCustomMessage::C_OgeWiCustomMessage(QWidget * const opc_Parent, const E_T
       QGraphicsDropShadowEffect * pc_Shadow;
 
       pc_Shadow = new QGraphicsDropShadowEffect(this->mpc_Ui->pc_GroupBoxBackground);
-      pc_Shadow->setBlurRadius(30.0);
-      c_Color = mc_STYLE_GUIDE_COLOR_34;
-      c_Color.setAlpha(128);
+      pc_Shadow->setBlurRadius(60.0);
+      pc_Shadow->setXOffset(0.0);
+      pc_Shadow->setYOffset(10.0);
+      c_Color = mc_STYLE_GUIDE_COLOR_33;
+      c_Color.setAlpha(180);
       pc_Shadow->setColor(c_Color);
       this->mpc_Ui->pc_GroupBoxBackground->setGraphicsEffect(pc_Shadow);
       //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
@@ -289,19 +291,16 @@ void C_OgeWiCustomMessage::m_SetMessageType(const E_Type & ore_MessageType)
    {
    case E_Type::eERROR:
       mc_PixmapIcon = QPixmap(":/images/Error_Icon_MessageBox.svg");
-      this->mpc_Ui->pc_WidgetFrame->SetBackgroundColor(24);
       mc_TypeString = "ERROR";
       break;
 
    case E_Type::eINFORMATION:
       mc_PixmapIcon = QPixmap(":/images/Info_Icon_MessageBox.svg");
-      this->mpc_Ui->pc_WidgetFrame->SetBackgroundColor(79);
       mc_TypeString = "INFORMATION";
       break;
 
    case E_Type::eQUESTION:
       mc_PixmapIcon = QPixmap(":/images/Question_Icon_MessageBox.svg");
-      this->mpc_Ui->pc_WidgetFrame->SetBackgroundColor(8);
       mc_TypeString = "QUESTION";
 
       // show the Cancel and NO Button and change text of OK button
@@ -315,13 +314,12 @@ void C_OgeWiCustomMessage::m_SetMessageType(const E_Type & ore_MessageType)
 
    case E_Type::eWARNING:
       mc_PixmapIcon = QPixmap(":/images/Warning_Icon_MessageBox.svg");
-      this->mpc_Ui->pc_WidgetFrame->SetBackgroundColor(179);
       mc_TypeString = "WARNING";
       break;
    }
 
    // set the icon
-   this->mpc_Ui->pc_LabelIcon->setPixmap(mc_PixmapIcon.scaledToWidth(135, Qt::SmoothTransformation));
+   this->mpc_Ui->pc_LabelIcon->setPixmap(mc_PixmapIcon.scaledToWidth(48, Qt::SmoothTransformation));
 
    // set the style
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBoxBackground, "Type", mc_TypeString);

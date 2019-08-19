@@ -70,6 +70,7 @@ void C_NagTopList::SetTypeNode(const bool oq_IsNode)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagTopList::SetSelectedIndexAndScroll(const sint32 os32_Selected)
 {
+   this->mc_Delegate.SetSelectedIndex(os32_Selected);
    this->mc_Model.SetSelectedIndex(os32_Selected);
    if (os32_Selected >= 0)
    {

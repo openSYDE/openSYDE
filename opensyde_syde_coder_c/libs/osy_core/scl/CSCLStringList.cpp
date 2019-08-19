@@ -10,7 +10,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -25,23 +25,23 @@
 #include "CSCLStringList.h"
 #include "stwtypes.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append one string
 
    Append one string at the end of the list
@@ -51,7 +51,7 @@ using namespace stw_scl;
    \return
    index of new string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SCLStringList::Add(const C_SCLString & orc_String)
 {
    Strings.IncLength();
@@ -59,7 +59,7 @@ uint32 C_SCLStringList::Add(const C_SCLString & orc_String)
    return static_cast<uint32>(Strings.GetHigh());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append one string
 
    Append one string at the end of the list.
@@ -67,24 +67,24 @@ uint32 C_SCLStringList::Add(const C_SCLString & orc_String)
 
    \param[in]  orc_String   string to append
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLStringList::Append(const C_SCLString & orc_String)
 {
    this->Add(orc_String);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear all strings
 
    Empty the string list.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLStringList::Clear(void)
 {
    Strings.SetLength(0);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete one string
 
    Delete one string from the string list.
@@ -92,13 +92,13 @@ void C_SCLStringList::Clear(void)
 
    \param[in]  ou32_Index   index of string to remove (0 = first string)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLStringList::Delete(const uint32 ou32_Index)
 {
    Strings.Delete(static_cast<sint32>(ou32_Index));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Swap the contents of two strings
 
    Swap the tests of two strings.
@@ -108,7 +108,7 @@ void C_SCLStringList::Delete(const uint32 ou32_Index)
    \param[in]  ou32_Index1   index of first string to swap (0 = first string in list)
    \param[in]  ou32_Index2   index of second string to swap (0 = first string in list)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLStringList::Exchange(const uint32 ou32_Index1, const uint32 ou32_Index2)
 {
    C_SCLString c_Temp;
@@ -118,7 +118,7 @@ void C_SCLStringList::Exchange(const uint32 ou32_Index1, const uint32 ou32_Index
    Strings[static_cast<sint32>(ou32_Index1)] = c_Temp;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert string into list
 
    Insert one string into the string list at a defined position.
@@ -126,13 +126,13 @@ void C_SCLStringList::Exchange(const uint32 ou32_Index1, const uint32 ou32_Index
    \param[in]  ou32_Index   index before which to insert the new string (0 = first string in list)
    \param[in]  orc_String   string to insert
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLStringList::Insert(const uint32 ou32_Index, const C_SCLString & orc_String)
 {
    Strings.Insert(static_cast<sint32>(ou32_Index), orc_String);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Find index of string within list
 
    Returns the index of a specified string within the string list.
@@ -142,7 +142,7 @@ void C_SCLStringList::Insert(const uint32 ou32_Index, const C_SCLString & orc_St
 
    \return  ou32_Index   index of string (0 = first string in list; -1 = string not found)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SCLStringList::IndexOf(const C_SCLString & orc_String)
 {
    sint32 s32_Index;
@@ -157,7 +157,7 @@ sint32 C_SCLStringList::IndexOf(const C_SCLString & orc_String)
    return -1;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Return all strings as one concatenated string
 
    Adds all strings to one single string.
@@ -165,7 +165,7 @@ sint32 C_SCLStringList::IndexOf(const C_SCLString & orc_String)
 
    \return  concatenated string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLStringList::GetText(void) const
 {
    C_SCLString c_Text;
@@ -178,20 +178,20 @@ C_SCLString C_SCLStringList::GetText(void) const
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get number of string in list
 
    Return number of strings contained in string list.
 
    \return  number of strings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SCLStringList::GetCount(void) const
 {
    return static_cast<uint32>(Strings.GetLength());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load strings from file
 
    Load strings from an ASCII file.
@@ -204,7 +204,7 @@ uint32 C_SCLStringList::GetCount(void) const
 
    \param[in]     orc_FileName     path to file
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLStringList::LoadFromFile(const C_SCLString & orc_FileName)
 {
    std::FILE * pt_File;
@@ -302,7 +302,7 @@ void C_SCLStringList::LoadFromFile(const C_SCLString & orc_FileName)
    delete[] pcn_Buffer;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save strings to file
 
    Save the contents of the string list to a file.
@@ -315,7 +315,7 @@ void C_SCLStringList::LoadFromFile(const C_SCLString & orc_FileName)
 
    \param[in]     orc_FileName     path to file
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLStringList::SaveToFile(const C_SCLString & orc_FileName)
 {
    sint32 s32_Line;
@@ -347,7 +347,7 @@ void C_SCLStringList::SaveToFile(const C_SCLString & orc_FileName)
    (void)std::fclose(pt_File);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the value of one key=value pair
 
    Tries to find a specified "key=" at the beginning of a string contained in the list.
@@ -364,7 +364,7 @@ void C_SCLStringList::SaveToFile(const C_SCLString & orc_FileName)
    if "key=" is found:  "value" after the "="
    else:                empty string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLStringList::Values(const C_SCLString & orc_Key) const
 {
    sint32 s32_Index;
@@ -386,7 +386,7 @@ C_SCLString C_SCLStringList::Values(const C_SCLString & orc_Key) const
    return c_Help;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Finds the first line containg a name + "="
 
    Returns the index of the first line containing a specified name with an added equals character.
@@ -399,7 +399,7 @@ C_SCLString C_SCLStringList::Values(const C_SCLString & orc_Key) const
    if "name=" is found:  index of string (0 = first string in list)
    else:                 -1
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SCLStringList::IndexOfName(const C_SCLString & orc_Name) const
 {
    bool q_Found = false;
@@ -430,7 +430,7 @@ sint32 C_SCLStringList::IndexOfName(const C_SCLString & orc_Name) const
    return s32_Index;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the part of a string after a "="
 
    Returns the part of one string after the equels ("=") chraracter.
@@ -441,7 +441,7 @@ sint32 C_SCLStringList::IndexOfName(const C_SCLString & orc_Name) const
    if the string contains "=":  part of string after "="
    else:                        empty string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SCLStringList::ValueFromIndex(const uint32 ou32_Index) const
 {
    uint32 u32_Pos;
@@ -459,14 +459,14 @@ C_SCLString C_SCLStringList::ValueFromIndex(const uint32 ou32_Index) const
    return c_Help;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add multiple strings to string list
 
    Adds then content of another string list to this string list.
 
    \param[in]     opc_Strings   string list to add (pointer is not checked for validity)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLStringList::AddStrings(const C_SCLStringList * const opc_Strings)
 {
    sint32 s32_Index;
@@ -480,12 +480,12 @@ void C_SCLStringList::AddStrings(const C_SCLStringList * const opc_Strings)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sort strings in list
 
    Sorts by ASCII values of the individual characters.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLStringList::Sort(void)
 {
    sint32 s32_Index;
@@ -505,4 +505,4 @@ void C_SCLStringList::Sort(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

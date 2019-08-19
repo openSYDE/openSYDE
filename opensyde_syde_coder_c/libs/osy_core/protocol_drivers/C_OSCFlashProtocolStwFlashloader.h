@@ -11,15 +11,15 @@
 #ifndef C_OSCFLASHPROTOCOLSTWFLASHLOADER_H
 #define C_OSCFLASHPROTOCOLSTWFLASHLOADER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "CXFLFlashWrite.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCFlashProtocolStwFlashloader :
    public stw_diag_lib::C_XFLFlashWrite
@@ -49,7 +49,7 @@ private:
    C_OSCFlashProtocolStwFlashloader & operator =(const C_OSCFlashProtocolStwFlashloader &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

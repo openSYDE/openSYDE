@@ -43,7 +43,7 @@ private:
    const stw_types::uint8 mu8_PreviousNodeId;
    const stw_types::uint8 mu8_NewNodeId;
 
-   void m_ChangeInterface(const stw_types::uint8 & oru8_NewInterface, const stw_types::uint8 & oru8_NodeId);
+   void m_ChangeInterface(const stw_types::uint8 & oru8_NewInterface, const stw_types::uint8 & oru8_NodeId) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

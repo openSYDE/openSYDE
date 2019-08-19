@@ -69,11 +69,13 @@
 #include <QWidget>
 /*
 //Qt modules
+// Cannot use the include-all ones from Qt as they conflict with the DBC library
 #include <QtGui>
 #include <QtCore>
 #include <QtWidgets>
 
 // STW includes
+// Don't include those as they can sometimes change
 #include "stwtypes.h"
 #include "C_PuiProject.h"
 #include "C_PuiSdHandler.h"

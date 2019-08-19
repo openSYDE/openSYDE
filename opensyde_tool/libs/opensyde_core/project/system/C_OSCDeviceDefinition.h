@@ -49,7 +49,7 @@ public:
    ///is programming supported enabled?
    bool q_ProgrammingSupport;
 
-   std::vector<stw_types::uint16> c_SupportedBitrates; ///< supported CAN bitrates in kBit/s
+   std::vector<stw_types::uint16> c_SupportedBitrates; ///< supported CAN bitrates in kbit/s
 
    ///is the KEFEX protocol supported (on CAN bus) ?
    bool q_DiagnosticProtocolKefex;

@@ -14,8 +14,9 @@
 
 #include <QEvent>
 #include <QHelpEvent>
-#include <QAbstractItemView>
 #include <QScrollBar>
+#include <QAbstractItemView>
+#include <QStandardItemModel>
 #include "C_OgeWiUtil.h"
 #include "C_OgeCbxToolTipBase.h"
 
@@ -115,6 +116,36 @@ bool C_OgeCbxToolTipBase::event(QEvent * const opc_Event)
    }
 
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set item at index as disabled
+
+   \param[in] os32_Index Index to disable
+   \param[in] oq_Status  Item status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeCbxToolTipBase::SetItemState(const stw_types::sint32 os32_Index, const bool oq_Status) const
+{
+   if (os32_Index < this->count())
+   {
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      QStandardItemModel * const pc_Model = dynamic_cast<QStandardItemModel * const>(this->model());
+      if (pc_Model != NULL)
+      {
+         QStandardItem * const pc_Item = pc_Model->item(os32_Index);
+         if (pc_Item != NULL)
+         {
+            Qt::ItemFlags c_Flags;
+            //lint -e{730,746,1013,1055} Use clean Qt interface
+            c_Flags.setFlag(Qt::ItemIsEnabled, oq_Status);
+            //lint -e{730,746,1013,1055} Use clean Qt interface
+            c_Flags.setFlag(Qt::ItemIsSelectable, oq_Status);
+            //Disable
+            pc_Item->setFlags(c_Flags);
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

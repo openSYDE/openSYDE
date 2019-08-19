@@ -57,13 +57,11 @@ void C_OsyCodeExportBase::m_PrintCommandLineParameters(void) const
 {
    std::cout << "Command line parameters:\n\n";
    std::cout <<
-      "Switch  Alternative notation   Description                                   Default      Example\n";
+      "Switch  Alternative notation   Description                                   Default           Example\n";
    std::cout <<
       "====================================================================================================================\n";
    std::cout <<
       "-s      --systemdefinition     Path to System Definition file                <none>            -s c:\\mysysdef.syde_sysdef\n";
-   std::cout <<
-      "-d      --devicedefinition     Path to Device Definitions file (devices.ini) <none>            -d c:\\openSYDE_devices\\devices.ini\n";
    std::cout <<
       "-o      --outputpath           Base path to generated files                  <none>            -o c:\\temp\n";
    std::cout <<
@@ -80,7 +78,7 @@ void C_OsyCodeExportBase::m_PrintCommandLineParameters(void) const
    std::cout << "\n";
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get resource version number of a file as an C_SCLString
 
    Extracts the windows version number of the specified file and returns it
@@ -233,7 +231,6 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
       }
    };
 
-   mc_DeviceDefinitionPath = "";
    mc_SystemDefinitionFilePath = "";
    mc_OutputPath = "";
 
@@ -246,7 +243,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
          switch (sn_Result)
          {
          case 'd':
-            mc_DeviceDefinitionPath = optarg;
+            std::cout <<
+               "Information: Command line parameter --devicedefinition ignored (Device Definition is no longer required).\n";
             break;
          case 's':
             mc_SystemDefinitionFilePath = optarg;
@@ -286,8 +284,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
    else
    {
       // Missing parameter option or missing mandatory parameter?
-      if ((q_ParseError == true) || (mc_DeviceDefinitionPath == "") || (mc_SystemDefinitionFilePath == "") ||
-          (mc_OutputPath == ""))
+      if ((q_ParseError == true) || (mc_SystemDefinitionFilePath == "") || (mc_OutputPath == ""))
       {
          //print directly to console; no need for logging this user feedback
          std::cout << "Error: Invalid or missing command line parameters.\n";
@@ -321,8 +318,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void
 
    // Load system definition
    const sint32 s32_Return =
-      C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(mc_SystemDefinition, mc_SystemDefinitionFilePath,
-                                                             mc_DeviceDefinitionPath);
+      C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(mc_SystemDefinition, mc_SystemDefinitionFilePath, "",
+                                                             false);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -379,8 +376,11 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
                                                   c_CreatedFiles);
                if (e_Return == eRESULT_OK)
                {
-                  std::cout << "Code generated for device \"" << orc_Node.c_Properties.c_Name.c_str() <<
-                     "\" application \"" << rc_Application.c_Name.c_str() << "\"\n";
+                  const C_SCLString c_Text = "Code generated for device \"" + orc_Node.c_Properties.c_Name +
+                                             "\" application \"" + rc_Application.c_Name +
+                                             "\". Code format version: 0x" +
+                                             C_SCLString::IntToHex(rc_Application.u16_GenCodeVersion, 4U) + ".\n";
+                  std::cout << c_Text.c_str();
                   std::cout << "Generated files:\n";
                   for (uint32 u32_File = 0U; u32_File < c_CreatedFiles.size(); u32_File++)
                   {
@@ -416,10 +416,11 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
             e_Return = m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application), c_Path, c_CreatedFiles);
             if (e_Return == eRESULT_OK)
             {
-               q_AtLeastOne = true;
-
-               std::cout << "Code generated for device \"" << orc_Node.c_Properties.c_Name.c_str() <<
-                  "\" application \"" << rc_Application.c_Name.c_str() << "\"\n";
+               const C_SCLString c_Text = "Code generated for device \"" + orc_Node.c_Properties.c_Name +
+                                          "\" application \"" + rc_Application.c_Name +
+                                          "\". Code format version: 0x" +
+                                          C_SCLString::IntToHex(rc_Application.u16_GenCodeVersion, 4U) + ".\n";
+               std::cout << c_Text.c_str();
                std::cout << "Generated files:\n";
                for (uint32 u32_File = 0U; u32_File < c_CreatedFiles.size(); u32_File++)
                {
@@ -427,6 +428,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
                   //append list of files:
                   mc_CreatedFiles.push_back(c_CreatedFiles[u32_File]);
                }
+               q_AtLeastOne = true;
             }
          }
       }

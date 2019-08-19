@@ -15,6 +15,7 @@
 #include <array>
 #include <QMap>
 
+#include "C_TblTreItem.h"
 #include "C_TblTreModel.h"
 #include "C_OSCCanMessage.h"
 #include "C_OSCNodeDataPoolListElement.h"
@@ -54,9 +55,9 @@ private:
    QMap<QString, QString> mc_MessageMap;
 
    void m_Init(void);
-   C_TblTreItem * m_CreateAndFillDatabaseNode(const QString & orc_File, C_TblTreItem * const opc_ParentItem);
+   C_TblTreItem * m_CreateAndFillDatabaseNode(const QString & orc_File, C_TblTreSimpleItem * const opc_ParentItem);
    void m_CreateAndFillMessageNode(const stw_opensyde_core::C_OSCCanMessage & orc_Message,
-                                   C_TblTreItem * const opc_ParentItem);
+                                   C_TblTreSimpleItem * const opc_ParentItem);
    static void mh_CombineIndices(std::vector<std::array<QString, 2> > & orc_BigVectorToAppendTo,
                                  const std::vector<std::array<QString, 2> > & orc_SmallVectorToAdd);
 };

@@ -11,7 +11,7 @@
 #ifndef CXFLPROTOCOLH
 #define CXFLPROTOCOLH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CCANDispatcher.h"
 #include "CHexFile.h"
@@ -23,11 +23,11 @@
 #include "CDLReportEvents.h"
 #include "CXFLECUInformation.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_diag_lib
 {
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 const stw_types::uint8 XFL_DIVERT_TARGET_BABY_B = 0U;
 
@@ -59,7 +59,7 @@ const stw_types::uint16 XFL_NUM_DIFFERENT_LOCAL_IDS = 256U; ///< 0..255 (255 is 
 //default protocol parameters:
 const stw_types::uint8 XFL_DEFAULT_SEND_ID    = 0x51U;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///Information about in protected flash sector
 class C_XFLProtectedSectorInfo
@@ -69,7 +69,7 @@ public:
    stw_types::uint16 u16_SectorNumber;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about aliased memory
 class C_XFLAliasedRange
 {
@@ -81,7 +81,7 @@ public:
    stw_types::sint64 GetOffset(void) const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about multiple aliased memory ranges
 class C_XFLAliasedRanges : public stw_scl::SCLDynamicArray<C_XFLAliasedRange>
 {
@@ -90,7 +90,7 @@ public:
       const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about checksum block
 class C_XFLChecksumBlock
 {
@@ -100,7 +100,7 @@ public:
    bool q_BlockDefinitionValid;         //true -> valid information contained in start and end address
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Raw company ID data
 class C_XFLCompanyID
 {
@@ -109,7 +109,7 @@ public:
    stw_types::uint8 u8_NumBytes; ///< number of actually used bytes (only 2 or 5 are valid)
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about flashloader services available on the server
 //use a big struct and not a bitfield:
 //- memory use is not a big issue on PC
@@ -196,7 +196,7 @@ public:
    C_XFLImplementedServices(void);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about which fingerprint information is supported by the server
 //lint -sem(stw_diag_lib::C_XFLFingerPrintSupportedIndexes::Clear,initializer)
 class C_XFLFingerPrintSupportedIndexes
@@ -215,7 +215,7 @@ public:
    bool aq_Reserved[25];
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Basic flashloader protocol settings
 class C_XFLProtocolConfig
 {
@@ -233,7 +233,7 @@ public:
    bool               q_XtdID;       ///< true -> 29bit IDs; false 11bit IDs
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /// STW Flashloader protocol driver
 class STW_DIAGLIB_EXPORT C_XFLProtocol : virtual public C_DLReportEvents
 {
@@ -461,7 +461,7 @@ public:
    stw_types::sint32 GetLastUser(stw_types::uint8 (& orau8_LastUser)[2]);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 
 } //end of namespace
 

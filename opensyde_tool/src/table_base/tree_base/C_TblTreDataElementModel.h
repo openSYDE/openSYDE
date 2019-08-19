@@ -14,6 +14,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMap>
 
+#include "C_TblTreItem.h"
 #include "C_TblTreModel.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
@@ -65,9 +66,9 @@ private:
    class C_TblTreDataElementModelState
    {
    public:
-      C_TblTreDataElementModelState(C_TblTreItem * const opc_Tree,
+      C_TblTreDataElementModelState(C_TblTreSimpleItem * const opc_Tree,
                                     const std::vector<C_PuiSdNodeCanMessageSyncManager *> & orc_SyncManagers);
-      C_TblTreItem * pc_Tree;
+      C_TblTreSimpleItem * pc_Tree;
       std::vector<C_PuiSdNodeCanMessageSyncManager *> c_SyncManagers;
 
       void CleanUp(void);
@@ -120,7 +121,7 @@ private:
 
    static void mh_CleanUp(QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> & orc_Map);
    static bool mh_Contains(const QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> & orc_Map,
-                           const C_TblTreItem * const opc_Item);
+                           const C_TblTreSimpleItem * const opc_Item);
    static std::vector<stw_types::uint32> mh_GetViewSdHash(const stw_types::uint32 ou32_ViewIndex);
    static bool mh_CheckNodeDiagnostic(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_NodeIndex);
 };

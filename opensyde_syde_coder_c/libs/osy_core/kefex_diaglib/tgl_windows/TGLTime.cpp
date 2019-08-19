@@ -11,7 +11,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -23,29 +23,29 @@
 #include "TGLTime.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current date and time with milli seconds
 
    \param[out] orc_DateTime Current date and time value with milli seconds
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
 {
    SYSTEMTIME c_LocalTimeNow;
@@ -63,7 +63,7 @@ void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
    orc_DateTime.mu16_MilliSeconds = c_LocalTimeNow.wMilliseconds;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Actively wait for a period of time
 
    Actively blocks for the given number of microseconds.
@@ -73,7 +73,7 @@ void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
 
    \param[in]   ou32_NumberUs             number of microseconds to block
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_tgl::TGL_DelayUs(const uint32 ou32_NumberUs)
 {
    const uint64 u64_StopTime = TGL_GetTickCountUS() + ou32_NumberUs;
@@ -83,7 +83,7 @@ void stw_tgl::TGL_DelayUs(const uint32 ou32_NumberUs)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get system time in microseconds
 
    Return elapsed time since system start in micro-seconds as precise as possible.
@@ -91,7 +91,7 @@ void stw_tgl::TGL_DelayUs(const uint32 ou32_NumberUs)
    \return
    System time in micro-seconds.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint64 stw_tgl::TGL_GetTickCountUS(void)
 {
    static bool hq_FirstCall = true;
@@ -112,7 +112,7 @@ uint64 stw_tgl::TGL_GetTickCountUS(void)
    //dropping the decimals is precise enough
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get system time in milliseconds
 
    Return elapsed time since system start in micro-seconds as precise as possible.
@@ -121,13 +121,13 @@ uint64 stw_tgl::TGL_GetTickCountUS(void)
    \return
    System time in milliseconds.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 stw_tgl::TGL_GetTickCount(void)
 {
    return static_cast<uint32>(TGL_GetTickCountUS() / 1000U);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sleep for a number of milliseconds
 
    Delay for a number of milliseconds. Thread control shall meanwhile be passed on.
@@ -135,7 +135,7 @@ uint32 stw_tgl::TGL_GetTickCount(void)
 
    \param[in]    ou32_NumberMs    number of milliseconds to delay
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_tgl::TGL_Sleep(const uint32 ou32_NumberMs)
 {
    Sleep(ou32_NumberMs);

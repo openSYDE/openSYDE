@@ -13,6 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QStyledItemDelegate>
+#include "stwtypes.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -27,10 +28,17 @@ class C_NagTopListDelegate :
 public:
    C_NagTopListDelegate(QObject * const opc_Parent = NULL);
 
+   void SetSelectedIndex(const stw_types::sint32 os32_Selected);
+
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
+   virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
+                      const QModelIndex & orc_Index) const override;
    virtual QSize sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const override;
    //lint -restore
+
+private:
+   stw_types::sint32 ms32_Selected;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

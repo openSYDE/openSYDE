@@ -124,6 +124,8 @@ private:
                                                         C_PuiSvReadDataConfiguration::E_TransmissionMode & ore_Mode);
    static stw_types::sint32 mh_StringToSourceType(const QString & orc_String,
                                                   C_PuiSvDbNodeDataPoolListElementId::E_Type & ore_Type);
+   static stw_types::sint32 mh_StringToChartSettingZoomMode(const QString & orc_String,
+                                                            C_PuiSvDbChart::E_SettingZoomMode & ore_ZoomMode);
    static void mh_SaveNodeActiveFlags(const std::vector<stw_types::uint8> & orc_NodeActiveFlags,
                                       stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveNodeUpdateInformation(const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation,
@@ -178,6 +180,7 @@ private:
    static QString mh_TransmissionModeToString(const C_PuiSvReadDataConfiguration::E_TransmissionMode oe_Mode);
    static QString mh_SourceTypeToString(const C_PuiSvDbNodeDataPoolListElementId::E_Type oe_Type);
    static C_PuiSvData::E_DeviceConfigurationMode mh_StringToDeviceConfigMode(const QString & orc_Input);
+   static QString mh_ChartZoomModeToString(const C_PuiSvDbChart::E_SettingZoomMode oe_ZoomMode);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

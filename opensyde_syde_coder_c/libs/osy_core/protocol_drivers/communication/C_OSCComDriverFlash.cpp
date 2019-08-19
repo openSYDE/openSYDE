@@ -10,7 +10,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cstring>
@@ -19,7 +19,7 @@
 #include "C_OSCComDriverFlash.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
@@ -27,27 +27,27 @@ using namespace stw_can;
 using namespace stw_scl;
 using namespace stw_diag_lib;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 extern void XFLSetInternalKey(const uint16 ou16_Key);
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
    \param[in]  oq_RoutingActive              Flag for activating routing
    \param[in]  opr_XflReportProgress         function to call if STW Flashloader driver has something to report
    \param[in]  opv_XflReportProgressInstance Instance pointer to pass when invoking opv_XflReportProgressInstance
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComDriverFlash::C_OSCComDriverFlash(const bool oq_RoutingActive,
                                          const C_OSCFlashProtocolStwFlashloader::PR_ReportProgress opr_XflReportProgress,
                                          void * const opv_XflReportProgressInstance) :
@@ -64,12 +64,12 @@ C_OSCComDriverFlash::C_OSCComDriverFlash(const bool oq_RoutingActive,
    XFLSetInternalKey(0x3472U);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 
    Clean up.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComDriverFlash::~C_OSCComDriverFlash(void)
 {
    uint32 u32_Counter;
@@ -85,7 +85,7 @@ C_OSCComDriverFlash::~C_OSCComDriverFlash(void)
    mpv_XflReportProgressInstance = NULL;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize all members
 
    \param[in]  orc_SystemDefinition    Entire system definition
@@ -105,7 +105,7 @@ C_OSCComDriverFlash::~C_OSCComDriverFlash(void)
    C_DEFAULT     Parameter ou32_ActiveBusIndex invalid
    C_RANGE       Routing configuration failed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::Init(const C_OSCSystemDefinition & orc_SystemDefinition, const uint32 ou32_ActiveBusIndex,
                                  const std::vector<uint8> & orc_ActiveNodes, C_CAN_Dispatcher * const opc_CanDispatcher,
                                  C_OSCIpDispatcher * const opc_IpDispatcher)
@@ -125,19 +125,19 @@ sint32 C_OSCComDriverFlash::Init(const C_OSCSystemDefinition & orc_SystemDefinit
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the new CAN bitrate
 
    An old connection will be closed.
 
-   \param[in] ou32_Bitrate      Bitrate in kBit/s
+   \param[in] ou32_Bitrate      Bitrate in kbit/s
 
    \return
    C_NO_ERR    Bitrate set
    C_COM       Error on reading bitrate
    C_CONFIG    No dispatcher installed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::InitCanAndSetCanBitrate(const uint32 ou32_Bitrate)
 {
    C_CAN_Dispatcher * const pc_CanDispatcher = this->m_GetCanDispatcher();
@@ -157,7 +157,7 @@ sint32 C_OSCComDriverFlash::InitCanAndSetCanBitrate(const uint32 ou32_Bitrate)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Configure openSYDE protocol polling timeout
 
    \param[in]    orc_ServerId      Server id for communication
@@ -167,7 +167,7 @@ sint32 C_OSCComDriverFlash::InitCanAndSetCanBitrate(const uint32 ou32_Bitrate)
    C_NO_ERR   new timeout configured
    C_RANGE    openSYDE protocol not found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::OsySetPollingTimeout(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                  const uint32 ou32_TimeoutMs) const
 {
@@ -182,7 +182,7 @@ sint32 C_OSCComDriverFlash::OsySetPollingTimeout(const C_OSCProtocolDriverOsyNod
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reset the openSYDE protocol polling timeout
 
    \param[in]    orc_ServerId      Server id for communication
@@ -191,7 +191,7 @@ sint32 C_OSCComDriverFlash::OsySetPollingTimeout(const C_OSCProtocolDriverOsyNod
    C_NO_ERR   new timeout configured
    C_RANGE    openSYDE protocol not found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::OsyResetPollingTimeout(const C_OSCProtocolDriverOsyNode & orc_ServerId) const
 {
    sint32 s32_Return = C_RANGE;
@@ -205,7 +205,39 @@ sint32 C_OSCComDriverFlash::OsyResetPollingTimeout(const C_OSCProtocolDriverOsyN
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the minimum Flashloader reset wait time in ms
+
+   Default minimum value is 500 ms.
+
+   \return
+   Time in ms all nodes needs at least to get from application to the Flashloader
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCComDriverFlash::GetMinimumFlashloaderResetWaitTime(void) const
+{
+   uint32 u32_WaitTime = 500U;
+   uint32 u32_Counter;
+
+   for (u32_Counter = 0U; u32_Counter < this->mc_ActiveNodesIndexes.size(); ++u32_Counter)
+   {
+      const C_OSCNode & rc_Node = this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_Counter]];
+
+      tgl_assert(rc_Node.pc_DeviceDefinition != NULL);
+      if (rc_Node.pc_DeviceDefinition != NULL)
+      {
+         if (rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTime > u32_WaitTime)
+         {
+            // The node needs a longer wait time
+            u32_WaitTime = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTime;
+         }
+      }
+   }
+
+   return u32_WaitTime;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send request programming
 
    Sending service as broadcast via CAN or ETH TP.
@@ -222,7 +254,7 @@ sint32 C_OSCComDriverFlash::OsyResetPollingTimeout(const C_OSCProtocolDriverOsyN
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_CONFIG   no transport protocol installed or broadcast protocol not initialized
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const
 {
    sint32 s32_Return;
@@ -264,7 +296,7 @@ sint32 C_OSCComDriverFlash::SendOsyBroadcastRequestProgramming(bool & orq_NotAcc
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send network reset broadcast
 
    Use the constants provided by C_OSCProtocolDriverOsyTpBase for the parameter.
@@ -276,7 +308,7 @@ sint32 C_OSCComDriverFlash::SendOsyBroadcastRequestProgramming(bool & orq_NotAcc
    C_COM      could not send request
    C_CONFIG   no dispatcher installed or broadcast protocol not initialized
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyBroadcastEcuReset(const uint8 ou8_ResetType) const
 {
    sint32 s32_Return;
@@ -301,7 +333,7 @@ sint32 C_OSCComDriverFlash::SendOsyBroadcastEcuReset(const uint8 ou8_ResetType) 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send broadcast service EnterDiagnosticSession(PreProgramming)
 
    Sending service as broadcast. Only available for CAN broadcast.
@@ -312,7 +344,7 @@ sint32 C_OSCComDriverFlash::SendOsyBroadcastEcuReset(const uint8 ou8_ResetType) 
    C_COM      could not send request
    C_CONFIG   no CAN dispatcher installed or broadcast protocol not initialized
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterPreProgrammingSession(void) const
 {
    sint32 s32_Return;
@@ -329,7 +361,7 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterPreProgrammingSession(void) 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send broadcast service EnterDiagnosticSession(Default)
 
    Sending service as broadcast. Only available for CAN broadcast.
@@ -340,7 +372,7 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterPreProgrammingSession(void) 
    C_COM      could not send request
    C_CONFIG   no CAN dispatcher installed or broadcast protocol not initialized
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterDefaultSession(void) const
 {
    sint32 s32_Return;
@@ -357,7 +389,7 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterDefaultSession(void) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read serial numbers of all devices on local bus
 
    \param[out]    orc_Responses   information about all nodes that sent a response
@@ -367,7 +399,7 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterDefaultSession(void) const
    C_COM      could not send request
    C_CONFIG   no dispatcher installed or broadcast protocol not initialized
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyCanBroadcastReadSerialNumber(
    std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberResults> & orc_Responses) const
 {
@@ -385,7 +417,7 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastReadSerialNumber(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reads the device name by service ReadDataByIdentifier
 
    \param[in]     orc_ServerId      Server id for communication
@@ -402,7 +434,7 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastReadSerialNumber(
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      error on creating temporary needed protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyReadDeviceName(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                   C_SCLString & orc_DeviceName, uint8 * const opu8_NrCode)
 {
@@ -435,7 +467,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadDeviceName(const C_OSCProtocolDriverOsyNo
 
    return s32_Return;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reads the serial number by service ReadDataByIdentifier
 
    \param[in]     orc_ServerId          Server id for communication
@@ -452,7 +484,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadDeviceName(const C_OSCProtocolDriverOsyNo
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      error on creating temporary needed protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyReadSerialNumber(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                     uint8 (&orau8_SerialNumber)[6], uint8 * const opu8_NrCode)
 {
@@ -484,7 +516,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadSerialNumber(const C_OSCProtocolDriverOsy
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node-id of node specified by serial number
 
    \param[in]    orau8_SerialNumber   serial number of node to address
@@ -500,7 +532,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadSerialNumber(const C_OSCProtocolDriverOsy
    C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
    C_OVERFLOW  multiple responses received
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyCanBroadcastSetNodeIdBySerialNumber(const uint8 (&orau8_SerialNumber)[6],
                                                                        const C_OSCProtocolDriverOsyNode & orc_NewNodeId)
 const
@@ -520,7 +552,7 @@ const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send broadcast to get device information via ETH-TP
 
    \param[out]    orc_ReadDeviceInfoResults     received responses
@@ -530,7 +562,7 @@ const
    C_COM       could not send request
    C_CONFIG    no dispatcher installed or ETH broadcast protocol not initialized
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyEthBroadcastGetDeviceInformation(
    std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults> & orc_ReadDeviceInfoResults) const
 {
@@ -548,7 +580,7 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastGetDeviceInformation(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send broadcast to set IP address via ETH-TP
 
    Send broadcast to change the IP address of one specific node.
@@ -574,7 +606,7 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastGetDeviceInformation(
    C_CONFIG    no dispatcher installed or ETH broadcast protocol not initialized
    C_TIMEOUT   no response within timeout
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const uint8 (&orau8_SerialNumber)[6],
                                                             const uint8 (&orau8_NewIpAddress)[4],
                                                             const uint8 (&orau8_NetMask)[4],
@@ -603,7 +635,7 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const uint8 (&orau8_
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send the request programming service to one node
 
    \param[in]     orc_ServerId      Server id for communication
@@ -617,7 +649,7 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const uint8 (&orau8_
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyRequestProgramming(const C_OSCProtocolDriverOsyNode & orc_ServerId) const
 {
    sint32 s32_Return = C_RANGE;
@@ -635,7 +667,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestProgramming(const C_OSCProtocolDriverO
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send the ReadActiveDiagnosticSession service to one node and report response
 
    \param[in]     orc_ServerId      Server id for communication
@@ -651,7 +683,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestProgramming(const C_OSCProtocolDriverO
    C_TIMEOUT   Expected response not received within timeout
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                                uint8 & oru8_SessionId, uint8 * const opu8_NrCode) const
 {
@@ -666,7 +698,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OSCProtoc
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send the ReadFlashBlockData service to read information about all flash blocks
 
    Executes the service in a loop starting from 0 (flashloader).
@@ -685,7 +717,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OSCProtoc
    C_TIMEOUT   Expected response not received within timeout
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyReadAllFlashBlockData(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                          std::vector<C_OSCProtocolDriverOsy::C_FlashBlockInfo> & orc_BlockInfo,
                                                          uint8 * const opu8_NrCode)
@@ -730,14 +762,14 @@ const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read various information from flashloader
 
    Read information from flashloader and fill in structure.
 
    \param[in]     orc_ServerId        Server id for communication
    \param[out]    orc_Information     read server information
-   \param[out]    opu8_NrCode       if != NULL and error response: negative response code
+   \param[out]    opu8_NrCode         if != NULL and error response: negative response code
 
    \return
    C_NO_ERR    Read information (placed in orc_Information)
@@ -748,7 +780,7 @@ const
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                                   C_FlashloaderInformation & orc_Information,
                                                                   uint8 * const opu8_NrCode) const
@@ -799,12 +831,29 @@ sint32 C_OSCComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OSCPro
       {
          s32_Return = pc_ExistingProtocol->OsyReadFlashCount(orc_Information.u32_FlashCount, opu8_NrCode);
       }
+
+      // Get available flashloader features
+      if (s32_Return == C_NO_ERR)
+      {
+         s32_Return = pc_ExistingProtocol->OsyReadListOfFeatures(orc_Information.c_AvailableFeatures, opu8_NrCode);
+      }
+
+      if ((s32_Return == C_NO_ERR) &&
+          (orc_Information.c_AvailableFeatures.q_MaxNumberOfBlockLengthAvailable == true))
+      {
+         s32_Return = pc_ExistingProtocol->OsyReadMaxNumberOfBlockLength(orc_Information.u16_MaxNumberOfBlockLength,
+                                                                         opu8_NrCode);
+         if (s32_Return != C_NO_ERR)
+         {
+            orc_Information.u16_MaxNumberOfBlockLength = 0U;
+         }
+      }
    }
 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Execute CheckFlashMemoryAvailable service
 
    \param[in]    orc_ServerId        Server id for communication
@@ -821,7 +870,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OSCPro
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyCheckFlashMemoryAvailable(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                              const uint32 ou32_StartAddress, const uint32 ou32_Size,
                                                              uint8 * const opu8_NrCode) const
@@ -836,7 +885,7 @@ sint32 C_OSCComDriverFlash::SendOsyCheckFlashMemoryAvailable(const C_OSCProtocol
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Execute WriteApplicationSoftwareFingerprint service
 
    If a user name with more than 20 characters is passed only the first 20 will be used.
@@ -856,7 +905,7 @@ sint32 C_OSCComDriverFlash::SendOsyCheckFlashMemoryAvailable(const C_OSCProtocol
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyWriteApplicationSoftwareFingerprint(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                                        const uint8 (&orau8_Date)[3],
                                                                        const uint8 (&orau8_Time)[3],
@@ -874,7 +923,7 @@ sint32 C_OSCComDriverFlash::SendOsyWriteApplicationSoftwareFingerprint(const C_O
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Execute RequestDownload service
 
    \param[in] orc_ServerId           Server id for communication
@@ -892,7 +941,7 @@ sint32 C_OSCComDriverFlash::SendOsyWriteApplicationSoftwareFingerprint(const C_O
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyRequestDownload(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                    const uint32 ou32_StartAddress, const uint32 ou32_Size,
                                                    uint32 & oru32_MaxBlockLength, uint8 * const opu8_NrCode) const
@@ -908,7 +957,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestDownload(const C_OSCProtocolDriverOsyN
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Execute RequestFileTransfer service
 
    \param[in] orc_ServerId           Server id for communication
@@ -926,7 +975,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestDownload(const C_OSCProtocolDriverOsyN
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyRequestFileTransfer(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                        const C_SCLString & orc_FilePath, const uint32 ou32_FileSize,
                                                        uint32 & oru32_MaxBlockLength, uint8 * const opu8_NrCode) const
@@ -942,7 +991,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestFileTransfer(const C_OSCProtocolDriver
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Execute TransferData service
 
    \param[in]  orc_ServerId               Server id for communication
@@ -959,7 +1008,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestFileTransfer(const C_OSCProtocolDriver
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyTransferData(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                 const uint8 ou8_BlockSequenceCounter, std::vector<uint8> & orc_Data,
                                                 uint8 * const opu8_NrCode) const
@@ -974,7 +1023,7 @@ sint32 C_OSCComDriverFlash::SendOsyTransferData(const C_OSCProtocolDriverOsyNode
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Execute TransferExitAddressBased service
 
    \param[in]  orc_ServerId               Server id for communication
@@ -994,7 +1043,7 @@ sint32 C_OSCComDriverFlash::SendOsyTransferData(const C_OSCProtocolDriverOsyNode
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitAddressBased(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                                    const bool oq_SendSignatureBlockAddress,
                                                                    const uint32 ou32_SignatureBlockAddress,
@@ -1011,7 +1060,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitAddressBased(const C_OSCPr
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Execute TransferExitFileBased service
 
    \param[in]  orc_ServerId               Server id for communication
@@ -1027,7 +1076,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitAddressBased(const C_OSCPr
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitFileBased(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                                 const uint32 ou32_CrcOverData,
                                                                 uint8 * const opu8_NrCode) const
@@ -1052,7 +1101,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitFileBased(const C_OSCProto
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send the reset ECU service request to one node
 
    \param[in]     orc_ServerId      Server id for communication
@@ -1064,7 +1113,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitFileBased(const C_OSCProto
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
    C_NOACT     Could not put request in TX queue
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyEcuReset(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                             const uint8 ou8_ResetType) const
 {
@@ -1079,7 +1128,7 @@ sint32 C_OSCComDriverFlash::SendOsyEcuReset(const C_OSCProtocolDriverOsyNode & o
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the session to preprogramming and the necessary security access to level 1
 
    \param[in]     orc_ServerId      Server id for communication
@@ -1094,7 +1143,7 @@ sint32 C_OSCComDriverFlash::SendOsyEcuReset(const C_OSCProtocolDriverOsyNode & o
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsySetPreProgrammingMode(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                          const bool oq_SessionOnly, uint8 * const opu8_NrCode) const
 {
@@ -1117,7 +1166,7 @@ sint32 C_OSCComDriverFlash::SendOsySetPreProgrammingMode(const C_OSCProtocolDriv
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the session to programming and the necessary security access to level 3
 
    \param[in]     orc_ServerId      Server id for communication
@@ -1131,7 +1180,7 @@ sint32 C_OSCComDriverFlash::SendOsySetPreProgrammingMode(const C_OSCProtocolDriv
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsySetProgrammingMode(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                       uint8 * const opu8_NrCode) const
 {
@@ -1154,7 +1203,7 @@ sint32 C_OSCComDriverFlash::SendOsySetProgrammingMode(const C_OSCProtocolDriverO
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set specified security level
 
    \param[in]     orc_ServerId      Server id for communication
@@ -1168,7 +1217,7 @@ sint32 C_OSCComDriverFlash::SendOsySetProgrammingMode(const C_OSCProtocolDriverO
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsySetSecurityLevel(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                     const uint8 ou8_Level) const
 {
@@ -1184,7 +1233,7 @@ sint32 C_OSCComDriverFlash::SendOsySetSecurityLevel(const C_OSCProtocolDriverOsy
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a new bitrate on a openSYDE server
 
    Only for CAN
@@ -1204,7 +1253,7 @@ sint32 C_OSCComDriverFlash::SendOsySetSecurityLevel(const C_OSCProtocolDriverOsy
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsySetBitrate(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                               const uint8 ou8_ChannelIndex, const uint32 ou32_Bitrate,
                                               uint8 * const opu8_NrCode) const
@@ -1220,7 +1269,7 @@ sint32 C_OSCComDriverFlash::SendOsySetBitrate(const C_OSCProtocolDriverOsyNode &
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set the ip address for the referenced channel to the given value
 
    Only for Ethernet
@@ -1242,7 +1291,7 @@ sint32 C_OSCComDriverFlash::SendOsySetBitrate(const C_OSCProtocolDriverOsyNode &
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsySetIpAddressForChannel(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                           const uint8 ou8_ChannelIndex,
                                                           const uint8 (&orau8_IpAddress)[4],
@@ -1262,7 +1311,7 @@ sint32 C_OSCComDriverFlash::SendOsySetIpAddressForChannel(const C_OSCProtocolDri
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets node id and bus id for specific communication channel
 
    \param[in]  orc_ServerId          Server id for communication
@@ -1282,7 +1331,7 @@ sint32 C_OSCComDriverFlash::SendOsySetIpAddressForChannel(const C_OSCProtocolDri
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsySetNodeIdForChannel(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                        const uint8 ou8_ChannelType, const uint8 ou8_ChannelIndex,
                                                        const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
@@ -1300,7 +1349,40 @@ sint32 C_OSCComDriverFlash::SendOsySetNodeIdForChannel(const C_OSCProtocolDriver
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets node id and bus id for specific communication channel
+
+   \param[in]  orc_ServerId          Server id for communication
+   \param[out] orc_ListOfFeatures    List of server features
+   \param[out] opu8_NrCode           if != NULL and error response: negative response code
+
+   \return
+   C_NO_ERR   List of features was read successfully
+   C_RANGE    openSYDE protocol not found
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in TX queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverFlash::SendOsyReadListOfFeatures(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                      C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ListOfFeatures,
+                                                      stw_types::uint8 * const opu8_NrCode) const
+{
+   sint32 s32_Return = C_RANGE;
+   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+
+   if (pc_ExistingProtocol != NULL)
+   {
+      s32_Return = pc_ExistingProtocol->OsyReadListOfFeatures(orc_ListOfFeatures, opu8_NrCode);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send reset request for all STW flashloader by specific reset message
 
    \return
@@ -1309,7 +1391,7 @@ sint32 C_OSCComDriverFlash::SendOsySetNodeIdForChannel(const C_OSCProtocolDriver
    C_COM       Error on sending reset request
    C_CONFIG    Not initialized or not valid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -1375,7 +1457,7 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send reset request for one STW flashloader by specific reset message
 
    \param[in]     orc_ServerId             Server id for communication
@@ -1387,7 +1469,7 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(void)
    C_CONFIG    Not initialized or not valid
    C_NOACT     No reset message configured or node has no STW flashloader
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(const C_OSCProtocolDriverOsyNode & orc_ServerId)
 {
    sint32 s32_Return = C_CONFIG;
@@ -1422,7 +1504,7 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(const C_OSCProtocolDriverOsy
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send "FLASH" requests
 
    Send the "FLASH" request for one time.
@@ -1434,7 +1516,7 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(const C_OSCProtocolDriverOsy
    C_DEFAULT     aborted by user
    C_CONFIG      no STW flashloader protocol initialized
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwSendFlash(const C_OSCProtocolDriverOsyNode & orc_ServerId)
 {
    sint32 s32_Return;
@@ -1458,7 +1540,7 @@ sint32 C_OSCComDriverFlash::SendStwSendFlash(const C_OSCProtocolDriverOsyNode & 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Scan for nodes in the network.
 
    \param[out]     orau8_LocalIDs     Number of responses for each ID.
@@ -1470,7 +1552,7 @@ sint32 C_OSCComDriverFlash::SendStwSendFlash(const C_OSCProtocolDriverOsyNode & 
    C_NO_ERR    all ok
    C_COM       error on sending
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwSearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFFERENT_LOCAL_IDS],
                                             uint8 & oru8_NodeFounds)
 {
@@ -1483,7 +1565,7 @@ sint32 C_OSCComDriverFlash::SendStwSearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFF
    return c_StwProtocol.SearchId(orau8_LocalIDs, &oru8_NodeFounds, 0, 0);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Perform a wakeup with local ID
 
    \param[in]     orc_ServerId      Server id for communication
@@ -1493,7 +1575,7 @@ sint32 C_OSCComDriverFlash::SendStwSearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFF
    C_NO_ERR           no errors
    C_COM              no response from server
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                  uint8 * const opu8_NodesFound)
 {
@@ -1537,7 +1619,7 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNod
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Perform a wakeup with serial number
 
    \param[in]     orau8_SerialNumber   Serial number to send
@@ -1547,7 +1629,7 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNod
    C_NO_ERR           no errors
    C_COM              no response from server
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const uint8 (&orau8_SerialNumber)[6], uint8 & oru8_LocalId)
 {
    sint32 s32_Return;
@@ -1577,7 +1659,7 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const uint8 (&orau8_S
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read the SNR(s) from the controller(s) specified by LocalId
 
    \param[in]     orc_ServerId             Server id for communication
@@ -1591,7 +1673,7 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const uint8 (&orau8_S
    C_NO_ERR       no errors
    C_COM          no response
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwGetSerialNumbers(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                     uint8 * const opu8_SerialNumbers, const uint8 ou8_NumMax,
                                                     uint8 & oru8_NumFound)
@@ -1611,7 +1693,7 @@ sint32 C_OSCComDriverFlash::SendStwGetSerialNumbers(const C_OSCProtocolDriverOsy
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read device-ID from server node
 
    \param[in]     orc_ServerId         Server id for communication
@@ -1622,7 +1704,7 @@ sint32 C_OSCComDriverFlash::SendStwGetSerialNumbers(const C_OSCProtocolDriverOsy
    C_COM              no response from server
    C_NOACT            error response from server
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                C_SCLString & orc_DeviceName)
 {
@@ -1650,7 +1732,7 @@ sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   short description of function
 
    long description of function within several lines
@@ -1663,7 +1745,7 @@ sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode 
    C_COM        no response
    C_NOACT      error response
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwSetLocalId(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                               const uint8 ou8_NewLocalId)
 {
@@ -1680,7 +1762,7 @@ sint32 C_OSCComDriverFlash::SendStwSetLocalId(const C_OSCProtocolDriverOsyNode &
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change the flash bitrate of a node
 
    \param[in]     orc_ServerId             Server id for communication
@@ -1691,7 +1773,7 @@ sint32 C_OSCComDriverFlash::SendStwSetLocalId(const C_OSCProtocolDriverOsyNode &
    C_COM      no response
    C_NOACT    error response
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwSetBitrateCan(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                  const uint32 ou32_Bitrate)
 {
@@ -1706,12 +1788,12 @@ sint32 C_OSCComDriverFlash::SendStwSetBitrateCan(const C_OSCProtocolDriverOsyNod
       pc_ExistingProtocol = &c_StwProtocol;
    }
 
-   // We support only 16 bit bitrate for STW flashloader -> bitrate resolution kBits/second
+   // We support only 16 bit bitrate for STW flashloader -> bitrate resolution kbit/second
    s32_Return = pc_ExistingProtocol->SetBitrateCAN(ou32_Bitrate / 1000U, false);
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sends net reset request for STW flashloader devices for a specific device
 
    \param[in]     orc_ServerId             Server id for communication
@@ -1720,7 +1802,7 @@ sint32 C_OSCComDriverFlash::SendStwSetBitrateCan(const C_OSCProtocolDriverOsyNod
    C_NO_ERR    Net reset request sent
    C_COM       Error on sending reset request
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwNetReset(const C_OSCProtocolDriverOsyNode & orc_ServerId)
 {
    sint32 s32_Return;
@@ -1744,14 +1826,14 @@ sint32 C_OSCComDriverFlash::SendStwNetReset(const C_OSCProtocolDriverOsyNode & o
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sends net reset request for STW flashloader devices
 
    \return
    C_NO_ERR    Net reset request sent
    C_COM       Error on sending reset request
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwNetReset(void)
 {
    sint32 s32_Return;
@@ -1772,7 +1854,7 @@ sint32 C_OSCComDriverFlash::SendStwNetReset(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read all kinds of information from STW flashloader
 
    Uses protocol services to read information about target device
@@ -1786,7 +1868,7 @@ sint32 C_OSCComDriverFlash::SendStwNetReset(void)
    C_COM       communication error
    C_CONFIG    node identified by orc_ServerId is unknown or does not speak STW Flashloader
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwReadDeviceInformation(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                          C_XFLInformationFromServer & orc_Information,
                                                          C_XFLChecksumAreas & orc_ChecksumInformation) const
@@ -1818,7 +1900,7 @@ sint32 C_OSCComDriverFlash::SendStwReadDeviceInformation(const C_OSCProtocolDriv
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write one hex file to an STW Flashloader node
 
    Prerequisites:
@@ -1832,7 +1914,7 @@ sint32 C_OSCComDriverFlash::SendStwReadDeviceInformation(const C_OSCProtocolDriv
    C_CONFIG    node identified by orc_ServerId is unknown or does not speak STW Flashloader
    else        problem during flashing; details can be seen in the progress log
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendStwDoFlash(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                            const stw_scl::C_SCLString & orc_HexFilePath) const
 {
@@ -1872,12 +1954,12 @@ sint32 C_OSCComDriverFlash::SendStwDoFlash(const C_OSCProtocolDriverOsyNode & or
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare for shutting down class
 
    To be called by child classes on shutdown, before they destroy all owned class instances
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComDriverFlash::PrepareForDestructionFlash(void)
 {
    this->PrepareForDestruction();
@@ -1891,7 +1973,7 @@ void C_OSCComDriverFlash::PrepareForDestructionFlash(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the information about the routing configuration
 
    \param[out]    ore_Mode       Needed routing mode
@@ -1900,7 +1982,7 @@ void C_OSCComDriverFlash::PrepareForDestructionFlash(void)
    true     Routing is necessary
    false    Routing is not necessary
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComDriverFlash::m_GetRoutingMode(C_OSCRoutingCalculation::E_Mode & ore_Mode) const
 {
    ore_Mode = C_OSCRoutingCalculation::eUPDATE;
@@ -1908,19 +1990,19 @@ bool C_OSCComDriverFlash::m_GetRoutingMode(C_OSCRoutingCalculation::E_Mode & ore
    return this->mq_RoutingActive;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns needed session ID for the current routing mode
 
    \return
    Session ID for flashloader
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint8 C_OSCComDriverFlash::m_GetRoutingSessionId(void) const
 {
    return C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the routing for a not openSYDE server is necessary
 
    \param[in]     orc_Node                             Current node
@@ -1929,7 +2011,7 @@ uint8 C_OSCComDriverFlash::m_GetRoutingSessionId(void) const
    true    Specific server and legacy routing necessary
    false   No specific server and legacy routing necessary
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComDriverFlash::m_IsRoutingSpecificNecessary(const C_OSCNode & orc_Node) const
 {
    bool q_Return = false;
@@ -1942,7 +2024,7 @@ bool C_OSCComDriverFlash::m_IsRoutingSpecificNecessary(const C_OSCNode & orc_Nod
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepares the routing for STW flashloader protocol
 
    long description of function within several lines
@@ -1957,7 +2039,7 @@ bool C_OSCComDriverFlash::m_IsRoutingSpecificNecessary(const C_OSCNode & orc_Nod
    C_NO_ERR    Specific server necessary
    C_NOACT     No specific server necessary
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::m_StartRoutingSpecific(const uint32 ou32_ActiveNode, const C_OSCNode * const opc_Node,
                                                    const C_OSCRoutingRoutePoint & orc_LastNodeOfRouting,
                                                    C_OSCProtocolDriverOsy * const opc_ProtocolOsyOfLastNodeOfRouting,
@@ -1975,9 +2057,10 @@ sint32 C_OSCComDriverFlash::m_StartRoutingSpecific(const uint32 ou32_ActiveNode,
           (opc_ProtocolOsyOfLastNodeOfRouting != NULL))
       {
          (*oppc_RoutingDispatcher) = new C_OSCCanDispatcherOsyRouter(*opc_ProtocolOsyOfLastNodeOfRouting);
-         // TODO Filter settings?
-         (*oppc_RoutingDispatcher)->SetFilterParameters(orc_LastNodeOfRouting.u8_OutInterfaceNumber, 0x00000000,
-                                                        0x00000000);
+
+         // Only 0x52 for Rx is relevant
+         (*oppc_RoutingDispatcher)->SetFilterParameters(orc_LastNodeOfRouting.u8_OutInterfaceNumber, 0x00000052,
+                                                        0x000007FF);
 
          this->mc_LegacyRouterDispatchers[ou32_ActiveNode] = (*oppc_RoutingDispatcher);
          // Set the new dispatcher
@@ -1994,12 +2077,12 @@ sint32 C_OSCComDriverFlash::m_StartRoutingSpecific(const uint32 ou32_ActiveNode,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Stops the specific routing configuration for one specific node
 
    \param[in]     ou32_ActiveNode                      Active node index of vector mc_ActiveNodes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComDriverFlash::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
 {
    const C_OSCNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]];
@@ -2020,7 +2103,7 @@ void C_OSCComDriverFlash::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
    C_OSCComDriverProtocol::m_StopRoutingSpecific(ou32_ActiveNode);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the interface has relevant functions activated
 
    In this case routing and update functionality
@@ -2031,7 +2114,7 @@ void C_OSCComDriverFlash::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
    true     Interface has relevant functions activated and is connected
    false    Interface has no relevant functions activated or is not connected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCComDriverFlash::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfaceSettings & orc_ComItfSettings) const
 {
    bool q_Return = false;
@@ -2046,7 +2129,7 @@ bool C_OSCComDriverFlash::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfa
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the pointer to the STW flashloader protocol of specific server id
 
    \param[in]     orc_ServerId             Server id for communication
@@ -2055,7 +2138,7 @@ bool C_OSCComDriverFlash::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfa
    Valid pointer  Protocol for server found
    NULL           No protocol for server found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCFlashProtocolStwFlashloader * C_OSCComDriverFlash::m_GetStwFlashloaderProtocol(
    const C_OSCProtocolDriverOsyNode & orc_ServerId) const
 {
@@ -2078,7 +2161,7 @@ C_OSCFlashProtocolStwFlashloader * C_OSCComDriverFlash::m_GetStwFlashloaderProto
    return pc_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComDriverFlash::m_InitFlashProtocolStw(C_OSCFlashProtocolStwFlashloader * const opc_FlashProtocolStw,
                                                  const uint8 ou8_LocalId)
 {
@@ -2093,7 +2176,7 @@ void C_OSCComDriverFlash::m_InitFlashProtocolStw(C_OSCFlashProtocolStwFlashloade
    opc_FlashProtocolStw->CfgSetBitrate(0U);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize flash protocols
 
    The functions fills the vector mc_OsyProtocols of the base class too.
@@ -2103,7 +2186,7 @@ void C_OSCComDriverFlash::m_InitFlashProtocolStw(C_OSCFlashProtocolStwFlashloade
    C_CONFIG   Invalid initialization
    C_OVERFLOW Unknown diagnostic server for at least one node or invalid node identifier was set in diagnostic protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::m_InitFlashProtocol(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -2133,6 +2216,7 @@ sint32 C_OSCComDriverFlash::m_InitFlashProtocol(void)
             {
             case C_OSCNodeProperties::eFL_OPEN_SYDE:
                pc_ProtocolOsy = new C_OSCProtocolDriverOsy();
+               pc_ProtocolOsy->InitializeHandleWaitTime(&C_OSCComDriverFlash::mh_HandleWaitTime, this);
                s32_Return = pc_ProtocolOsy->SetTransportProtocol(this->mc_TransportProtocols[u32_ActiveNodeCounter]);
                if (s32_Return == C_NO_ERR)
                {
@@ -2182,7 +2266,7 @@ sint32 C_OSCComDriverFlash::m_InitFlashProtocol(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::m_PrepareTemporaryOsyProtocol(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                           C_OSCProtocolDriverOsy & orc_OsyProtocol,
                                                           C_OSCProtocolDriverOsyTpCan & orc_CanTransportProtocol)
@@ -2207,7 +2291,7 @@ sint32 C_OSCComDriverFlash::m_PrepareTemporaryOsyProtocol(const C_OSCProtocolDri
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::m_GetStwResetMessage(const uint32 ou32_NodeIndex, T_STWCAN_Msg_TX & orc_Message) const
 {
    const C_OSCNode * const pc_Node = &this->mpc_SysDef->c_Nodes[ou32_NodeIndex];
@@ -2254,4 +2338,68 @@ sint32 C_OSCComDriverFlash::m_GetStwResetMessage(const uint32 ou32_NodeIndex, T_
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  In C_OSCProtocolDriverOsy registered function for handling long waiting times
+
+   See m_HandleWaitTime for detailed description
+
+   \param[in]     opv_Instance     Pointer to the instance of C_OSCComDriverFlash
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCComDriverFlash::mh_HandleWaitTime(void * const opv_Instance)
+{
+   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
+   C_OSCComDriverFlash * const pc_ComDriver = reinterpret_cast<C_OSCComDriverFlash * const>(opv_Instance);
+
+   tgl_assert(pc_ComDriver != NULL);
+   if (pc_ComDriver != NULL)
+   {
+      pc_ComDriver->m_HandleWaitTime();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  In C_OSCProtocolDriverOsy registered function for handling long waiting times
+
+   For example erasing of flash can have a long timeout time. It can be longer than five seconds.
+   An active CAN routing would be stopped of the server by the session timeout. This function sends
+   the tester present to the last CAN router node on the route to keep the route alive
+
+   \param[in]     opv_Instance     Pointer to the instance of C_OSCComDriverFlash
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCComDriverFlash::m_HandleWaitTime(void)
+{
+   if (this->mq_Initialized == true)
+   {
+      uint32 u32_Counter;
+
+      for (u32_Counter = 0U; u32_Counter < this->mc_ActiveNodesLastCanRouters.size(); ++u32_Counter)
+      {
+         const uint32 u32_ActiveNodeRouter = this->mc_ActiveNodesLastCanRouters[u32_Counter];
+
+         tgl_assert(u32_ActiveNodeRouter < this->mc_OsyProtocols.size());
+         if (u32_ActiveNodeRouter < this->mc_OsyProtocols.size())
+         {
+            C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNodeRouter];
+            if (pc_ProtocolOsy != NULL)
+            {
+               // Send tester present message without expecting a response
+               const sint32 s32_Return = pc_ProtocolOsy->OsyTesterPresent(1U);
+
+               if (s32_Return != C_NO_ERR)
+               {
+                  osc_write_log_error("Sending Tester Present", "Sending Tester Present failed with error code: " +
+                                      C_OSCLoggingHandler::h_StwError(s32_Return));
+               }
+               else
+               {
+                  osc_write_log_info("Sending Tester Present", "Tester Present sent successfully.");
+               }
+            }
+         }
+      }
+   }
 }

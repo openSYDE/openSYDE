@@ -83,13 +83,13 @@ C_GiBiArrow::C_GiBiArrow(const uint64 & oru64_ID, const std::vector<QPointF> * c
    this->mpc_LinePath->SetLineStyle(me_LineType);
    this->SetWidth(1);
    this->SetColor(Qt::black);
-   //TODO
+   //Z value
    if (opc_Points != NULL)
    {
       this->setZValue(mf64_ZORDER_INIT_LINE_ARROW);
    }
 
-   connect(this, &C_GiBiArrow::ChangedGraphic, this, &C_GiBiArrow::m_GenerateArrows);
+   connect(this, &C_GiBiArrow::SigChangedGraphic, this, &C_GiBiArrow::m_GenerateArrows);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

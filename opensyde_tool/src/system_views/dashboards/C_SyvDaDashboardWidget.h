@@ -68,6 +68,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigErrorChange(void);
+   void SigTriggerUpdateTransmissionConfiguration(void);
    void SigDataPoolWrite(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_DataPoolIndex,
                          const stw_types::uint16 ou16_ListIndex, const stw_types::uint16 ou16_ElementIndex);
    void SigDataPoolRead(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Index);

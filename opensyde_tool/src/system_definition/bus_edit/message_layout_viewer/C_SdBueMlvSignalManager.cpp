@@ -60,11 +60,13 @@ C_SdBueMlvSignalManager::C_SdBueMlvSignalManager(C_PuiSdNodeCanMessageSyncManage
    mu16_MaximumCountBits(ou16_MaximumCountBits),
    mu32_SignalIndex(0U),
    mc_Name(""),
+   mq_MultiplexerSignal(false),
    mu16_LastBit(0U),
    mq_Resizeable(true),
    mq_Hovered(false),
    mf64_Space(of64_Space),
-   ms16_MaximumLength(64)
+   ms16_MaximumLength(64),
+   ms16_MaximumLengthMultiplexer(16)
 {
 }
 
@@ -79,12 +81,12 @@ C_SdBueMlvSignalManager::~C_SdBueMlvSignalManager()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Loads the signal informations and initialize the signal manager and its sub items
+/*! \brief   Loads the signal information and initialize the signal manager and its sub items
+
+   Shall be used first when the signals are connected
 
    \param[in]     ou32_SignalIndex        Index of the signal
    \param[in]     orc_ColorConfiguration  Color configuration
-
-   Shall be used first when the signals are connected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
@@ -122,6 +124,7 @@ void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
          this->mq_Resizeable = true;
       }
    }
+   this->mq_MultiplexerSignal = (this->mc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL);
 
    // initialize the signal manager
    this->mu16_LastBit = this->GetDataBytesBitPosOfSignalBit(this->mc_Signal.u16_ComBitLength - 1U);
@@ -159,7 +162,7 @@ bool C_SdBueMlvSignalManager::SetStartBit(const uint16 ou16_Position)
    if (this->mc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
    {
       const sint16 s16_Length = static_cast<sint16>(this->mc_Signal.u16_ComBitLength) + s16_Diff;
-      if (s16_Length <= ms16_MaximumLength)
+      if (this->m_IsLengthValid(s16_Length) == true)
       {
          this->m_SetNewLength(s16_Length);
       }
@@ -177,7 +180,7 @@ bool C_SdBueMlvSignalManager::SetStartBit(const uint16 ou16_Position)
       const sint16 s16_Length = static_cast<sint16>(this->mc_Signal.u16_ComBitLength) -
                                 (s16_Diff - s16_RowDiffOffset);
 
-      if (s16_Length <= ms16_MaximumLength)
+      if (this->m_IsLengthValid(s16_Length) == true)
       {
          this->m_SetNewLength(s16_Length);
       }
@@ -217,7 +220,7 @@ bool C_SdBueMlvSignalManager::SetLastBit(const uint16 ou16_Position)
    if (this->mc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
    {
       const sint16 s16_Length = static_cast<sint16>(this->mc_Signal.u16_ComBitLength) + s16_Diff;
-      if (s16_Length <= ms16_MaximumLength)
+      if (this->m_IsLengthValid(s16_Length) == true)
       {
          this->m_SetNewLength(s16_Length);
       }
@@ -235,7 +238,7 @@ bool C_SdBueMlvSignalManager::SetLastBit(const uint16 ou16_Position)
       const sint16 s16_Length = static_cast<sint16>(this->mc_Signal.u16_ComBitLength) -
                                 (s16_Diff + s16_RowDiffOffset);
 
-      if (s16_Length <= ms16_MaximumLength)
+      if (this->m_IsLengthValid(s16_Length) == true)
       {
          this->m_SetNewLength(s16_Length);
       }
@@ -542,7 +545,7 @@ void C_SdBueMlvSignalManager::ClearItems(void)
    // remove all signal items from the scene and delete the items
    for (pc_ItItem = this->mc_VecSignalItems.begin(); pc_ItItem != this->mc_VecSignalItems.end(); ++pc_ItItem)
    {
-      Q_EMIT this->SigRemoveItem(*pc_ItItem);
+      Q_EMIT (this->SigRemoveItem(*pc_ItItem));
       (*pc_ItItem)->setParentItem(NULL);
       delete (*pc_ItItem);
    }
@@ -651,16 +654,23 @@ void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
       }
       else
       {
+         QString c_ShownText = this->mc_Name;
+
+         if (this->mq_MultiplexerSignal == true)
+         {
+            c_ShownText += C_GtGetText::h_GetText(" (Multiplexer)");
+         }
+
          // new item necessary
          pc_Item = new C_SdBueMlvSignalItem(this->mc_ColorConfiguration.c_BackgroundColor,
                                             this->mc_ColorConfiguration.c_FontColor,
-                                            this->mc_ColorConfiguration.c_ResizeItemColor, this->mc_Name,
+                                            this->mc_ColorConfiguration.c_ResizeItemColor, c_ShownText,
                                             this->mf64_Space);
          connect(pc_Item, &C_SdBueMlvSignalItem::SigItemHovered, this, &C_SdBueMlvSignalManager::m_SignalItemHovered);
          connect(pc_Item, &C_SdBueMlvSignalItem::SigChangeCursor, this, &C_SdBueMlvSignalManager::SigChangeCursor);
          this->mc_VecSignalItems.push_back(pc_Item);
          // add the item to the scene
-         Q_EMIT this->SigAddItem(pc_Item);
+         Q_EMIT (this->SigAddItem(pc_Item));
       }
 
       // get the first bit in this row
@@ -707,7 +717,7 @@ void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
    while (sn_Counter < this->mc_VecSignalItems.size())
    {
       // remove the item from the scene
-      Q_EMIT this->SigRemoveItem(this->mc_VecSignalItems[sn_Counter]);
+      Q_EMIT (this->SigRemoveItem(this->mc_VecSignalItems[sn_Counter]));
       disconnect(this->mc_VecSignalItems[sn_Counter], &C_SdBueMlvSignalItem::SigItemHovered,
                  this, &C_SdBueMlvSignalManager::m_SignalItemHovered);
       disconnect(this->mc_VecSignalItems[sn_Counter], &C_SdBueMlvSignalItem::SigChangeCursor, this,
@@ -842,4 +852,29 @@ void C_SdBueMlvSignalManager::m_SetError(const bool oq_Active)
    {
       this->mc_VecSignalItems[sn_Counter]->SetError(oq_Active);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Checks new length of signal
+
+   In case of a multiplexer signal, the signal shall not be longer than ms16_MaximumLengthMultiplexer. If it
+   is a non multiplexed or a multiplexed signal, the signal shall not be longer than ms16_MaximumLength
+
+   \param[in]       os16_Length     New length of signal
+
+   \retval   true            Length is valid
+   \retval   false           Length is not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdBueMlvSignalManager::m_IsLengthValid(const sint16 os16_Length) const
+{
+   bool q_Return = false;
+
+   if ((os16_Length <= ms16_MaximumLength) &&
+       ((this->mq_MultiplexerSignal == false) || (os16_Length <= ms16_MaximumLengthMultiplexer)))
+   {
+      q_Return = true;
+   }
+
+   return q_Return;
 }

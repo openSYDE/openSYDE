@@ -11,17 +11,17 @@
 #ifndef C_OSCLOGGINGHANDLER_H
 #define C_OSCLOGGINGHANDLER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "CSCLString.h"
 #include "TGLUtils.h"
 #include "TGLTime.h"
 #include "TGLTasks.h"
 #include <fstream>
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 //PC-Lint suppressions: function-like macro is the only way to get file,func,line information into the text
 //lint -save -e1960
 #define osc_write_log_info(activity, \
@@ -37,7 +37,7 @@ namespace stw_opensyde_core
                                                                                               TGL_UTIL_FUNC_ID))
 //lint -restore
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///Handler class for logging operations
 class C_OSCLoggingHandler
@@ -83,7 +83,7 @@ private:
    virtual ~C_OSCLoggingHandler(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -136,7 +136,7 @@ private:
    stw_types::uint32 mu32_State;
    bool mq_Connected;
 
-   stw_types::uint32 mu32_FileSize; // In KB
+   stw_types::uint32 mu32_FileSize; // In kB
 
    // File information for change check
    QDateTime mc_FileTimestamp;

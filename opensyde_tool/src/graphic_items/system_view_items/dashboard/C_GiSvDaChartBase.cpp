@@ -80,6 +80,9 @@ C_GiSvDaChartBase::C_GiSvDaChartBase(const uint32 & oru32_ViewIndex, const uint3
    //lint -e{1938}  static const is guaranteed preinitialized before main
    mpc_ChartWidget = new C_SyvDaItChartWidget(oru32_ViewIndex, mhu32_MaximumDataElements);
    this->mpc_Widget->SetWidget(this->mpc_ChartWidget);
+
+   //Activate child handles its own events for combo box pop up
+   this->setHandlesChildEvents(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

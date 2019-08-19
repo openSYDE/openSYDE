@@ -11,7 +11,7 @@
 #ifndef C_OSCCOMMESSAGELOGGERDATA_H
 #define C_OSCCOMMESSAGELOGGERDATA_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <algorithm>
 
 #include "stwtypes.h"
@@ -19,12 +19,12 @@
 #include "CSCLString.h"
 #include "C_OSCCanSignal.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCComMessageLoggerDataSignal
 {
@@ -51,6 +51,7 @@ public:
    virtual ~C_OSCComMessageLoggerData(void);
 
    void SortSignals(void);
+   static stw_scl::C_SCLString h_GetTimestampAsString(const stw_types::uint64 ou64_TimeStamp);
 
    stw_types::uint64 u64_TimeStampRelative;
    stw_types::uint64 u64_TimeStampAbsolute;
@@ -73,7 +74,7 @@ public:
    bool q_IsTx;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

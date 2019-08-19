@@ -129,6 +129,9 @@ QVariant C_SdBueSignalTableModel::headerData(const sintn osn_Section, const Qt::
          case eCOMMENT:
             c_Retval = C_GtGetText::h_GetText("Comment");
             break;
+         case eMULTIPLEXING:
+            c_Retval = C_GtGetText::h_GetText("Multiplexing");
+            break;
          case eSTART_BIT:
             c_Retval = C_GtGetText::h_GetText("Start [Bit]");
             break;
@@ -161,8 +164,6 @@ QVariant C_SdBueSignalTableModel::headerData(const sintn osn_Section, const Qt::
             break;
          case eUNIT:
             c_Retval = C_GtGetText::h_GetText("Unit");
-            break;
-         default:
             break;
          }
       }
@@ -213,7 +214,7 @@ sintn C_SdBueSignalTableModel::columnCount(const QModelIndex & orc_Parent) const
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 16;
+      sn_Retval = 17;
    }
    return sn_Retval;
 }
@@ -259,6 +260,43 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                {
                   c_Retval =
                      QString("%1 (0x%2)").arg(pc_Message->c_Name.c_str(), QString::number(pc_Message->u32_CanId, 16));
+               }
+               break;
+            case eMULTIPLEXING:
+               pc_OSCSignal = C_PuiSdHandler::h_GetInstance()->GetCanSignal(c_MessageId, u32_SignalIndex);
+               if (pc_OSCSignal != NULL)
+               {
+                  QString c_MultiplexerName = C_GtGetText::h_GetText("<no multiplexer defined yet>");
+                  uint32 u32_Multiplexer;
+                  switch (pc_OSCSignal->e_MultiplexerType)
+                  {
+                  case C_OSCCanSignal::eMUX_DEFAULT:
+                     c_Retval = "-";
+                     break;
+                  case C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL:
+                     c_Retval = C_GtGetText::h_GetText("Multiplexer");
+                     break;
+                  case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
+                     // find out name of multiplexer
+                     pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);                     
+                     if (pc_Message != NULL)
+                     {
+                        if(pc_Message->IsMultiplexed(&u32_Multiplexer) == true)
+                        {
+                           // multiplexer found -> name is name of corresponding data pool list element
+                           pc_OSCSignalCommon =
+                              C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_Multiplexer);
+                           if (pc_OSCSignalCommon != NULL)
+                           {
+                              c_MultiplexerName = QString(pc_OSCSignalCommon->c_Name.c_str());
+                           }
+                        } // if no multiplexer is found dummy-text is used
+
+                        c_Retval = QString(C_GtGetText::h_GetText("%1=%2")).arg(c_MultiplexerName).arg(
+                           pc_OSCSignal->u16_MultiplexValue);
+                     }
+                     break;
+                  }
                }
                break;
             case eNAME:
@@ -369,8 +407,6 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   c_Retval = QString(pc_OSCSignalCommon->c_Unit.c_str());
                }
                break;
-            default:
-               break;
             }
          }
       }
@@ -424,26 +460,9 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                            c_MessageId.e_ComProtocol,
                            c_MessageId.u32_InterfaceIndex,
                            c_MessageId.q_MessageIsTx);
-                     bool q_LayoutConflict;
-                     bool q_BorderConflict;
-                     bool q_NameConflict;
-                     bool q_NameInvalid;
-                     bool q_MinOverMax;
-                     bool q_ValueBelowMin;
-                     bool q_ValueOverMax;
-                     bool q_SignalValid;
                      QStringList c_Tmp;
-                     pc_Message->CheckErrorSignalDetailed(pc_List, u32_SignalIndex, &q_LayoutConflict,
-                                                          &q_BorderConflict,
-                                                          &q_NameConflict, &q_NameInvalid, &q_MinOverMax,
-                                                          &q_ValueBelowMin,
-                                                          &q_ValueOverMax, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                             c_MessageId.e_ComProtocol));
-                     q_SignalValid =
-                        (((((((q_LayoutConflict == false) && (q_BorderConflict == false)) &&
-                             (q_NameConflict == false)) &&
-                            (q_NameInvalid == false)) && (q_MinOverMax == false)) && (q_ValueBelowMin == false)) &&
-                         (q_ValueOverMax == false));
+                     const bool q_SignalValid = !pc_Message->CheckErrorSignal(pc_List, u32_SignalIndex, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                                                                 c_MessageId.e_ComProtocol));
                      c_Tmp.push_back(QString::number(20));
                      if (q_SignalValid == false)
                      {
@@ -467,11 +486,13 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
          case eINITIAL_VALUE:
          case eFACTOR:
          case eOFFSET:
+         case eMULTIPLEXING:
          case eAUTO_MIN_MAX:
          case eMINIMUM_VALUE:
          case eMAXIMUM_VALUE:
          case eUNIT:
-         default:
+         case eINDEX:
+         case eSTART_BIT:
             //No decoration
             break;
          }
@@ -486,11 +507,14 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
             c_Font = mc_STYLE_GUIDE_FONT_REGULAR_12;
             break;
          case eICON:
+         case eINDEX:
+         case eSTART_BIT:
          case eMESSAGE:
          case eNAME:
          case eLENGTH:
          case eBYTE_ORDER:
          case eVALUE_TYPE:
+         case eMULTIPLEXING:
          case eINITIAL_VALUE:
          case eFACTOR:
          case eOFFSET:
@@ -498,7 +522,6 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
          case eMINIMUM_VALUE:
          case eMAXIMUM_VALUE:
          case eUNIT:
-         default:
             c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
             break;
          }
@@ -589,36 +612,39 @@ C_SdBueSignalTableModel::E_Columns C_SdBueSignalTableModel::h_ColumnToEnum(const
       e_Retval = eMESSAGE;
       break;
    case 5:
-      e_Retval = eSTART_BIT;
+      e_Retval = eMULTIPLEXING;
       break;
    case 6:
-      e_Retval = eLENGTH;
+      e_Retval = eSTART_BIT;
       break;
    case 7:
-      e_Retval = eBYTE_ORDER;
+      e_Retval = eLENGTH;
       break;
    case 8:
-      e_Retval = eVALUE_TYPE;
+      e_Retval = eBYTE_ORDER;
       break;
    case 9:
-      e_Retval = eINITIAL_VALUE;
+      e_Retval = eVALUE_TYPE;
       break;
    case 10:
-      e_Retval = eFACTOR;
+      e_Retval = eINITIAL_VALUE;
       break;
    case 11:
-      e_Retval = eOFFSET;
+      e_Retval = eFACTOR;
       break;
    case 12:
-      e_Retval = eAUTO_MIN_MAX;
+      e_Retval = eOFFSET;
       break;
    case 13:
-      e_Retval = eMINIMUM_VALUE;
+      e_Retval = eAUTO_MIN_MAX;
       break;
    case 14:
-      e_Retval = eMAXIMUM_VALUE;
+      e_Retval = eMINIMUM_VALUE;
       break;
    case 15:
+      e_Retval = eMAXIMUM_VALUE;
+      break;
+   case 16:
       e_Retval = eUNIT;
       break;
    default:
@@ -660,38 +686,41 @@ sint32 C_SdBueSignalTableModel::h_EnumToColumn(const C_SdBueSignalTableModel::E_
    case eMESSAGE:
       s32_Retval = 4;
       break;
-   case eSTART_BIT:
+   case eMULTIPLEXING:
       s32_Retval = 5;
       break;
-   case eLENGTH:
+   case eSTART_BIT:
       s32_Retval = 6;
       break;
-   case eBYTE_ORDER:
+   case eLENGTH:
       s32_Retval = 7;
       break;
-   case eVALUE_TYPE:
+   case eBYTE_ORDER:
       s32_Retval = 8;
       break;
-   case eINITIAL_VALUE:
+   case eVALUE_TYPE:
       s32_Retval = 9;
       break;
-   case eFACTOR:
+   case eINITIAL_VALUE:
       s32_Retval = 10;
       break;
-   case eOFFSET:
+   case eFACTOR:
       s32_Retval = 11;
       break;
-   case eAUTO_MIN_MAX:
+   case eOFFSET:
       s32_Retval = 12;
       break;
-   case eMINIMUM_VALUE:
+   case eAUTO_MIN_MAX:
       s32_Retval = 13;
       break;
-   case eMAXIMUM_VALUE:
+   case eMINIMUM_VALUE:
       s32_Retval = 14;
       break;
-   case eUNIT:
+   case eMAXIMUM_VALUE:
       s32_Retval = 15;
+      break;
+   case eUNIT:
+      s32_Retval = 16;
       break;
    default:
       s32_Retval = -1;

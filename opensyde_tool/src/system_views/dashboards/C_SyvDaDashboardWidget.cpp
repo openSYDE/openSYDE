@@ -93,6 +93,9 @@ C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, cons
    //Error handling
    connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigErrorChange, this, &C_SyvDaDashboardWidget::SigErrorChange);
 
+   connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigTriggerUpdateTransmissionConfiguration, this,
+           &C_SyvDaDashboardWidget::SigTriggerUpdateTransmissionConfiguration);
+
    // Manual datapool element handling
    connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigDataPoolWrite, this, &C_SyvDaDashboardWidget::SigDataPoolWrite);
    connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigDataPoolRead, this, &C_SyvDaDashboardWidget::SigDataPoolRead);

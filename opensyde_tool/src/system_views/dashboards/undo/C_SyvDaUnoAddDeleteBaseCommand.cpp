@@ -64,7 +64,8 @@ C_SyvDaUnoAddDeleteBaseCommand::C_SyvDaUnoAddDeleteBaseCommand(QGraphicsScene * 
                                                                const std::vector<uint64> & orc_IDs,
                                                                const QString & orc_Text,
                                                                QUndoCommand * const opc_Parent,
-                                                               const C_PuiSvDashboard & orc_InitialSnapshotData) :
+                                                               const C_SyvDaDashboardSnapshot & orc_InitialSnapshotData)
+   :
    C_SebUnoAddDeleteBaseCommand(opc_Scene, orc_IDs, orc_Text, opc_Parent),
    mc_DataBackup(orc_InitialSnapshotData)
 {
@@ -94,7 +95,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Restore(void)
       //First: Restore data rail(s) if any (not replaced if already existing due to other not registered element
       // changes)
       m_RestoreReadRailsOnly();
-      pc_Scene->CopyFromSnapshotToScene(this->mc_DataBackup, NULL, &(this->mc_MapTypeAndIndexToID));
+      pc_Scene->CopyFromSnapshotToScene(this->mc_DataBackup, &(this->mc_MapTypeAndIndexToID));
       //Trigger error recheck
       pc_Scene->TriggerErrorCheck();
    }
@@ -189,6 +190,28 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::GetTextElementType(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply position offset
+
+   \param[in] orc_NewPos Offset
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaUnoAddDeleteBaseCommand::SetDataPositionOffset(const QPointF & orc_NewPos)
+{
+   this->mc_DataBackup.SetDataPositionOffset(orc_NewPos);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply Z value offset
+
+   \param[in] of64_HighestUsedZValue Highest used Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaUnoAddDeleteBaseCommand::SetDataZOffset(const float64 of64_HighestUsedZValue)
+{
+   this->mc_DataBackup.SetDataZOffset(of64_HighestUsedZValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get backup data
 
    \return
@@ -256,7 +279,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(pc_Scene->GetDashboardIndex());
          if (pc_Dashboard != NULL)
          {
-            std::vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
+            const std::vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
             C_PuiSvDbDataElement * pc_Data;
             C_GiUnique * pc_Unique;
             C_GiSvDaRectBaseGroup * pc_RectBase;
@@ -266,7 +289,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
             //Base elements
             m_StoreCommon(this->mc_DataBackup, this->mc_MapTypeAndIndexToID, *pc_Dashboard);
             //Other elements
-            for (std::vector<QGraphicsItem *>::iterator c_ItRelatedItem = c_RelatedItems.begin();
+            for (std::vector<QGraphicsItem *>::const_iterator c_ItRelatedItem = c_RelatedItems.begin();
                  c_ItRelatedItem != c_RelatedItems.end(); ++c_ItRelatedItem)
             {
                //lint -e{740,929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -506,8 +529,9 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Delete(void)
    if (pc_Scene != NULL)
    {
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(pc_Scene->GetViewIndex());
-      std::vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
-      for (std::vector<QGraphicsItem *>::iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
+      const std::vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
+      for (std::vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end();
+           ++c_ItItem)
       {
          pc_Scene->DeleteItem(*c_ItItem);
       }

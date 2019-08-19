@@ -3,10 +3,8 @@
    \file
    \brief       Standard open button (implementation)
 
-   Standard open button.
-   This class does not contain any functionality,
-   but needs to exist, to have a unique group,
-   to apply a specific stylesheet for.
+   Standard open button for file browse action with "..." icon.
+   Left border is styled for seamless transition to file path line edit.
 
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -41,6 +39,7 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubOpen::C_OgePubOpen(QWidget * const opc_Parent) :
-   QPushButton(opc_Parent)
+   C_OgePubToolTipBase(opc_Parent)
 {
+   this->setIcon(QIcon("://images/IconBrowse.svg"));
 }

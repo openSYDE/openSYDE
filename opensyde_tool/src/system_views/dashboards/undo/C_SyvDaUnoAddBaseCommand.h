@@ -28,7 +28,7 @@ class C_SyvDaUnoAddBaseCommand :
 public:
    C_SyvDaUnoAddBaseCommand(QGraphicsScene * const opc_Scene, const std::vector<stw_types::uint64> & orc_IDs,
                             const QString & orc_Text, QUndoCommand * const opc_Parent = NULL,
-                            const C_PuiSvDashboard & orc_InitialSnapshotData = C_PuiSvDashboard());
+                            const C_SyvDaDashboardSnapshot & orc_InitialSnapshotData = C_SyvDaDashboardSnapshot());
    virtual ~C_SyvDaUnoAddBaseCommand(void);
    virtual void undo(void) override;
    virtual void redo(void) override;

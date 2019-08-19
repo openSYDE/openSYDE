@@ -163,8 +163,7 @@ public:
    void SetProjSvDashboardToolbox(const QString & orc_ViewName, const QPoint & orc_Position, const QSize & orc_Size,
                                   const bool & orq_Maximized);
    void SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewName, const stw_types::sint32 os32_Index);
-   void SetProjSvDashboardMainTab(const QString & orc_ViewName, const QString & orc_DashboardName,
-                                  const stw_types::sint32 os32_TabIndex);
+   void SetProjSvDashboardMainTab(const QString & orc_ViewName, const QString & orc_DashboardName);
    void SetProjSvDashboardTearOffPosition(const QString & orc_ViewName, const QString & orc_DashboardName,
                                           const QPoint & orc_Position, const QSize & orc_Size,
                                           const bool oq_TornOffWindowMinimized, const bool oq_TornOffWindowMaximized);

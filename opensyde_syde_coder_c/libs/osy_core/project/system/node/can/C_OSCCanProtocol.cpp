@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -17,35 +17,35 @@
 #include "CSCLChecksums.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_tgl;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanProtocol::C_OSCCanProtocol(void) :
    e_Type(eLAYER2),
    u32_DataPoolIndex(0)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
@@ -53,7 +53,7 @@ C_OSCCanProtocol::C_OSCCanProtocol(void) :
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanProtocol::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
@@ -65,7 +65,7 @@ void C_OSCCanProtocol::CalcHash(uint32 & oru32_HashValue) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all signals for one message
 
    \param[in]  orc_DataPool          Data pool with message signal data
@@ -78,7 +78,7 @@ void C_OSCCanProtocol::CalcHash(uint32 & oru32_HashValue) const
    C_NO_ERR Result valid
    C_RANGE  Either interface, message or signal not found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanProtocol::GetAllSignalsForMessage(const C_OSCNodeDataPool & orc_DataPool,
                                                  const uint32 ou32_InterfaceIndex, const uint32 ou32_MessageIndex,
                                                  const bool oq_IsTx,
@@ -130,7 +130,7 @@ sint32 C_OSCCanProtocol::GetAllSignalsForMessage(const C_OSCNodeDataPool & orc_D
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific com list RX or TX
 
    \param[in] orc_DataPool         Data pool containing list
@@ -141,7 +141,7 @@ sint32 C_OSCCanProtocol::GetAllSignalsForMessage(const C_OSCNodeDataPool & orc_D
    NULL No matching list found
    Else List matching the requested interface and type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComListConst(const C_OSCNodeDataPool & orc_DataPool,
                                                                   const uint32 ou32_InterfaceIndex, const bool oq_IsTx)
 {
@@ -156,7 +156,7 @@ const C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComListConst(const C_OSCNod
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific list index
 
    \param[in] orc_DataPool         Data pool containing list
@@ -167,7 +167,7 @@ const C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComListConst(const C_OSCNod
      -1 No matching list found
    >= 0 List matching the requested interface and type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanProtocol::h_GetListIndex(const C_OSCNodeDataPool & orc_DataPool, const uint32 ou32_InterfaceIndex,
                                         const bool oq_IsTx)
 {
@@ -195,7 +195,7 @@ sint32 C_OSCCanProtocol::h_GetListIndex(const C_OSCNodeDataPool & orc_DataPool, 
    return s32_ResultIndex;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific com list RX or TX
 
    \param[in] orc_DataPool         Data pool containing list
@@ -206,7 +206,7 @@ sint32 C_OSCCanProtocol::h_GetListIndex(const C_OSCNodeDataPool & orc_DataPool, 
    NULL No matching list found
    Else List matching the requested interface and type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComList(C_OSCNodeDataPool & orc_DataPool,
                                                        const uint32 ou32_InterfaceIndex, const bool oq_IsTx)
 {
@@ -232,7 +232,7 @@ C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComList(C_OSCNodeDataPool & orc_D
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get index of specific com list RX or TX
 
    \param[in]  orc_DataPool         Data pool containing list
@@ -244,7 +244,7 @@ C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComList(C_OSCNodeDataPool & orc_D
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanProtocol::h_GetComListIndex(const C_OSCNodeDataPool & orc_DataPool, const uint32 ou32_InterfaceIndex,
                                            const bool oq_IsTx, uint32 & oru32_ListIndex)
 {
@@ -270,7 +270,7 @@ sint32 C_OSCCanProtocol::h_GetComListIndex(const C_OSCNodeDataPool & orc_DataPoo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific com list element
 
    \param[in] orc_DataPool         Data pool containing list element
@@ -283,7 +283,7 @@ sint32 C_OSCCanProtocol::h_GetComListIndex(const C_OSCNodeDataPool & orc_DataPoo
    NULL No matching list element found
    Else List element matching the requested interface, type, message and signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElementConst(const C_OSCNodeDataPool & orc_DataPool,
                                                                               const uint32 ou32_InterfaceIndex,
                                                                               const bool oq_IsTx,
@@ -314,7 +314,7 @@ const C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElementConst(co
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific com list element
 
    \param[in] orc_DataPool         Data pool containing list element
@@ -327,7 +327,7 @@ const C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElementConst(co
    NULL No matching list element found
    Else List element matching the requested interface, type, message and signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElement(C_OSCNodeDataPool & orc_DataPool,
                                                                    const uint32 ou32_InterfaceIndex, const bool oq_IsTx,
                                                                    const uint32 ou32_MessageIndex,
@@ -357,7 +357,7 @@ C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElement(C_OSCNodeData
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if communication list is of tx type
 
    \param[in]   orc_List    list to check
@@ -366,7 +366,7 @@ C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElement(C_OSCNodeData
    true  TX
    false RX
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanProtocol::h_ListIsComTx(const C_OSCNodeDataPoolList & orc_List)
 {
    bool q_Retval = false;
@@ -382,7 +382,7 @@ bool C_OSCCanProtocol::h_ListIsComTx(const C_OSCNodeDataPoolList & orc_List)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get CAN message DLC offset for signal range check
 
    \param[in] oe_Type Current protocol type
@@ -390,7 +390,7 @@ bool C_OSCCanProtocol::h_ListIsComTx(const C_OSCNodeDataPoolList & orc_List)
    \return
    CAN message DLC offset for signal range check
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(const E_Type oe_Type)
 {
    uint32 u32_Retval = 0UL;

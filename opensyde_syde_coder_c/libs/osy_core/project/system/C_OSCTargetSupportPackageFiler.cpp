@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -20,26 +20,26 @@
 #include "C_OSCXMLParser.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_tgl;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load target support package.
 
    Load data from specified file and place it in target support package instance
@@ -53,7 +53,7 @@ using namespace stw_scl;
    C_NOACT     specified file is present but structure is invalid (e.g. invalid XML file)
    C_CONFIG    in specified file is a XML node or attribute missing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCTargetSupportPackageFiler::h_Load(C_OSCTargetSupportPackage & orc_TargetSupportPackage,
                                               const stw_scl::C_SCLString & orc_Path)
 {
@@ -84,7 +84,7 @@ sint32 C_OSCTargetSupportPackageFiler::h_Load(C_OSCTargetSupportPackage & orc_Ta
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data from xml file.
 
    Parse a .syde_tsp file and save parameters to C_OSCTargetSupportPackage.
@@ -96,7 +96,7 @@ sint32 C_OSCTargetSupportPackageFiler::h_Load(C_OSCTargetSupportPackage & orc_Ta
    C_NO_ERR    XML data read and placed into target support package instance
    C_CONFIG    XML node or attribute missing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_TargetSupportPackage,
                                                C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -268,7 +268,7 @@ sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_T
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load applications data from XML file.
 
    Requires the XML parser to be on node "application".
@@ -280,7 +280,7 @@ sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_T
    C_NO_ERR    application data read and placed into target support package instance
    C_CONFIG    XML node or attribute missing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPackage & orc_TargetSupportPackage,
                                                            C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -372,6 +372,22 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
       }
       else
       {
+         // generated code structure version (optional attribute)
+         if (orc_XMLParser.AttributeExists("generated-code-version") == true)
+         {
+            c_Application.u16_GenCodeVersion =
+               static_cast<uint16>(orc_XMLParser.GetAttributeUint32("generated-code-version"));
+         }
+         else
+         {
+            // probably deprecated TSP -> default to first version
+            // (note: if not programmable this is not reached and therefore defaults to its initial value 0,
+            // but this does not harm as "code-generation-version" makes no sense in this case)
+            osc_write_log_warning("Loading target support package",
+                                  "XML attribute \"generated-code-version\" not found.");
+            c_Application.u16_GenCodeVersion = 1U;
+         }
+
          // code generation type
          c_Text = orc_XMLParser.SelectNodeChild("type");
          if (c_Text != "type")

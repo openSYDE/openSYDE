@@ -43,6 +43,9 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     orc_MessageId          Message identification indices
    \param[in]     oru32_SignalIndex      Signal index
    \param[in]     ou16_StartBit          Start bit of signal
+   \param[in]     oe_MultiplexerType     Multiplexer signal type
+   \param[in]     ou16_MultiplexerValue  Multiplexer value (only relevant if
+                                         oe_MultiplexerType is eMUX_MULTIPLEXED_SIGNAL)
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
    \param[in,out] opc_Parent             Optional pointer to parent
@@ -50,10 +53,13 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoSignalAddCommand::C_SdBueUnoSignalAddCommand(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                        const uint32 & oru32_SignalIndex, const uint16 ou16_StartBit,
+                                                       const C_OSCCanSignal::E_MultiplexerType oe_MultiplexerType,
+                                                       const uint16 ou16_MultiplexerValue,
                                                        C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                                        C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
                                                        QUndoCommand * const opc_Parent) :
-   C_SdBueUnoSignalAddDeleteBaseCommand(orc_MessageId, oru32_SignalIndex, ou16_StartBit, opc_MessageSyncManager,
+   C_SdBueUnoSignalAddDeleteBaseCommand(orc_MessageId, oru32_SignalIndex, ou16_StartBit, oe_MultiplexerType,
+                                        ou16_MultiplexerValue, opc_MessageSyncManager,
                                         opc_MessageTreeWidget,
                                         "Add Signal",
                                         opc_Parent)
@@ -80,18 +86,26 @@ C_SdBueUnoSignalAddCommand::C_SdBueUnoSignalAddCommand(const C_OSCCanMessageIden
    \param[in] orc_OSCSignalCommon Signal data (osc common)
    \param[in] orc_UISignalCommon  Signal data (ui common)
    \param[in] orc_UISignal        Signal data (ui)
+   \param[in] oe_ProtocolType     Current active protocol to handle necessary adaptations
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoSignalAddCommand::SetInitialData(const C_OSCCanSignal & orc_Signal,
                                                 const C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
                                                 const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
-                                                const C_PuiSdNodeCanSignal & orc_UISignal)
+                                                const C_PuiSdNodeCanSignal & orc_UISignal,
+                                                const C_OSCCanProtocol::E_Type oe_ProtocolType)
 {
    this->mc_Signal = orc_Signal;
    this->mc_OSCSignalCommon = orc_OSCSignalCommon;
    this->mc_UISignalCommon = orc_UISignalCommon;
    this->mc_UISignal = orc_UISignal;
    this->mc_UISignal.u8_ColorIndex = 0U;
+   //Restrict multiplexer
+   if (oe_ProtocolType != C_OSCCanProtocol::eLAYER2)
+   {
+      this->mc_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_DEFAULT;
+      this->mc_Signal.u16_MultiplexValue = 0;
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

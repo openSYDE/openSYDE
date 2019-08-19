@@ -7,37 +7,37 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_OSCCanUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanUtil::C_OSCCanUtil(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if signal fits into a CAN message with a specific DLC
 
    \param[in]     ou8_Dlc        Length of CAN message
@@ -47,18 +47,12 @@ C_OSCCanUtil::C_OSCCanUtil(void)
    true     Signal fits into message
    false    Signal does not fit into message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanUtil::h_IsSignalInMessage(const uint8 ou8_Dlc, const C_OSCCanSignal & orc_Signal)
 {
    bool q_Return = false;
    const uint16 u16_LastBit = orc_Signal.GetDataBytesBitPosOfSignalBit(orc_Signal.u16_ComBitLength - 1U);
-   uint16 u16_NeededBytes = u16_LastBit / 8U;
-
-   if ((u16_LastBit % 8U) != 0U)
-   {
-      // Round up
-      ++u16_NeededBytes;
-   }
+   const uint16 u16_NeededBytes = (u16_LastBit / 8U) + 1U;
 
    if (u16_NeededBytes <= ou8_Dlc)
    {
@@ -68,7 +62,7 @@ bool C_OSCCanUtil::h_IsSignalInMessage(const uint8 ou8_Dlc, const C_OSCCanSignal
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets value for signal out of CAN message data bytes
 
    Signals will be converted to little endian (Intel)
@@ -77,7 +71,7 @@ bool C_OSCCanUtil::h_IsSignalInMessage(const uint8 ou8_Dlc, const C_OSCCanSignal
    \param[in]     orc_Signal         Signal configuration used for extraction
    \param[in,out] orc_DataPoolData   Data with extracted value (Size must be already set)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanUtil::h_GetSignalValue(const uint8(&orau8_CanDb)[8], const C_OSCCanSignal & orc_Signal,
                                     std::vector<uint8> & orc_DataPoolData)
 {
@@ -185,14 +179,14 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8(&orau8_CanDb)[8], const C_OSCCan
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets value for signal out of CAN message data bytes
 
    \param[in]     orau8_CanDb    Data bytes of CAN message
    \param[in]     orc_Signal     Signal configuration used for extraction
    \param[in,out] orc_Value      Extracted value and source for size of value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanUtil::h_GetSignalValue(const uint8(&orau8_CanDb)[8], const C_OSCCanSignal & orc_Signal,
                                     C_OSCNodeDataPoolContent & orc_Value)
 {
@@ -205,7 +199,7 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8(&orau8_CanDb)[8], const C_OSCCan
    orc_Value.SetValueFromLittleEndianBlob(c_Data);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy data bytes from data pool data to message payload data according to endianness.
 
    copied from: module: comm_stack/osy_com_utils.c function: m_fill_message_payload_from_data_pool_data
@@ -214,7 +208,7 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8(&orau8_CanDb)[8], const C_OSCCan
    \param[in]     orc_Signal  Current signal
    \param[in]     orc_Value   Data from data pool to write into the message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanUtil::h_SetSignalValue(uint8 (&orau8_CanDb)[8], const C_OSCCanSignal & orc_Signal,
                                     const C_OSCNodeDataPoolContent & orc_Value)
 {

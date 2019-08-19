@@ -53,7 +53,6 @@ public:
    void Load(void);
    void Save(void) const;
    void CopyFromSnapshotToScene(const stw_opensyde_gui_logic::C_PuiSvDashboard & orc_Snapshot,
-                                const QPointF * const opc_Pos = NULL,
                                 const QMap<stw_opensyde_gui_logic::C_PuiBsTemporaryDataID,
                                            stw_types::uint64> * const opc_IDMap =
                                    NULL);
@@ -93,6 +92,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigErrorChange(void) const;
+   void SigTriggerUpdateTransmissionConfiguration(void);
    void SigDataPoolWrite(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_DataPoolIndex,
                          const stw_types::uint16 ou16_ListIndex, const stw_types::uint16 ou16_ElementIndex);
    void SigDataPoolRead(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Index);
@@ -145,9 +145,9 @@ private:
                     const stw_opensyde_gui_logic::C_PuiSvDbDataElement::E_Action & ore_Action) const;
 
    //Add
-   void m_LoadSubset(const QVector<stw_types::uint32> & orc_OtherStartIndices, const QPointF * const opc_Offset,
-                     const bool & orq_Selection, const QMap<stw_opensyde_gui_logic::C_PuiBsTemporaryDataID,
-                                                            stw_types::uint64> * const opc_IDMap);
+   void m_LoadSubset(const QVector<stw_types::uint32> & orc_OtherStartIndices, const bool & orq_Selection,
+                     const QMap<stw_opensyde_gui_logic::C_PuiBsTemporaryDataID,
+                                stw_types::uint64> * const opc_IDMap);
 
    void m_SelectionChanged(void);
    void m_InitBaseSceneContextMenuManager(void);

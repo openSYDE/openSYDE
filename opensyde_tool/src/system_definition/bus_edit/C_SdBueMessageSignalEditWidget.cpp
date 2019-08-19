@@ -68,12 +68,10 @@ C_SdBueMessageSignalEditWidget::C_SdBueMessageSignalEditWidget(QWidget * const o
            &C_SdBueMessageSignalEditWidget::m_OnMessageDlcChange);
    connect(this->mpc_Ui->pc_MsgLayoutViewerWidget, &C_SdBueMlvWidget::SigMessageUpdated, this,
            &C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaSelector);
-   connect(this->mpc_Ui->pc_SigPropertiesWidget, &C_SdBueSignalPropertiesWidget::SigPositionChanged, this,
+   connect(this->mpc_Ui->pc_SigPropertiesWidget, &C_SdBueSignalPropertiesWidget::SigUpdateMlv, this,
            &C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaProperties);
    connect(this->mpc_Ui->pc_SigPropertiesWidget, &C_SdBueSignalPropertiesWidget::SigNameChanged, this,
            &C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged);
-   connect(this->mpc_Ui->pc_SigPropertiesWidget, &C_SdBueSignalPropertiesWidget::SigTypeChanged, this,
-           &C_SdBueMessageSignalEditWidget::m_OnSignalTypeChanged);
    connect(this->mpc_Ui->pc_MsgLayoutViewerWidget, &C_SdBueMlvWidget::SigSignalActivated, this,
            &C_SdBueMessageSignalEditWidget::m_OnSignalActivated);
    //Error
@@ -94,6 +92,8 @@ C_SdBueMessageSignalEditWidget::C_SdBueMessageSignalEditWidget(QWidget * const o
    // MLV actions
    connect(this->mpc_Ui->pc_MsgLayoutViewerWidget, &C_SdBueMlvWidget::SigAddSignal, this,
            &C_SdBueMessageSignalEditWidget::SigAddSignal);
+   connect(this->mpc_Ui->pc_MsgLayoutViewerWidget, &C_SdBueMlvWidget::SigAddSignalMultiplexed, this,
+           &C_SdBueMessageSignalEditWidget::SigAddSignalMultiplexed);
    connect(this->mpc_Ui->pc_MsgLayoutViewerWidget, &C_SdBueMlvWidget::SigCopySignal, this,
            &C_SdBueMessageSignalEditWidget::SigCopySignal);
    connect(this->mpc_Ui->pc_MsgLayoutViewerWidget, &C_SdBueMlvWidget::SigCutSignal, this,
@@ -150,7 +150,6 @@ void C_SdBueMessageSignalEditWidget::SetMessageSyncManager(
 void C_SdBueMessageSignalEditWidget::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value) const
 {
    this->mpc_Ui->pc_MsgPropertiesWidget->SetComProtocol(ore_Value);
-   this->mpc_Ui->pc_SigPropertiesWidget->SetProtocol(ore_Value);
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SetComProtocol(ore_Value);
 }
 
@@ -428,29 +427,11 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalActivated(const uint32 ou32_Signa
 /*! \brief   On change of signal name
 
    \param[in] orc_MessageId      Message identification indices
-   \param[in] ou32_SignalIndex   Index of signal of message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                           const uint32 ou32_SignalIndex)
+void C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
-   this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectSignal(orc_MessageId, ou32_SignalIndex);
    Q_EMIT this->SigSignalNameChanged(orc_MessageId);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   On change of signal name
-
-   \param[in] orc_MessageId Message identification indices
-   \param[in] ou32_SignalIndex   Index of signal of message
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::m_OnSignalTypeChanged(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                           const uint32 ou32_SignalIndex)
-const
-{
-   // Inform message layout viewer because of different behavior with float or normal types
-   this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectSignal(orc_MessageId, ou32_SignalIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

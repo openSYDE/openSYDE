@@ -56,8 +56,9 @@ public:
                     const bool oq_IsTransmissionError, const bool oq_ErrorActive) const;
    void ResetError(void) const;
    void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
-   QString GetDataElementName(const stw_types::uint32 ou32_DataPoolElementConfigIndex);
-   QString GetDataElementUnit(const stw_types::uint32 ou32_DataPoolElementConfigIndex);
+   QString GetDataElementName(const stw_types::uint32 ou32_DataPoolElementConfigIndex) const;
+   QString GetDataElementUnit(const stw_types::uint32 ou32_DataPoolElementConfigIndex) const;
+   bool GetDataElementToggledState(const stw_types::uint32 ou32_DataPoolElementConfigIndex) const;
    void SetDataElementUnit(const stw_types::uint32 ou32_DataPoolElementConfigIndex, const QString & orc_DisplayName,
                            const QString & orc_Unit);
    bool GetCurrentDataSerie(stw_types::uint32 & oru32_DataPoolElementConfigIndex) const;
@@ -70,6 +71,12 @@ Q_SIGNALS:
    //lint -restore
    void SigDataItemToggled(const stw_types::uint32 ou32_DataPoolElementConfigIndex, const bool oq_Checked);
    void SigDataItemSelected(const stw_types::uint32 ou32_DataPoolElementConfigIndex);
+
+protected:
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   virtual bool event(QEvent * const opc_Event) override;
+   //lint -restore
 
 private:
    Ui::C_SyvDaItChartDataSelectorWidget * mpc_Ui;

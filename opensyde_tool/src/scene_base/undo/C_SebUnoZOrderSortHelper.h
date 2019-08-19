@@ -1,47 +1,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Line edit with right border styled for seamless transition to browse-button. (header)
-
-   See cpp file for detailed description
-
+   \brief       Sorting helper for scene z order
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMOGELEDARKBROWSE_H
-#define C_CAMOGELEDARKBROWSE_H
+#ifndef C_SEBUNOZORDERSORTHELPER_H
+#define C_SEBUNOZORDERSORTHELPER_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_OgeLeToolTipBase.h"
+#include <QGraphicsItem>
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
-namespace stw_opensyde_gui_elements
+namespace stw_opensyde_gui_logic
 {
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-class C_CamOgeLeDarkBrowse :
-   public C_OgeLeToolTipBase
+class C_SebUnoZOrderSortHelper
 {
-   Q_OBJECT
-
 public:
-   explicit C_CamOgeLeDarkBrowse(QWidget * const opc_Parent = NULL);
+   C_SebUnoZOrderSortHelper(void);
 
-   QString GetPath(void) const;
-   void SetPath(const QString & orc_NewPath);
+   bool operator ()(const QGraphicsItem * const opc_Item1, const QGraphicsItem * const opc_Item2) const;
 
-protected:
-   virtual void focusInEvent(QFocusEvent * const opc_Event) override;
-   virtual void focusOutEvent(QFocusEvent * const opc_Event) override;
-   virtual void resizeEvent(QResizeEvent * const opc_Event) override;
-   virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
-
-private:
-   QString mc_CompletePath;
-
-   void m_ShowMinimizedPath(void);
+   static void h_SortZValues(QList<QGraphicsItem *> & orc_ZValues);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

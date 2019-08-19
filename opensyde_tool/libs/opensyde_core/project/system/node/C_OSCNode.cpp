@@ -680,44 +680,40 @@ sint32 C_OSCNode::SetSignalPosition(const C_OSCCanProtocol::E_Type & ore_ComProt
    \param[in] orq_MessageIsTx      Flag if message is tx
    \param[in] oru32_MessageIndex   Message index
    \param[in] oru32_SignalIndex    Signal index
-   \param[in] orc_SignalData       Signal data for data pool
+   \param[in] ou16_MultiplexValue  New multiplex value
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNode::SetSignalCommon(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
-                                  const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
-                                  const uint32 & oru32_SignalIndex, const C_OSCNodeDataPoolListElement & orc_SignalData)
+sint32 C_OSCNode::SetSignalMUXValue(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
+                                    const uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                    const uint32 & oru32_MessageIndex, const uint32 & oru32_SignalIndex,
+                                    const stw_types::uint16 ou16_MultiplexValue)
 {
    sint32 s32_Retval = C_NO_ERR;
-   const C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
-   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol);
+   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
 
-   if ((pc_Protocol != NULL) && (pc_DataPool != NULL))
+   if (pc_Protocol != NULL)
    {
-      C_OSCNodeDataPoolList * const pc_ListData =
-         C_OSCCanProtocol::h_GetComList(*pc_DataPool, oru32_InterfaceIndex, orq_MessageIsTx);
-      if ((pc_ListData != NULL) && (oru32_InterfaceIndex < pc_Protocol->c_ComMessages.size()))
+      if (oru32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
       {
-         const C_OSCCanMessageContainer & rc_MessageContainer = pc_Protocol->c_ComMessages[oru32_InterfaceIndex];
-         const uint32 u32_DataPoolListElementIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
-            orq_MessageIsTx, oru32_MessageIndex) + oru32_SignalIndex;
-
-         if (u32_DataPoolListElementIndex < pc_ListData->c_Elements.size())
+         C_OSCCanMessageContainer & rc_MessageContainer = pc_Protocol->c_ComMessages[oru32_InterfaceIndex];
+         std::vector<C_OSCCanMessage> & rc_Messages = rc_MessageContainer.GetMessages(orq_MessageIsTx);
+         if (oru32_MessageIndex < rc_Messages.size())
          {
-            C_OSCNodeDataPoolListElement & rc_Element = pc_ListData->c_Elements[u32_DataPoolListElementIndex];
-            //Data pool
-            rc_Element = orc_SignalData;
-            //Depending on safety flag set appropriate access mode
-            if (pc_DataPool->q_IsSafety == true)
+            C_OSCCanMessage & rc_Message = rc_Messages[oru32_MessageIndex];
+
+            if (oru32_SignalIndex < rc_Message.c_Signals.size())
             {
-               rc_Element.e_Access = C_OSCNodeDataPoolListElement::eACCESS_RO;
+               //Message
+               C_OSCCanSignal & rc_Signal = rc_Message.c_Signals[oru32_SignalIndex];
+               rc_Signal.u16_MultiplexValue = ou16_MultiplexValue;
             }
             else
             {
-               rc_Element.e_Access = C_OSCNodeDataPoolListElement::eACCESS_RW;
+               s32_Retval = C_RANGE;
             }
          }
          else

@@ -25,7 +25,6 @@
 #include "C_HeHandler.h"
 #include "C_UsHandler.h"
 #include "C_ImpUtil.h"
-#include "C_Uti.h"
 #include "C_PuiSdHandler.h"
 #include "C_CieUtil.h"
 #include "C_OSCCanProtocol.h"
@@ -35,6 +34,7 @@
 #include "stwerrors.h"
 #include "C_RtfExportWidget.h"
 #include "C_PopUtil.h"
+#include "C_PuiUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -821,11 +821,7 @@ void C_SdHandlerWidget::RtfExport(void)
             // get default file name with project path (if using the RTF dialog the first time)
             QString c_DefaultFilename = C_PuiProject::h_GetInstance()->GetName();
             c_DefaultFilename += ".rtf";
-
-            QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath(); // get project path
-
-            c_RtfPath = stw_scl::C_SCLString(c_Folder.toStdString().c_str()) +
-                        stw_scl::C_SCLString(c_DefaultFilename.toStdString().c_str());
+            c_RtfPath = C_PuiUtil::h_GetAbsolutePathFromProject(c_DefaultFilename).toStdString().c_str();
          }
 
          if (c_RtfPath != "")

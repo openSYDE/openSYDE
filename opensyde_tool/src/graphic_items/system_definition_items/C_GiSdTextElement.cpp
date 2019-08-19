@@ -107,5 +107,18 @@ void C_GiSdTextElement::DeleteData(void)
 {
    C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.erase(
       C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.begin() +
-      ms32_Index);
+            ms32_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSdTextElement::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiBiTextElement::SetZValueCustom(of64_ZValue);
+   //Apply to data
+   this->UpdateData();
 }

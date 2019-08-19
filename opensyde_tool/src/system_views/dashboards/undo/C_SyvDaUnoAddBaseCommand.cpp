@@ -44,7 +44,7 @@ using namespace stw_opensyde_gui_logic;
 C_SyvDaUnoAddBaseCommand::C_SyvDaUnoAddBaseCommand(QGraphicsScene * const opc_Scene,
                                                    const std::vector<uint64> & orc_IDs, const QString & orc_Text,
                                                    QUndoCommand * const opc_Parent,
-                                                   const C_PuiSvDashboard & orc_InitialSnapshotData) :
+                                                   const C_SyvDaDashboardSnapshot & orc_InitialSnapshotData) :
    C_SyvDaUnoAddDeleteBaseCommand(opc_Scene, orc_IDs, orc_Text, opc_Parent, orc_InitialSnapshotData),
    mq_InitialStep(true)
 {

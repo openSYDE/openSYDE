@@ -35,7 +35,6 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_UsSystemViewDashboard::C_UsSystemViewDashboard(void) :
    q_TornOff(false),
-   s32_MainWindowTabIndex(-1),
    c_TornOffWindowPosition(0, 0),
    c_TornOffWindowSize(1000, 800),
    q_TornOffWindowMinimized(false),

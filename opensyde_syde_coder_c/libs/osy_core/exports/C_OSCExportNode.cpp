@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "TGLFile.h"
@@ -21,34 +21,34 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCExportNode::C_OSCExportNode(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create code for one application
 
    Creates code for one programmable application.
@@ -65,6 +65,7 @@ C_OSCExportNode::C_OSCExportNode(void)
    \param[in]  ou16_ApplicationIndex   Index of programmable application within orc_Node.c_Applications
    \param[in]  orc_Path                Storage path for created files
    \param[out] orc_Files               List of all exported file names (with absolute or relative path)
+   \param[in]  orc_ExportToolInfo      Information about calling executable (name + version)
 
    \return
    C_NO_ERR  Operation success
@@ -73,10 +74,12 @@ C_OSCExportNode::C_OSCExportNode(void)
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
              Data pool does not provide information about owning application or refers to an invalid application
              ApplicationIndex references invalid application
+   C_CONFIG  Protocol or data pool not available in node for interface
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw_types::uint16 ou16_ApplicationIndex,
-                                           const C_SCLString & orc_Path, std::vector<C_SCLString> & orc_Files)
+                                           const C_SCLString & orc_Path, std::vector<C_SCLString> & orc_Files,
+                                           const C_SCLString & orc_ExportToolInfo)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -131,7 +134,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
          q_CreateDpdInit = false;
       }
       s32_Retval = C_OSCExportOsyInit::h_CreateSourceCode(c_FileBase + ".c", orc_Node, q_CreateDpdInit,
-                                                          ou16_ApplicationIndex);
+                                                          ou16_ApplicationIndex, orc_ExportToolInfo);
       if (s32_Retval != C_NO_ERR)
       {
          osc_write_log_error("Creating source code",
@@ -205,7 +208,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                      C_OSCExportDataPool::h_CreateSourceCode(orc_Path, c_DataPool,
                                                              u8_DataPoolIndexWithinApplication,
                                                              q_IsRemote, u8_DataPoolIndexRemote,
-                                                             u8_ProcessId);
+                                                             u8_ProcessId, orc_ExportToolInfo);
                }
                else
                {
@@ -214,7 +217,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                      C_OSCExportDataPool::h_CreateSourceCode(orc_Path, rc_DataPool,
                                                              u8_DataPoolIndexWithinApplication,
                                                              q_IsRemote, u8_DataPoolIndexRemote,
-                                                             u8_ProcessId);
+                                                             u8_ProcessId, orc_ExportToolInfo);
                }
                //Handle file names
                if (s32_Retval == C_NO_ERR)
@@ -259,9 +262,9 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                       (rc_ComMessageContainer.c_RxMessages.size() > 0))
                   {
                      s32_Retval =
-                        C_OSCExportCommunicationStack::h_CreateSourceCode(orc_Path, orc_Node,
+                        C_OSCExportCommunicationStack::h_CreateSourceCode(orc_Path, orc_Node, ou16_ApplicationIndex,
                                                                           static_cast<uint8>(u32_ItInterface),
-                                                                          rc_Protocol.e_Type);
+                                                                          rc_Protocol.e_Type, orc_ExportToolInfo);
                      //Handle file names
                      if (s32_Retval == C_NO_ERR)
                      {
@@ -293,7 +296,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for correct preconditions for creating source code
 
    \param[in]  orc_Node   Node as information source for exported code
@@ -305,7 +308,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
              Data pool does not provide information about owning application or refers to an invalid application
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -340,7 +343,7 @@ sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt com data pool elements
 
    \param[in]     orc_Node           Current node containing data pools
@@ -352,7 +355,7 @@ sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
    C_RANGE  Data pool index or type invalid
    C_CONFIG Protocol not found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_GetAdaptedComDataPool(const C_OSCNode & orc_Node, const uint32 ou32_DataPoolIndex,
                                                  C_OSCNodeDataPool & orc_DataPool)
 {

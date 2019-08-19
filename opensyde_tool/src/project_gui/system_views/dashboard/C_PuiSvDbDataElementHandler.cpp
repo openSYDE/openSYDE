@@ -553,9 +553,10 @@ const
 
    This function is thread safe.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_Values                            Vector with result value(s)
-   \param[out]    opc_StringifiedValues                 Optional vector with result strings
+   \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
+   \param[out]    orc_Values                      Vector with result value(s)
+   \param[out]    opc_StringifiedValues           Optional vector with result strings
+   \param[in]     oq_UseScaling                   Optional flag if return value should include internally stored scaling
 
    \return
    C_NO_ERR    Value read
@@ -648,8 +649,9 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
 
    This function is thread safe.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    of64_Value                            Result value
+   \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
+   \param[out]    of64_Value                      Result value
+   \param[in]     oq_UseScaling                   Optional flag if return value should include internally stored scaling
 
    \return
    C_NO_ERR    Value read

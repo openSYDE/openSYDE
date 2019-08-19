@@ -48,7 +48,7 @@ protected:
    const stw_types::uint8 mu8_NodeId;
    stw_types::uint8 mu8_InitialNodeId;
 
-   stw_opensyde_gui::C_GiLiBusConnector * m_GetBusConnector(void);
+   stw_opensyde_gui::C_GiLiBusConnector * m_GetBusConnector(void) const;
    virtual void m_Reconnect(const stw_types::uint64 & oru64_StartingID, const stw_types::uint64 & oru64_LastID,
                             const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId) = 0;
 

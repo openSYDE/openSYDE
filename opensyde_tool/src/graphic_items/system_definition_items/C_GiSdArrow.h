@@ -32,6 +32,9 @@ public:
    virtual void LoadData(void) override;
    virtual void UpdateData(void) override;
    virtual void DeleteData(void) override;
+
+   //GI base
+   virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

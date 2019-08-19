@@ -100,37 +100,25 @@ C_SebBaseContextMenuManager::C_SebBaseContextMenuManager() :
                                                                          &C_SebBaseContextMenuManager::m_AlignBottom);
 
    //Z order
-   this->mc_OrderObjectContextMenu.setTitle(C_GtGetText::h_GetText("Z-Order"));
-   this->mpc_ActionOrderObjects = this->mc_ContextMenu.addMenu(&mc_OrderObjectContextMenu);
-
+   this->mpc_ActionOrderSeparator = this->mc_ContextMenu.addSeparator();
    // init and connect order objects actions
-   this->mpc_ActionBringToFront = this->mc_OrderObjectContextMenu.addAction(C_GtGetText::h_GetText(
-                                                                               "Bring to Front"), this,
-                                                                            &C_SebBaseContextMenuManager::SigBringToFront);
+   this->mpc_ActionBringToFront = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
+                                                                    "Bring to Front"), this,
+                                                                 &C_SebBaseContextMenuManager::SigBringToFront);
 
-   this->mpc_ActionBringForward = this->mc_OrderObjectContextMenu.addAction(C_GtGetText::h_GetText(
-                                                                               "Bring Forward"), this,
-                                                                            &C_SebBaseContextMenuManager::SigBringForward);
-
-   this->mpc_ActionSendBackward = this->mc_OrderObjectContextMenu.addAction(C_GtGetText::h_GetText(
-                                                                               "Send Backward"), this,
-                                                                            &C_SebBaseContextMenuManager::SigSendBackward);
-
-   this->mpc_ActionSendToBack = this->mc_OrderObjectContextMenu.addAction(C_GtGetText::h_GetText(
-                                                                             "Send to Back"), this,
-                                                                          &C_SebBaseContextMenuManager::SigSendToBack);
+   this->mpc_ActionSendToBack = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
+                                                                  "Send to Back"), this,
+                                                               &C_SebBaseContextMenuManager::SigSendToBack);
 
    this->mpc_ActionDeleteSeparator = this->mc_ContextMenu.addSeparator();
 
-   this->mpc_ActionDelete = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText("Delete"),
-                                                           this, &C_SebBaseContextMenuManager::m_Delete,
+   this->mpc_ActionDelete = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText("Delete"), this,
+                                                           &C_SebBaseContextMenuManager::m_Delete,
                                                            static_cast<sintn>(Qt::Key_Delete));
 
    // connect signal to detect closing the context menu
    connect(&this->mc_ContextMenu, &C_OgeContextMenu::aboutToHide,
            this, &C_SebBaseContextMenuManager::m_ContextMenuClosed);
-
-   m_InsertBendLineActions(this->mpc_ActionOrderObjects);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -203,7 +191,8 @@ void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMe
          this->mpc_ActionCut->setVisible(true);
          this->mpc_ActionCopy->setVisible(true);
          this->mpc_ActionDelete->setVisible(true);
-         this->mpc_ActionOrderObjects->setVisible(true);
+         this->mpc_ActionBringToFront->setVisible(true);
+         this->mpc_ActionSendToBack->setVisible(true);
          this->mpc_ActionAlignment->setVisible(true);
          q_ShowMenu = true;
          //Get current guideline item for alignment
@@ -262,7 +251,8 @@ void C_SebBaseContextMenuManager::m_SetActionsInvisible(void)
    this->mpc_ActionPaste->setVisible(false);
    this->mpc_ActionDelete->setVisible(false);
    this->mpc_ActionSetupStyle->setVisible(false);
-   this->mpc_ActionOrderObjects->setVisible(false);
+   this->mpc_ActionBringToFront->setVisible(false);
+   this->mpc_ActionSendToBack->setVisible(false);
    this->mpc_ActionAlignment->setVisible(false);
    this->mpc_ActionBendLine->setVisible(false);
    this->mpc_ActionRemoveBendLine->setVisible(false);
@@ -287,20 +277,6 @@ bool C_SebBaseContextMenuManager::m_ItemTypeHasSetupStyle(const sintn osn_ItemTy
 void C_SebBaseContextMenuManager::m_ContextMenuClosed(void)
 {
    Q_EMIT this->SigContextMenuClosed();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Insert bend line actions after specified item
-
-   \param[in,out] opc_Action Add actions after this action
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SebBaseContextMenuManager::m_InsertBendLineActions(QAction * const opc_Action)
-{
-   this->mc_ContextMenu.removeAction(this->mpc_ActionBendLine);
-   this->mc_ContextMenu.removeAction(this->mpc_ActionRemoveBendLine);
-   this->mc_ContextMenu.insertAction(opc_Action, this->mpc_ActionBendLine);
-   this->mc_ContextMenu.insertAction(opc_Action, this->mpc_ActionRemoveBendLine);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

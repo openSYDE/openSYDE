@@ -243,13 +243,13 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>84</height>
+                    <height>68</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>84</height>
+                    <height>68</height>
                    </size>
                   </property>
                   <property name="tabChangesFocus">
@@ -552,7 +552,7 @@ p, li { white-space: pre-wrap; }
                 <number>0</number>
                </property>
                <property name="rightMargin">
-                <number>6</number>
+                <number>0</number>
                </property>
                <property name="bottomMargin">
                 <number>0</number>
@@ -732,299 +732,30 @@ p, li { white-space: pre-wrap; }
        <number>20</number>
       </property>
       <item>
-       <layout class="QGridLayout" name="pc_GridLayout">
+       <layout class="QGridLayout" name="pc_GridLayout" columnstretch="0,0,1,0,0,0">
         <property name="topMargin">
          <number>0</number>
         </property>
-        <property name="spacing">
+        <property name="verticalSpacing">
          <number>0</number>
         </property>
-        <item row="12" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_10">
-          <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCodeGenerator">
-            <property name="text">
-             <string>Code Generator</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="14" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_9">
-          <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelIDE">
-            <property name="text">
-             <string>IDE Call</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="12" column="3">
-         <spacer name="horizontalSpacer_16">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>5</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="4" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_8">
-          <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelProject">
-            <property name="text">
-             <string>Project</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="4" column="1">
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>15</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="4" column="3">
-         <spacer name="horizontalSpacer_8">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>5</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="6" column="1">
-         <spacer name="horizontalSpacer_7">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>15</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="6" column="4">
-         <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonOutputFile">
-          <property name="minimumSize">
-           <size>
-            <width>50</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <spacer name="horizontalSpacer_13">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>15</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="4" column="2">
-         <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditProject">
-          <property name="minimumSize">
-           <size>
-            <width>560</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>30</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="2">
-         <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditOutputFile">
-          <property name="minimumSize">
-           <size>
-            <width>560</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="cursorPosition">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_7">
-          <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelProcessID">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="text">
-             <string>Process ID</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="2" column="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
-          <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxProcessID">
-            <property name="minimumSize">
-             <size>
-              <width>120</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>30</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>0</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item row="6" column="3">
-         <spacer name="horizontalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>5</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="6" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelOutputFile">
-            <property name="text">
-             <string>Output File</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="3">
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>5</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="4" column="4">
-         <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonProject">
+         <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxProcessID">
           <property name="minimumSize">
            <size>
-            <width>50</width>
+            <width>120</width>
             <height>30</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
+            <width>120</width>
             <height>30</height>
            </size>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="text">
-           <string>...</string>
-          </property>
          </widget>
         </item>
-        <item row="0" column="0" colspan="5">
+        <item row="0" column="0" colspan="6">
          <layout class="QVBoxLayout" name="verticalLayout_18">
           <property name="bottomMargin">
            <number>6</number>
@@ -1133,308 +864,7 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </item>
-        <item row="8" column="3">
-         <spacer name="horizontalSpacer_18">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>5</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="14" column="3">
-         <spacer name="horizontalSpacer_14">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>5</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="8" column="4">
-         <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonCodeGenerate">
-          <property name="minimumSize">
-           <size>
-            <width>50</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="1">
-         <spacer name="horizontalSpacer_17">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>15</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="14" column="1">
-         <spacer name="horizontalSpacer_15">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>15</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="13" column="2">
-         <spacer name="pc_SpacerTools">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>12</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="5" column="2">
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>12</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="9" column="2">
-         <spacer name="verticalSpacer_8">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>18</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="14" column="2">
-         <widget class="stw_opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditIDE">
-          <property name="minimumSize">
-           <size>
-            <width>560</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="cursorPosition">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="2">
-         <spacer name="verticalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>12</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="12" column="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,0,0">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditCodeGenerator">
-            <property name="minimumSize">
-             <size>
-              <width>460</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::StrongFocus</enum>
-            </property>
-            <property name="cursorPosition">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_24">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>5</width>
-              <height>0</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonRevertToDefault">
-            <property name="minimumSize">
-             <size>
-              <width>120</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Revert to default</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="12" column="4">
-         <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_PushButtonCodeGenerator">
-          <property name="minimumSize">
-           <size>
-            <width>50</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="14" column="4">
-         <spacer name="horizontalSpacer_26">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>50</width>
-            <height>30</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="3" column="2">
-         <spacer name="pc_SpacerProject">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>12</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="8" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_11">
-          <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCodeGenerate">
-            <property name="text">
-             <string>Code Generate</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="8" column="1">
+        <item row="9" column="1">
          <spacer name="horizontalSpacer_20">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -1450,7 +880,77 @@ p, li { white-space: pre-wrap; }
           </property>
          </spacer>
         </item>
-        <item row="11" column="0" colspan="5">
+        <item row="4" column="1">
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>15</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="7" column="1">
+         <spacer name="horizontalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>15</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="8" column="2">
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>12</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="9" column="5">
+         <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonCodeGenerate">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0" colspan="6">
          <layout class="QVBoxLayout" name="verticalLayout_17">
           <property name="bottomMargin">
            <number>6</number>
@@ -1540,11 +1040,78 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </item>
-        <item row="8" column="2">
+        <item row="9" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCodeGenerate">
+          <property name="text">
+           <string>Code Generate</string>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCodeStructure">
+          <property name="text">
+           <string>Code Structure</string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelIDE">
+          <property name="text">
+           <string>IDE Call</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCodeGenerator">
+          <property name="text">
+           <string>Code Generator</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelOutputFile">
+          <property name="text">
+           <string>Output File</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2" colspan="2">
+         <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditProject">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="14" column="2">
+         <spacer name="pc_SpacerToolsTop">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>12</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="9" column="2" colspan="2">
          <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditCodeGenerate">
           <property name="minimumSize">
            <size>
-            <width>560</width>
+            <width>0</width>
             <height>30</height>
            </size>
           </property>
@@ -1562,6 +1129,394 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="cursorPosition">
            <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="2">
+         <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditCodeGenerator">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="cursorPosition">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="2" colspan="2">
+         <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditOutputFile">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="cursorPosition">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelProject">
+          <property name="text">
+           <string>Project</string>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="1">
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>15</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="4">
+         <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PubMenuProject">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>ABC</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="5">
+         <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonOutputFile">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="5">
+         <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonCodeGenerator">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="5">
+         <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonProject">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="1">
+         <spacer name="horizontalSpacer_15">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>15</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="16" column="2">
+         <spacer name="pc_SpacerToolsBottom">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>12</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="13" column="1">
+         <spacer name="horizontalSpacer_17">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>15</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="10" column="2">
+         <spacer name="verticalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>18</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="5" column="2">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>12</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="2">
+         <spacer name="pc_SpacerProject">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>12</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="13" column="4">
+         <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PubMenuCodeGenerator">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>ABC</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="4">
+         <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PubMenuOutputFile">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>ABC</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <spacer name="horizontalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>15</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="13" column="3">
+         <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PushButtonRevertToDefault">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>&lt;-</string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="2" colspan="4">
+         <widget class="stw_opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditIDE">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="cursorPosition">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="4">
+         <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PubMenuCodeGenerate">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>ABC</string>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="2">
+         <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxCode">
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>30</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelProcessID">
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="text">
+           <string>Process ID</string>
           </property>
          </widget>
         </item>
@@ -1689,25 +1644,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubSvgIconOnly.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupItem.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
-   <extends>QSpinBox</extends>
-   <header>C_OgeSpxNumber.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
@@ -1737,6 +1676,42 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLeFilePath</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLeFilePath.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLeProperties.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubOpen</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubOpen.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <extends>QTextEdit</extends>
+   <header>C_OgeTedPropertiesComment.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubSvgIconOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
+   <extends>QSpinBox</extends>
+   <header>C_OgeSpxNumber.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
    <header>C_OgeWiOnlyBackground.h</header>
@@ -1749,19 +1724,9 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
-   <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
    <extends>QLineEdit</extends>
    <header>C_OgeLePropertiesName.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubConfigure.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItemValue</class>
@@ -1769,14 +1734,14 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeLabGroupItemValue.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeFilePath</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeFilePath.h</header>
+   <class>stw_opensyde_gui_elements::C_OgePubPathVariables</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubPathVariables.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.h</header>
+   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
+   <extends>QComboBox</extends>
+   <header>C_OgeCbxText.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1785,13 +1750,20 @@ p, li { white-space: pre-wrap; }
   <tabstop>pc_PushButtonAddDataPool</tabstop>
   <tabstop>pc_ScrollAreaDataPools</tabstop>
   <tabstop>pc_PushButtonClearProject</tabstop>
-  <tabstop>pc_SpinBoxProcessID</tabstop>
   <tabstop>pc_LineEditProject</tabstop>
+  <tabstop>pc_PubMenuProject</tabstop>
   <tabstop>pc_PushButtonProject</tabstop>
   <tabstop>pc_LineEditOutputFile</tabstop>
+  <tabstop>pc_PubMenuOutputFile</tabstop>
   <tabstop>pc_PushButtonOutputFile</tabstop>
+  <tabstop>pc_LineEditCodeGenerate</tabstop>
+  <tabstop>pc_PubMenuCodeGenerate</tabstop>
+  <tabstop>pc_PushButtonCodeGenerate</tabstop>
   <tabstop>pc_LineEditCodeGenerator</tabstop>
   <tabstop>pc_PushButtonRevertToDefault</tabstop>
+  <tabstop>pc_PubMenuCodeGenerator</tabstop>
+  <tabstop>pc_PushButtonCodeGenerator</tabstop>
+  <tabstop>pc_LineEditIDE</tabstop>
   <tabstop>pc_PushButtonCancel</tabstop>
   <tabstop>pc_PushButtonOk</tabstop>
  </tabstops>

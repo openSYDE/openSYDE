@@ -37,7 +37,7 @@ protected:
    virtual void m_Restore(void) = 0;
    void m_StoreCommon(C_PuiBsElements & orc_Storage, QMap<C_PuiBsTemporaryDataID,
                                                           stw_types::uint64> & orc_MapTypeAndIndexToID,
-                      const C_PuiBsElements & orc_AllElements);
+                      const C_PuiBsElements & orc_AllElements) const;
 
    virtual stw_types::sint32 GetBoundaryType(void) const = 0;
    virtual stw_types::sint32 GetImageType(void) const = 0;

@@ -33,7 +33,8 @@ public:
    virtual ~C_OSCExportOsyInit(void);
 
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_FilePath, const C_OSCNode & orc_Node,
-                                               const bool oq_RunsDpd, const stw_types::uint16 ou16_ApplicationIndex);
+                                               const bool oq_RunsDpd, const stw_types::uint16 ou16_ApplicationIndex,
+                                               const stw_scl::C_SCLString & orc_ExportToolInfo = "");
 
 private:
    static bool mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSettings & orc_Settings);

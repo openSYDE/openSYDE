@@ -102,11 +102,12 @@ void C_SdManUnoTopologyReconnectBaseCommand::redo(void)
 /*! \brief   Get current bus connector
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiBusConnector * C_SdManUnoTopologyReconnectBaseCommand::m_GetBusConnector(void)
+C_GiLiBusConnector * C_SdManUnoTopologyReconnectBaseCommand::m_GetBusConnector(void) const
 {
    C_GiLiBusConnector * pc_Retval = NULL;
 
-   vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+   const vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+
    if (c_Items.size() > 0)
    {
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

@@ -12,7 +12,7 @@
 #define C_SYVDAUNOADDDELETEBASECOMMAND_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_PuiSvDashboard.h"
+#include "C_SyvDaDashboardSnapshot.h"
 #include "C_PuiSvReadDataConfiguration.h"
 #include "C_SebUnoAddDeleteBaseCommand.h"
 
@@ -28,8 +28,8 @@ class C_SyvDaUnoAddDeleteBaseCommand :
 {
 public:
    C_SyvDaUnoAddDeleteBaseCommand(QGraphicsScene * const opc_Scene, const std::vector<stw_types::uint64> & orc_IDs,
-                                  const QString & orc_Text, QUndoCommand * const opc_Parent = NULL,
-                                  const C_PuiSvDashboard & orc_InitialSnapshotData = C_PuiSvDashboard());
+                                  const QString & orc_Text, QUndoCommand * const opc_Parent = NULL, const C_SyvDaDashboardSnapshot & orc_InitialSnapshotData =
+                                     C_SyvDaDashboardSnapshot());
 
 protected:
    virtual void m_DeleteSave(void);
@@ -41,6 +41,9 @@ protected:
    virtual stw_types::sint32 GetLineArrowType(void) const;
    virtual stw_types::sint32 GetTextElementType(void) const;
 
+   void SetDataPositionOffset(const QPointF & orc_NewPos);
+   void SetDataZOffset(const stw_types::float64 of64_HighestUsedZValue);
+
    C_PuiSvDashboard GetDataBackup(void) const;
    stw_types::sint32 GetStoredReadRailCount(void) const;
    stw_types::sint32 AddReadRailToInternalBackup(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
@@ -48,7 +51,7 @@ protected:
 
 private:
    QMap<C_PuiBsTemporaryDataID, stw_types::uint64> mc_MapTypeAndIndexToID;
-   C_PuiSvDashboard mc_DataBackup;
+   C_SyvDaDashboardSnapshot mc_DataBackup;
    QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> mc_SavedRailAssignments;
 
    void m_SaveToData(void);

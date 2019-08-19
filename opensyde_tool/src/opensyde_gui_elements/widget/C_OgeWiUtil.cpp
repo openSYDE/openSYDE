@@ -442,7 +442,8 @@ QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString
                C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::eERROR);
                c_MessageBox.SetHeading(orc_Heading);
                c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                      "File name invalid. Only alphanumeric characters + \"_\" are allowed.")));
+                                                      "File name invalid. "
+                                                      "Only alphanumeric characters and \"_\" are allowed.")));
                c_MessageBox.Execute();
             }
          }

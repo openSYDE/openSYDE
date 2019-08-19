@@ -1,20 +1,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Artificial data generator (header)
-
-   See cpp file for detailed description
-
-   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
+   \brief       Snapshot of dashboard items
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_CAMMETTREEDATASOURCE_H
-#define C_CAMMETTREEDATASOURCE_H
+#ifndef C_SYVDADASHBOARDSNAPSHOT_H
+#define C_SYVDADASHBOARDSNAPSHOT_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QTimer>
-#include <QObject>
-#include "C_CamMetTreeLoggerData.h"
+#include "C_PuiSvDashboard.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -23,28 +18,14 @@ namespace stw_opensyde_gui_logic
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-class C_CamMetTreeDataSource :
-   public QObject
+class C_SyvDaDashboardSnapshot :
+   public C_PuiSvDashboard
 {
-   Q_OBJECT
-
 public:
-   explicit C_CamMetTreeDataSource(QObject * const opc_Parent = NULL);
+   C_SyvDaDashboardSnapshot(void);
 
-   void Start(void);
-
-   //The signals keyword is necessary for Qt signal slot functionality
-   //lint -save -e1736
-
-Q_SIGNALS:
-   //lint -restore
-   void SigInternalTrigger(void);
-   void SigNewData(const C_CamMetTreeLoggerData & orc_Data);
-
-private:
-   QTimer mc_Timer;
-
-   void m_GenerateNewData(void);
+   virtual void SetDataPositionOffset(const QPointF & orc_NewPos) override;
+   virtual void SetDataZOffset(const stw_types::float64 of64_HighestUsedZValue) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

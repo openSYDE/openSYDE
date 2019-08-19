@@ -558,6 +558,8 @@ void C_SyvTopologyBaseScene::m_AddPcBusConnector(const C_GiLiBus * const opc_Bus
       //Create and add bus connection
       C_GiSvPcBusConnector * const pc_PcBusConnection = new C_GiSvPcBusConnector(
          this->m_GetNewUniqueID(), this->mu32_ViewIndex, c_UIInteractionPoints, opc_Bus, opc_Pc);
+      //Update Z value
+      pc_PcBusConnection->RestoreZOrder();
       //Save/Update
       pc_PcBusConnection->UpdateData();
       m_AddPcBusConnectorToScene(pc_PcBusConnection);
@@ -657,6 +659,8 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
                   {
                      pc_LastBus = pc_Item;
                   }
+                  //It's unlikely there is another bus with the same index
+                  break;
                }
             }
          }
@@ -694,6 +698,9 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
                      orc_BusName = pc_ValidBus->GetName();
                   }
                   q_Retval = true;
+                  //Update Z value
+                  // (misuse of interface does no update of z value as the class thinks it has already the right one)
+                  pc_PcConnector->RestoreZOrder();
                   //Save/Update
                   pc_PcConnector->UpdateData();
                }

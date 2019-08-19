@@ -12,8 +12,12 @@
 #define C_OGECHAVIEWBASE_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <QPoint>
 #include <QChartView>
 #include <QChart>
+//#include <QRubberBand>
+
+#include "stwtypes.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
@@ -28,9 +32,26 @@ class C_OgeChaViewBase :
    Q_OBJECT
 
 public:
+   enum E_SettingZoomMode
+   {
+      eSETTING_ZM_XY,
+      eSETTING_ZM_X,
+      eSETTING_ZM_Y
+   };
+
    C_OgeChaViewBase(QtCharts::QChart * const opc_Chart, QWidget * const opc_Parent = NULL);
 
    void SetDrawingActive(const bool oq_Active);
+   void SetZoomMode(const E_SettingZoomMode oe_ZoomMode);
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   //lint -restore
+   void SigYZoomed(const stw_types::float64 of64_Factor) const;
+   void SigScrolled(const stw_types::float64 of64_X, const stw_types::float64 of64_Y) const;
+   void SigZoomReseted(void) const;
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -50,6 +71,12 @@ private:
    bool mq_DragMoveActive;
    bool mq_DrawingActive;
    QPointF mc_DragMovePos;
+   QPoint mc_RubberBandStartPos;
+   E_SettingZoomMode me_ZoomMode;
+   //QRubberBand * mpc_RubberBand;
+
+   void m_Zoom(const bool oq_ZoomIn, const QPointF & orc_ZoomPos) const;
+   void m_Scroll(const QPointF & orc_Start, const QPointF & orc_End) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -14,19 +14,19 @@
 #ifndef C_OSCPROTOCOLDRIVEROSYTPIPH
 #define C_OSCPROTOCOLDRIVEROSYTPIPH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include "stwtypes.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "C_OSCIpDispatcher.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCProtocolDriverOsyTpIp :
    public C_OSCProtocolDriverOsyTpBase
@@ -142,7 +142,7 @@ public:
                                        const stw_types::uint8 (*const opau8_SerialNumber)[6] = NULL) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

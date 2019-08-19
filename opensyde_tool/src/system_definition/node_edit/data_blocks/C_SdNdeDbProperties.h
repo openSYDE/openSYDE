@@ -62,11 +62,16 @@ private:
    std::vector<stw_types::uint32> mc_SelectedDataPools;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
+   static const stw_types::sintn mhsn_VERSION_INDEX_V1;
+   static const stw_types::sintn mhsn_VERSION_INDEX_V2;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
    QString m_CheckName(void) const;
    QString m_CheckID(void) const;
+   QString m_CheckPaths(void) const;
+   QString m_CheckPath(const QString & orc_Path) const;
+   QString m_GetDialogPath(const QString & orc_CurrentPath) const;
 
    void m_LoadData(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex);
    void m_LoadFromData(const stw_opensyde_core::C_OSCNodeApplication & orc_Application);
@@ -77,6 +82,7 @@ private:
    void m_OnClickGenerator(void);
    void m_OnClickGenerate(void);
    void m_OnClickClearProject(void) const;
+
    void m_OnNameEdited(void) const;
    void m_OnProcessIDChanged(void) const;
 

@@ -39,6 +39,7 @@ public:
    static C_PuiProject * h_GetInstance(void);
    static void h_Destroy(void);
    static stw_types::uint64 h_GetProjectSize(const QString & orc_ProjectPath);
+   stw_types::sint32 LoadInitialProject(stw_types::uint16 * const opu16_FileVersion, QString & rc_LoadedProject);
    void LoadEmpty(void);
    bool IsEmptyProject(void) const;
    static void h_HandlePendingEvents(void);
@@ -59,7 +60,6 @@ private:
    static void mh_AdaptProjectPathToSystemViewsV1(const QString & orc_ProjectPath, QString & orc_SystemViewsPath);
    static void mh_AdaptProjectPathToSystemDefinitionV2(const QString & orc_ProjectPath,
                                                        QString & orc_SystemDefintionPath);
-   void m_InitialProjectLoad(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

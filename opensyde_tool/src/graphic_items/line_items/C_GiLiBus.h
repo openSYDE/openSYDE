@@ -59,6 +59,9 @@ public:
    virtual void GenerateHint(void);
    virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem) override;
 
+   //GI base
+   virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
+
    virtual void SetDisabledLook(const bool oq_Disabled) override;
    void ApplyStyle(const QColor & orc_LineColor, const stw_types::sintn osn_Width);
    virtual void CheckBusForChanges(void);

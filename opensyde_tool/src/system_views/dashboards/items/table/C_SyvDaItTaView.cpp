@@ -19,7 +19,7 @@
 #include "C_OgeWiUtil.h"
 #include "C_PuiSdHandler.h"
 #include "C_SyvDaItTaView.h"
-#include "C_SdNdeDataPoolListTableHeaderView.h"
+#include "C_SyvDaItTableHeaderView.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -74,7 +74,7 @@ C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, Q
    this->setFrameShape(QAbstractItemView::Shape::NoFrame);
    this->setEditTriggers(EditTrigger::NoEditTriggers);
    //Consider all elements for resize
-   this->setHorizontalHeader(new C_SdNdeDataPoolListTableHeaderView(Qt::Horizontal));
+   this->setHorizontalHeader(new C_SyvDaItTableHeaderView(Qt::Horizontal));
    this->horizontalHeader()->setStretchLastSection(false);
    this->horizontalHeader()->setFixedHeight(27);
    this->horizontalHeader()->setMinimumSectionSize(4);
@@ -149,15 +149,23 @@ void C_SyvDaItTaView::UpdateTransparence(const uint32 ou32_DataElementIndex, con
 void C_SyvDaItTaView::AddItem(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
 {
    const QModelIndexList c_IndexList = this->selectedIndexes();
+   const uint32 u32_NewItem = this->mc_Model.AddItem(c_IndexList, orc_DataPoolElementId);
 
-   this->mc_Model.AddItem(c_IndexList, orc_DataPoolElementId);
+   // select new item
+   this->selectRow(u32_NewItem);
+}
 
-   // select last inserted item if there was a selection before adding
-   if (c_IndexList.isEmpty() == false)
-   {
-      // new item got inserted after (+1) last selected row (last())
-      this->selectRow(c_IndexList.last().row() + 1);
-   }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Move selected items
+
+   \param[in] oq_Up Flag to switch to move one step up or down
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaView::MoveSelected(const bool oq_Up)
+{
+   const QModelIndexList c_IndexList = this->selectedIndexes();
+
+   this->mc_Model.MoveItems(c_IndexList, oq_Up);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -262,7 +270,7 @@ void C_SyvDaItTaView::SetSelectionAvailable(const bool oq_Active)
 {
    if (oq_Active == true)
    {
-      this->setSelectionMode(QAbstractItemView::SingleSelection);
+      this->setSelectionMode(QAbstractItemView::ExtendedSelection);
    }
    else
    {

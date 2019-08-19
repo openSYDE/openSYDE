@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -19,7 +19,7 @@
 #include "C_OSCFlashProtocolStwFlashloader.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
@@ -27,19 +27,19 @@ using namespace stw_diag_lib;
 using namespace stw_tgl;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   constructor
 
    Set up class
@@ -47,7 +47,7 @@ using namespace stw_scl;
    \param[in]  opr_Progress  function to call when reporting progress
    \param[in]  opv_Instance  instance pointer to pass as parameter when reporting progress
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCFlashProtocolStwFlashloader::C_OSCFlashProtocolStwFlashloader(const PR_ReportProgress opr_Progress,
                                                                    void * const opv_Instance) :
    C_XFLFlashWrite(),
@@ -56,19 +56,19 @@ C_OSCFlashProtocolStwFlashloader::C_OSCFlashProtocolStwFlashloader(const PR_Repo
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   destructor
 
    Tear down class
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
 {
    mpr_ReportProgress = NULL;
    mpv_ReportProgressInstance = NULL;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   report progress to application
 
    Convert progress information from STW Flashloader driver to openSYDE format and invoke installed reporting function
@@ -80,7 +80,7 @@ C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
    C_NO_ERR    continue operation
    else        abort operation (not honored at each position)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Progress1_1000,
                                                             const C_SCLString & orc_AdditionalText)
 {
@@ -94,7 +94,7 @@ sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Pr
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   report status to application
 
    Convert status information from STW Flashloader driver to openSYDE format and invoke installed reporting function
@@ -102,7 +102,7 @@ sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Pr
    \param[in]   orc_Text          textual information about status
    \param[in]   ou8_Type          type of reported status (see gu8_DL_REPORT_STATUS_TYPE_* constants)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCFlashProtocolStwFlashloader::TRG_ReportStatus(const C_SCLString & orc_Text, const uint8 ou8_Type)
 {
    if (mpr_ReportProgress != NULL)

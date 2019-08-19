@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Line edit field for file paths with minimizing file path handling (header)
+   \brief       Line edit field for file paths (header)
 
    See cpp file for detailed description
 
@@ -12,7 +12,7 @@
 #define C_OGELEFILEPATH_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_OgeLeProperties.h"
+#include "C_OgeLeFilePathBase.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
@@ -22,26 +22,20 @@ namespace stw_opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeLeFilePath :
-   public C_OgeLeProperties
+   public C_OgeLeFilePathBase
 {
    Q_OBJECT
 
 public:
    explicit C_OgeLeFilePath(QWidget * const opc_Parent = NULL);
 
-   void SetPath(const QString & orc_New, const QString & orc_RelativeTo = "");
-   QString GetPath(void) const;
+   void SetDbProjectPath(const QString & orc_DbPath);
 
 protected:
-   virtual void focusInEvent(QFocusEvent * const opc_Event) override;
-   virtual void focusOutEvent(QFocusEvent * const opc_Event) override;
-   virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
+   virtual QString m_ResolveVariables(const QString & orc_Path) override;
 
 private:
-   QString mc_Path;
-   QString mc_RelativeTo;
-
-   void m_SetToolTip(const QString & orc_AbsoluteFilePath);
+   QString mc_DbProjectPath;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

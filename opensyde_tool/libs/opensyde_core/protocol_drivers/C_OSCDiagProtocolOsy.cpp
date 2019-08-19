@@ -492,6 +492,7 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteFinalizeTransaction(void)
 
    \param[in]  ou8_DataPoolIndex   Data pool index
    \param[out] orau8_Version       Read version; format: see function description
+   \param[out] opu8_NrCode         if != NULL: negative response code in case of an error response
 
    \return
    C_NO_ERR   request sent, positive response received
@@ -502,18 +503,60 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteFinalizeTransaction(void)
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3])
+sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3],
+                                                 stw_types::uint8 * const opu8_NrCode)
 {
    sint32 s32_Retval;
    C_DataPoolMetaData c_MetaData;
 
-   s32_Retval = this->OsyReadDataPoolMetaData(ou8_DataPoolIndex, c_MetaData);
+   s32_Retval = this->OsyReadDataPoolMetaData(ou8_DataPoolIndex, c_MetaData, opu8_NrCode);
 
    if (s32_Retval == C_NO_ERR)
    {
       orau8_Version[0] = c_MetaData.au8_Version[0];
       orau8_Version[1] = c_MetaData.au8_Version[1];
       orau8_Version[2] = c_MetaData.au8_Version[2];
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read Datapool meta data
+
+   Version format: One byte for Major, Minor, Release
+
+   Example: v1.23r4 in 3 Bytes   -> (0x01, 0x17, 0x04)
+
+   \param[in]  ou8_DataPoolIndex   Datapool index
+   \param[out] orau8_Version       Read version; format: see function description
+   \param[out] orc_Name            Read name of Datapool
+   \param[out] opu8_NrCode         if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received; or: no action required
+   C_RANGE    data pool index is zero
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not send protocol request
+   C_CONFIG   CAN dispatcher not installed
+   C_WARN     error response
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCDiagProtocolOsy::DataPoolReadMetaData(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3],
+                                                  stw_scl::C_SCLString & orc_Name, stw_types::uint8 * const opu8_NrCode)
+{
+   sint32 s32_Retval;
+   C_DataPoolMetaData c_MetaData;
+
+   s32_Retval = this->OsyReadDataPoolMetaData(ou8_DataPoolIndex, c_MetaData, opu8_NrCode);
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      orau8_Version[0] = c_MetaData.au8_Version[0];
+      orau8_Version[1] = c_MetaData.au8_Version[1];
+      orau8_Version[2] = c_MetaData.au8_Version[2];
+
+      orc_Name = c_MetaData.c_Name;
    }
 
    return s32_Retval;

@@ -82,7 +82,7 @@ C_SebUnoBaseCommand::~C_SebUnoBaseCommand(void)
    else: pointer to item
 */
 //----------------------------------------------------------------------------------------------------------------------
-vector<QGraphicsItem *> C_SebUnoBaseCommand::m_GetSceneItems(void)
+vector<QGraphicsItem *> C_SebUnoBaseCommand::m_GetSceneItems(void) const
 {
    vector<QGraphicsItem *> c_Retval;
    c_Retval.resize(this->mc_IDs.size(), NULL);
@@ -103,13 +103,14 @@ vector<QGraphicsItem *> C_SebUnoBaseCommand::m_GetSceneItems(void)
    else: pointer to item
 */
 //----------------------------------------------------------------------------------------------------------------------
-QGraphicsItem * C_SebUnoBaseCommand::m_GetSceneItem(const uint64 & oru64_ID)
+QGraphicsItem * C_SebUnoBaseCommand::m_GetSceneItem(const uint64 & oru64_ID) const
 {
    QGraphicsItem * pc_Retval;
 
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   stw_opensyde_gui::C_SebScene * const pc_DetailedScene =
-      dynamic_cast<stw_opensyde_gui::C_SebScene * const>(mpc_Scene);
+   const stw_opensyde_gui::C_SebScene * const pc_DetailedScene =
+      dynamic_cast<const stw_opensyde_gui::C_SebScene * const>(mpc_Scene);
+
    if (pc_DetailedScene != NULL)
    {
       pc_Retval = pc_DetailedScene->GetItemByID(oru64_ID);

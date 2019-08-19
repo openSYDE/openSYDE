@@ -15,12 +15,13 @@
 
 #include "stwtypes.h"
 
-#include "C_GiPointInteraction.h"
-#include "C_GiBiConnectableItem.h"
-#include "C_GiBiSizeableItem.h"
 #include "C_PuiBsBox.h"
-#include "C_GiBiCustomMouseItem.h"
 #include "C_GiUnique.h"
+#include "C_GiBiBase.h"
+#include "C_GiBiSizeableItem.h"
+#include "C_GiPointInteraction.h"
+#include "C_GiBiCustomMouseItem.h"
+#include "C_GiBiConnectableItem.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -33,6 +34,7 @@ class C_GiBiRectBaseGroup :
    public C_GiBiConnectableItem,
    public stw_opensyde_gui_logic::C_GiUnique,
    public C_GiBiCustomMouseItem,
+   public C_GiBiBase,
    public QGraphicsItemGroup
 {
    Q_OBJECT
@@ -57,6 +59,9 @@ public:
    virtual QRectF boundingRect() const;
    QRectF GetVisibleBoundingRect() const;
    virtual void FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const;
+
+   //GI base
+   virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
 
    void SetResizing(const bool oq_Active);
    QSizeF GetSize(void) const;

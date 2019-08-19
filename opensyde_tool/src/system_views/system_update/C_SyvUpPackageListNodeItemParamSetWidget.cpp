@@ -200,9 +200,27 @@ void C_SyvUpPackageListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_
       }
       else
       {
-         const QString c_Details = QString(C_GtGetText::h_GetText("File path: %1")).arg(this->GetAppAbsoluteFilePath());
+         QString c_Details = QString(C_GtGetText::h_GetText("File path: %1")).arg(this->GetAppAbsoluteFilePath()) +
+                             "\nReason: ";
          //New file cannot be read
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+         switch (s32_ReadResult)
+         {
+         case C_RD_WR:
+            c_Details += C_GtGetText::h_GetText(
+               "File does not exist or has invalid structure. See log file for details.");
+            break;
+         case C_CHECKSUM:
+            c_Details += C_GtGetText::h_GetText("File CRC is not correct.");
+            break;
+         case C_CONFIG:
+            c_Details += C_GtGetText::h_GetText("File has missing content. See log file for details.");
+            break;
+         default:
+            c_Details += QString(C_GtGetText::h_GetText("Unknown reason. Error code: %1")).arg(s32_ReadResult);
+            break;
+         }
+
          c_Message.SetHeading(C_GtGetText::h_GetText("Update package configuration"));
          c_Message.SetDescription(C_GtGetText::h_GetText("File is not a valid parameter set image file."));
          c_Message.SetDetails(c_Details);

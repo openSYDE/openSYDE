@@ -243,7 +243,7 @@ void C_GiLiBusConnectorBase::RestoreZOrder(void)
 
    if ((pc_Bus != NULL) && (pc_Item != NULL))
    {
-      this->setZValue(std::min(pc_Bus->zValue(), pc_Item->zValue()) - 1.0);
+      this->SetZValueCustom(std::min(pc_Bus->zValue(), pc_Item->zValue()) - 1.0);
    }
 }
 
@@ -289,6 +289,18 @@ void C_GiLiBusConnectorBase::RevertBus(const stw_opensyde_gui::C_GiLiBus * const
    this->m_SetBus(opc_StartingBus);
    m_UpdateConnection(orc_ScenePos);
    m_Reconnect();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiLiBusConnectorBase::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiLiLineGroup::SetZValueCustom(of64_ZValue);
+   //For bus connectors no data update should happen for the z value
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -427,8 +439,11 @@ void C_GiLiBusConnectorBase::m_UpdateBus(const QPointF & orc_Pos, const C_GiLiBu
    if (this->GetBusItem() != NULL)
    {
       //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
-      disconnect(this->GetBusItem(), &C_GiLiBus::ChangedGraphic,
+      disconnect(this->GetBusItem(), &C_GiLiBus::SigChangedGraphic,
                  this, &C_GiLiBusConnectorBase::m_UpdateExternal);
+      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
+      disconnect(this->GetBusItem(), &C_GiLiBus::SigChangedZOrder,
+                 this, &C_GiLiBusConnectorBase::RestoreZOrder);
    }
    this->m_SetBus(opc_BusItem);
    if (this->GetBusItem() != NULL)
@@ -439,8 +454,11 @@ void C_GiLiBusConnectorBase::m_UpdateBus(const QPointF & orc_Pos, const C_GiLiBu
       c_Lines = this->GetBusItem()->GetLines();
       ms32_KnownLineCount = c_Lines.size();
       //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
-      connect(this->GetBusItem(), &C_GiLiBus::ChangedGraphic,
+      connect(this->GetBusItem(), &C_GiLiBus::SigChangedGraphic,
               this, &C_GiLiBusConnectorBase::m_UpdateExternal);
+      //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
+      connect(this->GetBusItem(), &C_GiLiBus::SigChangedZOrder,
+              this, &C_GiLiBusConnectorBase::RestoreZOrder);
       m_UpdateConnection(orc_Pos);
    }
 }
@@ -590,7 +608,7 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       //lint -e{740}  no problem because of common base class
       const QGraphicsItem * const pc_Item = dynamic_cast<const QGraphicsItem *>(this->mpc_GenericSignalItem);
-      disconnect(this, &C_GiLiBusConnectorBase::ChangedGraphic, this, &C_GiLiBusConnectorBase::m_UpdateInternal);
+      disconnect(this, &C_GiLiBusConnectorBase::SigChangedGraphic, this, &C_GiLiBusConnectorBase::m_UpdateInternal);
       //Moved by other element
       //Check connections
 
@@ -613,7 +631,7 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
             m_UpdatePointBus();
          }
       }
-      connect(this, &C_GiLiBusConnectorBase::ChangedGraphic, this, &C_GiLiBusConnectorBase::m_UpdateInternal);
+      connect(this, &C_GiLiBusConnectorBase::SigChangedGraphic, this, &C_GiLiBusConnectorBase::m_UpdateInternal);
    }
    else if (this->me_ActiveResizeMode == C_GiLiBusConnectorBase::eLINE)
    {
@@ -624,7 +642,7 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
          if (((this->mpc_GenericPositionItem != NULL) && (this->GetBusItem() != NULL)) &&
              (this->mpc_GenericSignalItem != NULL))
          {
-            disconnect(this, &C_GiLiBusConnectorBase::ChangedGraphic,
+            disconnect(this, &C_GiLiBusConnectorBase::SigChangedGraphic,
                        this, &C_GiLiBusConnectorBase::m_UpdateInternal);
             if (this->mc_Points.size() >= 2)
             {
@@ -654,7 +672,7 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
                   }
                }
             }
-            connect(this, &C_GiLiBusConnectorBase::ChangedGraphic,
+            connect(this, &C_GiLiBusConnectorBase::SigChangedGraphic,
                     this, &C_GiLiBusConnectorBase::m_UpdateInternal);
          }
       }
@@ -783,14 +801,18 @@ void C_GiLiBusConnectorBase::m_UpdateGenericItem(C_GiBiConnectableItem * const o
 {
    if (this->mpc_GenericSignalItem != NULL)
    {
-      disconnect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::ChangedGraphic,
+      disconnect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedGraphic,
                  this, &C_GiLiBusConnectorBase::m_UpdateExternal);
+      disconnect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedZOrder,
+                 this, &C_GiLiBusConnectorBase::RestoreZOrder);
    }
    this->mpc_GenericSignalItem = opc_NewItem;
    if (this->mpc_GenericSignalItem != NULL)
    {
-      connect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::ChangedGraphic,
+      connect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedGraphic,
               this, &C_GiLiBusConnectorBase::m_UpdateExternal);
+      connect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedZOrder,
+              this, &C_GiLiBusConnectorBase::RestoreZOrder);
    }
 }
 
@@ -834,9 +856,8 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
             bool q_FoundBus = false;
             bool q_RestoreMouseCursor = true;
             const QPointF c_CurPos = this->mc_Points[this->msn_ActiveItemIndex]->scenePos();
-            QList<QGraphicsItem *> c_All = this->scene()->items();
-
-            for (QList<QGraphicsItem *>::iterator c_ItItem = c_All.begin(); c_ItItem != c_All.end(); ++c_ItItem)
+            const QList<QGraphicsItem *> c_All = this->scene()->items();
+            for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_All.begin(); c_ItItem != c_All.end(); ++c_ItItem)
             {
                QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(c_ItItem.operator *());
                //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -851,6 +872,8 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
                      {
                         this->mc_Points[this->msn_ActiveItemIndex]->setCursor(pc_Bus->cursor());
                         q_RestoreMouseCursor = false;
+                        //Stop after connectable item found under cursor
+                        break;
                      }
                   }
                }
@@ -876,6 +899,12 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
                      }
                   }
                   m_OnIterationBusInteractionPointMoveCleanUp(pc_Parent, q_RestoreMouseCursor);
+                  //Stop after connectable item found under cursor
+                  if (q_RestoreMouseCursor == false)
+                  {
+                     //lint -e{1960} Loop has to stop here
+                     break;
+                  }
                }
             }
             if (this->msn_ActiveItemIndex == m_GetBusInteractionIndex())
@@ -900,7 +929,7 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
 
    Active:
    * Iteration over current scene items
-   * Bus interation point moving
+   * Bus interaction point moving
    * After any other handling is done
 
    \param[in,out] opc_HighestParentItem  Highest parent of current item
@@ -1081,7 +1110,7 @@ void C_GiLiBusConnectorBase::m_UpdateLastKnownBusPoints(void)
 void C_GiLiBusConnectorBase::m_CommonInit(void)
 {
    // connect
-   connect(this, &C_GiLiBusConnectorBase::ChangedGraphic, this, &C_GiLiBusConnectorBase::m_UpdateInternal);
+   connect(this, &C_GiLiBusConnectorBase::SigChangedGraphic, this, &C_GiLiBusConnectorBase::m_UpdateInternal);
 
    //Allow hover events for tool tip hide
    this->setAcceptHoverEvents(true);

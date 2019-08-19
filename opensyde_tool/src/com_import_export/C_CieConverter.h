@@ -63,12 +63,16 @@ public:
    ///information about messages
    struct C_CIECanSignal
    {
-      stw_opensyde_core::C_OSCCanSignal::E_ByteOrderType e_ComByteOrder;    ///< Communication value byte order
-      stw_types::uint16 u16_ComBitLength;                                   ///< Communication value bit length
-      stw_types::uint16 u16_ComBitStart;                                    ///< Communication value bit start position
-      C_CIEDataPoolElement c_Element;                                       ///< Communication data pool element
-      std::map<stw_types::uint32, stw_scl::C_SCLString> c_ValueDescription; ///< Optional communication value
-                                                                            // descriptions
+      stw_opensyde_core::C_OSCCanSignal::E_ByteOrderType e_ComByteOrder;      ///< Communication value byte order
+      stw_types::uint16 u16_ComBitLength;                                     ///< Communication value bit length
+      stw_types::uint16 u16_ComBitStart;                                      ///< Communication value bit start
+                                                                              // position
+      C_CIEDataPoolElement c_Element;                                         ///< Communication data pool element
+      std::map<stw_types::uint32, stw_scl::C_SCLString> c_ValueDescription;   ///< Optional communication value
+                                                                              // descriptions
+      stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType e_MultiplexerType; ///< Signal multiplexer type
+      stw_types::uint16 u16_MultiplexValue;                                   ///< Only used if eMULTIPLEXED_SIGNAL
+      ///< Multiplexer value if this signal should be present and represents the associated multiplex group
    };
 
    struct C_CIECanMessage
@@ -82,22 +86,8 @@ public:
       stw_opensyde_core::C_OSCCanMessage::E_TxMethodType e_TxMethod; ///< Message transmission trigger type
       stw_types::uint32 u32_CycleTimeMs;                             ///< ONLY used if transmission trigger is
                                                                      // eTX_METHOD_CYCLIC
-      ///< or eTX_METHOD_CYCLIC_ON_CHANGE.
-      ///< Format is in milli seconds.
-      ///< Time between transmissions.
-      ///< Probably the range is 1 to 50000 ms.
-      //      stw_types::uint16 u16_DelayTimeMs;     ///< Minimum time between transmission in ms.
-      //                                             ///< ONLY used if tx method is eTX_METHOD_ON_CHANGE
-      //                                             ///< or eTX_METHOD_CYCLIC_ON_CHANGE. ->UR: unused
-      std::vector<C_CIECanSignal> c_Signals; ///< Communication signals
+      std::vector<C_CIECanSignal> c_Signals;                         ///< Communication signals
    };
-
-   //   struct C_CIEDataPoolList
-   //   {
-   //      std::vector<C_CIEDataPoolListElement> c_Elements;  ///< List variables
-   //      std::vector<C_OSCNodeDataPoolDataSet> c_DataSets;  ///< Data sets
-
-   //   };
 
    /// Messages and appropriate warnings
    struct C_CIENodeMessage

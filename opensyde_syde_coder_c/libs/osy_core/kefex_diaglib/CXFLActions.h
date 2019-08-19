@@ -21,7 +21,7 @@
 namespace stw_diag_lib
 {
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///One parameter for divert stream mechanism
 class C_XFLDivertParameter
 {
@@ -31,7 +31,7 @@ public:
    stw_types::uint16 u16_ParameterValue; ///current value of parameter
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///General parameter definition for divert stream mechanism
 class C_XFLDivertParameters
 {
@@ -48,7 +48,7 @@ public:
    stw_types::sint32 SaveToINI(stw_scl::C_SCLIniFile & orc_IniFile, const stw_scl::C_SCLString & orc_Section);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Parameters for divert stream CAN target busses
 class C_XFLDivertParametersCAN : public C_XFLDivertParameters
 {
@@ -90,7 +90,7 @@ public:
    void SetValueTargetIDExtended(const stw_types::uint32 ou32_ID);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about one node found by "searching" for it on the bus
 class C_XFLFoundNode
 {
@@ -102,7 +102,7 @@ public:
    bool q_Selected;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about one flash memory region
 class C_XFLFlashRegionInformation
 {
@@ -111,7 +111,7 @@ public:
    stw_types::uint16 u16_NumBlocks;   ///< number of blocks in this region (i.e. blocks of the same size)
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about one flash IC
 class C_XFLFlashICInformation
 {
@@ -125,7 +125,7 @@ public:
    stw_types::uint16 GetNumberOfSectors(void) const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about one flash memory sector
 class C_XFLFlashSector
 {
@@ -138,7 +138,7 @@ public:
    bool IsAddressWithinSector(const stw_types::uint32 ou32_Address) const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about a number of flash memory sectors
 class C_XFLFlashSectors : public stw_scl::SCLDynamicArray<C_XFLFlashSector>
 {
@@ -147,7 +147,7 @@ public:
       const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about server's flash memory layout and protected sectors
 class C_XFLFlashInformation
 {
@@ -162,7 +162,7 @@ public:
    void ConvertToFlashSectorTable(C_XFLFlashSectors & orc_Sectors) const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///which features are available (one layer of abstraction above T_XFL_ImplementedServices)
 //lint -sem(stw_diag_lib::C_XFLFeaturesAvailable::Clear,initializer)
@@ -186,7 +186,7 @@ public:
    bool q_DeviceInfo;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///finger print information that can be read from a flashloader server
 class C_XFLFingerPrintInformationFromServer
@@ -210,7 +210,7 @@ public:
    bool q_ChecksumValid;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///all the stuff that can be read from a flashloader server:
 class C_XFLInformationFromServer
@@ -270,7 +270,7 @@ public:
    bool q_SMMWriteTimeoutFactorValid;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about one checksum area
 class C_XFLChecksumArea
 {
@@ -281,7 +281,7 @@ public:
    bool q_CheckAfterFlashing;          ///< true: flashloader shall check checksum against flash content after flashing
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about all checksum areas
 class C_XFLChecksumAreas
 {
@@ -291,7 +291,7 @@ public:
    bool q_IsBlockBased; ///< false -> sector based
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Defines how the server node shall be addressed during wakeup
 enum E_XFLWakeupMode
 {
@@ -302,7 +302,7 @@ enum E_XFLWakeupMode
    eXFL_WAKEUP_MODE_NO_WAKEUP     ///< do not perform any wakeup (can be used if the node is already in wakeup mode)
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Parameters for performing an ECU wakeup
 class STW_DIAGLIB_EXPORT C_XFLWakeupParameters
 {
@@ -325,7 +325,7 @@ public:
    stw_scl::C_SCLString c_CompanyID; ///< target node's company ID (2,3 or 5 characters)
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Higher level comfort layer on top of the flashloader protocol driver
 class STW_DIAGLIB_EXPORT C_XFLActions : public C_XFLProtocol
 {
@@ -375,10 +375,10 @@ public:
                                                       const stw_types::uint8 ou8_ErrorCode);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #endif

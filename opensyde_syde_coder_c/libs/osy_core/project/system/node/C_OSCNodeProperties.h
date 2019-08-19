@@ -11,7 +11,7 @@
 #ifndef C_OSCNODEPROPERTIES_H
 #define C_OSCNODEPROPERTIES_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <vector>
 #include "CSCLString.h"
@@ -20,12 +20,12 @@
 #include "C_OSCNodeOpenSydeServerSettings.h"
 #include "C_OSCDeviceDefinition.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCNodeProperties
 {
@@ -70,7 +70,7 @@ public:
    C_OSCNodeStwFlashloaderSettings c_STWFlashloaderSettings;   ///< Optional STW flashloader settings
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

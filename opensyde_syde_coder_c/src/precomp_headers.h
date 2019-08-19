@@ -18,7 +18,7 @@
 //lint -esym(766,"precomp_headers.h")   effectively not used in lint "builds"; but that's exactly what we want
 #ifndef _lint //speed up linting: don't include all of the headers for each linted .cpp file
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 /* Add C includes here */
 

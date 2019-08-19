@@ -16,19 +16,19 @@
 #ifndef C_OSCPROTOCOLDRIVEROSYTPBASE
 #define C_OSCPROTOCOLDRIVEROSYTPBASE
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include <deque>
 #include "stwtypes.h"
 #include "TGLTasks.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///container for one openSYDE protocol service
 class C_OSCProtocolDriverOsyService
@@ -43,7 +43,7 @@ public:
    bool q_CanTransferWithoutFlowControl; // Flag if service shall use openSYDE Multi Frame transfer
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///identifier of one node
 class C_OSCProtocolDriverOsyNode
 {
@@ -64,7 +64,7 @@ public:
    bool operator < (const C_OSCProtocolDriverOsyNode & orc_Cmp) const;
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///interface class
 class C_OSCProtocolDriverOsyTpBase
 {
@@ -129,9 +129,11 @@ public:
    virtual stw_types::sint32 Cycle(void) = 0;
    virtual stw_types::sint32 SetNodeIdentifiers(const C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,
                                                 const C_OSCProtocolDriverOsyNode & orc_ServerIdentifier);
+   virtual void GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,
+                                   C_OSCProtocolDriverOsyNode & orc_ServerIdentifier);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

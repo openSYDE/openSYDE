@@ -11,7 +11,7 @@
 #ifndef C_OSCCOMLOGGERPROTOCOLOPENSYDE_H
 #define C_OSCCOMLOGGERPROTOCOLOPENSYDE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <list>
 
 #include "CSCLString.h"
@@ -19,12 +19,12 @@
 #include "CCMONProtocolOpenSYDE.h"
 #include "C_OSCComMessageLoggerOsySysDefConfig.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCComLoggerProtocolOpenSYDE :
    public stw_cmon_protocol::C_CMONProtocolOpenSYDE
@@ -46,7 +46,7 @@ protected:
    std::list<const C_OSCComMessageLoggerOsySysDefConfig *> mc_SysDefConfigs;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

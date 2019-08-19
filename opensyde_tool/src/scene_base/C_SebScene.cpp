@@ -30,6 +30,7 @@
 #include "TGLUtils.h"
 #include "C_GiCustomFunctions.h"
 #include "C_Uti.h"
+#include "C_SebUnoZOrderSortHelper.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -67,8 +68,6 @@ C_SebScene::C_SebScene(QObject * const opc_Parent) :
    mq_ProxyWidgetInteractionActive(false),
    mpc_CurrentHoverItem(NULL),
    mu64_LastUnusedUniqueID(0),
-   mf64_ZOrderHigh(mf64_ZORDER_INIT_HIGH),
-   mf64_ZOrderLow(mf64_ZORDER_INIT_LOW),
    mq_RubberBandActive(false),
    mq_LeftButtonPressed(false),
    mq_DrawCustomBackground(true),
@@ -99,6 +98,64 @@ C_SebScene::C_SebScene(QObject * const opc_Parent) :
 C_SebScene::~C_SebScene()
 {
    //lint -e{1540}  no memory leak because of the parents of the items and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Filter relevant items for Z order
+
+   \param[in,out] orc_ZValues Items to filter
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SebScene::FilterChangableZValues(QList<QGraphicsItem *> & orc_ZValues) const
+{
+   QList<QGraphicsItem *> c_Tmp;
+   c_Tmp.reserve(orc_ZValues.size());
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_ZValues.begin();
+        c_ItItem != orc_ZValues.end(); ++c_ItItem)
+   {
+      if (this->IsZOrderChangeable(*c_ItItem) == true)
+      {
+         c_Tmp.push_back(*c_ItItem);
+      }
+   }
+   orc_ZValues = c_Tmp;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get highest used Z value of all scene items
+
+   \param[in] orc_Items Items to get highest Z value for
+
+   \return
+   Highest used Z value of all scene items
+*/
+//----------------------------------------------------------------------------------------------------------------------
+float64 C_SebScene::GetHighestUsedZValueList(const QList<QGraphicsItem *> & orc_Items) const
+{
+   //lint -e{530,10,1015,1013,1960}  c++11 feature
+   float64 f64_Retval = std::numeric_limits<float64>::lowest();
+   bool q_NothingFound = true;
+
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_Items.begin(); c_ItItem != orc_Items.end(); ++c_ItItem)
+   {
+      const QGraphicsItem * const pc_Item = *c_ItItem;
+      if ((pc_Item != NULL) && (this->IsZOrderChangeable(pc_Item) == true))
+      {
+         // search the highest z value of all items
+         if (pc_Item->zValue() > f64_Retval)
+         {
+            f64_Retval = pc_Item->zValue();
+            q_NothingFound = false;
+         }
+      }
+   }
+   //Avoid using extreme values
+   if (q_NothingFound)
+   {
+      f64_Retval = 0.0;
+   }
+
+   return f64_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -308,18 +365,18 @@ QGraphicsItem * C_SebScene::GetItemByID(const uint64 & oru64_ID) const
 {
    QGraphicsItem * pc_Retval = NULL;
    QGraphicsItem * pc_CurItemParent;
-   C_GiUnique * pc_Unique;
+   const C_GiUnique * pc_Unique;
 
-   QList<QGraphicsItem *> c_Items = this->items();
+   const QList<QGraphicsItem *> c_Items = this->items();
 
-   for (QList<QGraphicsItem *>::iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
    {
       pc_CurItemParent = C_SebUtil::h_GetHighestParent(*c_ItItem);
       if (pc_CurItemParent != NULL)
       {
          //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          //lint -e{740}  no problem because of common base class
-         pc_Unique = dynamic_cast<C_GiUnique *>(pc_CurItemParent);
+         pc_Unique = dynamic_cast<const C_GiUnique *>(pc_CurItemParent);
          if (pc_Unique != NULL)
          {
             if (pc_Unique->CheckMatch(oru64_ID) == true)
@@ -339,10 +396,6 @@ void C_SebScene::m_InitSceneContextMenuManager(void)
    // configure context menu
    connect(this->m_GetContextMenuManager(), &C_SebBaseContextMenuManager::SigBringToFront,
            this, &C_SebScene::m_BringToFront);
-   connect(this->m_GetContextMenuManager(), &C_SebBaseContextMenuManager::SigBringForward,
-           this, &C_SebScene::m_BringForward);
-   connect(this->m_GetContextMenuManager(), &C_SebBaseContextMenuManager::SigSendBackward,
-           this, &C_SebScene::m_SendBackward);
    connect(this->m_GetContextMenuManager(), &C_SebBaseContextMenuManager::SigSendToBack,
            this, &C_SebScene::m_SendToBack);
    connect(this->m_GetContextMenuManager(), &C_SebBaseContextMenuManager::SigAlign,
@@ -1250,6 +1303,40 @@ void C_SebScene::m_Delete(const bool oq_NoUserConfirm)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy all selected items from scene to copy paste manager
+
+   \param[in] orc_SelectedItems   Selected items to copy
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SebScene::m_CopyItemsToCopyPasteManager(const QList<QGraphicsItem *> & orc_SelectedItems)
+{
+   if (this->m_GetCopyPasteManager() != NULL)
+   {
+      //Special handling for Z order
+      //Start counting at one to compensate usage of highest used Z value
+      float64 f64_ZValue = 1.0;
+      QMap<const QGraphicsItem *, float64> c_NewZValues;
+
+      QList<QGraphicsItem *> c_SelectedItems = orc_SelectedItems;
+      //Step 1: filter all relevant items for z order
+      this->FilterChangableZValues(c_SelectedItems);
+      //Step 2: sort all items via z order
+      C_SebUnoZOrderSortHelper::h_SortZValues(c_SelectedItems);
+      //Step 3: map all items to an z value
+      for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_SelectedItems.begin(); c_ItItem != c_SelectedItems.end();
+           ++c_ItItem)
+      {
+         //Insert Z value for this item
+         c_NewZValues.insert(*c_ItItem, f64_ZValue);
+         //Iterate to next float64 value
+         f64_ZValue += 1.0;
+      }
+      //Step 4: proceed with normal copy paste handling
+      this->m_GetCopyPasteManager()->CopyFromSceneToManager(orc_SelectedItems, c_NewZValues);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear all items
 
    Hint: leaves all items which are not included in the system definition
@@ -1720,84 +1807,18 @@ void C_SebScene::m_Align(const QGraphicsItem * const opc_GuidelineItem, const E_
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_BringToFront(void)
 {
-   const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
-
-   QList<QGraphicsItem *>::const_iterator c_ItItem;
-   float64 f64_LowestZOrder = this->mf64_ZOrderHigh;
-   float64 f64_Diff;
-
-   for (c_ItItem = rc_SelectedItems.begin(); c_ItItem != rc_SelectedItems.end(); ++c_ItItem)
-   {
-      if (this->IsZOrderChangeable(*c_ItItem) == true)
-      {
-         // search the lowest z value of all selected items
-         if ((*c_ItItem)->zValue() < f64_LowestZOrder)
-         {
-            f64_LowestZOrder = (*c_ItItem)->zValue();
-         }
-      }
-   }
-   // The lowest of the selected item must be above the previous highest item
-   f64_Diff = (this->mf64_ZOrderHigh - f64_LowestZOrder) + 1.0;
-
    if (this->m_GetUndoManager() != NULL)
    {
-      this->m_GetUndoManager()->AdaptZOrder(rc_SelectedItems,
-                                            this->items(), f64_Diff, this->mf64_ZOrderHigh, this->mf64_ZOrderLow);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SebScene::m_BringForward(void)
-{
-   const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
-
-   if (this->m_GetUndoManager() != NULL)
-   {
-      this->m_GetUndoManager()->AdaptZOrder(rc_SelectedItems,
-                                            this->items(), 1.0, this->mf64_ZOrderHigh, this->mf64_ZOrderLow);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SebScene::m_SendBackward(void)
-{
-   const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
-
-   if (this->m_GetUndoManager() != NULL)
-   {
-      this->m_GetUndoManager()->AdaptZOrder(rc_SelectedItems,
-                                            this->items(), -1.0, this->mf64_ZOrderHigh, this->mf64_ZOrderLow);
+      this->m_GetUndoManager()->AdaptZOrder(this->selectedItems(), this->items(), true);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_SendToBack(void)
 {
-   const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
-
-   QList<QGraphicsItem *>::const_iterator c_ItItem;
-   float64 f64_HighestZOrder = this->mf64_ZOrderLow;
-   float64 f64_Diff;
-
-   for (c_ItItem = rc_SelectedItems.begin(); c_ItItem != rc_SelectedItems.end(); ++c_ItItem)
-   {
-      if (this->IsZOrderChangeable(*c_ItItem) == true)
-      {
-         // search the highest z value of all selected items
-         if ((*c_ItItem)->zValue() > f64_HighestZOrder)
-         {
-            f64_HighestZOrder = (*c_ItItem)->zValue();
-         }
-      }
-   }
-   // The highest of the selected item must be below the previous lowest item
-   f64_Diff = ((f64_HighestZOrder - this->mf64_ZOrderLow) + 1.0) * (-1.0);
-
    if (this->m_GetUndoManager() != NULL)
    {
-      this->m_GetUndoManager()->AdaptZOrder(rc_SelectedItems,
-                                            this->items(), f64_Diff, this->mf64_ZOrderHigh, this->mf64_ZOrderLow);
+      this->m_GetUndoManager()->AdaptZOrder(this->selectedItems(), this->items(), false);
    }
 }
 

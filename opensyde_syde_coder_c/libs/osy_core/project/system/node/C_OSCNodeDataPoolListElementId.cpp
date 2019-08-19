@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <stddef.h>
@@ -18,33 +18,33 @@
 
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolListElementId::C_OSCNodeDataPoolListElementId(void) :
    C_OSCNodeDataPoolListId(),
    u32_ElementIndex(0U)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
    \param[in] ou32_NodeIndex     Node index
@@ -52,7 +52,7 @@ C_OSCNodeDataPoolListElementId::C_OSCNodeDataPoolListElementId(void) :
    \param[in] ou32_ListIndex     List index
    \param[in] ou32_ElementIndex  Element index
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolListElementId::C_OSCNodeDataPoolListElementId(const stw_types::uint32 ou32_NodeIndex,
                                                                const stw_types::uint32 ou32_DataPoolIndex,
                                                                const stw_types::uint32 ou32_ListIndex,
@@ -62,7 +62,7 @@ C_OSCNodeDataPoolListElementId::C_OSCNodeDataPoolListElementId(const stw_types::
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Less operator.
 
    \param[in] orc_Cmp Compared instance
@@ -71,7 +71,7 @@ C_OSCNodeDataPoolListElementId::C_OSCNodeDataPoolListElementId(const stw_types::
    true     Current smaller than orc_Cmp
    false    Else
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_Cmp) const
 {
    bool q_Return;
@@ -144,7 +144,7 @@ bool C_OSCNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Equal operator.
 
    \param[in] orc_Cmp Compared instance
@@ -153,7 +153,7 @@ bool C_OSCNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_
    true     Current equals orc_Cmp
    false    Else
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCNodeDataPoolListElementId::operator ==(const C_OSCNodeDataPoolId & orc_Cmp) const
 {
    bool q_Return = C_OSCNodeDataPoolListId::operator ==(orc_Cmp);
@@ -185,14 +185,14 @@ bool C_OSCNodeDataPoolListElementId::operator ==(const C_OSCNodeDataPoolId & orc
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolListElementId::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NodeIndex, sizeof(this->u32_NodeIndex), oru32_HashValue);

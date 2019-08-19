@@ -130,7 +130,7 @@ sint32 C_OSCComDriverFlash::Init(const C_OSCSystemDefinition & orc_SystemDefinit
 
    An old connection will be closed.
 
-   \param[in] ou32_Bitrate      Bitrate in kBit/s
+   \param[in] ou32_Bitrate      Bitrate in kbit/s
 
    \return
    C_NO_ERR    Bitrate set
@@ -221,19 +221,15 @@ uint32 C_OSCComDriverFlash::GetMinimumFlashloaderResetWaitTime(void) const
 
    for (u32_Counter = 0U; u32_Counter < this->mc_ActiveNodesIndexes.size(); ++u32_Counter)
    {
-      const C_OSCNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_Counter]];
+      const C_OSCNode & rc_Node = this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_Counter]];
 
-      tgl_assert(pc_Node != NULL);
-      if (pc_Node != NULL)
+      tgl_assert(rc_Node.pc_DeviceDefinition != NULL);
+      if (rc_Node.pc_DeviceDefinition != NULL)
       {
-         tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
-         if (pc_Node->pc_DeviceDefinition != NULL)
+         if (rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTime > u32_WaitTime)
          {
-            if (pc_Node->pc_DeviceDefinition->u32_FlashloaderResetWaitTime > u32_WaitTime)
-            {
-               // The node needs a longer wait time
-               u32_WaitTime = pc_Node->pc_DeviceDefinition->u32_FlashloaderResetWaitTime;
-            }
+            // The node needs a longer wait time
+            u32_WaitTime = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTime;
          }
       }
    }
@@ -1792,7 +1788,7 @@ sint32 C_OSCComDriverFlash::SendStwSetBitrateCan(const C_OSCProtocolDriverOsyNod
       pc_ExistingProtocol = &c_StwProtocol;
    }
 
-   // We support only 16 bit bitrate for STW flashloader -> bitrate resolution kBits/second
+   // We support only 16 bit bitrate for STW flashloader -> bitrate resolution kbit/second
    s32_Return = pc_ExistingProtocol->SetBitrateCAN(ou32_Bitrate / 1000U, false);
    return s32_Return;
 }
@@ -2061,9 +2057,10 @@ sint32 C_OSCComDriverFlash::m_StartRoutingSpecific(const uint32 ou32_ActiveNode,
           (opc_ProtocolOsyOfLastNodeOfRouting != NULL))
       {
          (*oppc_RoutingDispatcher) = new C_OSCCanDispatcherOsyRouter(*opc_ProtocolOsyOfLastNodeOfRouting);
-         // TODO Filter settings?
-         (*oppc_RoutingDispatcher)->SetFilterParameters(orc_LastNodeOfRouting.u8_OutInterfaceNumber, 0x00000000,
-                                                        0x00000000);
+
+         // Only 0x52 for Rx is relevant
+         (*oppc_RoutingDispatcher)->SetFilterParameters(orc_LastNodeOfRouting.u8_OutInterfaceNumber, 0x00000052,
+                                                        0x000007FF);
 
          this->mc_LegacyRouterDispatchers[ou32_ActiveNode] = (*oppc_RoutingDispatcher);
          // Set the new dispatcher

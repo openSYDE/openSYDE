@@ -61,6 +61,21 @@ const QFont C_CamMetTreeDelegate::mhc_DefaultFont = C_Uti::h_GetFontPixel(mc_STY
 C_CamMetTreeDelegate::C_CamMetTreeDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent)
 {
+   connect(this, &C_CamMetTreeDelegate::SigStoreRenderer, this, &C_CamMetTreeDelegate::m_StoreRenderer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_CamMetTreeDelegate::~C_CamMetTreeDelegate(void)
+{
+   //Clean up
+   for (QMap<QString, QSvgRenderer *>::const_iterator c_It = this->mc_ActiveRenderers.begin();
+        c_It != this->mc_ActiveRenderers.end(); ++c_It)
+   {
+      delete (c_It.value());
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,8 +121,8 @@ void C_CamMetTreeDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
    {
       //Nothing to do (original paint already painted everything we want to be painted)
    }
-   C_CamMetTreeDelegate::mh_PaintSelectedCellIcon(opc_Painter, c_PaddedCellRect, orc_Index,
-                                                  q_Selected);
+   C_CamMetTreeDelegate::m_PaintSelectedCellIcon(opc_Painter, c_PaddedCellRect, orc_Index,
+                                                 q_Selected);
    Q_EMIT (this->SigEndAccept());
 }
 
@@ -144,8 +159,8 @@ QSize C_CamMetTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, co
    \param[in]     oq_Selected  Flag if item is selected
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeDelegate::mh_PaintSelectedCellIcon(QPainter * const opc_Painter, const QRect & orc_CellRect,
-                                                    const QModelIndex & orc_Index, const bool oq_Selected)
+void C_CamMetTreeDelegate::m_PaintSelectedCellIcon(QPainter * const opc_Painter, const QRect & orc_CellRect,
+                                                   const QModelIndex & orc_Index, const bool oq_Selected) const
 {
    const QStringList c_IconPaths = orc_Index.data(msn_USER_ROLE_ICON).toStringList();
 
@@ -154,17 +169,35 @@ void C_CamMetTreeDelegate::mh_PaintSelectedCellIcon(QPainter * const opc_Painter
    {
       //Icon seems to have no offset
       const QRect c_IconRect = QRect(orc_CellRect.topLeft(), QSize(16, 16));
-      if (oq_Selected)
+      const QString c_Path = oq_Selected ? c_IconPaths.at(1) : c_IconPaths.at(0);
+      const QMap<QString, QSvgRenderer *>::const_iterator c_It = this->mc_ActiveRenderers.find(c_Path);
+      if (c_It != this->mc_ActiveRenderers.end())
       {
-         QSvgRenderer c_Renderer(c_IconPaths.at(1));
-         c_Renderer.render(opc_Painter, c_IconRect);
+         //paint
+         c_It.value()->render(opc_Painter, c_IconRect);
       }
       else
       {
-         QSvgRenderer c_Renderer(c_IconPaths.at(0));
-         c_Renderer.render(opc_Painter, c_IconRect);
+         //Create
+         QSvgRenderer * const pc_Renderer = new QSvgRenderer(c_Path);
+         //paint
+         pc_Renderer->render(opc_Painter, c_IconRect);
+         //Store
+         Q_EMIT (this->SigStoreRenderer(c_Path, pc_Renderer));
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Store and take possession of renderer
+
+   \param[in,out] orc_Path     File path
+   \param[in,out] opc_Renderer Active renderer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeDelegate::m_StoreRenderer(const QString & orc_Path, QSvgRenderer * const opc_Renderer)
+{
+   this->mc_ActiveRenderers[orc_Path] = opc_Renderer;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -189,7 +222,7 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
    {
       //Handle manually
       const QStringList c_StringParts = orc_Index.data(msn_USER_ROLE_STRING_PARTS).toStringList();
-      const std::vector<sint32> c_ColSizes = mh_GetChildColWidths();
+      const std::vector<sint32> c_ColSizes = mh_GetChildColWidths(orc_Index.parent().parent().isValid());
       const std::vector<QString> c_Spaces = C_CamMetTreeDelegate::mh_GetTopSpaces();
       const std::vector<QFlags<Qt::AlignmentFlag> > c_Alignments = C_CamMetTreeDelegate::mh_GetTopAlignmentFlags();
       QRect c_CellRectAdapted;
@@ -212,7 +245,7 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
          else
          {
             //Look for color in PARENT!
-            c_FontColor = orc_Index.parent().data(static_cast<sint32>(Qt::ForegroundRole)).value<QColor>();
+            c_FontColor = orc_Index.data(static_cast<sint32>(Qt::ForegroundRole)).value<QColor>();
          }
 
          for (QStringList::const_iterator c_It = c_StringParts.begin(); c_It != c_StringParts.end(); ++c_It)
@@ -294,16 +327,26 @@ sint32 C_CamMetTreeDelegate::mh_GetMaxLength(const QStringList & orc_Names)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get vector of all restricted column sizes
 
+   \param[in] oq_IsThirdLayer Flag if these are for the third layer
+
    \return
    Vector of all restricted column sizes
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_CamMetTreeDelegate::mh_GetChildColWidths(void)
+std::vector<sint32> C_CamMetTreeDelegate::mh_GetChildColWidths(const bool oq_IsThirdLayer)
 {
    std::vector<sint32> c_Retval;
    c_Retval.reserve(5);
    //Signal name
-   c_Retval.push_back(200);
+   if (oq_IsThirdLayer == false)
+   {
+      //Normal offset and 20 for second layer indentation
+      c_Retval.push_back(200 + 20);
+   }
+   else
+   {
+      c_Retval.push_back(200);
+   }
    //Signal value (phys)
    c_Retval.push_back(150);
    //Signal unit
@@ -325,6 +368,7 @@ std::vector<sint32> C_CamMetTreeDelegate::mh_GetChildColWidths(void)
 std::vector<QFlags<Qt::AlignmentFlag> > C_CamMetTreeDelegate::mh_GetTopAlignmentFlags(void)
 {
    std::vector<QFlags<Qt::AlignmentFlag> > c_Retval;
+   c_Retval.reserve(5);
    c_Retval.push_back(Qt::AlignLeft | Qt::AlignVCenter);
    c_Retval.push_back(Qt::AlignRight | Qt::AlignVCenter);
    c_Retval.push_back(Qt::AlignLeft | Qt::AlignVCenter);

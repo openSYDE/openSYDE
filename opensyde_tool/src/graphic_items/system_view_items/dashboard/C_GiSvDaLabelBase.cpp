@@ -435,7 +435,9 @@ void C_GiSvDaLabelBase::m_UpdateCaption(const C_PuiSvDbLabel & orc_Data) const
 {
    if (this->mpc_LabelWidget != NULL)
    {
-      if ((orc_Data.c_DataPoolElementsConfig.size() > 0UL) && (orc_Data.c_Caption.compare("Value-label") == 0))
+      if ((orc_Data.c_DataPoolElementsConfig.size() > 0UL) &&
+          ((orc_Data.c_Caption.compare("VALUE-LABEL", Qt::CaseInsensitive) == 0) ||
+           (orc_Data.c_Caption == "")))
       {
          const C_PuiSvDbNodeDataElementConfig & rc_CurItem = orc_Data.c_DataPoolElementsConfig[0];
          if (rc_CurItem.c_ElementId.GetIsValid() == true)

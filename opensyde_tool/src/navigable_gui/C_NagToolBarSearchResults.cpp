@@ -12,6 +12,11 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <QColor>
+#include <QGraphicsDropShadowEffect>
+
+#include "constants.h"
+
 #include "C_NagToolBarSearchResults.h"
 #include "ui_C_NagToolBarSearchResults.h"
 
@@ -43,15 +48,25 @@ C_NagToolBarSearchResults::C_NagToolBarSearchResults(QWidget * const opc_Parent)
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_NagToolBarSearchResults)
 {
+   QGraphicsDropShadowEffect * pc_Shadow;
+   QColor c_Color;
+
    this->mpc_Ui->setupUi(this);
 
-   //this->setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint);
    this->setWindowFlags(Qt::FramelessWindowHint);
-   //this->setAttribute(Qt::WA_TranslucentBackground);
 
    this->mpc_Ui->pc_LabelNoSearchResultsFound->setVisible(false);
 
    this->mpc_Ui->pc_LabelNoSearchResultsFound->setText(C_GtGetText::h_GetText("    No results found"));
+
+   pc_Shadow = new QGraphicsDropShadowEffect(this);
+   pc_Shadow->setBlurRadius(4.0);
+   pc_Shadow->setOffset(3.0);
+
+   c_Color = mc_STYLE_GUIDE_COLOR_33;
+   c_Color.setAlpha(140);
+   pc_Shadow->setColor(c_Color);
+   this->setGraphicsEffect(pc_Shadow);
 
    // Forwarding the signal
    connect(this->mpc_Ui->pc_SearchTreeWidget, &C_SdSearchTreeWidget::SigChangeMode, this,
@@ -62,6 +77,7 @@ C_NagToolBarSearchResults::C_NagToolBarSearchResults(QWidget * const opc_Parent)
            &C_NagToolBarSearchResults::SigHide);
    connect(this->mpc_Ui->pc_SearchTreeWidget, &C_SdSearchTreeWidget::SigFocusOut, this,
            &C_NagToolBarSearchResults::SigFocusOut);
+   //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

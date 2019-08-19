@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Header view for dashboard table widget (implementation)
+   \brief       Header view for dashboard properties table widget (implementation)
 
    Header view for dashboard table widget
 

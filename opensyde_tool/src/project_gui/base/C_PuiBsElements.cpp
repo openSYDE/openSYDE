@@ -14,6 +14,7 @@
 
 #include "stwerrors.h"
 #include "TGLUtils.h"
+#include "C_SebUtil.h"
 #include "C_PuiBsElements.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -143,6 +144,74 @@ stw_types::uint32 C_PuiBsElements::Count(void) const
    u32_Retval += this->c_LineArrows.size();
    u32_Retval += this->c_TextElements.size();
    return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply position offset
+
+   \param[in] orc_NewPos Offset
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiBsElements::SetDataPositionOffset(const QPointF & orc_NewPos)
+{
+   //Boundaries
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_Boundaries.size(); ++u32_ItItem)
+   {
+      C_PuiBsBoundary & rc_Data = this->c_Boundaries[u32_ItItem];
+      rc_Data.c_UIPosition += orc_NewPos;
+   }
+   //Images
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_Images.size(); ++u32_ItItem)
+   {
+      C_PuiBsImage & rc_Data = this->c_Images[u32_ItItem];
+      rc_Data.c_UIPosition += orc_NewPos;
+   }
+   //Text elements
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_TextElements.size(); ++u32_ItItem)
+   {
+      C_PuiBsTextElement & rc_Data = this->c_TextElements[u32_ItItem];
+      rc_Data.c_UIPosition += orc_NewPos;
+   }
+   //Lines
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_LineArrows.size(); ++u32_ItItem)
+   {
+      C_PuiBsLineArrow & rc_Data = this->c_LineArrows[u32_ItItem];
+      C_SebUtil::h_AddLineOffset(rc_Data, orc_NewPos);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply Z value offset
+
+   \param[in] of64_HighestUsedZValue Highest used Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiBsElements::SetDataZOffset(const float64 of64_HighestUsedZValue)
+{
+   //Boundaries
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_Boundaries.size(); ++u32_ItItem)
+   {
+      C_PuiBsBoundary & rc_Data = this->c_Boundaries[u32_ItItem];
+      rc_Data.f64_ZOrder += of64_HighestUsedZValue;
+   }
+   //Images
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_Images.size(); ++u32_ItItem)
+   {
+      C_PuiBsImage & rc_Data = this->c_Images[u32_ItItem];
+      rc_Data.f64_ZOrder += of64_HighestUsedZValue;
+   }
+   //Text elements
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_TextElements.size(); ++u32_ItItem)
+   {
+      C_PuiBsTextElement & rc_Data = this->c_TextElements[u32_ItItem];
+      rc_Data.f64_ZOrder += of64_HighestUsedZValue;
+   }
+   //Lines
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_LineArrows.size(); ++u32_ItItem)
+   {
+      C_PuiBsLineArrow & rc_Data = this->c_LineArrows[u32_ItItem];
+      rc_Data.f64_ZOrder += of64_HighestUsedZValue;
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

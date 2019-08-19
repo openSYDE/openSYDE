@@ -9,41 +9,43 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OSCCanSignal.h"
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanSignal::C_OSCCanSignal(void) :
    e_ComByteOrder(eBYTE_ORDER_INTEL),
    u16_ComBitLength(8),
    u16_ComBitStart(0),
-   u32_ComDataElementIndex(0)
+   u32_ComDataElementIndex(0),
+   e_MultiplexerType(eMUX_DEFAULT),
+   u16_MultiplexValue(0)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current not equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
@@ -52,7 +54,7 @@ C_OSCCanSignal::C_OSCCanSignal(void) :
    Current not equal to orc_Cmp
    Else false
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
 {
    bool q_Return = false;
@@ -68,7 +70,7 @@ bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
@@ -76,17 +78,19 @@ bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_ComByteOrder, sizeof(this->e_ComByteOrder), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_MultiplexerType, sizeof(this->e_MultiplexerType), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_ComBitLength, sizeof(this->u16_ComBitLength), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_ComBitStart, sizeof(this->u16_ComBitStart), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_ComDataElementIndex, sizeof(this->u32_ComDataElementIndex),
                                       oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_MultiplexValue, sizeof(this->u16_MultiplexValue), oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the position of a signal bit in the data bytes
 
    \param[in]     ou16_SignalBitPosition   Signal bit position starting at 0
@@ -94,13 +98,13 @@ void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue) const
    \return
    Data bytes bit position
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_SignalBitPosition) const
 {
    return this->GetDataBytesBitPosOfSignalBit(this->u16_ComBitStart, ou16_SignalBitPosition);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the position of a signal bit in the data bytes
 
    \param[in]     ou16_StartBit            New start bit for the signal
@@ -109,7 +113,7 @@ uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_SignalBit
    \return
    Data bytes bit position
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
                                                      const uint16 ou16_SignalBitPosition) const
 {
@@ -149,12 +153,12 @@ uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
    return u16_DataBytesBitPos;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the positions of all signal bits in the data bytes
 
    \param[out]     orc_SetPositions   Signal bit positions
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanSignal::GetDataBytesBitPositionsOfSignal(std::set<uint16> & orc_SetPositions) const
 {
    uint16 u16_Counter;

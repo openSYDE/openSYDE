@@ -145,3 +145,45 @@ void C_SebBaseCopyPasteManager::m_MinToOrgPos(const QPointF & orc_P)
 {
    this->mc_OriginalPosition = mh_Min(this->mc_OriginalPosition, orc_P);
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle Z value for box
+
+   \param[in]     opc_Item              Original item
+   \param[in]     orc_NormalizedZValues Normalized Z values for all copied items
+   \param[in,out] orc_Box               Box data to change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SebBaseCopyPasteManager::mh_HandleZValueBox(const QGraphicsItem * const opc_Item,
+                                                   const QMap<const QGraphicsItem *,
+                                                              float64> & orc_NormalizedZValues,
+                                                   C_PuiBsBox & orc_Box)
+{
+   const QMap<const QGraphicsItem *, float64>::const_iterator c_ItItem = orc_NormalizedZValues.find(opc_Item);
+
+   if (c_ItItem != orc_NormalizedZValues.end())
+   {
+      orc_Box.f64_ZOrder = c_ItItem.value();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle Z value for line
+
+   \param[in]     opc_Item              Original item
+   \param[in]     orc_NormalizedZValues Normalized Z values for all copied items
+   \param[in,out] orc_Line              Line data to change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SebBaseCopyPasteManager::mh_HandleZValueLine(const QGraphicsItem * const opc_Item,
+                                                    const QMap<const QGraphicsItem *,
+                                                               float64> & orc_NormalizedZValues,
+                                                    C_PuiBsLineBase & orc_Line)
+{
+   const QMap<const QGraphicsItem *, float64>::const_iterator c_ItItem = orc_NormalizedZValues.find(opc_Item);
+
+   if (c_ItItem != orc_NormalizedZValues.end())
+   {
+      orc_Line.f64_ZOrder = c_ItItem.value();
+   }
+}

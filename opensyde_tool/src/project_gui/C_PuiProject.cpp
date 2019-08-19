@@ -27,7 +27,6 @@
 #include "stwerrors.h"
 #include "C_Uti.h"
 #include "C_UsHandler.h"
-#include "C_PopErrorHandling.h"
 #include "C_GtGetText.h"
 #include "C_PuiSvHandler.h"
 
@@ -415,7 +414,6 @@ C_PuiProject::C_PuiProject(void) :
    mu32_CalculatedProjectHash(),
    mq_SwitchToLastKnownUseCase(true)
 {
-   m_InitialProjectLoad();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -445,6 +443,80 @@ uint32 C_PuiProject::m_CalcHashProject(void) const
    this->CalcHash(u32_Hash);
 
    return u32_Hash;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load initial project
+
+   Loading Order:
+      1. Provided argument
+      2. If none: first project in recent projects list with existing .syde
+      3. If failed: empty project (next recent projects are loaded afterwards)
+
+  \param[out]  opu16_FileVersion   file version
+  \param[out]  rc_LoadedProject    project that was tried to load (if load fails, this->mc_Path gets overwritten)
+
+  \return
+   C_RD_WR  Problems accessing file system (e.g. no read access to file)
+   C_RANGE  A project file does not exist
+   C_NOACT  A project file is present but structure is invalid (e.g. invalid XML file)
+   C_CONFIG Content of a project file is invalid or incomplete
+   C_COM    Device definition not found for project
+   C_OVERFLOW  node in system definition references a device not part of the device definitions
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiProject::LoadInitialProject(uint16 * const opu16_FileVersion, QString & rc_LoadedProject)
+{
+   sint32 s32_Error;
+
+   // Initial project from command line
+   if (QApplication::arguments().size() > 1)
+   {
+      this->mq_SwitchToLastKnownUseCase = true;
+      SetPath(QApplication::arguments().at(1));
+   }
+   // Search in recent projects for existing *.syde file
+   else
+   {
+      const QStringList c_RecentProjects = C_UsHandler::h_GetInstance()->GetRecentProjects();
+      this->mq_SwitchToLastKnownUseCase = false;
+      SetPath("");
+      for (sint32 s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
+      {
+         QFileInfo c_File;
+         c_File.setFile(c_RecentProjects[s32_ItRecentProject]);
+         if (c_File.exists() == true)
+         {
+            SetPath(c_RecentProjects[s32_ItRecentProject]);
+            break;
+         }
+      }
+   }
+
+   // Load it
+   s32_Error = this->Load(opu16_FileVersion);
+   rc_LoadedProject = this->GetPath();
+
+   if (s32_Error == C_NO_ERR)
+   {
+      //New recent project
+      C_UsHandler::h_GetInstance()->AddToRecentProjects(this->GetPath());
+      C_UsHandler::h_GetInstance()->Save();
+   }
+   else
+   {
+      // Make sure to remove project from recent projects
+      C_UsHandler::h_GetInstance()->RemoveOfRecentProjects(this->GetPath());
+      C_UsHandler::h_GetInstance()->Save();
+
+      // Load empty project on fail (User feedback for error and next try with recent projects is done by main window)
+      this->LoadEmpty();
+
+      // Always stay at main page when loading once failed
+      this->mq_SwitchToLastKnownUseCase = false;
+   }
+
+   return s32_Error;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -569,96 +641,4 @@ void C_PuiProject::mh_AdaptProjectPathToSystemDefinitionV2(const QString & orc_P
    const QFileInfo c_File(orc_ProjectPath);
 
    orc_SystemDefintionPath = c_File.path() + "/" + c_File.baseName() + ".syde_sysdef";
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load initial project and handle occurring errors
-
-   Loading Order:
-      1. Provided argument
-      2. If none: first project in recent projects list with existing .syde
-      3. If failed: next project in recent projects list with existing .syde
-      4. If failed: empty project
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiProject::m_InitialProjectLoad()
-{
-   uint16 u16_Version;
-   sint32 s32_Error;
-
-   // Initial project from command line
-   if (QApplication::arguments().size() > 1)
-   {
-      this->mq_SwitchToLastKnownUseCase = true;
-      SetPath(QApplication::arguments().at(1));
-   }
-   // Search in recent projects for existing *.syde file
-   else
-   {
-      const QStringList c_RecentProjects = C_UsHandler::h_GetInstance()->GetRecentProjects();
-      this->mq_SwitchToLastKnownUseCase = false;
-      SetPath("");
-      for (sint32 s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
-      {
-         QFileInfo c_File;
-         c_File.setFile(c_RecentProjects[s32_ItRecentProject]);
-         if (c_File.exists() == true)
-         {
-            SetPath(c_RecentProjects[s32_ItRecentProject]);
-            break;
-         }
-      }
-   }
-
-   // load it (first try)
-   s32_Error = this->Load(&u16_Version);
-   C_PopErrorHandling::mh_ProjectLoadErr(s32_Error, this->GetPath(), NULL, u16_Version);
-
-   if (s32_Error == C_NO_ERR)
-   {
-      //New recent project
-      C_UsHandler::h_GetInstance()->AddToRecentProjects(this->GetPath());
-      C_UsHandler::h_GetInstance()->Save();
-   }
-   else
-   {
-      // Make sure to remove project from recent projects
-      C_UsHandler::h_GetInstance()->RemoveOfRecentProjects(this->GetPath());
-      C_UsHandler::h_GetInstance()->Save();
-      const QStringList c_RecentProjects = C_UsHandler::h_GetInstance()->GetRecentProjects();
-
-      // On loading fail try next available recent project (where "available" here means: *.syde exists)
-      this->mq_SwitchToLastKnownUseCase = false; // stay at main page when loading once failed
-      this->SetPath("");
-
-      for (sint32 s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
-      {
-         QFileInfo c_File;
-         c_File.setFile(c_RecentProjects[s32_ItRecentProject]);
-         if (c_File.exists() == true)
-         {
-            this->SetPath(c_RecentProjects[s32_ItRecentProject]);
-            break;
-         }
-      }
-
-      // load it (second try)
-      s32_Error = this->Load(&u16_Version);
-      C_PopErrorHandling::mh_ProjectLoadErr(s32_Error, this->GetPath(), NULL, u16_Version);
-
-      if (s32_Error == C_NO_ERR)
-      {
-         //New recent project
-         C_UsHandler::h_GetInstance()->AddToRecentProjects(this->GetPath());
-         C_UsHandler::h_GetInstance()->Save();
-      }
-      else
-      {
-         // Make sure to remove project from recent projects
-         C_UsHandler::h_GetInstance()->RemoveOfRecentProjects(this->GetPath());
-         C_UsHandler::h_GetInstance()->Save();
-         // load empty project if this second try also went wrong
-         this->LoadEmpty();
-      }
-   }
 }

@@ -12,7 +12,7 @@
 #ifndef CCANDLLH
 #define CCANDLLH
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <windows.h>
 #include "stwtypes.h"   //!<STW typedefs
 #include "stw_can.h"    //!<STW CAN DLL types
@@ -20,7 +20,7 @@
 namespace stw_can
 {
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 #ifndef STWCAN_PACKAGE
 #ifdef __BORLANDC__
 //maybe we want this module to be put into a VCL package ...
@@ -30,7 +30,7 @@ namespace stw_can
 #endif
 #endif
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 //function pointer types:
 typedef stw_types::sint32 (WINAPI *PR_CAN_INIT)(void);
 typedef stw_types::sint32 (WINAPI *PR_CAN_EXIT)(void);
@@ -95,11 +95,11 @@ typedef stw_types::sint32 (WINAPI * PR_CANtcp_Get_Device_Name)(const stw_types::
                                                                const stw_types::uint32 ou32_Index,
                                                                stw_types::charn * const opcn_DeviceName);
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Function Prototypes ------------------------------------------------- */
+/* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //lint -sem(stw_can::C_CAN_DLL::m_Init,initializer)
 //lint -sem(stw_can::C_CAN_DLL::m_Exit,cleanup)

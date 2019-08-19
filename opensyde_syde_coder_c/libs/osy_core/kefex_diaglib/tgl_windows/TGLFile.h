@@ -14,7 +14,7 @@
 #ifndef TGLFILEH
 #define TGLFILEH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "SCLDynamicArray.h"
@@ -27,12 +27,12 @@
 #endif
 #endif
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_tgl
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///Information about found files
 struct TGL_FileSearchRecord
@@ -61,7 +61,7 @@ stw_types::sint32 TGL_PACKAGE TGL_CreateDirectory(const stw_scl::C_SCLString & o
 stw_types::sint32 TGL_PACKAGE TGL_RemoveDirectory(const stw_scl::C_SCLString & orc_Directory,
                                                   const bool oq_ContentOnly);
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

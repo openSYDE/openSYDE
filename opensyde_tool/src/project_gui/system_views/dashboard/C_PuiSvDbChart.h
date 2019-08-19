@@ -25,6 +25,13 @@ class C_PuiSvDbChart :
    public C_PuiSvDbWidgetBase
 {
 public:
+   enum E_SettingZoomMode
+   {
+      eSETTING_ZM_XY,
+      eSETTING_ZM_X,
+      eSETTING_ZM_Y
+   };
+
    C_PuiSvDbChart();
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
@@ -32,6 +39,7 @@ public:
    virtual stw_types::sint32 RemoveElement(const stw_types::uint32 & oru32_Index) override;
 
    std::vector<bool> c_DataPoolElementsActive;
+   E_SettingZoomMode e_SettingZoomMode;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

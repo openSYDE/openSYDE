@@ -246,12 +246,12 @@ void C_SyvDaCopyPasteManager::PrepareCopyFromSceneToManager(const uint32 ou32_Vi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy selected files to copy paste manager
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] orc_SelectedItems   Selected items to copy
+   \param[in] orc_SelectedItems     Selected items to copy
+   \param[in] orc_NormalizedZValues Normalized Z values for all copied items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems)
+void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems,
+                                                     const QMap<const QGraphicsItem *, float64> & orc_NormalizedZValues)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
@@ -321,7 +321,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         const C_PuiSvDbChart * const pc_ChartData = pc_Dashboard->GetChart(u32_Index);
                         if (pc_ChartData != NULL)
                         {
-                           tgl_assert(c_Snapshot.AddWidget(pc_ChartData, C_PuiSvDbDataElement::eCHART) == C_NO_ERR);
+                           C_PuiSvDbChart c_Tmp = *pc_ChartData;
+                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eCHART) == C_NO_ERR);
                         }
                      }
                      else if (pc_Label != NULL)
@@ -330,7 +332,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         const C_PuiSvDbLabel * const pc_LabelData = pc_Dashboard->GetLabel(u32_Index);
                         if (pc_LabelData != NULL)
                         {
-                           tgl_assert(c_Snapshot.AddWidget(pc_LabelData, C_PuiSvDbDataElement::eLABEL) == C_NO_ERR);
+                           C_PuiSvDbLabel c_Tmp = *pc_LabelData;
+                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eLABEL) == C_NO_ERR);
                         }
                      }
                      else if (pc_Param != NULL)
@@ -339,7 +343,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         const C_PuiSvDbParam * const pc_ParamData = pc_Dashboard->GetParam(u32_Index);
                         if (pc_ParamData != NULL)
                         {
-                           tgl_assert(c_Snapshot.AddWidget(pc_ParamData, C_PuiSvDbDataElement::ePARAM) == C_NO_ERR);
+                           C_PuiSvDbParam c_Tmp = *pc_ParamData;
+                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::ePARAM) == C_NO_ERR);
                         }
                      }
                      else if (pc_PieChart != NULL)
@@ -348,7 +354,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         const C_PuiSvDbPieChart * const pc_PieChartData = pc_Dashboard->GetPieChart(u32_Index);
                         if (pc_PieChartData != NULL)
                         {
-                           tgl_assert(c_Snapshot.AddWidget(pc_PieChartData,
+                           C_PuiSvDbPieChart c_Tmp = *pc_PieChartData;
+                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp,
                                                            C_PuiSvDbDataElement::ePIE_CHART) == C_NO_ERR);
                         }
                      }
@@ -358,7 +366,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         const C_PuiSvDbProgressBar * const pc_ProgressBarData = pc_Dashboard->GetProgressBar(u32_Index);
                         if (pc_ProgressBarData != NULL)
                         {
-                           tgl_assert(c_Snapshot.AddWidget(pc_ProgressBarData,
+                           C_PuiSvDbProgressBar c_Tmp = *pc_ProgressBarData;
+                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp,
                                                            C_PuiSvDbDataElement::ePROGRESS_BAR) == C_NO_ERR);
                         }
                      }
@@ -368,7 +378,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         const C_PuiSvDbSlider * const pc_SliderData = pc_Dashboard->GetSlider(u32_Index);
                         if (pc_SliderData != NULL)
                         {
-                           tgl_assert(c_Snapshot.AddWidget(pc_SliderData, C_PuiSvDbDataElement::eSLIDER) == C_NO_ERR);
+                           C_PuiSvDbSlider c_Tmp = *pc_SliderData;
+                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eSLIDER) == C_NO_ERR);
                         }
                      }
                      else if (pc_SpinBox != NULL)
@@ -377,7 +389,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         const C_PuiSvDbSpinBox * const pc_SpinBoxData = pc_Dashboard->GetSpinBox(u32_Index);
                         if (pc_SpinBoxData != NULL)
                         {
-                           tgl_assert(c_Snapshot.AddWidget(pc_SpinBoxData,
+                           C_PuiSvDbSpinBox c_Tmp = *pc_SpinBoxData;
+                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp,
                                                            C_PuiSvDbDataElement::eSPIN_BOX) == C_NO_ERR);
                         }
                      }
@@ -387,7 +401,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         const C_PuiSvDbTable * const pc_TableData = pc_Dashboard->GetTable(u32_Index);
                         if (pc_TableData != NULL)
                         {
-                           tgl_assert(c_Snapshot.AddWidget(pc_TableData, C_PuiSvDbDataElement::eTABLE) == C_NO_ERR);
+                           C_PuiSvDbTable c_Tmp = *pc_TableData;
+                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eTABLE) == C_NO_ERR);
                         }
                      }
                      else if (pc_Toggle != NULL)
@@ -396,7 +412,9 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         const C_PuiSvDbToggle * const pc_ToggleData = pc_Dashboard->GetToggle(u32_Index);
                         if (pc_ToggleData != NULL)
                         {
-                           tgl_assert(c_Snapshot.AddWidget(pc_ToggleData, C_PuiSvDbDataElement::eTOGGLE) == C_NO_ERR);
+                           C_PuiSvDbToggle c_Tmp = *pc_ToggleData;
+                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eTOGGLE) == C_NO_ERR);
                         }
                      }
                      else
@@ -413,6 +431,10 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                               if (u32_Index < pc_Dashboard->c_TextElements.size())
                               {
                                  c_Snapshot.c_TextElements.push_back(pc_Dashboard->c_TextElements[u32_Index]);
+                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues,
+                                                                             c_Snapshot.c_TextElements[c_Snapshot.
+                                                                                                       c_TextElements.
+                                                                                                       size() - 1UL]);
                               }
                            }
                            break;
@@ -425,6 +447,10 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                               if (u32_Index < pc_Dashboard->c_Boundaries.size())
                               {
                                  c_Snapshot.c_Boundaries.push_back(pc_Dashboard->c_Boundaries[u32_Index]);
+                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues,
+                                                                             c_Snapshot.c_Boundaries[c_Snapshot.
+                                                                                                     c_Boundaries.
+                                                                                                     size() - 1UL]);
                               }
                            }
                            break;
@@ -437,6 +463,10 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                               if (u32_Index < pc_Dashboard->c_Images.size())
                               {
                                  c_Snapshot.c_Images.push_back(pc_Dashboard->c_Images[u32_Index]);
+                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues,
+                                                                             c_Snapshot.c_Images[c_Snapshot.
+                                                                                                 c_Images.
+                                                                                                 size() - 1UL]);
                               }
                            }
                            break;
@@ -449,6 +479,10 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                               if (u32_Index < pc_Dashboard->c_LineArrows.size())
                               {
                                  c_Snapshot.c_LineArrows.push_back(pc_Dashboard->c_LineArrows[u32_Index]);
+                                 C_SyvDaCopyPasteManager::mh_HandleZValueLine(*c_ItItem, orc_NormalizedZValues,
+                                                                              c_Snapshot.c_LineArrows[c_Snapshot.
+                                                                                                      c_LineArrows.
+                                                                                                      size() - 1UL]);
                               }
                            }
                            break;

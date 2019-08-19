@@ -213,6 +213,8 @@ void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
          c_CanSignal.u16_ComBitLength = c_CanMessageSignalsIter->u16_ComBitLength;
          c_CanSignal.e_ComByteOrder = c_CanMessageSignalsIter->e_ComByteOrder;
          c_CanSignal.u32_ComDataElementIndex = u32_SignalIndex;
+         c_CanSignal.e_MultiplexerType = c_CanMessageSignalsIter->e_MultiplexerType;
+         c_CanSignal.u16_MultiplexValue = c_CanMessageSignalsIter->u16_MultiplexValue;
          u32_SignalIndex++;
          // store signal in CAN message structure
          c_CanMessage.c_Signals.push_back(c_CanSignal);
@@ -303,7 +305,7 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   to convert openSYDE CAN message data structure to DBC data structure
+/*! \brief   Convert openSYDE CAN message data structure to DBC data structure for a single message
 
    \param[in]     ou32_BusIndex         bus index
    \param[in]     oe_Type               CAN protocol type (e.g. Layer 2, ECeS, ECoS)
@@ -351,6 +353,8 @@ sint32 C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(const uint32 ou32_B
          c_CurrentCIESignal.u16_ComBitLength = rc_CurrentOSCCanSignal.u16_ComBitLength;
          c_CurrentCIESignal.u16_ComBitStart = rc_CurrentOSCCanSignal.u16_ComBitStart;
          c_CurrentCIESignal.e_ComByteOrder = rc_CurrentOSCCanSignal.e_ComByteOrder;
+         c_CurrentCIESignal.e_MultiplexerType = rc_CurrentOSCCanSignal.e_MultiplexerType;
+         c_CurrentCIESignal.u16_MultiplexValue = rc_CurrentOSCCanSignal.u16_MultiplexValue;
 
          // fill up data pool list elements of signal
          C_CieConverter::C_CIEDataPoolElement & rc_CieElement = c_CurrentCIESignal.c_Element;

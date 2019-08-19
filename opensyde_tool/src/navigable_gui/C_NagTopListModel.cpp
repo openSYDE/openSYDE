@@ -12,8 +12,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include "C_SdUtil.h"
+#include "C_Uti.h"
 #include "stwtypes.h"
+#include "C_SdUtil.h"
 #include "constants.h"
 #include "C_GtGetText.h"
 #include "C_NagToolTip.h"
@@ -149,22 +150,20 @@ QVariant C_NagTopListModel::data(const QModelIndex & orc_Index, const sintn osn_
       {
          c_Retval = this->mc_Content[u32_Row];
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (osn_Role == static_cast<sintn>(Qt::BackgroundRole))
       {
          if (this->ms32_Selected == orc_Index.row())
          {
-            c_Retval = mc_STYLE_GUIDE_COLOR_13;
+            c_Retval = mc_STYLE_GUIDE_COLOR_21;
          }
          else
          {
-            c_Retval = mc_STYLE_GUIDE_COLOR_12;
+            c_Retval = mc_STYLE_GUIDE_COLOR_67;
          }
       }
       else if (osn_Role == static_cast<sintn>(Qt::FontRole))
       {
-         QFont c_Font = mc_STYLE_GUIDE_FONT_REGULAR_12;
-         c_Font.setPixelSize(c_Font.pointSize());
-         c_Retval = c_Font;
+         c_Retval = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
       }
       else if (osn_Role == static_cast<sintn>(Qt::DecorationRole))
       {

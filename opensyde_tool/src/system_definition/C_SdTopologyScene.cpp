@@ -185,6 +185,8 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
       c_OSCNode.pc_DeviceDefinition->GetDisplayName().c_str(), false).toStdString().c_str(); //default name: same as
                                                                                              // device type
    c_OSCNode.c_DeviceType = orc_NodeType.toStdString().c_str();
+   //UI
+   c_UINode.f64_ZOrder = this->GetHighestUsedZValueList(this->items()) + 1.0;
    //---Init COM IF Settings
    this->m_InitNodeComIfSettings(c_OSCNode);
    s32_Index = C_PuiSdHandler::h_GetInstance()->AddNodeAndSort(c_OSCNode, c_UINode);
@@ -193,6 +195,7 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
    //Graphics
    pc_Item = new C_GiNode(s32_Index, u64_UniqueID);
    pc_Item->setPos(orc_Pos);
+   pc_Item->setZValue(c_UINode.f64_ZOrder);
 
    m_AddNodeToScene(pc_Item);
 
@@ -207,12 +210,14 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
 
    \param[in] orc_Pos            Position to place item at
    \param[in] opu64_UniqueID     Optional pointer to unique ID to use for new item
+   \param[in] of64_ZValue        Z value to use
    \param[in] opc_TextElementBus Pointer to bus text element
    \param[in] orc_NameProposal   Name proposal
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddCanBus(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID,
-                                  C_GiTextElementBus * const opc_TextElementBus, const QString * const opc_NameProposal)
+                                  const float64 of64_ZValue, C_GiTextElementBus * const opc_TextElementBus,
+                                  const QString * const opc_NameProposal)
 {
    std::vector<QPointF> c_Points;
    C_GiLiCANBus * pc_CANBus;
@@ -241,6 +246,8 @@ void C_SdTopologyScene::AddCanBus(const QPointF & orc_Pos, const stw_types::uint
    //Object
    c_OSCBus.e_Type = C_OSCSystemBus::E_Type::eCAN;
    c_OSCBus.c_Name = "NewCANBus";
+   //UI
+   c_UIBus.f64_ZOrder = of64_ZValue;
    s32_Index = C_PuiSdHandler::h_GetInstance()->AddBusAndSort(c_OSCBus, c_UIBus, opc_NameProposal);
    this->m_SyncIndex(C_GiLiCANBus::eBUS, s32_Index, C_GiLiCANBus::eADD);
 
@@ -250,6 +257,7 @@ void C_SdTopologyScene::AddCanBus(const QPointF & orc_Pos, const stw_types::uint
    pc_CANBus = new C_GiLiCANBus(s32_Index, u64_UniqueID, opc_TextElementBus, true, &c_Points);
    pc_CANBus->SetWidth(6);
    pc_CANBus->SetColor(mc_STYLE_GUIDE_COLOR_10);
+   pc_CANBus->setZValue(c_UIBus.f64_ZOrder);
 
    //Add to scene
    this->m_AddBusToScene(pc_CANBus);
@@ -262,12 +270,13 @@ void C_SdTopologyScene::AddCanBus(const QPointF & orc_Pos, const stw_types::uint
 
    \param[in] orc_Pos            Position to place item at
    \param[in] opu64_UniqueID     Optional pointer to unique ID to use for new item
+   \param[in] of64_ZValue        Z value to use
    \param[in] opc_TextElementBus Pointer to bus text element
    \param[in] orc_NameProposal   Name proposal
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddEthernetBus(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID,
-                                       C_GiTextElementBus * const opc_TextElementBus,
+                                       const float64 of64_ZValue, C_GiTextElementBus * const opc_TextElementBus,
                                        const QString * const opc_NameProposal)
 {
    std::vector<QPointF> c_Points;
@@ -297,12 +306,15 @@ void C_SdTopologyScene::AddEthernetBus(const QPointF & orc_Pos, const stw_types:
    //Object
    c_OSCBus.e_Type = C_OSCSystemBus::E_Type::eETHERNET;
    c_OSCBus.c_Name = "NewEthernetBus";
+   //UI
+   c_UIBus.f64_ZOrder = of64_ZValue;
    s32_Index = C_PuiSdHandler::h_GetInstance()->AddBusAndSort(c_OSCBus, c_UIBus, opc_NameProposal);
    this->m_SyncIndex(C_GiLiEthernetBus::eBUS, s32_Index, C_GiLiEthernetBus::eADD);
    //Configure bus
    pc_EthernetBus = new C_GiLiEthernetBus(s32_Index, u64_UniqueID, opc_TextElementBus, true, &c_Points);
    pc_EthernetBus->SetWidth(6);
    pc_EthernetBus->SetColor(mc_STYLE_GUIDE_COLOR_5413);
+   pc_EthernetBus->setZValue(c_UIBus.f64_ZOrder);
 
    //Add to scene
    this->m_AddBusToScene(pc_EthernetBus);
@@ -340,7 +352,7 @@ void C_SdTopologyScene::AddBoundary(const QPointF & orc_Pos, const stw_types::ui
    c_BoundaryData.c_UIPosition = orc_Pos;
    c_BoundaryData.f64_Height = 100.0;
    c_BoundaryData.f64_Width = 100.0;
-   c_BoundaryData.f64_ZOrder = mf64_ZORDER_INIT_BOUNDARY;
+   c_BoundaryData.f64_ZOrder = this->GetHighestUsedZValueList(this->items()) + 1.0;
 
    C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.push_back(c_BoundaryData);
 
@@ -386,7 +398,7 @@ void C_SdTopologyScene::AddTextElement(const QString & orc_Text, const QPointF &
    //Default
    c_TextElementData.c_UIText = orc_Text;
    c_TextElementData.c_UIPosition = orc_Pos;
-   c_TextElementData.f64_ZOrder = mf64_ZORDER_INIT_TEXT_ELEMENT;
+   c_TextElementData.f64_ZOrder = this->GetHighestUsedZValueList(this->items()) + 1.0;
 
    C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.push_back(c_TextElementData);
 
@@ -407,14 +419,17 @@ void C_SdTopologyScene::AddTextElement(const QString & orc_Text, const QPointF &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a new text element for a concrete bus
 
-   \param[in] opu64_UniqueID Optional pointer to unique ID to use for new item
+   \param[in]  opu64_UniqueID  Optional pointer to unique ID to use for new item
+   \param[out] orf64_BusZValue Z value proposal for bus
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiTextElementBus * C_SdTopologyScene::AddTextElementBus(const uint64 * const opu64_UniqueID)
+C_GiTextElementBus * C_SdTopologyScene::AddTextElementBus(const uint64 * const opu64_UniqueID,
+                                                          float64 & orf64_BusZValue)
 {
    C_GiTextElementBus * pc_Item;
    sint32 s32_Index;
    uint64 u64_UniqueID;
+   C_PuiSdTextElementBus c_Data;
 
    //Check if a specific unique ID should be used
    if (opu64_UniqueID != NULL)
@@ -427,10 +442,15 @@ C_GiTextElementBus * C_SdTopologyScene::AddTextElementBus(const uint64 * const o
    }
 
    s32_Index = static_cast<sint32>(C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size());
-   C_PuiSdHandler::h_GetInstance()->c_BusTextElements.resize(static_cast<uintn>(s32_Index) + 1U);
+   //Get next free z value
+   orf64_BusZValue = this->GetHighestUsedZValueList(this->items()) + 1.0;
+   //Place text element over the bus
+   c_Data.f64_ZOrder = orf64_BusZValue + 1.0;
+   C_PuiSdHandler::h_GetInstance()->c_BusTextElements.push_back(c_Data);
 
    this->m_SyncIndex(C_PuiSdDataElement::eTEXT_ELEMENT_BUS, s32_Index, C_PuiSdDataElement::eADD);
    pc_Item = this->m_CreateBusTextElement(s32_Index, u64_UniqueID, NULL);
+   pc_Item->setZValue(c_Data.f64_ZOrder);
 
    m_AddBusTextElementToScene(pc_Item);
 
@@ -465,7 +485,7 @@ void C_SdTopologyScene::AddLine(const QPointF & orc_Pos, const stw_types::uint64
    s32_Index = static_cast<sint32>(C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size());
 
    //Default c_LineArrowData
-   c_LineArrowData.f64_ZOrder = mf64_ZORDER_INIT_LINE_ARROW;
+   c_LineArrowData.f64_ZOrder = this->GetHighestUsedZValueList(this->items()) + 1.0;
    c_LineArrowData.c_UIInteractionPoints.push_back(orc_Pos);
    c_LineArrowData.c_UIInteractionPoints.push_back(orc_Pos + QPointF(200.0, 0.0));
 
@@ -529,6 +549,8 @@ void C_SdTopologyScene::AddBusConnector(C_GiNode * const opc_Node, const C_GiLiB
       C_GiLiBusConnector * pc_Connector = new C_GiLiBusConnector(u64_UniqueID, c_Points,
                                                                  opc_Node,
                                                                  opc_Bus);
+      //Initial z order
+      pc_Connector->RestoreZOrder();
       opc_Node->AddConnection(pc_Connector);
       m_AddBusConnectorToScene(pc_Connector);
 
@@ -573,6 +595,7 @@ void C_SdTopologyScene::AddImage(const QString & orc_FilePath, const QPointF & o
    C_GiSdImageGroup * pc_Item;
    sint32 s32_Index;
    uint64 u64_UniqueID;
+   C_PuiBsImage c_ImageData;
 
    //Check if a specific unique ID should be used
    if (opu64_UniqueID != NULL)
@@ -584,13 +607,17 @@ void C_SdTopologyScene::AddImage(const QString & orc_FilePath, const QPointF & o
       u64_UniqueID = m_GetNewUniqueID();
    }
 
+   //Default
+   c_ImageData.f64_ZOrder = this->GetHighestUsedZValueList(this->items()) + 1.0;
+
    s32_Index = static_cast<sint32>(C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images.size());
-   C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images.resize(static_cast<uintn>(s32_Index) + 1U);
+   C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images.push_back(c_ImageData);
 
    this->m_SyncIndex(C_PuiSdDataElement::eIMAGE, s32_Index, C_PuiSdDataElement::eADD);
    pc_Item = new C_GiSdImageGroup(s32_Index, u64_UniqueID, orc_FilePath);
 
    pc_Item->setPos(orc_Pos);
+   pc_Item->setZValue(c_ImageData.f64_ZOrder);
 
    m_AddImageGroupToScene(pc_Item);
 
@@ -636,7 +663,8 @@ void C_SdTopologyScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
       {
          c_UniqueIDs[u32_ItItem] = m_GetNewUniqueID();
       }
-      this->mc_UndoManager.DoAddSnapshot(c_UniqueIDs, *pc_SnapShot, c_TotalOffset);
+      this->mc_UndoManager.DoAddSnapshot(c_UniqueIDs, *pc_SnapShot, c_TotalOffset,
+                                         this->GetHighestUsedZValueList(this->items()));
    }
 }
 
@@ -644,13 +672,12 @@ void C_SdTopologyScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
 /*! \brief   Copy snapshot to scene
 
    \param[in] orc_Snapshot Object snapshot
-   \param[in] opc_Pos      Optional position offset
    \param[in] opc_IDMap    Optional map for IDs to use
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::CopyFromSnapshotToScene(const stw_opensyde_gui_logic::C_SdTopologyDataSnapshot & orc_Snapshot,
-                                                const QPointF * const opc_Pos, const QMap<C_PuiBsTemporaryDataID,
-                                                                                          uint64> * const opc_IDMap)
+                                                const QMap<C_PuiBsTemporaryDataID,
+                                                           uint64> * const opc_IDMap)
 {
    uint32 u32_ItElem;
 
@@ -767,8 +794,7 @@ void C_SdTopologyScene::CopyFromSnapshotToScene(const stw_opensyde_gui_logic::C_
    {
       C_PuiSdHandler::h_GetInstance()->c_Elements.c_Images.push_back(orc_Snapshot.c_Images[u32_ItElem]);
    }
-   m_LoadSnapshot(c_NodeIndices, c_BusIndices, c_OtherIndices, opc_Pos, true, &(orc_Snapshot.c_BusConnections),
-                  opc_IDMap);
+   m_LoadSnapshot(c_NodeIndices, c_BusIndices, c_OtherIndices, true, &(orc_Snapshot.c_BusConnections), opc_IDMap);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1006,6 +1032,7 @@ bool C_SdTopologyScene::IsZOrderChangeable(const QGraphicsItem * const opc_Item)
        (opc_Item->type() == msn_GRAPHICS_ITEM_BUS) ||
        (opc_Item->type() == msn_GRAPHICS_ITEM_CANBUS) ||
        (opc_Item->type() == msn_GRAPHICS_ITEM_ETHERNETBUS) ||
+       (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT_BUS) ||
        (opc_Item->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
        (opc_Item->type() == msn_GRAPHICS_ITEM_BUS_CONNECT) ||
        (opc_Item->type() == msn_GRAPHICS_ITEM_LINE_ARROW) ||
@@ -1615,7 +1642,7 @@ void C_SdTopologyScene::m_Copy(void)
    {
       c_SelectedItems.push_back(*c_ItItem);
    }
-   this->mc_CopyPasteManager.CopyFromSceneToManager(c_SelectedItems);
+   this->m_CopyItemsToCopyPasteManager(c_SelectedItems);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1625,7 +1652,7 @@ void C_SdTopologyScene::m_Copy(void)
 void C_SdTopologyScene::m_Cut(void)
 {
    this->UpdateSystemDefinition();
-   this->mc_CopyPasteManager.CopyFromSceneToManager(this->selectedItems());
+   this->m_CopyItemsToCopyPasteManager(this->selectedItems());
 
    m_Delete(true);
 }
@@ -1946,7 +1973,7 @@ void C_SdTopologyScene::m_SelectionChanged(void)
             this->mpc_SelectedBusConnectorItem = dynamic_cast<C_GiLiBusConnector *>(c_SelectedItems[0]);
             if (this->mpc_SelectedBusConnectorItem != NULL)
             {
-               this->mpc_SelectedBusConnectorItem->setZValue(mf64_ZORDER_MAX);
+               this->mpc_SelectedBusConnectorItem->setZValue(this->GetHighestUsedZValueList(this->items()) + 1.0);
             }
          }
       }
@@ -1996,7 +2023,7 @@ void C_SdTopologyScene::m_StartConnector(const QPointF & orc_LineStart, const QP
 
    this->mpc_ConnectorLine->setPos(orc_LineStart);
    //Always on top
-   this->mpc_ConnectorLine->setZValue(std::numeric_limits<float64>::max());
+   this->mpc_ConnectorLine->setZValue(mf64_ZORDER_MAX);
    this->addItem(mpc_ConnectorLine);
 
    this->m_EnterConnectState(C_GiLiBusConnector::E_ConnectState::eTO_GENERIC_AND_BUS, this->mpc_NodeConnectItem);
@@ -2967,6 +2994,10 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
                pc_ComIfWidget->GetComDataPoolConfigurationNode2(q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
                this->m_ConfiugreComDatapools(opc_Node2, pc_ComIfWidget->GetSelectedInterface2(),
                                              q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
+
+               //Trigger error check as this circumvents the undo redo engine
+               this->CheckAllItemsForChanges();
+               Q_EMIT this->SigErrorChange();
             }
          }
       }
@@ -3103,15 +3134,13 @@ void C_SdTopologyScene::m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Ite
                                            2: Line arrow
                                            3: Image
                                            4: Bus text element
-   \param[in] opc_Offset                   Optional position offset
    \param[in] orq_Selection                False: Ignore selection
    \param[in] opc_AdditionalConnectionData Additional data for bus connections
    \param[in] opc_IDMap                    Optional map for IDs to use
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_LoadSnapshot(const QVector<uint32> & orc_NodeIndices, const QVector<uint32> & orc_BusIndices,
-                                       const QVector<uint32> & orc_OtherStartIndices, const QPointF * const opc_Offset,
-                                       const bool & orq_Selection,
+                                       const QVector<uint32> & orc_OtherStartIndices, const bool & orq_Selection,
                                        const std::vector<C_PuiSdCompleteBusConnectionData> * const opc_AdditionalConnectionData,
                                        const QMap<C_PuiBsTemporaryDataID, uint64> * const opc_IDMap)
 {
@@ -3146,7 +3175,7 @@ void C_SdTopologyScene::m_LoadSnapshot(const QVector<uint32> & orc_NodeIndices, 
    c_SaveIndices.append(0);
    c_SaveIndices.append(0);
 
-   this->m_LoadSubset(orc_NodeIndices, orc_BusIndices, orc_OtherStartIndices, opc_Offset, orq_Selection,
+   this->m_LoadSubset(orc_NodeIndices, orc_BusIndices, orc_OtherStartIndices, orq_Selection,
                       opc_AdditionalConnectionData, opc_IDMap);
 }
 

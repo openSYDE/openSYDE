@@ -87,6 +87,15 @@ C_SyvDaItChartWidget::C_SyvDaItChartWidget(const uint32 ou32_ViewIndex, const ui
    // 60 seconds as initial value
    mf64_MaxValue(5.0),
    mf64_MinValue(0.0),
+   mq_ValueZoomed(false),
+   mf64_ZoomFactor(1.0),
+   mf64_ScrollOffsetX(0.0),
+   mf64_ScrollOffsetY(0.0),
+   mf64_MaxValueZoomed(5.0),
+   mf64_MinValueZoomed(0.0),
+   mf64_ReferenceMaxValueZoomed(0.0),
+   mf64_ReferenceMinValueZoomed(0.0),
+   mf64_ReferenceRangeZoomed(0.0),
    mu32_TimeStampOfStart(0U),
    mf64_DefaultTimeSlot(60000.0),
    // 60 seconds as default value
@@ -154,6 +163,14 @@ C_SyvDaItChartWidget::C_SyvDaItChartWidget(const uint32 ou32_ViewIndex, const ui
            this, &C_SyvDaItChartWidget::m_DataItemToggled);
    connect(this->mpc_Ui->pc_ChartSelectorWidget, &C_SyvDaItChartDataSelectorWidget::SigDataItemSelected,
            this, &C_SyvDaItChartWidget::m_DataItemSelected);
+   connect(this->mpc_Ui->pc_SettingsWidget, &C_SyvDaItChartSettingsWidget::SigZoomModeChanged,
+           this, &C_SyvDaItChartWidget::m_SettingZoomModeChanged);
+   connect(this->mpc_ChartView, &C_OgeChaViewBase::SigYZoomed,
+           this, &C_SyvDaItChartWidget::m_YZoomed);
+   connect(this->mpc_ChartView, &C_OgeChaViewBase::SigZoomReseted,
+           this, &C_SyvDaItChartWidget::m_ZoomReseted);
+   connect(this->mpc_ChartView, &C_OgeChaViewBase::SigScrolled,
+           this, &C_SyvDaItChartWidget::m_Scrolled);
 
    this->SetDisplayStyle(C_PuiSvDbWidgetBase::eOPENSYDE, false);
    this->SetWidthOfDataSeriesSelector(330);
@@ -249,6 +266,8 @@ void C_SyvDaItChartWidget::SetData(const C_PuiSvDbChart & orc_Data)
       }
 
       tgl_assert(this->mc_Data.c_DataPoolElementsActive.size() == this->mc_DataPoolElementContentMin.size());
+
+      this->mpc_Ui->pc_SettingsWidget->SetData(this->mc_Data);
    }
 }
 
@@ -302,7 +321,9 @@ void C_SyvDaItChartWidget::SetDrawingActive(const bool oq_Active)
          QLineSeries * const pc_LineSerie = this->mc_DataPoolElementsDataSeries[u32_ConfigCounter];
          if (pc_LineSerie != NULL)
          {
-            pc_LineSerie->setVisible(oq_Active);
+            // Activate the drawing of the line only if the element is enabled
+            const bool q_Enabled = this->mpc_Ui->pc_ChartSelectorWidget->GetDataElementToggledState(u32_ConfigCounter);
+            pc_LineSerie->setVisible(oq_Active && q_Enabled);
          }
       }
    }
@@ -323,7 +344,6 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
 
       switch (oe_Style)
       {
-      //TBD by Karsten: done
       case C_PuiSvDbWidgetBase::eOPENSYDE:
          if (oq_DarkMode == true)
          {
@@ -753,7 +773,7 @@ void C_SyvDaItChartWidget::SelectDataSeriesAxis(const uint32 ou32_DataPoolElemen
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds the newest values of datapool elements to its associated data series of the chart
+/*! \brief   Adds the newest values of Datapool elements to its associated data series of the chart
 
    \param[in]     orc_DataPoolElementId   Datapool element identification
    \param[in]     orc_Values              List with all read elements
@@ -809,16 +829,46 @@ void C_SyvDaItChartWidget::AddDataSerieContent(const C_PuiSvDbNodeDataPoolListEl
                      this->mc_Data.c_DataPoolElementsConfig[u32_ConfigCounter].c_ElementScaling.f64_Factor,
                      this->mc_Data.c_DataPoolElementsConfig[u32_ConfigCounter].c_ElementScaling.f64_Offset);
 
-                  // Adapt range for value
-                  if (this->mf64_MaxValue < f64_Value)
+                  // Adapt the automatic scaling only for visible elements
+                  if (pc_LineSerie->isVisible() == true)
                   {
-                     // Add a little free space to the maximum
-                     this->mf64_MaxValue = f64_Value * 1.01;
+                     // Add a little free space to the values
+                     const float64 f64_FacHigh = 1.1;
+                     const float64 f64_FacLow = 0.9;
+                     const float64 f64_ValueFactorHigh = f64_Value * f64_FacHigh;
+                     const float64 f64_ValueFactorLow = f64_Value * f64_FacLow;
+
+                     // Adapt range for value
+                     if (f64_Value >= 0.0)
+                     {
+                        // Maximum
+                        if (this->mf64_MaxValue < f64_ValueFactorHigh)
+                        {
+                           this->mf64_MaxValue = f64_ValueFactorHigh;
+                        }
+
+                        // Minimum
+                        if (this->mf64_MinValue > f64_ValueFactorLow)
+                        {
+                           this->mf64_MinValue = f64_ValueFactorLow;
+                        }
+                     }
+                     else
+                     {
+                        // Maximum
+                        if (this->mf64_MaxValue < f64_ValueFactorLow)
+                        {
+                           this->mf64_MaxValue = f64_ValueFactorLow;
+                        }
+
+                        // Minimum
+                        if (this->mf64_MinValue > f64_ValueFactorHigh)
+                        {
+                           this->mf64_MinValue = f64_ValueFactorHigh;
+                        }
+                     }
                   }
-                  if (this->mf64_MinValue > f64_Value)
-                  {
-                     this->mf64_MinValue = f64_Value;
-                  }
+
                   pc_LineSerie->append(f64_Timestamp, f64_Value);
                }
 
@@ -871,7 +921,7 @@ uint32 C_SyvDaItChartWidget::GetCountDataSeries(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::UpdateTimeAxis(void)
 {
-   if (this->mq_DrawingActive)
+   if (this->mq_DrawingActive == true)
    {
       const uint32 u32_CurrentTimeStamp = stw_tgl::TGL_GetTickCount() - this->mu32_TimeStampOfStart;
       const uint32 u32_NextTimeStamp = u32_CurrentTimeStamp + static_cast<uint32>(msn_TIMER_GUI_REFRESH);
@@ -896,25 +946,38 @@ void C_SyvDaItChartWidget::UpdateTimeAxis(void)
 /*! \brief   Adapts and updates the value axis if necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItChartWidget::UpdateValueAxis()
+void C_SyvDaItChartWidget::UpdateValueAxis(void)
 {
-   if (this->mq_DrawingActive)
+   if (this->mq_DrawingActive == true)
    {
-      if (this->mpc_AxisValue->max() < this->mf64_MaxValue)
+      if (this->mq_ValueZoomed == false)
       {
-         this->mpc_AxisValue->setMax(this->mf64_MaxValue);
+         // Auto scaling active, use the detected range values
+         if (this->mpc_AxisValue->max() < this->mf64_MaxValue)
+         {
+            this->mpc_AxisValue->setMax(this->mf64_MaxValue);
+         }
+         if (this->mpc_AxisValueInvisible->max() < this->mf64_MaxValue)
+         {
+            this->mpc_AxisValueInvisible->setMax(this->mf64_MaxValue);
+         }
+         if (this->mpc_AxisValue->min() > this->mf64_MinValue)
+         {
+            this->mpc_AxisValue->setMin(this->mf64_MinValue);
+         }
+         if (this->mpc_AxisValueInvisible->min() > this->mf64_MinValue)
+         {
+            this->mpc_AxisValueInvisible->setMin(this->mf64_MinValue);
+         }
       }
-      if (this->mpc_AxisValueInvisible->max() < this->mf64_MaxValue)
+      else
       {
-         this->mpc_AxisValueInvisible->setMax(this->mf64_MaxValue);
-      }
-      if (this->mpc_AxisValue->min() > this->mf64_MinValue)
-      {
-         this->mpc_AxisValue->setMin(this->mf64_MinValue);
-      }
-      if (this->mpc_AxisValueInvisible->min() > this->mf64_MinValue)
-      {
-         this->mpc_AxisValueInvisible->setMin(this->mf64_MinValue);
+         // The user had scrolled or zoomed
+         const float64 f64_Max = this->mf64_MaxValueZoomed + this->mf64_ScrollOffsetY;
+         const float64 f64_Min = this->mf64_MinValueZoomed + this->mf64_ScrollOffsetY;
+
+         this->mpc_AxisValue->setRange(f64_Min, f64_Max);
+         this->mpc_AxisValueInvisible->setRange(f64_Min, f64_Max);
       }
    }
 }
@@ -922,9 +985,9 @@ void C_SyvDaItChartWidget::UpdateValueAxis()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Error update for data element
 
-   \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
+   \param[in] ou32_DataElementIndex           Index of shown Datapool element in widget
    \param[in] orc_ErrorText                   Error description
-   \param[in] orq_IsTransmissionError         Flag if transmission error occurred
+   \param[in] oq_IsTransmissionError          Flag if transmission error occurred
    \param[in] oq_ErrorActive                  Flag if error is active or should be cleared
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1115,4 +1178,98 @@ void C_SyvDaItChartWidget::m_DataItemToggled(const stw_types::uint32 ou32_DataPo
 void C_SyvDaItChartWidget::m_DataItemSelected(const uint32 ou32_DataPoolElementConfigIndex)
 {
    this->SelectDataSeriesAxis(ou32_DataPoolElementConfigIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the changed zoom mode
+
+   \param[in]       oe_SettingZoomMode     Current used zoom mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItChartWidget::m_SettingZoomModeChanged(const C_PuiSvDbChart::E_SettingZoomMode oe_SettingZoomMode)
+{
+   switch (oe_SettingZoomMode)
+   {
+   case C_PuiSvDbChart::eSETTING_ZM_XY:
+      this->mpc_ChartView->SetZoomMode(C_OgeChaViewBase::eSETTING_ZM_XY);
+      break;
+   case C_PuiSvDbChart::eSETTING_ZM_X:
+      this->mpc_ChartView->SetZoomMode(C_OgeChaViewBase::eSETTING_ZM_X);
+      break;
+   case C_PuiSvDbChart::eSETTING_ZM_Y:
+      this->mpc_ChartView->SetZoomMode(C_OgeChaViewBase::eSETTING_ZM_Y);
+      break;
+   default:
+      this->mpc_ChartView->SetZoomMode(C_OgeChaViewBase::eSETTING_ZM_XY);
+      break;
+   }
+
+   this->mc_Data.e_SettingZoomMode = oe_SettingZoomMode;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adaption of the Y axis values for the new zoom factor
+
+   \param[in]       of64_Factor     Factor for zooming the Y axis
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItChartWidget::m_YZoomed(const float64 of64_Factor)
+{
+   float64 f64_DeltaRangeZoom;
+   float64 f64_DeltaZoom;
+
+   if (this->mq_ValueZoomed == false)
+   {
+      this->mq_ValueZoomed = true;
+
+      // Save the current values as reference values. Further zooming shall be calculated based on this values
+      // and not on further changed values
+      this->mf64_ReferenceMaxValueZoomed = this->mf64_MaxValue;
+      this->mf64_ReferenceMinValueZoomed = this->mf64_MinValue;
+      this->mf64_ReferenceRangeZoomed = this->mf64_MaxValue - this->mf64_MinValue;
+   }
+
+   this->mf64_ZoomFactor *= of64_Factor;
+
+   f64_DeltaRangeZoom = this->mf64_ReferenceRangeZoomed * this->mf64_ZoomFactor;
+   f64_DeltaZoom = (this->mf64_ReferenceRangeZoomed - f64_DeltaRangeZoom) / 2.0;
+
+   this->mf64_MaxValueZoomed = this->mf64_ReferenceMaxValueZoomed - f64_DeltaZoom;
+   this->mf64_MinValueZoomed = this->mf64_ReferenceMinValueZoomed + f64_DeltaZoom;
+
+   this->UpdateValueAxis();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Scrolls the view of the chart
+
+   \param[in]       of64_X     Scrolling distance for X axis
+   \param[in]       of64_Y     Scrolling distance for Y axis
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItChartWidget::m_Scrolled(const float64 of64_X, const float64 of64_Y)
+{
+   if (this->mq_ValueZoomed == false)
+   {
+      // Custom scrolling needs the activation of the custom zooming with its reference values and
+      // deactivating of the auto scaling
+      this->m_YZoomed(1.0);
+   }
+
+   this->mf64_ScrollOffsetX += of64_X;
+   this->mf64_ScrollOffsetY += of64_Y;
+
+   this->UpdateValueAxis();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Zoom was reseted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItChartWidget::m_ZoomReseted(void)
+{
+   this->mq_ValueZoomed = false;
+   this->mf64_ZoomFactor = 1.0;
+   this->mf64_ScrollOffsetX = 0.0;
+   this->mf64_ScrollOffsetY = 0.0;
 }

@@ -47,7 +47,8 @@ C_SdBueUnoSignalDeleteCommand::C_SdBueUnoSignalDeleteCommand(const C_OSCCanMessa
                                                              const uint32 & oru32_SignalIndex,
                                                              C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
                                                              QUndoCommand * const opc_Parent) :
-   C_SdBueUnoSignalAddDeleteBaseCommand(orc_MessageId, oru32_SignalIndex, 0U, opc_MessageSyncManager,
+   C_SdBueUnoSignalAddDeleteBaseCommand(orc_MessageId, oru32_SignalIndex, 0U, C_OSCCanSignal::eMUX_DEFAULT, 0,
+                                        opc_MessageSyncManager,
                                         opc_MessageTreeWidget,
                                         "Delete Signal",
                                         opc_Parent)

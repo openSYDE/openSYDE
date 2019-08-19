@@ -12,7 +12,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <cmath>
 #include <limits>
+#include <QFlags>
 #include <QSpinBox>
 
 #include "TGLUtils.h"
@@ -25,6 +27,7 @@
 #include "C_PuiSdHandler.h"
 #include "C_SdTooltipUtil.h"
 #include "C_OgeSpxInt64Table.h"
+#include "C_OgeWiCustomMessage.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SdBueSignalPropertiesWidget.h"
 #include "ui_C_SdBueSignalPropertiesWidget.h"
@@ -41,13 +44,12 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sint32 ms32_TYPE_INDEX_UNSIGNED = 0;
-const sint32 ms32_TYPE_INDEX_SIGNED = 1;
-const sint32 ms32_TYPE_INDEX_FLOATING_32 = 2;
-const sint32 ms32_TYPE_INDEX_FLOATING_64 = 3;
-
 const sint32 ms32_BYTE_ORDER_INDEX_INTEL = 0;
 const sint32 ms32_BYTE_ORDER_INDEX_MOTOROLA = 1;
+
+const sint32 ms32_MUX_DEFAULT = 0;
+const sint32 ms32_MUX_MULTIPLEXER_SIGNAL = 1;
+const sint32 ms32_MUX_MULTIPLEXED_SIGNAL = 2;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -71,46 +73,14 @@ C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueSignalPropertiesWidget),
    mpc_MessageSyncManager(NULL),
-   mq_DataChangesAllowed(false),
-   mq_PositionUpdate(true)
+   me_DataType(eTY_UNSIGNED)
 {
    // init UI
    this->mpc_Ui->setupUi(this);
 
+   this->mpc_Ui->pc_ComboBoxType->view()->setTextElideMode(Qt::ElideRight);
+
    InitStaticNames();
-
-   //Ui restriction
-   this->mpc_Ui->pc_SpinBoxLength->SetMinimumCustom(1);
-   this->mpc_Ui->pc_SpinBoxLength->SetMaximumCustom(64);
-   this->mpc_Ui->pc_SpinBoxStartBit->SetMaximumCustom(63);
-
-   //Offset
-   //lint -e{10,530,747,1015,1013,1960}  c++11 feature
-   this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64>::lowest());
-   this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMaximumCustom(std::numeric_limits<float64>::max());
-   //Factor needs to be above zero
-   //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_DoubleSpinBoxFactor->SetMinimumCustom(C_OgeSpxFactor::mhf64_FACTOR_MIN);
-   this->mpc_Ui->pc_DoubleSpinBoxFactor->SetMaximumCustom(std::numeric_limits<float64>::max());
-
-   //AutoMinMax
-   m_HandleValueType(this->mpc_Ui->pc_ComboBoxType->currentIndex());
-   m_UpdateAutoMinMax();
-
-   //Ui restriction
-   this->mpc_Ui->pc_LineEditName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
-
-   // connects
-   connect(this->mpc_Ui->pc_CheckBoxAutoMinMax, &C_OgeChxProperties::toggled, this,
-           &C_SdBueSignalPropertiesWidget::m_HandleAutoMinMaxCheckBox);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_ComboBoxType, static_cast<void (QComboBox::*)(
-                                                         sintn)>(&C_OgeCbxText::currentIndexChanged), this,
-           &C_SdBueSignalPropertiesWidget::m_HandleValueType);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxLength, static_cast<void (QSpinBox::*)(
-                                                          sintn)>(&QSpinBox::valueChanged), this,
-           &C_SdBueSignalPropertiesWidget::m_HandleValueLengthChange);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -148,24 +118,53 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelType->setText(C_GtGetText::h_GetText("Type"));
    this->mpc_Ui->pc_LabelLength->setText(C_GtGetText::h_GetText("Length"));
    this->mpc_Ui->pc_LabelByteOrder->setText(C_GtGetText::h_GetText("Byte Order"));
-   this->mpc_Ui->pc_LabelMessage->setText(C_GtGetText::h_GetText("Message"));
    this->mpc_Ui->pc_LabelStartBit->setText(C_GtGetText::h_GetText("Start Bit"));
+   this->mpc_Ui->pc_LabelMuxType->setText(C_GtGetText::h_GetText("Multiplexer Type"));
+   this->mpc_Ui->pc_LabelMuxValue->setText(C_GtGetText::h_GetText("Multiplexer Value"));
    this->mpc_Ui->pc_CheckBoxAutoMinMax->setText(C_GtGetText::h_GetText("Auto min/max"));
 
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
 
    //Combo boxes
-   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
-                                                                                         eUINT8));
-   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
-                                                                                         eSINT8));
-   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
-                                                                                         eFLOAT32));
-   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
-                                                                                         eFLOAT64));
+   //Ensure there are four items
+   this->mpc_Ui->pc_ComboBoxType->addItem("1");
+   this->mpc_Ui->pc_ComboBoxType->addItem("2");
+   this->mpc_Ui->pc_ComboBoxType->addItem("3");
+   this->mpc_Ui->pc_ComboBoxType->addItem("4");
+   //Ensure the indices match the text
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<sintn>(eTY_UNSIGNED),
+                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+                                                                                             eUINT8));
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<sintn>(eTY_SIGNED),
+                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+                                                                                             eSINT8));
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<sintn>(eTY_FLOAT32),
+                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+                                                                                             eFLOAT32));
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<sintn>(eTY_FLOAT64),
+                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+                                                                                             eFLOAT64));
 
-   this->mpc_Ui->pc_ComboBoxByteOrder->addItem(C_SdUtil::h_ConvertByteOrderToName(C_OSCCanSignal::eBYTE_ORDER_INTEL));
-   this->mpc_Ui->pc_ComboBoxByteOrder->addItem(C_SdUtil::h_ConvertByteOrderToName(C_OSCCanSignal::eBYTE_ORDER_MOTOROLA));
+   //Ensure there are two items
+   this->mpc_Ui->pc_ComboBoxByteOrder->addItem("1");
+   this->mpc_Ui->pc_ComboBoxByteOrder->addItem("2");
+   //Ensure the indices match the text
+   this->mpc_Ui->pc_ComboBoxByteOrder->setItemText(ms32_BYTE_ORDER_INDEX_INTEL,
+                                                   C_SdUtil::h_ConvertByteOrderToName(C_OSCCanSignal::eBYTE_ORDER_INTEL));
+   this->mpc_Ui->pc_ComboBoxByteOrder->setItemText(ms32_BYTE_ORDER_INDEX_MOTOROLA,
+                                                   C_SdUtil::h_ConvertByteOrderToName(C_OSCCanSignal::
+                                                                                      eBYTE_ORDER_MOTOROLA));
+
+   //Ensure there are three items
+   this->mpc_Ui->pc_ComboBoxMuxType->addItem("1");
+   this->mpc_Ui->pc_ComboBoxMuxType->addItem("2");
+   this->mpc_Ui->pc_ComboBoxMuxType->addItem("3");
+   //Ensure the indices match the text
+   this->mpc_Ui->pc_ComboBoxMuxType->setItemText(ms32_MUX_DEFAULT, C_GtGetText::h_GetText("none"));
+   this->mpc_Ui->pc_ComboBoxMuxType->setItemText(ms32_MUX_MULTIPLEXER_SIGNAL,
+                                                 C_GtGetText::h_GetText("Multiplexer Signal"));
+   this->mpc_Ui->pc_ComboBoxMuxType->setItemText(ms32_MUX_MULTIPLEXED_SIGNAL,
+                                                 C_GtGetText::h_GetText("Multiplexed Signal"));
 
    //Other
    this->mpc_Ui->pc_SpinBoxLength->setSuffix(C_GtGetText::h_GetText("bit"));
@@ -183,7 +182,7 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    c_InfoText =  C_GtGetText::h_GetText("Symbolic signal name. Unique within a message."
                                         "\nC naming conventions must be followed:"
                                         "\n - must not be empty"
-                                        "\n - only alphanumeric characters + \"_\""
+                                        "\n - only alphanumeric characters and \"_\""
                                         "\n - should not be longer than 31 characters");
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"), c_InfoText);
 
@@ -242,9 +241,16 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    c_InfoText =  C_GtGetText::h_GetText("Start bit of the signal inside the message payload.");
    this->mpc_Ui->pc_LabelStartBit->SetToolTipInformation(C_GtGetText::h_GetText("Start Bit"), c_InfoText);
 
-   //Message
-   c_InfoText =  C_GtGetText::h_GetText("Name of message which contains this signal.");
-   this->mpc_Ui->pc_LabelMessage->SetToolTipInformation(C_GtGetText::h_GetText("Message"), c_InfoText);
+   //Multiplexer
+   c_InfoText =  C_GtGetText::h_GetText("Available types:\n"
+                                        "none (default): Standard signal, present in all messages of this type\n"
+                                        "Multiplexer Signal: Multiplexer signal, present in all messages of this type.\n"
+                                        "Value signifies which multiplexed signals will be present in the current instance of this message.\n"
+                                        "Multiplexed Signal: Multiplexed signal, only present in messages with the multiplexer signal value matching this signal's multiplexer value.\n");
+   this->mpc_Ui->pc_LabelMuxType->SetToolTipInformation(C_GtGetText::h_GetText("Multiplexer Type"), c_InfoText);
+   c_InfoText =  C_GtGetText::h_GetText(
+      "With which multiplexer signal value should this multiplexed signal be transmitted.");
+   this->mpc_Ui->pc_LabelMuxValue->SetToolTipInformation(C_GtGetText::h_GetText("Multiplexer Value"), c_InfoText);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -280,29 +286,11 @@ void C_SdBueSignalPropertiesWidget::SetSignalId(const C_OSCCanMessageIdentificat
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   On change of signal position in message
-
-   \param[in] orq_SignalErrorChange Optional flag to suppress error signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::ReloadPosition(const bool & orq_SignalErrorChange)
+void C_SdBueSignalPropertiesWidget::ReloadPosition(void)
 {
-   const C_OSCCanSignal * const pc_OSCSignal = C_PuiSdHandler::h_GetInstance()->GetCanSignal(this->mc_MessageId,
-                                                                                             this->mu32_SignalIndex);
-
-   if (pc_OSCSignal != NULL)
-   {
-      m_DisconnectPositionUpdate();
-
-      //Start bit
-      this->mpc_Ui->pc_SpinBoxStartBit->setValue(pc_OSCSignal->u16_ComBitStart);
-      //Length
-      this->mpc_Ui->pc_SpinBoxLength->setValue(pc_OSCSignal->u16_ComBitLength);
-
-      m_ConnectPositionUpdate();
-      //Force another save to ensure min max adaptations (after reconnect!)
-      m_RegisterChange();
-      m_CheckMessagePosition(orq_SignalErrorChange);
-   }
+   this->m_HandleAnyChange(eCHA_MLV);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -330,32 +318,6 @@ uint32 C_SdBueSignalPropertiesWidget::GetSignalIndex(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set protocol specific settings
-
-   \param[in] ore_Type Current protcol
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::SetProtocol(const C_OSCCanProtocol::E_Type & ore_Type)
-{
-   if (ore_Type == C_OSCCanProtocol::eECES)
-   {
-      m_DisconnectPositionUpdate();
-      this->mpc_Ui->pc_SpinBoxLength->SetMinimumCustom(1);
-      this->mpc_Ui->pc_SpinBoxLength->SetMaximumCustom(64 - 16);
-      this->mpc_Ui->pc_SpinBoxStartBit->SetMinimumCustom(0);
-      this->mpc_Ui->pc_SpinBoxStartBit->SetMaximumCustom((64 - 16) - 1);
-      m_ConnectPositionUpdate();
-   }
-   else
-   {
-      this->mpc_Ui->pc_SpinBoxLength->SetMinimumCustom(1);
-      this->mpc_Ui->pc_SpinBoxLength->SetMaximumCustom(64);
-      this->mpc_Ui->pc_SpinBoxStartBit->SetMinimumCustom(0);
-      this->mpc_Ui->pc_SpinBoxStartBit->SetMaximumCustom(64 - 1);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Selects the node name in the text edit for fast editing
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -374,259 +336,192 @@ void C_SdBueSignalPropertiesWidget::SelectName(void) const
 void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
 {
    const C_OSCCanMessage * const pc_OSCMessage = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+   const C_PuiSdNodeCanSignal * const pc_UiSignal = C_PuiSdHandler::h_GetInstance()->GetUiCanSignal(this->mc_MessageId,
+                                                                                                    this->mu32_SignalIndex);
    const C_OSCNodeDataPoolListElement * const pc_OSCSignalCommon =
       C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(this->mc_MessageId, this->mu32_SignalIndex);
    const C_PuiSdNodeDataPoolListElement * const pc_UISignalCommon =
       C_PuiSdHandler::h_GetInstance()->GetUiCanDataPoolListElement(this->mc_MessageId, this->mu32_SignalIndex);
 
-   this->mq_DataChangesAllowed = false;
-   //disconnects for UnRegisterChange
-   disconnect(this->mpc_Ui->pc_LineEditName, &QLineEdit::textChanged, this,
-              &C_SdBueSignalPropertiesWidget::m_OnTextChanged);
-   disconnect(this->mpc_Ui->pc_LineEditName, &QLineEdit::editingFinished, this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterNameChange);
-   disconnect(this->mpc_Ui->pc_LineEditUnit, &QLineEdit::textChanged, this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterChange);
-   disconnect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterChange);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_DoubleSpinBoxFactor, static_cast<void (QDoubleSpinBox::*)(
-                                                                   float64)>(&QDoubleSpinBox::valueChanged), this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterScalingChange);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_DoubleSpinBoxOffset, static_cast<void (QDoubleSpinBox::*)(
-                                                                   float64)>(&QDoubleSpinBox::valueChanged), this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterScalingChange);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_ComboBoxByteOrder, static_cast<void (QComboBox::*)(
-                                                                 sintn)>(&QComboBox::currentIndexChanged), this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterPositionChange);
-   disconnect(this->mpc_Ui->pc_CheckBoxAutoMinMax, &C_OgeChxProperties::toggled, this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterChange);
-   disconnect(this->mpc_Ui->pc_WidgetMin, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterMinMaxAndInitChange);
-   disconnect(this->mpc_Ui->pc_WidgetMax, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterMinMaxAndInitChange);
-   disconnect(this->mpc_Ui->pc_WidgetInit, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterMinMaxAndInitChange);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_ComboBoxType, static_cast<void (QComboBox::*)(
-                                                            sintn)>(&C_OgeCbxText::currentIndexChanged), this,
-              &C_SdBueSignalPropertiesWidget::m_HandleValueType);
-
    //May happen while deleting multiple signals
-   if (((pc_OSCSignalCommon != NULL) && (pc_UISignalCommon != NULL)) && (pc_OSCMessage != NULL))
+   if ((((pc_OSCSignalCommon != NULL) && (pc_UISignalCommon != NULL)) && (pc_OSCMessage != NULL)) &&
+       (pc_UiSignal != NULL))
    {
       tgl_assert(this->mu32_SignalIndex < pc_OSCMessage->c_Signals.size());
       if (this->mu32_SignalIndex < pc_OSCMessage->c_Signals.size())
       {
          const C_OSCCanSignal & rc_OSCSignal = pc_OSCMessage->c_Signals[this->mu32_SignalIndex];
 
-         //name
-         this->mpc_Ui->pc_LineEditName->setText(pc_OSCSignalCommon->c_Name.c_str());
+         //Copy
+         this->mc_DataOSCSignal = rc_OSCSignal;
+         this->mc_DataOSCSignalCommon = *pc_OSCSignalCommon;
+         this->mc_DataUiSignal = *pc_UiSignal;
+         this->mc_DataUiSignalCommon = *pc_UISignalCommon;
 
-         //comment
-         this->mpc_Ui->pc_TextEditComment->setText(pc_OSCSignalCommon->c_Comment.c_str());
-
-         //Auto min max
-         this->mpc_Ui->pc_CheckBoxAutoMinMax->setChecked(pc_UISignalCommon->q_AutoMinMaxActive);
-
-         m_ReInitMinMaxAndInit();
-
-         //Factor
-         this->mpc_Ui->pc_DoubleSpinBoxFactor->setValue(pc_OSCSignalCommon->f64_Factor);
-
-         //Offset
-         this->mpc_Ui->pc_DoubleSpinBoxOffset->setValue(pc_OSCSignalCommon->f64_Offset);
-
-         //Unit
-         this->mpc_Ui->pc_LineEditUnit->setText(pc_OSCSignalCommon->c_Unit.c_str());
-
-         //Byte order
-         switch (rc_OSCSignal.e_ComByteOrder)
-         {
-         case C_OSCCanSignal::eBYTE_ORDER_INTEL:
-            this->mpc_Ui->pc_ComboBoxByteOrder->setCurrentIndex(ms32_BYTE_ORDER_INDEX_INTEL);
-            break;
-         case C_OSCCanSignal::eBYTE_ORDER_MOTOROLA:
-            this->mpc_Ui->pc_ComboBoxByteOrder->setCurrentIndex(ms32_BYTE_ORDER_INDEX_MOTOROLA);
-            break;
-         default:
-            this->mpc_Ui->pc_ComboBoxByteOrder->setCurrentIndex(-1);
-            break;
-         }
-
-         //Type
-         switch (pc_OSCSignalCommon->GetType())
+         //Helper
+         switch (this->mc_DataOSCSignalCommon.GetType())
          {
          case C_OSCNodeDataPoolContent::eSINT8:
          case C_OSCNodeDataPoolContent::eSINT16:
          case C_OSCNodeDataPoolContent::eSINT32:
          case C_OSCNodeDataPoolContent::eSINT64:
-            this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(ms32_TYPE_INDEX_SIGNED);
+            this->me_DataType = eTY_SIGNED;
             break;
          case C_OSCNodeDataPoolContent::eUINT8:
          case C_OSCNodeDataPoolContent::eUINT16:
          case C_OSCNodeDataPoolContent::eUINT32:
          case C_OSCNodeDataPoolContent::eUINT64:
-            this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(ms32_TYPE_INDEX_UNSIGNED);
+            this->me_DataType = eTY_UNSIGNED;
             break;
          case C_OSCNodeDataPoolContent::eFLOAT32:
-            this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(ms32_TYPE_INDEX_FLOATING_32);
+            this->me_DataType = eTY_FLOAT32;
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64:
-            this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(ms32_TYPE_INDEX_FLOATING_64);
-            break;
-         default:
-            this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(-1);
+            this->me_DataType = eTY_FLOAT64;
             break;
          }
 
-         ReloadPosition(false);
+         //One time changes
+         //Multiplexer (one time)
+         this->m_InitComboBox(*pc_OSCMessage, this->mu32_SignalIndex);
+         //Set range before value
+         m_HandleMuxValueRange();
 
-         //Message
-         this->mpc_Ui->pc_LabelMessageValue->setText(pc_OSCMessage->c_Name.c_str());
-
-         //Initial check
-         m_CheckSignalName(false);
-         m_CheckMinMaxAndInitValue(false);
+         //Update all fields
+         m_UpdateUIForChange(eCHA_NAME);
+         m_UpdateUIForChange(eCHA_COMMENT);
+         m_UpdateUIForChange(eCHA_AUTO_MIN_MAX);
+         m_UpdateUIForChange(eCHA_MIN);
+         m_UpdateUIForChange(eCHA_MAX);
+         m_UpdateUIForChange(eCHA_FACTOR);
+         m_UpdateUIForChange(eCHA_OFFSET);
+         m_UpdateUIForChange(eCHA_INIT);
+         m_UpdateUIForChange(eCHA_UNIT);
+         m_UpdateUIForChange(eCHA_BYTE_ORDER);
+         m_UpdateUIForChange(eCHA_VALUE_TYPE);
+         m_UpdateUIForChange(eCHA_LENGTH);
+         m_UpdateUIForChange(eCHA_START_BIT);
+         m_UpdateUIForChange(eCHA_MUX_TYPE);
+         m_UpdateUIForChange(eCHA_MUX_VALUE);
       }
    }
-
-   this->mq_DataChangesAllowed = true;
-   //connects for RegisterChange
-   connect(this->mpc_Ui->pc_LineEditName, &QLineEdit::textChanged, this,
-           &C_SdBueSignalPropertiesWidget::m_OnTextChanged);
-   connect(this->mpc_Ui->pc_LineEditName, &QLineEdit::editingFinished, this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterNameChange);
-   connect(this->mpc_Ui->pc_LineEditUnit, &QLineEdit::textChanged, this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterChange);
-   connect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterChange);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_DoubleSpinBoxFactor, static_cast<void (QDoubleSpinBox::*)(
-                                                                float64)>(&QDoubleSpinBox::valueChanged), this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterScalingChange);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_DoubleSpinBoxOffset, static_cast<void (QDoubleSpinBox::*)(
-                                                                float64)>(&QDoubleSpinBox::valueChanged), this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterScalingChange);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_ComboBoxByteOrder, static_cast<void (QComboBox::*)(
-                                                              sintn)>(&QComboBox::currentIndexChanged), this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterPositionChange);
-   connect(this->mpc_Ui->pc_CheckBoxAutoMinMax, &C_OgeChxProperties::toggled, this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterChange);
-   connect(this->mpc_Ui->pc_WidgetMin, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterMinMaxAndInitChange);
-   connect(this->mpc_Ui->pc_WidgetMax, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterMinMaxAndInitChange);
-   connect(this->mpc_Ui->pc_WidgetInit, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterMinMaxAndInitChange);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_ComboBoxType, static_cast<void (QComboBox::*)(
-                                                         sintn)>(&C_OgeCbxText::currentIndexChanged), this,
-           &C_SdBueSignalPropertiesWidget::m_HandleValueType);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle toggle of auto min max check box
-
-   \param[in] orq_AutoMinMaxActive Flag for auto min max active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_HandleAutoMinMaxCheckBox(const bool & orq_AutoMinMaxActive)
+void C_SdBueSignalPropertiesWidget::m_HandleAutoMinMaxCheckBoxChange(void)
 {
-   if (orq_AutoMinMaxActive == true)
-   {
-      //Deactivate all fields
-      this->mpc_Ui->pc_LabelMin->setEnabled(false);
-      this->mpc_Ui->pc_LabelMax->setEnabled(false);
-      this->mpc_Ui->pc_WidgetMin->setEnabled(false);
-      this->mpc_Ui->pc_WidgetMax->setEnabled(false);
+   this->m_HandleAnyChange(eCHA_AUTO_MIN_MAX);
+}
 
-      if (this->mq_DataChangesAllowed == true)
-      {
-         //Assign new values
-         m_SaveToData();
-      }
-   }
-   else
-   {
-      //Activate all fields
-      this->mpc_Ui->pc_LabelMin->setEnabled(true);
-      this->mpc_Ui->pc_LabelMax->setEnabled(true);
-      this->mpc_Ui->pc_WidgetMin->setEnabled(true);
-      this->mpc_Ui->pc_WidgetMax->setEnabled(true);
-   }
-   //Renew min & max
-   this->m_ReInitMinMaxAndInit();
-   //Trigger error check
-   m_CheckMinMaxAndInitValue();
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle min value change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleMinChange(void)
+{
+   this->m_HandleAnyChange(eCHA_MIN);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle max value change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleMaxChange(void)
+{
+   this->m_HandleAnyChange(eCHA_MAX);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle factor change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleFactorChange(void)
+{
+   this->m_HandleAnyChange(eCHA_FACTOR);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle offset change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleOffsetChange(void)
+{
+   this->m_HandleAnyChange(eCHA_OFFSET);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle init value change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleInitChange(void)
+{
+   this->m_HandleAnyChange(eCHA_INIT);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle unit change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleUnitChange(void)
+{
+   this->m_HandleAnyChange(eCHA_UNIT);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle byte order change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleByteOrderChange(void)
+{
+   this->m_HandleAnyChange(eCHA_BYTE_ORDER);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle value type change
-
-   \param[in] ors32_Index Current index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_HandleValueType(const sint32 & ors32_Index)
+void C_SdBueSignalPropertiesWidget::m_HandleValueTypeChange(void)
 {
-   if (ors32_Index == ms32_TYPE_INDEX_UNSIGNED)
-   {
-      //No change
-   }
-   else if (ors32_Index == ms32_TYPE_INDEX_SIGNED)
-   {
-      //No change
-   }
-   else if (ors32_Index == ms32_TYPE_INDEX_FLOATING_32)
-   {
-      this->mpc_Ui->pc_SpinBoxLength->setValue(32);
-   }
-   else
-   {
-      this->mpc_Ui->pc_SpinBoxLength->setValue(64);
-   }
-   if ((ors32_Index == ms32_TYPE_INDEX_UNSIGNED) || (ors32_Index == ms32_TYPE_INDEX_SIGNED))
-   {
-      this->mpc_Ui->pc_SpinBoxLength->setEnabled(true);
-   }
-   else
-   {
-      this->mpc_Ui->pc_SpinBoxLength->setEnabled(false);
-   }
-   m_UpdateAutoMinMax();
-
-   // TODO
-   /*
-   if (this->mq_PositionUpdate == true)
-   {
-      Q_EMIT this->SigTypeChanged(this->mc_MessageId);
-   }
-   */
+   this->m_HandleAnyChange(eCHA_VALUE_TYPE);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle change of bit length
-
-   \param[in] ors32_Value New spin box value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_HandleValueLengthChange(const sint32 & ors32_Value)
+void C_SdBueSignalPropertiesWidget::m_HandleValueLengthChange(void)
 {
-   Q_UNUSED(ors32_Value)
-   m_UpdateAutoMinMax();
+   this->m_HandleAnyChange(eCHA_LENGTH);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Trigger update of auto min max
+/*! \brief   Handle start bit change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_UpdateAutoMinMax(void)
+void C_SdBueSignalPropertiesWidget::m_HandleStartBitChange(void)
 {
-   m_HandleAutoMinMaxCheckBox(this->mpc_Ui->pc_CheckBoxAutoMinMax->isChecked());
+   this->m_HandleAnyChange(eCHA_START_BIT);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle multiplexer type change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleMuxTypeChange(void)
+{
+   this->m_HandleAnyChange(eCHA_MUX_TYPE);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle multiplexer value change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleMuxValueChange(void)
+{
+   this->m_HandleAnyChange(eCHA_MUX_VALUE);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1115,21 +1010,21 @@ sint32 C_SdBueSignalPropertiesWidget::m_SaveGeneric(const C_OgeWiSpinBoxGroup * 
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType(void) const
 {
-   C_OSCNodeDataPoolContent::E_Type e_Retval;
-   const sintn sn_Length = this->mpc_Ui->pc_SpinBoxLength->value();
-   const sint32 s32_CurrentIndex = this->mpc_Ui->pc_ComboBoxType->currentIndex();
+   C_OSCNodeDataPoolContent::E_Type e_Retval = C_OSCNodeDataPoolContent::eUINT8;
+   const uint16 u16_BitLength = this->mc_DataOSCSignal.u16_ComBitLength;
 
-   if (s32_CurrentIndex == ms32_TYPE_INDEX_UNSIGNED)
+   switch (this->me_DataType)
    {
-      if (sn_Length <= 8)
+   case eTY_UNSIGNED:
+      if (u16_BitLength <= 8U)
       {
          e_Retval = C_OSCNodeDataPoolContent::eUINT8;
       }
-      else if ((sn_Length <= 16) && (sn_Length > 8))
+      else if ((u16_BitLength <= 16U) && (u16_BitLength > 8U))
       {
          e_Retval = C_OSCNodeDataPoolContent::eUINT16;
       }
-      else if ((sn_Length <= 32) && (sn_Length > 16))
+      else if ((u16_BitLength <= 32U) && (u16_BitLength > 16U))
       {
          e_Retval = C_OSCNodeDataPoolContent::eUINT32;
       }
@@ -1137,18 +1032,17 @@ C_OSCNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType
       {
          e_Retval = C_OSCNodeDataPoolContent::eUINT64;
       }
-   }
-   else if (s32_CurrentIndex == ms32_TYPE_INDEX_SIGNED)
-   {
-      if (sn_Length <= 8)
+      break;
+   case eTY_SIGNED:
+      if (u16_BitLength <= 8U)
       {
          e_Retval = C_OSCNodeDataPoolContent::eSINT8;
       }
-      else if ((sn_Length <= 16) && (sn_Length > 8))
+      else if ((u16_BitLength <= 16U) && (u16_BitLength > 8U))
       {
          e_Retval = C_OSCNodeDataPoolContent::eSINT16;
       }
-      else if ((sn_Length <= 32) && (sn_Length > 16))
+      else if ((u16_BitLength <= 32U) && (u16_BitLength > 16U))
       {
          e_Retval = C_OSCNodeDataPoolContent::eSINT32;
       }
@@ -1156,70 +1050,15 @@ C_OSCNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType
       {
          e_Retval = C_OSCNodeDataPoolContent::eSINT64;
       }
-   }
-   else if (s32_CurrentIndex == ms32_TYPE_INDEX_FLOATING_32)
-   {
+      break;
+   case eTY_FLOAT32:
       e_Retval = C_OSCNodeDataPoolContent::eFLOAT32;
-   }
-   else
-   {
+      break;
+   case eTY_FLOAT64:
       e_Retval = C_OSCNodeDataPoolContent::eFLOAT64;
+      break;
    }
    return e_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reinitialize min max and init based on stored values
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_ReInitMinMaxAndInit(const float64 * const opf64_Factor,
-                                                          const float64 * const opf64_Offset) const
-{
-   const C_OSCCanMessage * const pc_OSCMessage = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
-   const C_OSCNodeDataPoolListElement * const pc_OSCSignalCommon =
-      C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(this->mc_MessageId, this->mu32_SignalIndex);
-
-   if ((pc_OSCSignalCommon != NULL) && (pc_OSCMessage != NULL))
-   {
-      tgl_assert(this->mu32_SignalIndex < pc_OSCMessage->c_Signals.size());
-      if (this->mu32_SignalIndex < pc_OSCMessage->c_Signals.size())
-      {
-         const C_OSCCanSignal & rc_OSCSignal = pc_OSCMessage->c_Signals[this->mu32_SignalIndex];
-         float64 f64_Factor;
-         float64 f64_Offset;
-         if (opf64_Factor != NULL)
-         {
-            f64_Factor = *opf64_Factor;
-         }
-         else
-         {
-            f64_Factor = pc_OSCSignalCommon->f64_Factor;
-         }
-         if (opf64_Offset != NULL)
-         {
-            f64_Offset = *opf64_Offset;
-         }
-         else
-         {
-            f64_Offset = pc_OSCSignalCommon->f64_Offset;
-         }
-         //Min
-         tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetMin, pc_OSCSignalCommon->c_MinValue, f64_Factor, f64_Offset,
-                                  rc_OSCSignal.u16_ComBitLength, NULL, &pc_OSCSignalCommon->c_MaxValue) == C_NO_ERR);
-
-         //Max
-         tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetMax, pc_OSCSignalCommon->c_MaxValue, f64_Factor, f64_Offset,
-                                  rc_OSCSignal.u16_ComBitLength, &pc_OSCSignalCommon->c_MinValue, NULL) == C_NO_ERR);
-         //Init
-         if (pc_OSCSignalCommon->c_DataSetValues.size() > 0)
-         {
-            tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetInit, pc_OSCSignalCommon->c_DataSetValues[0],
-                                     f64_Factor, f64_Offset, rc_OSCSignal.u16_ComBitLength,
-                                     &pc_OSCSignalCommon->c_MinValue,
-                                     &pc_OSCSignalCommon->c_MaxValue) == C_NO_ERR);
-         }
-      }
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1243,7 +1082,7 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
       bool q_NameConflict = false;
 
       pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, &q_NameConflict, &q_NameInvalid,
-                                           NULL, NULL, NULL,
+                                           NULL, NULL, NULL, NULL, NULL,
                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(this->mc_MessageId.
                                                                                                   e_ComProtocol));
 
@@ -1267,6 +1106,89 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
             c_Content += C_GtGetText::h_GetText("- is already in use\n");
          }
          this->mpc_Ui->pc_LineEditName->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
+      }
+      if (orq_SignalErrorChange == true)
+      {
+         Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check MUX type
+
+   \param[in] orq_SignalErrorChange Optional flag to suppress error signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_CheckMUXType(const bool & orq_SignalErrorChange)
+{
+   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
+      this->mc_MessageId.u32_NodeIndex, this->mc_MessageId.e_ComProtocol, this->mc_MessageId.u32_InterfaceIndex,
+      this->mc_MessageId.q_MessageIsTx);
+
+   //check
+   if ((pc_Message != NULL) && (pc_List != NULL))
+   {
+      bool q_MuxTypeInvalid;
+
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL,
+                                           NULL, NULL, NULL, NULL, &q_MuxTypeInvalid, NULL,
+                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                              this->mc_MessageId.e_ComProtocol));
+      //set invalid text property
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ComboBoxMuxType, "Valid", !q_MuxTypeInvalid);
+      if (q_MuxTypeInvalid == false)
+      {
+         this->mpc_Ui->pc_ComboBoxMuxType->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+      }
+      else
+      {
+         const QString c_Heading = C_GtGetText::h_GetText(
+            "Multiplexer type");
+         const QString c_Content = C_GtGetText::h_GetText(
+            "There is currently no multiplexer defined for this multiplexed signal");
+         this->mpc_Ui->pc_ComboBoxMuxType->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
+      }
+      if (orq_SignalErrorChange == true)
+      {
+         Q_EMIT this->SigRecheckError(this->mc_MessageId);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check MUX value
+
+   \param[in] orq_SignalErrorChange Optional flag to suppress error signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_CheckMUXValue(const bool & orq_SignalErrorChange)
+{
+   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
+      this->mc_MessageId.u32_NodeIndex, this->mc_MessageId.e_ComProtocol, this->mc_MessageId.u32_InterfaceIndex,
+      this->mc_MessageId.q_MessageIsTx);
+
+   //check
+   if ((pc_Message != NULL) && (pc_List != NULL))
+   {
+      bool q_MuxValueInvalid;
+
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL,
+                                           NULL, NULL, NULL, NULL, NULL, &q_MuxValueInvalid,  C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                              this->mc_MessageId.e_ComProtocol));
+      //set invalid text property
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxMuxValue, "Valid", !q_MuxValueInvalid);
+      if (q_MuxValueInvalid == false)
+      {
+         this->mpc_Ui->pc_SpinBoxMuxValue->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
+      }
+      else
+      {
+         const QString c_Content = C_GtGetText::h_GetText(
+            "This value is out of range of the Multiplexer signal");
+         this->mpc_Ui->pc_SpinBoxMuxValue->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
       }
       if (orq_SignalErrorChange == true)
       {
@@ -1296,7 +1218,7 @@ void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_Sign
       bool q_BorderConflict = false;
 
       pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, &q_LayoutConflict, &q_BorderConflict, NULL,
-                                           NULL, NULL, NULL, NULL, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                           NULL, NULL, NULL, NULL, NULL, NULL, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
                                               this->mc_MessageId.e_ComProtocol));
       q_PositionValid = (q_LayoutConflict == false) && (q_BorderConflict == false);
       //set invalid text property
@@ -1344,7 +1266,7 @@ void C_SdBueSignalPropertiesWidget::m_CheckMinMaxAndInitValue(const bool & orq_S
       bool q_MinMaxValid;
 
       pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL,
-                                           &q_MinOverMax, &q_ValueBelowMin, &q_ValueOverMax,
+                                           &q_MinOverMax, &q_ValueBelowMin, &q_ValueOverMax, NULL, NULL,
                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
                                               this->mc_MessageId.e_ComProtocol));
       q_InitValid = (q_ValueBelowMin == false) && (q_ValueOverMax == false);
@@ -1379,237 +1301,1142 @@ void C_SdBueSignalPropertiesWidget::m_CheckMinMaxAndInitValue(const bool & orq_S
       }
    }
 }
-
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Trimm bus name
-
-   Remove whitespaces at the beginning and end of the string
+/*! \brief  Handle name change and do every check without sending any error changed signals yet
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_TrimmMessageName(void) const
+void C_SdBueSignalPropertiesWidget::m_HandleNameChangeWithoutSignal(void)
 {
-   this->mpc_Ui->pc_LineEditName->setText(this->mpc_Ui->pc_LineEditName->text().trimmed());
+   //Avoid signals
+   this->m_HandleAnyChange(eCHA_NAME, false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register Change
-
-   Function where ui elements register a change. Change will be sent via a signal
+/*! \brief  Handle name change with all necessary steps and update triggers
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_RegisterChange(void)
+void C_SdBueSignalPropertiesWidget::m_HandleNameChangeWithSignal(void)
 {
-   m_SaveToData();
-   //signal
-   Q_EMIT this->SigChanged();
+   this->m_HandleAnyChange(eCHA_NAME);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_OnTextChanged(void)
-{
-   this->m_SaveToData();
-   this->m_CheckSignalName(false);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register name change
-
-   Function where ui elements register a change. Change will be sent via a signal
+/*! \brief  Handle comment change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_RegisterNameChange(void)
+void C_SdBueSignalPropertiesWidget::m_HandleCommentChange(void)
 {
-   this->m_TrimmMessageName();
-   m_RegisterChange();
-   this->m_CheckSignalName();
-   Q_EMIT this->SigNameChanged(this->mc_MessageId, this->mu32_SignalIndex);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register scaling change
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_RegisterScalingChange(void)
-{
-   const float64 f64_Factor = this->mpc_Ui->pc_DoubleSpinBoxFactor->value();
-   const float64 f64_Offset = this->mpc_Ui->pc_DoubleSpinBoxOffset->value();
-
-   //Manually insert updated values
-   m_ReInitMinMaxAndInit(&f64_Factor, &f64_Offset);
-   //Save after reinit so there is no change of unscaled values
-   m_RegisterChange();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register position change
-
-   Function where ui elements register a change. Change will be sent via a signal
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_RegisterPositionChange(void)
-{
-   m_RegisterChange();
-   m_CheckMessagePosition();
-   //Trigger reload of potentially changed min&max values
-   m_ReInitMinMaxAndInit();
-   Q_EMIT this->SigPositionChanged(this->mc_MessageId, this->mu32_SignalIndex);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register min, max or init value change
-
-   Function where ui elements register a change. Change will be sent via a signal
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_RegisterMinMaxAndInitChange(void)
-{
-   m_RegisterChange();
-   m_CheckMinMaxAndInitValue();
-   m_ReInitMinMaxAndInit();
+   this->m_HandleAnyChange(eCHA_COMMENT);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data
+   \param[in]  oe_Change   Detected UI change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_SaveToData(void)
+void C_SdBueSignalPropertiesWidget::m_SaveToData(const E_Change oe_Change)
 {
    if (this->mpc_MessageSyncManager != NULL)
    {
-      const C_PuiSdNodeCanSignal * const pc_UiSignal = C_PuiSdHandler::h_GetInstance()->GetUiCanSignal(
-         this->mc_MessageId, this->mu32_SignalIndex);
-      if (pc_UiSignal != NULL)
+      C_OSCCanMessageIdentificationIndices c_NewMessageId;
+      //Multiplexer
+      if ((oe_Change == eCHA_MUX_TYPE) &&
+          (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL))
       {
-         C_OSCCanSignal c_OSCSignal;
-         C_OSCCanMessageIdentificationIndices c_NewMessageId;
-         C_OSCNodeDataPoolListElement c_OSCSignalCommon;
-         C_PuiSdNodeDataPoolListElement c_UISignalCommon;
-
-         //name
-         c_OSCSignalCommon.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
-
-         //comment
-         c_OSCSignalCommon.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
-
-         //Auto min max
-         c_UISignalCommon.q_AutoMinMaxActive = this->mpc_Ui->pc_CheckBoxAutoMinMax->isChecked();
-
-         //Factor
-         c_OSCSignalCommon.f64_Factor = this->mpc_Ui->pc_DoubleSpinBoxFactor->value();
-
-         //Offset
-         c_OSCSignalCommon.f64_Offset = this->mpc_Ui->pc_DoubleSpinBoxOffset->value();
-
-         //Length
-         c_OSCSignal.u16_ComBitLength = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxLength->value());
-
-         //Min
-         c_OSCSignalCommon.c_MinValue.SetArray(false);
-         c_OSCSignalCommon.c_MinValue.SetType(this->m_GetCurrentType());
-         if (c_UISignalCommon.q_AutoMinMaxActive == true)
+         //Adapt parent
+         const C_OSCCanMessage * const pc_Message =
+            C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+         if ((pc_Message != NULL) && (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE))
          {
-            mh_InitMin(c_OSCSignalCommon.c_MinValue, c_OSCSignal.u16_ComBitLength);
+            C_OSCCanMessage c_Copy = *pc_Message;
+            c_Copy.e_TxMethod = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
+            this->mpc_MessageSyncManager->SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
+               this->mc_MessageId, c_Copy);
          }
-         else
-         {
-            m_SaveGeneric(this->mpc_Ui->pc_WidgetMin, c_OSCSignalCommon.c_MinValue, c_OSCSignalCommon.f64_Factor,
-                          c_OSCSignalCommon.f64_Offset);
-         }
+      }
 
-         //Max
-         c_OSCSignalCommon.c_MaxValue.SetArray(false);
-         c_OSCSignalCommon.c_MaxValue.SetType(this->m_GetCurrentType());
-         if (c_UISignalCommon.q_AutoMinMaxActive == true)
-         {
-            mh_InitMax(c_OSCSignalCommon.c_MaxValue, c_OSCSignal.u16_ComBitLength);
-         }
-         else
-         {
-            m_SaveGeneric(this->mpc_Ui->pc_WidgetMax, c_OSCSignalCommon.c_MaxValue, c_OSCSignalCommon.f64_Factor,
-                          c_OSCSignalCommon.f64_Offset);
-         }
+      this->mpc_MessageSyncManager->SetCanSignal(this->mc_MessageId, this->mu32_SignalIndex, this->mc_DataOSCSignal,
+                                                 this->mc_DataOSCSignalCommon, this->mc_DataUiSignalCommon,
+                                                 this->mc_DataUiSignal);
 
-         //Init
-         c_OSCSignalCommon.c_DataSetValues.resize(1);
-         c_OSCSignalCommon.c_DataSetValues[0].SetArray(false);
-         c_OSCSignalCommon.c_DataSetValues[0].SetType(this->m_GetCurrentType());
-         m_SaveGeneric(this->mpc_Ui->pc_WidgetInit, c_OSCSignalCommon.c_DataSetValues[0], c_OSCSignalCommon.f64_Factor,
-                       c_OSCSignalCommon.f64_Offset);
-
-         //Also update min & max & init value for new range
-         mh_AdaptValueToSignalLength(c_OSCSignal.u16_ComBitLength, c_OSCSignalCommon.c_MinValue);
-         mh_AdaptValueToSignalLength(c_OSCSignal.u16_ComBitLength, c_OSCSignalCommon.c_MaxValue);
-         mh_AdaptValueToSignalLength(c_OSCSignal.u16_ComBitLength, c_OSCSignalCommon.c_DataSetValues[0]);
-
-         //Value (Necessary for type consistency)
-         c_OSCSignalCommon.c_Value = c_OSCSignalCommon.c_MinValue;
-         c_OSCSignalCommon.c_NvmValue = c_OSCSignalCommon.c_MinValue;
-
-         //Unit
-         c_OSCSignalCommon.c_Unit = this->mpc_Ui->pc_LineEditUnit->text().toStdString().c_str();
-
-         //Byte order
-         switch (this->mpc_Ui->pc_ComboBoxByteOrder->currentIndex())
-         {
-         case ms32_BYTE_ORDER_INDEX_INTEL:
-            c_OSCSignal.e_ComByteOrder = C_OSCCanSignal::eBYTE_ORDER_INTEL;
-            break;
-         case ms32_BYTE_ORDER_INDEX_MOTOROLA:
-            c_OSCSignal.e_ComByteOrder = C_OSCCanSignal::eBYTE_ORDER_MOTOROLA;
-            break;
-         default:
-            break;
-         }
-
-         //Start bit
-         c_OSCSignal.u16_ComBitStart = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxStartBit->value());
-
-         //Add critical message check
-         if (this->mpc_MessageSyncManager->RecheckCriticalMessage(this->mc_MessageId, c_NewMessageId) == true)
-         {
-            tgl_assert(false);
-            //Not possible here but should also not happen
-            //this->mc_MessageId = c_NewMessageId;
-         }
-
-         this->mpc_MessageSyncManager->SetCanSignal(this->mc_MessageId, this->mu32_SignalIndex, c_OSCSignal,
-                                                    c_OSCSignalCommon, c_UISignalCommon, *pc_UiSignal);
+      //Add critical message check (after change of data)
+      if (this->mpc_MessageSyncManager->RecheckCriticalMessage(this->mc_MessageId, c_NewMessageId) == true)
+      {
+         tgl_assert(false);
+         //Not possible here but should also not happen
+         //this->mc_MessageId = c_NewMessageId;
       }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reconnect signals for position change
+/*! \brief  Get current mutliplexer type
+
+   \return
+   Current mutliplexer type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_ConnectPositionUpdate(void)
+C_OSCCanSignal::E_MultiplexerType C_SdBueSignalPropertiesWidget::m_GetMuxType(void) const
 {
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxLength, static_cast<void (QSpinBox::*)(
-                                                          sintn)>(&C_OgeSpxNumber::valueChanged), this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterPositionChange);
-   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxStartBit, static_cast<void (QSpinBox::*)(
-                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
-           &C_SdBueSignalPropertiesWidget::m_RegisterPositionChange);
-
-   this->mq_PositionUpdate = true;
+   C_OSCCanSignal::E_MultiplexerType e_Retval;
+   switch (this->mpc_Ui->pc_ComboBoxMuxType->currentIndex())
+   {
+   case ms32_MUX_DEFAULT:
+      e_Retval = C_OSCCanSignal::eMUX_DEFAULT;
+      break;
+   case ms32_MUX_MULTIPLEXER_SIGNAL:
+      e_Retval = C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL;
+      break;
+   case ms32_MUX_MULTIPLEXED_SIGNAL:
+      e_Retval = C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL;
+      break;
+   default:
+      e_Retval = C_OSCCanSignal::eMUX_DEFAULT;
+      break;
+   }
+   return e_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Disconnect signals for position change
+/*! \brief  Initialize the combo box for multiplexer type
+
+   \param[in] orc_Message      Current message
+   \param[in] ou32_SignalIndex Current signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_DisconnectPositionUpdate(void)
+void C_SdBueSignalPropertiesWidget::m_InitComboBox(const C_OSCCanMessage & orc_Message,
+                                                   const uint32 ou32_SignalIndex) const
 {
+   bool q_OtherMultiplexer = false;
+
+   //Handle multiplexer
+   for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+   {
+      //Only check other signals
+      if (ou32_SignalIndex != u32_ItSig)
+      {
+         const C_OSCCanSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
+         if (rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+         {
+            q_OtherMultiplexer = true;
+         }
+      }
+   }
+   this->mpc_Ui->pc_ComboBoxMuxType->SetItemState(ms32_MUX_MULTIPLEXER_SIGNAL, !q_OtherMultiplexer);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle automated range for multiplexer value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleMuxValueRange(void) const
+{
+   this->mpc_Ui->pc_SpinBoxMuxValue->SetMinimumCustom(0);
+   //Automated maximum
+   this->mpc_Ui->pc_SpinBoxMuxValue->SetMaximumCustom(static_cast<sintn>(std::numeric_limits<uint16>::max()));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle all changes on UI
+
+   \param[in] oe_Change                           Detected UI change
+   \param[in] oq_AllowSignalsToInformOtherWidgets Optional flag to allow or block signals to inform other widgets
+                                                  of changes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleAnyChange(const C_SdBueSignalPropertiesWidget::E_Change oe_Change,
+                                                      const bool oq_AllowSignalsToInformOtherWidgets)
+{
+   std::list<E_Change> c_Changes;
+   std::list<E_Change> c_ErrorChanges;
+   QString c_UserNotificationText;
+   QString c_UserNotificationAdditionalInformation;
+   //Step 1: get new value from UI
+   this->m_ApplyNewValueFromUI(oe_Change);
+   //Step 2: change all values depending on the current value change
+   this->m_AdaptOtherValues(oe_Change, c_Changes, c_ErrorChanges, c_UserNotificationText,
+                            c_UserNotificationAdditionalInformation);
+   //Step 3: adapt other signals
+   this->m_UpdateOtherSignalsForChange(oe_Change);
+   //Step 4: Write new value to data storage
+   this->m_SaveToData(oe_Change);
+   //Step 5: Update UI errors (usually only relevant for itself)
+   for (std::list<E_Change>::const_iterator c_ItChange = c_ErrorChanges.begin(); c_ItChange != c_ErrorChanges.end();
+        ++c_ItChange)
+   {
+      this->m_UpdateErrorForChange(*c_ItChange);
+   }
+   //Step 6: Update UI based on all changes
+   for (std::list<E_Change>::const_iterator c_ItChange = c_Changes.begin(); c_ItChange != c_Changes.end();
+        ++c_ItChange)
+   {
+      this->m_UpdateUIForChange(*c_ItChange);
+   }
+   if (oq_AllowSignalsToInformOtherWidgets)
+   {
+      //Step 7: Send signals for current change
+      this->m_SendSignalForChange(oe_Change);
+   }
+   //User notification last
+   if ((c_UserNotificationText.isEmpty() == false) || (c_UserNotificationAdditionalInformation.isEmpty() == false))
+   {
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eINFORMATION);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Multiplexer type"));
+      c_Message.SetDescription(c_UserNotificationText);
+      c_Message.SetDetails(c_UserNotificationAdditionalInformation);
+      c_Message.Execute();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply value from UI
+
+   \param[in] oe_Change Detected UI change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_ApplyNewValueFromUI(const C_SdBueSignalPropertiesWidget::E_Change oe_Change)
+{
+   const C_OSCCanSignal * pc_Signal;
+
+   switch (oe_Change)
+   {
+   case eCHA_NAME:
+      this->mc_DataOSCSignalCommon.c_Name = this->mpc_Ui->pc_LineEditName->text().trimmed().toStdString().c_str();
+      break;
+   case eCHA_COMMENT:
+      this->mc_DataOSCSignalCommon.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
+      break;
+   case eCHA_AUTO_MIN_MAX:
+      this->mc_DataUiSignalCommon.q_AutoMinMaxActive = this->mpc_Ui->pc_CheckBoxAutoMinMax->isChecked();
+      break;
+   case eCHA_FACTOR:
+      this->mc_DataOSCSignalCommon.f64_Factor = this->mpc_Ui->pc_DoubleSpinBoxFactor->value();
+      break;
+   case eCHA_OFFSET:
+      this->mc_DataOSCSignalCommon.f64_Offset = this->mpc_Ui->pc_DoubleSpinBoxOffset->value();
+      break;
+   case eCHA_VALUE_TYPE:
+      this->me_DataType = static_cast<E_Type>(this->mpc_Ui->pc_ComboBoxType->currentIndex());
+      break;
+   case eCHA_LENGTH:
+      this->mc_DataOSCSignal.u16_ComBitLength = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxLength->value());
+      break;
+   case eCHA_MIN:
+      this->mc_DataOSCSignalCommon.c_MinValue.SetArray(false);
+      this->mc_DataOSCSignalCommon.c_MinValue.SetType(this->m_GetCurrentType());
+      //Get change from UI should only happen if user can interact
+      tgl_assert(this->mc_DataUiSignalCommon.q_AutoMinMaxActive == false);
+      m_SaveGeneric(this->mpc_Ui->pc_WidgetMin, this->mc_DataOSCSignalCommon.c_MinValue,
+                    this->mc_DataOSCSignalCommon.f64_Factor,
+                    this->mc_DataOSCSignalCommon.f64_Offset);
+      break;
+   case eCHA_MAX:
+      this->mc_DataOSCSignalCommon.c_MaxValue.SetArray(false);
+      this->mc_DataOSCSignalCommon.c_MaxValue.SetType(this->m_GetCurrentType());
+      //Get change from UI should only happen if user can interact
+      tgl_assert(this->mc_DataUiSignalCommon.q_AutoMinMaxActive == false);
+      m_SaveGeneric(this->mpc_Ui->pc_WidgetMax, this->mc_DataOSCSignalCommon.c_MaxValue,
+                    this->mc_DataOSCSignalCommon.f64_Factor,
+                    this->mc_DataOSCSignalCommon.f64_Offset);
+      break;
+   case eCHA_INIT:
+      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      this->mc_DataOSCSignalCommon.c_DataSetValues[0].SetArray(false);
+      this->mc_DataOSCSignalCommon.c_DataSetValues[0].SetType(this->m_GetCurrentType());
+      m_SaveGeneric(this->mpc_Ui->pc_WidgetInit, this->mc_DataOSCSignalCommon.c_DataSetValues[0],
+                    this->mc_DataOSCSignalCommon.f64_Factor,
+                    this->mc_DataOSCSignalCommon.f64_Offset);
+      break;
+   case eCHA_UNIT:
+      this->mc_DataOSCSignalCommon.c_Unit = this->mpc_Ui->pc_LineEditUnit->text().toStdString().c_str();
+      break;
+   case eCHA_BYTE_ORDER:
+      switch (this->mpc_Ui->pc_ComboBoxByteOrder->currentIndex())
+      {
+      case ms32_BYTE_ORDER_INDEX_INTEL:
+         this->mc_DataOSCSignal.e_ComByteOrder = C_OSCCanSignal::eBYTE_ORDER_INTEL;
+         break;
+      case ms32_BYTE_ORDER_INDEX_MOTOROLA:
+         this->mc_DataOSCSignal.e_ComByteOrder = C_OSCCanSignal::eBYTE_ORDER_MOTOROLA;
+         break;
+      default:
+         break;
+      }
+      break;
+   case eCHA_MUX_TYPE:
+      this->mc_DataOSCSignal.e_MultiplexerType = this->m_GetMuxType();
+      break;
+   case eCHA_MUX_VALUE:
+      this->mc_DataOSCSignal.u16_MultiplexValue = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxMuxValue->value());
+      break;
+   case eCHA_START_BIT:
+      this->mc_DataOSCSignal.u16_ComBitStart = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxStartBit->value());
+      break;
+   case eCHA_MLV:
+      //Data changed outside of this widgets responsibility
+      //Update value from data!
+      pc_Signal = C_PuiSdHandler::h_GetInstance()->GetCanSignal(this->mc_MessageId, this->mu32_SignalIndex);
+      if (pc_Signal != NULL)
+      {
+         this->mc_DataOSCSignal.u16_ComBitStart = pc_Signal->u16_ComBitStart;
+         this->mc_DataOSCSignal.u16_ComBitLength = pc_Signal->u16_ComBitLength;
+      }
+      break;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle automated adaptations for other fields based on the current change
+
+   \param[in]  oe_Change                                 Detected UI change
+   \param[out] orc_Changes                               Requested UI changes for other fields
+   \param[out] orc_ErrorChanges                          Requested error check (usually only relevant for itself)
+   \param[out] orc_UserNotificationText                  User notification text if any
+   \param[out] orc_UserNotificationAdditionalInformation User notification additional text if any
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalPropertiesWidget::E_Change oe_Change,
+                                                       std::list<E_Change> & orc_Changes,
+                                                       std::list<E_Change> & orc_ErrorChanges,
+                                                       QString & orc_UserNotificationText,
+                                                       QString & orc_UserNotificationAdditionalInformation)
+{
+   C_OSCNodeDataPoolContent::E_Type e_NewType;
+   switch (oe_Change)
+   {
+   case eCHA_NAME:
+      //Update itself for error
+      orc_ErrorChanges.push_back(eCHA_NAME);
+      //Affects MLV
+      orc_Changes.push_back(eCHA_MLV);
+      break;
+   case eCHA_MUX_VALUE:
+      //Update itself for error
+      orc_ErrorChanges.push_back(eCHA_MUX_VALUE);
+      //Error update might be necessary
+      orc_Changes.push_back(eCHA_START_BIT);
+      orc_Changes.push_back(eCHA_LENGTH);
+      //Affects MLV
+      orc_Changes.push_back(eCHA_MLV);
+      break;
+   case eCHA_BYTE_ORDER:
+      //Affects MLV
+      orc_Changes.push_back(eCHA_MLV);
+      break;
+   case eCHA_INIT:
+   case eCHA_UNIT:
+   case eCHA_COMMENT:
+      //No other elements affected
+      break;
+   case eCHA_START_BIT:
+      //Update itself for error
+      orc_ErrorChanges.push_back(eCHA_START_BIT);
+      //Error
+      orc_Changes.push_back(eCHA_LENGTH);
+      orc_Changes.push_back(eCHA_MLV);
+      break;
+   case eCHA_MIN:
+   case eCHA_MAX:
+   case eCHA_AUTO_MIN_MAX:
+      //Dataset resize just to be on the safe
+      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      //Min
+      if (oe_Change != eCHA_MIN)
+      {
+         this->m_HandleMinValueRange();
+         orc_Changes.push_back(eCHA_MIN);
+      }
+      //Max
+      if (oe_Change != eCHA_MAX)
+      {
+         this->m_HandleMaxValueRange();
+         orc_Changes.push_back(eCHA_MAX);
+      }
+      //Init
+      this->m_HandleInitValueRange();
+      orc_Changes.push_back(eCHA_INIT);
+      break;
+   case eCHA_LENGTH:
+      //Dataset resize just to be on the safe
+      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      //Determine new data type
+      e_NewType = this->m_GetCurrentType();
+      //Handle the actual new type
+      //Adapt types
+      this->m_InitializeDataWithPotentialNewType(e_NewType);
+      //Min
+      this->m_HandleMinValueRange();
+      orc_Changes.push_back(eCHA_MIN);
+      //Max
+      this->m_HandleMaxValueRange();
+      orc_Changes.push_back(eCHA_MAX);
+      //Init
+      this->m_HandleInitValueRange();
+      orc_Changes.push_back(eCHA_INIT);
+      //Update itself for error
+      orc_ErrorChanges.push_back(eCHA_LENGTH);
+      //Error check change
+      orc_Changes.push_back(eCHA_START_BIT);
+      //MLV update trigger
+      orc_Changes.push_back(eCHA_MLV);
+      break;
+   case eCHA_MLV:
+      //Dataset resize just to be on the safe
+      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      //Determine new data type
+      e_NewType = this->m_GetCurrentType();
+      //Handle the actual new type
+      //Adapt types
+      this->m_InitializeDataWithPotentialNewType(e_NewType);
+      //Min
+      this->m_HandleMinValueRange();
+      orc_Changes.push_back(eCHA_MIN);
+      //Max
+      this->m_HandleMaxValueRange();
+      orc_Changes.push_back(eCHA_MAX);
+      //Init
+      this->m_HandleInitValueRange();
+      orc_Changes.push_back(eCHA_INIT);
+      //Error check change
+      orc_Changes.push_back(eCHA_START_BIT);
+      orc_Changes.push_back(eCHA_LENGTH);
+      break;
+   case eCHA_VALUE_TYPE:
+      //Dataset resize just to be on the safe
+      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      //Determine new data type
+      e_NewType = this->m_GetCurrentType();
+      //This might trigger a length change
+      //Length field might change in all cases (disabled/enabled)
+      orc_Changes.push_back(eCHA_LENGTH);
+      //Handle length adaptation
+      if (e_NewType == C_OSCNodeDataPoolContent::eFLOAT32)
+      {
+         this->mc_DataOSCSignal.u16_ComBitLength = 32U;
+      }
+      else if (e_NewType == C_OSCNodeDataPoolContent::eFLOAT64)
+      {
+         this->mc_DataOSCSignal.u16_ComBitLength = 64U;
+      }
+      else
+      {
+         //No change necessary
+      }
+      //Handle the actual new type
+      //Adapt types
+      this->m_InitializeDataWithPotentialNewType(e_NewType);
+      //Min
+      this->m_HandleMinValueRange();
+      orc_Changes.push_back(eCHA_MIN);
+      //Max
+      this->m_HandleMaxValueRange();
+      orc_Changes.push_back(eCHA_MAX);
+      //Init
+      this->m_HandleInitValueRange();
+      orc_Changes.push_back(eCHA_INIT);
+      //MLV update trigger
+      orc_Changes.push_back(eCHA_MLV);
+      break;
+   case eCHA_MUX_TYPE:
+      //Dataset resize just to be on the safe
+      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      //Special type handling for multiplexer signals
+      //Each of MUX type might affect those fields visually even if their value stays unchanged (disabled/enabled)
+      orc_Changes.push_back(eCHA_AUTO_MIN_MAX);
+      orc_Changes.push_back(eCHA_FACTOR);
+      orc_Changes.push_back(eCHA_OFFSET);
+      orc_Changes.push_back(eCHA_UNIT);
+      orc_Changes.push_back(eCHA_LENGTH);
+      orc_Changes.push_back(eCHA_VALUE_TYPE);
+      orc_Changes.push_back(eCHA_MUX_VALUE);
+      //Error check change
+      orc_Changes.push_back(eCHA_START_BIT);
+      orc_Changes.push_back(eCHA_MUX_TYPE);
+      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         bool q_MessageAdapt;
+         const C_OSCCanMessage * const pc_Message =
+            C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+         //Only relevant if the range gets restricted
+         orc_Changes.push_back(eCHA_MIN);
+         orc_Changes.push_back(eCHA_MAX);
+         //Restricted values
+         if ((pc_Message != NULL) && (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE))
+         {
+            q_MessageAdapt = true;
+         }
+         else
+         {
+            q_MessageAdapt = false;
+         }
+         if (q_MessageAdapt == true)
+         {
+            orc_UserNotificationText = C_GtGetText::h_GetText(
+               "The message has been adapted to to some restrictions concerning multiplexer messages and signals.");
+            orc_UserNotificationAdditionalInformation = C_GtGetText::h_GetText("Multiplexer message restrictions:\n"
+                                                                               "- TX method may not be \"On Change\"\n"
+                                                                               "\n"
+                                                                               "Multiplexer signal restrictions:\n"
+                                                                               "- Auto min/ max always active\n"
+                                                                               "- Factor always 1\n"
+                                                                               "- Offset always 0\n"
+                                                                               "- Init value always 1\n"
+                                                                               "- Unit always empty\n"
+                                                                               "- Type always unsigned");
+         }
+         this->mc_DataUiSignalCommon.q_AutoMinMaxActive = true;
+         this->mc_DataOSCSignalCommon.f64_Factor = 1.0;
+         this->mc_DataOSCSignalCommon.f64_Offset = 0.0;
+         this->mc_DataOSCSignalCommon.c_Unit = "";
+         if (this->mc_DataOSCSignal.u16_ComBitLength > 16U)
+         {
+            this->mc_DataOSCSignal.u16_ComBitLength = 16U;
+         }
+         //Type
+         this->me_DataType = eTY_UNSIGNED;
+      }
+      //Determine new data type
+      e_NewType = this->m_GetCurrentType();
+      //Handle the actual new type
+      //Adapt types
+      this->m_InitializeDataWithPotentialNewType(e_NewType);
+      //Min
+      this->m_HandleMinValueRange();
+      orc_Changes.push_back(eCHA_MIN);
+      //Max
+      this->m_HandleMaxValueRange();
+      orc_Changes.push_back(eCHA_MAX);
+      //Init
+      this->m_HandleInitValueRange();
+      orc_Changes.push_back(eCHA_INIT);
+      //Multiplexer signal init value
+      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         //Adapt init value for multiplexer
+         C_SdNdeDataPoolContentUtil::h_SetValueInContent(0.0, this->mc_DataOSCSignalCommon.c_DataSetValues[0]);
+      }
+      //MLV update trigger
+      orc_Changes.push_back(eCHA_MLV);
+      break;
+   case eCHA_FACTOR:
+   case eCHA_OFFSET:
+      //Only visibility changes
+      orc_Changes.push_back(eCHA_MIN);
+      orc_Changes.push_back(eCHA_MAX);
+      orc_Changes.push_back(eCHA_INIT);
+      break;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize data structure with potential new type
+
+   \param[in] oe_Type Expected Type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_InitializeDataWithPotentialNewType(const C_OSCNodeDataPoolContent::E_Type oe_Type)
+{
+   this->mc_DataOSCSignalCommon.c_MinValue.SetArray(false);
+   this->mc_DataOSCSignalCommon.c_MinValue.SetType(oe_Type);
+
+   this->mc_DataOSCSignalCommon.c_MaxValue.SetArray(false);
+   this->mc_DataOSCSignalCommon.c_MaxValue.SetType(oe_Type);
+
+   this->mc_DataOSCSignalCommon.c_DataSetValues[0].SetArray(false);
+   this->mc_DataOSCSignalCommon.c_DataSetValues[0].SetType(oe_Type);
+
+   //Value (Necessary for type consistency)
+   this->mc_DataOSCSignalCommon.c_Value = this->mc_DataOSCSignalCommon.c_MinValue;
+   this->mc_DataOSCSignalCommon.c_NvmValue = this->mc_DataOSCSignalCommon.c_MinValue;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt min value to range and auto min max flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleMinValueRange()
+{
+   if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive == true)
+   {
+      mh_InitMin(this->mc_DataOSCSignalCommon.c_MinValue, this->mc_DataOSCSignal.u16_ComBitLength);
+   }
+   else
+   {
+      mh_AdaptValueToSignalLength(this->mc_DataOSCSignal.u16_ComBitLength,
+                                  this->mc_DataOSCSignalCommon.c_MinValue);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt max value to range and auto min max flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleMaxValueRange()
+{
+   if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive == true)
+   {
+      mh_InitMax(this->mc_DataOSCSignalCommon.c_MaxValue, this->mc_DataOSCSignal.u16_ComBitLength);
+   }
+   else
+   {
+      mh_AdaptValueToSignalLength(this->mc_DataOSCSignal.u16_ComBitLength,
+                                  this->mc_DataOSCSignalCommon.c_MaxValue);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt init value to allowed range
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleInitValueRange(void)
+{
+   mh_AdaptValueToSignalLength(this->mc_DataOSCSignal.u16_ComBitLength,
+                               this->mc_DataOSCSignalCommon.c_DataSetValues[0]);
+   if (this->mc_DataOSCSignalCommon.c_DataSetValues[0] < this->mc_DataOSCSignalCommon.c_MinValue)
+   {
+      this->mc_DataOSCSignalCommon.c_DataSetValues[0] = this->mc_DataOSCSignalCommon.c_MinValue;
+   }
+   if (this->mc_DataOSCSignalCommon.c_DataSetValues[0] > this->mc_DataOSCSignalCommon.c_MaxValue)
+   {
+      this->mc_DataOSCSignalCommon.c_DataSetValues[0] = this->mc_DataOSCSignalCommon.c_MaxValue;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle any changes in other signals
+
+   \param[in] oe_Change Detected UI change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
+   const C_SdBueSignalPropertiesWidget::E_Change oe_Change) const
+{
+   switch (oe_Change)
+   {
+   case eCHA_MLV:
+   case eCHA_LENGTH:
+      if ((this->mpc_MessageSyncManager != NULL) &&
+          (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL))
+      {
+         //Adapt parent
+         const C_OSCCanMessage * const pc_OSCMessage =
+            C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+         if ((pc_OSCMessage != NULL) && (pc_OSCMessage->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE))
+         {
+            C_OSCCanMessage c_Copy = *pc_OSCMessage;
+            c_Copy.e_TxMethod = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
+            this->mpc_MessageSyncManager->SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
+               this->mc_MessageId, c_Copy);
+         }
+      }
+      break;
+   case eCHA_INIT:
+   case eCHA_NAME:
+   case eCHA_MUX_TYPE:
+   case eCHA_VALUE_TYPE:
+   case eCHA_START_BIT:
+   case eCHA_UNIT:
+   case eCHA_COMMENT:
+   case eCHA_MUX_VALUE:
+   case eCHA_BYTE_ORDER:
+   case eCHA_MIN:
+   case eCHA_MAX:
+   case eCHA_AUTO_MIN_MAX:
+   case eCHA_FACTOR:
+   case eCHA_OFFSET:
+      //No change necessary
+      break;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle UI updates based on the specified change
+
+  Includes error check for initial call
+
+   \param[in]  oe_Change Detected UI change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change)
+{
+   //Don't trigger any new changes as all data is pulled from the internal data
+   m_DisconnectAll();
+   switch (oe_Change)
+   {
+   case eCHA_NAME:
+      //Restrictions
+      this->mpc_Ui->pc_LineEditName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
+      //Value
+      this->mpc_Ui->pc_LineEditName->setText(this->mc_DataOSCSignalCommon.c_Name.c_str());
+      break;
+   case eCHA_MUX_TYPE:
+      //Restrictions
+      if (this->mc_MessageId.e_ComProtocol == C_OSCCanProtocol::eLAYER2)
+      {
+         this->mpc_Ui->pc_ComboBoxMuxType->setVisible(true);
+         this->mpc_Ui->pc_LabelMuxType->setVisible(true);
+      }
+      else
+      {
+         this->mpc_Ui->pc_ComboBoxMuxType->setVisible(false);
+         this->mpc_Ui->pc_LabelMuxType->setVisible(false);
+      }
+      //Value
+      switch (this->mc_DataOSCSignal.e_MultiplexerType)
+      {
+      case C_OSCCanSignal::eMUX_DEFAULT:
+         this->mpc_Ui->pc_ComboBoxMuxType->setCurrentIndex(ms32_MUX_DEFAULT);
+         break;
+      case C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL:
+         this->mpc_Ui->pc_ComboBoxMuxType->setCurrentIndex(ms32_MUX_MULTIPLEXER_SIGNAL);
+         break;
+      case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
+         this->mpc_Ui->pc_ComboBoxMuxType->setCurrentIndex(ms32_MUX_MULTIPLEXED_SIGNAL);
+         break;
+      default:
+         break;
+      }
+      break;
+   case eCHA_VALUE_TYPE:
+      //Restrictions
+      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         this->mpc_Ui->pc_LabelType->setEnabled(false);
+         this->mpc_Ui->pc_ComboBoxType->setEnabled(false);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelType->setEnabled(true);
+         this->mpc_Ui->pc_ComboBoxType->setEnabled(true);
+      }
+      //Value
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(static_cast<sintn>(this->me_DataType));
+      break;
+   case eCHA_START_BIT:
+      //Restrictions
+      if (this->mc_MessageId.e_ComProtocol == C_OSCCanProtocol::eECES)
+      {
+         this->mpc_Ui->pc_SpinBoxStartBit->SetMaximumCustom((64 - 16) - 1);
+      }
+      else
+      {
+         this->mpc_Ui->pc_SpinBoxStartBit->SetMaximumCustom(64 - 1);
+      }
+      //Value
+      this->mpc_Ui->pc_SpinBoxStartBit->setValue(this->mc_DataOSCSignal.u16_ComBitStart);
+      break;
+   case eCHA_LENGTH:
+      //Restrictions
+      if ((this->mc_DataOSCSignalCommon.GetType() == C_OSCNodeDataPoolContent::eFLOAT32) ||
+          (this->mc_DataOSCSignalCommon.GetType() == C_OSCNodeDataPoolContent::eFLOAT64))
+      {
+         this->mpc_Ui->pc_LabelLength->setEnabled(false);
+         this->mpc_Ui->pc_SpinBoxLength->setEnabled(false);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelLength->setEnabled(true);
+         this->mpc_Ui->pc_SpinBoxLength->setEnabled(true);
+      }
+      this->mpc_Ui->pc_SpinBoxLength->SetMinimumCustom(1);
+      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         this->mpc_Ui->pc_SpinBoxLength->SetMaximumCustom(16);
+      }
+      else
+      {
+         if (this->mc_MessageId.e_ComProtocol == C_OSCCanProtocol::eECES)
+         {
+            this->mpc_Ui->pc_SpinBoxLength->SetMaximumCustom(64 - 16);
+         }
+         else
+         {
+            this->mpc_Ui->pc_SpinBoxLength->SetMaximumCustom(64);
+         }
+      }
+      //Value
+      this->mpc_Ui->pc_SpinBoxLength->setValue(this->mc_DataOSCSignal.u16_ComBitLength);
+      break;
+   case eCHA_INIT:
+      //Restrictions
+      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         this->mpc_Ui->pc_LabelInitValue->setEnabled(false);
+         this->mpc_Ui->pc_WidgetInit->setEnabled(false);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelInitValue->setEnabled(true);
+         this->mpc_Ui->pc_WidgetInit->setEnabled(true);
+      }
+      //Value
+      tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetInit, this->mc_DataOSCSignalCommon.c_DataSetValues[0],
+                               this->mc_DataOSCSignalCommon.f64_Factor, this->mc_DataOSCSignalCommon.f64_Offset,
+                               this->mc_DataOSCSignal.u16_ComBitLength,
+                               &this->mc_DataOSCSignalCommon.c_MinValue,
+                               &this->mc_DataOSCSignalCommon.c_MaxValue) == C_NO_ERR);
+      break;
+   case eCHA_UNIT:
+      //Restrictions
+      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         this->mpc_Ui->pc_LabelUnit->setEnabled(false);
+         this->mpc_Ui->pc_LineEditUnit->setEnabled(false);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelUnit->setEnabled(true);
+         this->mpc_Ui->pc_LineEditUnit->setEnabled(true);
+      }
+      //Value
+      this->mpc_Ui->pc_LineEditUnit->setText(this->mc_DataOSCSignalCommon.c_Unit.c_str());
+      break;
+   case eCHA_COMMENT:
+      //Restrictions
+      //Value
+      this->mpc_Ui->pc_TextEditComment->setText(this->mc_DataOSCSignalCommon.c_Comment.c_str());
+      break;
+   case eCHA_MUX_VALUE:
+      //Restrictions
+      if (this->mc_MessageId.e_ComProtocol == C_OSCCanProtocol::eLAYER2)
+      {
+         if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+         {
+            this->mpc_Ui->pc_SpinBoxMuxValue->setEnabled(true);
+            this->mpc_Ui->pc_LabelMuxValue->setEnabled(true);
+         }
+         else
+         {
+            this->mpc_Ui->pc_SpinBoxMuxValue->setEnabled(false);
+            this->mpc_Ui->pc_LabelMuxValue->setEnabled(false);
+         }
+         this->mpc_Ui->pc_SpinBoxMuxValue->setVisible(true);
+         this->mpc_Ui->pc_LabelMuxValue->setVisible(true);
+      }
+      else
+      {
+         this->mpc_Ui->pc_SpinBoxMuxValue->setVisible(false);
+         this->mpc_Ui->pc_LabelMuxValue->setVisible(false);
+      }
+      //Value
+      this->mpc_Ui->pc_SpinBoxMuxValue->setValue(this->mc_DataOSCSignal.u16_MultiplexValue);
+      break;
+   case eCHA_BYTE_ORDER:
+      //Restrictions
+      //Value
+      switch (this->mc_DataOSCSignal.e_ComByteOrder)
+      {
+      case C_OSCCanSignal::eBYTE_ORDER_INTEL:
+         this->mpc_Ui->pc_ComboBoxByteOrder->setCurrentIndex(ms32_BYTE_ORDER_INDEX_INTEL);
+         break;
+      case C_OSCCanSignal::eBYTE_ORDER_MOTOROLA:
+         this->mpc_Ui->pc_ComboBoxByteOrder->setCurrentIndex(ms32_BYTE_ORDER_INDEX_MOTOROLA);
+         break;
+      default:
+         this->mpc_Ui->pc_ComboBoxByteOrder->setCurrentIndex(-1);
+         break;
+      }
+      break;
+   case eCHA_MIN:
+      //Restrictions
+      if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive)
+      {
+         this->mpc_Ui->pc_LabelMin->setEnabled(false);
+         this->mpc_Ui->pc_WidgetMin->setEnabled(false);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelMin->setEnabled(true);
+         this->mpc_Ui->pc_WidgetMin->setEnabled(true);
+      }
+      //Value
+      tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetMin, this->mc_DataOSCSignalCommon.c_MinValue,
+                               this->mc_DataOSCSignalCommon.f64_Factor, this->mc_DataOSCSignalCommon.f64_Offset,
+                               this->mc_DataOSCSignal.u16_ComBitLength, NULL,
+                               &this->mc_DataOSCSignalCommon.c_MaxValue) == C_NO_ERR);
+      break;
+   case eCHA_MAX:
+      //Restrictions
+      if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive)
+      {
+         this->mpc_Ui->pc_LabelMax->setEnabled(false);
+         this->mpc_Ui->pc_WidgetMax->setEnabled(false);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelMax->setEnabled(true);
+         this->mpc_Ui->pc_WidgetMax->setEnabled(true);
+      }
+      //Value
+      tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetMax, this->mc_DataOSCSignalCommon.c_MaxValue,
+                               this->mc_DataOSCSignalCommon.f64_Factor, this->mc_DataOSCSignalCommon.f64_Offset,
+                               this->mc_DataOSCSignal.u16_ComBitLength, &this->mc_DataOSCSignalCommon.c_MinValue,
+                               NULL) == C_NO_ERR);
+      break;
+   case eCHA_AUTO_MIN_MAX:
+      //Restrictions
+      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         this->mpc_Ui->pc_CheckBoxAutoMinMax->setEnabled(false);
+      }
+      else
+      {
+         this->mpc_Ui->pc_CheckBoxAutoMinMax->setEnabled(true);
+      }
+      //Value
+      this->mpc_Ui->pc_CheckBoxAutoMinMax->setChecked(this->mc_DataUiSignalCommon.q_AutoMinMaxActive);
+      break;
+   case eCHA_FACTOR:
+      //Restrictions
+      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         this->mpc_Ui->pc_LabelFactor->setEnabled(false);
+         this->mpc_Ui->pc_DoubleSpinBoxFactor->setEnabled(false);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelFactor->setEnabled(true);
+         this->mpc_Ui->pc_DoubleSpinBoxFactor->setEnabled(true);
+      }
+      //Factor needs to be above zero
+      //lint -e{1938}  static const is guaranteed preinitialized before main
+      this->mpc_Ui->pc_DoubleSpinBoxFactor->SetMinimumCustom(C_OgeSpxFactor::mhf64_FACTOR_MIN);
+      this->mpc_Ui->pc_DoubleSpinBoxFactor->SetMaximumCustom(std::numeric_limits<float64>::max());
+      //Value
+      this->mpc_Ui->pc_DoubleSpinBoxFactor->setValue(this->mc_DataOSCSignalCommon.f64_Factor);
+      break;
+   case eCHA_OFFSET:
+      //Restrictions
+      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         this->mpc_Ui->pc_LabelOffset->setEnabled(false);
+         this->mpc_Ui->pc_DoubleSpinBoxOffset->setEnabled(false);
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelOffset->setEnabled(true);
+         this->mpc_Ui->pc_DoubleSpinBoxOffset->setEnabled(true);
+      }
+      //lint -e{10,530,747,1015,1013,1960}  c++11 feature
+      this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64>::lowest());
+      this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMaximumCustom(std::numeric_limits<float64>::max());
+      //Value
+      this->mpc_Ui->pc_DoubleSpinBoxOffset->setValue(this->mc_DataOSCSignalCommon.f64_Offset);
+      break;
+   case eCHA_MLV:
+      //Update UI via signal
+      Q_EMIT (this->SigUpdateMlv(this->mc_MessageId, this->mu32_SignalIndex));
+      break;
+   }
+   this->m_UpdateErrorForChange(oe_Change);
+   //Reactivate GUI change detection
+   m_ConnectAll();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle UI updates based on the specified change
+
+   \param[in]  oe_Change Detected UI change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_UpdateErrorForChange(const C_SdBueSignalPropertiesWidget::E_Change oe_Change)
+{
+   switch (oe_Change)
+   {
+   case eCHA_NAME:
+      //Check
+      m_CheckSignalName(false);
+      break;
+   case eCHA_MUX_TYPE:
+      //Check
+      m_CheckMUXType(false);
+      break;
+   case eCHA_START_BIT:
+      //Check
+      m_CheckMessagePosition(false);
+      break;
+   case eCHA_LENGTH:
+      //Check
+      m_CheckMessagePosition(false);
+      break;
+   case eCHA_MUX_VALUE:
+      //Check
+      m_CheckMUXValue(false);
+      break;
+   case eCHA_VALUE_TYPE:
+   case eCHA_INIT:
+   case eCHA_UNIT:
+   case eCHA_COMMENT:
+   case eCHA_BYTE_ORDER:
+   case eCHA_MIN:
+   case eCHA_MAX:
+   case eCHA_AUTO_MIN_MAX:
+   case eCHA_FACTOR:
+   case eCHA_OFFSET:
+   case eCHA_MLV:
+      //No check necessary
+      break;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle signals based on the current change
+
+   \param[in] oe_Change Detected UI change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_SendSignalForChange(const C_SdBueSignalPropertiesWidget::E_Change oe_Change)
+{
+   switch (oe_Change)
+   {
+   case eCHA_NAME:
+      Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      Q_EMIT (this->SigNameChanged(this->mc_MessageId));
+      break;
+   case eCHA_MUX_TYPE:
+      Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      Q_EMIT (this->SigNameChanged(this->mc_MessageId));
+      break;
+   case eCHA_VALUE_TYPE:
+      Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      break;
+   case eCHA_START_BIT:
+   case eCHA_LENGTH:
+      Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      break;
+   case eCHA_MUX_VALUE:
+      Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      break;
+   case eCHA_INIT:
+   case eCHA_UNIT:
+   case eCHA_COMMENT:
+   case eCHA_BYTE_ORDER:
+   case eCHA_MIN:
+   case eCHA_MAX:
+   case eCHA_AUTO_MIN_MAX:
+   case eCHA_FACTOR:
+   case eCHA_OFFSET:
+      //No signal necessary
+      break;
+   case eCHA_MLV:
+      Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      break;
+   }
+   Q_EMIT (this->SigChanged());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Connect all update functions
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_ConnectAll(void)
+{
+   //Special
+   connect(this->mpc_Ui->pc_LineEditName, &QLineEdit::textChanged, this,
+           &C_SdBueSignalPropertiesWidget::m_HandleNameChangeWithoutSignal);
+   //connects for RegisterChange
+   connect(this->mpc_Ui->pc_LineEditName, &QLineEdit::editingFinished, this,
+           &C_SdBueSignalPropertiesWidget::m_HandleNameChangeWithSignal);
+   connect(this->mpc_Ui->pc_LineEditUnit, &QLineEdit::textChanged, this,
+           &C_SdBueSignalPropertiesWidget::m_HandleUnitChange);
+   connect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
+           &C_SdBueSignalPropertiesWidget::m_HandleCommentChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_DoubleSpinBoxFactor, static_cast<void (QDoubleSpinBox::*)(
+                                                                float64)>(&QDoubleSpinBox::valueChanged), this,
+           &C_SdBueSignalPropertiesWidget::m_HandleFactorChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_DoubleSpinBoxOffset, static_cast<void (QDoubleSpinBox::*)(
+                                                                float64)>(&QDoubleSpinBox::valueChanged), this,
+           &C_SdBueSignalPropertiesWidget::m_HandleOffsetChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_ComboBoxByteOrder, static_cast<void (QComboBox::*)(
+                                                              sintn)>(&QComboBox::currentIndexChanged), this,
+           &C_SdBueSignalPropertiesWidget::m_HandleByteOrderChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_ComboBoxMuxType, static_cast<void (QComboBox::*)(
+                                                            sintn)>(&QComboBox::currentIndexChanged), this,
+           &C_SdBueSignalPropertiesWidget::m_HandleMuxTypeChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_SpinBoxMuxValue, static_cast<void (QSpinBox::*)(
+                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
+           &C_SdBueSignalPropertiesWidget::m_HandleMuxValueChange);
+   connect(this->mpc_Ui->pc_CheckBoxAutoMinMax, &C_OgeChxProperties::toggled, this,
+           &C_SdBueSignalPropertiesWidget::m_HandleAutoMinMaxCheckBoxChange);
+   connect(this->mpc_Ui->pc_WidgetMin, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
+           &C_SdBueSignalPropertiesWidget::m_HandleMinChange);
+   connect(this->mpc_Ui->pc_WidgetMax, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
+           &C_SdBueSignalPropertiesWidget::m_HandleMaxChange);
+   connect(this->mpc_Ui->pc_WidgetInit, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
+           &C_SdBueSignalPropertiesWidget::m_HandleInitChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_ComboBoxType, static_cast<void (QComboBox::*)(
+                                                         sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+           &C_SdBueSignalPropertiesWidget::m_HandleValueTypeChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_SpinBoxLength, static_cast<void (QSpinBox::*)(
+                                                          sintn)>(&QSpinBox::valueChanged), this,
+           &C_SdBueSignalPropertiesWidget::m_HandleValueLengthChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_SpinBoxStartBit, static_cast<void (QSpinBox::*)(
+                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
+           &C_SdBueSignalPropertiesWidget::m_HandleStartBitChange);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Disconnect all update functions
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_DisconnectAll(void)
+{
+   //Special
+   disconnect(this->mpc_Ui->pc_LineEditName, &QLineEdit::textChanged, this,
+              &C_SdBueSignalPropertiesWidget::m_HandleNameChangeWithoutSignal);
+   //disconnects for UnRegisterChange
+   disconnect(this->mpc_Ui->pc_LineEditName, &QLineEdit::editingFinished, this,
+              &C_SdBueSignalPropertiesWidget::m_HandleNameChangeWithSignal);
+   disconnect(this->mpc_Ui->pc_LineEditUnit, &QLineEdit::textChanged, this,
+              &C_SdBueSignalPropertiesWidget::m_HandleUnitChange);
+   disconnect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
+              &C_SdBueSignalPropertiesWidget::m_HandleCommentChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_DoubleSpinBoxFactor, static_cast<void (QDoubleSpinBox::*)(
+                                                                   float64)>(&QDoubleSpinBox::valueChanged), this,
+              &C_SdBueSignalPropertiesWidget::m_HandleFactorChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_DoubleSpinBoxOffset, static_cast<void (QDoubleSpinBox::*)(
+                                                                   float64)>(&QDoubleSpinBox::valueChanged), this,
+              &C_SdBueSignalPropertiesWidget::m_HandleOffsetChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_ComboBoxByteOrder, static_cast<void (QComboBox::*)(
+                                                                 sintn)>(&QComboBox::currentIndexChanged), this,
+              &C_SdBueSignalPropertiesWidget::m_HandleByteOrderChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_ComboBoxMuxType, static_cast<void (QComboBox::*)(
+                                                               sintn)>(&QComboBox::currentIndexChanged), this,
+              &C_SdBueSignalPropertiesWidget::m_HandleMuxTypeChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_SpinBoxMuxValue, static_cast<void (QSpinBox::*)(
+                                                               sintn)>(&C_OgeSpxNumber::valueChanged), this,
+              &C_SdBueSignalPropertiesWidget::m_HandleMuxValueChange);
+   disconnect(this->mpc_Ui->pc_CheckBoxAutoMinMax, &C_OgeChxProperties::toggled, this,
+              &C_SdBueSignalPropertiesWidget::m_HandleAutoMinMaxCheckBoxChange);
+   disconnect(this->mpc_Ui->pc_WidgetMin, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
+              &C_SdBueSignalPropertiesWidget::m_HandleMinChange);
+   disconnect(this->mpc_Ui->pc_WidgetMax, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
+              &C_SdBueSignalPropertiesWidget::m_HandleMaxChange);
+   disconnect(this->mpc_Ui->pc_WidgetInit, &C_OgeWiSpinBoxGroup::SigValueChanged, this,
+              &C_SdBueSignalPropertiesWidget::m_HandleInitChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_ComboBoxType, static_cast<void (QComboBox::*)(
+                                                            sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+              &C_SdBueSignalPropertiesWidget::m_HandleValueTypeChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_SpinBoxLength, static_cast<void (QSpinBox::*)(
-                                                             sintn)>(&C_OgeSpxNumber::valueChanged), this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterPositionChange);
+                                                             sintn)>(&QSpinBox::valueChanged), this,
+              &C_SdBueSignalPropertiesWidget::m_HandleValueLengthChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_SpinBoxStartBit, static_cast<void (QSpinBox::*)(
                                                                sintn)>(&C_OgeSpxNumber::valueChanged), this,
-              &C_SdBueSignalPropertiesWidget::m_RegisterPositionChange);
-
-   this->mq_PositionUpdate = false;
+              &C_SdBueSignalPropertiesWidget::m_HandleStartBitChange);
 }

@@ -20,7 +20,7 @@
 #include "C_PuiSvNodeUpdateParamInfo.h"
 #include "TGLUtils.h"
 #include "C_GtGetText.h"
-#include "C_ImpUtil.h"
+#include "C_PuiUtil.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_OgePopUpDialog.h"
 #include "C_PuiSvHandler.h"
@@ -518,8 +518,8 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetParamsetFileInfo(const QString 
    // Check if file was already added
    for (u32_Counter = 0U; u32_Counter < this->mu32_FileCount; ++u32_Counter)
    {
-      if (C_ImpUtil::h_GetAbsolutePathFromProject(orc_File) ==
-          C_ImpUtil::h_GetAbsolutePathFromProject(this->m_GetApplicationPath(u32_Counter)))
+      if (C_PuiUtil::h_GetAbsolutePathFromProject(orc_File) ==
+          C_PuiUtil::h_GetAbsolutePathFromProject(this->m_GetApplicationPath(u32_Counter)))
       {
          q_NewFile = false;
          break;
@@ -531,7 +531,7 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetParamsetFileInfo(const QString 
    {
       QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
       C_SyvUpParamSetFileAddPopUp * const pc_InfoDialog =
-         new C_SyvUpParamSetFileAddPopUp(*c_New, C_ImpUtil::h_GetAbsolutePathFromProject(orc_File), orc_File,
+         new C_SyvUpParamSetFileAddPopUp(*c_New, C_PuiUtil::h_GetAbsolutePathFromProject(orc_File), orc_File,
                                          this->mu32_NodeIndex);
 
       //Read file info
@@ -549,9 +549,25 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetParamsetFileInfo(const QString 
       }
       else
       {
-         const QString c_Details = QString(C_GtGetText::h_GetText("File path: %1")).arg(C_ImpUtil::h_GetAbsolutePathFromProject(
-                                                                                           orc_File));
+         QString c_Details = QString(C_GtGetText::h_GetText("File path: %1")).
+                             arg(C_PuiUtil::h_GetAbsolutePathFromProject(orc_File)) + "\nReason: ";
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+         switch (s32_ReadFileResult)
+         {
+         case C_RD_WR:
+            c_Details += C_GtGetText::h_GetText(
+               "File does not exist or has invalid structure. See log file for details.");
+            break;
+         case C_CHECKSUM:
+            c_Details += C_GtGetText::h_GetText("File CRC is not correct.");
+            break;
+         case C_CONFIG:
+            c_Details += C_GtGetText::h_GetText("File has missing content. See log file for details.");
+            break;
+         default:
+            c_Details += QString(C_GtGetText::h_GetText("Unknown reason. Error code: %1")).arg(s32_ReadFileResult);
+            break;
+         }
          c_Message.SetHeading(C_GtGetText::h_GetText("Update package configuration"));
          c_Message.SetDescription(C_GtGetText::h_GetText("File is not a valid parameter set image file."));
          c_Message.SetDetails(c_Details);
@@ -574,7 +590,7 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetParamsetFileInfo(const QString 
       c_Message.SetDescription(
          QString(C_GtGetText::h_GetText("The file %1 is already contained in the Update Package for this node "
                                         "and therefore not added again.")).
-         arg(C_ImpUtil::h_GetAbsolutePathFromProject(orc_File)));
+         arg(C_PuiUtil::h_GetAbsolutePathFromProject(orc_File)));
       c_Message.Execute();
    }
 

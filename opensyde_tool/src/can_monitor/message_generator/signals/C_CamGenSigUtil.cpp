@@ -47,11 +47,11 @@ using namespace stw_opensyde_gui_logic;
 std::vector<uint8> C_CamGenSigUtil::h_ConvertRawDataFormat(const C_CamProMessageData & orc_Message)
 {
    std::vector<uint8> c_Retval;
-   c_Retval.reserve(orc_Message.u8_DLC);
+   c_Retval.reserve(orc_Message.u16_Dlc);
    //Copy each byte
-   for (uint8 u8_It = 0; u8_It < orc_Message.u8_DLC; ++u8_It)
+   for (uint16 u16_It = 0; u16_It < orc_Message.u16_Dlc; ++u16_It)
    {
-      c_Retval.push_back(orc_Message.au8_Data[u8_It]);
+      c_Retval.push_back(orc_Message.c_Bytes[u16_It]);
    }
    return c_Retval;
 }
@@ -154,6 +154,8 @@ C_OSCCanSignal C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECan
    c_Retval.u16_ComBitLength = orc_Input.u16_ComBitLength;
    c_Retval.u16_ComBitStart = orc_Input.u16_ComBitStart;
    c_Retval.e_ComByteOrder = orc_Input.e_ComByteOrder;
+   c_Retval.e_MultiplexerType = orc_Input.e_MultiplexerType;
+   c_Retval.u16_MultiplexValue = orc_Input.u16_MultiplexValue;
    return c_Retval;
 }
 

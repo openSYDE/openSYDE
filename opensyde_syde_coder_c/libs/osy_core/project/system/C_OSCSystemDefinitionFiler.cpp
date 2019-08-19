@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cstdio>
@@ -22,26 +22,26 @@
 #include "TGLUtils.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_tgl;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load system definition
 
    Steps:
@@ -67,7 +67,7 @@ using namespace stw_scl;
                device definition file could not be loaded
    C_OVERFLOW  node in system definition references a device not part of the device definitions
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(C_OSCSystemDefinition & orc_SystemDefinition,
                                                               const stw_scl::C_SCLString & orc_PathSystemDefinition,
                                                               const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
@@ -100,7 +100,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(C_OSCSystemDefinit
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save system definition
 
    Save system definition
@@ -116,7 +116,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(C_OSCSystemDefinit
    C_RD_WR    could not erase pre-existing file before saving
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(const C_OSCSystemDefinition & orc_SystemDefinition,
                                                               const stw_scl::C_SCLString & orc_Path,
                                                               std::vector<C_SCLString> * const opc_CreatedFiles)
@@ -167,7 +167,7 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(const C_OSCSystemD
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load nodes
 
    Load nodes data.
@@ -191,7 +191,7 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(const C_OSCSystemD
    C_CONFIG    content is invalid or incomplete
    C_OVERFLOW  node in system definition references a device not part of the device definitions
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(std::vector<C_OSCNode> & orc_Nodes, C_OSCXMLParserBase & orc_XMLParser,
                                                const C_OSCDeviceManager & orc_DeviceDefinitions,
                                                const stw_scl::C_SCLString & orc_BasePath,
@@ -284,7 +284,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(std::vector<C_OSCNode> & orc_Node
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load buses
 
    Load buses data.
@@ -297,7 +297,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(std::vector<C_OSCNode> & orc_Node
    C_NO_ERR   no error
    C_CONFIG   content is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_LoadBuses(std::vector<C_OSCSystemBus> & orc_Buses,
                                                C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -348,7 +348,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadBuses(std::vector<C_OSCSystemBus> & orc
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save nodes
 
    Save nodes data.
@@ -363,7 +363,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadBuses(std::vector<C_OSCSystemBus> & orc
    C_NO_ERR   no error
    C_CONFIG   file could not be created
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & orc_Nodes,
                                                C_OSCXMLParserBase & orc_XMLParser,
                                                const stw_scl::C_SCLString & orc_BasePath,
@@ -416,7 +416,7 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & or
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save buses
 
    Save buses data.
@@ -429,7 +429,7 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & or
    C_NO_ERR   no error
    C_CONFIG   content is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemDefinitionFiler::h_SaveBuses(const std::vector<C_OSCSystemBus> & orc_Buses,
                                              C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -443,7 +443,7 @@ void C_OSCSystemDefinitionFiler::h_SaveBuses(const std::vector<C_OSCSystemBus> &
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load system definition
 
    Steps:
@@ -464,7 +464,7 @@ void C_OSCSystemDefinitionFiler::h_SaveBuses(const std::vector<C_OSCSystemBus> &
                device definition could not be loaded
    C_OVERFLOW  node in system definition references a device not part of the device definitions
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition & orc_SystemDefinition,
                                                           C_OSCXMLParserBase & orc_XMLParser,
                                                           const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
@@ -604,7 +604,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save system definition
 
    Save system definition
@@ -619,7 +619,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition 
    C_NO_ERR   no error
    C_CONFIG   file could not be created
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinition(const C_OSCSystemDefinition & orc_SystemDefinition,
                                                           C_OSCXMLParserBase & orc_XMLParser,
                                                           const stw_scl::C_SCLString & orc_BasePath,

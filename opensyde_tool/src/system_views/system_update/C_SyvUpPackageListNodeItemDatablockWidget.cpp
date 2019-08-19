@@ -115,7 +115,7 @@ void C_SyvUpPackageListNodeItemDatablockWidget::ViewFileInfo(void)
    {
       QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
       C_SyvUpHexFileView * const pc_InfoDialog =
-         new C_SyvUpHexFileView(*c_New, this->GetAppFilePath());
+         new C_SyvUpHexFileView(*c_New, this->GetAppAbsoluteFilePath());
 
       Q_UNUSED(pc_InfoDialog)
 

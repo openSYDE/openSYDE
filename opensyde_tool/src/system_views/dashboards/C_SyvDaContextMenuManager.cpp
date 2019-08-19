@@ -136,7 +136,8 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       this->mpc_ActionBendLine->setVisible(true);
       q_Return = true;
       break;
@@ -144,7 +145,8 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       q_Return = true;
       break;
    case msn_GRAPHICS_ITEM_BOUNDARY:    // boundary and text element have the same functionality
@@ -153,7 +155,8 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       q_Return = true;
       break;
    case msn_GRAPHICS_ITEM_DB_LABEL:        // Basic functions of dashboard elements are the same
@@ -166,7 +169,8 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       this->mpc_ActionEdit->setVisible(true);
       q_Return = true;
       break;
@@ -177,7 +181,8 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
-      this->mpc_ActionOrderObjects->setVisible(true);
+      this->mpc_ActionBringToFront->setVisible(true);
+      this->mpc_ActionSendToBack->setVisible(true);
       q_Return = true;
       break;
    default:

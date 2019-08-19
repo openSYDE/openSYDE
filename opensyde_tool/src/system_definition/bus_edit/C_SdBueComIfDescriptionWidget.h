@@ -59,6 +59,9 @@ public:
 
    void AddSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                   const stw_types::uint16 ou16_StartBit) const;
+   void AddSignalMultiplexed(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                             const stw_types::uint16 ou16_StartBit,
+                             const stw_types::uint16 ou16_MultiplexValue) const;
    void CopySignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                    const stw_types::uint32 ou32_SignalIndex) const;
    void CutSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -70,6 +73,7 @@ public:
 
    stw_opensyde_core::C_OSCCanProtocol::E_Type GetActProtocol(void) const;
    void TriggerLoadOfSplitterUserSettings(void) const;
+   void TriggerSaveOfSplitterUserSettings(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

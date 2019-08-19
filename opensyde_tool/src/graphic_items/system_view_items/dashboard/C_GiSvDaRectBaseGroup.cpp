@@ -969,6 +969,19 @@ void C_GiSvDaRectBaseGroup::GenerateHint(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiBiRectBaseGroup::SetZValueCustom(of64_ZValue);
+   //Apply to data
+   this->UpdateData();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the pointer to the associated dashboard data class
 
    \return
@@ -994,6 +1007,81 @@ const C_PuiSvDashboard * C_GiSvDaRectBaseGroup::GetSvDashboard(void) const
    }
 
    return pc_Dashboard;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the newest registered value of a specific datapool element. It can be an array too.
+
+   The vector will be cleared first.
+
+   If it is an array, the size of the vector is > 1
+   If it is no array, the size of the vector is 1
+   If an error occurred, the size of the vector is 0
+
+   This function is thread safe.
+
+   \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
+   \param[out]    orc_Values                      Vector with result value(s)
+   \param[out]    opc_StringifiedValues           Optional vector with result strings
+   \param[in]     oq_UseScaling                   Optional flag if return value should include internally stored scaling
+
+   \return
+   C_NO_ERR    Value read
+   C_RANGE     Index invalid
+   C_NOACT     No value received
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex,
+                                             std::vector<float64> & orc_Values,
+                                             std::vector<QString> * const opc_StringifiedValues,
+                                             const bool oq_UseScaling)
+{
+   C_PuiSvDbNodeDataPoolListElementId c_Id;
+   const sint32 s32_Retval = C_PuiSvDbDataElementHandler::m_GetLastValue(ou32_WidgetDataPoolElementIndex, orc_Values,
+                                                                         opc_StringifiedValues, oq_UseScaling);
+
+   //Remove error on valid new value
+   if ((s32_Retval == C_NO_ERR) && (this->GetDataPoolElementIndex(ou32_WidgetDataPoolElementIndex, c_Id) == C_NO_ERR))
+   {
+      this->mc_CommmunicationErrors.remove(c_Id);
+      this->mc_InvalidDlcSignals.remove(c_Id);
+      m_UpdateErrorIcon();
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the newest registered value of a specific datapool element as float
+
+   This function is thread safe.
+
+   \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
+   \param[out]    of64_Value                      Result value
+   \param[in]     oq_UseScaling                   Optional flag if return value should include internally stored scaling
+
+   \return
+   C_NO_ERR    Value read
+   C_RANGE     Index invalid
+   C_NOACT     No value received
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex, float64 & orf64_Value,
+                                             const bool oq_UseScaling)
+{
+   C_PuiSvDbNodeDataPoolListElementId c_Id;
+   const sint32 s32_Retval = C_PuiSvDbDataElementHandler::m_GetLastValue(ou32_WidgetDataPoolElementIndex, orf64_Value,
+                                                                         oq_UseScaling);
+
+   //Remove error on valid new value
+   if ((s32_Retval == C_NO_ERR) && (this->GetDataPoolElementIndex(ou32_WidgetDataPoolElementIndex, c_Id) == C_NO_ERR))
+   {
+      this->mc_CommmunicationErrors.remove(c_Id);
+      this->mc_InvalidDlcSignals.remove(c_Id);
+      m_UpdateErrorIcon();
+   }
+
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1685,8 +1773,12 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIcon(void)
            (this->mc_CommmunicationErrors.size() > 0)) || (this->mc_InvalidDlcSignals.size() > 0))
       {
          this->mpc_ConflictIcon->setVisible(true);
-         //Disable other icon
-         this->mpc_ButtonGroup->setVisible(false);
+         if (this->mpc_ButtonGroup->isVisible())
+         {
+            //Don't use move (cumulative) use set pos instead
+            //Move icon below update trigger
+            this->mpc_ConflictIcon->setPos(this->mpc_ConflictIcon->x(), this->mpc_ButtonGroup->boundingRect().height());
+         }
       }
       else
       {
@@ -1835,10 +1927,19 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
       tgl_assert(s32_Return == C_NO_ERR);
       if (s32_Return == C_NO_ERR)
       {
+         //Always iterate to next element!
          ++this->mu32_NextManualActionIndex;
-         if ((c_ElementId.GetIsValid() == true) && (m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true))
+         if (this->m_IsOnTrigger(c_ElementId))
          {
-            Q_EMIT this->SigDataPoolRead(c_ElementId);
+            if ((c_ElementId.GetIsValid() == true) && (m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true))
+            {
+               Q_EMIT this->SigDataPoolRead(c_ElementId);
+            }
+            else
+            {
+               //Skip to next element
+               this->m_ManualRead();
+            }
          }
          else
          {
@@ -1848,13 +1949,58 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
       }
       else
       {
+         //Unexpected
          this->m_ManualOperationFinished();
       }
    }
    else
    {
+      //Last element reached or write element
       this->m_ManualOperationFinished();
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if the specified ID is configured as on trigger
+
+   \param[in] orc_Id ID to check
+
+   \retval   true   Error occurred or on trigger configured
+   \retval   false  Definitely not on trigger configured
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::m_IsOnTrigger(const C_PuiSvDbNodeDataPoolListElementId & orc_Id) const
+{
+   bool q_Retval = true;
+
+   if (orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
+   {
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+      if (pc_View != NULL)
+      {
+         const QMap<C_OSCNodeDataPoolListElementId,
+                    C_PuiSvReadDataConfiguration> & rc_RailAssignments = pc_View->GetReadRailAssignments();
+         const QMap<C_OSCNodeDataPoolListElementId,
+                    C_PuiSvReadDataConfiguration>::const_iterator c_ItRailAssignment = rc_RailAssignments.find(
+            orc_Id);
+         if (c_ItRailAssignment != rc_RailAssignments.end())
+         {
+            //Only allow manual transmission for "on trigger" elements
+            if (c_ItRailAssignment.value().e_TransmissionMode != C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
+            {
+               q_Retval = false;
+            }
+         }
+      }
+   }
+   else
+   {
+      //Never trigger manual for bus element
+      q_Retval = false;
+   }
+
+   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1935,6 +2081,11 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
                C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(c_It.key())).arg(QString::number(c_It.value()));
          }
       }
+   }
+   //Check if redisplay necessary
+   if (c_Content.compare(this->GetCurrentToolTipContent()) != 0)
+   {
+      Q_EMIT this->SigHideToolTip();
    }
    this->SetDefaultToolTipHeading(c_Heading);
    this->SetDefaultToolTipContent(c_Content);

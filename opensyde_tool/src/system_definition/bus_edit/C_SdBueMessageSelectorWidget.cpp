@@ -273,6 +273,24 @@ void C_SdBueMessageSelectorWidget::SetInitialFocus(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle select messages action
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorWidget::SelectMessagesWithoutSignal(void)
+{
+   this->mpc_Ui->pc_MessageTreeWidget->collapseAll();
+   this->mpc_Ui->pc_MessageTreeWidget->DeselectAllItems();
+   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_MessagesPbWidget, "Selected", true);
+   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperatorUp,
+                                                                  "HasColor7Background",
+                                                                  true);
+   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperatorBottom,
+                                                                  "HasColor7Background",
+                                                                  true);
+   this->mq_MessagesActive = true;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle selection change with all aspects
 
    \param[in] orc_MessageId Message identification indices
@@ -306,7 +324,22 @@ void C_SdBueMessageSelectorWidget::SelectSignal(const C_OSCCanMessageIdentificat
 void C_SdBueMessageSelectorWidget::AddSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                              const uint16 ou16_StartBit) const
 {
-   this->mpc_Ui->pc_MessageTreeWidget->AddSignalWithStartBit(orc_MessageId, ou16_StartBit);
+   this->mpc_Ui->pc_MessageTreeWidget->AddSignalWithStartBit(orc_MessageId, ou16_StartBit, false, 0);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new signal
+
+   \param[in] orc_MessageId            Message identification indices
+   \param[in] ou16_StartBit            Start bit for new signal
+   \param[in] ou16_MultiplexValue    Concrete multiplexed value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorWidget::AddSignalMultiplexed(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                                        const uint16 ou16_StartBit,
+                                                        const uint16 ou16_MultiplexValue) const
+{
+   this->mpc_Ui->pc_MessageTreeWidget->AddSignalWithStartBit(orc_MessageId, ou16_StartBit, true, ou16_MultiplexValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -458,16 +491,7 @@ void C_SdBueMessageSelectorWidget::m_AddMessageButtonClicked(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_MessagesButtonClicked(void)
 {
-   this->mpc_Ui->pc_MessageTreeWidget->collapseAll();
-   this->mpc_Ui->pc_MessageTreeWidget->DeselectAllItems();
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_MessagesPbWidget, "Selected", true);
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperatorUp,
-                                                                  "HasColor7Background",
-                                                                  true);
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperatorBottom,
-                                                                  "HasColor7Background",
-                                                                  true);
-   this->mq_MessagesActive = true;
+   this->SelectMessagesWithoutSignal();
    Q_EMIT this->SigMessagesSelected();
 }
 

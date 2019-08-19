@@ -57,6 +57,9 @@ public:
    void RevertBus(const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                   const stw_opensyde_gui::C_GiLiBus * const opc_LastBus, const QPointF & orc_ScenePos);
 
+   //GI base
+   virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

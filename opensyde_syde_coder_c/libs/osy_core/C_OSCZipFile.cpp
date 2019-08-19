@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <fstream>
@@ -23,7 +23,7 @@
 #include "C_OSCUtils.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
@@ -31,19 +31,19 @@ using namespace stw_tgl;
 using namespace stw_opensyde_core;
 using namespace std;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create ZIP archive from files
 
    In the unlikely case that function fails there is no clean-up done and
@@ -75,7 +75,7 @@ using namespace std;
    C_RD_WR     could not open input file
    C_NOACT     could not add data to zip file (does the path to the file exist ?)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const std::set<C_SCLString> & orc_SupFiles,
                                      const C_SCLString & orc_ZipArchivePath, stw_scl::C_SCLString * const opc_ErrorText)
 {
@@ -175,7 +175,7 @@ sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const s
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Unpacks source zip archive and stores the contents to target unzip path.
 
    Assumptions:
@@ -194,7 +194,7 @@ sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const s
    C_NO_ERR    success
    C_RD_WR     could not unpack archive to target path
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C_SCLString & orc_TargetUnzipPath,
                                      stw_scl::C_SCLString * const opc_ErrorText)
 {

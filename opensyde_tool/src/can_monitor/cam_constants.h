@@ -49,6 +49,10 @@ const stw_types::sintn msn_TRACE_TRANSPARENCY_STEPS = msn_TRACE_TRANSPARENCY_STA
 const QString mc_DLL_PATH_PEAK_CAM = "..\\STW_dlls\\stwpeak2\\stwpeak2.dll";
 const QString mc_DLL_PATH_VECTOR_CAM = "..\\STW_dlls\\stwvec32\\stwvec32.dll";
 
+// Path variables for can monitor only
+const QString mc_PATH_VARIABLE_CAN_MONITOR_BIN = "%{CAN_MONITOR_BINARY}";
+const QString mc_PATH_VARIABLE_CAN_MONITOR_PROJ = "%{CAN_MONITOR_PROJECT}";
+
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

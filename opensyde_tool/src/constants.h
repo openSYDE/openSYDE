@@ -95,6 +95,7 @@ const QColor mc_STYLE_GUIDE_COLOR_38 = QColor(217, 217, 226, 255);
 const QColor mc_STYLE_GUIDE_COLOR_39 = QColor(116, 116, 116, 255);
 const QColor mc_STYLE_GUIDE_COLOR_40 = QColor(97, 97, 150, 255);
 const QColor mc_STYLE_GUIDE_COLOR_52 = QColor(66, 66, 66, 255);
+const QColor mc_STYLE_GUIDE_COLOR_67 = QColor(32, 31, 67, 255);
 const QColor mc_STYLE_GUIDE_COLOR_1353 = QColor(22, 22, 44, 255);
 const QColor mc_STYLE_GUIDE_COLOR_2706 = QColor(83, 83, 117);
 const QColor mc_STYLE_GUIDE_COLOR_3001 = QColor(73, 73, 133);
@@ -168,7 +169,7 @@ const stw_types::sint32 ms32_TOOL_TIP_DELAY = 100;
 const stw_types::uint32 mu32_TOOL_TIP_MAXIMUM_ITEMS = 3;
 
 //Message box default size
-const stw_types::sint32 ms32_MESSAGE_BOX_DEFAULT_WIDTH = 650;
+const stw_types::sint32 ms32_MESSAGE_BOX_DEFAULT_WIDTH = 600;
 
 //Icon Size
 const QSize mc_ICON_SIZE_24 = QSize(24, 24);
@@ -221,9 +222,12 @@ const stw_types::sintn msn_USER_ROLE_INTERACTION_IS_LINK = static_cast<stw_types
 const stw_types::sintn msn_USER_ROLE_INTERACTION_USE_MIN_VALUE = static_cast<stw_types::sintn>(Qt::UserRole) + 74;
 //Generic table interface: Flag to see if cell requires a maximum value while interacting (type: bool, default: false)
 const stw_types::sintn msn_USER_ROLE_INTERACTION_USE_MAX_VALUE = static_cast<stw_types::sintn>(Qt::UserRole) + 75;
+//Generic table interface: Strings for combo box (type: QStringList, default: none)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST = static_cast<stw_types::sintn>(Qt::UserRole) +
+                                                                          76;
 //Generic table interface: Values for combo box (type: QStringList, default: none)
 const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST = static_cast<stw_types::sintn>(Qt::UserRole) +
-                                                                         76;
+                                                                         77;
 //Generic table interface: Parameters for spin box (type: QStringList, default: none)
 //Expected 4 elements:
 //0: Min of type C_OSCNodeDataPoolContent encoded as string -> TBD
@@ -231,11 +235,18 @@ const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST = static_
 //2: Factor (float64) encoded as string
 //3: Offset (float64) encoded as string
 const stw_types::sintn msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST =
-   static_cast<stw_types::sintn>(Qt::UserRole) + 77;
+   static_cast<stw_types::sintn>(Qt::UserRole) + 78;
 
 // Paths
 const QString mc_DLL_PATH_PEAK = "STW_dlls\\stwpeak2\\stwpeak2.dll";
 const QString mc_DLL_PATH_VECTOR = "STW_dlls\\stwvec32\\stwvec32.dll";
+
+// Path variables
+const QString mc_PATH_VARIABLE_OPENSYDE_BIN = "%{OPENSYDE_BINARY}";
+const QString mc_PATH_VARIABLE_OPENSYDE_PROJ = "%{OPENSYDE_PROJECT}";
+const QString mc_PATH_VARIABLE_DATABLOCK_PROJ = "%{PROJECT_DIR}";
+const QString mc_PATH_VARIABLE_USER_NAME = "%{USER_NAME}";
+const QString mc_PATH_VARIABLE_COMPUTER_NAME = "%{COMPUTER_NAME}";
 
 // Identifier of update package subsections
 const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK = 0U;

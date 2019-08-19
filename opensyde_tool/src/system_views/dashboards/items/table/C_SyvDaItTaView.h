@@ -41,6 +41,7 @@ public:
    void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
 
    void AddItem(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId);
+   void MoveSelected(const bool oq_Up);
    void RemoveSelectedItems(
       std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> & orc_RemovedDataElements);
    std::vector<stw_types::uint32> GetUniqueSelectedRows(void) const;

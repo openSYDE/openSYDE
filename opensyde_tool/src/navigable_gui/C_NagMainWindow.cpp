@@ -83,6 +83,7 @@ C_NagMainWindow::C_NagMainWindow(void) :
    QMainWindow(NULL),
    mpc_Ui(new Ui::C_NagMainWindow),
    mpc_ActiveWidget(NULL),
+   mq_InitialProjectLoaded(false),
    mq_BlockDragAndDrop(false),
    mq_StartView(true),
    mq_ChangeUseCase(false),
@@ -114,7 +115,7 @@ C_NagMainWindow::C_NagMainWindow(void) :
 
    // load devices so they are known to UI
    stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
-      (C_Uti::h_GetExePath() + "\\..\\devices\\devices.ini").toStdString().c_str());
+      C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str());
 
    this->mpc_MainWidget = new C_NagMainWidget(this->mpc_Ui->pc_workAreaWidget);
    this->mpc_UseCaseWidget = new C_NagUseCaseViewWidget(this->mpc_Ui->pc_workAreaWidget);
@@ -167,11 +168,6 @@ C_NagMainWindow::C_NagMainWindow(void) :
       QSize c_Size = C_UsHandler::h_GetInstance()->GetAppSize();
       C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Position, c_Size, QSize(1000, 700), true);
       this->setGeometry(c_Position.x(), c_Position.y(), c_Size.width(), c_Size.height());
-
-      if (C_UsHandler::h_GetInstance()->GetAppMaximized() == true)
-      {
-         this->showMaximized();
-      }
    }
    //Drag & drop of *.syde files
    this->setAcceptDrops(true);
@@ -179,14 +175,6 @@ C_NagMainWindow::C_NagMainWindow(void) :
    //Window title
    this->setWindowTitle("openSYDE");
    connect(this->mpc_MainWidget, &C_NagMainWidget::SigNewApplicationName, this, &C_NagMainWindow::setWindowTitle);
-
-   // Project
-   // first initialization (for project load)
-   C_PuiProject::h_GetInstance();
-   this->m_ProjectLoaded(C_PuiProject::h_GetInstance()->GetSwitchUseCaseFlag());
-
-   // init dynamic text of main widget and window title
-   this->mpc_MainWidget->UpdateRecentProjects();
 
    //Window icon
    C_OgeWiUtil::h_SetWindowIcon(this);
@@ -295,6 +283,36 @@ void C_NagMainWindow::m_OpenDetail(const sint32 os32_Index, const sint32 os32_Su
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
+
+   Here: Loading initial project
+
+   \param[in,out] opc_Event    Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWindow::showEvent(QShowEvent * const opc_Event)
+{
+   if (C_UsHandler::h_GetInstance()->GetAppMaximized() == true)
+   {
+      // Call here maximized to avoid a further show event in the constructor
+      this->showMaximized();
+   }
+
+   QMainWindow::showEvent(opc_Event);
+
+   if (this->mq_InitialProjectLoaded == false)
+   {
+      this->mq_InitialProjectLoaded = true;
+
+      // Load initial project (must be called always at start to have a valid project!)
+      // Call it with a delay to make sure the UI is finished. The maximized state can cause a not reliable
+      // size information of the QWidgets or QMainWindow when the first events will caused (Polished, Paint if called,
+      // Show and WindowStateChange if called)
+      QTimer::singleShot(50, this, &C_NagMainWindow::m_LoadInitialProject);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten key press event slot
 
    Here: Trigger help key press handling
@@ -386,11 +404,11 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
          {
          case ms32_SUBMODE_SYSDEF_NODEEDIT:
             //One higher
-            m_ChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY, 0, C_GtGetText::h_GetText("Network Topology"));
+            m_ChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY, 0, C_GtGetText::h_GetText("NETWORK TOPOLOGY"));
             break;
          case ms32_SUBMODE_SYSDEF_BUSEDIT:
             //One higher
-            m_ChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY, 0, C_GtGetText::h_GetText("Network Topology"));
+            m_ChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY, 0, C_GtGetText::h_GetText("NETWORK TOPOLOGY"));
             break;
          case ms32_SUBMODE_SYSDEF_TOPOLOGY:
             //One higher
@@ -560,6 +578,34 @@ void C_NagMainWindow::dropEvent(QDropEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Perform initial project load.
+
+   Instantiate C_PuiProject, perform initial project load, handle errors and update GUI.
+
+   Do not try to load other recent projects, just open an empty project.
+   (If the last recent project is invalid, all others might be invalid too, e.g. because of invalid
+   devices.ini. In this case the user would be forced to close n message boxes if there are n recent projects
+   in user settings - very annoying).
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWindow::m_LoadInitialProject(void)
+{
+   uint16 u16_Version;
+   QString c_LoadedProject;
+
+   // Initial load (command line or first recent project)
+   const sint32 s32_Error = C_PuiProject::h_GetInstance()->LoadInitialProject(&u16_Version, c_LoadedProject);
+
+   C_PopErrorHandling::mh_ProjectLoadErr(s32_Error, c_LoadedProject, this->mpc_MainWidget, u16_Version);
+
+   // Handle use case switch
+   this->m_ProjectLoaded(C_PuiProject::h_GetInstance()->GetSwitchUseCaseFlag());
+
+   // Initialize dynamic text of main widget and window title
+   this->mpc_MainWidget->UpdateRecentProjects();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Preparation for showing a specific widget in the 'work area'
 
    \param[in]  oq_DeleteActualWidget   Flag for deleting the previous widget
@@ -629,7 +675,7 @@ void C_NagMainWindow::m_SetNewSpecificWidget(const stw_types::sint32 os32_Mode, 
 
    // show the new widget
    this->mpc_UseCaseWidget->SetUseCaseWidget(this->mpc_ActiveWidget, os32_Mode, os32_SubMode, oc_ItemName,
-                                             orc_SubSubModeName);
+                                             orc_SubSubModeName, os32_Mode == ms32_MODE_SYSVIEW);
 
    // configure the buttons of the upper toolbar
    this->mpc_Ui->pc_TopToolBar->ConfigureButtons(this->mpc_ActiveWidget);
@@ -713,12 +759,12 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
             }
             else
             {
-               orc_Name = C_GtGetText::h_GetText("Network Topology");
+               orc_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
             }
          }
          else
          {
-            orc_Name = C_GtGetText::h_GetText("Network Topology");
+            orc_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
          }
          orc_SubItemName = "";
       }
@@ -771,7 +817,15 @@ void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 o
    }
    else
    {
-      this->mpc_UseCaseWidget->UpdateUseCaseWidget(os32_SubMode, orc_Name, "");
+      if (os32_SubMode == ms32_SUBMODE_SYSDEF_TOPOLOGY)
+      {
+         this->mpc_UseCaseWidget->UpdateUseCaseWidget(os32_SubMode, orc_Name, "", false);
+      }
+      else
+      {
+         this->mpc_UseCaseWidget->UpdateUseCaseWidget(os32_SubMode, C_GtGetText::h_GetText(
+                                                         "NETWORK TOPOLOGY"), orc_Name, false);
+      }
    }
 
    pc_Handler->SetSubMode(os32_SubMode, ou32_Index, ou32_Flag);
@@ -834,7 +888,7 @@ void C_NagMainWindow::m_ShowSysViewItem(sint32 & ors32_SubMode, const uint32 ou3
    }
    else
    {
-      this->mpc_UseCaseWidget->UpdateUseCaseWidget(ors32_SubMode, orc_Name, orc_SubSubModeName);
+      this->mpc_UseCaseWidget->UpdateUseCaseWidget(ors32_SubMode, orc_Name, orc_SubSubModeName, true);
    }
 
    pc_Handler->SetSubMode(ors32_SubMode, ou32_Index, ou32_Flag);
@@ -1106,7 +1160,7 @@ void C_NagMainWindow::m_UpdateTitle(void) const
    QString c_SubSubMode;
 
    C_SyvUtil::h_GetViewDisplayName(this->mu32_Index, this->ms32_SubMode, c_SubMode, c_SubSubMode);
-   this->mpc_UseCaseWidget->UpdateItemName(c_SubMode, c_SubSubMode);
+   this->mpc_UseCaseWidget->UpdateItemName(c_SubMode, c_SubSubMode, true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

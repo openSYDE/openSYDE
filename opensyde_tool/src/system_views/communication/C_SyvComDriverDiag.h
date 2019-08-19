@@ -136,6 +136,9 @@ private:
       C_PuiSvDbNodeDataPoolListElementId c_ElementId;
       // Signal for showing in widget
       stw_opensyde_core::C_OSCCanSignal c_Signal;
+      // In case of a multiplexed signal in c_Signal, this is the multiplexer signal which must have the matching value
+      // If c_Signal is no multiplexed signal, this is not relevant
+      stw_opensyde_core::C_OSCCanSignal c_MultiplexerSignal;
       // And the content as information about the type
       stw_opensyde_core::C_OSCNodeDataPoolContent c_ElementContent;
    };
@@ -167,6 +170,9 @@ private:
    stw_types::sint32 m_InitDataDealer(void);
    stw_types::sint32 m_StartRoutingDiag(QString & orc_ErrorDetails, std::set<stw_types::uint32> & orc_ErrorActiveNodes);
    stw_types::sint32 m_StartDiagServers(QString & orc_ErrorDetails);
+   static stw_types::sint32 mh_CheckDatapools(const stw_opensyde_core::C_OSCNode * const opc_Node,
+                                              stw_opensyde_core::C_OSCDiagProtocolBase * const opc_Protocol,
+                                              QString & orc_ErrorDetails);
 
    stw_types::sint32 m_Cycle(void);
    static void mh_ThreadFunc(void * const opv_Instance);

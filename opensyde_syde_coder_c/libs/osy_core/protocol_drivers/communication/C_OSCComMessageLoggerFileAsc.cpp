@@ -7,7 +7,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <ctime> //lint !e829 //this module is specifically for Windows targets; no trouble with unspecified
@@ -19,26 +19,26 @@
 #include "TGLFile.h"
 #include "TGLTime.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
    \param[in]  orc_FilePath                 Path for file
@@ -46,7 +46,7 @@ using namespace stw_opensyde_core;
    \param[in]  oq_HexActive                 Mode for writing CAN Id and CAN data (hexadecimal or decimal)
    \param[in]  oq_RelativeTimeStampActive   Mode for writing CAN timestamp (relative or absolute)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLoggerFileAsc::C_OSCComMessageLoggerFileAsc(const C_SCLString & orc_FilePath,
                                                            const C_SCLString & orc_ProtocolName,
                                                            const bool oq_HexActive,
@@ -57,12 +57,12 @@ C_OSCComMessageLoggerFileAsc::C_OSCComMessageLoggerFileAsc(const C_SCLString & o
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 
    Writes the end line and closes the open file
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLoggerFileAsc::~C_OSCComMessageLoggerFileAsc(void)
 {
    if (this->mc_File.is_open() == true)
@@ -73,7 +73,7 @@ C_OSCComMessageLoggerFileAsc::~C_OSCComMessageLoggerFileAsc(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates, if necessary, and opens file and adds the default header of the file.
 
    An already opened file will be closed and deleted.
@@ -82,7 +82,7 @@ C_OSCComMessageLoggerFileAsc::~C_OSCComMessageLoggerFileAsc(void)
    C_NO_ERR    File successfully opened and created
    C_RD_WR     Error on creating file, folders or deleting old file
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComMessageLoggerFileAsc::OpenFile(void)
 {
    sint32 s32_Return;
@@ -119,12 +119,12 @@ sint32 C_OSCComMessageLoggerFileAsc::OpenFile(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adding of a concrete CAN message to the log file
 
    \param[in]     orc_MessageData      Current CAN message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLoggerFileAsc::AddMessageToFile(const C_OSCComMessageLoggerData & orc_MessageData)
 {
    if (this->mc_File.is_open() == true)
@@ -234,7 +234,7 @@ void C_OSCComMessageLoggerFileAsc::AddMessageToFile(const C_OSCComMessageLoggerD
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Writes header of asc log file
 
    Format:
@@ -243,7 +243,7 @@ void C_OSCComMessageLoggerFileAsc::AddMessageToFile(const C_OSCComMessageLoggerD
    no internal events logged
    // version 7.2.0
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLoggerFileAsc::m_WriteHeader(void)
 {
    if (this->mc_File.is_open() == true)
@@ -286,13 +286,13 @@ void C_OSCComMessageLoggerFileAsc::m_WriteHeader(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the current date and time in the asc format
 
    \return
    Time and date in defined format
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetAscTimeString(void)
 {
    C_SCLString c_Result = "";
@@ -323,7 +323,7 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetAscTimeString(void)
    return c_Result;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the weekday in the asc format
 
    \param[in]     osn_Day        Number for weekday, starting with Sunday a 0
@@ -331,7 +331,7 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetAscTimeString(void)
    \return
    Weekday
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetDay(const sintn osn_Day)
 {
    C_SCLString c_Day;
@@ -368,7 +368,7 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetDay(const sintn osn_Day)
    return c_Day;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the weekday in the asc format
 
    \param[in]     osn_Month       Number for month, starting with 0
@@ -376,7 +376,7 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetDay(const sintn osn_Day)
    \return
    Weekday
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetMonth(const sintn osn_Month)
 {
    C_SCLString c_Month;
@@ -428,7 +428,7 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetMonth(const sintn osn_Month)
    return c_Month;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts a timestamp in a string in a format based on seconds
 
    Examples for format:
@@ -441,7 +441,7 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetMonth(const sintn osn_Month)
    \return
    Adapted string
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCComMessageLoggerFileAsc::mh_AdaptTimeStamp(const uint64 ou64_TimeStamp)
 {
    C_SCLString c_TimeStamp;

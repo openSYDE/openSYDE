@@ -85,6 +85,19 @@ sintn C_GiBiImageGroup::type(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiBiImageGroup::SetZValueCustom(const float64 of64_ZValue)
+{
+   C_GiImageGroupWithoutData::SetZValueCustom(of64_ZValue);
+   //Apply to data
+   this->UpdateData();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update internal data
 
    \param[in]  orc_Data       Image data

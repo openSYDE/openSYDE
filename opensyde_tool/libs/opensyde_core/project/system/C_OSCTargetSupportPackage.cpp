@@ -46,6 +46,7 @@ C_OSCTSPApplication::C_OSCTSPApplication(void) :
    c_CodeGeneratorPath(""),
    c_ProjectFolder(""),
    c_GeneratePath(""),
+   u16_GenCodeVersion(0),
    c_ResultPath("")
 {
 }

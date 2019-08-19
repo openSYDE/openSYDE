@@ -1,25 +1,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Artificial data generator (implementation)
+   \brief       Group box style for selectable navigation section
 
-   Artificial data generator
+   Group box style for selectable navigation section.
+   This class does not contain any functionality,
+   but needs to exist, to have a unique group,
+   to apply a specific stylesheet for.
 
-   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <cstdlib>
-
-#include "CSCLString.h"
-#include "C_CamMetTreeDataSource.h"
+#include "C_OgeWiUtil.h"
+#include "C_OgeGbxNavigationSectionSelected.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_opensyde_gui_logic;
+using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,40 +41,19 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamMetTreeDataSource::C_CamMetTreeDataSource(QObject * const opc_Parent) :
-   QObject(opc_Parent)
+C_OgeGbxNavigationSectionSelected::C_OgeGbxNavigationSectionSelected(QWidget * const opc_Parent) :
+   QGroupBox(opc_Parent)
 {
-   this->mc_Timer.setInterval(1);
-   this->mc_Timer.start();
-   connect(this, &C_CamMetTreeDataSource::SigInternalTrigger, this, &C_CamMetTreeDataSource::m_GenerateNewData);
+   this->SetActive(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Start sending artificial data
+/*! \brief  Set active state for this group box
+
+   \param[in] oq_Active Active state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeDataSource::Start(void)
+void C_OgeGbxNavigationSectionSelected::SetActive(const bool oq_Active)
 {
-   connect(&mc_Timer, &QTimer::timeout, this, &C_CamMetTreeDataSource::SigInternalTrigger);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Internal generator for new data
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeDataSource::m_GenerateNewData(void)
-{
-   C_CamMetTreeLoggerData c_NewData;
-
-   c_NewData.c_CanDataDec = C_SCLString::IntToStr(std::rand());
-   c_NewData.c_CanDataHex = C_SCLString::IntToStr(std::rand());
-   c_NewData.c_CanDlc = C_SCLString::IntToStr(std::rand());
-   c_NewData.c_CanIdDec = C_SCLString::IntToStr(std::rand());
-   c_NewData.c_CanIdHex = C_SCLString::IntToStr(std::rand());
-   c_NewData.c_ProtocolTextDec = C_SCLString::IntToStr(std::rand());
-   c_NewData.c_ProtocolTextHex = C_SCLString::IntToStr(std::rand());
-   c_NewData.c_TimeStampAbsolute = C_SCLString::IntToStr(std::rand());
-   c_NewData.c_TimeStampRelative = C_SCLString::IntToStr(std::rand());
-
-   Q_EMIT this->SigNewData(c_NewData);
+   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Active", oq_Active);
 }

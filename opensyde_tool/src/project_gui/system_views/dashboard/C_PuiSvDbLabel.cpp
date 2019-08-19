@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbLabel::C_PuiSvDbLabel(void) :
    C_PuiSvDbWidgetBase(),
-   c_Caption("Value-label"),
+   c_Caption("VALUE-LABEL"),
    e_Type(eDEFAULT),
    q_ShowCaption(true),
    q_ShowUnit(true)

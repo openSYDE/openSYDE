@@ -11,16 +11,16 @@
 #ifndef C_OSCPARAMSETINTERPRETEDDATA_H
 #define C_OSCPARAMSETINTERPRETEDDATA_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OSCParamSetInterpretedNode.h"
 #include "C_OSCParamSetInterpretedFileInfoData.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCParamSetInterpretedData
 {
@@ -36,7 +36,7 @@ public:
    std::vector<C_OSCParamSetInterpretedNode> c_InterpretedNodes;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

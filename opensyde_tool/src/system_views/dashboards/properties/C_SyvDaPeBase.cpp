@@ -96,8 +96,9 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
    // register the widget for showing
    this->mpc_ParentDialog->SetWidget(this);
 
-   // set main title
+   // init static names
    this->mpc_ParentDialog->SetTitle(QString(C_GtGetText::h_GetText("%1 Widget")).arg(orc_Name));
+   this->InitStaticNames();
 
    //Factor needs to be above zero
    //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -106,6 +107,15 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
    //Debug texts
    this->mpc_Ui->pc_GroupBoxWrite->setTitle("");
    this->mpc_Ui->pc_GroupBoxRead->setTitle("");
+   this->mpc_Ui->pc_PushButtonClearDataElement->setText("");
+   this->mpc_Ui->pc_PushButtonDataElement->setText("");
+
+   //Button icon
+   this->mpc_Ui->pc_PushButtonClearDataElement->setIcon(QIcon("://images/system_views/IconClearAllEnabled.svg"));
+   this->mpc_Ui->pc_PushButtonClearDataElement->setIconSize(QSize(20, 20));
+   this->mpc_Ui->pc_PushButtonClearDataElement->setMenu(NULL); // remove menu
+
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditDataElement, "NoRightBorder", true);
 
    //Type
    if (oq_ReadElement == true)
@@ -158,13 +168,6 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
       this->mpc_Ui->pc_GroupBoxDataElementDisplay->setVisible(true);
    }
 
-   InitStaticNames();
-
-   //Clear
-   this->mpc_Ui->pc_PushButtonClearDataElement->setText("");
-   this->mpc_Ui->pc_PushButtonClearDataElement->setIcon(QIcon("://images/main_page_and_navi_bar/Icon_clear_table.svg"));
-   this->mpc_Ui->pc_PushButtonClearDataElement->setIconSize(QSize(20, 20));
-
    //Spin box
    //lint -e{10,530,747,1015,1013}  c++11 feature
    this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64>::lowest());
@@ -181,9 +184,8 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
    connect(this->mpc_Ui->pc_CheckBoxDefaultScaling, &C_OgeChxProperties::toggled, this,
            &C_SyvDaPeBase::m_OnUseDefaultScalingChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_ComboBoxTheme, static_cast<void (QComboBox::*)(
-                                                          sintn)>(&C_OgeCbxText::currentIndexChanged), this,
-           &C_SyvDaPeBase::SigRefresh);
+   connect(this->mpc_Ui->pc_ComboBoxTheme, static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged),
+           this, &C_SyvDaPeBase::SigRefresh);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -222,7 +224,6 @@ void C_SyvDaPeBase::InitStaticNames(void)
    this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setText(C_GtGetText::h_GetText("Configure"));
    this->mpc_Ui->pc_ComboBoxTransmissionMode->addItem(C_GtGetText::h_GetText("On Trigger"));
    this->mpc_Ui->pc_ComboBoxTransmissionMode->addItem(C_GtGetText::h_GetText("On Change"));
-   this->mpc_Ui->pc_PushButtonDataElement->setText(C_GtGetText::h_GetText("..."));
    this->mpc_Ui->pc_LabelTheme->setText(C_GtGetText::h_GetText("Theme"));
    this->mpc_Ui->pc_LabelDisplayName->setText(C_GtGetText::h_GetText("Display as"));
    this->mpc_Ui->pc_ComboBoxTheme->addItem(C_GtGetText::h_GetText("openSYDE"));

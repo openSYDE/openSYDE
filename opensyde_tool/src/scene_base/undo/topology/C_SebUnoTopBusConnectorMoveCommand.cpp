@@ -84,8 +84,9 @@ C_SebUnoTopBusConnectorMoveCommand::~C_SebUnoTopBusConnectorMoveCommand(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopBusConnectorMoveCommand::undo(void)
 {
-   vector<QGraphicsItem *> c_Items = m_GetSceneItems();
-   for (vector<QGraphicsItem *>::iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
+   const vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+
+   for (vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
    {
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_GiLiBusConnectorBase * const pc_BusConn = dynamic_cast<C_GiLiBusConnectorBase *>(*c_ItItem);
@@ -103,8 +104,9 @@ void C_SebUnoTopBusConnectorMoveCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopBusConnectorMoveCommand::redo(void)
 {
-   vector<QGraphicsItem *> c_Items = m_GetSceneItems();
-   for (vector<QGraphicsItem *>::iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
+   const vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+
+   for (vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
    {
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_GiLiBusConnectorBase * const pc_BusConn = dynamic_cast<C_GiLiBusConnectorBase *>(*c_ItItem);

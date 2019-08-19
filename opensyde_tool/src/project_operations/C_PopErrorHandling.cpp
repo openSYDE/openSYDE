@@ -81,6 +81,17 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
          c_Message.SetDetails(C_GtGetText::h_GetText("The content of a project file is invalid or incomplete."));
          c_Message.Execute();
          break;
+      case C_CHECKSUM:
+         //Update log file
+         C_OSCLoggingHandler::h_Flush();
+         c_Message.SetDetails(QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+                              arg(C_GtGetText::h_GetText(
+                                     "The verification of the project failed. For more information see ")).
+                              arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                              arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+                              arg(C_GtGetText::h_GetText("log file")));
+         c_Message.Execute();
+         break;
       case C_COM:
          //Update log file
          C_OSCLoggingHandler::h_Flush();

@@ -1040,7 +1040,8 @@ const C_CieConverter::C_CIECanMessage * C_SyvComMessageMonitor::m_CheckDbcFile(c
    \param[in,out] orc_MessageData    Message data target for the interpretation
 
    \return
-   possible return value(s) and description
+   true     Matching CAN message exists
+   false    No matching CAN message exists
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
@@ -1052,52 +1053,61 @@ bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMe
 
    if (opc_DbcMessage != NULL)
    {
-      uint32 u32_SignalCounter;
+      uint32 u32_Counter;
+      bool q_MultiplexerFound = false;
+      uint32 u32_MultiplexerIndex = 0U;
+      uint16 u16_MultiplexerValue = 0U;
+
       orc_MessageData.c_Name = opc_DbcMessage->c_Name.c_str();
 
-      // Interpret the signals
-      for (u32_SignalCounter = 0U; u32_SignalCounter < opc_DbcMessage->c_Signals.size(); ++u32_SignalCounter)
+      // Check if a multiplexer signal exists
+      for (u32_Counter = 0U; u32_Counter < opc_DbcMessage->c_Signals.size(); ++u32_Counter)
       {
-         C_OSCComMessageLoggerDataSignal c_Signal;
-         C_OSCCanSignal c_OscSignal;
-         const C_CieConverter::C_CIECanSignal & rc_DbcSignal = opc_DbcMessage->c_Signals[u32_SignalCounter];
+         const C_CieConverter::C_CIECanSignal & rc_DbcSignal = opc_DbcMessage->c_Signals[u32_Counter];
 
-         c_Signal.c_Name = rc_DbcSignal.c_Element.c_Name.c_str();
-         c_Signal.c_Unit = rc_DbcSignal.c_Element.c_Unit.c_str();
-         c_Signal.c_Comment = rc_DbcSignal.c_Element.c_Comment.c_str();
-
-         // Using of the openSYDE signal class for using common utility functions
-         c_OscSignal.e_ComByteOrder = rc_DbcSignal.e_ComByteOrder;
-         c_OscSignal.u16_ComBitLength = rc_DbcSignal.u16_ComBitLength;
-         c_OscSignal.u16_ComBitStart = rc_DbcSignal.u16_ComBitStart;
-
-         // Get the the minimum value for the correct type configuration
-         mh_InterpretCanSignalValue(c_Signal, orc_MessageData.c_CanMsg.au8_Data, orc_MessageData.c_CanMsg.u8_DLC,
-                                    c_OscSignal,
-                                    rc_DbcSignal.c_Element.c_MinValue,
-                                    rc_DbcSignal.c_Element.f64_Factor,
-                                    rc_DbcSignal.c_Element.f64_Offset);
-
-         if (rc_DbcSignal.c_ValueDescription.size() > 0)
+         if (rc_DbcSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
          {
-            // Check if a value description matches to the current value
-            try
-            {
-               const stw_types::uint32 u32_Value = static_cast<uint32>(c_Signal.c_Value.ToInt());
-               const std::map<stw_types::uint32, stw_scl::C_SCLString>::const_iterator c_ItDescription =
-                  rc_DbcSignal.c_ValueDescription.find(u32_Value);
+            mh_InterpretDbcFileCanSignal(orc_MessageData, rc_DbcSignal);
 
-               if (c_ItDescription != rc_DbcSignal.c_ValueDescription.end())
+            if (orc_MessageData.c_Signals.size() > 0)
+            {
+               const C_OSCComMessageLoggerDataSignal & rc_Signal =
+                  orc_MessageData.c_Signals[orc_MessageData.c_Signals.size() - 1];
+
+               if (rc_Signal.q_DlcError == false)
                {
-                  c_Signal.c_Value = c_ItDescription->second;
+                  try
+                  {
+                     u16_MultiplexerValue = static_cast<uint16>(rc_Signal.c_RawValueDec.ToInt());
+                     q_MultiplexerFound = true;
+                     u32_MultiplexerIndex = u32_Counter;
+                  }
+                  catch (...)
+                  {
+                  }
                }
             }
-            catch (...)
+            break;
+         }
+      }
+
+      // Interpret the signals
+      for (u32_Counter = 0U; u32_Counter < opc_DbcMessage->c_Signals.size(); ++u32_Counter)
+      {
+         // Skip the multiplexer signal if one was found. It was added already.
+         if ((q_MultiplexerFound == false) ||
+             (u32_Counter != u32_MultiplexerIndex))
+         {
+            const C_CieConverter::C_CIECanSignal & rc_DbcSignal = opc_DbcMessage->c_Signals[u32_Counter];
+
+            // Interpret all not multiplexed signals and all multiplexed signals with the matching multiplexer value
+            if ((rc_DbcSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT) ||
+                ((q_MultiplexerFound == true) &&
+                 (u16_MultiplexerValue == rc_DbcSignal.u16_MultiplexValue)))
             {
+               mh_InterpretDbcFileCanSignal(orc_MessageData, rc_DbcSignal);
             }
          }
-
-         orc_MessageData.c_Signals.push_back(c_Signal);
       }
 
       orc_MessageData.SortSignals();
@@ -1114,6 +1124,59 @@ bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMe
    this->mc_CriticalSectionConfig.Release();
 
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Interprets the DBC message signal
+
+   \param[in,out] orc_MessageData    Message data target for the interpretation
+   \param[in]     orc_DbcSignal      CAN signal of DBC file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvComMessageMonitor::mh_InterpretDbcFileCanSignal(C_OSCComMessageLoggerData & orc_MessageData,
+                                                          const C_CieConverter::C_CIECanSignal & orc_DbcSignal)
+{
+   C_OSCComMessageLoggerDataSignal c_Signal;
+   C_OSCCanSignal c_OscSignal;
+
+   c_Signal.c_Name = orc_DbcSignal.c_Element.c_Name.c_str();
+   c_Signal.c_Unit = orc_DbcSignal.c_Element.c_Unit.c_str();
+   c_Signal.c_Comment = orc_DbcSignal.c_Element.c_Comment.c_str();
+
+   // Using of the openSYDE signal class for using common utility functions
+   c_OscSignal.e_ComByteOrder = orc_DbcSignal.e_ComByteOrder;
+   c_OscSignal.u16_ComBitLength = orc_DbcSignal.u16_ComBitLength;
+   c_OscSignal.u16_ComBitStart = orc_DbcSignal.u16_ComBitStart;
+   c_OscSignal.e_MultiplexerType = orc_DbcSignal.e_MultiplexerType;
+   c_OscSignal.u16_MultiplexValue = orc_DbcSignal.u16_MultiplexValue;
+
+   // Get the the minimum value for the correct type configuration
+   mh_InterpretCanSignalValue(c_Signal, orc_MessageData.c_CanMsg.au8_Data, orc_MessageData.c_CanMsg.u8_DLC,
+                              c_OscSignal,
+                              orc_DbcSignal.c_Element.c_MinValue,
+                              orc_DbcSignal.c_Element.f64_Factor,
+                              orc_DbcSignal.c_Element.f64_Offset);
+
+   if (orc_DbcSignal.c_ValueDescription.size() > 0)
+   {
+      // Check if a value description matches to the current value
+      try
+      {
+         const stw_types::uint32 u32_Value = static_cast<uint32>(c_Signal.c_RawValueDec.ToInt64());
+         const std::map<stw_types::uint32, stw_scl::C_SCLString>::const_iterator c_ItDescription =
+            orc_DbcSignal.c_ValueDescription.find(u32_Value);
+
+         if (c_ItDescription != orc_DbcSignal.c_ValueDescription.end())
+         {
+            c_Signal.c_Value = c_ItDescription->second;
+         }
+      }
+      catch (...)
+      {
+      }
+   }
+
+   orc_MessageData.c_Signals.push_back(c_Signal);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

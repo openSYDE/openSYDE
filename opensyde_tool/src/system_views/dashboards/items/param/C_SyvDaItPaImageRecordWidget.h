@@ -71,7 +71,6 @@ private:
    C_SyvDaItPaImageRecordWidget & operator =(const C_SyvDaItPaImageRecordWidget &);
 
    void m_OnBrowse(void);
-   QString m_GetValidPath(const QString & orc_Path) const;
    void m_SplitNameAndPath(const QString & orc_FullPath, QString & orc_Name, QString & orc_Path) const;
    void m_FilePathChanged(void);
    void m_ReadClicked(void);

@@ -263,7 +263,7 @@ void C_SyvDaItChartDataSelectorWidget::UpdateTransparence(const uint32 ou32_Data
    Element name
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItChartDataSelectorWidget::GetDataElementName(const uint32 ou32_DataPoolElementConfigIndex)
+QString C_SyvDaItChartDataSelectorWidget::GetDataElementName(const uint32 ou32_DataPoolElementConfigIndex) const
 {
    QString c_Return = "";
 
@@ -284,7 +284,7 @@ QString C_SyvDaItChartDataSelectorWidget::GetDataElementName(const uint32 ou32_D
    Element unit
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItChartDataSelectorWidget::GetDataElementUnit(const uint32 ou32_DataPoolElementConfigIndex)
+QString C_SyvDaItChartDataSelectorWidget::GetDataElementUnit(const uint32 ou32_DataPoolElementConfigIndex) const
 {
    QString c_Return = "";
 
@@ -294,6 +294,28 @@ QString C_SyvDaItChartDataSelectorWidget::GetDataElementUnit(const uint32 ou32_D
    }
 
    return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the toggled state if the element is active or not
+
+   \param[in]     orc_DataPoolElementId   Datapool element identification
+
+   \retval   true    Element is enabled
+   \retval   false   Element is disabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaItChartDataSelectorWidget::GetDataElementToggledState(const uint32 ou32_DataPoolElementConfigIndex) const
+{
+   bool q_Return = false;
+
+   if (ou32_DataPoolElementConfigIndex < this->mc_DataPoolElementsDataItemWidgets.size())
+   {
+      q_Return =
+         this->mc_DataPoolElementsDataItemWidgets[ou32_DataPoolElementConfigIndex]->GetDataElementToggledState();
+   }
+
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -348,6 +370,34 @@ bool C_SyvDaItChartDataSelectorWidget::GetCurrentDataSerie(uint32 & oru32_DataPo
 void C_SyvDaItChartDataSelectorWidget::SelectDataSerie(const uint32 ou32_DataPoolElementConfigIndex)
 {
    this->m_DataItemSelected(ou32_DataPoolElementConfigIndex, false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
+
+   Here: Hide tool tip of all items. It is possible that one item does not get the leave event and the tool tip
+   would not be closed
+
+   \param[in,out] opc_Event Event identification and information
+
+   \return
+   True  Event was recognized and processed
+   False Event ignored
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaItChartDataSelectorWidget::event(QEvent * const opc_Event)
+{
+   if (opc_Event->type() == QEvent::Leave)
+   {
+      uint32 u32_Counter;
+
+      for (u32_Counter = 0U; u32_Counter < this->mc_DataPoolElementsDataItemWidgets.size(); ++u32_Counter)
+      {
+         this->mc_DataPoolElementsDataItemWidgets[u32_Counter]->HideToolTip();
+      }
+   }
+
+   return QWidget::event(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

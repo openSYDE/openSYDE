@@ -16,12 +16,12 @@
 #include "stwerrors.h"
 #include "TGLUtils.h"
 #include "C_Uti.h"
+#include "C_PuiUtil.h"
 
 #include "C_SyvUpPackageListNodeDatablocksWidget.h"
 #include "ui_C_SyvUpUpdatePackageListNodeWidget.h"
 #include "C_OSCNodeApplication.h"
 #include "C_GtGetText.h"
-#include "C_ImpUtil.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
 #include "C_SyvUpPackageListNodeItemDatablockWidget.h"
@@ -65,7 +65,7 @@ C_SyvUpPackageListNodeDatablocksWidget::C_SyvUpPackageListNodeDatablocksWidget(Q
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a new file for the application
 
-   \param[in]     orc_File      New path
+   \param[in]     orc_File      New path (already contains Db Project path and might be relative to openSYDE project)
    \param[in]     opc_App       Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -82,7 +82,8 @@ void C_SyvUpPackageListNodeDatablocksWidget::AdaptFile(const QString & orc_File,
    else
    {
       // Check the file
-      const QString c_AbsoluteFilePath = C_ImpUtil::h_GetAbsolutePathFromProject(orc_File);
+      // note: Data Block project path is already prefixed, so we only make absolute to openSYDE project
+      const QString c_AbsoluteFilePath = C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File);
       QFileInfo c_FileInfo(c_AbsoluteFilePath);
       const bool q_FileExists = c_FileInfo.exists() && c_FileInfo.isFile();
 
@@ -196,9 +197,9 @@ void C_SyvUpPackageListNodeDatablocksWidget::RevertFile(C_SyvUpUpdatePackageList
                           SetNodeUpdateInformationPath(this->mu32_ViewIndex, this->mu32_NodeIndex, u32_AppNumber, "",
                                                        C_PuiSvNodeUpdate::eFTP_DATA_BLOCK) == C_NO_ERR);
 
-               opc_App->SetAppFile(
-                  C_Uti::h_ConcatPathIfNecessary(pc_Node->c_Applications[u32_AppNumber].c_ProjectPath.c_str(),
-                                                 pc_Node->c_Applications[u32_AppNumber].c_ResultPath.c_str()), true);
+               opc_App->SetAppFile(C_PuiUtil::h_MakeIndependentOfDbProjectPath(
+                                      pc_Node->c_Applications[u32_AppNumber].c_ProjectPath.c_str(),
+                                      pc_Node->c_Applications[u32_AppNumber].c_ResultPath.c_str()), true);
             }
          }
          else
@@ -501,13 +502,13 @@ void C_SyvUpPackageListNodeDatablocksWidget::m_InitSpecificItem(const stw_opensy
          }
          else
          {
-            pc_AppWidget->SetAppFile(C_Uti::h_ConcatPathIfNecessary(pc_App->c_ProjectPath.c_str(),
-                                                                    pc_App->c_ResultPath.c_str()), true);
+            pc_AppWidget->SetAppFile(C_PuiUtil::h_MakeIndependentOfDbProjectPath(pc_App->c_ProjectPath.c_str(),
+                                                                                pc_App->c_ResultPath.c_str()), true);
          }
 
          // Set the default path for comparing with import configuration
-         pc_AppWidget->SetDefaultFile(C_Uti::h_ConcatPathIfNecessary(pc_App->c_ProjectPath.c_str(),
-                                                                     pc_App->c_ResultPath.c_str()));
+         pc_AppWidget->SetDefaultFile(C_PuiUtil::h_MakeIndependentOfDbProjectPath(pc_App->c_ProjectPath.c_str(),
+                                                                                   pc_App->c_ResultPath.c_str()));
 
          pc_AppWidget->SetAppType(pc_App->e_Type);
          pc_AppWidget->SetAppNumber(u32_Counter);

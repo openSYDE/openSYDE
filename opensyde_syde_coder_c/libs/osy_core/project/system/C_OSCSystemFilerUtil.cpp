@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cstdio>
@@ -21,41 +21,41 @@
 #include "C_OSCSystemFilerUtil.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCSystemFilerUtil::C_OSCSystemFilerUtil(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert bus type enum to string
 
    \param[in]   oe_Type   Bus type
 
    \return  string representation of oe_Type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCSystemFilerUtil::mh_BusTypeEnumToString(const C_OSCSystemBus::E_Type oe_Type)
 {
    C_SCLString c_Retval;
@@ -71,7 +71,7 @@ C_SCLString C_OSCSystemFilerUtil::mh_BusTypeEnumToString(const C_OSCSystemBus::E
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert bus type string to enum
 
    \param[in]  orc_Type   type string
@@ -81,7 +81,7 @@ C_SCLString C_OSCSystemFilerUtil::mh_BusTypeEnumToString(const C_OSCSystemBus::E
    C_NO_ERR   no error
    C_RANGE    String unknown
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemFilerUtil::mh_BusTypeStringToEnum(const stw_scl::C_SCLString & orc_Type,
                                                     C_OSCSystemBus::E_Type & ore_Type)
 {
@@ -103,7 +103,7 @@ sint32 C_OSCSystemFilerUtil::mh_BusTypeStringToEnum(const stw_scl::C_SCLString &
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get parser at root file node and handle all possible errors
 
    Warning: includes error logging
@@ -118,7 +118,7 @@ sint32 C_OSCSystemFilerUtil::mh_BusTypeStringToEnum(const stw_scl::C_SCLString &
    C_RANGE    file not found
    C_CONFIG   root node not found
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemFilerUtil::mh_GetParserForExistingFile(C_OSCXMLParser & orc_FileXMLParser,
                                                          const C_SCLString & orc_Path, const C_SCLString & orc_RootNode)
 {
@@ -148,7 +148,7 @@ sint32 C_OSCSystemFilerUtil::mh_GetParserForExistingFile(C_OSCXMLParser & orc_Fi
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get parser at root file node and handle all possible errors
 
    Warning: includes error logging
@@ -161,7 +161,7 @@ sint32 C_OSCSystemFilerUtil::mh_GetParserForExistingFile(C_OSCXMLParser & orc_Fi
    C_NO_ERR   XML handle was created
    C_NOACT    existing file could not be deleted
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemFilerUtil::mh_GetParserForNewFile(C_OSCXMLParser & orc_FileXMLParser, const C_SCLString & orc_Path,
                                                     const C_SCLString & orc_RootNode)
 {
@@ -183,7 +183,7 @@ sint32 C_OSCSystemFilerUtil::mh_GetParserForNewFile(C_OSCXMLParser & orc_FileXML
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create directory
 
    Warning: includes error logging
@@ -194,7 +194,7 @@ sint32 C_OSCSystemFilerUtil::mh_GetParserForNewFile(C_OSCXMLParser & orc_FileXML
    C_NO_ERR   XML handle was created
    C_NOACT    folder could not be created
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSystemFilerUtil::mh_CreateFolder(const C_SCLString & orc_Path)
 {
    sint32 s32_Retval;
@@ -219,7 +219,7 @@ sint32 C_OSCSystemFilerUtil::mh_CreateFolder(const C_SCLString & orc_Path)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt item name for file name usage
 
    \param[in] orc_ItemName Item name
@@ -227,13 +227,13 @@ sint32 C_OSCSystemFilerUtil::mh_CreateFolder(const C_SCLString & orc_Path)
    \return
    Item name ready for file name usage
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(const C_SCLString & orc_ItemName)
 {
    return C_OSCUtils::h_NiceifyStringForFileName(orc_ItemName.LowerCase());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Combine the base path and a relative sub folder path
 
    \param[in] orc_BasePathName      Base path name
@@ -242,7 +242,7 @@ C_SCLString C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(const C_SCLStrin
    \return
    Full, combined path
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCSystemFilerUtil::mh_CombinePaths(const C_SCLString & orc_BasePathName,
                                                   const C_SCLString & orc_SubFolderFileName)
 {

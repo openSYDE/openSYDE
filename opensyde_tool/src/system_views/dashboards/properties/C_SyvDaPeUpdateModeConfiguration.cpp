@@ -104,11 +104,11 @@ void C_SyvDaPeUpdateModeConfiguration::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelDataElament->setText(C_GtGetText::h_GetText("Diagnostic Data Elements"));
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("OK"));
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
-   this->mpc_Ui->pc_PushButtonConfigure->setText(C_GtGetText::h_GetText("Configure Cyclic transmission intervals"));
+   this->mpc_Ui->pc_PushButtonConfigure->setText(C_GtGetText::h_GetText("Configure Cyclic Transmission Intervals"));
    this->mpc_Ui->pc_LabelNoElements->setText(C_GtGetText::h_GetText("No Diagnostic Data Elements declared."));
    //Tooltips
    this->mpc_Ui->pc_PushButtonConfigure->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                  "Configure Cyclic transmission intervals"),
+                                                                  "Configure Cyclic Transmission Intervals"),
                                                                C_GtGetText::h_GetText(
                                                                   "Configure the transmission intervals used by data elements in transmission mode \"Cyclic\""));
 }

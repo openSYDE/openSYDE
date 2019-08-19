@@ -14,18 +14,18 @@
 #ifndef C_OSCPROTOCOLDRIVEROSYTPCANH
 #define C_OSCPROTOCOLDRIVEROSYTPCANH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "CCANDispatcher.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCProtocolDriverOsyTpCan :
    public C_OSCProtocolDriverOsyTpBase
@@ -152,7 +152,7 @@ public:
    void ClearDispatcherQueue(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

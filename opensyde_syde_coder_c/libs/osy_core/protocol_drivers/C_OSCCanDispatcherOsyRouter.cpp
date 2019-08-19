@@ -14,7 +14,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -24,32 +24,32 @@
 #include "TGLTime.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
    \param[in]  orc_OsyProtocol   openSYDE protocol instance to use for communication for the "last mile"
 
    Initialize instance
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy & orc_OsyProtocol) :
    C_CAN_Dispatcher(0U),
    mrc_OsyProtocol(orc_OsyProtocol),
@@ -60,7 +60,7 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
    orc_OsyProtocol.InitializeTunnelCanMessage(&C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived, this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
    Initialize instance
@@ -68,7 +68,7 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
    \param[in]  orc_OsyProtocol  openSYDE protocol driver to communicate over
    \param[in]  ou8_CommChannel  communication driver channel
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy & orc_OsyProtocol,
                                                          const uint8 ou8_CommChannel) :
    C_CAN_Dispatcher(ou8_CommChannel),
@@ -80,7 +80,7 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
    orc_OsyProtocol.InitializeTunnelCanMessage(&C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived, this);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the routing configuration
 
    The functions sets the parameter for routing configuration, but does not activate it!
@@ -90,11 +90,11 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
    \param[in]     ou32_FilterId           Filter id for all relevant IDs
                                           The MSB is the flag for 11 Bit (= 0) or 29 Bit (= 1)
                                           Bits 29 and 30 are reserved (shall be set to zero)
-   \param[in]     ou32_FilterMask         Mask that is applied to both the received CAN frame identifiers an the
+   \param[in]     ou32_FilterMask         Mask that is applied to both the received CAN frame identifiers and the
                                           FilterId before comparison.
                                           Bits 29, 30 and 31 are reserved (shall be set to zero)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingChannel, const uint32 ou32_FilterId,
                                                       const uint32 ou32_FilterMask)
 {
@@ -103,7 +103,7 @@ void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingCha
    this->mu32_FilterMask = ou32_FilterMask;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialization of CAN legacy routing
 
    Parameters shall be set with SetFilterParameters first before calling this function.
@@ -117,14 +117,14 @@ void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingCha
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(void)
 {
    return this->mrc_OsyProtocol.OsySetTunnelCanMessages(this->mu8_RoutingChannel, this->mu32_FilterId,
                                                         this->mu32_FilterMask);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function has no functionality
 
    Not bitrate can be set by this dispatcher. Use CAN_Init without parameter for initialization of the
@@ -135,14 +135,14 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(void)
    \return
    C_NOACT
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
 {
    (void)os32_BitrateKBitS;
    return C_NOACT;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Stop of CAN legacy routing
 
    \return
@@ -154,21 +154,25 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Exit(void)
 {
    return this->mrc_OsyProtocol.OsyStopTunnelCanMessages();
 }
 
-//-----------------------------------------------------------------------------
-/*! \brief   short description of function
-
-   long description of function within several lines
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the current CAN session
 
    \return
-   possible return value(s) and description
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in TX queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
+   C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
 {
    sint32 s32_Return;
@@ -183,7 +187,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sending a CAN message with legacy routing
 
    \param[in]  orc_Message     CAN message to send
@@ -198,13 +202,13 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX & orc_Message)
 {
    return this->mrc_OsyProtocol.OsySendCanMessage(this->mu8_RoutingChannel, orc_Message);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check timestamp basis of driver
 
    Return system time in micro seconds as the driver sees it.
@@ -216,7 +220,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX 
    \return
    C_NO_ERR   information read
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTimeUs) const
 {
    oru64_SystemTimeUs = stw_tgl::TGL_GetTickCountUS();
@@ -224,7 +228,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTim
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read the first received message from the list
 
    Functions shall read and return one asynchronous received tunneled CAN message.
@@ -235,7 +239,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTim
    C_NO_ERR   message read
    C_WARN     no message read
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::m_CAN_Read_Msg(stw_can::T_STWCAN_Msg_RX & orc_Message)
 {
    sint32 s32_Return = C_WARN;
@@ -258,14 +262,14 @@ sint32 C_OSCCanDispatcherOsyRouter::m_CAN_Read_Msg(stw_can::T_STWCAN_Msg_RX & or
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   In C_OSCProtocolDriverOsy registered function for receiving asynchronous messages
 
    \param[in]     opv_Instance     Pointer to the instance of C_OSCCanDispatcherOsyRouter
    \param[in]     ou8_Channel      Channel the message was received on
    \param[in]     orc_CanMessage   Async received CAN message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived(void * const opv_Instance, const uint8 ou8_Channel,
                                                                  const stw_can::T_STWCAN_Msg_RX & orc_CanMessage)
 {
@@ -280,13 +284,13 @@ void C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived(void * const op
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   In C_OSCProtocolDriverOsy registered function for receiving asynchronous messages
 
    \param[in]     ou8_Channel      Channel the message was received on
    \param[in]     orc_CanMessage   Async received CAN message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanDispatcherOsyRouter::m_OsyTunnelCanMessageReceived(const uint8 ou8_Channel,
                                                                 const stw_can::T_STWCAN_Msg_RX & orc_CanMessage)
 {

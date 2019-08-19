@@ -17,6 +17,9 @@
  * packaging of this file.  Please review the following information to
  * ensure the GNU General Public License version 3.0 requirements will be
  * met: http://www.gnu.org/copyleft/gpl.html.
+
+ * This file contains modifications made by Sensor-Technik Wiedemann GmbH (STW)
+ * The modifications are also under GPL 3.0 like the original code itself.
  */
 
 #pragma once
@@ -286,13 +289,15 @@ private:
     void writeAttributeRelationValues(std::ofstream & ofs, Network & network);
 
     /** Read Value Description (VAL) for Signal (SG) */
-    bool readValueDescriptionSignal(Network & network, std::string & line);
+    // 2019-06-04 STW: adapted interface for multiline value description
+    bool readValueDescriptionSignal(Network & network, std::ifstream & ifs, std::string & line);
 
     /** Read Value Description (VAL) for Environment Variable (EV) */
     bool readValueDescriptionEnvironmentVariable(Network & network, std::string & line);
 
     /** Read Value Description (VAL) */
-    void readValueDescription(Network & network, std::string & line);
+    // 2019-06-04 STW: adapted interface for multiline value description
+    void readValueDescription(Network & network, std::ifstream & ifs, std::string & line);
 
     /** Write Value Descriptions (VAL) for Signals (SG) */
     void writeValueDescriptionsSignals(std::ofstream & ofs, Network & network);

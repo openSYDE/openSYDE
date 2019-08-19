@@ -28,6 +28,8 @@ public:
    C_SdBueUnoSignalAddDeleteBaseCommand(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                         const stw_types::uint32 & oru32_SignalIndex,
                                         const stw_types::uint16 ou16_StartBit,
+                                        const stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType oe_MultiplexerType,
+                                        const stw_types::uint16 ou16_MultiplexerValue,
                                         C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                         stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, const QString & orc_Text = "",
                                         QUndoCommand * const opc_Parent = NULL);

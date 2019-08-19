@@ -51,6 +51,7 @@ const float64 C_GiLiLineGroup::mhf64_MaxDistToAlign = 10.0;
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiLineGroup::C_GiLiLineGroup(const std::vector<QPointF> * const opc_Points, const bool & orq_MiddleLine,
                                  QGraphicsItem * const opc_Parent) :
+   QGraphicsItemGroup(opc_Parent),
    mpc_LinePath(new C_GiLiLine(NULL, orq_MiddleLine, opc_Parent)),
    //lint -e{1938}  static const is guaranteed preinitialized before main
    me_ActiveResizeMode(eNO_ELEMENT),
@@ -430,6 +431,17 @@ void C_GiLiLineGroup::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply new Z value
+
+   \param[in] of64_ZValue New Z value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiLiLineGroup::SetZValueCustom(const float64 of64_ZValue)
+{
+   this->setZValue(of64_ZValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::m_InitPoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
 {
    QPointF c_AdaptedScenePos = this->mapToScene(orc_Pos);
@@ -515,6 +527,7 @@ void C_GiLiLineGroup::LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsLineBas
 {
    this->SetWidth(orc_Data.s32_UIWidthPixels);
    this->SetColor(orc_Data.c_UIColor);
+   //Don't trigger data update at this point
    this->setZValue(orc_Data.f64_ZOrder);
 }
 

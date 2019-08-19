@@ -51,7 +51,8 @@ public:
    void AddMessage(void);
    void AddSignal(void);
    void AddSignalWithStartBit(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                              const stw_types::uint16 ou16_StartBit);
+                              const stw_types::uint16 ou16_StartBit, const bool oq_MultiplexedSignal,
+                              const stw_types::uint16 ou16_MultiplexValue);
    void Delete(void);
    void DeleteSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 ou32_SignalIndex);

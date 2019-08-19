@@ -11,16 +11,16 @@
 #ifndef CXFLECUINFORMATIONH
 #define CXFLECUINFORMATIONH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "CSCLStringList.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_diag_lib
 {
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 //contants for device information block
 const stw_types::uint8 XFL_DEVICE_INFO_MAGIC_LENGTH_V1 = 7U;
@@ -28,7 +28,7 @@ const stw_types::uint8 XFL_DEVICE_INFO_MAGIC_LENGTH_V2 = 8U;
 extern const stw_types::charn XFL_DEVICE_INFO_MAGIC_V1[XFL_DEVICE_INFO_MAGIC_LENGTH_V1 + 1U]; /// +1 for \0
 extern const stw_types::charn XFL_DEVICE_INFO_MAGIC_V2[XFL_DEVICE_INFO_MAGIC_LENGTH_V2]; /// \0 already included
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///Device information block
 class C_XFLECUInformation
@@ -92,7 +92,7 @@ public:
    bool ContainsAdditionalInfo(void) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 
 } //end of namespace
 

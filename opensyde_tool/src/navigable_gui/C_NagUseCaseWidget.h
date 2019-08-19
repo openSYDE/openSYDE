@@ -83,7 +83,8 @@ Q_SIGNALS:
    void SigErrorChanged(const stw_types::uint32 ou32_Index);
    void SigStartViewClicked(void);
    void SigTriggerUpdateTitle(void);
-   void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName);
+   void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName,
+                       const bool oq_CombineItemAndSubSubName);
    void SigSetInteractionWidget(QWidget * const opc_Widget) const;
    void SigSearch(void);
    void SigNewUserSettings(void);

@@ -1,18 +1,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Line edit field for properties with tool tip (implementation)
+   \brief       Custom message box cancel button with more tiny look than standard cancel button.
 
-   Line edit field for properties with tool tip
+   Custom message box cancel button with more tiny look than standard cancel button..
+   This class does not contain any functionality,
+   but needs to exist, to have a unique group,
+   to apply a specific stylesheet for.
 
-   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include "C_OgeLePropertiesToolTip.h"
+#include "C_OgePubMessageCancel.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
@@ -37,7 +40,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeLePropertiesToolTip::C_OgeLePropertiesToolTip(QWidget * const opc_Parent) :
-   C_OgeLeToolTipBase(opc_Parent)
+C_OgePubMessageCancel::C_OgePubMessageCancel(QWidget * const opc_Parent) :
+   QPushButton(opc_Parent)
 {
 }

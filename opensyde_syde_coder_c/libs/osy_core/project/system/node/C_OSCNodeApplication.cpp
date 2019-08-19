@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -19,28 +19,28 @@
 #include "CSCLChecksums.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeApplication::C_OSCNodeApplication(void) :
    e_Type(eBINARY),
    c_Name(""),
@@ -51,11 +51,12 @@ C_OSCNodeApplication::C_OSCNodeApplication(void) :
    c_IDECall(""),
    c_CodeGeneratorPath(""),
    c_GeneratePath(""),
+   u16_GenCodeVersion(0),
    c_ResultPath("")
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
@@ -63,7 +64,7 @@ C_OSCNodeApplication::C_OSCNodeApplication(void) :
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeApplication::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
@@ -76,10 +77,11 @@ void C_OSCNodeApplication::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_CodeGeneratorPath.c_str(),
                                       this->c_CodeGeneratorPath.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_GeneratePath.c_str(), this->c_GeneratePath.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_GenCodeVersion, sizeof(this->u16_GenCodeVersion), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_ResultPath.c_str(), this->c_ResultPath.Length(), oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform application type to string
 
    \param[in] ore_Application Application type
@@ -87,7 +89,7 @@ void C_OSCNodeApplication::CalcHash(uint32 & oru32_HashValue) const
    \return
    Stringified application type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplication::E_Type & ore_Application)
 {
    C_SCLString c_Retval;
@@ -107,7 +109,7 @@ C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplicati
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to application type
 
    \param[in]  orc_String String to interpret
@@ -116,7 +118,7 @@ C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplicati
    \return
    C_NO_ERR   no error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeApplication::h_StringToApplication(const C_SCLString & orc_String,
                                                    C_OSCNodeApplication::E_Type & ore_Type)
 {

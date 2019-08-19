@@ -57,7 +57,8 @@ Q_SIGNALS:
    void SigErrorChange(void);
    void SigSwitchToDataPool(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
    void SigSwitchToBus(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
-   void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName = "");
+   void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName,
+                       const bool oq_CombineItemAndSubSubName);
    void SigSave(void);
    void SigSaveAs(void);
 

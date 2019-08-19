@@ -1,5 +1,6 @@
 /* --------------------------------------------------------------------- */
 stw_opensyde_gui--C_NagTopList,
+stw_opensyde_gui--C_NagTopList::item,
 stw_opensyde_gui--C_NagViewList,
 stw_opensyde_gui--C_SyvDcConnectedNodeList,
 stw_opensyde_gui--C_SyvDcExistingNodeList,
@@ -43,12 +44,6 @@ stw_opensyde_gui--C_SdNdeDataPoolSelectorAddListWidget::item
 {
 border: 0px;
 padding-left: 5px;
-}
-
-/* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_NagTopList::item
-{
-padding-left: 16px;
 }
 
 /* --------------------------------------------------------------------- */

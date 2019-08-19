@@ -107,7 +107,12 @@ public:
                                       stw_types::uint8 * const opu8_NrCode);
    virtual stw_types::sint32 NvmWriteFinalizeTransaction(void);
    virtual stw_types::sint32 DataPoolReadVersion(const stw_types::uint8 ou8_DataPoolIndex,
-                                                 stw_types::uint8(&orau8_Version)[3]);
+                                                 stw_types::uint8(&orau8_Version)[3],
+                                                 stw_types::uint8 * const opu8_NrCode);
+   virtual stw_types::sint32 DataPoolReadMetaData(const stw_types::uint8 ou8_DataPoolIndex,
+                                                  stw_types::uint8(&orau8_Version)[3],
+                                                  stw_scl::C_SCLString & orc_Name,
+                                                  stw_types::uint8 * const opu8_NrCode);
    virtual stw_types::sint32 DataPoolVerify(const stw_types::uint8 ou8_DataPoolIndex,
                                             const stw_types::uint16 ou16_NumberOfDataPoolElements,
                                             const stw_types::uint16 ou16_DataPoolVersion,

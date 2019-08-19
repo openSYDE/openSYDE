@@ -9,7 +9,7 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <sstream>
@@ -20,34 +20,34 @@
 #include "TGLUtils.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolFiler::C_OSCNodeDataPoolFiler(void)
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load datapool file
 
    \param[out]    orc_NodeDataPool Data storage
@@ -57,7 +57,7 @@ C_OSCNodeDataPoolFiler::C_OSCNodeDataPoolFiler(void)
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDataPool,
                                                   const C_SCLString & orc_FilePath)
 {
@@ -85,7 +85,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool
 
    Load node data from XML file
@@ -99,7 +99,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPool, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -184,7 +184,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node data pool
 
    Save node to XML file
@@ -194,7 +194,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPo
    \param[in]     orc_NodeDataPool data storage
    \param[in,out] orc_XMLParser    XML with data-pool active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDataPool,
                                             C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -220,7 +220,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDa
    orc_XMLParser.CreateNodeChild("export-settings", "");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool list
 
    Load node data from XML file
@@ -234,7 +234,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDa
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_NodeDataPoolList,
                                                   C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -302,7 +302,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_No
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node data pool list
 
    Save node to XML file
@@ -312,7 +312,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_No
    \param[in]     orc_NodeDataPoolList data storage
    \param[in,out] orc_XMLParser        XML with data-pool active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolList(const C_OSCNodeDataPoolList & orc_NodeDataPoolList,
                                                 C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -334,7 +334,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolList(const C_OSCNodeDataPoolList & or
    tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool element
 
    Load node data from XML file
@@ -349,7 +349,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolList(const C_OSCNodeDataPoolList & or
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
                                                      C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -479,7 +479,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node data pool element
 
    Save node to XML file
@@ -489,7 +489,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
    \param[in]     orc_NodeDataPoolListElement data storage
    \param[in,out] orc_XMLParser               XML with list active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolElement(const C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
                                                    C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -510,7 +510,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElement(const C_OSCNodeDataPoolListEl
    tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool lists
 
    Load node data from XML file
@@ -524,7 +524,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElement(const C_OSCNodeDataPoolListEl
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
                                                    C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -581,7 +581,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OSCNodeDataPool
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node data pool lists
 
    Save node to XML file
@@ -591,7 +591,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OSCNodeDataPool
    \param[in]     orc_NodeDataPoolLists   data storage
    \param[in,out] orc_XMLParser           XML with data-pool active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
                                                  C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -605,7 +605,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeData
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool elements
 
    Load node data from XML file
@@ -619,7 +619,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeData
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
    std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -674,7 +674,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node data pool elements
 
    Save node to XML file
@@ -684,7 +684,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
    \param[in]     orc_NodeDataPoolListElements data storage
    \param[in,out] orc_XMLParser                XML with list active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
    const std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -699,7 +699,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool list element data set values
 
    Load node data from XML file
@@ -716,7 +716,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElementDataSetValues(const C_OSCNodeDataPoolContent & orc_ContentType,
                                                                       std::vector<C_OSCNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues,
                                                                       C_OSCXMLParserBase & orc_XMLParser)
@@ -748,7 +748,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElementDataSetValues(const C_OS
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node data pool list element data set values
 
    Save node to XML file
@@ -758,7 +758,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElementDataSetValues(const C_OS
    \param[in]     orc_NodeDataPoolListElementDataSetValues data storage
    \param[in,out] orc_XMLParser                            XML with list active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElementDataSetValues(
    const std::vector<C_OSCNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues,
    C_OSCXMLParserBase & orc_XMLParser)
@@ -772,7 +772,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElementDataSetValues(
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool list data sets
 
    Load node data from XML file
@@ -786,7 +786,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElementDataSetValues(
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListDataSets(
    std::vector<C_OSCNodeDataPoolDataSet> & orc_NodeDataPoolListDataSets, C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -835,7 +835,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListDataSets(
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node data pool list data sets
 
    Save node to XML file
@@ -845,7 +845,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListDataSets(
    \param[in]     orc_NodeDataPoolListDataSets data storage
    \param[in,out] orc_XMLParser                XML with list active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolListDataSets(
    const std::vector<C_OSCNodeDataPoolDataSet> & orc_NodeDataPoolListDataSets, C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -861,7 +861,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListDataSets(
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform data pool type to string
 
    \param[in] ore_DataPool Data pool type
@@ -869,7 +869,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListDataSets(
    \return
    Stringified data pool type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::E_Type & ore_DataPool)
 {
    C_SCLString c_Retval;
@@ -892,7 +892,7 @@ C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to data pool type
 
    \param[in]  orc_String String to interpret
@@ -902,7 +902,7 @@ C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::
    C_NO_ERR   no error
    C_RANGE    String unknown
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String, C_OSCNodeDataPool::E_Type & ore_Type)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -928,7 +928,7 @@ sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool element type
 
    Load element type from the node "type"
@@ -943,7 +943,7 @@ sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                          C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -972,7 +972,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(C_OSCNodeDataPoolConten
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pool element type
 
    Save data pool element type,isarray,arraysize to XML parser
@@ -982,7 +982,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(C_OSCNodeDataPoolConten
    \param[in]      orc_NodeDataPoolContent  data storage
    \param[in,out]  orc_XMLParser            XML parser
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                        C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -997,7 +997,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolCo
    orc_XMLParser.SelectNodeParent();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool element value
 
    Load node data from XML file
@@ -1013,7 +1013,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolCo
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                           C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -1131,7 +1131,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pool element value
 
    Save data pool element value to XML parser
@@ -1142,7 +1142,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
    \param[in]      orc_NodeDataPoolContent data storage
    \param[in,out]  orc_XMLParser           XML parser
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLString & orc_NodeName,
                                                         const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                         C_OSCXMLParserBase & orc_XMLParser)
@@ -1240,7 +1240,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLStri
    orc_XMLParser.SelectNodeParent();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node data pool content
 
    Save node to XML file in V1 format.
@@ -1252,7 +1252,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLStri
    \param[in]     orc_NodeDataPoolContent data storage
    \param[in,out] orc_XMLParser           XML with variable (Node to store data pool content) active
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                      C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -1352,7 +1352,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCont
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get automatically generated file name
 
    \param[in] orc_DatapoolName Datapool name
@@ -1360,13 +1360,13 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCont
    \return
    Automatically generated file name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeDataPoolFiler::h_GetFileName(const C_SCLString & orc_DatapoolName)
 {
    return "dp_" + C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(orc_DatapoolName) + "_core.xml";
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool content
 
    Load node data from XML file in V1 format.
@@ -1380,7 +1380,7 @@ C_SCLString C_OSCNodeDataPoolFiler::h_GetFileName(const C_SCLString & orc_Datapo
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                        C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -1482,7 +1482,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save datapool
 
    Save node to XML file
@@ -1494,7 +1494,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent 
    C_NO_ERR   data saved
    C_CONFIG   file could not be created
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(const C_OSCNodeDataPool & orc_NodeDataPool,
                                                   const C_SCLString & orc_FilePath)
 {
@@ -1524,7 +1524,7 @@ sint32 C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(const C_OSCNodeDataPool & orc_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform node data pool content type to string
 
    \param[in] ore_NodeDataPoolContent Node data pool content type
@@ -1532,7 +1532,7 @@ sint32 C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(const C_OSCNodeDataPool & orc_
    \return
    Stringified node data pool content type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolContentToString(
    const C_OSCNodeDataPoolContent::E_Type & ore_NodeDataPoolContent)
 {
@@ -1577,7 +1577,7 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolContentToString(
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to node data pool content type
 
    \param[in]  orc_String String to interpret
@@ -1587,7 +1587,7 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolContentToString(
    C_NO_ERR   no error
    C_RANGE    String unknown
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolContent(const C_SCLString & orc_String,
                                                               C_OSCNodeDataPoolContent::E_Type & ore_Type)
 {
@@ -1642,7 +1642,7 @@ sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolContent(const C_SCLString 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform node data pool element access type to string
 
    \param[in] ore_NodeDataPoolElementAccess Node data pool element access type
@@ -1650,7 +1650,7 @@ sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolContent(const C_SCLString 
    \return
    Stringified node data pool element access type
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolElementAccessToString(
    const C_OSCNodeDataPoolListElement::E_Access & ore_NodeDataPoolElementAccess)
 {
@@ -1671,7 +1671,7 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolElementAccessToString(
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to node data pool element access type
 
    \param[in]  orc_String String to interpret
@@ -1681,7 +1681,7 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolElementAccessToString(
    C_NO_ERR   no error
    C_RANGE    String unknown
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolElementAccess(const C_SCLString & orc_String,
                                                                     C_OSCNodeDataPoolListElement::E_Access & ore_Type)
 {
@@ -1705,14 +1705,14 @@ sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolElementAccess(const C_SCLS
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set unit64 attribute
 
    \param[in,out] orc_XMLParser XML
    \param[in]     orc_String    Attribute
    \param[in]     ou64_Input    Value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_String,
                                                    const uint64 ou64_Input)
 {
@@ -1722,7 +1722,7 @@ void C_OSCNodeDataPoolFiler::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLP
    orc_XMLParser.SetAttributeString(orc_String, std::string(c_Stream.str()).c_str());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get unit64 attribute
 
    \param[in] orc_XMLParser XML
@@ -1731,7 +1731,7 @@ void C_OSCNodeDataPoolFiler::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLP
    \return
    Value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint64 C_OSCNodeDataPoolFiler::mh_GetAttributeUint64(const C_OSCXMLParserBase & orc_XMLParser,
                                                      const C_SCLString & orc_String)
 {

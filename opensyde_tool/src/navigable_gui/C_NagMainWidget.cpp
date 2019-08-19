@@ -84,6 +84,7 @@ C_NagMainWidget::C_NagMainWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_BtnAbout, &QPushButton::clicked, this, &C_NagMainWidget::m_AboutClicked);
    connect(this->mpc_Ui->pc_BtnNewProj, &C_OgePubProjAction::clicked, this, &C_NagMainWidget::m_OnNewProj);
    connect(this->mpc_Ui->pc_BtnOpenProj, &C_OgePubProjAction::clicked, this, &C_NagMainWidget::m_OnOpenProj);
+   connect(this->mpc_Ui->pc_BtnSaveProj, &QPushButton::clicked, this, &C_NagMainWidget::m_OnSaveProj);
    connect(this->mpc_Ui->pc_BtnSaveProjAs, &C_OgePubProjAction::clicked, this, &C_NagMainWidget::OnSaveProjAs);
    connect(this->mpc_Ui->pc_BtnEdit, &C_OgePubIconOnly::clicked, this, &C_NagMainWidget::m_OnEdit);
    connect(this->mpc_Ui->pc_LabelVersion, &C_OgeLabDoubleClick::SigDoubleClicked, this, &C_NagMainWidget::m_OnEdit);
@@ -167,7 +168,8 @@ void C_NagMainWidget::InitText(void) const
    this->mpc_Ui->pc_BtnAbout->setText(C_GtGetText::h_GetText("About"));
    this->mpc_Ui->pc_BtnNewProj->setText(C_GtGetText::h_GetText("New Project"));
    this->mpc_Ui->pc_BtnOpenProj->setText(C_GtGetText::h_GetText("Open Project"));
-   this->mpc_Ui->pc_BtnSaveProjAs->setText(C_GtGetText::h_GetText("Save Project as"));
+   this->mpc_Ui->pc_BtnSaveProj->setText(C_GtGetText::h_GetText("Save Project"));
+   this->mpc_Ui->pc_BtnSaveProjAs->setText(C_GtGetText::h_GetText("Save Project As"));
    this->mpc_Ui->pc_LabelCurProjTitle->setText(C_GtGetText::h_GetText("Current Project"));
    this->mpc_Ui->pc_LabRecentProjects->setText(C_GtGetText::h_GetText("Recent Projects"));
    this->mpc_Ui->pc_LabelNoRecentProj->setText(C_GtGetText::h_GetText(
@@ -179,9 +181,11 @@ void C_NagMainWidget::InitText(void) const
                                                       C_GtGetText::h_GetText("Create new empty project."));
    this->mpc_Ui->pc_BtnOpenProj->SetToolTipInformation(C_GtGetText::h_GetText("Open Project"),
                                                        C_GtGetText::h_GetText("Browse to open existing project."));
-   this->mpc_Ui->pc_BtnSaveProjAs->SetToolTipInformation(C_GtGetText::h_GetText("Save Project as"),
+   this->mpc_Ui->pc_BtnSaveProj->SetToolTipInformation(C_GtGetText::h_GetText("Save Project"),
+                                                       C_GtGetText::h_GetText("Save current project."));
+   this->mpc_Ui->pc_BtnSaveProjAs->SetToolTipInformation(C_GtGetText::h_GetText("Save Project As"),
                                                          C_GtGetText::h_GetText(
-                                                            "Select name and location to save the project"));
+                                                            "Select name and location to save the project."));
    this->mpc_Ui->pc_BtnAbout->SetToolTipInformation(C_GtGetText::h_GetText("About"),
                                                     C_GtGetText::h_GetText("Show information about openSYDE tool."));
    this->mpc_Ui->pc_BtnSysDef->SetToolTipInformation(C_GtGetText::h_GetText("SYSTEM DEFINITION"),
@@ -202,6 +206,130 @@ void C_NagMainWidget::InitText(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open a project.
+
+   \param[in]     orc_FilePath      path to project file
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
+{
+   if (orc_FilePath.compare("") != 0)
+   {
+      uint16 u16_Version;
+      stw_types::sint32 s32_Result;
+
+      Q_EMIT (this->SigBeforeOtherProjectLoad());
+      C_PuiProject::h_GetInstance()->SetPath(orc_FilePath);
+      s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
+      C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
+
+      if (s32_Result == C_NO_ERR)
+      {
+         C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
+         // Save new recent project configuration
+         C_UsHandler::h_GetInstance()->Save();
+         Q_EMIT (this->SigOtherProjectLoaded(true));
+      }
+      else
+      {
+         // Make sure to remove project from recent projects
+         C_UsHandler::h_GetInstance()->RemoveOfRecentProjects(orc_FilePath);
+
+         // load last available recent project (where "available" here means: *.syde exists)
+         const QStringList c_RecentProjects = C_UsHandler::h_GetInstance()->GetRecentProjects();
+
+         Q_EMIT (this->SigBeforeOtherProjectLoad());
+         C_PuiProject::h_GetInstance()->SetPath("");
+
+         for (sint32 s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
+         {
+            QFileInfo c_File;
+            c_File.setFile(c_RecentProjects[s32_ItRecentProject]);
+            // do not load same project again
+            if ((c_File.exists() == true) && (c_RecentProjects[s32_ItRecentProject] != orc_FilePath))
+            {
+               C_PuiProject::h_GetInstance()->SetPath(c_RecentProjects[s32_ItRecentProject]);
+               break;
+            }
+         }
+
+         s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
+
+         // very unlikely, but the previous project could be corrupt -> check it and load empty project else
+         C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
+         if (s32_Result == C_NO_ERR)
+         {
+            C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
+            // Save recent project configuration
+            C_UsHandler::h_GetInstance()->Save();
+         }
+         else
+         {
+            C_PuiProject::h_GetInstance()->LoadEmpty();
+         }
+         Q_EMIT (this->SigOtherProjectLoaded(false));
+      }
+   }
+
+   this->UpdateRecentProjects();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for updating recent projects.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::UpdateRecentProjects(void)
+{
+   std::vector<QString> c_Files;
+   std::vector<C_OSCProject> c_Projects;
+   const QStringList c_List = C_UsHandler::h_GetInstance()->GetRecentProjects();
+   for (QStringList::const_iterator c_ItList = c_List.begin(); c_ItList != c_List.end(); ++c_ItList)
+   {
+      C_OSCProject c_Tmp;
+      if (C_OSCProjectFiler::h_Load(c_Tmp, c_ItList->toStdString().c_str()) == C_NO_ERR)
+      {
+         c_Files.push_back(*c_ItList);
+         c_Projects.push_back(c_Tmp);
+      }
+   }
+   if (c_Files.size() > 0)
+   {
+      this->mpc_Ui->pc_GroupBoxNoRecentProj->setVisible(false);
+      this->mpc_Ui->pc_TableView->setVisible(true);
+      this->mpc_Ui->pc_TableView->UpdateData(c_Files, c_Projects);
+   }
+   else
+   {
+      this->mpc_Ui->pc_GroupBoxNoRecentProj->setVisible(true);
+      this->mpc_Ui->pc_TableView->setVisible(false);
+   }
+
+   // update current project section
+   m_UpdateCurrProjInfo();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for save project as button click.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::OnSaveProjAs(void)
+{
+   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
+   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      UpdateRecentProjects();
+   }
+
+   if (c_New != NULL)
+   {
+      pc_Dialog->SaveUserSettings();
+      c_New->HideOverlay();
+   }
+   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initializes paths of disabled icons.
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -216,6 +344,8 @@ void C_NagMainWidget::m_InitIcons(void) const
                                               "://images/main_page_and_navi_bar/Icon_new_project_disabled.svg");
    this->mpc_Ui->pc_BtnOpenProj->SetCustomIcon("://images/main_page_and_navi_bar/Icon_open_project.svg",
                                                "://images/main_page_and_navi_bar/Icon_open_project_disabled.svg");
+   this->mpc_Ui->pc_BtnSaveProj->SetCustomIcon("://images/main_page_and_navi_bar/Icon_save.svg",
+                                               "://images/main_page_and_navi_bar/Icon_save_disabled.svg");
    this->mpc_Ui->pc_BtnSaveProjAs->SetCustomIcon("://images/main_page_and_navi_bar/Icon_save_as.svg",
                                                  "://images/main_page_and_navi_bar/Icon_save_as_disabled.svg");
 
@@ -325,47 +455,13 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for updating recent projects.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWidget::UpdateRecentProjects(void)
-{
-   std::vector<QString> c_Files;
-   std::vector<C_OSCProject> c_Projects;
-   const QStringList c_List = C_UsHandler::h_GetInstance()->GetRecentProjects();
-   for (QStringList::const_iterator c_ItList = c_List.begin(); c_ItList != c_List.end(); ++c_ItList)
-   {
-      C_OSCProject c_Tmp;
-      if (C_OSCProjectFiler::h_Load(c_Tmp, c_ItList->toStdString().c_str()) == C_NO_ERR)
-      {
-         c_Files.push_back(*c_ItList);
-         c_Projects.push_back(c_Tmp);
-      }
-   }
-   if (c_Files.size() > 0)
-   {
-      this->mpc_Ui->pc_GroupBoxNoRecentProj->setVisible(false);
-      this->mpc_Ui->pc_TableView->setVisible(true);
-      this->mpc_Ui->pc_TableView->UpdateData(c_Files, c_Projects);
-   }
-   else
-   {
-      this->mpc_Ui->pc_GroupBoxNoRecentProj->setVisible(true);
-      this->mpc_Ui->pc_TableView->setVisible(false);
-   }
-
-   // update current project section
-   m_UpdateCurrProjInfo();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot function for button system definition click
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_SysDefClicked()
 {
-   Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY, 0,
-                              C_GtGetText::h_GetText("Network Topology"));
+   Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY, 0,
+                               C_GtGetText::h_GetText("NETWORK TOPOLOGY")));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -379,7 +475,7 @@ void C_NagMainWidget::m_SysViewClicked()
 
    C_SyvUtil::h_GetViewDisplayName(0U, ms32_SUBMODE_SYSVIEW_SETUP, c_SubMode, c_SubSubMode);
 
-   Q_EMIT this->SigChangeMode(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP, 0, c_SubMode, c_SubSubMode);
+   Q_EMIT (this->SigChangeMode(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP, 0, c_SubMode, c_SubSubMode));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -411,11 +507,11 @@ void C_NagMainWidget::m_OnNewProj(void)
 {
    if (C_PopUtil::h_AskUserToContinue(this) == true)
    {
-      Q_EMIT this->SigBeforeOtherProjectLoad();
+      Q_EMIT (this->SigBeforeOtherProjectLoad());
       C_PuiProject::h_GetInstance()->LoadEmpty();
 
-      Q_EMIT this->SigOtherProjectLoaded(true);
-      Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY);
+      Q_EMIT (this->SigOtherProjectLoaded(true));
+      Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY));
 
       UpdateRecentProjects();
    }
@@ -448,93 +544,22 @@ void C_NagMainWidget::m_OnOpenProj(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Open a project.
-
-   \param[in]     orc_FilePath      path to project file
+/*! \brief   Slot function for save project button click.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
+void C_NagMainWidget::m_OnSaveProj(void)
 {
-   if (orc_FilePath.compare("") != 0)
+   if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
    {
-      uint16 u16_Version;
-      stw_types::sint32 s32_Result;
-
-      Q_EMIT this->SigBeforeOtherProjectLoad();
-      C_PuiProject::h_GetInstance()->SetPath(orc_FilePath);
-      s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
-      C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
-
-      if (s32_Result == C_NO_ERR)
-      {
-         C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
-         // Save new recent project configuration
-         C_UsHandler::h_GetInstance()->Save();
-         Q_EMIT this->SigOtherProjectLoaded(true);
-      }
-      else
-      {
-         // Make sure to remove project from recent projects
-         C_UsHandler::h_GetInstance()->RemoveOfRecentProjects(orc_FilePath);
-
-         // load last available recent project (where "available" here means: *.syde exists)
-         const QStringList c_RecentProjects = C_UsHandler::h_GetInstance()->GetRecentProjects();
-
-         Q_EMIT this->SigBeforeOtherProjectLoad();
-         C_PuiProject::h_GetInstance()->SetPath("");
-
-         for (sint32 s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
-         {
-            QFileInfo c_File;
-            c_File.setFile(c_RecentProjects[s32_ItRecentProject]);
-            // do not load same project again
-            if ((c_File.exists() == true) && (c_RecentProjects[s32_ItRecentProject] != orc_FilePath))
-            {
-               C_PuiProject::h_GetInstance()->SetPath(c_RecentProjects[s32_ItRecentProject]);
-               break;
-            }
-         }
-
-         s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
-
-         // very unlikely, but the previous project could be corrupt -> check it and load empty project else
-         C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
-         if (s32_Result == C_NO_ERR)
-         {
-            C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
-            // Save recent project configuration
-            C_UsHandler::h_GetInstance()->Save();
-         }
-         else
-         {
-            C_PuiProject::h_GetInstance()->LoadEmpty();
-         }
-         Q_EMIT this->SigOtherProjectLoaded(false);
-      }
+      // open save as dialog
+      this->OnSaveProjAs();
    }
-
-   this->UpdateRecentProjects();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for save project as button click.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWidget::OnSaveProjAs(void)
-{
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
-   C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   else
    {
-      UpdateRecentProjects();
+      // save current existing project
+      C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
+      this->UpdateRecentProjects();
    }
-
-   if (c_New != NULL)
-   {
-      pc_Dialog->SaveUserSettings();
-      c_New->HideOverlay();
-   }
-   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
