@@ -16,6 +16,7 @@
 #include "C_OgeWiOnlyBackground.h"
 #include "C_CamProFilterData.h"
 #include "C_CamMosSectionPopup.h"
+#include "C_CamOgePubSettingsAdd.h"
 #include "C_UsHandler.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -88,10 +89,17 @@ private:
    stw_opensyde_gui::C_CamMosSectionPopup * mpc_PopupLogging;
 
    void m_OnExpandSettings(const bool oq_Expand);
+   void m_HidePopupDatabase(void) const;
+   void m_HidePopupDllConfig(void) const;
+   void m_HidePopupFilter(void) const;
+   void m_HidePopupLogging(void) const;
    void m_ShowPopupDatabase(const bool oq_Checked);
    void m_ShowPopupDllConfig(const bool oq_Checked);
    void m_ShowPopupFilter(const bool oq_Checked);
    void m_ShowPopupLogging(const bool oq_Checked);
+   void m_ShowPopup(stw_opensyde_gui::C_CamMosSectionPopup * const opc_Popup,
+                    const stw_opensyde_gui_elements::C_CamOgePubSettingsAdd * const opc_Button) const;
+   QPoint m_GetPopupMovePoint(const stw_opensyde_gui_elements::C_CamOgePubSettingsAdd * const opc_Button) const;
    stw_opensyde_gui_logic::C_UsHandler::E_SettingsSubSection m_GetPopOpenIdentity(void) const;
 
    //Avoid call

@@ -20,7 +20,7 @@
 #include "C_GtGetText.h"
 #include "C_OgeCbxParam.h"
 #include "C_PuiSdHandler.h"
-#include "C_SdNdeDataPoolUtil.h"
+#include "C_SdNdeDpUtil.h"
 #include "C_TblTreDelegateUtil.h"
 #include "C_SyvDaItPaTreeModel.h"
 #include "C_SyvDaItPaTreeDelegate.h"
@@ -215,7 +215,7 @@ void C_SyvDaItPaTreeDelegate::setEditorData(QWidget * const opc_Editor, const QM
          case C_SyvDaItPaTreeModel::eSET:
             if (u32_ValidLayers == 4UL)
             {
-               C_SdNdeDataPoolUtil::h_SetGenericEditorDataVariable(opc_Editor, orc_Index);
+               C_SdNdeDpUtil::h_SetGenericEditorDataVariable(opc_Editor, orc_Index);
             }
             else if (u32_ValidLayers == 3UL)
             {
@@ -267,7 +267,7 @@ void C_SyvDaItPaTreeDelegate::setModelData(QWidget * const opc_Editor, QAbstract
          case C_SyvDaItPaTreeModel::eSET:
             if (u32_ValidLayers == 4UL)
             {
-               C_SdNdeDataPoolUtil::h_SetModelGenericDataVariable(opc_Editor, opc_Model, orc_Index);
+               C_SdNdeDpUtil::h_SetModelGenericDataVariable(opc_Editor, opc_Model, orc_Index);
             }
             else if (u32_ValidLayers == 3UL)
             {
@@ -419,7 +419,7 @@ QWidget * C_SyvDaItPaTreeDelegate::m_CreateEditor(QWidget * const opc_Parent, co
                                                                        c_Id.u32_ListIndex, c_Id.u32_ElementIndex);
          if (pc_Element != NULL)
          {
-            pc_Retval = C_SdNdeDataPoolUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
+            pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
                                                                    pc_Element->c_MaxValue, pc_Element->f64_Factor,
                                                                    pc_Element->f64_Offset, 0, true);
             if (pc_Retval == NULL)

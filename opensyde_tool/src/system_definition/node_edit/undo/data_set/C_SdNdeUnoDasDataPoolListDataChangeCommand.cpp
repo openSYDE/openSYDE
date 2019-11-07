@@ -51,7 +51,7 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDasDataPoolListDataChangeCommand::C_SdNdeUnoDasDataPoolListDataChangeCommand(const uint32 & oru32_NodeIndex,
-                                                                                       const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager, const uint32 & oru32_DataPoolListDataSetIndex, const QVariant & orc_NewData, const C_SdNdeDataPoolUtil::E_DataSetDataChangeType & ore_DataChangeType,
+                                                                                       const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const uint32 & oru32_DataPoolListDataSetIndex, const QVariant & orc_NewData, const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType,
                                                                                        QUndoCommand * const opc_Parent)
    :
    C_SdNdeUnoDasDataPoolListBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
@@ -104,10 +104,10 @@ void C_SdNdeUnoDasDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
       //Copy previous value
       switch (this->me_DataChangeType)
       {
-      case C_SdNdeDataPoolUtil::eDATA_SET_NAME:
+      case C_SdNdeDpUtil::eDATA_SET_NAME:
          orc_PreviousData = QString(c_OSCData.c_Name.c_str());
          break;
-      case C_SdNdeDataPoolUtil::eDATA_SET_COMMENT:
+      case C_SdNdeDpUtil::eDATA_SET_COMMENT:
          orc_PreviousData = QString(c_OSCData.c_Comment.c_str());
          break;
       default:
@@ -116,10 +116,10 @@ void C_SdNdeUnoDasDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
       //Copy new value
       switch (this->me_DataChangeType)
       {
-      case C_SdNdeDataPoolUtil::eDATA_SET_NAME:
+      case C_SdNdeDpUtil::eDATA_SET_NAME:
          c_OSCData.c_Name = orc_NewData.toString().toStdString().c_str();
          break;
-      case C_SdNdeDataPoolUtil::eDATA_SET_COMMENT:
+      case C_SdNdeDpUtil::eDATA_SET_COMMENT:
          c_OSCData.c_Comment = orc_NewData.toString().toStdString().c_str();
          break;
       default:

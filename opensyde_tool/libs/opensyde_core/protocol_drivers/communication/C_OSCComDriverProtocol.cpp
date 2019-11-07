@@ -1584,7 +1584,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                                               routing if an error occurred
 
    \return
-   C_NO_ERR   request sent, positive response received
+   C_NO_ERR   request sent, positive response received or no routing necessary
    C_TIMEOUT  expected response not received within timeout
    C_NOACT    could not send request (e.g. TX buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized

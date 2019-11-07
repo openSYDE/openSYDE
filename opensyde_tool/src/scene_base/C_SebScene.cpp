@@ -57,7 +57,7 @@ const float64 C_SebScene::mhf64_MovingRange = 10.0;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
 */
@@ -90,7 +90,7 @@ C_SebScene::C_SebScene(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   default destructor
+/*! \brief  default destructor
 
    Clean up.
 */
@@ -159,9 +159,9 @@ float64 C_SebScene::GetHighestUsedZValueList(const QList<QGraphicsItem *> & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the drawing of the background active
+/*! \brief  Sets the drawing of the background active
 
-   \param[in]  oq_Active   Flag for drawing the background
+   \param[in] oq_Active Flag for drawing the background
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::SetDrawingBackground(const bool oq_Active)
@@ -171,7 +171,7 @@ void C_SebScene::SetDrawingBackground(const bool oq_Active)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the minimum required scene rectangle size for all elements
+/*! \brief  Returns the minimum required scene rectangle size for all elements
 
    \return
    Minimum scene rectangle size
@@ -183,7 +183,7 @@ QRectF C_SebScene::GetMinimumSceneRect(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Activate blocking of the context menu for one call
+/*! \brief  Activate blocking of the context menu for one call
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::BlockContextMenu(void)
@@ -192,7 +192,7 @@ void C_SebScene::BlockContextMenu(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check scene if tool tip for current position is necessary
+/*! \brief  Check scene if tool tip for current position is necessary
 
    \param[in] orc_ScenePos Scene position to check for tool tip
 */
@@ -224,7 +224,7 @@ void C_SebScene::DisplayToolTip(const QPointF & orc_ScenePos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check scene if tool tip for current position is necessary
+/*! \brief  Check scene if tool tip for current position is necessary
 
    Display tool tip for set object
 
@@ -247,12 +247,12 @@ void C_SebScene::DisplaySpecificItemToolTip(const QPointF & orc_ScenePos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checks if the cursor position is relevant for the proxy widget
+/*! \brief  Checks if the cursor position is relevant for the proxy widget
 
    In base is no item relevant. Function returns always false.
    Derived classes must overwrite the function if needed.
 
-   \param[in]     orc_ScenePos     Scene position of cursor
+   \param[in] orc_ScenePos Scene position of cursor
 
    \return
    true     Cursor is on a relevant position
@@ -267,7 +267,7 @@ bool C_SebScene::IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal for update of current scaling
+/*! \brief  Signal for update of current scaling
 
    \param[in] orc_Transform Current scaling
 */
@@ -295,7 +295,7 @@ void C_SebScene::UpdateTransform(const QTransform & orc_Transform)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set dark mode active
+/*! \brief  Set dark mode active
 
    \param[in] oq_Value Dark mode active
 */
@@ -307,11 +307,15 @@ void C_SebScene::SetDarkModeActive(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add bend point to line
+/*! \brief  Add bend point to line
 
    \param[in,out] opc_Item     Line item
    \param[in]     orc_ScenePos Scene position
    \param[in]     opc_Index    Optional specific index to add point add
+
+   \return
+   -1: error
+   else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
@@ -330,11 +334,15 @@ sint32 C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Remove bend point of line
+/*! \brief  Remove bend point of line
 
    \param[in,out] opc_Item     Line item
    \param[in]     orc_ScenePos Scene position
    \param[in]     opc_Index    Optional specific index which point to remove
+
+   \return
+   -1: error
+   else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SebScene::RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
@@ -352,7 +360,7 @@ sint32 C_SebScene::RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get item identified by unique item ID
+/*! \brief  Get item identified by unique item ID
 
    \param[in] oru64_ID Unique item ID
 
@@ -417,9 +425,9 @@ void C_SebScene::m_InitSceneContextMenuManager(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten key press release event slot
+/*! \brief  Overwritten key press release event slot
 
-   \param[in,out] opc_KeyEvent  Key event identification and information
+   \param[in,out] opc_KeyEvent Key event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -646,7 +654,7 @@ void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten focus out event slot
+/*! \brief  Overwritten focus out event slot
 
    Here: Remove selection of items
 
@@ -662,7 +670,7 @@ void C_SebScene::focusOutEvent(QFocusEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten drag move event
+/*! \brief  Overwritten drag move event
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -707,7 +715,7 @@ void C_SebScene::dragMoveEvent(QGraphicsSceneDragDropEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten drop event
+/*! \brief  Overwritten drop event
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -728,7 +736,7 @@ void C_SebScene::dropEvent(QGraphicsSceneDragDropEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse move event slot
+/*! \brief  Overwritten mouse move event slot
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -755,7 +763,7 @@ void C_SebScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse press event slot
+/*! \brief  Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -847,7 +855,7 @@ void C_SebScene::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse release event slot
+/*! \brief  Overwritten mouse release event slot
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -865,7 +873,7 @@ void C_SebScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten context menu event
+/*! \brief  Overwritten context menu event
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -888,9 +896,9 @@ void C_SebScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Eve
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new text element to scene and connect signals
+/*! \brief  Add new text element to scene and connect signals
 
-   \param[in,out] opc_Item  Text element
+   \param[in,out] opc_Item Text element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddTextElementToScene(C_GiBiTextElement * const opc_Item)
@@ -900,7 +908,7 @@ void C_SebScene::m_AddTextElementToScene(C_GiBiTextElement * const opc_Item)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new line arrow to scene and connect signals
+/*! \brief  Add new line arrow to scene and connect signals
 
    \param[in,out] opc_Item Line arrow item
 */
@@ -912,9 +920,9 @@ void C_SebScene::m_AddLineArrowToScene(C_GiBiArrow * const opc_Item)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new boundary to scene and connect signals
+/*! \brief  Add new boundary to scene and connect signals
 
-   \param[in,out] opc_Item  Boundary item
+   \param[in,out] opc_Item Boundary item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddBoundaryToScene(C_GiBiBoundary * const opc_Item)
@@ -923,9 +931,9 @@ void C_SebScene::m_AddBoundaryToScene(C_GiBiBoundary * const opc_Item)
    m_AddAnyItemToScene(opc_Item);
 }
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new image to scene and connect signals
+/*! \brief  Add new image to scene and connect signals
 
-   \param[in,out] opc_Item  Image group item
+   \param[in,out] opc_Item Image group item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddImageGroupToScene(C_GiBiImageGroup * const opc_Item)
@@ -935,7 +943,7 @@ void C_SebScene::m_AddImageGroupToScene(C_GiBiImageGroup * const opc_Item)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new rectangle based item to scene and connect signals
+/*! \brief  Add new rectangle based item to scene and connect signals
 
    \param[in,out] opc_Item Rectangle based item
 */
@@ -949,9 +957,9 @@ void C_SebScene::m_AddRectBaseGroupToScene(C_GiBiRectBaseGroup * const opc_Item)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new line based item to scene and connect signals
+/*! \brief  Add new line based item to scene and connect signals
 
-   \param[in,out] opc_Item  Line based item
+   \param[in,out] opc_Item Line based item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddLineGroupToScene(C_GiLiLineGroup * const opc_Item)
@@ -964,7 +972,7 @@ void C_SebScene::m_AddLineGroupToScene(C_GiLiLineGroup * const opc_Item)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add any item and do general actions
+/*! \brief  Add any item and do general actions
 
    \param[in,out] opc_Item Pointer to new item
 */
@@ -978,7 +986,7 @@ void C_SebScene::m_AddAnyItemToScene(QGraphicsItem * const opc_Item)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set initial state of actions select and move
+/*! \brief  Set initial state of actions select and move
 
    \param[in,out] opc_Item Current item
 */
@@ -1030,7 +1038,7 @@ void C_SebScene::m_SetItemSelectionAndMoveAvailability(QGraphicsItem * const opc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle after move action
+/*! \brief  Handle after move action
 
    \param[in] orc_PositionDifference Position difference of move
 */
@@ -1051,7 +1059,7 @@ void C_SebScene::m_HandleRevertableMove(const QPointF & orc_PositionDifference)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle after resize action
+/*! \brief  Handle after resize action
 
    \param[in] ors32_InteractionPointIndex Interaction point index
    \param[in] orc_PositionDifference      Position difference of resize
@@ -1068,7 +1076,7 @@ void C_SebScene::m_HandleRevertableResizeLine(const sint32 & ors32_InteractionPo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle after sub line move action
+/*! \brief  Handle after sub line move action
 
    \param[in] ors32_SubLineIndex     Sub line index
    \param[in] orc_PositionDifference Position difference of resize
@@ -1083,12 +1091,12 @@ void C_SebScene::m_HandleSubLineMove(const sint32 & ors32_SubLineIndex, const QP
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register resize action
+/*! \brief  Register resize action
 
-   \param[in]     orc_OldPos  Old position
-   \param[in]     orc_OldSize Old size
-   \param[in]     orc_NewPos  New position
-   \param[in]     orc_NewSize New size
+   \param[in] orc_OldPos  Old position
+   \param[in] orc_OldSize Old size
+   \param[in] orc_NewPos  New position
+   \param[in] orc_NewSize New size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleRevertableResizeRectangle(const QPointF & orc_OldPos, const QSizeF & orc_OldSize,
@@ -1102,7 +1110,7 @@ void C_SebScene::m_HandleRevertableResizeRectangle(const QPointF & orc_OldPos, c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Select new item only
+/*! \brief  Select new item only
 
    \param[in, out] opc_Item          Item to be selected
    \param[in]      oq_ClearSelection Flag if the old selection have to be cleared
@@ -1119,7 +1127,7 @@ void C_SebScene::m_UpdateSelection(QGraphicsItem * const opc_Item, const bool oq
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Select all items
+/*! \brief  Select all items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_SelectAll(void) const
@@ -1144,7 +1152,7 @@ bool C_SebScene::m_IsRubberBandActive(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   React to text interaction mode change
+/*! \brief  React to text interaction mode change
 
    \param[in] orq_On Flag if text interaction mode is currently active
 */
@@ -1164,7 +1172,7 @@ void C_SebScene::m_HandleProxyWidgetInteractionChange(const bool & orq_On)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add image to scene
+/*! \brief  Add image to scene
 
    \param[in] orc_Path     Image path
    \param[in] orc_Position Image scene position
@@ -1178,9 +1186,9 @@ void C_SebScene::m_AddImage(const QString & orc_Path, const QPointF & orc_Positi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds a new image
+/*! \brief  Adds a new image
 
-   \param[in] orc_Pos        Position to place item at
+   \param[in] orc_Pos Position to place item at
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddImageWithFileDialog(const QPointF & orc_Pos)
@@ -1203,10 +1211,10 @@ void C_SebScene::m_AddImageWithFileDialog(const QPointF & orc_Pos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Map scene position to screen position
+/*! \brief  Map scene position to screen position
 
-   \param[in]       orc_ScenePos    Scene position
-   \param[in,out]   orc_GlobalPos   Screen position
+   \param[in]     orc_ScenePos  Scene position
+   \param[in,out] orc_GlobalPos Screen position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_MapToGlobal(const QPointF & orc_ScenePos, QPoint & orc_GlobalPos) const
@@ -1222,10 +1230,10 @@ void C_SebScene::m_MapToGlobal(const QPointF & orc_ScenePos, QPoint & orc_Global
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Map screen position to scene position
+/*! \brief  Map screen position to scene position
 
-   \param[in]       orc_GlobalPos   Screen position
-   \param[in,out]   orc_ScenePos    Scene position
+   \param[in]     orc_GlobalPos Screen position
+   \param[in,out] orc_ScenePos  Scene position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_MapFromGlobal(const QPoint & orc_GlobalPos, QPointF & orc_ScenePos) const
@@ -1241,7 +1249,7 @@ void C_SebScene::m_MapFromGlobal(const QPoint & orc_GlobalPos, QPointF & orc_Sce
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete selected items
+/*! \brief  Delete selected items
 
    \param[in] oq_NoUserConfirm Optional flag to suppress user confirmation for any delete action
 */
@@ -1305,7 +1313,7 @@ void C_SebScene::m_Delete(const bool oq_NoUserConfirm)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Copy all selected items from scene to copy paste manager
 
-   \param[in] orc_SelectedItems   Selected items to copy
+   \param[in] orc_SelectedItems Selected items to copy
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_CopyItemsToCopyPasteManager(const QList<QGraphicsItem *> & orc_SelectedItems)
@@ -1337,7 +1345,7 @@ void C_SebScene::m_CopyItemsToCopyPasteManager(const QList<QGraphicsItem *> & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clear all items
+/*! \brief  Clear all items
 
    Hint: leaves all items which are not included in the system definition
 */
@@ -1351,9 +1359,9 @@ void C_SebScene::m_Clear(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete line based item of scene and disconnect signals
+/*! \brief  Delete line based item of scene and disconnect signals
 
-   \param[in,out] opc_Item  Line based item
+   \param[in,out] opc_Item Line based item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_RemoveLineGroupOfScene(C_GiLiLineGroup * const opc_Item)
@@ -1366,7 +1374,7 @@ void C_SebScene::m_RemoveLineGroupOfScene(C_GiLiLineGroup * const opc_Item)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete rectangle based item of scene and disconnect signals
+/*! \brief  Delete rectangle based item of scene and disconnect signals
 
    \param[in,out] opc_Item Rectangle based item
 */
@@ -1381,9 +1389,9 @@ void C_SebScene::m_RemoveRectBaseGroupOfScene(C_GiBiRectBaseGroup * const opc_It
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paste origin items
+/*! \brief  Paste origin items
 
-   \param[in] opc_Pos   Optional position where items shall be paste
+   \param[in] opc_Pos Optional position where items shall be paste
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_Paste(const QPointF * const opc_Pos)
@@ -1395,7 +1403,7 @@ void C_SebScene::m_Paste(const QPointF * const opc_Pos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if paste is possible
+/*! \brief  Check if paste is possible
 
    Warning: also has to check copy paste manager!
 
@@ -1417,7 +1425,7 @@ bool C_SebScene::m_IsPastePossible(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if undo currently possible
+/*! \brief  Check if undo currently possible
 
    \return
    True  Undo possible
@@ -1430,7 +1438,7 @@ bool C_SebScene::m_IsUndoAvailable(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Optional check for user confirmation on delete action
+/*! \brief  Optional check for user confirmation on delete action
 
    \param[in] orc_SelectedItems Selected items
 
@@ -1446,7 +1454,7 @@ bool C_SebScene::m_HandleDeleteUserConfirmation(const QList<QGraphicsItem *> & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paste objects of clipboard
+/*! \brief  Paste objects of clipboard
 
    \param[in] opc_Pos Optional position to paste at (Otherwise current mouse cursor position is chosen)
 */
@@ -1458,7 +1466,7 @@ void C_SebScene::m_PasteOfClipBoard(const QPointF * const opc_Pos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update hints to reality
+/*! \brief  Update hints to reality
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_UpdateHints(void) const
@@ -1489,7 +1497,7 @@ void C_SebScene::m_UpdateHints(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle tool tip hide event
+/*! \brief  Handle tool tip hide event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleHideToolTip(void)
@@ -1500,7 +1508,7 @@ void C_SebScene::m_HandleHideToolTip(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Start timer for possible tool tip
+/*! \brief  Start timer for possible tool tip
 
    \param[in] orc_ScenePos Scene position to start tool tip at
    \param[in] opc_Item     Item to display tooltip for
@@ -1520,7 +1528,7 @@ void C_SebScene::m_StartTimerForToolTipDirect(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Stop tool tip
+/*! \brief  Stop tool tip
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_StopToolTip(void)
@@ -1553,7 +1561,7 @@ void C_SebScene::m_RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Call setup style dialog
+/*! \brief  Call setup style dialog
 
    \param[in,out] opc_Item Item to change style for
 
@@ -1630,7 +1638,7 @@ void C_SebScene::m_ApplySetupStyleMultiple(const QList<QGraphicsItem *> & orc_Se
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get new unique ID
+/*! \brief  Get new unique ID
 
    \param[in] opc_IDMap   Optional map for item to id
    \param[in] os32_Type   Item type, warning: only casted enum values accepted
@@ -1697,7 +1705,7 @@ QRectF C_SebScene::m_ItemsBoundRect(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapt scene rectangle
+/*! \brief  Adapt scene rectangle
 
    The scene rectangle will be adpated dependent of the existing items and
    a additional border area.
@@ -1767,7 +1775,7 @@ void C_SebScene::m_MoveSelectedItems(const QPointF & orc_Delta)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paste origin items by key press
+/*! \brief  Paste origin items by key press
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_PasteKey(void)
@@ -1776,7 +1784,7 @@ void C_SebScene::m_PasteKey(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paste origin items by context menu click
+/*! \brief  Paste origin items by context menu click
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_PasteClick()
@@ -1790,7 +1798,7 @@ void C_SebScene::m_PasteClick()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Align selected items
+/*! \brief  Align selected items
 
    \param[in] opc_GuidelineItem Item to use as guideline
    \param[in] ore_Alignment     Alignment type
@@ -1823,7 +1831,7 @@ void C_SebScene::m_SendToBack(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle setup style action
+/*! \brief  Handle setup style action
 
    \param[in,out] opc_Item Item to change style for
 */
@@ -1854,7 +1862,7 @@ void C_SebScene::m_SetupStyle(QGraphicsItem * const opc_Item)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Now show tool tip
+/*! \brief  Now show tool tip
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_TriggerToolTip(void)
@@ -1863,7 +1871,7 @@ void C_SebScene::m_TriggerToolTip(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle background state
+/*! \brief  Handle background state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleBackground(void)
@@ -1893,7 +1901,7 @@ void C_SebScene::m_HandleBackground(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle change of selection
+/*! \brief  Handle change of selection
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_OnSelectionChange(void)
@@ -1907,7 +1915,7 @@ void C_SebScene::m_OnSelectionChange(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot for delete action
+/*! \brief  Slot for delete action
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_DeleteSlot(void)
@@ -1916,7 +1924,7 @@ void C_SebScene::m_DeleteSlot(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get supported image types as filter
+/*! \brief  Get supported image types as filter
 
    \return
    Supported image types as filter

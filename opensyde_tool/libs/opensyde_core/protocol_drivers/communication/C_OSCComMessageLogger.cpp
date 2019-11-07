@@ -414,6 +414,7 @@ sint32 C_OSCComMessageLogger::RemoveDatabase(const C_SCLString & orc_Path)
 /*! \brief   Activate or deactivate a registered database
 
    \param[in]  orc_Path    Path and filename of database file
+   \param[in]  oq_Active   Flag if database is active
 
    \return
    C_NO_ERR    Database removed
@@ -428,8 +429,27 @@ sint32 C_OSCComMessageLogger::ActivateDatabase(const C_SCLString & orc_Path, con
 
    if (c_ItFlag != this->mc_DatabaseActiveFlags.end())
    {
+      std::map<stw_scl::C_SCLString, C_OSCComMessageLoggerOsySysDefConfig>::iterator c_ItSysDef =
+            this->mc_OsySysDefs.find(orc_Path);
+
       c_ItFlag->second = oq_Active;
       s32_Return = C_NO_ERR;
+
+      // Check if it is a openSYDE System Definition
+      if (c_ItSysDef != this->mc_OsySysDefs.end())
+      {
+         // The configuration of the layer 7 interpretation must be adapted too
+         if (oq_Active == true)
+         {
+            this->mc_ProtocolDec.AddOsySysDef(&(c_ItSysDef->second));
+            this->mc_ProtocolHex.AddOsySysDef(&(c_ItSysDef->second));
+         }
+         else
+         {
+            this->mc_ProtocolDec.RemoveOsySysDef(&(c_ItSysDef->second));
+            this->mc_ProtocolHex.RemoveOsySysDef(&(c_ItSysDef->second));
+         }
+      }
    }
 
    return s32_Return;
@@ -997,7 +1017,7 @@ bool C_OSCComMessageLogger::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_Me
 
             if (orc_MessageData.c_Signals.size() > 0)
             {
-               const C_OSCComMessageLoggerDataSignal & rc_Signal =
+               C_OSCComMessageLoggerDataSignal & rc_Signal =
                   orc_MessageData.c_Signals[orc_MessageData.c_Signals.size() - 1];
 
                if (rc_Signal.q_DlcError == false)
@@ -1005,6 +1025,7 @@ bool C_OSCComMessageLogger::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_Me
                   try
                   {
                      u16_MultiplexValue = static_cast<uint16>(rc_Signal.c_RawValueDec.ToInt());
+                     rc_Signal.c_Name += " (Multiplexer)";
                      q_MultiplexerFound = true;
                      u32_MultiplexerIndex = u32_Counter;
                   }

@@ -55,7 +55,7 @@ const QColor C_SebGraphicsView::mhc_GradientColorDark = mc_STYLE_GUIDE_COLOR_52;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
 */
@@ -115,7 +115,7 @@ C_SebGraphicsView::C_SebGraphicsView(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebGraphicsView::~C_SebGraphicsView()
@@ -124,7 +124,7 @@ C_SebGraphicsView::~C_SebGraphicsView()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the actual zoom value as percent
+/*! \brief  Sets the actual zoom value as percent
 
    \param[in] osn_Percent Percent
    \param[in] orq_Silent  Flag if user notification should be shown
@@ -139,7 +139,7 @@ void C_SebGraphicsView::SetZoomValue(const sintn osn_Percent, const bool & orq_S
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Gets the actual zoom value as percent
+/*! \brief  Gets the actual zoom value as percent
 
    \return  Actual zoom value
 */
@@ -150,7 +150,7 @@ sintn C_SebGraphicsView::GetZoomValue(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Manual update of transformation values
+/*! \brief  Manual update of transformation values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::UpdateTransform(void) const
@@ -166,13 +166,13 @@ void C_SebGraphicsView::UpdateTransform(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the actual position of the viewport on the scene
+/*! \brief  Sets the actual position of the viewport on the scene
 
    The position will be set to the scroll bars in the scroll bar event to make sure
    the setting of the position is not to early. If it will be set to early, it
    does not work.
 
-   \param[in]  orc_Pos  New positon
+   \param[in] orc_Pos New positon
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetViewPos(const QPoint & orc_Pos)
@@ -184,7 +184,7 @@ void C_SebGraphicsView::SetViewPos(const QPoint & orc_Pos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Gets the actual position of the viewport on the scene
+/*! \brief  Gets the actual position of the viewport on the scene
 
    \return  Actual viewport position
 */
@@ -200,9 +200,9 @@ QPoint C_SebGraphicsView::GetViewPos(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the flag for drawing the background
+/*! \brief  Sets the flag for drawing the background
 
-   \param[in]  oq_Active   Flag for drawing the background
+   \param[in] oq_Active Flag for drawing the background
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetDrawingBackground(const bool oq_Active)
@@ -213,7 +213,7 @@ void C_SebGraphicsView::SetDrawingBackground(const bool oq_Active)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set flag for subtle surround gradient vs strong top and left gradient
+/*! \brief  Set flag for subtle surround gradient vs strong top and left gradient
 
    \param[in] orq_SubtleSurroundGradientActive true: subtle surround gradient
                                                false: strong top and left gradient
@@ -225,12 +225,12 @@ void C_SebGraphicsView::SetSubtleSurroundGradient(const bool & orq_SubtleSurroun
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show tool tip
+/*! \brief  Show tool tip
 
    \param[in] orc_ScenePos Scne position to show tool tip at
    \param[in] orc_Heading  Heading of tool tip
    \param[in] orc_Content  Content of tool tip
-   \param[in] oq_IsError   Tool tip is error type
+   \param[in] oe_Type      Type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::ShowToolTip(const QPointF & orc_ScenePos, const QString & orc_Heading,
@@ -246,7 +246,7 @@ void C_SebGraphicsView::ShowToolTip(const QPointF & orc_ScenePos, const QString 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Hide tool tip
+/*! \brief  Hide tool tip
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::HideToolTip(void)
@@ -255,7 +255,7 @@ void C_SebGraphicsView::HideToolTip(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set dark mode state for scene
+/*! \brief  Set dark mode state for scene
 
    \param[in] oq_DarkMode Dark mode active flag
                           true:  Dark mode
@@ -269,7 +269,7 @@ void C_SebGraphicsView::SetDarkMode(const bool oq_DarkMode)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the scene and connects with available signals
+/*! \brief  Sets the scene and connects with available signals
 
    For connecting to the signals it has to be a C_SebScene scene.
 
@@ -292,9 +292,10 @@ void C_SebGraphicsView::SetSceneAndConnect(QGraphicsScene * const opc_Scene)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Scroll to scene position
+/*! \brief  Scroll to scene position
 
    \param[in] orc_ScenePosition Scene position
+   \param[in] orc_Size          Size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::ScrollTo(const QPointF & orc_ScenePosition, const QSizeF & orc_Size)
@@ -306,12 +307,13 @@ void C_SebGraphicsView::ScrollTo(const QPointF & orc_ScenePosition, const QSizeF
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided background paint event
+/*! \brief  Overrided background paint event
 
    Draws the background with a gradient and the background image which is defined in
    the ui file.
 
-   \param[in,out] opc_event  Pointer to paint event
+   \param[in,out] opc_Painter Painter
+   \param[in]     orc_Rect    Rect
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::drawBackground(QPainter * const opc_Painter, const QRectF & orc_Rect)
@@ -404,9 +406,9 @@ void C_SebGraphicsView::drawBackground(QPainter * const opc_Painter, const QRect
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided resize event
+/*! \brief  Overrided resize event
 
-   \param[in,out] opc_event  Pointer to resize event
+   \param[in,out] opc_Event Event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::resizeEvent(QResizeEvent * const opc_Event)
@@ -420,11 +422,11 @@ void C_SebGraphicsView::resizeEvent(QResizeEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided mouse move event
+/*! \brief  Overrided mouse move event
 
    Drag and move functionality.
 
-   \param[in,out] opc_event  Pointer to mouse event
+   \param[in,out] opc_Event Event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
@@ -453,11 +455,11 @@ void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided mouse press event
+/*! \brief  Overrided mouse press event
 
    Drag and move functionality.
 
-   \param[in,out] opc_event  Pointer to mouse event
+   \param[in,out] opc_Event Event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
@@ -523,9 +525,9 @@ void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided mouse release event
+/*! \brief  Overrided mouse release event
 
-   \param[in,out] opc_event  Pointer to mouse event
+   \param[in,out] opc_Event Event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::mouseReleaseEvent(QMouseEvent * const opc_Event)
@@ -556,11 +558,11 @@ void C_SebGraphicsView::mouseReleaseEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided key press event
+/*! \brief  Overrided key press event
 
    Zooming functionality.
 
-   \param[in,out] opc_event  Pointer to key event
+   \param[in,out] opc_Event Event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::keyPressEvent(QKeyEvent * const opc_Event)
@@ -592,11 +594,11 @@ void C_SebGraphicsView::keyPressEvent(QKeyEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided wheel event
+/*! \brief  Overrided wheel event
 
    Zooming functionality.
 
-   \param[in,out] opc_event  Pointer to wheel event
+   \param[in,out] opc_Event Event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::wheelEvent(QWheelEvent * const opc_Event)
@@ -619,7 +621,7 @@ void C_SebGraphicsView::wheelEvent(QWheelEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten drag enter event slot
+/*! \brief  Overwritten drag enter event slot
 
    Here: Do not accept external *.syde file here. It will be handled in NagMainWindow
 
@@ -643,7 +645,7 @@ void C_SebGraphicsView::dragEnterEvent(QDragEnterEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten drop event slot
+/*! \brief  Overwritten drop event slot
 
    Here: Set focus back to scene
 
@@ -657,7 +659,7 @@ void C_SebGraphicsView::dropEvent(QDropEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten default event slot
+/*! \brief  Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -689,7 +691,7 @@ bool C_SebGraphicsView::event(QEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for zoom notification timer
+/*! \brief  Slot function for zoom notification timer
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ZoomNotificationTimerEvent()
@@ -702,10 +704,10 @@ void C_SebGraphicsView::m_ZoomNotificationTimerEvent()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Scale view by scale factor
+/*! \brief  Scale view by scale factor
 
-   \param[in] of64_ScaleFactor  Scale Factor
-   \param[in] orq_Silent        Flag if user notification should be shown
+   \param[in] of64_ScaleFactor Scale Factor
+   \param[in] orq_Silent       Flag if user notification should be shown
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & orq_Silent)
@@ -771,7 +773,7 @@ void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Zoom step in
+/*! \brief  Zoom step in
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ZoomIn(void)
@@ -780,7 +782,7 @@ void C_SebGraphicsView::m_ZoomIn(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Zoom step out
+/*! \brief  Zoom step out
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ZoomOut(void)
@@ -789,7 +791,7 @@ void C_SebGraphicsView::m_ZoomOut(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   UpdateZoomValue
+/*! \brief  UpdateZoomValue
 
    \param[in] orq_Silent Flag if user notification should be shown
 */
@@ -812,7 +814,9 @@ void C_SebGraphicsView::m_UpdateZoomValue(const bool & orq_Silent)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Implementation of drag moving
+/*! \brief  Implementation of drag moving
+
+   \param[in] opc_Event Event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_DragMove(const QMouseEvent * const opc_Event)
@@ -880,7 +884,7 @@ void C_SebGraphicsView::m_VerScrollbarChanged(const sintn osn_Min, const sintn o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set proxy widget interaction state
+/*! \brief  Set proxy widget interaction state
 
    \param[in] oq_Active Proxy widget interaction state
 */

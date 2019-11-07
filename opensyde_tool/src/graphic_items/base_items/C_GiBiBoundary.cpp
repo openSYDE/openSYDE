@@ -18,6 +18,7 @@
 #include "stwtypes.h"
 #include "C_GiBiBoundary.h"
 #include "C_OgePopUpDialog.h"
+#include "C_GtGetText.h"
 #include "C_GiSyBaseWidget.h"
 #include "C_GiSyBoundaryWidget.h"
 #include "C_PuiSdDataElement.h"
@@ -35,8 +36,6 @@ const float64 mf64_ActionPointOffsetBoundary = 8.0;
 const float64 C_GiBiBoundary::mhf64_MinWidthBoundary = 50.0;
 const float64 C_GiBiBoundary::mhf64_MinHeightBoundary = 50.0;
 
-const QString mc_NAME_BOUNDARY = "BOUNDARY";
-
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
@@ -48,14 +47,14 @@ const QString mc_NAME_BOUNDARY = "BOUNDARY";
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID     Unique ID
-   \param[in]     orf64_Width  Width of node
-   \param[in]     orf64_Height Height of node
-   \param[in,out] opc_Parent   Optional pointer to parent
+   \param[in]     oru64_ID    Unique ID
+   \param[in]     of64_Width  Width of node
+   \param[in]     of64_Height Height of node
+   \param[in,out] opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiBoundary::C_GiBiBoundary(const uint64 & oru64_ID, const float64 of64_Width, const float64 of64_Height,
@@ -96,7 +95,7 @@ C_GiBiBoundary::C_GiBiBoundary(const uint64 & oru64_ID, const float64 of64_Width
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -109,7 +108,7 @@ C_GiBiBoundary::~C_GiBiBoundary()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this itme
+/*! \brief  Returns the type of this itme
 
    \return  ID
 */
@@ -120,7 +119,7 @@ sintn C_GiBiBoundary::type(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Open style dialog
+/*! \brief  Open style dialog
 
    \param[in] oq_DarkMode Optional dark mode flag
 
@@ -134,7 +133,7 @@ bool C_GiBiBoundary::OpenStyleDialog(const bool oq_DarkMode)
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
-   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, mc_NAME_BOUNDARY, oq_DarkMode);
+   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Boundary"), oq_DarkMode);
    C_GiSyBoundaryWidget * pc_SettingsWidget = new C_GiSyBoundaryWidget(*pc_Dialog);
 
    pc_SettingsWidget->SetBorderColor(this->GetBorderColor());
@@ -182,7 +181,7 @@ void C_GiBiBoundary::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set border width
+/*! \brief  Set border width
 
    \param[in] ors32_Width New line width
 */
@@ -201,7 +200,7 @@ void C_GiBiBoundary::SetBorderWidth(const stw_types::sint32 & ors32_Width)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set border color
+/*! \brief  Set border color
 
    \param[in] orc_Color New color
 */
@@ -216,7 +215,7 @@ void C_GiBiBoundary::SetBorderColor(const QColor & orc_Color)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set background color
+/*! \brief  Set background color
 
    \param[in] orc_Color New color
 */
@@ -231,7 +230,7 @@ void C_GiBiBoundary::SetBackgroundColor(const QColor & orc_Color)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get border width
+/*! \brief  Get border width
 
    \return
    border width
@@ -243,7 +242,7 @@ sint32 C_GiBiBoundary::GetBorderWidth() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get border color
+/*! \brief  Get border color
 
    \return
    border color
@@ -255,7 +254,7 @@ QColor C_GiBiBoundary::GetBorderColor() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get background color
+/*! \brief  Get background color
 
    \return
    background color
@@ -276,10 +275,10 @@ void C_GiBiBoundary::m_ResizeUpdateItems(const float64 of64_DiffWidth, const flo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load from internal data
+/*! \brief  Load from internal data
 
-   \param[in]  orc_Data       Boundary data
-   \param[in]  oq_DarkMode    Optional dark mode flag
+   \param[in] orc_Data    Boundary data
+   \param[in] oq_DarkMode Optional dark mode flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiBoundary::m_LoadFromData(const C_PuiBsBoundary & orc_Data, const bool oq_DarkMode)
@@ -299,10 +298,10 @@ void C_GiBiBoundary::m_LoadFromData(const C_PuiBsBoundary & orc_Data, const bool
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update internal data
+/*! \brief  Update internal data
 
-   \param[in]  orc_Data       Boundary data
-   \param[in]  oq_DarkMode    Optional dark mode flag
+   \param[in] orc_Data    Boundary data
+   \param[in] oq_DarkMode Optional dark mode flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiBoundary::m_UpdateData(C_PuiBsBoundary & orc_Data, const bool oq_DarkMode) const

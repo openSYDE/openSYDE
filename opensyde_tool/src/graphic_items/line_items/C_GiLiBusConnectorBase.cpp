@@ -37,15 +37,15 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID          Unique ID
-   \param[in]     orc_TriggerPos    Ideal position of connector
-   \param[in]     opc_BusItem       End of connection at bus
-   \param[in]     oq_MiddleLine     Indicator if middle line is required
-   \param[in,out] opc_Parent        Optional pointer to parent
+   \param[in]     oru64_ID       Unique ID
+   \param[in]     orc_TriggerPos Ideal position of connector
+   \param[in]     opc_BusItem    End of connection at bus
+   \param[in]     oq_MiddleLine  Indicator if middle line is required
+   \param[in,out] opc_Parent     Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64 & oru64_ID, const QPointF & orc_TriggerPos,
@@ -77,7 +77,7 @@ C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64 & oru64_ID, const QP
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -122,7 +122,7 @@ C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64 & oru64_ID,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -139,7 +139,7 @@ C_GiLiBusConnectorBase::~C_GiLiBusConnectorBase(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the position of the point which is connected to the bus
+/*! \brief  Returns the position of the point which is connected to the bus
 
    \return  Position of item
 */
@@ -163,7 +163,10 @@ QPointF C_GiLiBusConnectorBase::GetPos(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all points
+/*! \brief  Get all points
+
+   \return
+   All points
 */
 //----------------------------------------------------------------------------------------------------------------------
 std::vector<QPointF> C_GiLiBusConnectorBase::GetPointsScenePos(void) const
@@ -185,7 +188,7 @@ std::vector<QPointF> C_GiLiBusConnectorBase::GetPointsScenePos(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set new point positions
+/*! \brief  Set new point positions
 
    \param[in] orc_ScenePos New point position set
 */
@@ -209,7 +212,7 @@ void C_GiLiBusConnectorBase::SetPoints(const std::vector<QPointF> & orc_ScenePos
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the bus item
+/*! \brief  Returns the bus item
 
    \return  Bus item
 */
@@ -220,7 +223,7 @@ const C_GiLiBus * C_GiLiBusConnectorBase::GetBusItem(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the generic position item
+/*! \brief  Returns the generic position item
 
    \return  Generic position item
 */
@@ -231,7 +234,7 @@ const C_GiBiConnectableItem * C_GiLiBusConnectorBase::GetGenericPositionItem(voi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Change z order for bus connector
+/*! \brief  Change z order for bus connector
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::RestoreZOrder(void)
@@ -248,7 +251,7 @@ void C_GiLiBusConnectorBase::RestoreZOrder(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get scene position of specific interaction point
+/*! \brief  Get scene position of specific interaction point
 
    \param[out] orc_ScenePos Scene position of specific interaction point
 */
@@ -261,7 +264,7 @@ void C_GiLiBusConnectorBase::GetNodeInteractionScenePos(QPointF & orc_ScenePos) 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get scene position of specific interaction point
+/*! \brief  Get scene position of specific interaction point
 
    \param[out] orc_ScenePos Scene position of specific interaction point
 */
@@ -274,7 +277,7 @@ void C_GiLiBusConnectorBase::GetBusInteractionScenePos(QPointF & orc_ScenePos) c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Revert bus connection to last known bus item
+/*! \brief  Revert bus connection to last known bus item
 
    \param[in,out] opc_StartingBus Last known bus this bus connection was connected to
    \param[in,out] opc_LastBus     New bus this bus connection is currently connected to
@@ -304,7 +307,7 @@ void C_GiLiBusConnectorBase::SetZValueCustom(const float64 of64_ZValue)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse press event slot
+/*! \brief  Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -355,7 +358,7 @@ void C_GiLiBusConnectorBase::mousePressEvent(QGraphicsSceneMouseEvent * const op
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten hover leave event slot
+/*! \brief  Overwritten hover leave event slot
 
    Here: Hide tool tip
 
@@ -370,7 +373,7 @@ void C_GiLiBusConnectorBase::hoverLeaveEvent(QGraphicsSceneHoverEvent * const op
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse release event slot
+/*! \brief  Overwritten mouse release event slot
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -425,7 +428,7 @@ void C_GiLiBusConnectorBase::m_SetBus(const C_GiLiBus * const opc_Bus)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle new bus
+/*! \brief  Handle new bus
 
    Save new bus and update connection at position.
    Dismiss temporary bus.
@@ -464,7 +467,7 @@ void C_GiLiBusConnectorBase::m_UpdateBus(const QPointF & orc_Pos, const C_GiLiBu
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update connection
+/*! \brief  Update connection
 
    Find and save new connection at position.
 
@@ -486,7 +489,7 @@ void C_GiLiBusConnectorBase::m_UpdateConnection(const QPointF & orc_ScenePos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current connection
+/*! \brief  Get current connection
 
    \return
    NULL: Invalid
@@ -509,7 +512,7 @@ C_GiLiLineConnection * C_GiLiBusConnectorBase::m_GetCurrentConn(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculate the relative position for the connection
+/*! \brief  Calculate the relative position for the connection
 
    \param[in] opc_Conn     Connection to calculate the relative position for
    \param[in] orc_ScenePos Position to use for relative calculation
@@ -522,7 +525,7 @@ void C_GiLiBusConnectorBase::m_CalcConnProgress(const C_GiLiLineConnection * con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle update of connected item
+/*! \brief  Handle update of connected item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_UpdateExternal(void)
@@ -597,7 +600,7 @@ void C_GiLiBusConnectorBase::m_UpdateExternal(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of line and its position
+/*! \brief  Update of line and its position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_UpdateInternal(void)
@@ -688,7 +691,7 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get bus interaction index
+/*! \brief  Get bus interaction index
 
    \return
    Bus interaction index
@@ -700,7 +703,7 @@ sint32 C_GiLiBusConnectorBase::m_GetBusInteractionIndex(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update bus point position
+/*! \brief  Update bus point position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_UpdatePointBus(void)
@@ -723,7 +726,7 @@ void C_GiLiBusConnectorBase::m_UpdatePointBus(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get the position for the selected connection
+/*! \brief  Get the position for the selected connection
 
    \param[in]  opc_Conn   Connection to calculate the position for
    \param[out] orc_OutPos Calculated scene position on connection
@@ -738,7 +741,7 @@ void C_GiLiBusConnectorBase::m_CalcConnPos(const C_GiLiLineConnection * const op
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update generic point position
+/*! \brief  Update generic point position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_UpdateGenericPoint(void)
@@ -758,7 +761,7 @@ void C_GiLiBusConnectorBase::m_UpdateGenericPoint(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get generic interaction index
+/*! \brief  Get generic interaction index
 
    \return
    Generic interaction index
@@ -770,9 +773,9 @@ sint32 C_GiLiBusConnectorBase::mh_GetGenericInteractionIndex(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save local position of orc_InPos mapped to current port
+/*! \brief  Save local position of orc_InPos mapped to current port
 
-   \param[in]  orc_InPos  Position to map
+   \param[in] orc_InPos Position to map
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_CalcInitialLocalPos(const QPointF & orc_InPos)
@@ -789,7 +792,7 @@ void C_GiLiBusConnectorBase::m_CalcInitialLocalPos(const QPointF & orc_InPos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle generic item
+/*! \brief  Handle generic item
 
    Save generic item.
    Dismiss temporary generic item.
@@ -817,7 +820,7 @@ void C_GiLiBusConnectorBase::m_UpdateGenericItem(C_GiBiConnectableItem * const o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore last valid bus
+/*! \brief  Restore last valid bus
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_RestoreLastValidBus(void)
@@ -826,7 +829,7 @@ void C_GiLiBusConnectorBase::m_RestoreLastValidBus(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore bus connection state to normal and reconnect all in air interaction points
+/*! \brief  Restore bus connection state to normal and reconnect all in air interaction points
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_Reconnect(void)
@@ -840,7 +843,7 @@ void C_GiLiBusConnectorBase::m_Reconnect(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle interaction point move
+/*! \brief  Handle interaction point move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
@@ -925,7 +928,7 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle bus item interaction point move item iteration
+/*! \brief  Handle bus item interaction point move item iteration
 
    Active:
    * Iteration over current scene items
@@ -954,7 +957,7 @@ void C_GiLiBusConnectorBase::m_OnIterationBusInteractionPointMoveCleanUp(QGraphi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapt own style to bus
+/*! \brief  Adapt own style to bus
 
    \param[in] opc_Bus Connected bus item
 */
@@ -1104,7 +1107,7 @@ void C_GiLiBusConnectorBase::m_UpdateLastKnownBusPoints(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize common settings
+/*! \brief  Initialize common settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::m_CommonInit(void)

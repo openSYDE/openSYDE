@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -78,7 +78,7 @@ C_CamGenMessagesWidget::C_CamGenMessagesWidget(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenMessagesWidget::~C_CamGenMessagesWidget()
@@ -87,7 +87,7 @@ C_CamGenMessagesWidget::~C_CamGenMessagesWidget()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize all displayed static names
+/*! \brief  Initialize all displayed static names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::InitStaticNames(void) const
@@ -107,7 +107,7 @@ void C_CamGenMessagesWidget::InitStaticNames(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save all user settings
+/*! \brief  Save all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::SaveUserSettings(void) const
@@ -116,7 +116,7 @@ void C_CamGenMessagesWidget::SaveUserSettings(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle user settings
+/*! \brief  Handle user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::LoadUserSettings(void) const
@@ -125,7 +125,7 @@ void C_CamGenMessagesWidget::LoadUserSettings(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Remove all messages for the specified file
+/*! \brief  Remove all messages for the specified file
 
    \param[in] orc_File Database to remove all messages for
 */
@@ -136,7 +136,7 @@ void C_CamGenMessagesWidget::RemoveMessagesForFile(const QString & orc_File) con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal communication start
+/*! \brief  Signal communication start
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::SetCommunicationStarted(void) const
@@ -145,7 +145,7 @@ void C_CamGenMessagesWidget::SetCommunicationStarted(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal communication stop
+/*! \brief  Signal communication stop
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::SetCommunicationStopped(void) const
@@ -154,7 +154,7 @@ void C_CamGenMessagesWidget::SetCommunicationStopped(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if the key needs to be handled by this widget
+/*! \brief  Check if the key needs to be handled by this widget
 
    \param[in] orc_Input Key input interpreted as text
 
@@ -169,7 +169,7 @@ bool C_CamGenMessagesWidget::CheckAndHandleKey(const QString & orc_Input) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update message data
+/*! \brief  Update message data
 
    \param[in] ou32_MessageIndex Message index
 */
@@ -180,7 +180,7 @@ void C_CamGenMessagesWidget::UpdateMessageData(const stw_types::uint32 ou32_Mess
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Request trigger of model function for update cyclic message
+/*! \brief  Request trigger of model function for update cyclic message
 
    Reason: have one central point for each check which has to be done when changing an existing message
 
@@ -195,7 +195,7 @@ void C_CamGenMessagesWidget::TriggerModelUpdateCyclicMessage(const stw_types::ui
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle buttons init state
+/*! \brief  Handle buttons init state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::m_InitButtons(void) const
@@ -246,7 +246,7 @@ void C_CamGenMessagesWidget::m_InitButtons(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update dynamic heading
+/*! \brief  Update dynamic heading
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::m_UpdateHeading(void) const
@@ -257,7 +257,7 @@ void C_CamGenMessagesWidget::m_UpdateHeading(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register item count change
+/*! \brief  Register item count change
 
    \param[in] ou32_NewItemCount New item count
 */

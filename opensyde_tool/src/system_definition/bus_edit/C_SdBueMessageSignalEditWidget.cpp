@@ -166,7 +166,7 @@ void C_SdBueMessageSignalEditWidget::SelectMessage(const C_OSCCanMessageIdentifi
    this->mpc_Ui->pc_SigPropertiesWidget->setVisible(false);
    this->mpc_Ui->pc_MessageLabel->setVisible(true);
    this->mpc_Ui->pc_SignalLabel->setVisible(false);
-   this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(orc_MessageId);
+   this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(true, orc_MessageId);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -181,6 +181,7 @@ void C_SdBueMessageSignalEditWidget::SelectSignal(const C_OSCCanMessageIdentific
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectSignal(orc_MessageId, oru32_SignalIndex);
    this->mpc_Ui->pc_MsgPropertiesWidget->setVisible(false);
+   this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(false, C_OSCCanMessageIdentificationIndices());
    this->mpc_Ui->pc_SigPropertiesWidget->setVisible(true);
    this->mpc_Ui->pc_MessageLabel->setVisible(false);
    this->mpc_Ui->pc_SignalLabel->setVisible(true);
@@ -188,16 +189,28 @@ void C_SdBueMessageSignalEditWidget::SelectSignal(const C_OSCCanMessageIdentific
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Hide
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalEditWidget::Hide(void)
+{
+   this->setVisible(false);
+   this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(false, C_OSCCanMessageIdentificationIndices());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the node 'mode' of the widget with all necessary indexes
 
    \param[in] ou32_NodeIndex      Node index
    \param[in] ou32_InterfaceIndex Interface index
+   \param[in] orc_DatapoolIndexes All Datapool indexes associated to the same protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::SetNodeDataPool(const stw_types::uint32 ou32_NodeIndex,
-                                                     const stw_types::uint32 ou32_InterfaceIndex) const
+void C_SdBueMessageSignalEditWidget::SetNodeId(const stw_types::uint32 ou32_NodeIndex,
+                                               const stw_types::uint32 ou32_InterfaceIndex,
+                                               const std::vector<stw_types::uint32> & orc_DatapoolIndexes) const
 {
-   this->mpc_Ui->pc_MsgPropertiesWidget->SetNodeDataPool(ou32_NodeIndex, ou32_InterfaceIndex);
+   this->mpc_Ui->pc_MsgPropertiesWidget->SetNodeId(ou32_NodeIndex, ou32_InterfaceIndex, orc_DatapoolIndexes);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -221,6 +234,30 @@ void C_SdBueMessageSignalEditWidget::OnConnectionChange(void) const
    if (this->mpc_Ui->pc_MsgPropertiesWidget->isVisible() == true)
    {
       this->mpc_Ui->pc_MsgPropertiesWidget->OnConnectionChange();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   In case of a disconnected node update of the unique message ids
+
+   \param[in]     ou32_NodeIndex      Node index
+   \param[in]     ou32_InterfaceIndex Interface index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalEditWidget::OnNodeDisconnected(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
+{
+   //Only relevant if visible
+   if (this->mpc_Ui->pc_MsgPropertiesWidget->isVisible() == true)
+   {
+      this->mpc_Ui->pc_MsgPropertiesWidget->OnNodeDisconnected(ou32_NodeIndex, ou32_InterfaceIndex);
+   }
+   else if (this->mpc_Ui->pc_SigPropertiesWidget->isVisible() == true)
+   {
+      this->mpc_Ui->pc_SigPropertiesWidget->OnNodeDisconnected(ou32_NodeIndex, ou32_InterfaceIndex);
+   }
+   else
+   {
+      // Nothing to do
    }
 }
 
@@ -289,10 +326,10 @@ void C_SdBueMessageSignalEditWidget::SelectName(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get last selection info
 
-   \param[out] orq_MessageSelected Set flag if there is a selected message
-   \param[out] orc_MessageName     Selected message name if any
-   \param[out] orq_SignalSelected  Flag if signal selected
-   \param[out] orc_SignalName      Selected signal name if any
+   \param[out] orq_MessageSelected           Set flag if there is a selected message
+   \param[out] orc_MessageName               Selected message name if any
+   \param[out] orq_SignalSelected            Flag if signal selected
+   \param[out] orc_SignalName                Selected signal name if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected, QString & orc_MessageName,

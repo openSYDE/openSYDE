@@ -80,7 +80,6 @@ private:
    void m_EditComDataPool(const stw_types::uint32 ou32_DataPoolIndex, const stw_types::uint32 ou32_ListIndex);
    void m_CurrentTabChanged(const stw_types::sintn osn_Index) const;
    void m_ReloadDataPools(void) const;
-   void m_CheckDataPoolInteraction(void) const;
    void m_OpenDataPool(const stw_types::uint32 ou32_DataPoolIndex);
 
    Ui::C_SdNdeNodeEditWidget * mpc_Ui;

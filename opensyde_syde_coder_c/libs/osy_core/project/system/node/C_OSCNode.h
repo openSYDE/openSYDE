@@ -43,38 +43,46 @@ public:
    stw_types::sint32 DeleteDataPool(const stw_types::uint32 & oru32_DataPoolIndex);
    stw_types::sint32 MoveDataPool(const stw_types::uint32 ou32_Start, const stw_types::uint32 ou32_Target);
    stw_types::sint32 InsertMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                   const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                   const stw_types::uint32 & oru32_InterfaceIndex,
+                                   const stw_types::uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                    const stw_types::uint32 & oru32_MessageIndex, const C_OSCCanMessage & orc_Message,
                                    const std::vector<C_OSCNodeDataPoolListElement> & orc_SignalData);
    stw_types::sint32 SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                const stw_types::uint32 & oru32_InterfaceIndex,
+                                const stw_types::uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                 const stw_types::uint32 & oru32_MessageIndex, const C_OSCCanMessage & orc_Message,
                                 const bool & orq_NewMessageIsTx,
                                 const std::vector<C_OSCNodeDataPoolListElement> & orc_SignalData);
    stw_types::sint32 DeleteMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                   const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                   const stw_types::uint32 & oru32_InterfaceIndex,
+                                   const stw_types::uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                    const stw_types::uint32 & oru32_MessageIndex);
    stw_types::sint32 InsertSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                  const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                  const stw_types::uint32 & oru32_InterfaceIndex,
+                                  const stw_types::uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                   const stw_types::uint32 & oru32_MessageIndex,
                                   const stw_types::uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal,
                                   const C_OSCNodeDataPoolListElement & orc_SignalData);
    stw_types::sint32 SetSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                               const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                               const stw_types::uint32 & oru32_InterfaceIndex,
+                               const stw_types::uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                const stw_types::uint32 & oru32_MessageIndex,
                                const stw_types::uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal,
                                const C_OSCNodeDataPoolListElement & orc_SignalData);
    stw_types::sint32 SetSignalPosition(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                       const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                       const stw_types::uint32 & oru32_InterfaceIndex,
+                                       const stw_types::uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                        const stw_types::uint32 & oru32_MessageIndex,
                                        const stw_types::uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal);
    stw_types::sint32 SetSignalMUXValue(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                       const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                       const stw_types::uint32 & oru32_InterfaceIndex,
+                                       const stw_types::uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                        const stw_types::uint32 & oru32_MessageIndex,
                                        const stw_types::uint32 & oru32_SignalIndex,
                                        const stw_types::uint16 ou16_MultiplexValue);
    stw_types::sint32 DeleteSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                  const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                  const stw_types::uint32 & oru32_InterfaceIndex,
+                                  const stw_types::uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                   const stw_types::uint32 & oru32_MessageIndex,
                                   const stw_types::uint32 & oru32_SignalIndex);
 
@@ -92,10 +100,18 @@ public:
    stw_types::uint32 GetElementAbsoluteAddress(const stw_types::uint32 ou32_DataPoolIndex,
                                                const stw_types::uint32 ou32_ListIndex,
                                                const stw_types::uint32 ou32_ElementIndex) const;
-   const C_OSCNodeDataPool * GetComDataPoolConst(const C_OSCCanProtocol::E_Type & ore_Protocol) const;
-   C_OSCNodeDataPool * GetComDataPool(const C_OSCCanProtocol::E_Type & ore_Protocol);
-   const C_OSCCanProtocol * GetCANProtocolConst(const C_OSCCanProtocol::E_Type & ore_Protocol) const;
-   C_OSCCanProtocol * GetCANProtocol(const C_OSCCanProtocol::E_Type & ore_Protocol);
+   const C_OSCNodeDataPool * GetComDataPoolConst(const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                                 const stw_types::uint32 ou32_DataPoolIndex) const;
+   C_OSCNodeDataPool * GetComDataPool(const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                      const stw_types::uint32 ou32_DataPoolIndex);
+   std::vector<const C_OSCNodeDataPool *> GetComDatapoolsConst(const C_OSCCanProtocol::E_Type & ore_Protocol) const;
+   std::vector<C_OSCNodeDataPool *> GetComDataPools(const C_OSCCanProtocol::E_Type & ore_Protocol);
+   const C_OSCCanProtocol * GetCANProtocolConst(const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                                const stw_types::uint32 ou32_DataPoolIndex) const;
+   C_OSCCanProtocol * GetCANProtocol(const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                     const stw_types::uint32 ou32_DataPoolIndex);
+   std::vector<const C_OSCCanProtocol *> GetCANProtocolsConst(const C_OSCCanProtocol::E_Type & ore_Protocol) const;
+   std::vector<C_OSCCanProtocol *> GetCANProtocols(const C_OSCCanProtocol::E_Type & ore_Protocol);
    const C_OSCCanProtocol * GetRelatedCANProtocolConst(const stw_types::uint32 ou32_DataPoolIndex) const;
    C_OSCCanProtocol * GetRelatedCANProtocol(const stw_types::uint32 ou32_DataPoolIndex);
    void CheckErrorDataPool(const stw_types::uint32 & oru32_DataPoolIndex, bool * const opq_NameConflict,

@@ -35,7 +35,7 @@ using namespace std;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Scene         Pointer to currently active scene
    \param[in]     orc_IDs           Affected unique IDs
@@ -56,7 +56,7 @@ C_SebUnoTopBusConnectorMoveCommand::C_SebUnoTopBusConnectorMoveCommand(QGraphics
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Copy constructor
+/*! \brief  Copy constructor
 
    \param[in]     opc_Prev   Original command
    \param[in,out] opc_Parent Optional pointer to parent
@@ -71,7 +71,7 @@ C_SebUnoTopBusConnectorMoveCommand::C_SebUnoTopBusConnectorMoveCommand(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoTopBusConnectorMoveCommand::~C_SebUnoTopBusConnectorMoveCommand(void)
@@ -79,7 +79,7 @@ C_SebUnoTopBusConnectorMoveCommand::~C_SebUnoTopBusConnectorMoveCommand(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Undo move
+/*! \brief  Undo move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopBusConnectorMoveCommand::undo(void)
@@ -99,7 +99,7 @@ void C_SebUnoTopBusConnectorMoveCommand::undo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo move
+/*! \brief  Redo move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopBusConnectorMoveCommand::redo(void)

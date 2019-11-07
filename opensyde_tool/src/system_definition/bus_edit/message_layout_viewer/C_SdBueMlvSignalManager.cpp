@@ -18,7 +18,7 @@
 
 #include "C_PuiSdHandler.h"
 #include "C_GtGetText.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_SdUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */

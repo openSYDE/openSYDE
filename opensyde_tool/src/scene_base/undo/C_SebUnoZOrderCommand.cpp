@@ -38,11 +38,12 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
-   \param[in,out] opc_Scene  Pointer to currently active scene
-   \param[in]     orc_IDs    Affected unique IDs
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out] opc_Scene      Pointer to currently active scene
+   \param[in]     orc_IDs        Affected unique IDs
+   \param[in]     orc_NewZValues New Z values
+   \param[in,out] opc_Parent     Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoZOrderCommand::C_SebUnoZOrderCommand(QGraphicsScene * const opc_Scene, const vector<uint64> & orc_IDs,
@@ -62,7 +63,7 @@ C_SebUnoZOrderCommand::C_SebUnoZOrderCommand(QGraphicsScene * const opc_Scene, c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoZOrderCommand::~C_SebUnoZOrderCommand()
@@ -70,7 +71,7 @@ C_SebUnoZOrderCommand::~C_SebUnoZOrderCommand()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo z order
+/*! \brief  Redo z order
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderCommand::undo(void)
@@ -80,7 +81,7 @@ void C_SebUnoZOrderCommand::undo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo z order
+/*! \brief  Redo z order
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderCommand::redo(void)
@@ -90,7 +91,7 @@ void C_SebUnoZOrderCommand::redo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapt z order of selected items
+/*! \brief  Adapt z order of selected items
 
    \param[in]     opc_Scene         Pointer to currently active scene
    \param[in]     orc_Items         All items
@@ -149,7 +150,7 @@ void C_SebUnoZOrderCommand::ApplyZValues(const std::vector<float64> & orc_Values
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Create z order map of selected items
+/*! \brief  Create z order map of selected items
 
    \param[in]     opc_Scene         Pointer to currently active scene
    \param[in]     orc_Items         All items

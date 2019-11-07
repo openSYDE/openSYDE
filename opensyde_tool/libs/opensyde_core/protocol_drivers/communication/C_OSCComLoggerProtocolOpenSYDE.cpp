@@ -58,7 +58,23 @@ C_OSCComLoggerProtocolOpenSYDE::C_OSCComLoggerProtocolOpenSYDE(void) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComLoggerProtocolOpenSYDE::AddOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
 {
-   this->mc_SysDefConfigs.push_back(opc_SysDefConfig);
+   std::list<const C_OSCComMessageLoggerOsySysDefConfig *>::const_iterator c_ItConfig;
+   bool q_AddConfig = true;
+
+   // Add only if not already added
+   for (c_ItConfig = this->mc_SysDefConfigs.begin(); c_ItConfig != this->mc_SysDefConfigs.end(); ++c_ItConfig)
+   {
+      if ((*c_ItConfig) == opc_SysDefConfig)
+      {
+         q_AddConfig = false;
+         break;
+      }
+   }
+
+   if (q_AddConfig == true)
+   {
+      this->mc_SysDefConfigs.push_back(opc_SysDefConfig);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

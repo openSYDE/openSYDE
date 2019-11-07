@@ -43,7 +43,7 @@ const QFont C_CamGenTableDelegate::mhc_HighlightFont = C_Uti::h_GetFontPixel(mc_
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
 */
@@ -54,7 +54,7 @@ C_CamGenTableDelegate::C_CamGenTableDelegate(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paint item
+/*! \brief  Paint item
 
    Here: paint data manually (for alignment)
 

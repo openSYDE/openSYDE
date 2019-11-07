@@ -37,7 +37,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -75,7 +75,7 @@ C_CamGenSigWidget::C_CamGenSigWidget(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigWidget::~C_CamGenSigWidget(void)
@@ -84,7 +84,7 @@ C_CamGenSigWidget::~C_CamGenSigWidget(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize all displayed static names
+/*! \brief  Initialize all displayed static names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::InitStaticNames(void) const
@@ -100,7 +100,7 @@ void C_CamGenSigWidget::InitStaticNames(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save all user settings
+/*! \brief  Save all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::SaveUserSettings(void) const
@@ -109,7 +109,7 @@ void C_CamGenSigWidget::SaveUserSettings(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle user settings
+/*! \brief  Handle user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::LoadUserSettings(void)
@@ -118,7 +118,7 @@ void C_CamGenSigWidget::LoadUserSettings(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle signal reload on external trigger
+/*! \brief  Handle signal reload on external trigger
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::TriggerSignalReload(void)
@@ -129,7 +129,7 @@ void C_CamGenSigWidget::TriggerSignalReload(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update the message DLC
+/*! \brief  Update the message DLC
 
    \param[in] ou32_MessageIndex Message index
 */
@@ -140,7 +140,7 @@ void C_CamGenSigWidget::UpdateMessageDLC(const stw_types::uint32 ou32_MessageInd
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update current selected message
+/*! \brief  Update current selected message
 
    \param[in] ou32_NumSelectedItems Number of selected items
    \param[in] ou32_Row              Selected row
@@ -211,7 +211,7 @@ void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelected
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reset
+/*! \brief  Reset
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::m_Reset(void)

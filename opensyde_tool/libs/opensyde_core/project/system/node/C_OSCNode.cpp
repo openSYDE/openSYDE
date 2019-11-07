@@ -194,6 +194,7 @@ sint32 C_OSCNode::MoveDataPool(const uint32 ou32_Start, const uint32 ou32_Target
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
+   \param[in] oru32_DatapoolIndex  Datapool index
    \param[in] orq_MessageIsTx      Flag if message is tx
    \param[in] oru32_MessageIndex   Message index
    \param[in] orc_Message          Message data
@@ -205,13 +206,13 @@ sint32 C_OSCNode::MoveDataPool(const uint32 ou32_Start, const uint32 ou32_Target
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::InsertMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
-                                const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
-                                const C_OSCCanMessage & orc_Message,
+                                const uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
+                                const uint32 & oru32_MessageIndex, const C_OSCCanMessage & orc_Message,
                                 const std::vector<C_OSCNodeDataPoolListElement> & orc_SignalData)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
-   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol);
+   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol, oru32_DatapoolIndex);
+   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol, oru32_DatapoolIndex);
 
    if ((pc_Protocol != NULL) && (pc_DataPool != NULL))
    {
@@ -278,6 +279,7 @@ sint32 C_OSCNode::InsertMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
+   \param[in] oru32_DatapoolIndex  Datapool index
    \param[in] orq_MessageIsTx      Flag if message is tx
    \param[in] oru32_MessageIndex   Message index
    \param[in] orc_Message          Message data
@@ -291,13 +293,14 @@ sint32 C_OSCNode::InsertMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
-                             const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
-                             const C_OSCCanMessage & orc_Message, const bool & orq_NewMessageIsTx,
+                             const uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
+                             const uint32 & oru32_MessageIndex, const C_OSCCanMessage & orc_Message,
+                             const bool & orq_NewMessageIsTx,
                              const std::vector<C_OSCNodeDataPoolListElement> & orc_SignalData)
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
+   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol, oru32_DatapoolIndex);
 
    if (pc_Protocol != NULL)
    {
@@ -310,7 +313,7 @@ sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, c
             //Standard set (Move would handle both cases but vector resizing might have a serious performance impact)
             if (oru32_MessageIndex < rc_Messages.size())
             {
-               C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol);
+               C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol, oru32_DatapoolIndex);
                rc_Messages[oru32_MessageIndex] = orc_Message;
                //Handle data pool
                if (pc_DataPool != NULL)
@@ -348,14 +351,16 @@ sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, c
          else
          {
             //Move
-            s32_Retval =
-               this->DeleteMessage(ore_ComProtocol, oru32_InterfaceIndex, orq_MessageIsTx, oru32_MessageIndex);
+            s32_Retval = this->DeleteMessage(ore_ComProtocol, oru32_InterfaceIndex, oru32_DatapoolIndex,
+                                             orq_MessageIsTx, oru32_MessageIndex);
+
             if (s32_Retval == C_NO_ERR)
             {
                const std::vector<C_OSCCanMessage> & rc_MatchingMessages = rc_MessageContainer.GetMessages(
                   orq_NewMessageIsTx);
                const uint32 u32_NewMessageIndex = rc_MatchingMessages.size();
-               s32_Retval = this->InsertMessage(ore_ComProtocol, oru32_InterfaceIndex, orq_NewMessageIsTx,
+               s32_Retval = this->InsertMessage(ore_ComProtocol, oru32_InterfaceIndex, oru32_DatapoolIndex,
+                                                orq_NewMessageIsTx,
                                                 u32_NewMessageIndex, orc_Message,
                                                 orc_SignalData);
             }
@@ -372,6 +377,7 @@ sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, c
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
+   \param[in] oru32_DatapoolIndex  Datapool index
    \param[in] orq_MessageIsTx      Flag if message is tx
    \param[in] oru32_MessageIndex   Message index
 
@@ -381,11 +387,12 @@ sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, c
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::DeleteMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
-                                const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex)
+                                const uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
+                                const uint32 & oru32_MessageIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
-   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol);
+   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol, oru32_DatapoolIndex);
+   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol, oru32_DatapoolIndex);
 
    if ((pc_Protocol != NULL) && (pc_DataPool != NULL))
    {
@@ -449,6 +456,7 @@ sint32 C_OSCNode::DeleteMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
+   \param[in] oru32_DatapoolIndex  Datapool index
    \param[in] orq_MessageIsTx      Flag if message is tx
    \param[in] oru32_MessageIndex   Message index
    \param[in] oru32_SignalIndex    Signal index
@@ -461,13 +469,13 @@ sint32 C_OSCNode::DeleteMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::InsertSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
-                               const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
-                               const uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal,
-                               const C_OSCNodeDataPoolListElement & orc_SignalData)
+                               const uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
+                               const uint32 & oru32_MessageIndex, const uint32 & oru32_SignalIndex,
+                               const C_OSCCanSignal & orc_Signal, const C_OSCNodeDataPoolListElement & orc_SignalData)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
-   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol);
+   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol, oru32_DatapoolIndex);
+   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol, oru32_DatapoolIndex);
 
    if ((pc_Protocol != NULL) && (pc_DataPool != NULL))
    {
@@ -539,6 +547,7 @@ sint32 C_OSCNode::InsertSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
+   \param[in] oru32_DatapoolIndex  Datapool index
    \param[in] orq_MessageIsTx      Flag if message is tx
    \param[in] oru32_MessageIndex   Message index
    \param[in] oru32_SignalIndex    Signal index
@@ -551,13 +560,13 @@ sint32 C_OSCNode::InsertSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::SetSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
-                            const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
-                            const uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal,
-                            const C_OSCNodeDataPoolListElement & orc_SignalData)
+                            const uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
+                            const uint32 & oru32_MessageIndex, const uint32 & oru32_SignalIndex,
+                            const C_OSCCanSignal & orc_Signal, const C_OSCNodeDataPoolListElement & orc_SignalData)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
-   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol);
+   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol, oru32_DatapoolIndex);
+   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol, oru32_DatapoolIndex);
 
    if ((pc_Protocol != NULL) && (pc_DataPool != NULL))
    {
@@ -612,6 +621,7 @@ sint32 C_OSCNode::SetSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, co
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
+   \param[in] oru32_DatapoolIndex  Datapool index
    \param[in] orq_MessageIsTx      Flag if message is tx
    \param[in] oru32_MessageIndex   Message index
    \param[in] oru32_SignalIndex    Signal index
@@ -623,12 +633,12 @@ sint32 C_OSCNode::SetSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, co
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::SetSignalPosition(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                    const uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
-                                    const uint32 & oru32_MessageIndex, const uint32 & oru32_SignalIndex,
-                                    const C_OSCCanSignal & orc_Signal)
+                                    const uint32 & oru32_InterfaceIndex, const uint32 & oru32_DatapoolIndex,
+                                    const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
+                                    const uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
+   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol, oru32_DatapoolIndex);
 
    if (pc_Protocol != NULL)
    {
@@ -677,6 +687,7 @@ sint32 C_OSCNode::SetSignalPosition(const C_OSCCanProtocol::E_Type & ore_ComProt
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
+   \param[in] oru32_DatapoolIndex  Datapool index
    \param[in] orq_MessageIsTx      Flag if message is tx
    \param[in] oru32_MessageIndex   Message index
    \param[in] oru32_SignalIndex    Signal index
@@ -688,12 +699,12 @@ sint32 C_OSCNode::SetSignalPosition(const C_OSCCanProtocol::E_Type & ore_ComProt
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::SetSignalMUXValue(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
-                                    const uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
-                                    const uint32 & oru32_MessageIndex, const uint32 & oru32_SignalIndex,
-                                    const stw_types::uint16 ou16_MultiplexValue)
+                                    const uint32 & oru32_InterfaceIndex, const uint32 & oru32_DatapoolIndex,
+                                    const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
+                                    const uint32 & oru32_SignalIndex, const stw_types::uint16 ou16_MultiplexValue)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
+   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol, oru32_DatapoolIndex);
 
    if (pc_Protocol != NULL)
    {
@@ -739,6 +750,7 @@ sint32 C_OSCNode::SetSignalMUXValue(const C_OSCCanProtocol::E_Type & ore_ComProt
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
+   \param[in] oru32_DatapoolIndex  Datapool index
    \param[in] orq_MessageIsTx      Flag if message is tx
    \param[in] oru32_MessageIndex   Message index
    \param[in] oru32_SignalIndex    Signal index
@@ -749,12 +761,12 @@ sint32 C_OSCNode::SetSignalMUXValue(const C_OSCCanProtocol::E_Type & ore_ComProt
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::DeleteSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
-                               const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
-                               const uint32 & oru32_SignalIndex)
+                               const uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
+                               const uint32 & oru32_MessageIndex, const uint32 & oru32_SignalIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol);
-   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol);
+   C_OSCCanProtocol * const pc_Protocol = this->GetCANProtocol(ore_ComProtocol, oru32_DatapoolIndex);
+   C_OSCNodeDataPool * const pc_DataPool = this->GetComDataPool(ore_ComProtocol, oru32_DatapoolIndex);
 
    if ((pc_Protocol != NULL) && (pc_DataPool != NULL))
    {
@@ -1043,14 +1055,16 @@ uint32 C_OSCNode::GetElementAbsoluteAddress(const uint32 ou32_DataPoolIndex, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get communication data pool for specified protocol
 
-   \param[in] ore_Protocol Communication protocol
+   \param[in] ore_Protocol       Communication protocol
+   \param[in] ou32_DataPoolIndex Datapool index
 
    \return
    NULL No matching data pool found for communication protocol
    Else Pointer to communication data pool of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPool * C_OSCNode::GetComDataPoolConst(const C_OSCCanProtocol::E_Type & ore_Protocol) const
+const C_OSCNodeDataPool * C_OSCNode::GetComDataPoolConst(const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                                         const uint32 ou32_DataPoolIndex) const
 {
    const C_OSCNodeDataPool * pc_Retval = NULL;
 
@@ -1060,9 +1074,11 @@ const C_OSCNodeDataPool * C_OSCNode::GetComDataPoolConst(const C_OSCCanProtocol:
       const C_OSCCanProtocol & rc_CANProtocol = this->c_ComProtocols[u32_ItCANProtocol];
       if (rc_CANProtocol.e_Type == ore_Protocol)
       {
-         if (rc_CANProtocol.u32_DataPoolIndex < this->c_DataPools.size())
+         if ((rc_CANProtocol.u32_DataPoolIndex == ou32_DataPoolIndex) &&
+             (rc_CANProtocol.u32_DataPoolIndex < this->c_DataPools.size()))
          {
             pc_Retval = &this->c_DataPools[rc_CANProtocol.u32_DataPoolIndex];
+            break;
          }
       }
    }
@@ -1072,14 +1088,16 @@ const C_OSCNodeDataPool * C_OSCNode::GetComDataPoolConst(const C_OSCCanProtocol:
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get communication data pool for specified protocol
 
-   \param[in] ore_Protocol Communication protocol
+   \param[in] ore_Protocol       Communication protocol
+   \param[in] ou32_DataPoolIndex Datapool index
 
    \return
    NULL No matching data pool found for communication protocol
    Else Pointer to communication data pool of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPool * C_OSCNode::GetComDataPool(const C_OSCCanProtocol::E_Type & ore_Protocol)
+C_OSCNodeDataPool * C_OSCNode::GetComDataPool(const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                              const uint32 ou32_DataPoolIndex)
 {
    C_OSCNodeDataPool * pc_Retval = NULL;
 
@@ -1089,9 +1107,11 @@ C_OSCNodeDataPool * C_OSCNode::GetComDataPool(const C_OSCCanProtocol::E_Type & o
       const C_OSCCanProtocol & rc_CANProtocol = this->c_ComProtocols[u32_ItCANProtocol];
       if (rc_CANProtocol.e_Type == ore_Protocol)
       {
-         if (rc_CANProtocol.u32_DataPoolIndex < this->c_DataPools.size())
+         if ((rc_CANProtocol.u32_DataPoolIndex == ou32_DataPoolIndex) &&
+             (rc_CANProtocol.u32_DataPoolIndex < this->c_DataPools.size()))
          {
             pc_Retval = &this->c_DataPools[rc_CANProtocol.u32_DataPoolIndex];
+            break;
          }
       }
    }
@@ -1099,54 +1119,168 @@ C_OSCNodeDataPool * C_OSCNode::GetComDataPool(const C_OSCCanProtocol::E_Type & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data for specified communication protocol
+/*! \brief   Get all communication data pools for specified protocol
 
-   \param[in] ore_Protocol Communication protocol
+   \param[in] ore_Protocol       Communication protocol type
 
    \return
-   NULL No matching data found for communication protocol
-   Else Pointer to communication data of node
+   Empty vector            No matching data found for communication protocol
+   Pointer to protocols    Pointers to communication datapools of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCCanProtocol * C_OSCNode::GetCANProtocolConst(const C_OSCCanProtocol::E_Type & ore_Protocol)
+std::vector<const C_OSCNodeDataPool *> C_OSCNode::GetComDatapoolsConst(const C_OSCCanProtocol::E_Type & ore_Protocol)
 const
 {
-   const C_OSCCanProtocol * pc_Retval = NULL;
+   std::vector<const C_OSCNodeDataPool *> c_Return;
 
    for (uint32 u32_ItCANProtocol = 0; u32_ItCANProtocol < this->c_ComProtocols.size(); ++u32_ItCANProtocol)
    {
       const C_OSCCanProtocol & rc_CANProtocol = this->c_ComProtocols[u32_ItCANProtocol];
       if (rc_CANProtocol.e_Type == ore_Protocol)
       {
-         pc_Retval = &this->c_ComProtocols[u32_ItCANProtocol];
+         if (rc_CANProtocol.u32_DataPoolIndex < this->c_DataPools.size())
+         {
+            c_Return.push_back(&this->c_DataPools[rc_CANProtocol.u32_DataPoolIndex]);
+         }
       }
    }
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all communication data pools for specified protocol
+
+   \param[in] ore_Protocol       Communication protocol type
+
+   \return
+   Empty vector            No matching data found for communication protocol
+   Pointer to protocols    Pointers to communication datapools of node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<C_OSCNodeDataPool *> C_OSCNode::GetComDataPools(const C_OSCCanProtocol::E_Type & ore_Protocol)
+{
+   std::vector<C_OSCNodeDataPool *> c_Return;
+
+   for (uint32 u32_ItCANProtocol = 0; u32_ItCANProtocol < this->c_ComProtocols.size(); ++u32_ItCANProtocol)
+   {
+      const C_OSCCanProtocol & rc_CANProtocol = this->c_ComProtocols[u32_ItCANProtocol];
+      if (rc_CANProtocol.e_Type == ore_Protocol)
+      {
+         if (rc_CANProtocol.u32_DataPoolIndex < this->c_DataPools.size())
+         {
+            c_Return.push_back(&this->c_DataPools[rc_CANProtocol.u32_DataPoolIndex]);
+         }
+      }
+   }
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get protocol for specified communication protocol and specified Datapools
+
+   \param[in] ore_Protocol       Communication protocol
+   \param[in] ou32_DataPoolIndex Datapool index
+
+   \return
+   NULL No matching data found for communication protocol
+   Else Pointer to communication data of node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCCanProtocol * C_OSCNode::GetCANProtocolConst(const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                                        const uint32 ou32_DataPoolIndex)
+const
+{
+   const C_OSCCanProtocol * pc_Retval = this->GetRelatedCANProtocolConst(ou32_DataPoolIndex);
+
+   if ((pc_Retval != NULL) &&
+       (pc_Retval->e_Type != ore_Protocol))
+   {
+      // Protocol does not match
+      pc_Retval = NULL;
+   }
+
    return pc_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data for specified communication protocol
+/*! \brief   Get protocol for specified communication protocol and specified Datapools
 
-   \param[in] ore_Protocol Communication protocol
+   \param[in] ore_Protocol       Communication protocol
+   \param[in] ou32_DataPoolIndex Datapool index
 
    \return
    NULL No matching data found for communication protocol
    Else Pointer to communication data of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanProtocol * C_OSCNode::GetCANProtocol(const C_OSCCanProtocol::E_Type & ore_Protocol)
+C_OSCCanProtocol * C_OSCNode::GetCANProtocol(const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                             const uint32 ou32_DataPoolIndex)
 {
-   C_OSCCanProtocol * pc_Retval = NULL;
+   C_OSCCanProtocol * pc_Retval =  this->GetRelatedCANProtocol(ou32_DataPoolIndex);
 
-   for (uint32 u32_ItCANProtocol = 0; u32_ItCANProtocol < this->c_ComProtocols.size(); ++u32_ItCANProtocol)
+   if ((pc_Retval != NULL) &&
+       (pc_Retval->e_Type != ore_Protocol))
    {
-      const C_OSCCanProtocol & rc_CANProtocol = this->c_ComProtocols[u32_ItCANProtocol];
-      if (rc_CANProtocol.e_Type == ore_Protocol)
+      // Protocol does not match
+      pc_Retval = NULL;
+   }
+
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all protocols for specified communication protocol
+
+   \param[in] ore_Protocol       Communication protocol
+
+   \return
+   Empty vector            No matching data found for communication protocol
+   Pointer to protocols    Pointers to communication data of node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<const C_OSCCanProtocol *> C_OSCNode::GetCANProtocolsConst(const C_OSCCanProtocol::E_Type & ore_Protocol)
+const
+{
+   std::vector<const C_OSCCanProtocol *> c_Return;
+
+   for (uint32 u32_ItCanProtocol = 0; u32_ItCanProtocol < this->c_ComProtocols.size(); ++u32_ItCanProtocol)
+   {
+      const C_OSCCanProtocol & rc_Protocol = this->c_ComProtocols[u32_ItCanProtocol];
+      if (rc_Protocol.e_Type == ore_Protocol)
       {
-         pc_Retval = &this->c_ComProtocols[u32_ItCANProtocol];
+         c_Return.push_back(&this->c_ComProtocols[u32_ItCanProtocol]);
       }
    }
-   return pc_Retval;
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all protocols for specified communication protocol
+
+   \param[in] ore_Protocol       Communication protocol
+
+   \return
+   Empty vector            No matching data found for communication protocol
+   Pointer to protocols    Pointers to communication data of node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<C_OSCCanProtocol *> C_OSCNode::GetCANProtocols(const C_OSCCanProtocol::E_Type & ore_Protocol)
+{
+   std::vector<C_OSCCanProtocol *> c_Return;
+
+   for (uint32 u32_ItCanProtocol = 0; u32_ItCanProtocol < this->c_ComProtocols.size(); ++u32_ItCanProtocol)
+   {
+      const C_OSCCanProtocol & rc_Protocol = this->c_ComProtocols[u32_ItCanProtocol];
+      if (rc_Protocol.e_Type == ore_Protocol)
+      {
+         c_Return.push_back(&this->c_ComProtocols[u32_ItCanProtocol]);
+      }
+   }
+
+   return c_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1169,6 +1303,7 @@ const C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocolConst(const uint32 ou32
       if (rc_Protocol.u32_DataPoolIndex == ou32_DataPoolIndex)
       {
          pc_Retval = &this->c_ComProtocols[u32_ItCanProtocol];
+         break;
       }
    }
 
@@ -1195,6 +1330,7 @@ C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocol(const uint32 ou32_DataPoolIn
       if (rc_Protocol.u32_DataPoolIndex == ou32_DataPoolIndex)
       {
          pc_Retval = &this->c_ComProtocols[u32_ItCanProtocol];
+         break;
       }
    }
 

@@ -1458,7 +1458,7 @@ bool C_SyvDaDashboardSelectorTabWidget::m_EditTab(const uint32 & oru32_DataIndex
 
    // show popup dialog
    QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_SyvDaDashboardTabProperties * pc_Dialog = new C_SyvDaDashboardTabProperties(*c_New, "DASHBOARD TAB",
+   C_SyvDaDashboardTabProperties * pc_Dialog = new C_SyvDaDashboardTabProperties(*c_New, "Dashboard Tab",
                                                                                  oru32_DataIndex,
                                                                                  this->mu32_ViewIndex);
 

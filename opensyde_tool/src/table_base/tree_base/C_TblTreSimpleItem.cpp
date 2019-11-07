@@ -35,7 +35,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblTreSimpleItem::C_TblTreSimpleItem() :
@@ -44,7 +44,7 @@ C_TblTreSimpleItem::C_TblTreSimpleItem() :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -56,7 +56,7 @@ C_TblTreSimpleItem::~C_TblTreSimpleItem()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add child and take ownership
+/*! \brief  Add child and take ownership
 
    \param[in,out] opc_Child Child to add & store
 */
@@ -71,7 +71,7 @@ void C_TblTreSimpleItem::AddChild(C_TblTreSimpleItem * const opc_Child)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Insert child and take ownership
+/*! \brief  Insert child and take ownership
 
    \param[in]     ou32_Index Index for new child
    \param[in,out] opc_Child  Child to add & store
@@ -87,7 +87,7 @@ void C_TblTreSimpleItem::InsertChild(const uint32 ou32_Index, C_TblTreSimpleItem
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle children space reservation (performance)
+/*! \brief  Handle children space reservation (performance)
 
    \param[in] ou32_Space Number of items to reserve for
 */
@@ -98,7 +98,7 @@ void C_TblTreSimpleItem::ReserveChildrenSpace(const uint32 ou32_Space)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set child and take ownership
+/*! \brief  Set child and take ownership
 
    Warning: this will delete the previous item at this position
 
@@ -117,7 +117,7 @@ void C_TblTreSimpleItem::SetChild(const uint32 ou32_Index, C_TblTreSimpleItem * 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get index of this item in parent item
+/*! \brief  Get index of this item in parent item
 
    \return
    Index of this item in parent item
@@ -150,7 +150,7 @@ void C_TblTreSimpleItem::ClearChildren(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get index of item in vector
+/*! \brief  Get index of item in vector
 
    \param[in] orc_Vector Vector
    \param[in] opc_Item   Item

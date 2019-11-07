@@ -21,6 +21,7 @@
 #include "CSCLChecksums.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_SyvRoRouteCalculation.h"
 #include "C_TblTreDataElementModel.h"
 #include "C_SdUtil.h"
@@ -46,6 +47,8 @@ const QString C_TblTreDataElementModel::mhc_IconMessage = ":/images/system_defin
 const QString C_TblTreDataElementModel::mhc_AdditionalDataPoolInfo = " (Already assigned)";
 const QString C_TblTreDataElementModel::mhc_AdditionalWriteOnlyInfo = " (Not supported, read only)";
 const QString C_TblTreDataElementModel::mhc_AdditionalArrayInfo = " (Not supported, array or string type)";
+const QString C_TblTreDataElementModel::mhc_AdditionalArrayStringInfo = " (Not supported, string type)";
+const QString C_TblTreDataElementModel::mhc_AdditionalArrayIndexInfo = " (Not supported, array index)";
 const QString C_TblTreDataElementModel::mhc_Additional64BitInfo = " (Not supported, 64 bit value)";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -65,7 +68,7 @@ QMap<std::vector<stw_types::uint32>,
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -79,7 +82,7 @@ C_TblTreDataElementModel::C_TblTreDataElementModel(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -90,7 +93,7 @@ C_TblTreDataElementModel::~C_TblTreDataElementModel(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set the active node index
+/*! \brief  Set the active node index
 
    \param[in] ou32_NodeIndex               Active node index
    \param[in] os32_SkipApplicationIndex    Application index to not display as used
@@ -106,13 +109,14 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
 
    this->beginResetModel();
    this->me_Mode = C_TblTreDataElementModel::eDATAPOOLS;
+
    //Clear
    m_CleanUpLastModel();
    this->mpc_InvisibleRootItem = new C_TblTreItem();
-   //Init
 
    //Static
    pc_NodeItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconNode);
+
    //Node
    if (pc_Node != NULL)
    {
@@ -132,16 +136,19 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
       pc_DiagItem->q_Selectable = false;
       pc_NvmItem->q_Selectable = false;
       pc_ComItem->q_Selectable = false;
+
       //Use some unique index for expansion restoration mechanism
       pc_DiagItem->u32_Index = 0;
       pc_NvmItem->u32_Index = 1;
       pc_ComItem->u32_Index = 2;
+
       //Init current node
       pc_NodeItem->u32_Index = ou32_NodeIndex;
       pc_NodeItem->q_Selectable = false;
       pc_NodeItem->c_Name = pc_Node->c_Properties.c_Name.c_str();
       pc_NodeItem->c_ToolTipHeading = pc_Node->c_Properties.c_Name.c_str();
       pc_NodeItem->c_ToolTipContent = pc_Node->c_Properties.c_Comment.c_str();
+
       //Data pools
       pc_NodeItem->ReserveChildrenSpace(3UL);
       pc_DiagItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
@@ -151,12 +158,26 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
       {
          const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
          C_TblTreItem * const pc_DataPoolItem = new C_TblTreItem();
-         //Init current node
+
+         //Init current Datapool
          pc_DataPoolItem->u32_Index = u32_ItDataPool;
          pc_DataPoolItem->c_Name = rc_DataPool.c_Name.c_str();
          pc_DataPoolItem->c_ToolTipHeading = rc_DataPool.c_Name.c_str();
          pc_DataPoolItem->c_ToolTipContent = rc_DataPool.c_Comment.c_str();
          pc_DataPoolItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconDatapool);
+
+         // Append protocol type if COMM datapool
+         if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
+         {
+            pc_DataPoolItem->c_Name += C_GtGetText::h_GetText(" (Protocol: ");
+            pc_DataPoolItem->c_Name +=
+               C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCANProtocolType(ou32_NodeIndex,
+                                                                                                   u32_ItDataPool));
+            pc_DataPoolItem->c_Name +=  ")";
+            pc_DataPoolItem->c_ToolTipHeading = pc_DataPoolItem->c_Name;
+         }
+
+         // Set disabled/enabled
          if ((rc_DataPool.s32_RelatedDataBlockIndex < 0) ||
              ((os32_SkipApplicationIndex >= 0) && (rc_DataPool.s32_RelatedDataBlockIndex == os32_SkipApplicationIndex)))
          {
@@ -185,6 +206,7 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
             pc_DataPoolItem->q_Selectable = false;
             pc_DataPoolItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalDataPoolInfo;
          }
+
          //Flags
          q_NodeValid = true;
          switch (rc_DataPool.e_Type)
@@ -243,18 +265,19 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize tree structure
+/*! \brief  Initialize tree structure
 
-   \param[in] ou32_ViewIndex           View index
-   \param[in] oe_Mode                  Item mode
-   \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
-   \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
-   \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
+   \param[in] ou32_ViewIndex            View index
+   \param[in] oe_Mode                   Item mode
+   \param[in] oq_ShowOnlyWriteElements  Optional flag to show only writable elements
+   \param[in] oq_ShowArrayElements      Optional flag to hide all array elements (if false)
+   \param[in] oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
+   \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode oe_Mode,
                                       const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
-                                      const bool oq_Show64BitValues)
+                                      const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues)
 {
    QElapsedTimer c_Timer;
 
@@ -279,7 +302,7 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
          const C_TblTreDataElementModelState & rc_It = c_It.value();
          this->mpc_InvisibleRootItem = rc_It.pc_Tree;
          this->mc_MessageSyncManagers = rc_It.c_SyncManagers;
-         this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+         this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_ShowArrayIndexElements,
                                        oq_Show64BitValues);
          if (mq_TIMING_OUTPUT)
          {
@@ -289,7 +312,8 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
       else
       {
          this->mpc_InvisibleRootItem = new C_TblTreItem();
-         m_InitDatapoolElement(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_Show64BitValues);
+         m_InitDatapoolElement(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                               oq_ShowArrayIndexElements, oq_Show64BitValues);
          //Clean up (old values probably not necessary in future);
          mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsDE);
          //Directly store the model (after filling it-> for sync managers)
@@ -310,7 +334,7 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
          const C_TblTreDataElementModelState & rc_It = c_It.value();
          this->mpc_InvisibleRootItem = rc_It.pc_Tree;
          this->mc_MessageSyncManagers = rc_It.c_SyncManagers;
-         this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+         this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_ShowArrayIndexElements,
                                        oq_Show64BitValues);
          if (mq_TIMING_OUTPUT)
          {
@@ -320,7 +344,8 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
       else
       {
          this->mpc_InvisibleRootItem = new C_TblTreItem();
-         m_InitBusSignal(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_Show64BitValues);
+         m_InitBusSignal(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                         oq_Show64BitValues);
          //Clean up (old values probably not necessary in future);
          mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsBS);
          //Directly store the model (after filling it-> for sync managers)
@@ -341,7 +366,7 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
          const C_TblTreDataElementModelState & rc_It = c_It.value();
          this->mpc_InvisibleRootItem = rc_It.pc_Tree;
          this->mc_MessageSyncManagers = rc_It.c_SyncManagers;
-         this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+         this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_ShowArrayIndexElements,
                                        oq_Show64BitValues);
          if (mq_TIMING_OUTPUT)
          {
@@ -377,7 +402,7 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data elements
+/*! \brief  Get data elements
 
    \param[in] orc_Index Index
 
@@ -411,7 +436,7 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Preparation for final clean up
+/*! \brief  Preparation for final clean up
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::h_CleanUp(void)
@@ -425,7 +450,7 @@ void C_TblTreDataElementModel::h_CleanUp(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get tree column count
+/*! \brief  Get tree column count
 
    \param[in] orc_Parent Parent
 
@@ -440,7 +465,7 @@ sintn C_TblTreDataElementModel::columnCount(const QModelIndex & orc_Parent) cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Convert generic item representation to model index
+/*! \brief  Convert generic item representation to model index
 
    \param[in] orc_ItemIndices Generic item representation
 
@@ -491,7 +516,7 @@ QModelIndex C_TblTreDataElementModel::GetIndexForItem(const std::vector<uint32> 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Convert model index to generic item representation
+/*! \brief  Convert model index to generic item representation
 
    \param[in] orc_ItemIndex Model index
 
@@ -522,7 +547,7 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Tree         Tree layout to remember
    \param[in]     orc_SyncManagers Sync managers to store
@@ -536,7 +561,7 @@ C_TblTreDataElementModel::C_TblTreDataElementModelState::C_TblTreDataElementMode
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Preparation for final clean up
+/*! \brief  Preparation for final clean up
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::C_TblTreDataElementModelState::CleanUp(void)
@@ -551,7 +576,7 @@ void C_TblTreDataElementModel::C_TblTreDataElementModelState::CleanUp(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clean up all current sync managers
+/*! \brief  Clean up all current sync managers
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_ClearSyncManagers(void)
@@ -564,7 +589,7 @@ void C_TblTreDataElementModel::m_ClearSyncManagers(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clean up current model
+/*! \brief  Clean up current model
 
    Warning: pointer might be invalid after call of this function
 */
@@ -590,21 +615,24 @@ void C_TblTreDataElementModel::m_CleanUpLastModel(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Translate signal index to data pool index
+/*! \brief  Translate signal index to data pool index
 
    WARNING: Only works if message contains at least one signal
 
    \param[in] orc_Indices      Message identification indices
    \param[in] ou32_SignalIndex Signal index
+
+   \return
+   Parsed element ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbNodeDataPoolListElementId C_TblTreDataElementModel::mh_Translate(
    const C_OSCCanMessageIdentificationIndices & orc_Indices, const uint32 ou32_SignalIndex)
 {
    C_PuiSvDbNodeDataPoolListElementId c_Retval(0, 0, 0, 0, C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
-                                               false);
+                                               false, 0UL, false);
    const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPool(
-      orc_Indices.u32_NodeIndex, orc_Indices.e_ComProtocol);
+      orc_Indices.u32_NodeIndex, orc_Indices.e_ComProtocol, orc_Indices.u32_DatapoolIndex);
 
    if (pc_DataPool != NULL)
    {
@@ -615,9 +643,12 @@ C_PuiSvDbNodeDataPoolListElementId C_TblTreDataElementModel::mh_Translate(
          const C_OSCCanMessageContainer * const pc_Container =
             C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_Indices.u32_NodeIndex,
                                                                             orc_Indices.e_ComProtocol,
-                                                                            orc_Indices.u32_InterfaceIndex);
+                                                                            orc_Indices.u32_InterfaceIndex,
+                                                                            orc_Indices.u32_DatapoolIndex);
+
          const C_OSCCanProtocol * const pc_Protocol = C_PuiSdHandler::h_GetInstance()->GetCanProtocol(
-            orc_Indices.u32_NodeIndex, orc_Indices.e_ComProtocol);
+            orc_Indices.u32_NodeIndex, orc_Indices.e_ComProtocol, orc_Indices.u32_DatapoolIndex);
+
          if ((pc_Container != NULL) && (pc_Protocol != NULL))
          {
             const uint32 u32_SignalDataStartIndex = pc_Container->GetMessageSignalDataStartIndex(
@@ -625,7 +656,7 @@ C_PuiSvDbNodeDataPoolListElementId C_TblTreDataElementModel::mh_Translate(
                orc_Indices.u32_MessageIndex);
             c_Retval = C_PuiSvDbNodeDataPoolListElementId(orc_Indices.u32_NodeIndex, pc_Protocol->u32_DataPoolIndex,
                                                           u32_ListIndex, u32_SignalDataStartIndex + ou32_SignalIndex,
-                                                          C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL);
+                                                          C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL, false, 0UL);
          }
       }
    }
@@ -634,7 +665,7 @@ C_PuiSvDbNodeDataPoolListElementId C_TblTreDataElementModel::mh_Translate(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize tree structure for bus signals
+/*! \brief  Initialize tree structure for bus signals
 
    \param[in] ou32_ViewIndex           View index
    \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
@@ -841,16 +872,19 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize tree structure for data pool elements
+/*! \brief  Initialize tree structure for data pool elements
 
-   \param[in] ou32_ViewIndex           View index
-   \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
-   \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
-   \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
+   \param[in] ou32_ViewIndex            View index
+   \param[in] oq_ShowOnlyWriteElements  Optional flag to show only writable elements
+   \param[in] oq_ShowArrayElements      Optional flag to hide all array elements (if false)
+   \param[in] oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
+   \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
-                                                     const bool oq_ShowArrayElements, const bool oq_Show64BitValues)
+                                                     const bool oq_ShowArrayElements,
+                                                     const bool oq_ShowArrayIndexElements,
+                                                     const bool oq_Show64BitValues)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 
@@ -915,13 +949,23 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
                {
                   const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
                   C_TblTreItem * const pc_DataPoolItem = new C_TblTreItem();
-                  //Init current node
+                  //Init current Datapool
                   pc_DataPoolItem->u32_Index = u32_ItDataPool;
                   pc_DataPoolItem->c_Name = rc_DataPool.c_Name.c_str();
                   pc_DataPoolItem->c_ToolTipHeading = rc_DataPool.c_Name.c_str();
                   pc_DataPoolItem->c_ToolTipContent = rc_DataPool.c_Comment.c_str();
                   pc_DataPoolItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconDatapool);
                   pc_DataPoolItem->q_Selectable = false;
+                  // Append protocol type if COMM datapool
+                  if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
+                  {
+                     pc_DataPoolItem->c_Name += C_GtGetText::h_GetText(" (Protocol: ");
+                     pc_DataPoolItem->c_Name +=
+                        C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCANProtocolType(
+                                                                      u32_ItNode, u32_ItDataPool));
+                     pc_DataPoolItem->c_Name +=  ")";
+                     pc_DataPoolItem->c_ToolTipHeading = pc_DataPoolItem->c_Name;
+                  }
                   //Flag
                   q_DataPoolValid = false;
                   //Data pool
@@ -935,7 +979,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
                      pc_ListItem->u32_Index = u32_ItList;
                      pc_ListItem->c_Name = rc_List.c_Name.c_str();
                      pc_ListItem->c_ToolTipHeading = rc_List.c_Name.c_str();
-                     // tooltip content: do not use h_GetToolTipContenList because we do not want so much info and
+                     // tooltip content: do not use h_GetToolTipContentDpList because we do not want so much info and
                      // consistency with superior tree items
                      pc_ListItem->c_ToolTipContent = rc_List.c_Comment.c_str();
                      pc_ListItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconList);
@@ -946,11 +990,16 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
                      pc_ListItem->ReserveChildrenSpace(rc_List.c_Elements.size());
                      for (uint32 u32_ItElement = 0; u32_ItElement < rc_List.c_Elements.size(); ++u32_ItElement)
                      {
+                        const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
+                           C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(u32_ItNode, u32_ItDataPool,
+                                                                                     u32_ItList,
+                                                                                     u32_ItElement);
                         const C_OSCNodeDataPoolListElement & rc_Element = rc_List.c_Elements[u32_ItElement];
                         C_TblTreItem * const pc_ElementItem =
                            new C_TblTreItem();
                         const C_OSCNodeDataPoolListElementId c_NodeDpListElement(u32_ItNode, u32_ItDataPool, u32_ItList,
                                                                                  u32_ItElement);
+                        const bool oq_IsString = (pc_UiElement != NULL) ? pc_UiElement->q_InterpretAsString : false;
                         //Init current node
                         pc_ElementItem->u32_Index = u32_ItElement;
                         pc_ElementItem->c_ToolTipHeading = rc_Element.c_Name.c_str();
@@ -982,8 +1031,15 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
                         // Adapt the element item
                         C_TblTreDataElementModel::mh_ConfigureDatapoolElement(oq_ShowOnlyWriteElements,
                                                                               oq_ShowArrayElements,
+                                                                              oq_ShowArrayIndexElements,
                                                                               oq_Show64BitValues,
-                                                                              rc_Element, pc_ElementItem);
+                                                                              rc_Element, pc_ElementItem, oq_IsString);
+
+                        //Array elements
+                        C_TblTreDataElementModel::mh_CreateOrUpdateArrayElementNodes(oq_ShowOnlyWriteElements,
+                                                                                     oq_ShowArrayIndexElements,
+                                                                                     oq_Show64BitValues, rc_Element,
+                                                                                     oq_IsString, pc_ElementItem);
 
                         //Add
                         pc_ListItem->AddChild(pc_ElementItem);
@@ -1059,15 +1115,18 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapts the properties of already existing tree structure for data pool elements
+/*! \brief  Adapts the properties of already existing tree structure for data pool elements
 
-   \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
-   \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
-   \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
+   \param[in] oq_ShowOnlyWriteElements  Optional flag to show only writable elements
+   \param[in] oq_ShowArrayElements      Optional flag to hide all array elements (if false)
+   \param[in] oq_ShowArrayIndexElements Show array index elements
+   \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWriteElements,
-                                                       const bool oq_ShowArrayElements, const bool oq_Show64BitValues)
+                                                       const bool oq_ShowArrayElements,
+                                                       const bool oq_ShowArrayIndexElements,
+                                                       const bool oq_Show64BitValues)
 {
    if (this->mpc_InvisibleRootItem != NULL)
    {
@@ -1143,6 +1202,13 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
                                       pc_OscNode->c_DataPools[pc_DatapoolItem->u32_Index].
                                       c_Lists[pc_ListItem->u32_Index].c_Elements.size()))
                                  {
+                                    const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
+                                       C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(pc_NodeItem->u32_Index,
+                                                                                                 pc_DatapoolItem->u32_Index,
+                                                                                                 pc_ListItem->u32_Index,
+                                                                                                 pc_ElementItem->u32_Index);
+                                    const bool oq_IsString = (pc_UiElement !=
+                                                              NULL) ? pc_UiElement->q_InterpretAsString : false;
                                     const C_OSCNodeDataPoolListElement & rc_Element =
                                        pc_OscNode->c_DataPools[pc_DatapoolItem->u32_Index].
                                        c_Lists[pc_ListItem->u32_Index].c_Elements[pc_ElementItem->u32_Index];
@@ -1150,8 +1216,18 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
                                     // Adapt the element item
                                     C_TblTreDataElementModel::mh_ConfigureDatapoolElement(oq_ShowOnlyWriteElements,
                                                                                           oq_ShowArrayElements,
+                                                                                          oq_ShowArrayIndexElements,
                                                                                           oq_Show64BitValues,
-                                                                                          rc_Element, pc_ElementItem);
+                                                                                          rc_Element,
+                                                                                          pc_ElementItem, oq_IsString);
+
+                                    //Array element layer
+                                    C_TblTreDataElementModel::mh_CreateOrUpdateArrayElementNodes(
+                                       oq_ShowOnlyWriteElements,
+                                       oq_ShowArrayIndexElements,
+                                       oq_Show64BitValues,
+                                       rc_Element, oq_IsString,
+                                       pc_ElementItem);
                                  }
                               }
                            }
@@ -1166,23 +1242,26 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapts the properties of the tree item
+/*! \brief  Adapts the properties of the tree item
 
    Sets the enabled and selectable flag dependent of the paramters oq_ShowOnlyWriteElements, oq_ShowArrayElements and
    oq_Show64BitValues
 
-   \param[in]     oq_ShowOnlyWriteElements Optional flag to show only writable elements
-   \param[in]     oq_ShowArrayElements     Optional flag to hide all array elements (if false)
-   \param[in]     oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
-   \param[in]     orc_Element              Datapool element of tree item
-   \param[in]     opc_ElementItem          Tree item for datapool element
+   \param[in] oq_ShowOnlyWriteElements  Optional flag to show only writable elements
+   \param[in] oq_ShowArrayElements      Optional flag to hide all array elements (if false)
+   \param[in] oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
+   \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
+   \param[in] orc_Element               Datapool element of tree item
+   \param[in] opc_ElementItem           Tree item for datapool element
+   \param[in] oq_IsString               Is string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_ConfigureDatapoolElement(const bool oq_ShowOnlyWriteElements,
                                                            const bool oq_ShowArrayElements,
+                                                           const bool oq_ShowArrayIndexElements,
                                                            const bool oq_Show64BitValues,
                                                            const C_OSCNodeDataPoolListElement & orc_Element,
-                                                           C_TblTreItem * const opc_ElementItem)
+                                                           C_TblTreItem * const opc_ElementItem, const bool oq_IsString)
 {
    if (opc_ElementItem != NULL)
    {
@@ -1221,17 +1300,179 @@ void C_TblTreDataElementModel::mh_ConfigureDatapoolElement(const bool oq_ShowOnl
       }
       else
       {
-         opc_ElementItem->q_Enabled = false;
-         opc_ElementItem->q_Selectable = false;
-         //Explanation
-         opc_ElementItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalArrayInfo;
+         if (oq_IsString)
+         {
+            opc_ElementItem->q_Enabled = false;
+            opc_ElementItem->q_Selectable = false;
+            //Explanation
+            opc_ElementItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalArrayStringInfo;
+         }
+         else
+         {
+            //If there are select-able child items don't disable the parent node
+            if (oq_ShowArrayIndexElements)
+            {
+               opc_ElementItem->q_Enabled = true;
+            }
+            else
+            {
+               opc_ElementItem->q_Enabled = false;
+            }
+            opc_ElementItem->q_Selectable = false;
+            //If there are select-able child items don't add explanation
+            if (oq_ShowArrayIndexElements == false)
+            {
+               //Explanation
+               opc_ElementItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalArrayInfo;
+            }
+         }
       }
    }
    //lint -e{429}  no memory leak because of no ownership of the element opc_ElementItem here
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize tree structure for data pool lists
+/*! \brief  Adapts the properties of the tree item
+
+   Sets the enabled and selectable flag dependent of the paramters oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+   oq_ShowArrayIndexElements and oq_Show64BitValues
+
+   \param[in]     oq_ShowOnlyWriteElements  Optional flag to show only writable elements
+   \param[in]     oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
+   \param[in]     oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
+   \param[in]     orc_Element               Datapool element of tree item
+   \param[in,out] opc_ArrayItem             Array item
+   \param[in]     ou32_Index                Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblTreDataElementModel::mh_ConfigureDatapoolArrayElement(const bool oq_ShowOnlyWriteElements,
+                                                                const bool oq_ShowArrayIndexElements,
+                                                                const bool oq_Show64BitValues,
+                                                                const C_OSCNodeDataPoolListElement & orc_Element,
+                                                                C_TblTreItem * const opc_ArrayItem,
+                                                                const uint32 ou32_Index)
+{
+   if (opc_ArrayItem != NULL)
+   {
+      // Set the name always here, in case of an earlier update, the name was adapted with the explanation
+      opc_ArrayItem->c_Name = QString("[%1]").arg(ou32_Index);
+
+      if (oq_ShowArrayIndexElements == true)
+      {
+         if ((((orc_Element.GetType() != C_OSCNodeDataPoolContent::eFLOAT64) &&
+               (orc_Element.GetType() != C_OSCNodeDataPoolContent::eUINT64)) &&
+              (orc_Element.GetType() != C_OSCNodeDataPoolContent::eSINT64)) ||
+             (oq_Show64BitValues == true))
+         {
+            if ((orc_Element.e_Access == C_OSCNodeDataPoolListElement::eACCESS_RW) ||
+                (oq_ShowOnlyWriteElements == false))
+            {
+               //Valid
+               opc_ArrayItem->q_Enabled = true;
+               opc_ArrayItem->q_Selectable = true;
+            }
+            else
+            {
+               opc_ArrayItem->q_Enabled = false;
+               opc_ArrayItem->q_Selectable = false;
+               //Explanation
+               opc_ArrayItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalWriteOnlyInfo;
+            }
+         }
+         else
+         {
+            opc_ArrayItem->q_Enabled = false;
+            opc_ArrayItem->q_Selectable = false;
+            //Explanation
+            opc_ArrayItem->c_Name += C_TblTreDataElementModel::mhc_Additional64BitInfo;
+         }
+      }
+      else
+      {
+         opc_ArrayItem->q_Enabled = false;
+         opc_ArrayItem->q_Selectable = false;
+         //Explanation
+         opc_ArrayItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalArrayIndexInfo;
+      }
+   }
+   //lint -e{429}  no memory leak because of no ownership of the element opc_ElementItem here
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle array element section
+
+   \param[in] oq_ShowOnlyWriteElements  Optional flag to show only writable elements
+   \param[in] oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
+   \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
+   \param[in] orc_Element               Datapool element of tree item
+   \param[in] oq_IsStringElement        Flag if current item is an string element
+   \param[in] opc_ElementItem           Tree item for datapool element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblTreDataElementModel::mh_CreateOrUpdateArrayElementNodes(const bool oq_ShowOnlyWriteElements,
+                                                                  const bool oq_ShowArrayIndexElements,
+                                                                  const bool oq_Show64BitValues,
+                                                                  const C_OSCNodeDataPoolListElement & orc_Element,
+                                                                  const bool oq_IsStringElement,
+                                                                  C_TblTreItem * const opc_ElementItem)
+{
+   if (opc_ElementItem != NULL)
+   {
+      if ((orc_Element.GetArray()) && (oq_IsStringElement == false))
+      {
+         if (opc_ElementItem->c_Children.size() == orc_Element.GetArraySize())
+         {
+            //Update
+            for (uint32 u32_ArrayIndex = 0U; u32_ArrayIndex < orc_Element.GetArraySize(); ++u32_ArrayIndex)
+            {
+               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               C_TblTreItem * const pc_ArrayItem =
+                  dynamic_cast<C_TblTreItem * const>(opc_ElementItem->c_Children[
+                                                        u32_ArrayIndex]);
+
+               C_TblTreDataElementModel::mh_ConfigureDatapoolArrayElement(oq_ShowOnlyWriteElements,
+                                                                          oq_ShowArrayIndexElements,
+                                                                          oq_Show64BitValues,
+                                                                          orc_Element,
+                                                                          pc_ArrayItem, u32_ArrayIndex);
+            }
+         }
+         else
+         {
+            //Create new
+            for (uint32 u32_ArrayIndex = 0U; u32_ArrayIndex < orc_Element.GetArraySize();
+                 ++u32_ArrayIndex)
+            {
+               C_TblTreItem * const pc_ArrayItem = new C_TblTreItem();
+               //Init current node
+               pc_ArrayItem->u32_Index = u32_ArrayIndex;
+               pc_ArrayItem->c_Name = QString("[%1]").arg(u32_ArrayIndex);
+               pc_ArrayItem->c_ToolTipHeading = pc_ArrayItem->c_Name;
+               pc_ArrayItem->c_ToolTipContent =
+                  QString(C_GtGetText::h_GetText("Array element %1 of \"%2\"")).arg(u32_ArrayIndex).arg(
+                     orc_Element.c_Name.c_str());
+
+               //Configure
+               C_TblTreDataElementModel::mh_ConfigureDatapoolArrayElement(oq_ShowOnlyWriteElements,
+                                                                          oq_ShowArrayIndexElements,
+                                                                          oq_Show64BitValues,
+                                                                          orc_Element,
+                                                                          pc_ArrayItem, u32_ArrayIndex);
+
+               //Add
+               opc_ElementItem->AddChild(pc_ArrayItem);
+            }
+         }
+      }
+      else
+      {
+         opc_ElementItem->ClearChildren();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize tree structure for data pool lists
 
    \param[in] ou32_ViewIndex View index
 */
@@ -1422,7 +1663,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get bus signals
+/*! \brief  Get bus signals
 
    \param[in] orc_Index Index
 
@@ -1518,7 +1759,7 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data pools
+/*! \brief  Get data pools
 
    \param[in] orc_Index Index
 
@@ -1562,7 +1803,7 @@ const
                c_Retval.push_back(C_PuiSvDbNodeDataPoolListElementId(pc_SecondParent->u32_Index,
                                                                      pc_TreeItem->u32_Index, 0UL, 0UL,
                                                                      C_PuiSvDbNodeDataPoolListElementId::
-                                                                     eDATAPOOL_ELEMENT));
+                                                                     eDATAPOOL_ELEMENT, false, 0UL));
             }
          }
          else
@@ -1585,7 +1826,7 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data pool elements
+/*! \brief  Get data pool elements
 
    \param[in] orc_Index Index
 
@@ -1627,8 +1868,31 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetD
                      dynamic_cast<const C_TblTreItem * const>(pc_FourthParent->pc_Parent);
                   if ((pc_FifthParent != NULL) && (pc_FifthParent->pc_Parent != NULL))
                   {
-                     //Should not happen
-                     tgl_assert(false);
+                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     const C_TblTreItem * const pc_SixthParent =
+                        dynamic_cast<const C_TblTreItem * const>(pc_FifthParent->pc_Parent);
+                     if ((pc_SixthParent != NULL) && (pc_SixthParent->pc_Parent != NULL))
+                     {
+                        //Should not happen
+                        tgl_assert(false);
+                     }
+                     else
+                     {
+                        //Data array index element
+                        //6: Invisible item
+                        //5: Node item
+                        //4: Data pool type item
+                        //3: Data pool item
+                        //2: List item
+                        //1: Element item
+                        c_Retval.push_back(C_PuiSvDbNodeDataPoolListElementId(pc_FifthParent->u32_Index,
+                                                                              pc_FourthParent->u32_Index,
+                                                                              pc_SecondParent->u32_Index,
+                                                                              pc_FirstParent->u32_Index,
+                                                                              C_PuiSvDbNodeDataPoolListElementId::
+                                                                              eDATAPOOL_ELEMENT, true,
+                                                                              pc_TreeItem->u32_Index));
+                     }
                   }
                   else
                   {
@@ -1643,7 +1907,7 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetD
                                                                            pc_FirstParent->u32_Index,
                                                                            pc_TreeItem->u32_Index,
                                                                            C_PuiSvDbNodeDataPoolListElementId::
-                                                                           eDATAPOOL_ELEMENT));
+                                                                           eDATAPOOL_ELEMENT, false, 0UL));
                   }
                }
                else
@@ -1685,7 +1949,7 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetD
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data pool elements
+/*! \brief  Get data pool elements
 
    \param[in] orc_Index Index
 
@@ -1746,7 +2010,7 @@ const
                                                                               u32_ListIndex,
                                                                               u32_ItElement,
                                                                               C_PuiSvDbNodeDataPoolListElementId::
-                                                                              eDATAPOOL_ELEMENT));
+                                                                              eDATAPOOL_ELEMENT, false, 0UL));
                      }
                   }
                   else
@@ -1785,7 +2049,7 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clean up map
+/*! \brief  Clean up map
 
    \param[in] orc_Map Map to clean up
 */
@@ -1800,7 +2064,7 @@ void C_TblTreDataElementModel::mh_CleanUp(QMap<std::vector<uint32>, C_TblTreData
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if item in map
+/*! \brief  Check if item in map
 
    \param[in] orc_Map  Map to look in
    \param[in] opc_Item Item to look for
@@ -1828,7 +2092,7 @@ bool C_TblTreDataElementModel::mh_Contains(const QMap<std::vector<uint32>, C_Tbl
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get view and system definition hash in combination
+/*! \brief  Get view and system definition hash in combination
 
    \param[in] ou32_ViewIndex View index
 
@@ -1870,7 +2134,7 @@ std::vector<uint32> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32 ou32
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if diagnostic mode activated
+/*! \brief  Check if diagnostic mode activated
 
    \param[in] ou32_ViewIndex View index
    \param[in] ou32_NodeIndex Node index

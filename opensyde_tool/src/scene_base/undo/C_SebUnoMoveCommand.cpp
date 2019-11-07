@@ -32,7 +32,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Scene              Pointer to currently active scene
    \param[in]     orc_IDs                Affected unique IDs
@@ -48,7 +48,7 @@ C_SebUnoMoveCommand::C_SebUnoMoveCommand(QGraphicsScene * const opc_Scene, const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -58,7 +58,7 @@ C_SebUnoMoveCommand::~C_SebUnoMoveCommand(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Undo move
+/*! \brief  Undo move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoMoveCommand::undo(void)
@@ -72,7 +72,7 @@ void C_SebUnoMoveCommand::undo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo move
+/*! \brief  Redo move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoMoveCommand::redo(void)
@@ -86,7 +86,7 @@ void C_SebUnoMoveCommand::redo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Attempt merge with current command
+/*! \brief  Attempt merge with current command
 
    \param[in] opc_Command Command to merge with
 
@@ -115,7 +115,7 @@ bool C_SebUnoMoveCommand::mergeWith(const QUndoCommand * const opc_Command)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Undo for one item
+/*! \brief  Undo for one item
 
    \param[in,out] opc_Item Item to perform action on
 */
@@ -129,7 +129,7 @@ void C_SebUnoMoveCommand::m_UndoSingle(QGraphicsItem * const opc_Item) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo for one item
+/*! \brief  Redo for one item
 
    \param[in,out] opc_Item Item to perform action on
 */

@@ -30,7 +30,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeLoggerDataGreyOutInformation::C_CamMetTreeLoggerDataGreyOutInformation(void) :

@@ -15,7 +15,7 @@
 #include "stwerrors.h"
 #include "C_OgeWiSpinBoxGroup.h"
 #include "ui_C_OgeWiSpinBoxGroup.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -107,7 +107,7 @@ void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
 {
    std::vector<C_OSCNodeDataPoolContent::E_Type> c_Types;
    m_DeactivateConnections();
-   if (C_SdNdeDataPoolContentUtil::h_GetMinimalTypeAfterScaling(orc_Min, orc_Max, of64_Factor, of64_Offset,
+   if (C_SdNdeDpContentUtil::h_GetMinimalTypeAfterScaling(orc_Min, orc_Max, of64_Factor, of64_Offset,
                                                                 c_Types) == C_NO_ERR)
    {
       if (ou32_Index < c_Types.size())

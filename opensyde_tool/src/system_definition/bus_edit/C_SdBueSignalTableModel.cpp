@@ -20,7 +20,7 @@
 #include "C_PuiSdHandler.h"
 #include "C_SdUtil.h"
 #include "C_SdTooltipUtil.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -278,14 +278,15 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                      break;
                   case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
                      // find out name of multiplexer
-                     pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);                     
+                     pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);
                      if (pc_Message != NULL)
                      {
-                        if(pc_Message->IsMultiplexed(&u32_Multiplexer) == true)
+                        if (pc_Message->IsMultiplexed(&u32_Multiplexer) == true)
                         {
                            // multiplexer found -> name is name of corresponding data pool list element
                            pc_OSCSignalCommon =
-                              C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_Multiplexer);
+                              C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId,
+                                                                                            u32_Multiplexer);
                            if (pc_OSCSignalCommon != NULL)
                            {
                               c_MultiplexerName = QString(pc_OSCSignalCommon->c_Name.c_str());
@@ -351,7 +352,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                {
                   if (pc_OSCSignalCommon->c_DataSetValues.size() > 0)
                   {
-                     c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
+                     c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(
                         pc_OSCSignalCommon->c_DataSetValues[0],
                         pc_OSCSignalCommon->f64_Factor,
                         pc_OSCSignalCommon->f64_Offset, 0);
@@ -382,7 +383,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_SignalIndex);
                if (pc_OSCSignalCommon != NULL)
                {
-                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_OSCSignalCommon->c_MinValue,
+                  c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OSCSignalCommon->c_MinValue,
                                                                                          pc_OSCSignalCommon->f64_Factor,
                                                                                          pc_OSCSignalCommon->f64_Offset,
                                                                                          0);
@@ -393,7 +394,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_SignalIndex);
                if (pc_OSCSignalCommon != NULL)
                {
-                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_OSCSignalCommon->c_MaxValue,
+                  c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OSCSignalCommon->c_MaxValue,
                                                                                          pc_OSCSignalCommon->f64_Factor,
                                                                                          pc_OSCSignalCommon->f64_Offset,
                                                                                          0);
@@ -459,6 +460,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                            c_MessageId.u32_NodeIndex,
                            c_MessageId.e_ComProtocol,
                            c_MessageId.u32_InterfaceIndex,
+                           c_MessageId.u32_DatapoolIndex,
                            c_MessageId.q_MessageIsTx);
                      QStringList c_Tmp;
                      const bool q_SignalValid = !pc_Message->CheckErrorSignal(pc_List, u32_SignalIndex, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(

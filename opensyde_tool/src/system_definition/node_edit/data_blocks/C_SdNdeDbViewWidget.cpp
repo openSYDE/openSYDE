@@ -77,8 +77,6 @@ C_SdNdeDbViewWidget::C_SdNdeDbViewWidget(QWidget * const opc_Parent) :
            &C_SdNdeDbViewWidget::AddApp);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigReloadDataPools, this,
            &C_SdNdeDbViewWidget::SigReloadDataPools);
-   connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigCheckDataPoolInteraction, this,
-           &C_SdNdeDbViewWidget::SigCheckDataPoolInteraction);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigOpenDataPool, this,
            &C_SdNdeDbViewWidget::SigOpenDataPool);
    connect(this->mpc_Ui->pc_PushButtonCodeGenerationOptions, &QPushButton::clicked, this,
@@ -444,21 +442,31 @@ void C_SdNdeDbViewWidget::m_AddFromTSP(void)
 
    if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eINFORMATION);
+      C_OgeWiCustomMessage c_Message(this);
+      QString c_Description = QString(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).")).
+                              arg(pc_Dialog->GetTSPApplicationCount());
+      QString c_Details = "";
       c_Message.SetHeading(C_GtGetText::h_GetText("Add new Data Blocks"));
-      c_Message.SetDescription(QString(C_GtGetText::h_GetText(
-                                          "Successfully created %1 Data Block(s).")).arg(
-                                  pc_Dialog->GetTSPApplicationCount()));
       for (uint32 u32_It = 0; u32_It < pc_Dialog->GetTSPApplicationCount(); ++u32_It)
       {
          C_OSCNodeApplication c_Tmp;
          c_Tmp.e_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
          c_Tmp.q_Active = true;
-         pc_Dialog->AddSelectedProject(u32_It, c_Tmp);
+         pc_Dialog->AddSelectedProject(u32_It, c_Tmp, c_Details);
          m_AddApplication(c_Tmp);
       }
       //Last step
       pc_Dialog->HandleCodeGenerationConfig();
+
+      // Add warnings if any
+      if (c_Details.isEmpty() == false)
+      {
+         c_Message.SetType(C_OgeWiCustomMessage::eWARNING);
+         c_Description += C_GtGetText::h_GetText(" Some warnings occured. See details for more information.");
+         c_Message.SetDetails(c_Details);
+      }
+
+      c_Message.SetDescription(c_Description);
       c_Message.Execute();
    }
 
@@ -504,7 +512,7 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
       //connect(pc_New, &C_OgePopUpDialog::SigHelp, pc_SettingsWidget, &C_GiSyLineWidget::HandleHelp);
 
       //Resize
-      c_New->SetSize(QSize(810, 690));
+      c_New->SetSize(QSize(810, 350));
 
       if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
       {

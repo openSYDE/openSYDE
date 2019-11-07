@@ -48,7 +48,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListMoveCommand::C_SdNdeUnoDataPoolListMoveCommand(const uint32 & oru32_NodeIndex,
                                                                      const uint32 & oru32_DataPoolIndex,
-                                                                     stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                                                     stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                                                      const std::vector<uint32> & oru32_SourceRows,
                                                                      const std::vector<uint32> & oru32_TargetRows,
                                                                      QUndoCommand * const opc_Parent) :

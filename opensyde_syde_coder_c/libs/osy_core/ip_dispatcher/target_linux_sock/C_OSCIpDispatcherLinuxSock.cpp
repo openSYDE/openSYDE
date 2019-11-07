@@ -458,6 +458,10 @@ sint32 C_OSCIpDispatcherLinuxSock::m_ConfigureUdpSocket(const bool oq_ServerPort
       t_LocalAddr.sin_addr.s_addr = htonl(ou32_IpToBindTo);
       if (oq_ServerPort == true)
       {
+         // Make port 13400 reusable to be able to run osy client and server simultaneously on same target
+         sintn sn_Enabled = 1;
+         setsockopt(orsn_Socket, SOL_SOCKET, SO_REUSEADDR, &sn_Enabled, sizeof(sn_Enabled));
+
          t_LocalAddr.sin_port = htons(mhu16_UDP_TCP_PORT); //provide port
       }
       else

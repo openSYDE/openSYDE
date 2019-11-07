@@ -35,7 +35,7 @@ using namespace stw_types;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -59,7 +59,7 @@ C_GiLiLineConnection::C_GiLiLineConnection(const sint32 & ors32_LineIndex, QGrap
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -69,7 +69,7 @@ C_GiLiLineConnection::~C_GiLiLineConnection()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten set line
+/*! \brief  Overwritten set line
 
    Here: Emit new line coordinates
 
@@ -82,7 +82,7 @@ void C_GiLiLineConnection::AdaptLine(const QLineF & orc_Line)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set line index
+/*! \brief  Set line index
 
    \param[in] ors32_LineIndex Index of line
 */
@@ -93,7 +93,9 @@ void C_GiLiLineConnection::SetLineIndex(const stw_types::sint32 & ors32_LineInde
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get line index
+/*! \brief  Get line index
+
+   \return Index of line
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_GiLiLineConnection::GetLineIndex(void) const
@@ -102,7 +104,7 @@ stw_types::sint32 C_GiLiLineConnection::GetLineIndex(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore default mouse cursor
+/*! \brief  Restore default mouse cursor
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineConnection::RestoreDefaultCursor(void)
@@ -122,7 +124,7 @@ void C_GiLiLineConnection::SetTemporaryCursor(const QCursor & orc_TemporaryCurso
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set default mouse cursor
+/*! \brief  Set default mouse cursor
 
    \param[in] orc_Value New default mouse cursor
 */
@@ -134,7 +136,7 @@ void C_GiLiLineConnection::SetDefaultCursor(const QCursor & orc_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten paint event slot
+/*! \brief  Overwritten paint event slot
 
    Here: Avoid drawing the line. This is only a helper class
 
@@ -154,7 +156,7 @@ void C_GiLiLineConnection::paint(QPainter * const opc_Painter, const QStyleOptio
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Return more accurate shape
+/*! \brief  Return more accurate shape
 
    \return  The painter path as polygon
 */
@@ -167,7 +169,7 @@ QPainterPath C_GiLiLineConnection::shape() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Find closest point in shape to scene position
+/*! \brief  Find closest point in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
    \param[out] orc_Closest    Closest point in shape
@@ -180,7 +182,7 @@ void C_GiLiLineConnection::FindClosestPoint(const QPointF & orc_ScenePoint, QPoi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Find closest point in shape to scene position
+/*! \brief  Find closest point in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
    \param[out] orf64_Relative Relative position
@@ -193,12 +195,15 @@ void C_GiLiLineConnection::FindClosestPointRelative(const QPointF & orc_ScenePoi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten itemChange event slot
+/*! \brief  Overwritten itemChange event slot
 
    Here: Signal position change
 
    \param[in] oe_Change Indicator what changed
    \param[in] orc_Value Value corresponding to change
+
+   \return
+   new value
 */
 //----------------------------------------------------------------------------------------------------------------------
 QVariant C_GiLiLineConnection::itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value)
@@ -207,7 +212,7 @@ QVariant C_GiLiLineConnection::itemChange(const GraphicsItemChange oe_Change, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set interaction point width
+/*! \brief  Set interaction point width
 
    \param[in] orf64_Value New value
 */

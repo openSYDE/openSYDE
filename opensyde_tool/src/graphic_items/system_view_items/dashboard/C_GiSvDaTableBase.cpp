@@ -738,7 +738,7 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
       QGraphicsView * const pc_View = this->scene()->views().at(0);
       QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
       C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, this->mu32_ViewIndex, true,
-                                                                                    false, true, true, false);
+                                                                                    false, true, true, true, false);
 
       //Resize
       c_New->SetSize(QSize(800, 800));

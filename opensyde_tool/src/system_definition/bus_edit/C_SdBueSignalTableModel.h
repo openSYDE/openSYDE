@@ -53,20 +53,13 @@ public:
    void SetMessageSyncManager(C_PuiSdNodeCanMessageSyncManager * const opc_Value);
    void UpdateData(void);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-   // Header:
-   //lint -e{1735} Suppression, because default parameters are identical
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
+   // and default parameters are identical.
+   //lint -save -e1960 -e1735
    virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation, const stw_types::sintn osn_Role =
                                   static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
-
-   // Basic functionality:
-   //lint -e{1735} Suppression, because default parameters are identical
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
-   //lint -e{1735} Suppression, because default parameters are identical
    virtual stw_types::sintn columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
-
-   //lint -e{1735} Suppression, because default parameters are identical
    virtual QVariant data(const QModelIndex & orc_Index, const stw_types::sintn osn_Role =
                             static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    virtual Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;

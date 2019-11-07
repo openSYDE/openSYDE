@@ -37,16 +37,22 @@ public:
    ~C_SdBueMessageRxList(void);
 
    void InitStaticNames(void) const;
-   void AddNodes(const std::vector<QString> & orc_EntryNames, const std::vector<stw_types::uint32> & orc_NodeIndexes,
+   void AddNodes(const std::vector<QString> & orc_EntryNames, const std::vector<QString> & orc_EntryDatapoolNames,
+                 const std::vector<stw_types::uint32> & orc_NodeIndexes,
                  const std::vector<stw_types::uint32> & orc_InterfaceIndexes,
+                 const std::vector<stw_types::uint32> & orc_DatapoolIndexes,
                  const std::vector<bool> & orc_UseAutoReceiveTimeoutFlags,
                  const std::vector<stw_types::uint32> & orc_ReceiveTimeoutValues);
    void SetLastKnownCycleTimeValue(const stw_types::uint32 ou32_Value);
    void SetAlwaysHideTimeout(const bool oq_Hide);
    void CheckNodes(const std::vector<stw_types::uint32> & orc_NodeIndexes,
-                   const std::vector<stw_types::uint32> & orc_InterfaceIndexes) const;
+                   const std::vector<stw_types::uint32> & orc_InterfaceIndexes,
+                   const std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;
    void CheckSpecificNode(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-                          const bool oq_Checked) const;
+                          const stw_types::uint32 ou32_DatapoolIndex, const bool oq_Checked) const;
+   void SetModeSingleNode(const bool oq_ModeSingleNode);
+
+   void Clear(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -54,19 +60,20 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigNodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-                       const bool oq_Checked);
-   void SigNodeUseReceiveTimeout(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-                                 const bool oq_UseReceiveTimeout);
+                       const stw_types::uint32 ou32_DatapoolIndex, const bool oq_Checked);
+   void SigNodeUseAutoReceiveTimeout(const stw_types::uint32 ou32_NodeIndex,
+                                     const stw_types::uint32 ou32_InterfaceIndex,
+                                     const stw_types::uint32 ou32_DatapoolIndex, const bool oq_UseReceiveTimeout);
    void SigNodeReceiveTimeout(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-                              const stw_types::uint32 ou32_ReceiveTimeout);
+                              const stw_types::uint32 ou32_DatapoolIndex, const stw_types::uint32 ou32_ReceiveTimeout);
 
 private:
    Ui::C_SdBueMessageRxList * mpc_Ui;
    std::vector<C_SdBueMessageRxEntry *> mc_Entries;
    stw_types::uint32 mu32_LastKnownCycleTimeValue;
    bool mq_AlwaysHide;
+   bool mq_ModeSingleNode;
 
-   void m_Clear(void);
    //Avoid call
    C_SdBueMessageRxList(const C_SdBueMessageRxList &);
    C_SdBueMessageRxList & operator =(const C_SdBueMessageRxList &);

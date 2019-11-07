@@ -41,7 +41,7 @@ public:
    void PrepareForExpanded(const bool oq_Expand) const;
    void OnCommunicationStarted(const bool oq_Online);
    void OnSigLogFileAddResult(const stw_types::sint32 os32_Result);
-   void OnSigSavedAsNew(void) const;
+   void OnSigSavedAsNew(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -50,6 +50,7 @@ Q_SIGNALS:
    void SigAddLogFileAsc(const QString & orc_FilePath);
    void SigAddLogFileBlf(const QString & orc_FilePath);
    void SigRemoveAllLogFiles(void);
+   void SigHide(void);
 
 private:
    Ui::C_CamMosLoggingWidget * mpc_Ui;
@@ -61,14 +62,15 @@ private:
    C_CamMosLoggingWidget & operator =(const C_CamMosLoggingWidget &);
 
    void m_LoadConfig(void) const;
+   void m_LoadFolderConfig(void) const;
    void m_OnExpand(const bool oq_Expand) const;
    void m_OnToggled(const bool oq_Enabled);
-   void m_OnFolderEdited(void) const;
-   void m_OnFileNameEdited(void) const;
+   void m_OnFolderEdited(void);
+   void m_OnFileNameEdited(void);
    void m_OnOverwriteModeSelected(const stw_types::sint32 os32_Index) const;
    void m_OnFormatSelected(const stw_types::sint32 os32_Index) const;
    void m_OnBrowse(void);
-   void m_InsertPathVar(const QString & orc_Variable) const;
+   void m_InsertPathVar(const QString & orc_Variable);
 
    void m_DecideStartStop(void);
    void m_CheckAndStartLogging(void);

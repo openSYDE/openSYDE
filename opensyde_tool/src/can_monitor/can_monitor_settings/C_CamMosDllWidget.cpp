@@ -21,6 +21,7 @@
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "CCAN.h"
+#include "C_OSCUtils.h"
 #include "C_GtGetText.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_Uti.h"
@@ -120,6 +121,7 @@ void C_CamMosDllWidget::OnCommunicationStarted(const bool oq_Online) const
    this->mpc_Ui->pc_RadioButtonPeak->setDisabled(oq_Online);
    this->mpc_Ui->pc_RadioButtonVector->setDisabled(oq_Online);
    this->mpc_Ui->pc_WidgetCustomDll->setDisabled(oq_Online);
+   this->mpc_Ui->pc_PushButtonConfigure->setDisabled(oq_Online);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -148,6 +150,7 @@ void C_CamMosDllWidget::m_InitUi(void)
    // initialize button icon
    QIcon c_Icon;
    c_Icon.addFile("://images/IconEditHovered.svg", QSize(), QIcon::Normal);
+   c_Icon.addFile("://images/IconEditDisabled.svg", QSize(), QIcon::Disabled);
    this->mpc_Ui->pc_PushButtonConfigure->setIconSize(QSize(16, 16));
    this->mpc_Ui->pc_PushButtonConfigure->setIcon(c_Icon);
 
@@ -170,6 +173,8 @@ void C_CamMosDllWidget::m_InitUi(void)
    // connects
    connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigExpandSection,
            this, &C_CamMosDllWidget::m_OnExpand);
+   connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigHide,
+           this, &C_CamMosDllWidget::SigHide);
 
    // behavior of DLL selection (Other vs. PEAK and Vector)
    connect(this->mpc_Ui->pc_RadioButtonPeak, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
@@ -179,7 +184,7 @@ void C_CamMosDllWidget::m_InitUi(void)
    connect(this->mpc_Ui->pc_RadioButtonOther, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
            this, &C_CamMosDllWidget::m_OtherDllClicked);
    connect(this->mpc_Ui->pc_LineEditCustomDllPath, &C_CamOgeLeFilePath::editingFinished, this,
-           &C_CamMosDllWidget::m_UpdateCANDllPath);
+           &C_CamMosDllWidget::m_OnCustomDllEdited);
 
    // path actions
    connect(this->mpc_Ui->pc_PushButtonBrowse, &C_CamOgePubDarkBrowse::clicked, this, &C_CamMosDllWidget::m_OnBrowse);
@@ -386,8 +391,13 @@ void C_CamMosDllWidget::m_OnBrowse(void)
    {
       c_Path = c_Dialog.selectedFiles().at(0);
       c_Path = C_CamUti::h_AskUserToSaveRelativePath(this, c_Path, C_Uti::h_GetExePath());
-      this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
-      this->m_UpdateCANDllPath();
+
+      // if path contains invalid characters this returned empty
+      if (c_Path.isEmpty() == false)
+      {
+         this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
+         this->m_UpdateCANDllPath();
+      }
    }
 }
 
@@ -397,8 +407,63 @@ void C_CamMosDllWidget::m_OnBrowse(void)
    \param[in]       orc_Variable     path variable
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDllWidget::m_InsertPathVar(const QString & orc_Variable) const
+void C_CamMosDllWidget::m_InsertPathVar(const QString & orc_Variable)
 {
    this->mpc_Ui->pc_LineEditCustomDllPath->InsertVariable(orc_Variable);
-   this->m_UpdateCANDllPath();
+   this->m_OnCustomDllEdited();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for editing finished signal of line edit for custom DLL.
+
+   Check if inserted path is empty or contains invalid characters.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosDllWidget::m_OnCustomDllEdited(void)
+{
+   const QString c_Path =  this->mpc_Ui->pc_LineEditCustomDllPath->GetPath();
+   const QString c_ResolvedPath = C_CamUti::h_ResolvePlaceholderVariables(c_Path);
+
+   if ((stw_opensyde_core::C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == true) ||
+       (c_ResolvedPath.isEmpty() == true)) // actually empty path is not valid but feedback on "play" is good enough
+   {
+      // update data handling
+      this->m_UpdateCANDllPath();
+   }
+   else
+   {
+      // Invalid name: revert and inform user
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+      const QString c_Heading = C_GtGetText::h_GetText("PC CAN Interface configuration");
+      const QString c_MessageText =
+         C_GtGetText::h_GetText("CAN DLL path contains invalid characters.");
+      QString c_Details;
+
+      c_Details = C_GtGetText::h_GetText("Path:\n");
+      c_Details += c_Path;
+
+      if (c_Path != c_ResolvedPath)
+      {
+         c_Details += C_GtGetText::h_GetText(" (resolved: ") + c_ResolvedPath + ")";
+      }
+
+      // disconnect to ignore editingFinished signal on focus lose because of popup
+      disconnect(this->mpc_Ui->pc_LineEditCustomDllPath, &C_CamOgeLeFilePath::editingFinished,
+                 this, &C_CamMosDllWidget::m_OnCustomDllEdited);
+      c_Message.SetHeading(c_Heading);
+      c_Message.SetDescription(c_MessageText);
+      c_Message.SetDetails(c_Details);
+      c_Message.Execute();
+
+      this->m_LoadConfig();
+
+      if (this->mpc_Ui->pc_LineEditCustomDllPath->hasFocus() == true)
+      {
+         this->mpc_Ui->pc_LineEditCustomDllPath->UpdateText();
+      }
+
+      // reconnect
+      connect(this->mpc_Ui->pc_LineEditCustomDllPath, &C_CamOgeLeFilePath::editingFinished,
+              this, &C_CamMosDllWidget::m_OnCustomDllEdited);
+   }
 }

@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Scene   Pointer to currently active scene
    \param[in]     orc_IDs     Affected unique IDs
@@ -59,7 +59,7 @@ C_SebUnoResizeRectangleCommand::C_SebUnoResizeRectangleCommand(QGraphicsScene * 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoResizeRectangleCommand::~C_SebUnoResizeRectangleCommand()
@@ -67,7 +67,7 @@ C_SebUnoResizeRectangleCommand::~C_SebUnoResizeRectangleCommand()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Undo move
+/*! \brief  Undo move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoResizeRectangleCommand::undo(void)
@@ -81,7 +81,7 @@ void C_SebUnoResizeRectangleCommand::undo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo move
+/*! \brief  Redo move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoResizeRectangleCommand::redo(void)
@@ -95,7 +95,7 @@ void C_SebUnoResizeRectangleCommand::redo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Undo for one item
+/*! \brief  Undo for one item
 
    \param[in,out] opc_Item Item to perform action on
 */
@@ -116,7 +116,7 @@ void C_SebUnoResizeRectangleCommand::m_UndoSingle(QGraphicsItem * const opc_Item
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo for one item
+/*! \brief  Redo for one item
 
    \param[in,out] opc_Item Item to perform action on
 */

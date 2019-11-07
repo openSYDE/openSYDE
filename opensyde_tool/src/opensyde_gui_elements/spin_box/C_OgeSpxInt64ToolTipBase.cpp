@@ -92,7 +92,7 @@ bool C_OgeSpxInt64ToolTipBase::m_IsEnabled(void) const
    Minimum as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeSpxInt64ToolTipBase::m_GetMinimum(void) const
+QString C_OgeSpxInt64ToolTipBase::m_GetMinimumRawString(void) const
 {
    const QVariant c_Tmp = this->GetMinimum();
 
@@ -106,7 +106,7 @@ QString C_OgeSpxInt64ToolTipBase::m_GetMinimum(void) const
    Maximum as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeSpxInt64ToolTipBase::m_GetMaximum(void) const
+QString C_OgeSpxInt64ToolTipBase::m_GetMaximumRawString(void) const
 {
    const QVariant c_Tmp = this->GetMaximum();
 

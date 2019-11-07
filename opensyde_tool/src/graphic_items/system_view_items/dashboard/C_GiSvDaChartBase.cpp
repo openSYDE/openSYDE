@@ -541,7 +541,7 @@ void C_GiSvDaChartBase::m_AddNewDataElement(void)
 
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
    C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, this->mu32_ViewIndex, true,
-                                                                                 false, false, true, false);
+                                                                                 false, false, true, true, false);
 
    //Resize
    c_New->SetSize(QSize(800, 800));
@@ -650,13 +650,13 @@ void C_GiSvDaChartBase::m_RegisterDataElementRail(
                                                                     orc_DataPoolElementId.u32_ListIndex,
                                                                     orc_DataPoolElementId.u32_ElementIndex);
 
-      if ((pc_Element != NULL) && (pc_Element->GetArray() == false))
+      if (pc_Element != NULL)
       {
          C_PuiSvReadDataConfiguration c_Config;
          c_Config.u8_RailIndex = 1;
-         if (((pc_Element->GetType() == C_OSCNodeDataPoolContent::eFLOAT64) ||
-              (pc_Element->GetType() == C_OSCNodeDataPoolContent::eSINT64)) ||
-             (pc_Element->GetType() == C_OSCNodeDataPoolContent::eUINT64))
+         if (pc_Element->GetArray() || (((pc_Element->GetType() == C_OSCNodeDataPoolContent::eFLOAT64) ||
+                                         (pc_Element->GetType() == C_OSCNodeDataPoolContent::eSINT64)) ||
+                                        (pc_Element->GetType() == C_OSCNodeDataPoolContent::eUINT64)))
          {
             c_Config.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER;
          }

@@ -24,7 +24,7 @@
 #include "C_PuiSvDbProgressBar.h"
 #include "C_OgePopUpDialog.h"
 #include "C_SyvDaPeBase.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_SyvDaPeProgressBar.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -265,7 +265,7 @@ bool C_GiSvDaProgressBarBase::CallProperties(void)
          {
             c_ElementId = C_PuiSvDbNodeDataPoolListElementId(0, 0, 0, 0,
                                                              C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
-                                                             false);
+                                                             false, 0UL, false);
             c_Scaling = C_PuiSvDbDataElementScaling();
          }
 
@@ -432,15 +432,16 @@ void C_GiSvDaProgressBarBase::m_UpdateStaticValues(void)
          {
             QString c_Text;
             float64 f64_Value;
-            const QString c_Value = this->GetUnscaledValueInRangeAsScaledString(0.0, 0UL, &f64_Value);
-            C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(pc_Element->c_MinValue, this->mf64_UnscaledMin);
-            C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, this->mf64_UnscaledMax);
+            const uint32 u32_Index = c_ID.GetArrayElementIndexOrZero();
+            const QString c_Value = this->GetUnscaledValueInRangeAsScaledString(0.0, u32_Index, &f64_Value);
+            C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MinValue, this->mf64_UnscaledMin, u32_Index);
+            C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, this->mf64_UnscaledMax, u32_Index);
             this->mpc_ProgressBarWidget->SetUnit(c_Scaling.c_Unit);
-            C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(pc_Element->c_MinValue, c_Scaling.f64_Factor,
-                                                                 c_Scaling.f64_Offset, c_Text, 0UL);
+            C_SdNdeDpContentUtil::h_GetValueAsScaledString(pc_Element->c_MinValue, c_Scaling.f64_Factor,
+                                                                 c_Scaling.f64_Offset, c_Text, u32_Index);
             this->mpc_ProgressBarWidget->SetMin(0, c_Text);
-            C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(pc_Element->c_MaxValue, c_Scaling.f64_Factor,
-                                                                 c_Scaling.f64_Offset, c_Text, 0UL);
+            C_SdNdeDpContentUtil::h_GetValueAsScaledString(pc_Element->c_MaxValue, c_Scaling.f64_Factor,
+                                                                 c_Scaling.f64_Offset, c_Text, u32_Index);
             this->mpc_ProgressBarWidget->SetMax(2000000, c_Text);
             //Update value
             this->mpc_ProgressBarWidget->SetValue(static_cast<sintn>(f64_Value * 2000000.0), c_Value);

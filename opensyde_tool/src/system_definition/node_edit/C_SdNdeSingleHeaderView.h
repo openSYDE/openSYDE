@@ -12,7 +12,7 @@
 #define C_SDNDESINGLEHEADERVIEW_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_SdNdeDataPoolListTableHeaderView.h"
+#include "C_SdNdeDpListTableHeaderView.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -22,7 +22,7 @@ namespace stw_opensyde_gui
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeSingleHeaderView :
-   public C_SdNdeDataPoolListTableHeaderView
+   public C_SdNdeDpListTableHeaderView
 {
    Q_OBJECT
 

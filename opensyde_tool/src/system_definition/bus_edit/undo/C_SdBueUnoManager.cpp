@@ -155,7 +155,7 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
    pc_UndoCommand->SetInitialData(c_Message, std::vector<C_OSCNodeDataPoolListElement>(),
                                   std::vector<C_PuiSdNodeDataPoolListElement>(),
                                   std::vector<C_PuiSdNodeCanSignal>(), std::vector<QString>(),
-                                  std::vector<uint32>(), std::vector<bool>());
+                                  std::vector<uint32>(), std::vector<uint32>(), std::vector<bool>());
 
    this->DoPush(pc_UndoCommand);
 }
@@ -170,6 +170,7 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
    \param[in]     orc_UISignals               Signal ui data
    \param[in]     orc_OwnerNodeName           Owner node names
    \param[in]     orc_OwnerNodeInterfaceIndex Owner node interface index
+   \param[in]     orc_OwnerNodeDatapoolIndex  Owner node Datapool index
    \param[in]     orc_OwnerIsTxFlag           Owner has message as TX flags
    \param[in,out] opc_MessageSyncManager      Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget       Message tree widget to perform actions on
@@ -178,7 +179,7 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                         const std::vector<C_OSCCanMessage> & orc_Messages,
-                                        const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget,
+                                        const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<stw_types::uint32> > & orc_OwnerNodeDatapoolIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget,
                                         std::vector<C_OSCCanMessageIdentificationIndices> & orc_NewIds)
 {
    //Check if consistent size
@@ -200,6 +201,7 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
          {
             std::vector<QString> c_OwnerNodeName;
             std::vector<uint32>  c_OwnerNodeInterfaceIndex;
+            std::vector<uint32>  c_OwnerNodeDatapoolIndex;
             std::vector<bool>  c_OwnerIsTxFlag;
             C_OSCCanMessage c_Tmp = orc_Messages[u32_ItMessage];
             //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -210,20 +212,23 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
                                                                                                 pc_MessageTreeWidget,
                                                                                                 pc_PasteCommand);
             //Check last owners storage valid
-            if (((u32_ItMessage < orc_OwnerNodeName.size()) && (u32_ItMessage < orc_OwnerNodeInterfaceIndex.size())) &&
+            if ((u32_ItMessage < orc_OwnerNodeName.size()) &&
+                (u32_ItMessage < orc_OwnerNodeInterfaceIndex.size()) &&
+                (u32_ItMessage < orc_OwnerNodeDatapoolIndex.size()) &&
                 (u32_ItMessage < orc_OwnerIsTxFlag.size()))
             {
                C_SdBueUnoManager::mh_HandleLastOwnersValidation(orc_MessageId, orc_OwnerNodeName[u32_ItMessage],
                                                                 orc_OwnerNodeInterfaceIndex[u32_ItMessage],
+                                                                orc_OwnerNodeDatapoolIndex[u32_ItMessage],
                                                                 orc_OwnerIsTxFlag[u32_ItMessage], c_OwnerNodeName,
-                                                                c_OwnerNodeInterfaceIndex,
+                                                                c_OwnerNodeInterfaceIndex, c_OwnerNodeDatapoolIndex,
                                                                 c_OwnerIsTxFlag);
             }
             //If vector are empty default behavior is used instead
             pc_AddCommand->SetInitialData(c_Tmp, orc_OSCSignalCommons[u32_ItMessage],
                                           orc_UISignalCommons[u32_ItMessage],
                                           orc_UISignals[u32_ItMessage],
-                                          c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
+                                          c_OwnerNodeName, c_OwnerNodeInterfaceIndex, c_OwnerNodeDatapoolIndex,
                                           c_OwnerIsTxFlag);
 
             c_AddCommands.push_back(pc_AddCommand);
@@ -487,44 +492,57 @@ void C_SdBueUnoManager::mh_PatchMessageId(const C_PuiSdNodeCanMessageSyncManager
    \param[in]  orc_MessageId                   New message id from current bus to use as fallback
    \param[in]  orc_LastOwnerNodeName           Original owners node names
    \param[in]  orc_LastOwnerNodeInterfaceIndex Original owners interface indices
+   \param[in]  orc_LastOwnerNodeDatapoolIndex  Original owners Datapool indices
    \param[in]  orc_LastOwnerIsTxFlag           Original owners TX flags
    \param[out] orc_NewOwnerNodeName            New/valid owners node names (empty if no matches found)
    \param[out] orc_NewOwnerNodeInterfaceIndex  New/valid owners interface indices (empty if no matches found)
+   \param[out] orc_NewOwnerNodeDatapoolIndex   New/valid owners Datapool indices (empty if no matches found)
    \param[out] orc_NewOwnerIsTxFlag            New/valid owners TX flags (empty if no matches found)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                       const std::vector<QString> & orc_LastOwnerNodeName,
                                                       const std::vector<uint32> & orc_LastOwnerNodeInterfaceIndex,
+                                                      const std::vector<uint32> & orc_LastOwnerNodeDatapoolIndex,
                                                       const std::vector<bool> & orc_LastOwnerIsTxFlag,
                                                       std::vector<QString> & orc_NewOwnerNodeName,
                                                       std::vector<uint32> & orc_NewOwnerNodeInterfaceIndex,
+                                                      std::vector<uint32> & orc_NewOwnerNodeDatapoolIndex,
                                                       std::vector<bool> & orc_NewOwnerIsTxFlag)
 {
    //Confirm connected to bus state part 1 (container)
    const C_OSCCanMessageContainer * const pc_Container =
       C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_MessageId.u32_NodeIndex,
                                                                       orc_MessageId.e_ComProtocol,
-                                                                      orc_MessageId.u32_InterfaceIndex);
+                                                                      orc_MessageId.u32_InterfaceIndex,
+                                                                      orc_MessageId.u32_DatapoolIndex);
+
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
       orc_MessageId.u32_NodeIndex);
 
    if ((pc_Node != NULL) &&
-       ((pc_Container != NULL) && (pc_Container->q_IsComProtocolUsedByInterface == true)))
+       (pc_Container != NULL))
    {
       if (orc_MessageId.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size())
       {
          const C_OSCNodeComInterfaceSettings & rc_Interface =
             pc_Node->c_Properties.c_ComInterfaces[orc_MessageId.u32_InterfaceIndex];
-         //Confirm connected to bus state part 2 (interface)
-         if (rc_Interface.q_IsBusConnected == true)
+
+         //Confirm connected to bus state part 2 (interface) -> Bus mode
+         if ((rc_Interface.q_IsBusConnected == true) &&
+             (pc_Container->q_IsComProtocolUsedByInterface == true))
          {
             std::vector<uint32> c_NodeIndexes;
             std::vector<uint32> c_InterfaceIndexes;
-            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(
-               rc_Interface.u32_BusIndex, c_NodeIndexes, c_InterfaceIndexes);
+            std::vector<uint32> c_DatapoolIndexes;
+
+            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeAndComDpIndexesOfBus(
+               rc_Interface.u32_BusIndex, orc_MessageId.e_ComProtocol, c_NodeIndexes, c_InterfaceIndexes,
+               c_DatapoolIndexes);
+
             //Check if operation was successful
-            if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+            if ((c_NodeIndexes.size() == c_InterfaceIndexes.size()) &&
+                (c_NodeIndexes.size() == c_DatapoolIndexes.size()))
             {
                //Confirm last owners still valid
                for (uint32 u32_ItLastOwner = 0UL; u32_ItLastOwner < orc_LastOwnerNodeName.size();
@@ -550,9 +568,16 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                            {
                               const C_OSCNodeComInterfaceSettings & rc_LastInterface =
                                  pc_Node->c_Properties.c_ComInterfaces[orc_LastOwnerNodeInterfaceIndex[u32_ItLastOwner]];
+
                               if ((rc_LastInterface.q_IsBusConnected == true) &&
                                   (rc_LastInterface.u32_BusIndex == rc_Interface.u32_BusIndex))
                               {
+                                 const C_OSCCanProtocol * const pc_Protocol =
+                                    C_PuiSdHandler::h_GetInstance()->GetCanProtocol(orc_MessageId.u32_NodeIndex,
+                                                                                    orc_MessageId.e_ComProtocol,
+                                                                                    orc_LastOwnerNodeDatapoolIndex[
+                                                                                       u32_ItLastOwner]);
+
                                  //Exact match use same info
                                  orc_NewOwnerNodeName.push_back(orc_LastOwnerNodeName[u32_ItLastOwner]);
                                  orc_NewOwnerNodeInterfaceIndex.push_back(orc_LastOwnerNodeInterfaceIndex[
@@ -560,6 +585,19 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                                  orc_NewOwnerIsTxFlag.push_back(orc_LastOwnerIsTxFlag[u32_ItLastOwner]);
                                  //Signal stop
                                  q_ExactMatch = true;
+
+                                 // Check if the Datapool does match too
+                                 if ((pc_Protocol != NULL) &&
+                                     (orc_LastOwnerNodeDatapoolIndex[u32_ItLastOwner] < pc_Node->c_DataPools.size()))
+                                 {
+                                    orc_NewOwnerNodeDatapoolIndex.push_back(orc_LastOwnerNodeDatapoolIndex[
+                                                                               u32_ItLastOwner]);
+                                 }
+                                 else
+                                 {
+                                    //The Datapool has to be changed to the matching one
+                                    orc_NewOwnerNodeDatapoolIndex.push_back(c_DatapoolIndexes[u32_ItConnectedNode]);
+                                 }
                               }
                            }
                            //Only continue if change necessary -> adapt last owner!
@@ -569,8 +607,11 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                               orc_NewOwnerNodeName.push_back(orc_LastOwnerNodeName[u32_ItLastOwner]);
                               //The direction should not be a problem
                               orc_NewOwnerIsTxFlag.push_back(orc_LastOwnerIsTxFlag[u32_ItLastOwner]);
+
                               //The interface has to be changed to the only connected one
                               orc_NewOwnerNodeInterfaceIndex.push_back(c_InterfaceIndexes[u32_ItConnectedNode]);
+                              //The Datapool has to be changed to the matching one
+                              orc_NewOwnerNodeDatapoolIndex.push_back(c_DatapoolIndexes[u32_ItConnectedNode]);
                            }
                            //Always stop if matching node name was found
                            // (avoid match with same node and different interface!)
@@ -578,6 +619,47 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                         }
                      }
                   }
+               }
+            }
+         }
+         else
+         {
+            // Node mode
+            //Confirm last owners still valid
+            for (uint32 u32_ItLastOwner = 0UL; u32_ItLastOwner < orc_LastOwnerNodeName.size(); ++u32_ItLastOwner)
+            {
+               const QString & rc_CurName = orc_LastOwnerNodeName[u32_ItLastOwner];
+
+               if (rc_CurName.compare(pc_Node->c_Properties.c_Name.c_str()) == 0)
+               {
+                  bool q_ExactMatch = false;
+                  const C_OSCCanProtocol * const pc_Protocol =
+                     C_PuiSdHandler::h_GetInstance()->GetCanProtocol(orc_MessageId.u32_NodeIndex,
+                                                                     orc_MessageId.e_ComProtocol,
+                                                                     orc_LastOwnerNodeDatapoolIndex[u32_ItLastOwner]);
+
+                  //Match!
+                  if ((pc_Protocol != NULL) &&
+                      (orc_LastOwnerNodeDatapoolIndex[u32_ItLastOwner] < pc_Node->c_DataPools.size()))
+                  {
+                     //Exact match use same info
+                     orc_NewOwnerNodeDatapoolIndex.push_back(orc_LastOwnerNodeDatapoolIndex[u32_ItLastOwner]);
+                     //Signal stop
+                     q_ExactMatch = true;
+                  }
+                  //Only continue if change necessary -> adapt last owner!
+                  if (q_ExactMatch == false)
+                  {
+                     //The Datapool has to be changed to the matching one
+                     orc_NewOwnerNodeDatapoolIndex.push_back(orc_MessageId.u32_DatapoolIndex);
+                  }
+
+                  //node name seems to match so no change necessary
+                  orc_NewOwnerNodeName.push_back(orc_LastOwnerNodeName[u32_ItLastOwner]);
+                  //The direction should not be a problem
+                  orc_NewOwnerIsTxFlag.push_back(orc_LastOwnerIsTxFlag[u32_ItLastOwner]);
+                  // In node mode it is not relevant what the old interface index was, it is always the current one
+                  orc_NewOwnerNodeInterfaceIndex.push_back(orc_MessageId.u32_InterfaceIndex);
                }
             }
          }

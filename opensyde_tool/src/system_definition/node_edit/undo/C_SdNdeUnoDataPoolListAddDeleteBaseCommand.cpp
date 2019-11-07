@@ -54,7 +54,7 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDataPoolListAddDeleteBaseCommand(const uint32 & oru32_NodeIndex,
-                                                                                       const uint32 & oru32_DataPoolIndex, stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                                                                       const uint32 & oru32_DataPoolIndex, stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                                                                        const std::vector<uint32> & orc_Indices, const QString & orc_Text,
                                                                                        QUndoCommand * const opc_Parent)
    :

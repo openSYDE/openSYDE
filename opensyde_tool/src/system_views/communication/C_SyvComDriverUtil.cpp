@@ -14,6 +14,7 @@
 
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "C_Uti.h"
 #include "C_SyvComDriverUtil.h"
 #include "C_PuiSdHandler.h"
 
@@ -125,9 +126,15 @@ sint32 C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(const uint32 ou32_View
             else
             {
                //No CAN
-               *oppc_CanDispatcher = NULL;
 
+               // Set optional Ethernet configuration file path
+               const QString c_EthFilePath = stw_opensyde_gui_logic::C_Uti::h_GetAbsolutePathFromExe(
+                  "User/eth_config.ini");
+
+               *oppc_CanDispatcher = NULL;
                *oppc_IpDispatcher = new C_OSCIpDispatcherWinSock();
+
+               (*oppc_IpDispatcher)->LoadConfigFile(c_EthFilePath.toStdString().c_str());
             }
          }
          else

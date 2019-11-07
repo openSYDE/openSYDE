@@ -115,49 +115,58 @@ void C_SyvDcDeviceInformation::SetIpAddress(const uint8 (&orau8_IpAddress)[4])
 
 //----------------------------------------------------------------------------------------------------------------------
 
-C_SCLString C_SyvDcDeviceInformation::h_SerialNumberToString(const uint8 (&orau8_SerialNumer)[6])
-{
-   C_SCLString c_Result;
-
-   c_Result.PrintFormatted("%02X.%02X%02X%02X.%02X%02X",
-                           orau8_SerialNumer[0], orau8_SerialNumer[1], orau8_SerialNumer[2], orau8_SerialNumer[3],
-                           orau8_SerialNumer[4], orau8_SerialNumer[5]);
-   return c_Result;
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcDeviceInformation::h_SerialNumberFromStringToArray(const C_SCLString & orc_SerialNumber,
                                                                uint8 * const opu8_SerialNumer)
 {
    bool q_Return = false;
+   C_SCLString c_CompleteString;
 
-   if ((orc_SerialNumber.Length() == 14) && (opu8_SerialNumer != NULL))
+   if (opu8_SerialNumer != NULL)
    {
-      SCLDynamicArray<C_SCLString> c_Tokens;
-      //Get all numbers
-      orc_SerialNumber.Tokenize(".", c_Tokens);
-      if (c_Tokens.GetLength() == 3)
+      //format up to and including 2019. E.g: 05.123456.1001
+      if (orc_SerialNumber.Length() == 14)
       {
-         C_SCLString c_CompleteString;
-         //Combine all numbers
-         for (uint32 u32_ItCounter = 0U; u32_ItCounter < static_cast<uint32>(c_Tokens.GetLength()); ++u32_ItCounter)
+         SCLDynamicArray<C_SCLString> c_Tokens;
+         //Get all numbers
+         orc_SerialNumber.Tokenize(".", c_Tokens);
+         if (c_Tokens.GetLength() == 3)
          {
-            c_CompleteString += c_Tokens[u32_ItCounter];
-         }
-         if (c_CompleteString.Length() == 12)
-         {
-            uint32 u32_ItByte = 0U;
-            q_Return = true;
-            //For each 2 numbers assign one byte
-            for (uint32 u32_ItChar = 1U; u32_ItChar < c_CompleteString.Length(); u32_ItChar += 2)
+            //Combine all numbers
+            for (uint32 u32_ItCounter = 0U; u32_ItCounter < static_cast<uint32>(c_Tokens.GetLength()); ++u32_ItCounter)
             {
-               C_SCLString c_SubString = c_CompleteString[u32_ItChar];
-               c_SubString += c_CompleteString[static_cast<sintn>(u32_ItChar) + 1];
-               c_SubString = "0x" + c_SubString;
-               opu8_SerialNumer[u32_ItByte] = static_cast<uint8>(c_SubString.ToInt());
-               //Next byte
-               ++u32_ItByte;
+               c_CompleteString += c_Tokens[u32_ItCounter];
             }
+         }
+      }
+      //format from 2020. E.g: 200012345678
+      else if (orc_SerialNumber.Length() == 12)
+      {
+         //no convert needed
+         c_CompleteString = orc_SerialNumber;
+      }
+      else
+      {
+         //invalid format, should never happen
+         C_SCLString c_Error;
+         c_Error.PrintFormatted("Invalid serial number format. String: \"%s\".", c_CompleteString.c_str());
+         osc_write_log_error("Convert serial number string to array", c_Error);
+      }
+
+      //get bytes
+      if (c_CompleteString.Length() == 12)
+      {
+         uint32 u32_ItByte = 0U;
+         q_Return = true;
+         //For each 2 numbers assign one byte
+         for (uint32 u32_ItChar = 1U; u32_ItChar < c_CompleteString.Length(); u32_ItChar += 2)
+         {
+            C_SCLString c_SubString = c_CompleteString[u32_ItChar];
+            c_SubString += c_CompleteString[static_cast<sintn>(u32_ItChar) + 1];
+            c_SubString = "0x" + c_SubString;
+            opu8_SerialNumer[u32_ItByte] = static_cast<uint8>(c_SubString.ToInt());
+            //Next byte
+            ++u32_ItByte;
          }
       }
    }

@@ -73,24 +73,28 @@ bool C_OgeSpxDoubleToolTipBase::event(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set minimum value (simple wrapper with tool tip update)
 
-   \param[in] of64_Value New minimum value
+   \param[in] of64_Value  New minimum value
+   \param[in] orc_Display String display value for minimum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxDoubleToolTipBase::SetMinimumCustom(const stw_types::float64 of64_Value)
+void C_OgeSpxDoubleToolTipBase::SetMinimumCustom(const stw_types::float64 of64_Value, const QString & orc_Display)
 {
    this->setMinimum(of64_Value);
+   this->mc_UserMinValString = orc_Display;
    this->ActivateDefaultToolTip();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set maximum value (simple wrapper with tool tip update)
 
-   \param[in] of64_Value New maximum value
+   \param[in] of64_Value  New maximum value
+   \param[in] orc_Display String display value for maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxDoubleToolTipBase::SetMaximumCustom(const stw_types::float64 of64_Value)
+void C_OgeSpxDoubleToolTipBase::SetMaximumCustom(const stw_types::float64 of64_Value, const QString & orc_Display)
 {
    this->setMaximum(of64_Value);
+   this->mc_UserMaxValString = orc_Display;
    this->ActivateDefaultToolTip();
 }
 
@@ -113,7 +117,7 @@ bool C_OgeSpxDoubleToolTipBase::m_IsEnabled(void) const
    Minimum as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeSpxDoubleToolTipBase::m_GetMinimum(void) const
+QString C_OgeSpxDoubleToolTipBase::m_GetMinimumRawString(void) const
 {
    return QString::number(this->minimum());
 }
@@ -125,7 +129,7 @@ QString C_OgeSpxDoubleToolTipBase::m_GetMinimum(void) const
    Maximum as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeSpxDoubleToolTipBase::m_GetMaximum(void) const
+QString C_OgeSpxDoubleToolTipBase::m_GetMaximumRawString(void) const
 {
    return QString::number(this->maximum());
 }

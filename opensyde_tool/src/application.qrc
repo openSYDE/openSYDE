@@ -493,5 +493,7 @@
         <file>images/IconRevert.svg</file>
         <file>images/main_page_and_navi_bar/Icon_save_as.svg</file>
         <file>images/main_page_and_navi_bar/Icon_save_as_disabled.svg</file>
+        <file>images/system_definition/IconDataPoolSmallInactive.svg</file>
+        <file>images/CheckBoxIndeterminate.svg</file>
     </qresource>
 </RCC>

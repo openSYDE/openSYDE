@@ -16,6 +16,7 @@
 #include "ui_C_SyvDcConnectedNodeWidget.h"
 
 #include "C_Uti.h"
+#include "C_OSCUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -85,7 +86,7 @@ C_SyvDcConnectedNodeWidget::~C_SyvDcConnectedNodeWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDcConnectedNodeWidget::GetSerialNumberString(void) const
 {
-   return QString(C_SyvDcDeviceInformation::h_SerialNumberToString(this->mc_Info.au8_SerialNumber).c_str());
+   return QString(C_OSCUtils::h_SerialNumberToString(&this->mc_Info.au8_SerialNumber[0]).c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -163,7 +164,7 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
 
    if (this->mc_Info.q_SerialNumberValid == true)
    {
-      c_Name = QString(C_SyvDcDeviceInformation::h_SerialNumberToString(this->mc_Info.au8_SerialNumber).c_str());
+      c_Name = QString(C_OSCUtils::h_SerialNumberToString(&this->mc_Info.au8_SerialNumber[0]).c_str());
    }
    else
    {

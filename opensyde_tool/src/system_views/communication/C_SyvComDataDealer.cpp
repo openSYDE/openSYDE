@@ -142,7 +142,7 @@ void C_SyvComDataDealer::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
    C_RANGE     specified data pool, list, element does not exist in data pools of configured node
                protocol driver reported parameter out of range (does the protocol support the index range ?)
    C_TIMEOUT   expected response not received within timeout
-   C_NOACT     could not send request (e.g. TX buffer full)
+   C_NOACT     could not send request (e.g. Tx buffer full)
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response reveived
    C_OVERFLOW  size of data received from server does not match size of specified data pool element
@@ -180,7 +180,7 @@ sint32 C_SyvComDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uin
    C_RANGE     specified data pool, list, element does not exist in data pools of configured node
                protocol driver reported parameter out of range (does the protocol support the address range ?)
    C_TIMEOUT   expected response not received within timeout
-   C_NOACT     could not send request (e.g. TX buffer full)
+   C_NOACT     could not send request (e.g. Tx buffer full)
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response received
    C_COM       expected server response not received because of communication error
@@ -219,7 +219,7 @@ sint32 C_SyvComDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 o
    C_RD_WR     Datapool element size configuration does not match with count of read bytes
    C_CHECKSUM  Checksum of read datapool list is invalid
    C_TIMEOUT   Expected response not received within timeout
-   C_NOACT     Could not send request (e.g. TX buffer full)
+   C_NOACT     Could not send request (e.g. Tx buffer full)
    C_WARN      Error response or malformed protocol response
    C_COM       Pre-requisites not correct; e.g. driver not initialized or
                parameter out of range (checked by client side)
@@ -278,7 +278,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolI
             // Update the value
             (*c_ItWidget)->InsertNewValueIntoQueue(C_PuiSvDbNodeDataPoolListElementId(c_ElementId,
                                                                                       C_PuiSvDbNodeDataPoolListElementId
-                                                                                      ::eDATAPOOL_ELEMENT),
+                                                                                      ::eDATAPOOL_ELEMENT, false, 0UL),
                                                    c_DbContent);
          }
       }
@@ -327,7 +327,8 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_Data
             // Update the value
             (*c_ItWidget)->RegisterDataPoolElementCyclicError(C_PuiSvDbNodeDataPoolListElementId(c_ElementId,
                                                                                                  C_PuiSvDbNodeDataPoolListElementId
-                                                                                                 ::eDATAPOOL_ELEMENT),
+                                                                                                 ::eDATAPOOL_ELEMENT,
+                                                                                                 false, 0UL),
                                                               ou8_ErrorCode);
          }
       }
@@ -368,7 +369,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPo
             // Update the value
             (*c_ItWidget)->AddNewNvmValueIntoQueue(C_PuiSvDbNodeDataPoolListElementId(c_ElementId,
                                                                                       C_PuiSvDbNodeDataPoolListElementId
-                                                                                      ::eDATAPOOL_ELEMENT),
+                                                                                      ::eDATAPOOL_ELEMENT, false, 0UL),
                                                    c_DbContent);
          }
       }

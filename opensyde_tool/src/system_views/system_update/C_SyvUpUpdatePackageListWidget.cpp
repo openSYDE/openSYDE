@@ -603,16 +603,9 @@ void C_SyvUpUpdatePackageListWidget::ImportConfig(void)
    const QString c_Folder = this->m_GetDialogPath();
    const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE Update Package Configuration File")) + "(*" +
                             mhc_CONFIG_FILE_TYPE + ")";
-   QString c_FileName = "";
-
-   // do not use QFileDialog::getOpenFileName because it does not support default suffix
-   QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Import Update Package Configuration"), c_Folder, c_Filter);
-
-   c_Dialog.setDefaultSuffix(mhc_CONFIG_FILE_TYPE);
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
-   {
-      c_FileName = c_Dialog.selectedFiles().at(0); // multi-selection is not possible
-   }
+   const QString c_FileName =
+      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Import Update Package Configuration"), c_Folder,
+                                     c_Filter, "", QFileDialog::DontConfirmOverwrite);
 
    if (c_FileName != "")
    {

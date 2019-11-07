@@ -42,16 +42,16 @@ using namespace stw_types;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID          Unique ID
-   \param[in]     orc_TriggerPos    Ideal position of connector
-   \param[in]     opc_NodeItem      Start of connection at node
-   \param[in]     opc_BusItem       End of connection at bus
-   \param[in]     oq_MiddleLine     Indicator if middle line is required
-   \param[in,out] opc_Parent        Optional pointer to parent
+   \param[in]     oru64_ID       Unique ID
+   \param[in]     orc_TriggerPos Ideal position of connector
+   \param[in]     opc_NodeItem   Start of connection at node
+   \param[in]     opc_BusItem    End of connection at bus
+   \param[in]     oq_MiddleLine  Indicator if middle line is required
+   \param[in,out] opc_Parent     Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const QPointF & orc_TriggerPos,
@@ -65,7 +65,7 @@ C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const QPointF & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -96,7 +96,7 @@ C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const std::vecto
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -106,7 +106,7 @@ C_GiLiBusConnector::~C_GiLiBusConnector(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this item
+/*! \brief  Returns the type of this item
 
    \return  ID
 */
@@ -117,7 +117,7 @@ sintn C_GiLiBusConnector::type(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Context menu entry delete connection was clicked
+/*! \brief  Context menu entry delete connection was clicked
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::DeleteConnection(void)
@@ -134,7 +134,7 @@ void C_GiLiBusConnector::DeleteConnection(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set new point positions
+/*! \brief  Set new point positions
 
    \param[in] orc_ScenePos New point position set
 */
@@ -165,7 +165,7 @@ void C_GiLiBusConnector::SetPoints(const std::vector<QPointF> & orc_ScenePos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the node item
+/*! \brief  Returns the node item
 
    \return  Node item
 */
@@ -177,7 +177,7 @@ const C_GiNode * C_GiLiBusConnector::GetNodeItem(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the node item
+/*! \brief  Returns the node item
 
    \return  Node item
 */
@@ -189,7 +189,7 @@ C_GiNode * C_GiLiBusConnector::GetNodeItem(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Write current GUI layer connection information to connector class.
+/*! \brief  Write current GUI layer connection information to connector class.
 
    \param[in,out] opc_UIConnection Storage for GUI information
 */
@@ -220,7 +220,7 @@ void C_GiLiBusConnector::UpdateData(C_PuiSdNodeConnection * const opc_UIConnecti
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Generate hint to display
+/*! \brief  Generate hint to display
 
    Connection to [Bus] using [Node] Interface [Interface number]
 */
@@ -265,7 +265,7 @@ void C_GiLiBusConnector::GenerateHint(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get connection item
+/*! \brief  Get connection item
 
    \return
    Pointer to connection
@@ -286,7 +286,7 @@ const C_PuiSdNodeConnectionId * C_GiLiBusConnector::GetConnectionData(void) cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper function to change bus connector interface number
+/*! \brief  Helper function to change bus connector interface number
 
    \param[in] oru8_NewInterface New interface number
    \param[in] oru8_NodeId       New node id
@@ -304,7 +304,7 @@ void C_GiLiBusConnector::ChangeInterface(const uint8 & oru8_NewInterface, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Revert bus connection to last known node item
+/*! \brief  Revert bus connection to last known node item
 
    \param[in,out] opc_StartingNode Last known node this bus connection was connected to
    \param[in,out] opc_LastNode     New node this bus connection is currently connected to
@@ -321,7 +321,7 @@ void C_GiLiBusConnector::Revert(stw_opensyde_gui::C_GiNode * const opc_StartingN
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Connect bus connection to new node
+/*! \brief  Connect bus connection to new node
 
    \param[in,out] opc_StartingNode  Last known node this bus connection was connected to
    \param[in,out] opc_LastNode      New node to connect this bus connection to
@@ -362,7 +362,7 @@ void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_Starti
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Connect bus connection to new bus
+/*! \brief  Connect bus connection to new bus
 
    \param[in,out] opc_StartingBus   Last known bus this bus connection was connected to
    \param[in,out] opc_LastBus       New bus to connect this bus connection to
@@ -399,7 +399,7 @@ void C_GiLiBusConnector::Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current connected port
+/*! \brief  Get current connected port
 
    \return
    Current connected port item
@@ -412,7 +412,7 @@ const C_GiPort * C_GiLiBusConnector::GetPortItem(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle interaction point move
+/*! \brief  Handle interaction point move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_OnInteractionPointMove(void)
@@ -492,7 +492,7 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle generic item interaction point move item iteration
+/*! \brief  Handle generic item interaction point move item iteration
 
    Active:
    * Iteration over current scene items
@@ -559,7 +559,7 @@ void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle generic interaction point mouse release
+/*! \brief  Handle generic interaction point mouse release
 
    \param[in] orc_ScenePos Scene position
 
@@ -593,7 +593,7 @@ bool C_GiLiBusConnector::m_OnGenericInteractionPointMouseRelease(const QPointF &
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle bus change
+/*! \brief  Handle bus change
 
    \param[in] orc_ScenePos Scene position
 */
@@ -613,7 +613,7 @@ void C_GiLiBusConnector::m_OnBusChange(const QPointF & orc_ScenePos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Init connector
+/*! \brief  Init connector
 
    \param[in,out] opc_NodeItem Node to connect to
    \param[in]     orc_Pos      Position on bus
@@ -632,7 +632,7 @@ void C_GiLiBusConnector::m_InitConnector(C_GiNode * const opc_NodeItem, const QP
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle new port
+/*! \brief  Handle new port
 
    Find and save new port at position.
    Dismiss temporary port.

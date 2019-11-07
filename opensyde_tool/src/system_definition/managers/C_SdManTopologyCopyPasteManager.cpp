@@ -270,7 +270,6 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
                }
             }
             break;
-         // TODO BAY: Add further elements to copy
          default:
             break;
          }

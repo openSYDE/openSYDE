@@ -104,6 +104,7 @@ void C_CamDbOsy::FindAllMessages(void)
                   //Id
                   c_CurListId.u32_DataPoolIndex = rc_Protocol.u32_DataPoolIndex;
                   c_CurId.e_ComProtocol = rc_Protocol.e_Type;
+                  c_CurId.u32_DatapoolIndex = rc_Protocol.u32_DataPoolIndex;
                   if ((rc_Protocol.u32_DataPoolIndex < rc_Node.c_DataPools.size()) &&
                       (c_InterfaceIndexes[u32_ItFoundItem] < rc_Protocol.c_ComMessages.size()))
                   {
@@ -272,6 +273,7 @@ sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
                   //Id
                   c_CurListId.u32_DataPoolIndex = rc_Protocol.u32_DataPoolIndex;
                   c_CurId.e_ComProtocol = rc_Protocol.e_Type;
+                  c_CurId.u32_DatapoolIndex = rc_Protocol.u32_DataPoolIndex;
                   if ((rc_Protocol.u32_DataPoolIndex < rc_Node.c_DataPools.size()) &&
                       (c_InterfaceIndexes[u32_ItFoundItem] < rc_Protocol.c_ComMessages.size()))
                   {
@@ -388,7 +390,8 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamDbOsy::GetOSCMessage(const QStri
          if (c_It->u32_NodeIndex < this->mc_Data.c_OsySysDef.c_Nodes.size())
          {
             const C_OSCNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_It->u32_NodeIndex];
-            const C_OSCCanProtocol * const pc_Protocol = rc_Node.GetCANProtocolConst(c_It->e_ComProtocol);
+            const C_OSCCanProtocol * const pc_Protocol = rc_Node.GetCANProtocolConst(c_It->e_ComProtocol,
+                                                                                     c_It->u32_DatapoolIndex);
             if (pc_Protocol != NULL)
             {
                if (c_It->u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())

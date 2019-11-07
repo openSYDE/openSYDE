@@ -486,7 +486,6 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                               }
                            }
                            break;
-                        // TODO BAY: Add further elements to copy
                         default:
                            break;
                         }

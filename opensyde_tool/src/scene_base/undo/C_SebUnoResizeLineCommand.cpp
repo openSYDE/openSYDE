@@ -34,13 +34,13 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
-   \param[in,out] opc_Scene               Pointer to currently active scene
-   \param[in]     orc_IDs                 Affected unique IDs
-   \param[in]     oru8_InteractionPointID Interaction point ID
-   \param[in]     orc_PositionDifference  Position difference
-   \param[in]     opc_Parent              Optional pointer to parent
+   \param[in,out] opc_Scene                Pointer to currently active scene
+   \param[in]     orc_IDs                  Affected unique IDs
+   \param[in]     ors32_InteractionPointID Interaction point ID
+   \param[in]     orc_PositionDifference   Position difference
+   \param[in]     opc_Parent               Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoTopResizeLineCommand::C_SebUnoTopResizeLineCommand(QGraphicsScene * const opc_Scene,
@@ -55,7 +55,7 @@ C_SebUnoTopResizeLineCommand::C_SebUnoTopResizeLineCommand(QGraphicsScene * cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoTopResizeLineCommand::~C_SebUnoTopResizeLineCommand()
@@ -63,7 +63,7 @@ C_SebUnoTopResizeLineCommand::~C_SebUnoTopResizeLineCommand()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Undo move
+/*! \brief  Undo move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopResizeLineCommand::undo(void)
@@ -77,7 +77,7 @@ void C_SebUnoTopResizeLineCommand::undo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo move
+/*! \brief  Redo move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopResizeLineCommand::redo(void)
@@ -91,7 +91,7 @@ void C_SebUnoTopResizeLineCommand::redo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Undo for one item
+/*! \brief  Undo for one item
 
    \param[in,out] opc_Item Item to perform action on
 */
@@ -115,7 +115,7 @@ void C_SebUnoTopResizeLineCommand::m_UndoSingle(QGraphicsItem * const opc_Item) 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo for one item
+/*! \brief  Redo for one item
 
    \param[in,out] opc_Item Item to perform action on
 */

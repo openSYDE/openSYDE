@@ -35,7 +35,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -49,7 +49,7 @@ C_TblEditLineEditBase::C_TblEditLineEditBase(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize from value
+/*! \brief  Initialize from value
 
    Warning: this also prepares the output value type
 
@@ -64,7 +64,7 @@ void C_TblEditLineEditBase::SetFromVariant(const QVariant & orc_DisplayValue, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set minimum value from variant
+/*! \brief  Set minimum value from variant
 
    \param[in] orc_Value Edit value
 */
@@ -76,7 +76,7 @@ void C_TblEditLineEditBase::SetMinFromVariant(const QVariant & orc_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set maximum value from variant
+/*! \brief  Set maximum value from variant
 
    \param[in] orc_Value Edit value
 */
@@ -88,7 +88,7 @@ void C_TblEditLineEditBase::SetMaxFromVariant(const QVariant & orc_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get value as variant
+/*! \brief  Get value as variant
 
    Expected: same value type as input
 
@@ -108,23 +108,30 @@ sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & 
       "Only floating point numbers and integers are allowed.");
    sint32 s32_Retval = C_NO_ERR;
    bool q_Worked = false;
+   uint32 u32_Base = 10;
+
+   // handle base (hex/dec) by hand because QString::toInt(&q_Worked, 0) and Co. also handles octal what we do not want
+   if (this->text().startsWith("0x"))
+   {
+      u32_Base = 16;
+   }
 
    switch (this->me_Type)
    {
    case QVariant::Int:
-      orc_Value = this->text().toInt(&q_Worked, 0);
+      orc_Value = this->text().toInt(&q_Worked, u32_Base);
       orc_ErrorDescription = c_ErrorDescriptionInt;
       break;
    case QVariant::UInt:
-      orc_Value = this->text().toUInt(&q_Worked, 0);
+      orc_Value = this->text().toUInt(&q_Worked, u32_Base);
       orc_ErrorDescription = c_ErrorDescriptionInt;
       break;
    case QVariant::LongLong:
-      orc_Value = this->text().toLongLong(&q_Worked, 0);
+      orc_Value = this->text().toLongLong(&q_Worked, u32_Base);
       orc_ErrorDescription = c_ErrorDescriptionInt;
       break;
    case QVariant::ULongLong:
-      orc_Value = this->text().toULongLong(&q_Worked, 0);
+      orc_Value = this->text().toULongLong(&q_Worked, u32_Base);
       orc_ErrorDescription = c_ErrorDescriptionInt;
       break;
    case QVariant::Double:
@@ -195,7 +202,7 @@ sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update tooltip (for min max only!)
+/*! \brief  Update tooltip (for min max only!)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblEditLineEditBase::m_UpdateToolTip(void)
@@ -221,7 +228,7 @@ void C_TblEditLineEditBase::m_UpdateToolTip(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get string as float value (if possible)
+/*! \brief  Get string as float value (if possible)
 
    \param[in]  orc_Value  Value to transform
    \param[out] orq_Worked Output for error reporting

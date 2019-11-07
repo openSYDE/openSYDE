@@ -30,6 +30,7 @@
 #include "C_PuiSdUtil.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_OSCUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -844,7 +845,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const C_SyvDcDeviceConfiguation & o
 
       // Serial number
       orc_Text += "SN.: " +
-                  QString(C_SyvDcDeviceInformation::h_SerialNumberToString(orc_Config.au8_SerialNumber).c_str()) +
+                  QString(C_OSCUtils::h_SerialNumberToString(&orc_Config.au8_SerialNumber[0]).c_str()) +
                   "<br>";
 
       if (this->mpc_DcSequences->GetNodeIndex(c_ServerId, u32_NodeIndex) == true)
@@ -1067,7 +1068,9 @@ void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSetti
             (orc_ServerIdOnUsedBus != orc_ServerIdOnConfiguredBus))
    {
       // The interface shall not be configured, because it is not the used interface by the device configuration
-      orc_Text += QString(C_GtGetText::h_GetText(" (skipped, connected to other bus)<br>"));
+      orc_Text +=
+         QString(C_GtGetText::h_GetText(
+                    " (skipped, connected to other bus. Config Mode: Only directly connected interfaces)<br>"));
    }
    else
    {
@@ -1442,7 +1445,7 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
             c_Text += "SN.: ";
             if (rc_Info.q_SerialNumberValid == true)
             {
-               c_Text += QString(C_SyvDcDeviceInformation::h_SerialNumberToString(rc_Info.au8_SerialNumber).c_str());
+               c_Text += QString(C_OSCUtils::h_SerialNumberToString(&rc_Info.au8_SerialNumber[0]).c_str());
             }
             else
             {
@@ -2138,8 +2141,8 @@ void C_SyvDcWidget::m_Timer(void)
                for (uint32 u32_SnCounter = 0U; u32_SnCounter < c_DeviceInfo.size(); ++u32_SnCounter)
                {
                   c_Text += "Device " + QString(c_DeviceInfo[u32_SnCounter].c_DeviceName.c_str()) + ": " +
-                            QString(C_SyvDcDeviceInformation::h_SerialNumberToString(
-                                       c_DeviceInfo[u32_SnCounter].au8_SerialNumber).c_str()) + "\n";
+                            QString(C_OSCUtils::h_SerialNumberToString(
+                                       &c_DeviceInfo[u32_SnCounter].au8_SerialNumber[0]).c_str()) + "\n";
                   this->mc_FoundDevices.push_back(c_DeviceInfo[u32_SnCounter]);
                }
 
@@ -2192,8 +2195,8 @@ void C_SyvDcWidget::m_Timer(void)
                for (uint32 u32_SnCounter = 0U; u32_SnCounter < c_DeviceInfo.size(); ++u32_SnCounter)
                {
                   c_Text += "Device " + QString(c_DeviceInfo[u32_SnCounter].c_DeviceName.c_str()) + ": " +
-                            QString(C_SyvDcDeviceInformation::h_SerialNumberToString(c_DeviceInfo[u32_SnCounter].
-                                                                                     au8_SerialNumber).c_str()) +
+                            QString(C_OSCUtils::h_SerialNumberToString(&c_DeviceInfo[u32_SnCounter].
+                                                                       au8_SerialNumber[0]).c_str()) +
                             "\n";
 
                   this->mc_FoundDevices.push_back(c_DeviceInfo[u32_SnCounter]);
@@ -2408,9 +2411,7 @@ void C_SyvDcWidget::m_HandleMissingDevices(const std::vector<C_SyvDcDeviceConfig
       if (q_Found == false)
       {
          orc_ReportText += "<b>" + QString(C_GtGetText::h_GetText("SN.: %1")).arg(
-            QString(C_SyvDcDeviceInformation::h_SerialNumberToString(
-                       rc_ExpectedDevice.au8_SerialNumber).c_str())) +
-                           "</b><br/>";
+            QString(C_OSCUtils::h_SerialNumberToString(&rc_ExpectedDevice.au8_SerialNumber[0]).c_str())) + "</b><br/>";
       }
    }
 }

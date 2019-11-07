@@ -17,8 +17,8 @@
 #include "TGLUtils.h"
 #include "C_SdNdeUnoAedDataPoolListManager.h"
 #include "C_SdNdeUnoAedDataPoolListDataChangeCommand.h"
-#include "C_SdNdeDataPoolListTableView.h"
-#include "C_SdNdeDataPoolListTableModel.h"
+#include "C_SdNdeDpListTableView.h"
+#include "C_SdNdeDpListTableModel.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -66,8 +66,8 @@ void C_SdNdeUnoAedDataPoolListManager::DoDataChangeElements(const uint32 & oru32
                                                             const uint32 & oru32_DataPoolIndex,
                                                             const uint32 & oru32_ListIndex,
                                                             const uint32 & oru32_ElementIndex,
-                                                            const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType, const uint32 & oru32_DataSetIndex, const uint32 & oru32_ArrayElementIndex, const QVariant & orc_NewData,
-                                                            C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager)
+                                                            const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType, const uint32 & oru32_DataSetIndex, const uint32 & oru32_ArrayElementIndex, const QVariant & orc_NewData,
+                                                            C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager)
 {
    QUndoCommand * pc_Command;
 

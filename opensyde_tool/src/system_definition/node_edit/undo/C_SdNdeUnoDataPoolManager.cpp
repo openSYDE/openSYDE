@@ -15,7 +15,7 @@
 #include "stwtypes.h"
 #include "C_SdNdeUnoDataPoolManager.h"
 #include "C_SdNdeUnoDataPoolListMoveCommand.h"
-#include "C_SdNdeDataPoolListsTreeWidget.h"
+#include "C_SdNdeDpListsTreeWidget.h"
 #include "C_SdNdeUnoDataPoolListDeleteCommand.h"
 #include "C_SdNdeUnoDataPoolListPasteCommand.h"
 #include "C_SdNdeUnoDataPoolListAddCommand.h"
@@ -71,7 +71,7 @@ C_SdNdeUnoDataPoolManager::~C_SdNdeUnoDataPoolManager(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoMoveList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                           C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                           C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                            const std::vector<uint32> & oru32_StartIndices,
                                            const std::vector<uint32> & oru32_TargetIndices)
 {
@@ -98,7 +98,7 @@ void C_SdNdeUnoDataPoolManager::DoMoveList(const uint32 & oru32_NodeIndex, const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoDeleteList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                             stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                             stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                              const std::vector<uint32> & orc_Indices)
 {
    if (orc_Indices.size() > 0)
@@ -133,7 +133,7 @@ void C_SdNdeUnoDataPoolManager::DoDeleteList(const uint32 & oru32_NodeIndex, con
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoPaste(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                        C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                        C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                         const uint32 & oru32_InsertListIndex)
 {
    C_SdNdeUnoDataPoolListPasteCommand * const pc_PasteCommand = new C_SdNdeUnoDataPoolListPasteCommand(oru32_NodeIndex,
@@ -162,7 +162,7 @@ void C_SdNdeUnoDataPoolManager::DoPaste(const uint32 & oru32_NodeIndex, const ui
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoAddList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                          stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                          stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                           const std::vector<uint32> & orc_Indices)
 {
    if (orc_Indices.size() > 0)
@@ -188,8 +188,8 @@ void C_SdNdeUnoDataPoolManager::DoAddList(const uint32 & oru32_NodeIndex, const 
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoChangeListData(const uint32 & oru32_NodeIndex,     const uint32 & oru32_DataPoolIndex,
-                                                 stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget, const uint32 & oru32_DataPoolListIndex, const QVariant & orc_NewData,
-                                                 const C_SdNdeDataPoolUtil::E_ListDataChangeType & ore_DataChangeType)
+                                                 stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget, const uint32 & oru32_DataPoolListIndex, const QVariant & orc_NewData,
+                                                 const C_SdNdeDpUtil::E_ListDataChangeType & ore_DataChangeType)
 {
    C_SdNdeUnoDataPoolListDataChangeCommand * const pc_DataChangeCommand =
       new C_SdNdeUnoDataPoolListDataChangeCommand(

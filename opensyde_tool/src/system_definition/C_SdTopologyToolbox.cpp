@@ -222,14 +222,8 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
          {
             const C_OSCDeviceDefinition & rc_Device = c_Devices[u32_ItDevice];
             const QString c_DeviceName = rc_Device.c_DeviceName.c_str();
-            const QString c_NVM =
-               rc_Device.q_ProgrammingSupport ? QString(C_GtGetText::h_GetText("NVM-Size: %1 Bytes")).arg(
-                  rc_Device.u32_UserEepromSizeBytes) : "";
             //Tooltip
-            const QString c_DeviceDescription = QString(rc_Device.c_DeviceDescription.c_str()) + "\n \n" +
-                                                QString(C_GtGetText::h_GetText("Available buses: CAN=%1, Ethernet=%2\n"))
-                                                .arg(rc_Device.u8_NumCanBusses).arg(rc_Device.u8_NumEthernetBusses) +
-                                                c_NVM;
+            const QString c_DeviceDescription = QString(rc_Device.c_DeviceDescription.c_str());
             pc_List->addItem(rc_Device.GetDisplayName().c_str());
             pc_Item = pc_List->item(pc_List->count() - 1);
             pc_Item->setData(msn_USER_ROLE_ADDITIONAL_INFORMATION, c_DeviceName);

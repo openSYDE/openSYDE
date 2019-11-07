@@ -972,15 +972,17 @@ p, li { white-space: pre-wrap; }
  <tabstops>
   <tabstop>pc_LineEditName</tabstop>
   <tabstop>pc_TedComment</tabstop>
-  <tabstop>pc_LeCanIdStart</tabstop>
-  <tabstop>pc_LeCanIdEnd</tabstop>
-  <tabstop>pc_PushButtonSave</tabstop>
-  <tabstop>pc_PushButtonCancel</tabstop>
   <tabstop>pc_PubAddItem</tabstop>
   <tabstop>pc_TableView</tabstop>
   <tabstop>pc_ComboBoxType</tabstop>
+  <tabstop>pc_RabStop</tabstop>
+  <tabstop>pc_RabPass</tabstop>
+  <tabstop>pc_LeCanIdStart</tabstop>
+  <tabstop>pc_LeCanIdEnd</tabstop>
   <tabstop>pc_CheckBoxExtended</tabstop>
   <tabstop>pc_PubAddFromDatabase</tabstop>
+  <tabstop>pc_PushButtonSave</tabstop>
+  <tabstop>pc_PushButtonCancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

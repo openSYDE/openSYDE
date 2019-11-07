@@ -20,7 +20,7 @@
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
 #include "C_OgeSpxDoubleAutoFix.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -156,7 +156,7 @@ void C_OgeSpxDoubleAutoFix::m_Init(void)
    sint32 s32_DecimalsFactor;
    sint32 s32_DecimalsOffset;
 
-   C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(this->mc_UnscaledMin, c_Tmp);
+   C_SdNdeDpContentUtil::h_GetValuesAsFloat64(this->mc_UnscaledMin, c_Tmp);
    if (this->mu32_Index < c_Tmp.size())
    {
       this->mf64_ScaledMin = C_OSCUtils::h_GetValueScaled(c_Tmp[this->mu32_Index], this->mf64_Factor,
@@ -167,7 +167,7 @@ void C_OgeSpxDoubleAutoFix::m_Init(void)
       this->mf64_ScaledMin = 0.0;
       tgl_assert(false);
    }
-   C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(this->mc_UnscaledMax, c_Tmp);
+   C_SdNdeDpContentUtil::h_GetValuesAsFloat64(this->mc_UnscaledMax, c_Tmp);
    if (this->mu32_Index < c_Tmp.size())
    {
       this->mf64_ScaledMax = C_OSCUtils::h_GetValueScaled(c_Tmp[this->mu32_Index], this->mf64_Factor,

@@ -32,7 +32,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
 */
@@ -48,7 +48,7 @@ C_CamGenSigTableDelegate::C_CamGenSigTableDelegate(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten set editor data event slot
+/*! \brief  Overwritten set editor data event slot
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
@@ -71,7 +71,7 @@ void C_CamGenSigTableDelegate::setEditorData(QWidget * const opc_Editor, const Q
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Create generic combo box interaction element
+/*! \brief  Create generic combo box interaction element
 
    \param[in,out] opc_Parent Optional pointer to parent
 
@@ -85,7 +85,7 @@ C_OgeCbxTableBase * C_CamGenSigTableDelegate::m_CreateComboBox(QWidget * const o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle delayed widget selection clear
+/*! \brief  Handle delayed widget selection clear
 
    \param[in,out] opc_Widget Widget to clear the selection for
 */

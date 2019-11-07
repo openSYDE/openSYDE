@@ -171,7 +171,6 @@ void C_NagMainWidget::InitText(void) const
    this->mpc_Ui->pc_BtnSaveProj->setText(C_GtGetText::h_GetText("Save Project"));
    this->mpc_Ui->pc_BtnSaveProjAs->setText(C_GtGetText::h_GetText("Save Project As"));
    this->mpc_Ui->pc_LabelCurProjTitle->setText(C_GtGetText::h_GetText("Current Project"));
-   this->mpc_Ui->pc_LabRecentProjects->setText(C_GtGetText::h_GetText("Recent Projects"));
    this->mpc_Ui->pc_LabelNoRecentProj->setText(C_GtGetText::h_GetText(
                                                   "No recent projects found, use \"Open Project\"."));
    this->mpc_Ui->pc_GroupBoxNoRecentProj->setTitle("");
@@ -294,12 +293,15 @@ void C_NagMainWidget::UpdateRecentProjects(void)
    }
    if (c_Files.size() > 0)
    {
+      this->mpc_Ui->pc_LabRecentProjects->setText(
+         QString(C_GtGetText::h_GetText("Recent Projects (%1)")).arg(c_Files.size()));
       this->mpc_Ui->pc_GroupBoxNoRecentProj->setVisible(false);
       this->mpc_Ui->pc_TableView->setVisible(true);
       this->mpc_Ui->pc_TableView->UpdateData(c_Files, c_Projects);
    }
    else
    {
+      this->mpc_Ui->pc_LabRecentProjects->setText(C_GtGetText::h_GetText("Recent Projects"));
       this->mpc_Ui->pc_GroupBoxNoRecentProj->setVisible(true);
       this->mpc_Ui->pc_TableView->setVisible(false);
    }

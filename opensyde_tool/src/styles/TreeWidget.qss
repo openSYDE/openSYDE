@@ -1,6 +1,6 @@
 /* --------------------------------------------------------------------- */
 stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget,
-stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget,
+stw_opensyde_gui--C_SdNdeDpListsTreeWidget,
 stw_opensyde_gui--C_SyvDaItPaListTreeWidget,
 stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch,
 stw_opensyde_gui--C_TblTreDataElementView,
@@ -17,7 +17,7 @@ margin-right: 10px;
 
 stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:!has-children,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:!has-children,
-stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget::item:!has-children,
+stw_opensyde_gui--C_SdNdeDpListsTreeWidget::item:!has-children,
 stw_opensyde_gui--C_TblTreDataElementView::item,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::item
 {
@@ -33,14 +33,14 @@ margin-bottom: 3px;
 
 stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:has-children,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:has-children,
-stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget::item:has-children
+stw_opensyde_gui--C_SdNdeDpListsTreeWidget::item:has-children
 {
 margin-bottom: 1px;
 }
 
 stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:has-children,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:has-children,
-stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget::item:has-children
+stw_opensyde_gui--C_SdNdeDpListsTreeWidget::item:has-children
 {
 border-style: solid;
 border-width: 1px;

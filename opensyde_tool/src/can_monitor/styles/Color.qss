@@ -37,7 +37,6 @@ stw_opensyde_gui--C_CamMosFilterTableView QHeaderView::section,
 stw_opensyde_gui_elements--C_CamOgePubProjOp,
 stw_opensyde_gui_elements--C_CamOgeTobRecentProjects,
 stw_opensyde_gui_elements--C_CamOgePubAbout,
-QAbstractItemView[View="CompleterDark"]::item,
 stw_opensyde_gui_elements--C_CamOgeCbxDark QListView::item
 {
 background-color:transparent;
@@ -63,8 +62,6 @@ stw_opensyde_gui_elements--C_OgeLeDark,
 stw_opensyde_gui_elements--C_CamOgeLeFilePath,
 stw_opensyde_gui_elements--C_CamOgeCbxDark QListView::item,
 stw_opensyde_gui_elements--C_CamOgeCbxDark,
-QAbstractItemView[View="CompleterDark"],
-QAbstractItemView[View="CompleterDark"]::item,
 stw_opensyde_gui_elements--C_OgeMuSections::item,
 stw_opensyde_gui_elements--C_OgeMuSections QLabel,
 stw_opensyde_gui_elements--C_OgePubDialog:enabled,
@@ -182,8 +179,6 @@ stw_opensyde_gui_elements--C_OgePubConfigure:enabled:hover
 background-color:rgb(42, 42, 91);
 }
 
-QAbstractItemView[View="CompleterDark"]::item:hover,
-QAbstractItemView[View="CompleterDark"]::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgeMuSections::item:selected,
 stw_opensyde_gui_elements--C_CamOgeCbxDark QListView::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgePubCancel:enabled,
@@ -272,7 +267,6 @@ stw_opensyde_gui_elements--C_OgeLeDark,
 stw_opensyde_gui_elements--C_CamOgeLeFilePath,
 stw_opensyde_gui_elements--C_CamOgePubDarkBrowse,
 stw_opensyde_gui_elements--C_CamOgePubPathVariables,
-QAbstractItemView[View="CompleterDark"],
 stw_opensyde_gui_elements--C_OgeMuSections,
 stw_opensyde_gui_elements--C_CamOgeCbxDark,
 stw_opensyde_gui_elements--C_CamOgeCbxDark QListView
@@ -673,7 +667,6 @@ stw_opensyde_gui_elements--C_OgeLeDark,
 stw_opensyde_gui_elements--C_CamOgeLeFilePath,
 stw_opensyde_gui_elements--C_CamOgePubDarkBrowse,
 stw_opensyde_gui_elements--C_CamOgePubPathVariables,
-QAbstractItemView[View="CompleterDark"],
 stw_opensyde_gui_elements--C_OgeMuSections,
 stw_opensyde_gui_elements--C_CamOgeCbxDark,
 stw_opensyde_gui_elements--C_CamOgeCbxDark QListView
@@ -741,8 +734,6 @@ border-color:rgb(146, 146, 194);
 
 /* --------------------------------------------------------------------- */
 /* CAN Monitor specific color 106 */
-QAbstractItemView[View="CompleterDark"]::item:hover,
-QAbstractItemView[View="CompleterDark"]::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgeMuSections::item:selected,
 stw_opensyde_gui_elements--C_CamOgeCbxDark QListView::item:hover,
 stw_opensyde_gui_elements--C_CamOgeCbxDark QListView::item:selected:!hover

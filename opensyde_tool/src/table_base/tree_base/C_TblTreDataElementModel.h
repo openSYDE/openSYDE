@@ -45,16 +45,15 @@ public:
    void InitSD(const stw_types::uint32 ou32_NodeIndex, const stw_types::sint32 os32_SkipApplicationIndex,
                const std::vector<stw_types::uint32> & orc_UsedDataPoolIndicesIndex);
    void InitSV(const stw_types::uint32 ou32_ViewIndex, const E_Mode oe_Mode, const bool oq_ShowOnlyWriteElements,
-               const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
+               const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues);
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> GetDataElements(
       const QModelIndex & orc_Index)
    const;
    static void h_CleanUp(void);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-   // Basic functionality:
-   //lint -e{1735} Suppression, because default parameters are identical
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
+   // and default parameters are identical.
+   //lint -save -e1960 -e1735
    virtual stw_types::sintn columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    //lint -restore
 
@@ -91,6 +90,8 @@ private:
    static const QString mhc_AdditionalDataPoolInfo;
    static const QString mhc_AdditionalWriteOnlyInfo;
    static const QString mhc_AdditionalArrayInfo;
+   static const QString mhc_AdditionalArrayStringInfo;
+   static const QString mhc_AdditionalArrayIndexInfo;
    static const QString mhc_Additional64BitInfo;
 
    void m_ClearSyncManagers(void);
@@ -101,13 +102,22 @@ private:
    void m_InitBusSignal(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                         const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
    void m_InitDatapoolElement(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
-                              const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
+                              const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
+                              const bool oq_Show64BitValues);
    void m_UpdateDatapoolElement(const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
-                                const bool oq_Show64BitValues);
+                                const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues);
    static void mh_ConfigureDatapoolElement(const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
-                                           const bool oq_Show64BitValues,
+                                           const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
                                            const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_Element,
-                                           C_TblTreItem * const opc_ElementItem);
+                                           C_TblTreItem * const opc_ElementItem, const bool oq_IsString);
+   static void mh_ConfigureDatapoolArrayElement(const bool oq_ShowOnlyWriteElements,
+                                                const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
+                                                const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_Element,
+                                                C_TblTreItem * const opc_ArrayItem, const stw_types::uint32 ou32_Index);
+   static void mh_CreateOrUpdateArrayElementNodes(const bool oq_ShowOnlyWriteElements,
+                                                  const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
+                                                  const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_Element,
+                                                  const bool oq_IsStringElement, C_TblTreItem * const opc_ElementItem);
    void m_InitNvmList(const stw_types::uint32 ou32_ViewIndex);
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> m_GetBusSignals(
       const QModelIndex & orc_Index)

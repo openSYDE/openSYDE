@@ -33,7 +33,7 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -46,11 +46,11 @@ C_SebStyle::C_SebStyle(QStyle * const opc_Style) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten draw control
+/*! \brief  Overwritten draw control
 
    Here: Draw custom rubber band
 
-   \param[in]     oc_Element  Control type
+   \param[in]     oe_Element  Control type
    \param[in]     opc_Option  Drawing options
    \param[in,out] opc_Painter Used painter
    \param[in,out] opc_Widget  Widget to draw in

@@ -97,6 +97,12 @@ C_CamMosWidget::C_CamMosWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_PbFilter, &C_CamOgePubSettingsAdd::toggled, this, &C_CamMosWidget::m_ShowPopupFilter);
    connect(this->mpc_Ui->pc_PbLogging, &C_CamOgePubSettingsAdd::toggled, this, &C_CamMosWidget::m_ShowPopupLogging);
 
+   // connect hide signal of widgets
+   connect(this->mpc_Ui->pc_WiDatabase, &C_CamMosDatabaseWidget::SigHide, this, &C_CamMosWidget::m_HidePopupDatabase);
+   connect(this->mpc_Ui->pc_WiDllConfig, &C_CamMosDllWidget::SigHide, this, &C_CamMosWidget::m_HidePopupDllConfig);
+   connect(this->mpc_Ui->pc_WiFilter, &C_CamMosFilterWidget::SigHide, this, &C_CamMosWidget::m_HidePopupFilter);
+   connect(this->mpc_Ui->pc_WiLogging, &C_CamMosLoggingWidget::SigHide, this, &C_CamMosWidget::m_HidePopupLogging);
+
    // expand collapse section
    connect(this->mpc_Ui->pc_WiTitle, &C_CamOgeWiSectionHeader::SigExpandSection,
            this, &C_CamMosWidget::m_OnExpandSettings);
@@ -294,25 +300,27 @@ void C_CamMosWidget::ExpandSettings(const bool oq_Expand) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::moveEvent(QMoveEvent * const opc_Event)
 {
+   QPoint c_Point;
+
    if (this->mpc_PopupDatabase->isVisible() == true)
    {
-      this->mpc_PopupDatabase->DoMove(
-         this->mpc_Ui->pc_PbDatabase->mapToGlobal(this->mpc_Ui->pc_PbDatabase->rect().topLeft()));
+      c_Point = this->m_GetPopupMovePoint(this->mpc_Ui->pc_PbDatabase);
+      this->mpc_PopupDatabase->DoMove(c_Point);
    }
    else if (this->mpc_PopupDllConfig->isVisible() == true)
    {
-      this->mpc_PopupDllConfig->DoMove(
-         this->mpc_Ui->pc_PbDllConfig->mapToGlobal(this->mpc_Ui->pc_PbDllConfig->rect().topLeft()));
+      c_Point = this->m_GetPopupMovePoint(this->mpc_Ui->pc_PbDllConfig);
+      this->mpc_PopupDllConfig->DoMove(c_Point);
    }
    else if (this->mpc_PopupFilter->isVisible() == true)
    {
-      this->mpc_PopupFilter->DoMove(
-         this->mpc_Ui->pc_PbFilter->mapToGlobal(this->mpc_Ui->pc_PbFilter->rect().topLeft()));
+      c_Point = this->m_GetPopupMovePoint(this->mpc_Ui->pc_PbFilter);
+      this->mpc_PopupFilter->DoMove(c_Point);
    }
    else if (this->mpc_PopupLogging->isVisible() == true)
    {
-      this->mpc_PopupLogging->DoMove(
-         this->mpc_Ui->pc_PbLogging->mapToGlobal(this->mpc_Ui->pc_PbLogging->rect().topLeft()));
+      c_Point = this->m_GetPopupMovePoint(this->mpc_Ui->pc_PbLogging);
+      this->mpc_PopupLogging->DoMove(c_Point);
    }
    else
    {
@@ -394,6 +402,42 @@ void C_CamMosWidget::m_OnExpandSettings(const bool oq_Expand)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide database popup.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosWidget::m_HidePopupDatabase(void) const
+{
+   this->mpc_Ui->pc_PbDatabase->setChecked(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide CAN DLL configuration popup.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosWidget::m_HidePopupDllConfig(void) const
+{
+   this->mpc_Ui->pc_PbDllConfig->setChecked(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide filter popup.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosWidget::m_HidePopupFilter(void) const
+{
+   this->mpc_Ui->pc_PbFilter->setChecked(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide logging popup.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosWidget::m_HidePopupLogging(void) const
+{
+   this->mpc_Ui->pc_PbLogging->setChecked(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show database popup.
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -401,8 +445,7 @@ void C_CamMosWidget::m_ShowPopupDatabase(const bool oq_Checked)
 {
    if (oq_Checked == true)
    {
-      this->mpc_PopupDatabase->Show(
-         this->mpc_Ui->pc_PbDatabase->mapToGlobal(this->mpc_Ui->pc_PbDatabase->rect().topLeft()));
+      this->m_ShowPopup(this->mpc_PopupDatabase, this->mpc_Ui->pc_PbDatabase);
 
       // hide all other popups
       this->mpc_Ui->pc_PbDllConfig->setChecked(false);
@@ -423,8 +466,7 @@ void C_CamMosWidget::m_ShowPopupDllConfig(const bool oq_Checked)
 {
    if (oq_Checked == true)
    {
-      this->mpc_PopupDllConfig->Show(
-         this->mpc_Ui->pc_PbDllConfig->mapToGlobal(this->mpc_Ui->pc_PbDllConfig->rect().topLeft()));
+      this->m_ShowPopup(this->mpc_PopupDllConfig, this->mpc_Ui->pc_PbDllConfig);
 
       // hide all other popups
       this->mpc_Ui->pc_PbDatabase->setChecked(false);
@@ -444,8 +486,7 @@ void C_CamMosWidget::m_ShowPopupFilter(const bool oq_Checked)
 {
    if (oq_Checked == true)
    {
-      this->mpc_PopupFilter->Show(
-         this->mpc_Ui->pc_PbFilter->mapToGlobal(this->mpc_Ui->pc_PbFilter->rect().topLeft()));
+      this->m_ShowPopup(this->mpc_PopupFilter, this->mpc_Ui->pc_PbFilter);
 
       // hide all other popups
       this->mpc_Ui->pc_PbDatabase->setChecked(false);
@@ -465,8 +506,7 @@ void C_CamMosWidget::m_ShowPopupLogging(const bool oq_Checked)
 {
    if (oq_Checked == true)
    {
-      this->mpc_PopupLogging->Show(
-         this->mpc_Ui->pc_PbLogging->mapToGlobal(this->mpc_Ui->pc_PbLogging->rect().topLeft()));
+      this->m_ShowPopup(this->mpc_PopupLogging, this->mpc_Ui->pc_PbLogging);
 
       // hide all other popups
       this->mpc_Ui->pc_PbDatabase->setChecked(false);
@@ -477,6 +517,43 @@ void C_CamMosWidget::m_ShowPopupLogging(const bool oq_Checked)
    {
       this->mpc_PopupLogging->setVisible(false);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show an popup
+
+   \param[in]       opc_Popup    Specific popup widget
+   \param[in]       opc_Button   Specific button as start point
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosWidget::m_ShowPopup(C_CamMosSectionPopup * const opc_Popup,
+                                 const C_CamOgePubSettingsAdd * const opc_Button) const
+{
+   const QPoint c_Point = this->m_GetPopupMovePoint(opc_Button);
+
+   opc_Popup->Show(c_Point);
+   //lint -e{429}  no memory leak because opc_Popup points to instances which are freed in destructor
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the point for the DoMove function of C_CamMosSectionPopup
+
+   \param[in]       opc_Button   Specific button as start point
+
+   \return
+   Point for DoMove function on parent of splitter widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QPoint C_CamMosWidget::m_GetPopupMovePoint(const C_CamOgePubSettingsAdd * const opc_Button) const
+{
+   // Position of button in C_CamMosWidget widget
+   const QPoint c_Settings = opc_Button->mapToParent(opc_Button->rect().topLeft());
+   // Position on splitter level
+   const QPoint c_Splitter = this->mapToParent(c_Settings);
+   // Position on parent of splitter
+   const QPoint c_TopWidget = this->parentWidget()->mapToParent(c_Splitter);
+
+   return c_TopWidget;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

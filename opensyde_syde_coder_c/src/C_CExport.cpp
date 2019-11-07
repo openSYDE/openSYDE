@@ -101,7 +101,7 @@ void C_CExport::m_PrintBanner(void)
    std::cout << " ___/ /  / / /_/ / /___   / /___/ /_/ / /_/ /  __/ /     / /___\n";
    std::cout << "/____/  /_/_____/_____/   \\____/\\____/\\__,_/\\___/_/      \\____/\n";
    std::cout << "\n";
-   std::cout << "openSYDE connector for Code Generation in \"C\"\n";
+   std::cout << "openSYDE connector for Code Generation in \"C\"" << &std::endl;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

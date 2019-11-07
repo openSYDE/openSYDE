@@ -35,7 +35,7 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Scene         Pointer to currently active scene
    \param[in]     orc_IDs           Affected unique IDs
@@ -55,7 +55,7 @@ C_SebUnoBendPointBaseCommand::C_SebUnoBendPointBaseCommand(QGraphicsScene * cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBendPointBaseCommand::~C_SebUnoBendPointBaseCommand()
@@ -63,7 +63,7 @@ C_SebUnoBendPointBaseCommand::~C_SebUnoBendPointBaseCommand()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete bend point
+/*! \brief  Delete bend point
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBendPointBaseCommand::m_DeleteBend(void)
@@ -89,7 +89,7 @@ void C_SebUnoBendPointBaseCommand::m_DeleteBend(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add bend point
+/*! \brief  Add bend point
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBendPointBaseCommand::m_AddBend(void)

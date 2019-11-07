@@ -49,8 +49,6 @@ public:
                    const stw_types::sint32 os32_Flag) const;
    stw_types::sintn GetTabIndex(void) const;
 
-   const Ui::C_SdBueBusEditWidget * GetUiWidget() const;
-
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

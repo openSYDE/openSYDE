@@ -40,12 +40,12 @@ using namespace stw_opensyde_gui_elements;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent           Reference to parent
-   \param[in]     ou32_MessageIndex    Index of message the key belongs to
+   \param[in,out] orc_Parent        Reference to parent
+   \param[in]     ou32_MessageIndex Index of message the key belongs to
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenKeySelect::C_CamGenKeySelect(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
@@ -96,7 +96,7 @@ C_CamGenKeySelect::C_CamGenKeySelect(stw_opensyde_gui_elements::C_OgePopUpDialog
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenKeySelect::~C_CamGenKeySelect(void)
@@ -105,7 +105,7 @@ C_CamGenKeySelect::~C_CamGenKeySelect(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize all displayed static names
+/*! \brief  Initialize all displayed static names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenKeySelect::InitStaticNames(void) const
@@ -122,7 +122,7 @@ void C_CamGenKeySelect::InitStaticNames(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten key press event slot
+/*! \brief  Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
@@ -155,7 +155,7 @@ void C_CamGenKeySelect::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of Ok button click
+/*! \brief  Slot of Ok button click
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenKeySelect::m_OkClicked(void)
@@ -168,7 +168,7 @@ void C_CamGenKeySelect::m_OkClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of Cancel button click
+/*! \brief  Slot of Cancel button click
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenKeySelect::m_CancelClicked(void)
@@ -177,7 +177,7 @@ void C_CamGenKeySelect::m_CancelClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load data from handler
+/*! \brief  Load data from handler
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenKeySelect::m_LoadData(void) const

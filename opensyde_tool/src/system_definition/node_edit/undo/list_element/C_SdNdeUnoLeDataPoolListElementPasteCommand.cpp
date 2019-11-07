@@ -20,7 +20,7 @@
 #include "constants.h"
 #include "C_GtGetText.h"
 #include "C_OgeWiCustomMessage.h"
-#include "C_SdNdeDataPoolListTableView.h"
+#include "C_SdNdeDpListTableView.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -53,7 +53,7 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementPasteCommand::C_SdNdeUnoLeDataPoolListElementPasteCommand(const uint32 & oru32_NodeIndex,
-                                                                                         const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                                                                         const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
                                                                                          QUndoCommand * const opc_Parent)
    :
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,

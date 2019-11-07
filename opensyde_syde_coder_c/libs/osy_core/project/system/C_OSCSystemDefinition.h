@@ -19,6 +19,7 @@
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "C_OSCDeviceManager.h"
+#include "C_OSCCanProtocol.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -66,13 +67,11 @@ public:
                                        const bool oq_IgnoreMessageDirection = false) const;
    void GetNodeIndexesOfBus(const stw_types::uint32 ou32_BusIndex, std::vector<stw_types::uint32> & orc_NodeIndexes,
                             std::vector<stw_types::uint32> & orc_InterfaceIndexes) const;
-   void GetMessageReceiversIndices(const stw_types::uint32 ou32_BusIndex, const stw_scl::C_SCLString & orc_MessageName,
-                                   std::vector<stw_types::uint32> & orc_NodeIndices,
-                                   std::vector<stw_types::uint32> & orc_InterfaceIndices) const;
-   void GetMessageTransmittersIndices(const stw_types::uint32 ou32_BusIndex,
-                                      const stw_scl::C_SCLString & orc_MessageName,
-                                      std::vector<stw_types::uint32> & orc_NodeIndices,
-                                      std::vector<stw_types::uint32> & orc_InterfaceIndices) const;
+   void GetNodeAndComDpIndexesOfBus(const stw_types::uint32 ou32_BusIndex,
+                                    const C_OSCCanProtocol::E_Type & ore_ComProtocol,
+                                    std::vector<stw_types::uint32> & orc_NodeIndexes,
+                                    std::vector<stw_types::uint32> & orc_InterfaceIndexes,
+                                    std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;
 
    void AddNode(C_OSCNode & orc_Node);
 
@@ -85,6 +84,12 @@ private:
                                        const stw_types::uint32 ou32_DataPoolIndex) const;
    stw_types::uint32 m_GetRelatedProtocolHash(const stw_types::uint32 ou32_NodeIndex,
                                               const stw_types::uint32 ou32_DataPoolIndex) const;
+
+   void m_GetNodeAndComDpIndexesOfBus(const stw_types::uint32 ou32_BusIndex,
+                                      const C_OSCCanProtocol::E_Type * const ope_ComProtocol,
+                                      std::vector<stw_types::uint32> & orc_NodeIndexes,
+                                      std::vector<stw_types::uint32> & orc_InterfaceIndexes,
+                                      std::vector<stw_types::uint32> * const opc_DatapoolIndexes) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

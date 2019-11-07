@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
 */
@@ -53,7 +53,7 @@ C_TblViewInteraction::C_TblViewInteraction(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse move event slot
+/*! \brief  Overwritten mouse move event slot
 
    Here: handle mouse cursor changes
 
@@ -67,7 +67,7 @@ void C_TblViewInteraction::mouseMoveEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten event slot
+/*! \brief  Overwritten event slot
 
    Here: handle mouse cursor changes
 
@@ -105,7 +105,7 @@ bool C_TblViewInteraction::event(QEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten event filter slot
+/*! \brief  Overwritten event filter slot
 
    Here: handle mouse cursor changes
 
@@ -130,7 +130,7 @@ bool C_TblViewInteraction::eventFilter(QObject * const opc_Object, QEvent * cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle global position change
+/*! \brief  Handle global position change
 
    \param[in] orc_GlobalPos Global position
 */
@@ -174,7 +174,7 @@ void C_TblViewInteraction::m_HandleGlobalMousePos(const QPoint & orc_GlobalPos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check clicked item
+/*! \brief  Check clicked item
 
    \param[in] orc_Index Clicked item index
 */

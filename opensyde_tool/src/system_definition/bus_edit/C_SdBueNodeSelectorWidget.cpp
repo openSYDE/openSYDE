@@ -22,7 +22,6 @@
 
 #include "C_OSCNode.h"
 #include "C_OSCSystemBus.h"
-#include "C_OSCNodeDataPool.h"
 #include "C_PuiSdHandler.h"
 #include "C_GtGetText.h"
 #include "C_SdUtil.h"
@@ -172,12 +171,13 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
 
          if (pc_Node != NULL)
          {
-            // get the datapool
-            const C_OSCNodeDataPool * const pc_DataPool = pc_Node->GetComDataPoolConst(oe_Protocol);
-            const C_OSCCanProtocol * const pc_Protcol = pc_Node->GetCANProtocolConst(oe_Protocol);
+            // get the protocols
+            std::vector<const C_OSCCanProtocol *> c_Protocols = pc_Node->GetCANProtocolsConst(oe_Protocol);
+            uint32 u32_Counter;
 
-            if ((pc_DataPool != NULL) && (pc_Protcol != NULL))
+            for (u32_Counter = 0U; u32_Counter < c_Protocols.size(); ++u32_Counter)
             {
+               const C_OSCCanProtocol * const pc_Protcol = c_Protocols[u32_Counter];
                if (c_InterfaceIndexes[u32_NodeCounter] < pc_Protcol->c_ComMessages.size())
                {
                   const C_OSCCanMessageContainer & rc_MessageContainer =
@@ -225,21 +225,20 @@ void C_SdBueNodeSelectorWidget::m_NodeToggled(const uint32 ou32_NodeIndex, const
 
       if (pc_Node != NULL)
       {
-         // check if a datapool exist
-         const C_OSCNodeDataPool * const pc_DataPool = pc_Node->GetComDataPoolConst(this->me_Protocol);
+         // check if a protocol and therefore a Datapool exist
+         const bool q_ProtocolAndDbExists = (pc_Node->GetCANProtocolsConst(this->me_Protocol).size() > 0U);
 
-         if (pc_DataPool != NULL)
+         if (q_ProtocolAndDbExists == true)
          {
             // No new datapool necessary
-            Q_EMIT this->SigConnectNodeToProt(ou32_NodeIndex, ou32_InterfaceIndex);
+            Q_EMIT (this->SigConnectNodeToProt(ou32_NodeIndex, ou32_InterfaceIndex));
          }
          else
          {
             // No COM datapool yet. New one must be created if permissible
-            if (C_SdUtil::h_CheckDatapoolNumber(ou32_NodeIndex, C_OSCNodeDataPool::eCOM, false,
-                                                this->parentWidget()) == true)
+            if (C_SdUtil::h_CheckDatapoolNumber(ou32_NodeIndex, false, this->parentWidget()) == true)
             {
-               Q_EMIT this->SigConnectNodeToProtAndAddDataPool(ou32_NodeIndex, ou32_InterfaceIndex);
+               Q_EMIT (this->SigConnectNodeToProtAndAddDataPool(ou32_NodeIndex, ou32_InterfaceIndex));
             }
             else // No more datapools can be added
             {
@@ -252,7 +251,7 @@ void C_SdBueNodeSelectorWidget::m_NodeToggled(const uint32 ou32_NodeIndex, const
    else
    {
       // Disconnect the COM datapool of the node
-      Q_EMIT this->SigDisconnectNodeFromProt(ou32_NodeIndex, ou32_InterfaceIndex);
+      Q_EMIT (this->SigDisconnectNodeFromProt(ou32_NodeIndex, ou32_InterfaceIndex));
    }
 }
 
@@ -261,37 +260,25 @@ void C_SdBueNodeSelectorWidget::m_NodeComImport(const uint32 ou32_NodeIndex, con
 {
    sint32 s32_Return = C_NO_ERR;
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-   uint32 u32_ProtocolCounter;
-   uint32 u32_DataPoolIndex = 0U;
 
    if (pc_Node != NULL)
    {
-      // check if a datapool exist
-      const C_OSCNodeDataPool * const pc_DataPool = pc_Node->GetComDataPoolConst(this->me_Protocol);
+      // check if a protocol and therefore a Datapool exist
+      const bool q_ProtocolAndDbExists = (pc_Node->GetCANProtocolsConst(this->me_Protocol).size() > 0U);
 
-      if (pc_DataPool == NULL)
+      if (q_ProtocolAndDbExists == false)
       {
          // No COM datapool yet. New one must be created
-         Q_EMIT this->SigAddDataPool(ou32_NodeIndex, ou32_InterfaceIndex);
+         Q_EMIT (this->SigAddDataPool(ou32_NodeIndex, ou32_InterfaceIndex));
       }
 
-      // Get the datapool index
-      for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < pc_Node->c_ComProtocols.size(); ++u32_ProtocolCounter)
-      {
-         if (pc_Node->c_ComProtocols[u32_ProtocolCounter].e_Type == this->me_Protocol)
-         {
-            u32_DataPoolIndex = pc_Node->c_ComProtocols[u32_ProtocolCounter].u32_DataPoolIndex;
-            break;
-         }
-      }
-
-      s32_Return = C_CieUtil::h_ImportFile(ou32_NodeIndex, u32_DataPoolIndex, ou32_InterfaceIndex, this);
+      s32_Return = C_CieUtil::h_ImportFile(ou32_NodeIndex, this->me_Protocol, -1, ou32_InterfaceIndex, this);
 
       if (s32_Return == C_NO_ERR)
       {
          // Refresh update
-         Q_EMIT this->SigReload();
-         Q_EMIT this->SigErrorChange();
+         Q_EMIT (this->SigReload());
+         Q_EMIT (this->SigErrorChange());
       }
    }
 }

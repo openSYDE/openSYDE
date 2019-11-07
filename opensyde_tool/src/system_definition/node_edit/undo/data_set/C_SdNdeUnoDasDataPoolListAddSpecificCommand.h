@@ -29,7 +29,7 @@ public:
    C_SdNdeUnoDasDataPoolListAddSpecificCommand(const stw_types::uint32 & oru32_NodeIndex,
                                                const stw_types::uint32 & oru32_DataPoolIndex,
                                                const stw_types::uint32 & oru32_DataPoolListIndex,
-                                               C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                               C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
                                                const std::vector<stw_types::uint32> & orc_Indices,
                                                const std::vector<stw_opensyde_core::C_OSCNodeDataPoolDataSet> & orc_OSCNames,
                                                const std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues,

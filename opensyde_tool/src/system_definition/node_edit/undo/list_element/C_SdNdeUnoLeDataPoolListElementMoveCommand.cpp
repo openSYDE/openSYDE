@@ -52,7 +52,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementMoveCommand::C_SdNdeUnoLeDataPoolListElementMoveCommand(const uint32 & oru32_NodeIndex,
-                                                                                       const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                                                                       const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
                                                                                        const std::vector<uint32> & orc_SourceRow,
                                                                                        const std::vector<uint32> & orc_TargetRow, const bool & orq_AdaptIndices,
                                                                                        QUndoCommand * const opc_Parent)
@@ -77,7 +77,7 @@ void C_SdNdeUnoLeDataPoolListElementMoveCommand::redo(void)
 {
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
-      C_SdNdeDataPoolListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
+      C_SdNdeDpListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
@@ -110,7 +110,7 @@ void C_SdNdeUnoLeDataPoolListElementMoveCommand::undo(void)
    C_SdNdeUnoLeDataPoolListElementBaseCommand::undo();
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
-      C_SdNdeDataPoolListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
+      C_SdNdeDpListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {

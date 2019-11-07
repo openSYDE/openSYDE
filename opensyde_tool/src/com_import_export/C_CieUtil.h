@@ -27,7 +27,8 @@ public:
    C_CieUtil(void);
 
    static stw_types::sint32 h_ImportFile(const stw_types::uint32 ou32_NodeIndex,
-                                         const stw_types::uint32 ou32_DataPoolIndex,
+                                         const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType,
+                                         const stw_types::sint32 os32_DataPoolIndex,
                                          const stw_types::uint32 ou32_InterfaceIndex, QWidget * const opc_Parent);
    static stw_types::sint32 h_ExportFile(
       const stw_opensyde_gui_logic::C_CieConverter::C_CIECommDefinition & orc_CommDef, QWidget * const opc_Parent,

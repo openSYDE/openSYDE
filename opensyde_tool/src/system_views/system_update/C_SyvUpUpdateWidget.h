@@ -116,8 +116,6 @@ private:
 
    std::vector<bool> m_GetIsFileBasedFlagForEach(void) const;
 
-   static QString mh_SerialNumberToString(const stw_types::uint8 oau8_SerialNumer[6]);
-
    static bool mh_IsAnimated(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsConnectionStart(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsConnectionSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);

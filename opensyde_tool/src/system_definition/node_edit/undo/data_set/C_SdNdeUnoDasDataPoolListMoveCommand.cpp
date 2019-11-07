@@ -51,7 +51,7 @@ using namespace stw_opensyde_gui_logic;
 C_SdNdeUnoDasDataPoolListMoveCommand::C_SdNdeUnoDasDataPoolListMoveCommand(const uint32 & oru32_NodeIndex,
                                                                            const uint32 & oru32_DataPoolIndex,
                                                                            const uint32 & oru32_DataPoolListIndex,
-                                                                           C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                                                           C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
                                                                            const std::vector<uint32> & orc_SourceCol,
                                                                            const std::vector<uint32> & orc_TargetCol, const bool & orq_AdaptIndices,
                                                                            QUndoCommand * const opc_Parent) :

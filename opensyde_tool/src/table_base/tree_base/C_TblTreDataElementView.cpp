@@ -37,7 +37,7 @@ QMap<C_TblTreDataElementModel::E_Mode,
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -63,7 +63,7 @@ C_TblTreDataElementView::C_TblTreDataElementView(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementView::~C_TblTreDataElementView(void)
@@ -71,7 +71,7 @@ C_TblTreDataElementView::~C_TblTreDataElementView(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set flag to use internal expanded items
+/*! \brief  Set flag to use internal expanded items
 
    \param[in] oq_Use Flag to use internal expanded items
 */
@@ -82,7 +82,7 @@ void C_TblTreDataElementView::SetUseInternalExpandedItems(const bool oq_Use)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set the active node index
+/*! \brief  Set the active node index
 
    \param[in] ou32_NodeIndex               Active node index
    \param[in] os32_SkipApplicationIndex    Application index to not display as used
@@ -99,37 +99,38 @@ void C_TblTreDataElementView::InitSD(const uint32 ou32_NodeIndex, const sint32 o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize tree structure
+/*! \brief  Initialize tree structure
 
-   \param[in] ou32_ViewIndex           View index
-   \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
-   \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
-   \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
-   \param[in] oq_ShowNVMLists          Optional flag to only show NVM LISTs
+   \param[in] ou32_ViewIndex            View index
+   \param[in] oq_ShowOnlyWriteElements  Optional flag to show only writable elements
+   \param[in] oq_ShowArrayElements      Optional flag to hide all array elements (if false)
+   \param[in] oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
+   \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
+   \param[in] oq_ShowNVMLists           Optional flag to only show NVM LISTs
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::InitSV(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
-                                     const bool oq_ShowArrayElements, const bool oq_Show64BitValues,
-                                     const bool oq_ShowNVMLists)
+                                     const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
+                                     const bool oq_Show64BitValues, const bool oq_ShowNVMLists)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    if (oq_ShowNVMLists == true)
    {
       this->me_Mode = C_TblTreDataElementModel::eNVM_LIST;
       this->mc_Model.InitSV(this->mu32_ViewIndex, C_TblTreDataElementModel::eNVM_LIST, oq_ShowOnlyWriteElements,
-                            oq_ShowArrayElements, oq_Show64BitValues);
+                            oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues);
    }
    else
    {
       this->me_Mode = C_TblTreDataElementModel::eDATAPOOL_ELEMENT;
       this->mc_Model.InitSV(this->mu32_ViewIndex, C_TblTreDataElementModel::eDATAPOOL_ELEMENT, oq_ShowOnlyWriteElements,
-                            oq_ShowArrayElements, oq_Show64BitValues);
+                            oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues);
    }
    m_RestoreExpandedIndices();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Filter for string
+/*! \brief  Filter for string
 
    \param[in] orc_Text String
 */
@@ -160,9 +161,9 @@ void C_TblTreDataElementView::Search(const QString & orc_Text)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Setting of view index without initialization
+/*! \brief  Setting of view index without initialization
 
-   \param[in] ou32_ViewIndex           View index
+   \param[in] ou32_ViewIndex View index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::SetViewIndex(const uint32 ou32_ViewIndex)
@@ -171,26 +172,28 @@ void C_TblTreDataElementView::SetViewIndex(const uint32 ou32_ViewIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Switch displayed content
+/*! \brief  Switch displayed content
 
-   \param[in] ore_Mode                 New mode
-   \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
-   \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
-   \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
+   \param[in] ore_Mode                  New mode
+   \param[in] oq_ShowOnlyWriteElements  Optional flag to show only writable elements
+   \param[in] oq_ShowArrayElements      Optional flag to hide all array elements (if false)
+   \param[in] oq_ShowArrayIndexElements Show array index elements
+   \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::SwitchMode(const C_TblTreDataElementModel::E_Mode & ore_Mode,
                                          const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
-                                         const bool oq_Show64BitValues)
+                                         const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues)
 {
    this->me_Mode = ore_Mode;
    this->mc_Model.InitSV(this->mu32_ViewIndex, ore_Mode, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                         oq_ShowArrayIndexElements,
                          oq_Show64BitValues);
    m_RestoreExpandedIndices();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get selected data elements
+/*! \brief  Get selected data elements
 
    \return
    Current selected data elements
@@ -215,7 +218,7 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementView::GetSele
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if view empty
+/*! \brief  Check if view empty
 
    \return
    True  Empty
@@ -228,7 +231,7 @@ bool C_TblTreDataElementView::IsEmpty(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle expanded index save
+/*! \brief  Handle expanded index save
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::SaveExpandedIndices(void)
@@ -249,7 +252,7 @@ void C_TblTreDataElementView::SaveExpandedIndices(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse double click event slot
+/*! \brief  Overwritten mouse double click event slot
 
    Here: Add dialog exit if valid selection
 
@@ -271,11 +274,12 @@ void C_TblTreDataElementView::mouseDoubleClickEvent(QMouseEvent * const opc_Even
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten selection changed event slot
+/*! \brief  Overwritten selection changed event slot
 
    Here: Emit signal with new number of selected items
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in] orc_Selected   Selected
+   \param[in] orc_Deselected Deselected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::selectionChanged(const QItemSelection & orc_Selected,
@@ -286,7 +290,7 @@ void C_TblTreDataElementView::selectionChanged(const QItemSelection & orc_Select
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Append all expanded indices for this parent
+/*! \brief  Append all expanded indices for this parent
 
    \param[in,out] orc_FoundItems All expanded items
    \param[in]     orc_CurParent  Current parent to analyze
@@ -308,7 +312,7 @@ void C_TblTreDataElementView::m_AppendExpandedIndices(std::vector<std::vector<ui
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle expanded index restoration
+/*! \brief  Handle expanded index restoration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::m_RestoreExpandedIndices(void)
@@ -333,13 +337,13 @@ void C_TblTreDataElementView::m_RestoreExpandedIndices(void)
       }
       else
       {
-         this->expandAll();
+         this->m_ExpandInitial();
       }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Map source model index to sort model index
+/*! \brief  Map source model index to sort model index
 
    Hint: This function is probably only necessary because the mapFromSource seems to not work in some cases
    -> Problematic case: if there is no parent this functions seems to return an invalid internalPointer
@@ -363,4 +367,40 @@ QModelIndex C_TblTreDataElementView::m_ManualMapFromSource(const QModelIndex & o
       c_Retval = this->mc_SortModel.index(orc_Index.row(), orc_Index.column());
    }
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle initial expand
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblTreDataElementView::m_ExpandInitial(void)
+{
+   for (sintn sn_ItChild = 0; sn_ItChild < this->mc_SortModel.rowCount(); ++sn_ItChild)
+   {
+      const QModelIndex c_ModelIndex = this->mc_SortModel.index(sn_ItChild, 0);
+      this->expand(c_ModelIndex);
+      m_ExpandAllChildren(c_ModelIndex, 0UL, 3UL);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Expand all children
+
+   \param[in] orc_Index         Index
+   \param[in] ou32_LayerCounter Layer counter
+   \param[in] ou32_MaxLayer     Max layer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblTreDataElementView::m_ExpandAllChildren(const QModelIndex & orc_Index, const uint32 ou32_LayerCounter,
+                                                  const uint32 ou32_MaxLayer)
+{
+   if (ou32_LayerCounter < ou32_MaxLayer)
+   {
+      for (sintn sn_ItChild = 0; sn_ItChild < this->mc_SortModel.rowCount(orc_Index); ++sn_ItChild)
+      {
+         const QModelIndex c_ModelIndex = this->mc_SortModel.index(sn_ItChild, 0, orc_Index);
+         this->expand(c_ModelIndex);
+         m_ExpandAllChildren(c_ModelIndex, ou32_LayerCounter + 1UL, ou32_MaxLayer);
+      }
+   }
 }

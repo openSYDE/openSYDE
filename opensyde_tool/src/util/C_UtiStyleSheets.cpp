@@ -33,10 +33,10 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SdNdeDbListWidget",
    "stw_opensyde_gui_elements--C_OgeTedSdListHeader",
    "stw_opensyde_gui_elements--C_OgeTedSyListHeader",
-   "stw_opensyde_gui--C_SdNdeDataPoolComListWidget",
+   "stw_opensyde_gui--C_SdNdeDpComListWidget",
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget",
    "stw_opensyde_gui_elements--C_OgeTableWidgetComIF",
-   "stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget",
+   "stw_opensyde_gui--C_SdNdeDpListsTreeWidget",
    "stw_opensyde_gui--C_SyvDaItPaArView",
    "stw_opensyde_gui--C_SyvDaItPaTableView",
    "stw_opensyde_gui--C_SdBueSignalTableView",
@@ -44,12 +44,12 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SdBueMessageTableView",
    "stw_opensyde_gui--C_SdBueMessageTableView",
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView",
-   "stw_opensyde_gui--C_SdNdeDataPoolListTableView",
+   "stw_opensyde_gui--C_SdNdeDpListTableView",
    "stw_opensyde_gui--C_TblTreDataElementView",
    "stw_opensyde_gui--C_SyvDaItTaView",
    "stw_opensyde_gui--C_SyvDaItPaTreeView",
-   "stw_opensyde_gui--C_SdNdeDataPoolListDataSetView",
-   "stw_opensyde_gui--C_SdNdeDataPoolListArrayEditView",
+   "stw_opensyde_gui--C_SdNdeDpListDataSetView",
+   "stw_opensyde_gui--C_SdNdeDpListArrayEditView",
    "stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget",
    "stw_opensyde_gui_elements--C_OgeTedPropertiesComment",
    "stw_opensyde_gui_elements--C_OgeTebMessageDetails",
@@ -70,7 +70,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui_elements--C_OgeDarkScrollArea",
    "stw_opensyde_gui_logic--C_PopFileTableView",
    "stw_opensyde_gui_elements--C_OgeSaNaviBar",
-   "stw_opensyde_gui--C_SdNdeDataPoolSelectorAddListWidget"
+   "stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget"
 }
    );
 //lint -e{36,155}  c++11 feature
@@ -164,15 +164,15 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui--C_SdNdeDbListWidget QScrollBar[C_SdNdeDbWidget=\"true\"]",
    "stw_opensyde_gui_elements--C_OgeTedSdListHeader QScrollBar",
    "stw_opensyde_gui_elements--C_OgeTedSyListHeader QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDataPoolComListWidget QScrollBar",
+   "stw_opensyde_gui--C_SdNdeDpComListWidget QScrollBar",
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDataPoolListTableView QScrollBar",
+   "stw_opensyde_gui--C_SdNdeDpListTableView QScrollBar",
    "stw_opensyde_gui--C_TblTreDataElementView QScrollBar",
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget QScrollBar",
    "stw_opensyde_gui_elements--C_OgeTableWidgetComIF QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDataPoolListDataSetView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDataPoolListArrayEditView QScrollBar",
+   "stw_opensyde_gui--C_SdNdeDpListsTreeWidget QScrollBar",
+   "stw_opensyde_gui--C_SdNdeDpListDataSetView QScrollBar",
+   "stw_opensyde_gui--C_SdNdeDpListArrayEditView QScrollBar",
    "stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget QScrollBar",
    "stw_opensyde_gui--C_SyvDaItPaTreeView QScrollBar[DarkMode=\"false\"]",
    "stw_opensyde_gui--C_SyvDaItTaView QScrollBar[DarkMode=\"false\"]",
@@ -193,7 +193,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar",
    "stw_opensyde_gui--C_SyvDcExistingNodeList QScrollBar",
    "stw_opensyde_gui--C_SyvDcConnectedNodeList QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDataPoolSelectorAddListWidget QScrollBar"
+   "stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget QScrollBar"
 }
    );
 //lint -e{36,155}  c++11 feature

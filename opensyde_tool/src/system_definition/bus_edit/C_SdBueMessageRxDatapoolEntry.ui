@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C_SdBueMessageRxDatapoolEntry</class>
+ <widget class="QWidget" name="C_SdBueMessageRxDatapoolEntry">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>69</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>C_SdBueMessageRxDatapoolEntry</string>
+  </property>
+  <widget class="stw_opensyde_gui_elements::C_OgeChxDefaultSmall" name="pc_CheckBoxActive">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>10</y>
+     <width>377</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>CheckBox</string>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeChxDefaultSmall</class>
+   <extends>QCheckBox</extends>
+   <header>C_OgeChxDefaultSmall.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

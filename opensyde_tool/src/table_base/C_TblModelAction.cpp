@@ -44,7 +44,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
 */
@@ -55,7 +55,7 @@ C_TblModelAction::C_TblModelAction(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get table row count
+/*! \brief  Get table row count
 
    Compare with file header description.
 
@@ -82,7 +82,7 @@ sintn C_TblModelAction::rowCount(const QModelIndex & orc_Parent) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle add new item action
+/*! \brief  Handle add new item action
 
    \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
 
@@ -99,7 +99,7 @@ uint32 C_TblModelAction::AddNewItem(const std::vector<uint32> & orc_SelectedIndi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle paste items action
+/*! \brief  Handle paste items action
 
    \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
 
@@ -116,7 +116,7 @@ std::vector<uint32> C_TblModelAction::PasteItems(const std::vector<uint32> & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle cut selected items action
+/*! \brief  Handle cut selected items action
 
    \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
 
@@ -135,7 +135,7 @@ uint32 C_TblModelAction::CutSelectedItems(const std::vector<uint32> & orc_Select
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle delete selected items action
+/*! \brief  Handle delete selected items action
 
    \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
 
@@ -200,7 +200,7 @@ uint32 C_TblModelAction::DeleteSelectedItems(const std::vector<uint32> & orc_Sel
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle move selected items action
+/*! \brief  Handle move selected items action
 
    Warning 1: This function currently can only handle shifts by ONE up or down
 
@@ -309,7 +309,7 @@ void C_TblModelAction::MoveSelectedItems(const std::vector<uint32> & orc_Selecte
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if all indices are inside of item size boundary (can be used for move operation target index check)
+/*! \brief  Check if all indices are inside of item size boundary (can be used for move operation target index check)
 
    \param[in] orc_Indices Indices to check
 
@@ -334,7 +334,7 @@ bool C_TblModelAction::CheckAllIndicesInRange(const std::vector<uint32> & orc_In
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reload table content (after change of data outside this classes responsibility)
+/*! \brief  Reload table content (after change of data outside this classes responsibility)
 
    Warning: should only be used if type of change has unknown effect on complete table content
    -> if only one column or row changes use dataChanged instead
@@ -374,7 +374,7 @@ void C_TblModelAction::m_EndRemoveRows(const uint32 ou32_FirstIndex, const uint3
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle hex value entry display & edit role
+/*! \brief  Handle hex value entry display & edit role
 
    \param[in] ou64_Value Value
    \param[in] osn_Role   Role
@@ -399,7 +399,7 @@ QVariant C_TblModelAction::mh_HandleHexValue(const uint64 ou64_Value, const sint
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get value in hex format, ready to be displayed (including "0x")
+/*! \brief  Get value in hex format, ready to be displayed (including "0x")
 
    \param[in] ou64_Value value to convert
 
@@ -415,7 +415,7 @@ QString C_TblModelAction::mh_GetValueAsHex(const uint64 ou64_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility function to transform bool value into Qt::CheckState stored as QVariant
+/*! \brief  Utility function to transform bool value into Qt::CheckState stored as QVariant
 
    \param[in] oq_Value Value to encode
 
@@ -439,7 +439,7 @@ QVariant C_TblModelAction::mh_GetBoolAsCheckStateVariant(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility function to transform Qt::CheckState stored as QVariant into bool
+/*! \brief  Utility function to transform Qt::CheckState stored as QVariant into bool
 
    \param[in] orc_Value Qt::CheckState stored as QVariant
 
@@ -464,7 +464,7 @@ bool C_TblModelAction::mh_GetCheckStateVariantAsBool(const QVariant & orc_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get last of those selected indices
+/*! \brief  Get last of those selected indices
 
    \param[in] orc_SelectedIndices Selected row indices
 
@@ -495,7 +495,7 @@ uint32 C_TblModelAction::m_GetLastSelectedIndex(const std::vector<uint32> & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Move items to target index
+/*! \brief  Move items to target index
 
    \param[in] orc_ContiguousIndices Contiguous section of ascending indices
    \param[in] ou32_TargetIndex      Target index

@@ -208,8 +208,8 @@ void C_HeHandler::InitSpecialHelpPages(void)
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNodeComIfSetupWidget", "Communication Interface Setup");
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNodeToNodeConnectionSetupWidget",
                                       "Node to Node - Connection Setup");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDatapoolProperties", "Datapool Properties");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDataPoolListDataSetWidget", "Datasets");
+   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDpProperties", "Datapool Properties");
+   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDpListDataSetWidget", "Datasets");
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeProgrammingOptions", "Code Generation - Settings");
 
    //System Commissioning

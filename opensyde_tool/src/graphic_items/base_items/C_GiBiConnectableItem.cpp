@@ -36,7 +36,7 @@ using namespace stw_types;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiConnectableItem::C_GiBiConnectableItem()
@@ -44,7 +44,7 @@ C_GiBiConnectableItem::C_GiBiConnectableItem()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper function to trigger changed graphic manually to avoid signals on every possible change
+/*! \brief  Helper function to trigger changed graphic manually to avoid signals on every possible change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiConnectableItem::TriggerSigChangedGraphic()
@@ -53,7 +53,7 @@ void C_GiBiConnectableItem::TriggerSigChangedGraphic()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculate distance to segment of line
+/*! \brief  Calculate distance to segment of line
 
    Look at http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
    Abstract:
@@ -118,7 +118,7 @@ void C_GiBiConnectableItem::h_DistToLine(const QPointF & orc_LineStart, const QP
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculate distance point to point
+/*! \brief  Calculate distance point to point
 
    \param[in]  orc_Point1     Start
    \param[in]  orc_Point2     End

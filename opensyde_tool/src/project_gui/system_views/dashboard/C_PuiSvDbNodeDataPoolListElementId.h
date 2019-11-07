@@ -35,13 +35,15 @@ public:
 
    C_PuiSvDbNodeDataPoolListElementId(void);
    C_PuiSvDbNodeDataPoolListElementId(const C_OSCNodeDataPoolListElementId & orc_Base, const E_Type oe_Type,
-                                      const bool oq_IsValid = true, const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_InvalidTypePlaceholder =
+                                      const bool oq_UseArrayElementIndex,
+                                      const stw_types::uint32 ou32_ArrayElementIndex, const bool oq_IsValid = true, const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_InvalidTypePlaceholder =
                                          stw_opensyde_core::C_OSCNodeDataPool::eDIAG,
                                       const QString & orc_InvalidNamePlaceholder = "");
    C_PuiSvDbNodeDataPoolListElementId(const stw_types::uint32 ou32_NodeIndex,
                                       const stw_types::uint32 ou32_DataPoolIndex,
                                       const stw_types::uint32 ou32_ListIndex, const stw_types::uint32 ou32_ElementIndex,
-                                      const E_Type oe_Type, const bool oq_IsValid = true, const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_InvalidTypePlaceholder =
+                                      const E_Type oe_Type, const bool oq_UseArrayElementIndex,
+                                      const stw_types::uint32 ou32_ArrayElementIndex, const bool oq_IsValid = true, const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_InvalidTypePlaceholder =
                                          stw_opensyde_core::C_OSCNodeDataPool::eDIAG,
                                       const QString & orc_InvalidNamePlaceholder = "");
 
@@ -49,6 +51,8 @@ public:
    virtual bool operator < (const C_OSCNodeDataPoolId & orc_Cmp) const;
    //lint -e{1511} Hiding of original operators is intended
    virtual bool operator == (const C_OSCNodeDataPoolId & orc_Cmp) const;
+
+   bool CheckSameDataElement(const C_PuiSvDbNodeDataPoolListElementId & orc_OtherId) const;
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
    void MarkInvalid(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_InvalidTypePlaceholder,
@@ -62,8 +66,17 @@ public:
    E_Type GetType(void) const;
    void SetType(const E_Type oe_Type);
 
+   stw_types::uint32 GetArrayElementIndex(void) const;
+   stw_types::uint32 GetArrayElementIndexOrZero(void) const;
+   void SetArrayElementIndex(const stw_types::uint32 ou32_Value);
+
+   bool GetUseArrayElementIndex(void) const;
+   void SetUseArrayElementIndex(const bool oq_Value);
+
 private:
    E_Type me_Type;
+   bool mq_UseArrayElementIndex;
+   stw_types::uint32 mu32_ArrayElementIndex;
    bool mq_IsValid; ///< Invalid flag,
    ///< should only be set by system definition
    ///< to system view synchronisation engine

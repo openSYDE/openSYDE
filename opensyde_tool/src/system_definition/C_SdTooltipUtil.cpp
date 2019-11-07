@@ -16,7 +16,7 @@
 #include "stwerrors.h"
 #include "C_GtGetText.h"
 #include "C_SdTooltipUtil.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -77,15 +77,15 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
    switch (orc_Message.e_TxMethod)
    {
    case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
-      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("TX-Method: On Event\n"));
+      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Tx-Method: On Event\n"));
       break;
    case C_OSCCanMessage::eTX_METHOD_CYCLIC:
-      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("TX-Method: Cyclic\n"));
+      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Tx-Method: Cyclic\n"));
       c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Cycle Time: %1\n")).arg(
          orc_Message.u32_CycleTimeMs);
       break;
    case C_OSCCanMessage::eTX_METHOD_ON_CHANGE:
-      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("TX-Method: On Change\n"));
+      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Tx-Method: On Change\n"));
       c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Not earlier than: %1\n")).arg(
          orc_Message.u16_DelayTimeMs);
       c_ToolTipContent +=
@@ -143,14 +143,14 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
    }
 
    c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Min: "));
-   if (C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_MinValue, f64_Value) == C_NO_ERR)
+   if (C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_MinValue, f64_Value, 0UL) == C_NO_ERR)
    {
       c_ToolTipContent.append(QString::number(f64_Value));
    }
    c_ToolTipContent.append("\n");
 
    c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Max: "));
-   if (C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_MaxValue, f64_Value) == C_NO_ERR)
+   if (C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_MaxValue, f64_Value, 0UL) == C_NO_ERR)
    {
       c_ToolTipContent.append(QString::number(f64_Value));
    }
@@ -167,8 +167,8 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
    if (orc_DpListElement.c_DataSetValues.size() > 0UL)
    {
       c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Init Value: "));
-      if (C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_DataSetValues[0UL],
-                                                          f64_Value) == C_NO_ERR)
+      if (C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_DataSetValues[0UL],
+                                                          f64_Value, 0UL) == C_NO_ERR)
       {
          c_ToolTipContent.append(QString::number(f64_Value));
       }

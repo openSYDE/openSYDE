@@ -63,7 +63,7 @@ const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH = 3;
    \param[in]     ou32_DashboardIndex         Dashboard index
    \param[in]     orc_Name                    Name of the item for the title
    \param[in]     orc_Id                      Element id to use for default initialization (only used if not invalid)
-   \param[in]     rc_Scaling                  Scaling information for default initialization
+   \param[in]     orc_Scaling                 Scaling information for default initialization
    \param[in]     oq_ReadElement              Optional flag if dialog for read element
    \param[in]     oq_DarkMode                 Optional flag if dark mode active
    \param[in]     oq_ShowWidgetSpecificPart   Optional flag if widget specific part is visible
@@ -74,7 +74,7 @@ const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH = 3;
 C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_ViewIndex,
                              const uint32 ou32_DashboardIndex, const QString & orc_Name,
                              const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
-                             const C_PuiSvDbDataElementScaling & rc_Scaling, const bool oq_ReadElement,
+                             const C_PuiSvDbDataElementScaling & orc_Scaling, const bool oq_ReadElement,
                              const bool oq_DarkMode, const bool oq_ShowWidgetSpecificPart,
                              const bool oq_AllowChangeOfDataElement, const QString & orc_DisplayName) :
    QWidget(&orc_Parent),
@@ -133,7 +133,7 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
    //Init date element fields
    if (orc_Id.GetIsValid() == true)
    {
-      m_InitDataElement(orc_Id, rc_Scaling);
+      m_InitDataElement(orc_Id, orc_Scaling);
    }
    else
    {
@@ -460,17 +460,9 @@ QString C_SyvDaPeBase::GetDisplayName(void) const
 
    if (this->mc_DataElement.GetIsValid() == true)
    {
-      const C_OSCNodeDataPoolListElement * const pc_Element =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
-                                                                    this->mc_DataElement.u32_DataPoolIndex,
-                                                                    this->mc_DataElement.u32_ListIndex,
-                                                                    this->mc_DataElement.u32_ElementIndex);
-      if (pc_Element != NULL)
+      if (c_Retval.compare(this->m_GetDefaultDisplayName(this->mc_DataElement)) == 0)
       {
-         if (c_Retval.compare(pc_Element->c_Name.c_str()) == 0)
-         {
-            c_Retval = "";
-         }
+         c_Retval = "";
       }
    }
 
@@ -558,7 +550,8 @@ void C_SyvDaPeBase::m_Browse(void)
    //Set parent for better hierarchy handling via window manager
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
    C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, this->mu32_ViewIndex, false,
-                                                                                 !this->mq_ReadElement, false, true,
+                                                                                 !this->mq_ReadElement, false,
+                                                                                 this->mq_ReadElement, true,
                                                                                  false);
 
    //Resize
@@ -584,26 +577,43 @@ void C_SyvDaPeBase::m_Browse(void)
                                                                           this->mc_DataElement.u32_DataPoolIndex,
                                                                           this->mc_DataElement.u32_ListIndex,
                                                                           this->mc_DataElement.u32_ElementIndex);
-            if ((pc_Element != NULL) && (pc_Element->GetArray() == false))
+            if (pc_Element != NULL)
             {
-               C_PuiSvReadDataConfiguration c_Config;
-               c_Config.u8_RailIndex = 1;
-               if (((pc_Element->GetType() == C_OSCNodeDataPoolContent::eFLOAT64) ||
-                    (pc_Element->GetType() == C_OSCNodeDataPoolContent::eSINT64)) ||
-                   (pc_Element->GetType() == C_OSCNodeDataPoolContent::eUINT64))
+               if (pc_Element->GetArray() == false)
                {
-                  c_Config.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER;
+                  C_PuiSvReadDataConfiguration c_Config;
+                  c_Config.u8_RailIndex = 1;
+                  if (((pc_Element->GetType() == C_OSCNodeDataPoolContent::eFLOAT64) ||
+                       (pc_Element->GetType() == C_OSCNodeDataPoolContent::eSINT64)) ||
+                      (pc_Element->GetType() == C_OSCNodeDataPoolContent::eUINT64))
+                  {
+                     c_Config.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER;
+                  }
+                  else
+                  {
+                     c_Config.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_CYCLIC;
+                  }
+                  c_Config.InitDefaultThreshold(pc_Element->c_MinValue, pc_Element->c_MaxValue);
+                  if (C_PuiSvHandler::h_GetInstance()->AddViewReadRailItem(this->mu32_ViewIndex, this->mc_DataElement,
+                                                                           c_Config) == C_NO_ERR)
+                  {
+                     //Remember we were the one who added this configuration
+                     this->mq_NewConfigAdded = true;
+                  }
                }
                else
                {
-                  c_Config.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_CYCLIC;
-               }
-               c_Config.InitDefaultThreshold(pc_Element->c_MinValue, pc_Element->c_MaxValue);
-               if (C_PuiSvHandler::h_GetInstance()->AddViewReadRailItem(this->mu32_ViewIndex, this->mc_DataElement,
-                                                                        c_Config) == C_NO_ERR)
-               {
-                  //Remember we were the one who added this configuration
-                  this->mq_NewConfigAdded = true;
+                  //Array item
+                  C_PuiSvReadDataConfiguration c_Config;
+                  c_Config.u8_RailIndex = 1;
+                  c_Config.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER;
+                  c_Config.InitDefaultThreshold(pc_Element->c_MinValue, pc_Element->c_MaxValue);
+                  if (C_PuiSvHandler::h_GetInstance()->AddViewReadRailItem(this->mu32_ViewIndex, this->mc_DataElement,
+                                                                           c_Config) == C_NO_ERR)
+                  {
+                     //Remember we were the one who added this configuration
+                     this->mq_NewConfigAdded = true;
+                  }
                }
             }
          }
@@ -764,6 +774,43 @@ void C_SyvDaPeBase::m_Configuration(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get default display name
+
+   \param[in] orc_Id ID to use for default
+
+   \return
+   Default display name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SyvDaPeBase::m_GetDefaultDisplayName(const C_PuiSvDbNodeDataPoolListElementId & orc_Id) const
+{
+   QString c_Retval;
+
+   if (orc_Id.GetIsValid() == true)
+   {
+      const C_OSCNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+                                                                    this->mc_DataElement.u32_DataPoolIndex,
+                                                                    this->mc_DataElement.u32_ListIndex,
+                                                                    this->mc_DataElement.u32_ElementIndex);
+
+      if (pc_Element != NULL)
+      {
+         const QString c_Name = pc_Element->c_Name.c_str();
+         if (orc_Id.GetUseArrayElementIndex())
+         {
+            c_Retval = QString("%1[%2]").arg(c_Name).arg(orc_Id.GetArrayElementIndex());
+         }
+         else
+         {
+            c_Retval = c_Name;
+         }
+      }
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register change of use default scaling property
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -838,51 +885,38 @@ void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId &
 {
    if (orc_Id.GetIsValid() == true)
    {
-      const C_OSCNodeDataPoolListElement * const pc_Element =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
-            orc_Id.u32_NodeIndex, orc_Id.u32_DataPoolIndex,
-            orc_Id.u32_ListIndex,
-            orc_Id.u32_ElementIndex);
-
-      if (pc_Element != NULL)
+      const QString c_UpdateModeInfo = C_SyvUtil::h_GetUpdateModeDescription(this->mu32_ViewIndex, orc_Id);
+      QString c_Edit;
+      if (orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
       {
-         const QString c_UpdateModeInfo = C_SyvUtil::h_GetUpdateModeDescription(this->mu32_ViewIndex, orc_Id);
-         QString c_Edit;
-         if (orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
-         {
-            c_Edit = C_PuiSdHandler::h_GetInstance()->GetNamespace(orc_Id);
-         }
-         else
-         {
-            c_Edit = C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(orc_Id);
-         }
-
-         this->mpc_Ui->pc_LineEditDataElement->setText(c_Edit);
-         this->mpc_Ui->pc_LineEditDataElement->SetToolTipInformation("", c_Edit);
-         this->mpc_Ui->pc_LabelNamespaceValue->setText(c_Edit);
-         if (this->mc_DisplayName.compare("") == 0)
-         {
-            this->mpc_Ui->pc_LineEditDataElementDisplayName->setText(pc_Element->c_Name.c_str());
-         }
-         else
-         {
-            this->mpc_Ui->pc_LineEditDataElementDisplayName->setText(this->mc_DisplayName);
-         }
-         this->mpc_Ui->pc_CheckBoxDefaultScaling->setChecked(orc_Scaling.q_UseDefault);
-         this->mpc_Ui->pc_DoubleSpinBoxOffset->setValue(orc_Scaling.f64_Offset);
-         this->mpc_Ui->pc_DoubleSpinBoxFactor->setValue(orc_Scaling.f64_Factor);
-         this->mpc_Ui->pc_LineEditUnit->setText(orc_Scaling.c_Unit);
-         m_OnUseDefaultScalingChange();
-
-         //Update mode
-         this->mpc_Ui->pc_LabelUpdateMode->setText(c_UpdateModeInfo);
-         this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setVisible(
-            orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_Edit = C_PuiSvHandler::h_GetNamespace(orc_Id);
       }
       else
       {
-         m_InitNoDataElement();
+         c_Edit = C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(orc_Id);
       }
+
+      this->mpc_Ui->pc_LineEditDataElement->setText(c_Edit);
+      this->mpc_Ui->pc_LineEditDataElement->SetToolTipInformation("", c_Edit);
+      this->mpc_Ui->pc_LabelNamespaceValue->setText(c_Edit);
+      if (this->mc_DisplayName.compare("") == 0)
+      {
+         this->mpc_Ui->pc_LineEditDataElementDisplayName->setText(this->m_GetDefaultDisplayName(orc_Id));
+      }
+      else
+      {
+         this->mpc_Ui->pc_LineEditDataElementDisplayName->setText(this->mc_DisplayName);
+      }
+      this->mpc_Ui->pc_CheckBoxDefaultScaling->setChecked(orc_Scaling.q_UseDefault);
+      this->mpc_Ui->pc_DoubleSpinBoxOffset->setValue(orc_Scaling.f64_Offset);
+      this->mpc_Ui->pc_DoubleSpinBoxFactor->setValue(orc_Scaling.f64_Factor);
+      this->mpc_Ui->pc_LineEditUnit->setText(orc_Scaling.c_Unit);
+      m_OnUseDefaultScalingChange();
+
+      //Update mode
+      this->mpc_Ui->pc_LabelUpdateMode->setText(c_UpdateModeInfo);
+      this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setVisible(
+         orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
    }
    else
    {

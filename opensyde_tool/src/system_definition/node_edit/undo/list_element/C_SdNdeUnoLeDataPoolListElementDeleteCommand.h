@@ -29,7 +29,7 @@ public:
    C_SdNdeUnoLeDataPoolListElementDeleteCommand(const stw_types::uint32 & oru32_NodeIndex,
                                                 const stw_types::uint32 & oru32_DataPoolIndex,
                                                 const stw_types::uint32 & oru32_DataPoolListIndex,
-                                                C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                                C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
                                                 const std::vector<stw_types::uint32> & orc_Indices,
                                                 QUndoCommand * const opc_Parent = NULL);
    virtual void redo(void) override;

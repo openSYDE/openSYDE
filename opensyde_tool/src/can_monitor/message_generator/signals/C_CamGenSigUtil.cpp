@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Convert message data array to vector
+/*! \brief  Convert message data array to vector
 
    \param[in] orc_Message message data
 
@@ -57,7 +57,7 @@ std::vector<uint8> C_CamGenSigUtil::h_ConvertRawDataFormat(const C_CamProMessage
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Decode raw value into C_OSCNodeDataPoolContent
+/*! \brief  Decode raw value into C_OSCNodeDataPoolContent
 
    Based on: openSYDE structure
 
@@ -95,7 +95,7 @@ C_OSCNodeDataPoolContent C_CamGenSigUtil::h_DecodeRawToContentSignal(const std::
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Decode signal value to raw
+/*! \brief  Decode signal value to raw
 
    \param[in,out] orc_Raw    Raw CAN message values
    \param[in]     orc_Signal Signal description
@@ -136,7 +136,7 @@ void C_CamGenSigUtil::h_DecodeSignalValueToRaw(std::vector<uint8> & orc_Raw, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Convert DBC to opensyde signal
+/*! \brief  Convert DBC to opensyde signal
 
    Warning: u32_ComDataElementIndex is invalid
 
@@ -160,7 +160,7 @@ C_OSCCanSignal C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECan
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Convert DBC to opensyde signal
+/*! \brief  Convert DBC to opensyde signal
 
    Warning: e_Access & q_DiagEventCall & q_NvMValueChanged & q_IsValid & u32_NvMStartAddress are invalid
 
@@ -188,7 +188,7 @@ C_OSCNodeDataPoolListElement C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConve
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Convert DBC to opensyde message
+/*! \brief  Convert DBC to opensyde message
 
    Warning: u32_TimeoutMs & u16_DelayTimeMs & signals are all not filled in
 
@@ -216,7 +216,7 @@ C_OSCCanMessage C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get a single bit from the input byte vector
+/*! \brief  Get a single bit from the input byte vector
 
    \param[in] ou32_BitPos Bit position
    \param[in] orc_Bytes   Bytes to use as data
@@ -246,7 +246,7 @@ bool C_CamGenSigUtil::h_GetBit(const uint32 ou32_BitPos, const std::vector<uint8
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set a single bit in the output byte vector
+/*! \brief  Set a single bit in the output byte vector
 
    \param[in]     ou32_BitPos Bit position
    \param[in,out] orc_Bytes   Bytes to change
@@ -280,7 +280,7 @@ void C_CamGenSigUtil::h_SetBit(const uint32 ou32_BitPos, std::vector<uint8> & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigUtil::C_CamGenSigUtil(void)

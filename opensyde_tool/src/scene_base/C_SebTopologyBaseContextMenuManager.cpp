@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebTopologyBaseContextMenuManager::C_SebTopologyBaseContextMenuManager(void) :
@@ -43,7 +43,7 @@ C_SebTopologyBaseContextMenuManager::C_SebTopologyBaseContextMenuManager(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebTopologyBaseContextMenuManager::~C_SebTopologyBaseContextMenuManager(void)
@@ -51,7 +51,7 @@ C_SebTopologyBaseContextMenuManager::~C_SebTopologyBaseContextMenuManager(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Activate single item specific actions
+/*! \brief  Activate single item specific actions
 
    \return
    true     Specific action found

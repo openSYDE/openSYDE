@@ -57,6 +57,7 @@ public:
    stw_types::sint32 GetNaviBarNodeSectionSize(void) const;
    stw_types::sint32 GetSdNodeEditSplitterX(void) const;
    stw_types::sint32 GetSdBusEditTreeSplitterX(void) const;
+   stw_types::sint32 GetSdBusEditTreeSplitterX2(void) const;
    stw_types::sint32 GetSdBusEditLayoutSplitterX(void) const;
    static stw_types::uint8 GetMaxRecentProjects(void);
    QString GetCurrentSaveAsPath(void) const;
@@ -102,6 +103,7 @@ public:
    void SetNaviBarNodeSectionSize(const stw_types::sint32 os32_Value);
    void SetSdNodeEditSplitterX(const stw_types::sint32 os32_Value);
    void SetSdBusEditTreeSplitterX(const stw_types::sint32 os32_Value);
+   void SetSdBusEditTreeSplitterX2(const stw_types::sint32 os32_Value);
    void SetSdBusEditLayoutSplitterX(const stw_types::sint32 os32_Value);
    void SetSdTopologyToolboxMaximized(const bool & orq_New);
    void SetCurrentSaveAsPath(const QString & orc_Value);
@@ -215,6 +217,8 @@ private:
                                                          // x value
    stw_types::sint32 ms32_SdBusEditTreeSplitterX;        ///< History of last known sys def bus edit tree splitter
                                                          // position x value
+   stw_types::sint32 ms32_SdBusEditTreeSplitterX2;       ///< History of last known sys def bus edit tree splitter
+                                                         // position 2 x value
    stw_types::sint32 ms32_SdBusEditLayoutSplitterX;      ///< History of last known sys def bus edit layout splitter
                                                          // position x value
    bool mq_SdTopologyToolboxMaximized;                   ///< History of sys def toolbox state

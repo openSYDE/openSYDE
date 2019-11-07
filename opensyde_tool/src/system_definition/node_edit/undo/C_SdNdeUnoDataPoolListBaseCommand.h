@@ -15,7 +15,7 @@
 
 #include <QString>
 #include <QUndoCommand>
-#include "C_SdNdeDataPoolListsTreeWidget.h"
+#include "C_SdNdeDpListsTreeWidget.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -30,13 +30,13 @@ class C_SdNdeUnoDataPoolListBaseCommand :
 public:
    C_SdNdeUnoDataPoolListBaseCommand(const stw_types::uint32 & oru32_NodeIndex,
                                      const stw_types::uint32 & oru32_DataPoolIndex,
-                                     stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget, const QString & orc_Text = "",
+                                     stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget, const QString & orc_Text = "",
                                      QUndoCommand * const opc_Parent = NULL);
 
 protected:
    const stw_types::uint32 mu32_NodeIndex;
    const stw_types::uint32 mu32_DataPoolIndex;
-   stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const mpc_DataPoolListsTreeWidget;
+   stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const mpc_DataPoolListsTreeWidget;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

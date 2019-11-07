@@ -32,6 +32,7 @@ public:
    void SetPath(const QString & orc_New, const QString & orc_RelativeTo = "");
    QString GetPath(void) const;
    void InsertVariable(const QString & orc_Variable);
+   void UpdateText(void);
 
 protected:
    virtual void focusInEvent(QFocusEvent * const opc_Event) override;

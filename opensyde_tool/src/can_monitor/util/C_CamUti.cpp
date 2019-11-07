@@ -20,12 +20,15 @@
 #include "C_Uti.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_GtGetText.h"
+#include "C_OSCUtils.h"
+#include "C_OgeWiUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
+using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -77,18 +80,24 @@ QString C_CamUti::h_GetAbsPathFromProj(const QString & orc_Path)
    \param[in]     orc_Path                   relative or absolute path of file or directory
    \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
 
-   \return
-   path the user wants to save
+   \retval   String with path    Path the user wants to save or input path if relativeness is not possible
+   \retval   Empty string        orc_Path has at least one invalid character
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_CamUti::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QString & orc_Path,
                                               const QString & orc_AbsoluteReferenceDir)
 {
-   QString c_Return = orc_Path;
+   QString c_Return;
    QString c_PathRelative;
    QString c_PathAbsolute;
 
-   if (C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, c_PathAbsolute, c_PathRelative) == true)
+   // Check first if path is a valid path with no unwanted characters
+   if (C_OSCUtils::h_CheckValidFilePath(orc_Path.toStdString().c_str()) == false)
+   {
+      C_OgeWiUtil::h_ShowPathInvalidError(opc_Parent, orc_Path);
+      c_Return = "";
+   }
+   else if (C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, c_PathAbsolute, c_PathRelative) == true)
    {
       // ask user
       C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eQUESTION);
@@ -107,6 +116,11 @@ QString C_CamUti::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const 
       {
          c_Return = c_PathAbsolute;
       }
+   }
+   else
+   {
+      // Nothing to do
+      c_Return = orc_Path;
    }
 
    return c_Return;

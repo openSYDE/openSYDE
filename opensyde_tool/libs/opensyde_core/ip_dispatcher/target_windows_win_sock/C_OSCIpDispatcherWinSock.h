@@ -73,6 +73,7 @@ private:
    std::vector<SOCKET> mc_SocketsUdpServer; ///< one socket per local interface (for receiving responses)
 
    std::vector<stw_types::uint32> mc_LocalInterfaceIps; ///< IPs of local interfaces
+   stw_scl::C_SCLString mc_PreferredInterfaceName;
 
    static std::map<C_BufferIdentifier, std::list<std::vector<stw_types::uint8> > > mhc_TcpBuffer; ///< dispatcher buffer
    static stw_tgl::C_TGLCriticalSection mhc_LockBuffer;
@@ -111,6 +112,8 @@ public:
                                            std::vector<stw_types::uint8> & orc_Data);
    virtual stw_types::sint32 SendUdp(const std::vector<stw_types::uint8> & orc_Data);
    virtual stw_types::sint32 ReadUdp(std::vector<stw_types::uint8> &orc_Data, stw_types::uint8(&orau8_Ip)[4]);
+
+   void LoadConfigFile(const stw_scl::C_SCLString & orc_FileLocation);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

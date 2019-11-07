@@ -37,17 +37,17 @@ using namespace stw_types;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]     ors32_Index          Index of data element in system definition
-   \param[in]     oru64_ID             Unique ID
-   \param[in]     opc_TextElementName  Pointer to text element for showing bus name
-   \param[in]     oq_DoErrorCheck      Optional flag to trigger error check directly in constructor
-   \param[in]     opc_Points           Points for line
-   \param[in]     orq_MiddleLine       Indicator if line(s) should have a different colored central line
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in]     ors32_Index         Index of data element in system definition
+   \param[in]     oru64_ID            Unique ID
+   \param[in]     opc_TextElementName Pointer to text element for showing bus name
+   \param[in]     oq_DoErrorCheck     Optional flag to trigger error check directly in constructor
+   \param[in]     opc_Points          Points for line
+   \param[in]     orq_MiddleLine      Indicator if line(s) should have a different colored central line
+   \param[in,out] opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64_ID,
@@ -109,7 +109,7 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -124,7 +124,7 @@ C_GiLiBus::~C_GiLiBus()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this itme
+/*! \brief  Returns the type of this itme
 
    \return  ID
 */
@@ -135,7 +135,10 @@ sintn C_GiLiBus::type() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get name
+/*! \brief  Get name
+
+   \return
+   Bus name
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_GiLiBus::GetName(void) const
@@ -154,9 +157,9 @@ QString C_GiLiBus::GetName(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the CAN bitrate in a prepared string
+/*! \brief  Returns the CAN bitrate in a prepared string
 
-   \param[in]     oq_WithComma      If true, a comma will be added at the beginning of the string
+   \param[in] oq_WithComma If true, a comma will be added at the beginning of the string
 
    \return
    Text with CAN bitrate or empty String in case of an Ethernet bus
@@ -181,7 +184,7 @@ QString C_GiLiBus::GetBitrate(const bool oq_WithComma) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for initially loading internal data
+/*! \brief  Function for initially loading internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::LoadData(void)
@@ -202,7 +205,7 @@ void C_GiLiBus::LoadData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for updating internal data
+/*! \brief  Slot function for updating internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::UpdateData(void)
@@ -221,7 +224,7 @@ void C_GiLiBus::UpdateData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete data in system definition
+/*! \brief  Delete data in system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::DeleteData(void)
@@ -230,7 +233,7 @@ void C_GiLiBus::DeleteData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Generate hint to display
+/*! \brief  Generate hint to display
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::GenerateHint(void)
@@ -337,7 +340,7 @@ void C_GiLiBus::SetZValueCustom(const float64 of64_ZValue)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set item disabled look flag
+/*! \brief  Set item disabled look flag
 
    \param[in] oq_Disabled Flag if item is disabled
 */
@@ -353,9 +356,10 @@ void C_GiLiBus::SetDisabledLook(const bool oq_Disabled)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Apply style
+/*! \brief  Apply style
 
-   \param[in]     opc_InputDialog      Dialog with style result
+   \param[in] orc_LineColor line color
+   \param[in] osn_Width     line width
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::ApplyStyle(const QColor & orc_LineColor, const stw_types::sintn osn_Width)
@@ -366,7 +370,7 @@ void C_GiLiBus::ApplyStyle(const QColor & orc_LineColor, const stw_types::sintn 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checking the bus data for errors and updates the conflict icon
+/*! \brief  Checking the bus data for errors and updates the conflict icon
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::CheckBusForChanges(void)
@@ -382,7 +386,7 @@ void C_GiLiBus::CheckBusForChanges(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Flag for displaying interaction points and handling multiselection mode
+/*! \brief  Flag for displaying interaction points and handling multiselection mode
 
    false:
    Deactivate interaction points
@@ -409,7 +413,7 @@ void C_GiLiBus::SetResizing(const bool & orq_ResizeActive)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the associated bus text element
+/*! \brief  Returns the associated bus text element
 
    \return
    Pointer to the text element
@@ -421,7 +425,7 @@ C_GiTextElementBus * C_GiLiBus::GetTextElementBus(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse press event slot
+/*! \brief  Overwritten mouse press event slot
 
    Here: Hide tool tip
 
@@ -436,7 +440,7 @@ void C_GiLiBus::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten hover leave event slot
+/*! \brief  Overwritten hover leave event slot
 
    Here: Hide tool tip
 
@@ -451,9 +455,10 @@ void C_GiLiBus::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update the position of the text element
+/*! \brief  Update the position of the text element
 
-   \param[in]     orc_PositionDifference      Dialog with style result
+   \param[in] ors32_LineIndex        Line index
+   \param[in] orc_PositionDifference Dialog with style result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::m_BusWasMoved(const stw_types::sint32 & ors32_LineIndex, const QPointF & orc_PositionDifference)
@@ -479,7 +484,7 @@ void C_GiLiBus::m_UpdateTextElementName(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Unregister text element for bus
+/*! \brief  Unregister text element for bus
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::m_UnregisterTextElement(void)

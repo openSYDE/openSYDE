@@ -46,10 +46,11 @@ private:
                                           C_CieConverter::C_CIENode & orc_Node);
    static stw_types::sint32 mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMessage,
                                               C_CieConverter::C_CIENodeMessage & orc_Message);
-   static stw_types::sint32 mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal,
-                                         C_CieConverter::C_CIENodeMessage & orc_Message);
+   static stw_types::sint32 mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, bool & orq_MultiplexerSignalExists,
+                                         bool & orq_SignalAdapted, C_CieConverter::C_CIENodeMessage & orc_Message);
    static void mh_VerifySignalValueTable(C_CieConverter::C_CIECanSignal & orc_DbcSignal);
    static stw_types::sint32 mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSignal,
+                                               const bool oq_MultiplexerSignal, bool & orq_SignalAdapted,
                                                C_CieConverter::C_CIEDataPoolElement & orc_Element,
                                                stw_scl::C_SCLStringList & orc_WarningMessages);
    static stw_types::sint32 mh_GetAttributeDefinitions(const Vector::DBC::Network & orc_DbcNetwork);

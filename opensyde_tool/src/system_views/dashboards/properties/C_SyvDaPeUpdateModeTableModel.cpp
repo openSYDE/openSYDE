@@ -20,8 +20,8 @@
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
-#include "C_SdNdeDataPoolUtil.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_SyvDaPeUpdateModeTableModel.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -334,7 +334,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                                                                                                 rc_CurId.u32_ElementIndex);
                      if (pc_OSCElement != NULL)
                      {
-                        c_Retval = C_SdNdeDataPoolUtil::h_ConvertContentTypeToString(pc_OSCElement->c_Value.GetType());
+                        c_Retval = C_SdNdeDpUtil::h_ConvertContentTypeToString(pc_OSCElement->c_Value.GetType());
                      }
                   }
                   break;
@@ -379,7 +379,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   if (rc_CurConfig.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE)
                   {
                      c_Retval =
-                        C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
+                        C_SdNdeDpContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
                   }
                   else
                   {
@@ -432,7 +432,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   c_Retval = static_cast<sintn>(rc_CurConfig.u8_RailIndex);
                   break;
                case eTHRESHOLD:
-                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
+                  c_Retval = C_SdNdeDpContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
                   break;
                default:
                   //Not necessary
@@ -608,7 +608,7 @@ bool C_SyvDaPeUpdateModeTableModel::setData(const QModelIndex & orc_Index, const
                   rc_CurConfig.u8_RailIndex = static_cast<uint8>(orc_Value.toInt());
                   break;
                case eTHRESHOLD:
-                  C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGeneric(orc_Value, rc_CurConfig.c_ChangeThreshold,
+                  C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(orc_Value, rc_CurConfig.c_ChangeThreshold,
                                                                            0);
                   break;
                default:

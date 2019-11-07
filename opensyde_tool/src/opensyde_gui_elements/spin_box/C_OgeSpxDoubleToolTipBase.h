@@ -38,13 +38,13 @@ public:
    virtual bool event(QEvent * const opc_Event) override;
    //lint -restore
 
-   void SetMinimumCustom(const stw_types::float64 of64_Value);
-   void SetMaximumCustom(const stw_types::float64 of64_Value);
+   void SetMinimumCustom(const stw_types::float64 of64_Value, const QString & orc_Display = "");
+   void SetMaximumCustom(const stw_types::float64 of64_Value, const QString & orc_Display = "");
 
 protected:
    virtual bool m_IsEnabled(void) const override;
-   virtual QString m_GetMinimum(void) const override;
-   virtual QString m_GetMaximum(void) const override;
+   virtual QString m_GetMinimumRawString(void) const override;
+   virtual QString m_GetMaximumRawString(void) const override;
    virtual void m_SetMouseTracking(const bool oq_Active) override;
    virtual bool m_CallBaseEvent(QEvent * const opc_Event) override;
 

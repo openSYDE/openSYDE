@@ -37,7 +37,9 @@ public:
    C_SdUtil(void);
    static stw_types::sint32 h_GetNames(const std::vector<stw_types::uint32> & orc_NodeIndices,
                                        const std::vector<stw_types::uint32> & orc_InterfaceIndices,
-                                       std::vector<QString> & orc_Names);
+                                       std::vector<QString> & orc_Names,
+                                       const std::vector<stw_types::uint32> * const opc_DatapoolIndices = NULL,
+                                       std::vector<QString> * const opc_DatapoolNames = NULL);
    static stw_types::sint32 h_GetName(const stw_types::uint32 & oru32_NodeIndex, QString & orc_Name);
    static stw_types::sint32 h_GetName(const stw_types::uint32 & oru32_NodeIndex,
                                       const stw_types::uint32 & oru32_InterfaceIndex, QString & orc_Name);
@@ -87,9 +89,8 @@ public:
    static bool h_CheckNodeInterfaceConnected(
       const std::vector<stw_opensyde_core::C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
       const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_BusType);
-   static bool h_CheckDatapoolNumber(const stw_types::uint32 & oru32_NodeIndex,
-                                     const stw_opensyde_core::C_OSCNodeDataPool::E_Type & ore_DataPoolType,
-                                     const bool & orq_AlreadyChecked, QWidget * const opc_Parent);
+   static bool h_CheckDatapoolNumber(const stw_types::uint32 & oru32_NodeIndex, const bool & orq_AlreadyChecked,
+                                     QWidget * const opc_Parent);
    static stw_types::sint32 h_GetErrorToolTipNode(const stw_types::uint32 & oru32_NodeIndex, QString & orc_Text,
                                                   bool & orq_ErrorDetected);
    static void h_GetErrorToolTipBus(const stw_types::uint32 & oru32_BusIndex, QString & orc_Text);

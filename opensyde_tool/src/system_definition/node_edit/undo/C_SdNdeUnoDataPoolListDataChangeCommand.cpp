@@ -55,7 +55,7 @@ using namespace stw_errors;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListDataChangeCommand::C_SdNdeUnoDataPoolListDataChangeCommand(const uint32 & oru32_NodeIndex,
                                                                                  const uint32 & oru32_DataPoolIndex,
-                                                                                 stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget, const uint32 & oru32_DataPoolListIndex, const QVariant & orc_NewData, const C_SdNdeDataPoolUtil::E_ListDataChangeType & ore_DataChangeType,
+                                                                                 stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget, const uint32 & oru32_DataPoolListIndex, const QVariant & orc_NewData, const C_SdNdeDpUtil::E_ListDataChangeType & ore_DataChangeType,
                                                                                  QUndoCommand * const opc_Parent) :
    C_SdNdeUnoDataPoolListBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, opc_DataPoolListsTreeWidget,
                                      "Change List data", opc_Parent),
@@ -113,25 +113,25 @@ void C_SdNdeUnoDataPoolListDataChangeCommand::m_Change(QVariant & orc_PreviousDa
       //Apply new
       switch (this->me_DataChangeType)
       {
-      case C_SdNdeDataPoolUtil::eLIST_NAME:
+      case C_SdNdeDpUtil::eLIST_NAME:
          tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListName(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                          this->mu32_DataPoolListIndex,
                                                                          orc_NewData.toString()) == C_NO_ERR);
          break;
-      case C_SdNdeDataPoolUtil::eLIST_COMMENT:
+      case C_SdNdeDpUtil::eLIST_COMMENT:
          tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListComment(this->mu32_NodeIndex,
                                                                             this->mu32_DataPoolIndex,
                                                                             this->mu32_DataPoolListIndex,
                                                                             orc_NewData.toString()) == C_NO_ERR);
          break;
-      case C_SdNdeDataPoolUtil::eLIST_SIZE:
+      case C_SdNdeDpUtil::eLIST_SIZE:
          tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListNVMSize(this->mu32_NodeIndex,
                                                                             this->mu32_DataPoolIndex,
                                                                             this->mu32_DataPoolListIndex,
                                                                             static_cast<uint32>(orc_NewData.toULongLong())) ==
                     C_NO_ERR);
          break;
-      case C_SdNdeDataPoolUtil::eLIST_CRC:
+      case C_SdNdeDpUtil::eLIST_CRC:
          tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListNVMCRC(this->mu32_NodeIndex,
                                                                            this->mu32_DataPoolIndex,
                                                                            this->mu32_DataPoolListIndex,
@@ -163,21 +163,21 @@ void C_SdNdeUnoDataPoolListDataChangeCommand::m_Change(QVariant & orc_PreviousDa
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListDataChangeCommand::mh_ConvertListTypeToGeneric(const C_OSCNodeDataPoolList & orc_OSCElement,
-                                                                          const C_SdNdeDataPoolUtil::E_ListDataChangeType & ore_Type,
+                                                                          const C_SdNdeDpUtil::E_ListDataChangeType & ore_Type,
                                                                           QVariant & orc_Generic)
 {
    switch (ore_Type)
    {
-   case C_SdNdeDataPoolUtil::eLIST_NAME:
+   case C_SdNdeDpUtil::eLIST_NAME:
       orc_Generic = orc_OSCElement.c_Name.c_str();
       break;
-   case C_SdNdeDataPoolUtil::eLIST_COMMENT:
+   case C_SdNdeDpUtil::eLIST_COMMENT:
       orc_Generic = orc_OSCElement.c_Comment.c_str();
       break;
-   case C_SdNdeDataPoolUtil::eLIST_SIZE:
+   case C_SdNdeDpUtil::eLIST_SIZE:
       orc_Generic = static_cast<uint64>(orc_OSCElement.u32_NvMSize);
       break;
-   case C_SdNdeDataPoolUtil::eLIST_CRC:
+   case C_SdNdeDpUtil::eLIST_CRC:
       orc_Generic = orc_OSCElement.q_NvMCRCActive;
       break;
    default:

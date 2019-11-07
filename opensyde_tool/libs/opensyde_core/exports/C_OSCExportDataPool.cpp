@@ -79,6 +79,7 @@ void C_OSCExportDataPool::h_GetFileName(const C_OSCNodeDataPool & orc_DataPool, 
 
    \param[in] orc_Path                 storage path for created files
    \param[in] orc_DataPool             data pool configuration
+   \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in] ou8_DataPoolIndex        index of data pool within local process
    \param[in] oq_IsRemote              true: create source code for a "remote" data pool
    \param[in] ou8_DataPoolIndexRemote  index of data pool within remote process
@@ -90,10 +91,10 @@ void C_OSCExportDataPool::h_GetFileName(const C_OSCNodeDataPool & orc_DataPool, 
    C_RD_WR  Operation failure: cannot store files
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, const C_OSCNodeDataPool & orc_DataPool,
-                                               const uint8 ou8_DataPoolIndex, const bool oq_IsRemote,
-                                               const uint8 ou8_DataPoolIndexRemote, const uint8 ou8_ProcessId,
-                                               const C_SCLString & orc_ExportToolInfo)
+sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, const uint16 ou16_GenCodeVersion,
+                                               const C_OSCNodeDataPool & orc_DataPool, const uint8 ou8_DataPoolIndex,
+                                               const bool oq_IsRemote, const uint8 ou8_DataPoolIndexRemote,
+                                               const uint8 ou8_ProcessId, const C_SCLString & orc_ExportToolInfo)
 {
    sint32 s32_Retval;
    uint32 u32_HashValue = 0U;
@@ -104,14 +105,14 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
 
    // create header file
    s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, orc_DataPool, ou8_DataPoolIndex, c_ProjectId,
-                                    oq_IsRemote);
+                                    ou16_GenCodeVersion, oq_IsRemote);
 
    // create implementation file
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, orc_DataPool, ou8_DataPoolIndex,
-                                               c_ProjectId,
-                                               ou8_DataPoolIndexRemote, ou8_ProcessId, oq_IsRemote);
+                                               c_ProjectId, ou16_GenCodeVersion, ou8_DataPoolIndexRemote, ou8_ProcessId,
+                                               oq_IsRemote);
    }
 
    return s32_Retval;
@@ -125,6 +126,7 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
    \param[in] orc_DataPool             data pool configuration
    \param[in] ou8_DataPoolIndex        index of data pool
    \param[in] orc_ProjectId            project id for consistency check
+   \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in] oq_IsRemote              true: create for remote data pool
 
    \return
@@ -134,7 +136,8 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportToolInfo, const C_SCLString & orc_Path,
                                                 const C_OSCNodeDataPool & orc_DataPool, const uint8 ou8_DataPoolIndex,
-                                                const C_SCLString & orc_ProjectId, const bool oq_IsRemote)
+                                                const C_SCLString & orc_ProjectId, const uint16 ou16_GenCodeVersion,
+                                                const bool oq_IsRemote)
 {
    sint32 s32_Retval;
    C_SCLStringList c_Data;
@@ -146,13 +149,14 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportTo
    mh_AddIncludes(c_Data, orc_DataPool, mhq_IS_HEADER_FILE);
 
    // add defines
-   mh_AddDefines(c_Data, orc_DataPool, ou8_DataPoolIndex, orc_ProjectId, mhq_IS_HEADER_FILE, oq_IsRemote);
+   mh_AddDefines(c_Data, orc_DataPool, ou8_DataPoolIndex, orc_ProjectId, ou16_GenCodeVersion, mhq_IS_HEADER_FILE,
+                 oq_IsRemote);
 
    // add types
    mh_AddTypes(c_Data, orc_DataPool, mhq_IS_HEADER_FILE, oq_IsRemote);
 
    // add global variables
-   mh_AddGlobalVariables(c_Data, orc_DataPool, mhq_IS_HEADER_FILE, oq_IsRemote);
+   mh_AddGlobalVariables(c_Data, orc_DataPool, ou16_GenCodeVersion, mhq_IS_HEADER_FILE, oq_IsRemote);
 
    // add function prototypes
    mh_AddFunctionPrototypes(c_Data, orc_DataPool, orc_ProjectId);
@@ -174,6 +178,7 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportTo
    \param[in] orc_DataPool             data pool configuration
    \param[in] ou8_DataPoolIndex        index of data pool
    \param[in] orc_ProjectId            project id for consistency check
+   \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in] ou8_DataPoolIndexRemote  index of data pool within remote process
    \param[in] ou8_ProcessId            ID of process owning this data pool
    \param[in] oq_IsRemote              true: create for remote data pool
@@ -188,6 +193,7 @@ sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_
                                                         const C_OSCNodeDataPool & orc_DataPool,
                                                         const uint8 ou8_DataPoolIndex,
                                                         const C_SCLString & orc_ProjectId,
+                                                        const uint16 ou16_GenCodeVersion,
                                                         const uint8 ou8_DataPoolIndexRemote, const uint8 ou8_ProcessId,
                                                         const bool oq_IsRemote)
 {
@@ -201,13 +207,14 @@ sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_
    mh_AddIncludes(c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE);
 
    // add defines
-   mh_AddDefines(c_Data, orc_DataPool, ou8_DataPoolIndex, orc_ProjectId, mhq_IS_IMPLEMENTATION_FILE, oq_IsRemote);
+   mh_AddDefines(c_Data, orc_DataPool, ou8_DataPoolIndex, orc_ProjectId, ou16_GenCodeVersion,
+                 mhq_IS_IMPLEMENTATION_FILE, oq_IsRemote);
 
    // add types
    mh_AddTypes(c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE, oq_IsRemote);
 
    // add global variables
-   mh_AddGlobalVariables(c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE, oq_IsRemote);
+   mh_AddGlobalVariables(c_Data, orc_DataPool, ou16_GenCodeVersion, mhq_IS_IMPLEMENTATION_FILE, oq_IsRemote);
 
    // add module global variables and function prototypes
    mh_AddModuleGlobal(c_Data, orc_DataPool, ou8_ProcessId, ou8_DataPoolIndexRemote, oq_IsRemote);
@@ -308,13 +315,15 @@ void C_OSCExportDataPool::mh_AddIncludes(C_SCLStringList & orc_Data, const C_OSC
    \param[in]  orc_DataPool             data pool configuration
    \param[in]  ou8_DataPoolIndex        index of data pool
    \param[in]  orc_ProjectId            project id for consistency check
+   \param[in]  ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in]  oq_FileType              .c or .h file selected
    \param[in]  oq_IsRemote              true: create for remote data pool
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                         const uint8 ou8_DataPoolIndex, const C_SCLString & orc_ProjectId,
-                                        const bool oq_FileType, const bool oq_IsRemote)
+                                        const uint16 ou16_GenCodeVersion, const bool oq_FileType,
+                                        const bool oq_IsRemote)
 {
    const C_SCLString c_DataPoolName = orc_DataPool.c_Name.UpperCase();
    const C_SCLString c_MagicName = c_DataPoolName + "_PROJECT_ID_" + orc_ProjectId;
@@ -388,6 +397,19 @@ void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCN
    }
    else
    {
+      if (ou16_GenCodeVersion == 3U)
+      {
+         orc_Data.Append("///check for correct version of structure definitions");
+         orc_Data.Append("#if OSY_DPA_DATA_POOL_DEFINITION_VERSION != 0x000" +
+                         C_SCLString::IntToStr(static_cast<sint32>(ou16_GenCodeVersion) - 1) + "U");
+         // datapool export version is one less than over all code structure version (no changes from version 1 to 2)
+         orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
+                         "generated code");
+         orc_Data.Append("static T_osy_non_existing_type_" + orc_ProjectId + " mt_Variable;");
+         orc_Data.Append("#endif");
+         orc_Data.Append("");
+      }
+
       orc_Data.Append("///ensure file consistency (if compilation fails here the .h file does not match this .c file)");
       orc_Data.Append(c_MagicName);
       orc_Data.Append("");
@@ -473,12 +495,14 @@ void C_OSCExportDataPool::mh_AddTypes(C_SCLStringList & orc_Data, const C_OSCNod
 
    \param[out] orc_Data                 converted data to string list
    \param[in]  orc_DataPool             data pool configuration
+   \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in]  oq_FileType              .c or .h file selected
    \param[in]  oq_IsRemote              true: create for remote data pool
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
-                                                const bool oq_FileType, const bool oq_IsRemote)
+void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data,  const C_OSCNodeDataPool & orc_DataPool,
+                                                const uint16 ou16_GenCodeVersion, const bool oq_FileType,
+                                                const bool oq_IsRemote)
 {
    bool q_AtLeastOneElement = false;
 
@@ -506,7 +530,7 @@ void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data, cons
          }
       }
 
-      orc_Data.Append("///Data pool instance data for API functions::");
+      orc_Data.Append("///Data pool instance data for API functions:");
       orc_Data.Append("extern const T_osy_dpa_data_pool gt_" + orc_DataPool.c_Name + "_DataPool;");
       orc_Data.Append("");
    }
@@ -516,12 +540,26 @@ void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data, cons
       {
          if (q_AtLeastOneElement == true)
          {
-            C_SCLString c_String;
+            C_SCLString c_SafeRamData;
             if (orc_DataPool.q_IsSafety == true)
             {
-               c_String = "OSY_DPA_SAFE_RAM_DATA ";
+               if (ou16_GenCodeVersion == 3U)
+               {
+                  c_SafeRamData = "OSY_DPA_SAFE_RAM_DATA_READALL_ZERO ";
+               }
+               else
+               {
+                  c_SafeRamData = "OSY_DPA_SAFE_RAM_DATA ";
+               }
             }
-            orc_Data.Append(c_String + "T_" + orc_DataPool.c_Name + "_DataPoolValues gt_" + orc_DataPool.c_Name +
+            else
+            {
+               if (ou16_GenCodeVersion == 3U)
+               {
+                  c_SafeRamData = "OSY_DPA_NONSAFE_RAM_DATA_WRITEALL_ZERO ";
+               }
+            }
+            orc_Data.Append(c_SafeRamData + "T_" + orc_DataPool.c_Name + "_DataPoolValues gt_" + orc_DataPool.c_Name +
                             "_DataPoolValues;");
          }
       }

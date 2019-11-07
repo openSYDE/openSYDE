@@ -34,12 +34,17 @@ public:
 
 protected:
    virtual bool m_IsEnabled(void) const = 0;
-   virtual QString m_GetMinimum(void) const = 0;
-   virtual QString m_GetMaximum(void) const = 0;
+   virtual QString m_GetMinimumString(void) const;
+   virtual QString m_GetMaximumString(void) const;
+   virtual QString m_GetMinimumRawString(void) const = 0;
+   virtual QString m_GetMaximumRawString(void) const = 0;
    virtual void m_SetMouseTracking(const bool oq_Active) = 0;
    virtual bool m_CallBaseEvent(QEvent * const opc_Event) = 0;
 
    bool m_HandleEvent(QEvent * const opc_Event);
+
+   QString mc_UserMinValString;
+   QString mc_UserMaxValString;
 
 private:
    QString mc_ToolTipAdditionalContent;

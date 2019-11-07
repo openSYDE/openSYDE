@@ -32,7 +32,8 @@ public:
    static stw_types::sint32 h_CreateFolderRecursively(const stw_scl::C_SCLString & orc_Folder);
    static stw_scl::C_SCLString h_NiceifyStringForFileName(const stw_scl::C_SCLString & orc_String);
    static stw_scl::C_SCLString h_NiceifyStringForCComment(const stw_scl::C_SCLString & orc_String);
-   static bool h_IsStringNiceifiedForFileName(const stw_scl::C_SCLString & orc_String);
+   static bool h_CheckValidFileName(const stw_scl::C_SCLString & orc_String);
+   static bool h_CheckValidFilePath(const stw_scl::C_SCLString & orc_String);
 
    static bool h_IsScalingActive(const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset);
    static stw_types::float64 h_GetValueScaled(const stw_types::float64 of64_Value, const stw_types::float64 of64_Factor,
@@ -40,6 +41,7 @@ public:
    static stw_types::float64 h_GetValueUnscaled(const stw_types::float64 of64_Value,
                                                 const stw_types::float64 of64_Factor,
                                                 const stw_types::float64 of64_Offset);
+   static stw_scl::C_SCLString h_SerialNumberToString(const stw_types::uint8 * const opu8_SerialNumber);
 
 private:
    static const stw_types::float64 mhf64_Epsilon;

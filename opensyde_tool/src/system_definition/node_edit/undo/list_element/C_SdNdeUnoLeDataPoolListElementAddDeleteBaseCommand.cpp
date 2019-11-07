@@ -19,7 +19,7 @@
 #include "constants.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdUtil.h"
-#include "C_SdNdeDataPoolListTableView.h"
+#include "C_SdNdeDpListTableView.h"
 #include "TGLUtils.h"
 
 #include "C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand.h"
@@ -57,7 +57,7 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand(
    const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
-   C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
    const std::vector<uint32> & orc_Indices, const QString & orc_Text, QUndoCommand * const opc_Parent) :
    C_SdNdeUnoLeDataPoolListElementBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                               opc_DataPoolListModelViewManager,
@@ -83,7 +83,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
    m_SortAscending();
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
-      C_SdNdeDataPoolListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
+      C_SdNdeDpListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
@@ -117,9 +117,9 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
    m_SortAscending();
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
-      C_SdNdeDataPoolListTableView * const pc_View = this->mpc_DataPoolListModelViewManager->GetElementView(
+      C_SdNdeDpListTableView * const pc_View = this->mpc_DataPoolListModelViewManager->GetElementView(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
-      C_SdNdeDataPoolListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
+      C_SdNdeDpListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
@@ -228,7 +228,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::SetInitialData(
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
    const std::vector<std::vector<uint32> > & orc_Items, const bool oq_ScrollToLast)
 {
-   C_SdNdeDataPoolListTableView * const pc_View = this->mpc_DataPoolListModelViewManager->GetElementView(
+   C_SdNdeDpListTableView * const pc_View = this->mpc_DataPoolListModelViewManager->GetElementView(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
 
    if (pc_View != NULL)
@@ -248,7 +248,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
             //scroll to last
             if ((oq_ScrollToLast) && (u32_ItSection == (orc_Items.size() - 1UL)))
             {
-               C_SdNdeDataPoolListTableModel * const pc_Model =
+               C_SdNdeDpListTableModel * const pc_Model =
                   this->mpc_DataPoolListModelViewManager->GetElementModel(
                      this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
                if (pc_Model != NULL)

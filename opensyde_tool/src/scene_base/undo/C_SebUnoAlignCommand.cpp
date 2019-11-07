@@ -37,7 +37,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Scene             Pointer to currently active scene
    \param[in]     orc_IDs               Affected unique IDs
@@ -56,7 +56,7 @@ C_SebUnoAlignCommand::C_SebUnoAlignCommand(QGraphicsScene * const opc_Scene,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoAlignCommand::~C_SebUnoAlignCommand(void)
@@ -64,7 +64,7 @@ C_SebUnoAlignCommand::~C_SebUnoAlignCommand(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Empty redo
+/*! \brief  Empty redo
 
    All actions are done using child commands
 */
@@ -75,7 +75,7 @@ void C_SebUnoAlignCommand::redo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Empty undo
+/*! \brief  Empty undo
 
    All actions are done using child commands
 */
@@ -86,7 +86,7 @@ void C_SebUnoAlignCommand::undo(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Align selected items
+/*! \brief  Align selected items
 
    \param[in] oru64_GuidelineItemID ID of guideline item
    \param[in] ore_Alignment         Alignment type

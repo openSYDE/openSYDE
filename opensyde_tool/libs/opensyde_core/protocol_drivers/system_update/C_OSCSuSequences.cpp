@@ -3041,13 +3041,8 @@ void C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
                          orc_Info.c_MoreInformation.au8_ProtocolVersion[2]);
    orc_Text.Add(c_Line);
    orc_Text.Add("Flash count: " + C_SCLString::IntToStr(orc_Info.c_MoreInformation.u32_FlashCount));
-   c_Line.PrintFormatted("Device serial number: %02X.%02X%02X%02X.%02X%02X",
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[0],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[1],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[2],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[3],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[4],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[5]);
+   c_Line = "Device serial number: " +
+            (C_OSCUtils::h_SerialNumberToString(&orc_Info.c_MoreInformation.au8_EcuSerialNumber[0]));
    orc_Text.Add(c_Line);
    orc_Text.Add("Device article number: " + C_SCLString::IntToStr(orc_Info.c_MoreInformation.u32_EcuArticleNumber));
    orc_Text.Add("Device article version: " + orc_Info.c_MoreInformation.c_EcuHardwareVersionNumber);

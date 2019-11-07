@@ -40,13 +40,13 @@ const float64 C_GiLiLineGroup::mhf64_MaxDistToAlign = 10.0;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]     opc_Points      Optional points for line
-   \param[in]     orq_MiddleLine  Indicator if line(s) should have a different colored central line
-   \param[in,out] opc_Parent      Optional pointer to parent
+   \param[in]     opc_Points     Optional points for line
+   \param[in]     orq_MiddleLine Indicator if line(s) should have a different colored central line
+   \param[in,out] opc_Parent     Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiLineGroup::C_GiLiLineGroup(const std::vector<QPointF> * const opc_Points, const bool & orq_MiddleLine,
@@ -73,7 +73,7 @@ C_GiLiLineGroup::C_GiLiLineGroup(const std::vector<QPointF> * const opc_Points, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -84,7 +84,7 @@ C_GiLiLineGroup::~C_GiLiLineGroup(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set interaction elements visible
+/*! \brief  Set interaction elements visible
 
    \param[in] orq_Visible Visible status
 */
@@ -98,7 +98,7 @@ void C_GiLiLineGroup::m_SetInteractionVisibility(const bool & orq_Visible)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set interaction elements visible but interactable
+/*! \brief  Set interaction elements visible but interactable
 
    \param[in] orq_Invisible Visible status
 */
@@ -211,10 +211,14 @@ bool C_GiLiLineGroup::m_Near(const float64 of64_Exact, const float64 of64_Eval)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds a bending point
+/*! \brief  Adds a bending point
 
    \param[in] orc_ScenePos Position of the bending point
    \param[in] opc_Index    Optional specific index to add point add
+
+   \return
+   -1: error
+   else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * const opc_Index)
@@ -279,10 +283,14 @@ sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Removes a bending point
+/*! \brief  Removes a bending point
 
    \param[in] orc_ScenePos Position of the bending point
    \param[in] opc_Index    Optional specific index which point to remove
+
+   \return
+   -1: error
+   else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiLiLineGroup::RemoveBend(const QPointF & orc_ScenePos, const sint32 * const opc_Index)
@@ -334,7 +342,7 @@ sint32 C_GiLiLineGroup::RemoveBend(const QPointF & orc_ScenePos, const sint32 * 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle point position change
+/*! \brief  Handle point position change
 
    \param[in] ors32_PointIndex Index of changed point
 */
@@ -349,7 +357,7 @@ void C_GiLiLineGroup::OnPointChange(const stw_types::sint32 & ors32_PointIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns an estimate of the area painted by the item
+/*! \brief  Returns an estimate of the area painted by the item
 
    \return     Rectangle
 */
@@ -360,7 +368,7 @@ QRectF C_GiLiLineGroup::boundingRect() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore all custom mouse cursors
+/*! \brief  Restore all custom mouse cursors
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::RestoreDefaultCursor(void)
@@ -379,7 +387,7 @@ void C_GiLiLineGroup::RestoreDefaultCursor(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwrite cursor
+/*! \brief  Overwrite cursor
 
    \param[in] orc_TemporaryCursor Temporary cursor for item
 */
@@ -400,7 +408,7 @@ void C_GiLiLineGroup::SetTemporaryCursor(const QCursor & orc_TemporaryCursor)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set default mouse cursor
+/*! \brief  Set default mouse cursor
 
    \param[in] orc_Value New default mouse cursor
 */
@@ -465,7 +473,7 @@ void C_GiLiLineGroup::m_InitPoint(const sint32 & ors32_Index, const QPointF & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper to handle point creation
+/*! \brief  Helper to handle point creation
 
    \param[in] ors32_Index Index of creation
    \param[in] orc_Pos     Position of new point in scene
@@ -489,7 +497,7 @@ void C_GiLiLineGroup::m_AddPointAt(const stw_types::sint32 & ors32_Index, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper to handle point removal
+/*! \brief  Helper to handle point removal
 
    \param[in] ors32_Index Index of point
 */
@@ -518,7 +526,7 @@ void C_GiLiLineGroup::m_RemovePointAt(const stw_types::sint32 & ors32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for initially loading basic internal data
+/*! \brief  Function for initially loading basic internal data
 
    \param[in,out] orc_Data Data element to load
 */
@@ -532,7 +540,7 @@ void C_GiLiLineGroup::LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsLineBas
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Enter basic line info
+/*! \brief  Enter basic line info
 
    \param[in,out] orc_Data Data element to update
 */
@@ -553,7 +561,7 @@ void C_GiLiLineGroup::UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsLineBase & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize class
+/*! \brief  Initialize class
 
    \param[in] orc_Points Initial points
 */
@@ -574,10 +582,13 @@ void C_GiLiLineGroup::Init(const std::vector<QPointF> & orc_Points)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten itemChange event slot
+/*! \brief  Overwritten itemChange event slot
 
-   \param[in,out] opc_Change Indicator what changed
-   \param[in]     orc_Value  Value corresponding to change
+   \param[in,out] oe_Change Indicator what changed
+   \param[in]     orc_Value Value corresponding to change
+
+   \return
+   new value
 */
 //----------------------------------------------------------------------------------------------------------------------
 QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value)
@@ -689,7 +700,7 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse press event slot
+/*! \brief  Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -745,7 +756,7 @@ void C_GiLiLineGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse move event slot
+/*! \brief  Overwritten mouse move event slot
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -763,7 +774,7 @@ void C_GiLiLineGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse release event slot
+/*! \brief  Overwritten mouse release event slot
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -805,9 +816,9 @@ void C_GiLiLineGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Eve
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the width of the line
+/*! \brief  Sets the width of the line
 
-   \param[in]     Width
+   \param[in] ors32_Width New width
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::SetWidth(const sint32 & ors32_Width)
@@ -816,9 +827,9 @@ void C_GiLiLineGroup::SetWidth(const sint32 & ors32_Width)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the color of the main line
+/*! \brief  Sets the color of the main line
 
-   \param[in]     Color
+   \param[in] orc_Color New color
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::SetColor(const QColor & orc_Color)
@@ -827,9 +838,9 @@ void C_GiLiLineGroup::SetColor(const QColor & orc_Color)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the color of the middle line
+/*! \brief  Sets the color of the middle line
 
-   \param[in]     Color
+   \param[in] orc_Color New color
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::SetMiddleLineColor(const QColor & orc_Color)
@@ -838,9 +849,9 @@ void C_GiLiLineGroup::SetMiddleLineColor(const QColor & orc_Color)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Activates or Deactivates the middle line
+/*! \brief  Activates or Deactivates the middle line
 
-   \param[in]     Flag for activating or deactivaing
+   \param[in] orq_MiddleLine True: activate middle line, false: deactivate middle line
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::SetMiddleLine(const bool & orq_MiddleLine)
@@ -849,7 +860,7 @@ void C_GiLiLineGroup::SetMiddleLine(const bool & orq_MiddleLine)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Return the width of the line
+/*! \brief  Return the width of the line
 
    \return  Width
 */
@@ -860,7 +871,7 @@ sint32 C_GiLiLineGroup::GetWidth() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Return the color of the line
+/*! \brief  Return the color of the line
 
    \return  Color
 */
@@ -871,7 +882,7 @@ QColor C_GiLiLineGroup::GetColor() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Return the color of the middle line
+/*! \brief  Return the color of the middle line
 
    \return  Color
 */
@@ -882,7 +893,7 @@ QColor C_GiLiLineGroup::GetMiddleLineColor() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Return all used lines
+/*! \brief  Return all used lines
 
    \return  vector with pointer to all used lines
 */
@@ -893,7 +904,7 @@ QVector<C_GiLiLineConnection *> C_GiLiLineGroup::GetLines() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Return the flag about the usage of the middle line
+/*! \brief  Return the flag about the usage of the middle line
 
    \return  Flag if the middle line is used
 */
@@ -904,7 +915,10 @@ bool C_GiLiLineGroup::GetMiddleLine() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get the number of used points
+/*! \brief  Get the number of used points
+
+   \return
+   Number of used points
 */
 //----------------------------------------------------------------------------------------------------------------------
 sintn C_GiLiLineGroup::GetNumberPoints(void) const
@@ -913,7 +927,10 @@ sintn C_GiLiLineGroup::GetNumberPoints(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the position
+/*! \brief  Returns the position
+
+   \return
+   Position
 */
 //----------------------------------------------------------------------------------------------------------------------
 QPointF C_GiLiLineGroup::GetPos(void) const
@@ -937,7 +954,7 @@ QPointF C_GiLiLineGroup::GetPos(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set item disabled look flag
+/*! \brief  Set item disabled look flag
 
    \param[in] oq_Disabled Flag if item is disabled
 */
@@ -948,7 +965,7 @@ void C_GiLiLineGroup::SetDisabledLook(const bool oq_Disabled)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set animation status
+/*! \brief  Set animation status
 
    \param[in] oq_Active          Animation active flag
    \param[in] oq_Inverse         Optional flag to animate in inverse direction
@@ -967,7 +984,7 @@ void C_GiLiLineGroup::SetAnimated(const bool oq_Active, const bool oq_Inverse, c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Flag for displaying interaction points and handling multiselection mode
+/*! \brief  Flag for displaying interaction points and handling multiselection mode
 
    false:
    Deactivate interaction points
@@ -994,7 +1011,7 @@ void C_GiLiLineGroup::SetResizing(const bool & orq_ResizeActive)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Find closest point in shape to scene position
+/*! \brief  Find closest point in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
    \param[out] orc_Closest    Closest point in shape
@@ -1026,10 +1043,10 @@ void C_GiLiLineGroup::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF &
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Find closest connection in shape to scene position
+/*! \brief  Find closest connection in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
-   \param[out] orsn_Index     Index of closest connection in shape
+   \param[out] ors32_Index    Index of closest connection in shape
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::FindClosestConnection(const QPointF & orc_ScenePoint, sint32 & ors32_Index) const
@@ -1064,7 +1081,7 @@ void C_GiLiLineGroup::FindClosestConnection(const QPointF & orc_ScenePoint, sint
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper to handle point update
+/*! \brief  Helper to handle point update
 
    \param[in] ors32_Index                    Index of creation
    \param[in] orc_Pos                        Position of new point in scene
@@ -1101,9 +1118,9 @@ void C_GiLiLineGroup::UpdatePoint(const sint32 & ors32_Index, const QPointF & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get point position
+/*! \brief  Get point position
 
-   \param[in]  ors32_Index Point index
+   \param[in] os32_Index Point index
 
    \return
    Point scene position
@@ -1118,7 +1135,7 @@ QPointF C_GiLiLineGroup::GetPointScenePos(const sint32 os32_Index) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get point position
+/*! \brief  Get point position
 
    \param[in]  ors32_Index Point index
    \param[out] orc_Pos     Point scene position
@@ -1137,7 +1154,7 @@ void C_GiLiLineGroup::GetPointPos(const sint32 & ors32_Index, QPointF & orc_Pos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if there is a bend point at the specified scene position
+/*! \brief  Check if there is a bend point at the specified scene position
 
    \param[in] orc_ScenePoint Scene position to check
 
@@ -1163,7 +1180,7 @@ bool C_GiLiLineGroup::CheckBendPointAt(const QPointF & orc_ScenePoint) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper function to trigger changed graphic manually to avoid signals on every possible change
+/*! \brief  Helper function to trigger changed graphic manually to avoid signals on every possible change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::TriggerSigChangedGraphic(void)
@@ -1176,7 +1193,7 @@ void C_GiLiLineGroup::TriggerSigChangedGraphic(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten paint event slot
+/*! \brief  Overwritten paint event slot
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
@@ -1200,7 +1217,7 @@ void C_GiLiLineGroup::paint(QPainter * const opc_Painter, const QStyleOptionGrap
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Return more accurate shape
+/*! \brief  Return more accurate shape
 
    \return  The painter path as polygon
 */
@@ -1217,7 +1234,7 @@ QPainterPath C_GiLiLineGroup::shape(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal for update of current scaling
+/*! \brief  Signal for update of current scaling
 
    \param[in] orc_Transform Current scaling
 */

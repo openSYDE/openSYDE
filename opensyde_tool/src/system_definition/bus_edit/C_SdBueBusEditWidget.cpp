@@ -259,6 +259,17 @@ void C_SdBueBusEditWidget::m_TabChanged(const sintn osn_Index) const
 {
    sintn sn_Counter;
 
+   if (osn_Index == 2L)
+   {
+      //Restore
+      this->mpc_Ui->pc_WidgetComIfDescr->TriggerLoadOfSplitterUserSettings();
+   }
+   else
+   {
+      //Save
+      this->mpc_Ui->pc_WidgetComIfDescr->TriggerSaveOfSplitterUserSettings();
+   }
+
    for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_TabWidgetPageNavi->count(); ++sn_Counter)
    {
       if (sn_Counter != osn_Index)
@@ -270,18 +281,6 @@ void C_SdBueBusEditWidget::m_TabChanged(const sintn osn_Index) const
    this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->setSizePolicy(QSizePolicy::Preferred,
                                                                         QSizePolicy::Preferred);
    this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->adjustSize();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Getter to access UI information of this widget.
-
-   \return
-   const pointer of UI functionality
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const Ui::C_SdBueBusEditWidget * C_SdBueBusEditWidget::GetUiWidget() const
-{
-   return this->mpc_Ui;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

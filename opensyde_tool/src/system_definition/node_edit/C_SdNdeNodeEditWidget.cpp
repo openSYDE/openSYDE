@@ -88,19 +88,19 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
       // connecting to signals
       connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigChanged,
               this, &C_SdNdeNodeEditWidget::m_DataChanged);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDataPoolEditWidget::SigChanged,
+      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigChanged,
               this, &C_SdNdeNodeEditWidget::m_DataChanged);
       connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigChanged,
               this, &C_SdNdeNodeEditWidget::m_DataChanged);
       connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange,
               this, &C_SdNdeNodeEditWidget::SigErrorChange);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDataPoolEditWidget::SigSwitchToBus,
+      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToBus,
               this, &C_SdNdeNodeEditWidget::m_OnSwitchToBus);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDataPoolEditWidget::SigEdit,
+      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigEdit,
               this, &C_SdNdeNodeEditWidget::m_EditComDataPool);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDataPoolEditWidget::SigSave,
+      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSave,
               this, &C_SdNdeNodeEditWidget::SigSave);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDataPoolEditWidget::SigSaveAs,
+      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSaveAs,
               this, &C_SdNdeNodeEditWidget::SigSaveAs);
       connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::currentChanged,
               this, &C_SdNdeNodeEditWidget::m_CurrentTabChanged);
@@ -121,14 +121,12 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
    }
 
    //Other connects
-   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDataPoolEditWidget::SigErrorChange,
+   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigErrorChange,
            this, &C_SdNdeNodeEditWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigErrorChange, this,
            &C_SdNdeNodeEditWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigReloadDataPools, this,
            &C_SdNdeNodeEditWidget::m_ReloadDataPools);
-   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigCheckDataPoolInteraction, this,
-           &C_SdNdeNodeEditWidget::m_CheckDataPoolInteraction);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOpenDataPool, this,
            &C_SdNdeNodeEditWidget::m_OpenDataPool);
 }
@@ -382,21 +380,24 @@ void C_SdNdeNodeEditWidget::m_EditComDataPool(const uint32 ou32_DataPoolIndex, c
          default:
             break;
          }
-      }
-      c_Title += C_GtGetText::h_GetText(" - COMM Interface Description");
 
-      // add the necessary widget to the tab widget
-      sn_Index = this->mpc_Ui->pc_TabWidgetPageNavi->addTab(this->mpc_TabThreeWidget, c_Title);
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(sn_Index);
+         c_Title += C_GtGetText::h_GetText(" - COMM Interface Description");
 
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TabWidgetPageNavi->tabBar(),
-                                             "LastItemVeryBig",
-                                             true);
+         // add the necessary widget to the tab widget
+         sn_Index = this->mpc_Ui->pc_TabWidgetPageNavi->addTab(this->mpc_TabThreeWidget, c_Title);
+         this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(sn_Index);
 
-      // set the data
-      if (this->mpc_ComIfDescriptionWidget != NULL)
-      {
-         this->mpc_ComIfDescriptionWidget->SetNodeDataPool(this->mu32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex);
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TabWidgetPageNavi->tabBar(),
+                                                "LastItemVeryBig",
+                                                true);
+
+         // set the data
+         if (this->mpc_ComIfDescriptionWidget != NULL)
+         {
+            //For each interface two lists
+            this->mpc_ComIfDescriptionWidget->SetNodeId(this->mu32_NodeIndex, pc_Protocol->e_Type,
+                                                        ou32_ListIndex / 2);
+         }
       }
    }
 }
@@ -446,6 +447,11 @@ void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
    this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->setSizePolicy(QSizePolicy::Preferred,
                                                                         QSizePolicy::Preferred);
    this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->adjustSize();
+
+   // The previous call of adjustSize causes some times to a second size change of pc_DataPoolEditWidget
+   // This can cause a wrong size of the widget. A further call of adjustSize seems to repair the problem
+   // The origin reason why the widget is resized two times with different sizes is unknown
+   this->mpc_Ui->pc_DataPoolEditWidget->adjustSize();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -455,15 +461,6 @@ void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
 void C_SdNdeNodeEditWidget::m_ReloadDataPools(void) const
 {
    this->mpc_Ui->pc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Trigger check of data pool interaction availability
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::m_CheckDataPoolInteraction(void) const
-{
-   this->mpc_Ui->pc_DataPoolEditWidget->CheckDataPoolInteraction();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

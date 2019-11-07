@@ -35,7 +35,7 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paint icon cell
+/*! \brief  Paint icon cell
 
    \param[in,out] opc_Painter Painter
    \param[in]     orc_Option  Option

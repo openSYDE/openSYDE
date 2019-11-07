@@ -159,7 +159,7 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
 /*! \brief   Replace special characters in string
 
    Aims:
-   * convert into strings that can be used for file system folder names
+   * convert into strings that can be used for file system folder names or file names
    * prevent accidentally rendering unique names identical
      (e.g.: "ITEM!§" and "ITEM%&" should not result in the same string)
 
@@ -183,6 +183,7 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
 
    Special handling will also be applied to strings only containing "." or "..".
    These will be replaced by "dot" resp. "doubledot".
+   Furthermore empty or blank strings (e.g. "", " ", "  ") will be replaced by "blank".
 
    As a result the length of the string might change.
 
@@ -195,8 +196,9 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
 C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_String)
 {
    C_SCLString c_Result;
+   bool q_Blank = true;
 
-   //check fringe cases; "." and ".." have special meaning in most file systems
+   //check fringe cases; "." and ".." have special meaning in most file systems and are no valid directory names
    if (orc_String == ".")
    {
       c_Result = "dot";
@@ -220,9 +222,20 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
          else
          {
             c_Result += cn_Character;
+
+            if (cn_Character != ' ')
+            {
+               q_Blank = false;
+            }
          }
       }
    }
+
+   if (q_Blank == true)
+   {
+      c_Result = "blank";
+   }
+
    return c_Result;
 }
 
@@ -277,27 +290,23 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check if string is niceified for a file names
+/*! \brief  Check if string is valid for a file name by comparing it with result of h_NiceifyStringForFileName.
 
    See description of h_NiceifyStringForFileName. If the string has at least one character which would be replaced
-   by h_NiceifyStringForFileName, the function returns false
+   by h_NiceifyStringForFileName, the string is invalid and therefore the function returns false.
 
-   TODO: Somehow by accident h_NiceifyStringForCComment was used instead of h_NiceifyStringForFileName. The problem is
-         that using h_NiceifyStringForFileName does not work because it is for file names and not for paths, so "\"
-         and ":" are not allowed. Nicefying for C Comment suffices in many cases, the only problem is that so
-         allowed-path-handling in openSYDE GUI is not homogeneous, because there also exist cases where only C names
-         are allowed for paths (which is very restrictive and could be improved).
+   For checking whole paths use h_CheckValidFileName, because here slashes and colons are not allowed.
 
-   \param[in]     orc_String         Original string
+   \param[in]     orc_String         File path name
 
-   \retval   true    The string is niceified and is valid
-   \retval   false   The string is not nice and is not valid
+   \retval   true    The string is valid
+   \retval   false   The string is not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCUtils::h_IsStringNiceifiedForFileName(const C_SCLString & orc_String)
+bool C_OSCUtils::h_CheckValidFileName(const C_SCLString & orc_String)
 {
    bool q_Return = true;
-   const C_SCLString c_Temp = h_NiceifyStringForCComment(orc_String);
+   const C_SCLString c_Temp = h_NiceifyStringForFileName(orc_String);
 
    if (c_Temp != orc_String)
    {
@@ -305,6 +314,48 @@ bool C_OSCUtils::h_IsStringNiceifiedForFileName(const C_SCLString & orc_String)
    }
 
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if string is niceified for file or directory paths.
+
+   Replaces drive name ("C:") and path seperators ("/" or "\") and uses file name check for remaining strings.
+   Empty paths are handled invalid because an empty file path is not valid.
+
+   \param[in]     orc_String         File path string
+
+   \retval   true    The string is niceified and is valid
+   \retval   false   The string is not nice and is not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCUtils::h_CheckValidFilePath(const C_SCLString & orc_String)
+{
+   C_SCLString c_StringWithoutSpecialChars = "";
+
+   if (orc_String != "")
+   {
+      for (uint32 u32_Index = 0U; u32_Index < orc_String.Length(); u32_Index++)
+      {
+         const charn cn_Character = orc_String.c_str()[u32_Index];
+         // skip the following characters:
+         //    ':' on second place (after drive name)
+         //    '/' resp. '\'
+         //    . and because it is valid in paths (but sometimes invalid in names)
+         if (((u32_Index != 1U) || (cn_Character != ':')) &&
+             ((cn_Character != '\\') && (cn_Character != '/') && (cn_Character != '.')))
+         {
+            c_StringWithoutSpecialChars += cn_Character;
+         }
+      }
+
+      // was not empty before but is empty now -> artificially add a character again
+      if (c_StringWithoutSpecialChars == "")
+      {
+         c_StringWithoutSpecialChars = "_";
+      }
+   }
+
+   return (c_StringWithoutSpecialChars == h_NiceifyStringForFileName(c_StringWithoutSpecialChars));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -368,4 +419,42 @@ float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 o
    f64_Result /= of64_Factor;
 
    return f64_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert serial number array to string
+
+   Support of two serial number formats:
+      1: format up to and including 2019. E.g: 05.123456.1001
+      2: format from 2020. E.g: 200012345678
+
+   \param[in]       opu8_SerialNumber     Pointer to first of six serial number array elements
+
+   \return
+   serial number string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCUtils::h_SerialNumberToString(const uint8 * const opu8_SerialNumber)
+{
+   C_SCLString c_Result;
+
+   if (opu8_SerialNumber != NULL)
+   {
+      if (opu8_SerialNumber[0] < static_cast<uint8>(0x20))
+      {
+         //format up to and including 2019. E.g: 05.123456.1001
+         c_Result.PrintFormatted("%02X.%02X%02X%02X.%02X%02X",
+                                 opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
+                                 opu8_SerialNumber[4], opu8_SerialNumber[5]);
+      }
+      else
+      {
+         //format from 2020. E.g: 200012345678
+         c_Result.PrintFormatted("%02X%02X%02X%02X%02X%02X",
+                                 opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
+                                 opu8_SerialNumber[4], opu8_SerialNumber[5]);
+      }
+   }
+
+   return c_Result;
 }

@@ -28,7 +28,7 @@ class C_SdNdeUnoDataPoolListAddCommand :
 public:
    C_SdNdeUnoDataPoolListAddCommand(const stw_types::uint32 & oru32_NodeIndex,
                                     const stw_types::uint32 & oru32_DataPoolIndex,
-                                    stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                    stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                     const std::vector<stw_types::uint32> & orc_Indices,
                                     QUndoCommand * const opc_Parent = NULL);
    virtual void redo(void) override;

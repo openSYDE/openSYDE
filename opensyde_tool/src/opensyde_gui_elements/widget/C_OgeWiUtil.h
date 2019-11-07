@@ -53,6 +53,7 @@ public:
                                     const QString & orc_StartingFolder, const QString & orc_Filter,
                                     const QString & orc_DefaultFileName,
                                     const QFileDialog::Options oc_Option = QFileDialog::Options());
+   static void h_ShowPathInvalidError(QWidget * const opc_Parent, const QString & orc_InvalidPaths);
 
 private:
    C_OgeWiUtil(void);

@@ -30,7 +30,7 @@ public:
    C_SdNdeUnoLeDataPoolListElementMoveCommand(const stw_types::uint32 & oru32_NodeIndex,
                                               const stw_types::uint32 & oru32_DataPoolIndex,
                                               const stw_types::uint32 & oru32_DataPoolListIndex,
-                                              C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                              C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
                                               const std::vector<stw_types::uint32> & orc_SourceRow,
                                               const std::vector<stw_types::uint32> & orc_TargetRow, const bool & orq_AdaptIndices,
                                               QUndoCommand * const opc_Parent = NULL);

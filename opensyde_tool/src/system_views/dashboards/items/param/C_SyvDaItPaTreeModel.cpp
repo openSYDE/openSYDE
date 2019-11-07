@@ -19,9 +19,9 @@
 #include "C_GiSvDaParam.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSdHandler.h"
-#include "C_SdNdeDataPoolUtil.h"
+#include "C_SdNdeDpUtil.h"
 #include "C_SyvDaItPaTreeModel.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -1001,12 +1001,12 @@ void C_SyvDaItPaTreeModel::UpdateECUValues(void)
                         if ((pc_UiElement->q_InterpretAsString == true) && (rc_ValueStrings.size() > 0UL))
                         {
                            rc_ValueStrings[0] =
-                              C_SdNdeDataPoolUtil::h_ConvertToString(c_Content);
+                              C_SdNdeDpUtil::h_ConvertToString(c_Content);
                         }
                         else
                         {
                            rc_ValueStrings.clear();
-                           C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledString(c_Content,
+                           C_SdNdeDpContentUtil::h_GetValuesAsScaledString(c_Content,
                                                                                  pc_OSCElement->f64_Factor,
                                                                                  pc_OSCElement->f64_Offset,
                                                                                  rc_ValueStrings);
@@ -1633,14 +1633,14 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                                  {
                                     //Return display value (no edit required)
                                     c_Retval =
-                                       C_SdNdeDataPoolContentUtil::h_CombineString(this->mc_ECUValuesString[u32_Index]);
+                                       C_SdNdeDpContentUtil::h_CombineString(this->mc_ECUValuesString[u32_Index]);
                                  }
                               }
                               else
                               {
                                  //Return display value (no edit required)
                                  c_Retval =
-                                    C_SdNdeDataPoolContentUtil::h_CombineString(this->mc_ECUValuesString[u32_Index]);
+                                    C_SdNdeDpContentUtil::h_CombineString(this->mc_ECUValuesString[u32_Index]);
                               }
                            }
                         }
@@ -1671,7 +1671,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                         {
                            if (pc_UiElement->q_InterpretAsString == true)
                            {
-                              c_Retval = C_SdNdeDataPoolUtil::h_ConvertToString(*pc_Content);
+                              c_Retval = C_SdNdeDpUtil::h_ConvertToString(*pc_Content);
                            }
                            else
                            {
@@ -1685,7 +1685,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                                  else
                                  {
                                     //Return value for edit
-                                    c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(*pc_Content,
+                                    c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(*pc_Content,
                                                                                                            pc_OSCElement->f64_Factor,
                                                                                                            pc_OSCElement->f64_Offset,
                                                                                                            0);
@@ -1694,7 +1694,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                               else
                               {
                                  QString c_Output;
-                                 C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledCombinedString(*pc_Content,
+                                 C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(*pc_Content,
                                                                                                pc_OSCElement->f64_Factor,
                                                                                                pc_OSCElement->f64_Offset,
                                                                                                c_Output);
@@ -2172,7 +2172,7 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
                                  rc_Config.c_ElementId.u32_ListIndex, rc_Config.c_ElementId.u32_ElementIndex);
                            if (pc_Element != NULL)
                            {
-                              C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(orc_Value, rc_Content,
+                              C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_Value, rc_Content,
                                                                                                   pc_Element->f64_Factor,
                                                                                                   pc_Element->f64_Offset,
                                                                                                   0);
@@ -2181,7 +2181,7 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
                         else
                         {
                            //Array edit should handle this use-case except string
-                           C_SdNdeDataPoolUtil::h_SetString(orc_Value.toString(), rc_Content);
+                           C_SdNdeDpUtil::h_SetString(orc_Value.toString(), rc_Content);
                         }
                         tgl_assert(pc_ParamWidget->SetParamItem(c_Copy) == C_NO_ERR);
                      }

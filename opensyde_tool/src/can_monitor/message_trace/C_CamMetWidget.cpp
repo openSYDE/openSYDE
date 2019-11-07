@@ -41,7 +41,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -91,7 +91,7 @@ C_CamMetWidget::C_CamMetWidget(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetWidget::~C_CamMetWidget()
@@ -100,7 +100,7 @@ C_CamMetWidget::~C_CamMetWidget()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load all user settings
+/*! \brief  Load all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::LoadUserSettings(void)
@@ -109,7 +109,7 @@ void C_CamMetWidget::LoadUserSettings(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save all user settings
+/*! \brief  Save all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::SaveUserSettings(void) const
@@ -119,7 +119,7 @@ void C_CamMetWidget::SaveUserSettings(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Stopping logging in case of an error
+/*! \brief  Stopping logging in case of an error
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::StopLogging(void)
@@ -128,24 +128,20 @@ void C_CamMetWidget::StopLogging(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clears the previous communication
+/*! \brief  Clears the previous communication
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::ClearData(void)
 {
    this->mpc_Ui->pc_TraceView->ActionClearData();
    this->mpc_Ui->pc_StatusWidget->SetBusLoad(0U, this->ms32_CANBitrate);
-   this->mpc_Ui->pc_StatusWidget->SetTxErrors(0U);
    this->mpc_Ui->pc_StatusWidget->SetFilteredMessages(0U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds new filter configurations
+/*! \brief  Adds new filter configurations
 
-   \param[in]  orc_FilterItems     Filter configurations to add
-
-   \return
-   possible return value(s) and description
+   \param[in] orc_FilterItems Filter configurations to add
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::AddFilterItems(const QList<C_CamProFilterItemData> & orc_FilterItems)
@@ -159,12 +155,9 @@ void C_CamMetWidget::AddFilterItems(const QList<C_CamProFilterItemData> & orc_Fi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Removes specific filter configurations
+/*! \brief  Removes specific filter configurations
 
-   \param[in]     orc_FilterItems         All filter configurations for removing
-
-   \return
-   possible return value(s) and description
+   \param[in] orc_FilterItems All filter configurations for removing
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::RemoveFilterItems(const QList<C_CamProFilterItemData> & orc_FilterItems)
@@ -178,7 +171,7 @@ void C_CamMetWidget::RemoveFilterItems(const QList<C_CamProFilterItemData> & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Removes the entire filter configuration
+/*! \brief  Removes the entire filter configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::RemoveAllFilters(void)
@@ -187,9 +180,9 @@ void C_CamMetWidget::RemoveAllFilters(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Updates the status bar filter label
+/*! \brief  Updates the status bar filter label
 
-   \param[in]     ou32_ActiveFilters         Count of active filters
+   \param[in] ou32_ActiveFilters Count of active filters
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters) const
@@ -198,11 +191,11 @@ void C_CamMetWidget::SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds a new openSYDE system definition
+/*! \brief  Adds a new openSYDE system definition
 
-   \param[in]     orc_PathSystemDefinition       Path of system definition file (Must be .syde_sysdef)
-   \param[in]     os32_BusIndex                  Bus index of CAN bus of system definition for monitoring
-                                                 Set to -1 if no known yet
+   \param[in] orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
+   \param[in] os32_BusIndex            Bus index of CAN bus of system definition for monitoring
+                                       Set to -1 if no known yet
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::AddDatabaseOsySysDef(const QString & orc_PathSystemDefinition, const sint32 os32_BusIndex)
@@ -227,9 +220,9 @@ void C_CamMetWidget::AddDatabaseOsySysDef(const QString & orc_PathSystemDefiniti
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds a new DBC file
+/*! \brief  Adds a new DBC file
 
-   \param[in]     orc_PathDbc       Path of DBC file (Must be .dbc)
+   \param[in] orc_PathDbc Path of DBC file (Must be .dbc)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::AddDatabaseDbc(const QString & orc_PathDbc)
@@ -244,9 +237,9 @@ void C_CamMetWidget::AddDatabaseDbc(const QString & orc_PathDbc)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Removes a database for interpretation
+/*! \brief  Removes a database for interpretation
 
-   \param[in]     orc_PathDatabase         Path with file name of database
+   \param[in] orc_PathDatabase Path with file name of database
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::RemoveDatabase(const QString & orc_PathDatabase)
@@ -255,10 +248,10 @@ void C_CamMetWidget::RemoveDatabase(const QString & orc_PathDatabase)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Activates a database for interpretation
+/*! \brief  Activates a database for interpretation
 
-   \param[in]     orc_PathDatabase         Path with file name of database
-   \param[in]     oq_Active                Flag if database shall be active or not for interpretation
+   \param[in] orc_PathDatabase Path with file name of database
+   \param[in] oq_Active        Flag if database shall be active or not for interpretation
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::ActivateDatabase(const QString & orc_PathDatabase, const bool oq_Active)
@@ -267,7 +260,7 @@ void C_CamMetWidget::ActivateDatabase(const QString & orc_PathDatabase, const bo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Updates the set bus index of the specific system definition
+/*! \brief  Updates the set bus index of the specific system definition
 
    This function is thread safe.
 
@@ -275,8 +268,8 @@ void C_CamMetWidget::ActivateDatabase(const QString & orc_PathDatabase, const bo
    C_NO_ERR    Bus index for this system definition adapted
    C_NOACT     No system definition found with this path
 
-   \param[in]     orc_PathSystemDefinition       Path of system definition file (Must be .syde_sysdef)
-   \param[in]     ou32_BusIndex                  Bus index of CAN bus of system definition for monitoring
+   \param[in] orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
+   \param[in] ou32_BusIndex            Bus index of CAN bus of system definition for monitoring
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::SetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition,
@@ -290,9 +283,9 @@ void C_CamMetWidget::SetDatabaseOsySysDefBus(const QString & orc_PathSystemDefin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new ASC file logging.
+/*! \brief  Add new ASC file logging.
 
-   \param[in]     orc_FilePath     file path to log file
+   \param[in] orc_FilePath file path to log file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::AddLogFileAsc(const QString & orc_FilePath)
@@ -306,9 +299,9 @@ void C_CamMetWidget::AddLogFileAsc(const QString & orc_FilePath)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new BLF file logging.
+/*! \brief  Add new BLF file logging.
 
-   \param[in]     orc_FilePath     file path to log file
+   \param[in] orc_FilePath file path to log file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::AddLogFileBlf(const QString & orc_FilePath)
@@ -319,7 +312,7 @@ void C_CamMetWidget::AddLogFileBlf(const QString & orc_FilePath)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Remove all configured log files.
+/*! \brief  Remove all configured log files.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::RemoveAllLogFiles(void) const
@@ -328,7 +321,7 @@ void C_CamMetWidget::RemoveAllLogFiles(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the used message monitor
+/*! \brief  Returns the used message monitor
 
    \return
    Pointer to message logger
@@ -340,7 +333,7 @@ stw_opensyde_gui_logic::C_SyvComMessageMonitor * C_CamMetWidget::GetMessageMonit
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Stops the logging
+/*! \brief  Stops the logging
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::m_StartLogging(void)
@@ -351,7 +344,7 @@ void C_CamMetWidget::m_StartLogging(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Timer function for updating status bar
+/*! \brief  Timer function for updating status bar
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::m_StatusBarTimer(void)
@@ -362,7 +355,7 @@ void C_CamMetWidget::m_StatusBarTimer(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checks the progress of the current loading database file
+/*! \brief  Checks the progress of the current loading database file
 
    Starts and checks the thread for loading openSYDE system definition and DBC files
 */
@@ -396,7 +389,7 @@ void C_CamMetWidget::m_DatabaseTimer(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set bitrate
+/*! \brief  Set bitrate
 
    \param[in] os32_Value New bitrate
 */

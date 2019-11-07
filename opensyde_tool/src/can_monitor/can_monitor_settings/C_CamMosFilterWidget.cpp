@@ -169,12 +169,11 @@ void C_CamMosFilterWidget::m_InitUi(void)
    this->mpc_Ui->pc_LabNoFilter->setText(C_GtGetText::h_GetText(
                                             "No receive filters are declared.\nadd any via \"Add Filter\"."));
 
-   // initialize scroll bar
-   this->mpc_Ui->pc_ScrollArea->DeactivateScrollbarResize();
-
    // connects
    connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigExpandSection,
            this, &C_CamMosFilterWidget::m_OnExpand);
+   connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigHide,
+           this, &C_CamMosFilterWidget::SigHide);
    connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigToggled,
            this, &C_CamMosFilterWidget::m_EnableFilters);
    connect(this->mpc_Ui->pc_BtnAdd, &C_CamOgePubSettingsAdd::clicked, this, &C_CamMosFilterWidget::m_OnAddClicked);
@@ -316,9 +315,25 @@ void C_CamMosFilterWidget::m_OnAddClicked()
       // add new widget
       this->m_AddFilterWidget(c_FilterData);
 
-      // enable filter items if filter widget is enabled
-      if (C_CamProHandler::h_GetInstance()->GetFilterWidgetEnabled() == true)
+      // if receive filters are disabled ask user for enabling
+      if (C_CamProHandler::h_GetInstance()->GetFilterWidgetEnabled() == false)
       {
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Receive Filter Disabled"));
+         c_Message.SetDescription(C_GtGetText::h_GetText("Filters are not applied as long as receive filter setting is "
+                                                         "disabled. Do you want to enable it now?"));
+         c_Message.SetOKButtonText("Enable");
+         c_Message.SetNOButtonText("Keep Disabled");
+         if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+         {
+            C_CamProHandler::h_GetInstance()->SetFilterWidgetEnabled(true);
+            this->mpc_Ui->pc_WiHeader->SetToggleState(true);
+            // this also emits toggled signal, so filter items get enabled automatically
+         }
+      }
+      else
+      {
+         // enable new filter items if filter widget is already enabled
          c_TempItems = c_FilterData.c_FilterItems;
          this->m_GetActiveFilterItems(c_TempItems);
 

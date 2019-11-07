@@ -18,6 +18,7 @@
 #include "C_GiBiArrow.h"
 #include "C_GiBiLineBounding.h"
 #include "C_OgePopUpDialog.h"
+#include "C_GtGetText.h"
 #include "C_GiSyBaseWidget.h"
 #include "C_GiSyLineWidget.h"
 #include "gitypes.h"
@@ -29,7 +30,6 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString mc_NAME_ARROW = "LINE/ARROW";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -43,7 +43,7 @@ const stw_types::float64 C_GiBiArrow::mhf64_ShapeOffsetFactor = 4.0;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -93,7 +93,7 @@ C_GiBiArrow::C_GiBiArrow(const uint64 & oru64_ID, const std::vector<QPointF> * c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiArrow::~C_GiBiArrow(void)
@@ -102,7 +102,7 @@ C_GiBiArrow::~C_GiBiArrow(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Shape including arrow head(s)
+/*! \brief  Shape including arrow head(s)
 
    \return
    shape of arrow
@@ -128,7 +128,7 @@ QPainterPath C_GiBiArrow::shape() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Custom set width
+/*! \brief  Custom set width
 
    \param[in] ors32_Width New width
 */
@@ -141,7 +141,7 @@ void C_GiBiArrow::SetWidth(const sint32 & ors32_Width)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this item
+/*! \brief  Returns the type of this item
 
    \return  ID
 */
@@ -152,7 +152,7 @@ sintn C_GiBiArrow::type() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Open style dialog
+/*! \brief  Open style dialog
 
    \param[in] oq_DarkMode Optional dark mode flag
 
@@ -167,7 +167,7 @@ bool C_GiBiArrow::OpenStyleDialog(const bool oq_DarkMode)
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
-   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, mc_NAME_ARROW, oq_DarkMode);
+   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Line/Arrow"), oq_DarkMode);
    C_GiSyLineWidget * pc_SettingsWidget = new C_GiSyLineWidget(C_GiSyLineWidget::E_Type::eLINE, *pc_Dialog);
 
    pc_SettingsWidget->SetLineColor(this->GetColor());
@@ -218,13 +218,13 @@ void C_GiBiArrow::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Apply style
+/*! \brief  Apply style
 
-   \param[in]     orc_LineColor     line color
-   \param[in]     osn_Width         line width
-   \param[in]     oe_LineType       line type
-   \param[in]     oe_StartArrow     start arrow head type
-   \param[in]     oe_EndArrow       end arrow head type
+   \param[in] orc_LineColor line color
+   \param[in] osn_Width     line width
+   \param[in] oe_LineType   line type
+   \param[in] oe_StartArrow start arrow head type
+   \param[in] oe_EndArrow   end arrow head type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::ApplyStyle(const QColor & orc_LineColor, const sintn osn_Width,
@@ -241,7 +241,7 @@ void C_GiBiArrow::ApplyStyle(const QColor & orc_LineColor, const sintn osn_Width
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get start arrow head type
+/*! \brief  Get start arrow head type
 
    \return
    Current value
@@ -253,7 +253,7 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetStartA
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get end arrow head type
+/*! \brief  Get end arrow head type
 
    \return
    Current value
@@ -265,7 +265,7 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetEndArr
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get line type
+/*! \brief  Get line type
 
    \return
    Current value
@@ -277,7 +277,7 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiBiArrow::GetLineType() 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set start arrow head type
+/*! \brief  Set start arrow head type
 
    \param[in] ore_New New value
 */
@@ -289,7 +289,7 @@ void C_GiBiArrow::SetStartArrowHeadType(const stw_opensyde_gui_logic::C_PuiBsLin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set end arrow head type
+/*! \brief  Set end arrow head type
 
    \param[in] ore_New New value
 */
@@ -301,7 +301,7 @@ void C_GiBiArrow::SetEndArrowHeadType(const stw_opensyde_gui_logic::C_PuiBsLineA
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set line type
+/*! \brief  Set line type
 
    \param[in] ore_New New value
 */
@@ -313,7 +313,7 @@ void C_GiBiArrow::SetLineType(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check where interaction point placement is for the specified type
+/*! \brief  Check where interaction point placement is for the specified type
 
    \param[in] ore_Type Arrow head type
 
@@ -329,7 +329,7 @@ bool C_GiBiArrow::h_HasOffsetInteractionPoint(const C_PuiBsLineArrow::E_ArrowHea
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse press event slot
+/*! \brief  Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -356,7 +356,7 @@ void C_GiBiArrow::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Generate polygon for arrows
+/*! \brief  Generate polygon for arrows
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::m_GenerateArrows()
@@ -371,9 +371,9 @@ void C_GiBiArrow::m_GenerateArrows()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load from internal data
+/*! \brief  Load from internal data
 
-   \param[in]  orc_Data    Line data
+   \param[in] orc_Data Line data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::m_LoadFromData(const C_PuiBsLineArrow & orc_Data)
@@ -385,9 +385,9 @@ void C_GiBiArrow::m_LoadFromData(const C_PuiBsLineArrow & orc_Data)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update internal data
+/*! \brief  Update internal data
 
-   \param[in]  orc_Data    line data
+   \param[in] orc_Data line data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::m_UpdateData(C_PuiBsLineArrow & orc_Data) const
@@ -399,7 +399,7 @@ void C_GiBiArrow::m_UpdateData(C_PuiBsLineArrow & orc_Data) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Generate polygon for arrow
+/*! \brief  Generate polygon for arrow
 
    \param[in,out] opc_ArrowItem     Arrow item to fill
    \param[in]     ore_ArrowHeadType Arrow head type to generate

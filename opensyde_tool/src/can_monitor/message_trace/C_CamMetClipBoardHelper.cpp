@@ -33,7 +33,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Copies the CAN message in text form to the clipboard
+/*! \brief  Copies the CAN message in text form to the clipboard
 
    Style of copied information:
    - Without name
@@ -49,10 +49,10 @@ using namespace stw_opensyde_core;
    |- SignalName        200 Unit     C8 (RAW)   Comment
    |- NextSignalName    200 Unit     C8 (RAW)   Comment
 
-   \param[in]     oq_DisplayAsHex                  Flag for display style for CAN ID and CAN data
-   \param[in]     oq_DisplayTimestampRelative      Flag for display style for timestamp
-   \param[in]     orc_MessageData                  Vector with pointer to all message data and the flag if the
-                                                   signals should be visible too
+   \param[in] oq_DisplayAsHex             Flag for display style for CAN ID and CAN data
+   \param[in] oq_DisplayTimestampRelative Flag for display style for timestamp
+   \param[in] orc_MessageData             Vector with pointer to all message data and the flag if the
+                                          signals should be visible too
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, const bool oq_DisplayTimestampRelative,
@@ -223,7 +223,7 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetClipBoardHelper::C_CamMetClipBoardHelper(void) :

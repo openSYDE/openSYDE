@@ -32,7 +32,7 @@
 #include "C_SyvUtil.h"
 #include "C_HeHandler.h"
 #include "C_SdTopologyWidget.h"
-#include "C_SdNdeDataPoolEditWidget.h"
+#include "C_SdNdeDpEditWidget.h"
 #include "C_SdHandlerWidget.h"
 #include "C_SyvHandlerWidget.h"
 #include "C_UsHandler.h"
@@ -742,12 +742,13 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
                C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(oru32_Index);
             if (pc_Node != NULL)
             {
-               orc_Name = pc_Node->c_Properties.c_Name.c_str();
+               orc_SubItemName = pc_Node->c_Properties.c_Name.c_str();
             }
             else
             {
-               orc_Name = "Node";
+               orc_SubItemName = "Node";
             }
+            orc_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
          }
          else if (ors32_SubMode == ms32_SUBMODE_SYSDEF_BUSEDIT)
          {
@@ -755,24 +756,27 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
                C_PuiSdHandler::h_GetInstance()->GetOSCBus(oru32_Index);
             if (pc_Bus != NULL)
             {
-               orc_Name = pc_Bus->c_Name.c_str();
+               orc_SubItemName = pc_Bus->c_Name.c_str();
             }
             else
             {
-               orc_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
+               orc_SubItemName = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
             }
+            orc_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
          }
          else
          {
             orc_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
          }
-         orc_SubItemName = "";
       }
       else if (os32_Mode == ms32_MODE_SYSVIEW)
       {
          ors32_SubMode = this->ms32_SvSubMode;
          oru32_Index = this->mu32_SvIndex;
          oru32_Flag = this->mu32_SvFlag;
+
+         //Handle new views if necessary
+         this->mc_SystemViewManager.HandleInitialSystemView();
 
          C_SyvUtil::h_GetViewDisplayName(oru32_Index, ors32_SubMode, orc_Name, orc_SubItemName);
       }
@@ -788,7 +792,7 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
-                                       const uint32 ou32_Flag)
+                                       const QString & orc_SubName, const uint32 ou32_Flag)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_SdHandlerWidget * pc_Handler = dynamic_cast<C_SdHandlerWidget *>(this->mpc_ActiveWidget);
@@ -808,7 +812,7 @@ void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 o
       this->m_PrepareForSpecificWidget();
       pc_Handler = new C_SdHandlerWidget(NULL);
       this->mpc_ActiveWidget = pc_Handler;
-      this->m_SetNewSpecificWidget(ms32_MODE_SYSDEF, os32_SubMode, orc_Name, "", ou32_Index);
+      this->m_SetNewSpecificWidget(ms32_MODE_SYSDEF, os32_SubMode, orc_Name, orc_SubName, ou32_Index);
    }
    else if (this->mq_StartView == true)
    {
@@ -819,7 +823,7 @@ void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 o
    {
       if (os32_SubMode == ms32_SUBMODE_SYSDEF_TOPOLOGY)
       {
-         this->mpc_UseCaseWidget->UpdateUseCaseWidget(os32_SubMode, orc_Name, "", false);
+         this->mpc_UseCaseWidget->UpdateUseCaseWidget(os32_SubMode, orc_Name, orc_SubName, false);
       }
       else
       {
@@ -846,9 +850,6 @@ void C_NagMainWindow::m_ShowSysViewItem(sint32 & ors32_SubMode, const uint32 ou3
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_SyvHandlerWidget * pc_Handler = dynamic_cast<C_SyvHandlerWidget *>(this->mpc_ActiveWidget);
-
-   //Handle new views if necessary
-   this->mc_SystemViewManager.HandleInitialSystemView();
 
    // Special case: Handle system view PC reconnect
    if (ors32_SubMode != ms32_SUBMODE_SYSVIEW_SETUP)
@@ -1298,7 +1299,7 @@ bool C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
       if (os32_Mode == ms32_MODE_SYSDEF)
       {
          // special case: system definition
-         this->m_ShowSysDefItem(s32_SubMode, u32_Index, c_Name, u32_Flag);
+         this->m_ShowSysDefItem(s32_SubMode, u32_Index, c_Name, c_SubSubName, u32_Flag);
          // update Navigationbar
          this->mpc_Ui->pc_NaviBar->SetMode(os32_Mode, s32_SubMode, u32_Index);
          this->mpc_Ui->pc_TopToolBar->ShowSearch(true);

@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -57,7 +57,7 @@ C_CamMetStatusBarWidget::C_CamMetStatusBarWidget(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetStatusBarWidget::~C_CamMetStatusBarWidget()
@@ -66,7 +66,7 @@ C_CamMetStatusBarWidget::~C_CamMetStatusBarWidget()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize all displayed static names
+/*! \brief  Initialize all displayed static names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::InitStaticNames(void)
@@ -89,10 +89,10 @@ void C_CamMetStatusBarWidget::InitStaticNames(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Updates the label with CAN bus load
+/*! \brief  Updates the label with CAN bus load
 
-   \param[in]     ou8_BusLoad         CAN bus load in percentage
-   \param[in]     os32_CANBitrate     CAN bitrate
+   \param[in] ou8_BusLoad     CAN bus load in percentage
+   \param[in] os32_CANBitrate CAN bitrate
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad, const stw_types::sint32 os32_CANBitrate)
@@ -125,9 +125,9 @@ void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Updates the label with TX errors
+/*! \brief  Updates the label with TX errors
 
-   \param[in]     ou32_TxErrors         Count of TX errors
+   \param[in] ou32_TxErrors Count of TX errors
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::SetTxErrors(const stw_types::uint32 ou32_TxErrors)
@@ -160,9 +160,9 @@ void C_CamMetStatusBarWidget::SetTxErrors(const stw_types::uint32 ou32_TxErrors)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the number of filtered CAN messages
+/*! \brief  Sets the number of filtered CAN messages
 
-   \param[in]     ou32_FilteredMessages         Number of filtered messages
+   \param[in] ou32_FilteredMessages Number of filtered messages
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::SetFilteredMessages(const stw_types::uint32 ou32_FilteredMessages)
@@ -172,9 +172,9 @@ void C_CamMetStatusBarWidget::SetFilteredMessages(const stw_types::uint32 ou32_F
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Updates the label with active filters
+/*! \brief  Updates the label with active filters
 
-   \param[in]     ou32_ActiveFilters         Number of active CAN filters
+   \param[in] ou32_ActiveFilters Number of active CAN filters
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters)
@@ -184,7 +184,7 @@ void C_CamMetStatusBarWidget::SetActiveFilters(const stw_types::uint32 ou32_Acti
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update the filter label
+/*! \brief  Update the filter label
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::m_UpdateFilterLabel(void) const

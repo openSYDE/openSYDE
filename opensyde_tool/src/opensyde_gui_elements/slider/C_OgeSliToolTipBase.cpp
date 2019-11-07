@@ -16,7 +16,8 @@
 #include <QHelpEvent>
 #include <QStyle>
 #include "C_OgeSliToolTipBase.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
+#include "C_OSCNodeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -164,10 +165,10 @@ void C_OgeSliToolTipBase::m_OnValueChange(void)
 
    c_Tmp.SetArray(false);
    c_Tmp.SetType(this->me_RepresentationType);
-   C_SdNdeDataPoolContentUtil::h_SetValueInContent(
+   C_OSCNodeDataPoolContentUtil::h_SetValueInContent(
       static_cast<float64>(this->value()) - this->mf64_ToolTipRangeOffset, c_Tmp);
-   C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(c_Tmp, this->mf64_ToolTipFactor, this->mf64_ToolTipOffset,
-                                                        c_Content, 0UL);
+   C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_Tmp, this->mf64_ToolTipFactor, this->mf64_ToolTipOffset,
+                                                  c_Content, 0UL);
 
    this->SetToolTipInformation("", c_Content);
    //Update directly

@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -49,7 +49,7 @@ C_TblTreModel::C_TblTreModel(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data at index
+/*! \brief  Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
@@ -114,7 +114,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get item flags
+/*! \brief  Get item flags
 
    \param[in] orc_Index Index
 

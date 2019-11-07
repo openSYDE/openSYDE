@@ -14,14 +14,14 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "stwtypes.h"
-#include "C_SdNdeDataPoolUtil.h"
+#include "C_SdNdeDpUtil.h"
 #include "C_UtiUndoStack.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace stw_opensyde_gui
 {
-class C_SdNdeDataPoolListsTreeWidget;
+class C_SdNdeDpListsTreeWidget;
 }
 
 namespace stw_opensyde_gui_logic
@@ -40,22 +40,22 @@ public:
    virtual ~C_SdNdeUnoDataPoolManager(void);
 
    void DoMoveList(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
-                   stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                   stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                    const std::vector<stw_types::uint32> & oru32_StartIndices,
                    const std::vector<stw_types::uint32> & oru32_TargetIndices);
    void DoDeleteList(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
-                     stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                     stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                      const std::vector<stw_types::uint32> & orc_Indices);
    void DoPaste(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
-                stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                 const stw_types::uint32 & oru32_InsertListIndex);
    void DoAddList(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
-                  stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                  stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                   const std::vector<stw_types::uint32> & orc_Indices);
    void DoChangeListData(const stw_types::uint32 & oru32_NodeIndex,     const stw_types::uint32 & oru32_DataPoolIndex,
-                         stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                         stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                          const stw_types::uint32 & oru32_DataPoolListIndex, const QVariant & orc_NewData,
-                         const C_SdNdeDataPoolUtil::E_ListDataChangeType & ore_DataChangeType);
+                         const C_SdNdeDpUtil::E_ListDataChangeType & ore_DataChangeType);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

@@ -42,7 +42,8 @@ public:
                              stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId(0, 0, 0, 0,
                                                                                         stw_opensyde_gui_logic::
                                                                                         C_PuiSvDbNodeDataPoolListElementId
-                                                                                        ::eDATAPOOL_ELEMENT, false), const stw_opensyde_gui_logic::C_PuiSvDbDataElementScaling & rc_Scaling =
+                                                                                        ::eDATAPOOL_ELEMENT, false, 0UL,
+                                                                                        false), const stw_opensyde_gui_logic::C_PuiSvDbDataElementScaling & orc_Scaling =
                              stw_opensyde_gui_logic::C_PuiSvDbDataElementScaling(), const bool oq_ReadElement = true, const bool oq_DarkMode = false, const bool oq_ShowWidgetSpecificPart = true, const bool oq_AllowChangeOfDataElement = true,
                           const QString & orc_DisplayName = "");
    ~C_SyvDaPeBase(void);
@@ -105,6 +106,7 @@ private:
    void m_Clear(void);
    void m_ClearDataElement(void);
    void m_Configuration(void) const;
+   QString m_GetDefaultDisplayName(const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;
    void m_OnUseDefaultScalingChange(void) const;
 
    void m_InitNoDataElement(void) const;

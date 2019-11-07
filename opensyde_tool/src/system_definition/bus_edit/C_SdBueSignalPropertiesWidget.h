@@ -50,6 +50,8 @@ public:
    stw_types::uint32 GetSignalIndex(void) const;
    void SelectName(void) const;
 
+   void OnNodeDisconnected(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
+
 private:
    //Avoid call
    C_SdBueSignalPropertiesWidget(const C_SdBueSignalPropertiesWidget &);
@@ -136,7 +138,7 @@ private:
    stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType m_GetMuxType(void) const;
    void m_InitComboBox(const stw_opensyde_core::C_OSCCanMessage & orc_Message,
                        const stw_types::uint32 ou32_SignalIndex) const;
-   void m_HandleMuxValueRange(void) const;
+   void m_HandleMuxValueRange(const stw_opensyde_core::C_OSCCanMessage & orc_Message, const stw_types::uint32 ou32_SignalIndex) const;
 
    void m_HandleAnyChange(const E_Change oe_Change, const bool oq_AllowSignalsToInformOtherWidgets = true);
    void m_ApplyNewValueFromUI(const E_Change oe_Change);

@@ -281,6 +281,18 @@ sint32 C_UsHandler::GetSdBusEditTreeSplitterX(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bus edit tree splitter x position 2 value
+
+   \return
+   Current bus edit tree splitter x position 2 value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_UsHandler::GetSdBusEditTreeSplitterX2() const
+{
+   return this->ms32_SdBusEditTreeSplitterX2;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get bus edit layout splitter x position value
 
    \return
@@ -798,6 +810,17 @@ void C_UsHandler::SetSdBusEditTreeSplitterX(const sint32 os32_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set bus edit tree splitter x position 2 value
+
+   \param[in] os32_Value New bus edit tree splitter x position 2 value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetSdBusEditTreeSplitterX2(const sint32 os32_Value)
+{
+   this->ms32_SdBusEditTreeSplitterX2 = os32_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set bus edit layout splitter x position value
 
    \param[in] os32_Value New bus edit layout splitter x position value
@@ -870,7 +893,6 @@ void C_UsHandler::RemoveOfRecentProjects(const QString & orc_Str)
 void C_UsHandler::ClearRecentProjects(void)
 {
    this->mc_RecentProjects.clear();
-   this->AddToRecentProjects(this->mc_ActualProject);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

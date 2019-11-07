@@ -282,6 +282,12 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
    See description of h_NiceifyStringForFileName. If the string has at least one character which would be replaced
    by h_NiceifyStringForFileName, the function returns false
 
+   TODO: Somehow by accident h_NiceifyStringForCComment was used instead of h_NiceifyStringForFileName. The problem is
+         that using h_NiceifyStringForFileName does not work because it is for file names and not for paths, so "\"
+         and ":" are not allowed. Nicefying for C Comment suffices in many cases, the only problem is that so
+         allowed-path-handling in openSYDE GUI is not homogeneous, because there also exist cases where only C names
+         are allowed for paths (which is very restrictive and could be improved).
+
    \param[in]     orc_String         Original string
 
    \retval   true    The string is niceified and is valid
@@ -362,4 +368,42 @@ float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 o
    f64_Result /= of64_Factor;
 
    return f64_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert serial number array to string
+
+   Support of two serial number formats:
+      1: format up to and including 2019. E.g: 05.123456.1001
+      2: format from 2020. E.g: 200012345678
+
+   \param[in]       opu8_SerialNumber     Pointer to first of six serial number array elements
+
+   \return
+   serial number string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCUtils::h_SerialNumberToString(const uint8 * const opu8_SerialNumber)
+{
+   C_SCLString c_Result;
+
+   if (opu8_SerialNumber != NULL)
+   {
+      if (opu8_SerialNumber[0] < static_cast<uint8>(0x20))
+      {
+         //format up to and including 2019. E.g: 05.123456.1001
+         c_Result.PrintFormatted("%02X.%02X%02X%02X.%02X%02X",
+                                 opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
+                                 opu8_SerialNumber[4], opu8_SerialNumber[5]);
+      }
+      else
+      {
+         //format from 2020. E.g: 200012345678
+         c_Result.PrintFormatted("%02X%02X%02X%02X%02X%02X",
+                                 opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
+                                 opu8_SerialNumber[4], opu8_SerialNumber[5]);
+      }
+   }
+
+   return c_Result;
 }

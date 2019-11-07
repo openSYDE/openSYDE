@@ -31,11 +31,9 @@ class C_TblModelAction :
 public:
    C_TblModelAction(QObject * const opc_Parent = NULL);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-
-   // Basic functionality:
-   //lint -e{1735} Suppression, because default parameters are identical
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
+   // and default parameters are identical.
+   //lint -save -e1960 -e1735
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
    //lint -restore
 

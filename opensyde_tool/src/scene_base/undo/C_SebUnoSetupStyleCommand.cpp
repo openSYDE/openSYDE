@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Scene   Pointer to currently active scene
    \param[in]     orc_IDs     Affected unique IDs
@@ -55,7 +55,7 @@ C_SebUnoSetupStyleCommand::C_SebUnoSetupStyleCommand(QGraphicsScene * const opc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -67,7 +67,7 @@ C_SebUnoSetupStyleCommand::~C_SebUnoSetupStyleCommand(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal for registering setup style start
+/*! \brief  Signal for registering setup style start
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::InitPrevious(void)
@@ -77,7 +77,7 @@ void C_SebUnoSetupStyleCommand::InitPrevious(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal for registering setup style complete
+/*! \brief  Signal for registering setup style complete
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::InitNext(void)
@@ -87,7 +87,7 @@ void C_SebUnoSetupStyleCommand::InitNext(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Undo style
+/*! \brief  Undo style
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::undo()
@@ -97,7 +97,7 @@ void C_SebUnoSetupStyleCommand::undo()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Redo style
+/*! \brief  Redo style
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::redo()
@@ -107,7 +107,7 @@ void C_SebUnoSetupStyleCommand::redo()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore all style features for all internally stored items from the snapshot using the preserved mapping
+/*! \brief  Restore all style features for all internally stored items from the snapshot using the preserved mapping
 
    \param[out] orc_MapIDToTypeAndIndex Map for ID to state data entry
    \param[out] opc_Snapshot            Preserved state data
@@ -204,11 +204,11 @@ void C_SebUnoSetupStyleCommand::m_Restore(const QMap<uint64, C_PuiBsTemporaryDat
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save all style features of the specified items in the snapshot and preserve a mapping for later access
+/*! \brief  Save all style features of the specified items in the snapshot and preserve a mapping for later access
 
-   \param[in]  orc_Items    Items to save style features for
-   \param[out] orc_Map      Map for ID to state data entry
-   \param[out] orc_Snapshot Preserved state data
+   \param[in]     orc_Items    Items to save style features for
+   \param[out]    orc_Map      Map for ID to state data entry
+   \param[in,out] opc_Snapshot Preserved state data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraphicsItem *> & orc_Items, QMap<uint64,

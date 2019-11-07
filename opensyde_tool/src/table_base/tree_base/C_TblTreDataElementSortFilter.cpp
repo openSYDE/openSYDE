@@ -31,7 +31,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -44,7 +44,7 @@ C_TblTreDataElementSortFilter::C_TblTreDataElementSortFilter(QObject * const opc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set filter string
+/*! \brief  Set filter string
 
    \param[in] orc_Text Text to filter for
 */
@@ -57,7 +57,7 @@ void C_TblTreDataElementSortFilter::SetFilter(const QString & orc_Text)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if current row is accepted for filter
+/*! \brief  Check if current row is accepted for filter
 
    \param[in] osn_SourceRow    Source row
    \param[in] orc_SourceParent Source parent

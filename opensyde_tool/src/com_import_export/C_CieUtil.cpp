@@ -10,8 +10,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QFileDialog>
-
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_CieUtil.h"
@@ -26,14 +24,14 @@
 #include "C_OgeWiUtil.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_OSCLoggingHandler.h"
-#include "C_CieDataPoolComListImportReportWidget.h"
-#include "C_CieDataPoolComListDBCImportWidget.h"
+#include "C_CieImportReportWidget.h"
+#include "C_CieDBCImportNodeSelectWidget.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_CieDataPoolListAdapter.h"
 #include "C_OSCImportEdsDcf.h"
 #include "C_OSCNode.h"
 #include "C_CieExportDbc.h"
-#include "C_CieDataPoolComListExportReportWidget.h"
+#include "C_CieExportReportWidget.h"
 #include "constants.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -70,7 +68,8 @@ C_CieUtil::C_CieUtil(void)
    Supported are dbc, eds and dcf files.
 
    \param[in]  ou32_NodeIndex        Index of node in system definition
-   \param[in]  ou32_DataPoolIndex    Index of node comm datapool
+   \param[in]  oe_ProtocolType       Type of comm protocol
+   \param[in]  os32_DataPoolIndex    Index of node comm datapool (-1 if unknown)
    \param[in]  ou32_InterfaceIndex   Index of node communication interface
    \param[in]  opc_Parent            Parent for dialog
 
@@ -79,8 +78,9 @@ C_CieUtil::C_CieUtil(void)
    C_NOACT     Nothing done, aborted by user
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                               const uint32 ou32_InterfaceIndex, QWidget * const opc_Parent)
+sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const C_OSCCanProtocol::E_Type oe_ProtocolType,
+                               const sint32 os32_DataPoolIndex, const uint32 ou32_InterfaceIndex,
+                               QWidget * const opc_Parent)
 {
    //Load user settings value
    QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownImportPath();
@@ -97,11 +97,9 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
 
-   c_FullFilePath = QFileDialog::getOpenFileName(opc_Parent,
-                                                 C_GtGetText::h_GetText("Select File for openSYDE Import"),
-                                                 c_Folder,
-                                                 c_FilterName,
-                                                 NULL);
+   c_FullFilePath =
+      C_OgeWiUtil::h_GetSaveFileName(opc_Parent, C_GtGetText::h_GetText("Select File for openSYDE Import"), c_Folder,
+                                     c_FilterName, "", QFileDialog::DontConfirmOverwrite);
 
    // check for user abort (empty string)
    if (c_FullFilePath != "")
@@ -153,8 +151,8 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
                // create node selector
                QPointer<C_OgePopUpDialog> const c_PopUpDialogNodeSelection =
                   new C_OgePopUpDialog(opc_Parent, opc_Parent);
-               C_CieDataPoolComListDBCImportWidget * const pc_DialogNodeSelection =
-                  new C_CieDataPoolComListDBCImportWidget(*c_PopUpDialogNodeSelection, c_CommDef);
+               C_CieDBCImportNodeSelectWidget * const pc_DialogNodeSelection =
+                  new C_CieDBCImportNodeSelectWidget(*c_PopUpDialogNodeSelection, c_CommDef);
 
                // resize node selector
                c_PopUpDialogNodeSelection->SetSize(QSize(600, 380));
@@ -175,10 +173,9 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
                      // create message report for user
                      QPointer<C_OgePopUpDialog> const c_PopUpDialogReportDialog = new C_OgePopUpDialog(opc_Parent,
                                                                                                        opc_Parent);
-                     C_CieDataPoolComListImportReportWidget * const pc_DialogImportReport =
-                        new C_CieDataPoolComListImportReportWidget(*c_PopUpDialogReportDialog, ou32_NodeIndex,
-                                                                   ou32_DataPoolIndex,
-                                                                   ou32_InterfaceIndex, c_FullFilePath);
+                     C_CieImportReportWidget * const pc_DialogImportReport =
+                        new C_CieImportReportWidget(*c_PopUpDialogReportDialog, ou32_NodeIndex, oe_ProtocolType,
+                                                    os32_DataPoolIndex, ou32_InterfaceIndex, c_FullFilePath);
 
                      //Hide previous overlay before showing the next one
                      c_PopUpDialogNodeSelection->HideOverlay();
@@ -264,10 +261,9 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
                       (c_DataPoolStructure.c_Core.c_OSCTxMessageData.size() > 0UL))
                   {
                      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(opc_Parent, opc_Parent);
-                     C_CieDataPoolComListImportReportWidget * const pc_Dialog =
-                        new C_CieDataPoolComListImportReportWidget(*c_New, ou32_NodeIndex,
-                                                                   ou32_DataPoolIndex,
-                                                                   ou32_InterfaceIndex, c_FullFilePath);
+                     C_CieImportReportWidget * const pc_Dialog =
+                        new C_CieImportReportWidget(*c_New, ou32_NodeIndex, oe_ProtocolType, os32_DataPoolIndex,
+                                                    ou32_InterfaceIndex, c_FullFilePath);
 
                      //Init
                      tgl_assert(pc_Dialog->SetMessageData(c_DataPoolStructure) == C_NO_ERR);
@@ -452,9 +448,8 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
                // create message report for user
                QPointer<C_OgePopUpDialog> const c_PopUpDialogReportDialog =
                   new C_OgePopUpDialog(opc_Parent, opc_Parent);
-               C_CieDataPoolComListExportReportWidget * const pc_DialogExportReport =
-                  new C_CieDataPoolComListExportReportWidget(*c_PopUpDialogReportDialog,
-                                                             c_FullFilePath);
+               C_CieExportReportWidget * const pc_DialogExportReport =
+                  new C_CieExportReportWidget(*c_PopUpDialogReportDialog, c_FullFilePath);
 
                pc_DialogExportReport->SetMessageData(c_NodeMapping, c_ExportStatistic, c_Warnings);
 

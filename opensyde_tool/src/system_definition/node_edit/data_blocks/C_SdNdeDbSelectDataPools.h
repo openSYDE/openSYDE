@@ -54,6 +54,8 @@ private:
    Ui::C_SdNdeDbSelectDataPools * mpc_Ui;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
+   const stw_types::uint32 mu32_NodeIndex;
+   const std::vector<stw_types::uint32> mc_UsedDataPoolIndices;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
@@ -61,6 +63,7 @@ private:
    void m_HandleHiding(void) const;
    void m_OnSearch(const QString & orc_Text) const;
    void m_UpdateSelection(const stw_types::sintn osn_SelectionCount) const;
+   bool m_IsCommDatapoolSelectionValid(void);
 
    //Avoid call
    C_SdNdeDbSelectDataPools(const C_SdNdeDbSelectDataPools &);

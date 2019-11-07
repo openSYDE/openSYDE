@@ -37,6 +37,14 @@ using namespace stw_opensyde_gui_elements;
 //lint -e{970,909,923,1960} Required Qt interface
 Q_DECLARE_METATYPE(C_CamMetTreeLoggerData)
 
+const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_TIME_STAMP = 150;
+const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_ID = 81;
+const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_NAME = 317;
+const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_DIR = 44;
+const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_DLC = 44;
+const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_DATA = 247;
+const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_COUNTER = 97;
+
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
@@ -48,7 +56,7 @@ Q_DECLARE_METATYPE(C_CamMetTreeLoggerData)
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -128,7 +136,7 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -140,7 +148,7 @@ C_CamMetTreeView::~C_CamMetTreeView()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Continues the paused the logging
+/*! \brief  Continues the paused the logging
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::Continue(void)
@@ -155,7 +163,7 @@ void C_CamMetTreeView::Continue(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Pauses the logging.
+/*! \brief  Pauses the logging.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::Pause(void)
@@ -172,7 +180,7 @@ void C_CamMetTreeView::Pause(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function to react on the stop of the communication
+/*! \brief  Function to react on the stop of the communication
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::Stop(void)
@@ -189,7 +197,7 @@ void C_CamMetTreeView::Stop(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function to react on the stop of the communication
+/*! \brief  Function to react on the stop of the communication
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::Start(void)
@@ -205,7 +213,7 @@ void C_CamMetTreeView::Start(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle action: clear data
+/*! \brief  Handle action: clear data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::ActionClearData(void)
@@ -217,9 +225,9 @@ void C_CamMetTreeView::ActionClearData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the protocol for interpreting
+/*! \brief  Sets the protocol for interpreting
 
-   \param[in]     oe_Protocol     Set protocol type
+   \param[in] oe_Protocol Set protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::SetProtocol(const stw_cmon_protocol::e_CMONL7Protocols oe_Protocol)
@@ -237,7 +245,7 @@ void C_CamMetTreeView::SetProtocol(const stw_cmon_protocol::e_CMONL7Protocols oe
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set display mode: display tree
+/*! \brief  Set display mode: display tree
 
    \param[in] oq_Value New value
 */
@@ -252,7 +260,7 @@ void C_CamMetTreeView::SetDisplayTree(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set display mode: display unique messages
+/*! \brief  Set display mode: display unique messages
 
    \param[in] oq_Value New value
 */
@@ -272,7 +280,7 @@ void C_CamMetTreeView::SetDisplayUniqueMessages(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set display style for ID
+/*! \brief  Set display style for ID
 
    \param[in] oq_Value New value
 */
@@ -283,7 +291,7 @@ void C_CamMetTreeView::SetDisplayAsHex(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set display style for timestamp
+/*! \brief  Set display style for timestamp
 
    \param[in] oq_Value New value
 */
@@ -294,7 +302,7 @@ void C_CamMetTreeView::SetDisplayTimestampRelative(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns display style for CAN ID and CAN data
+/*! \brief  Returns display style for CAN ID and CAN data
 
    \return
    true     Displaying hex
@@ -320,7 +328,7 @@ bool C_CamMetTreeView::GetDisplayTimestampRelative()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save all user settings
+/*! \brief  Save all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::SaveUserSettings(void) const
@@ -330,7 +338,7 @@ void C_CamMetTreeView::SaveUserSettings(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore column widths
+/*! \brief  Restore column widths
 
    \param[in] orc_ColumnWidths Stored column widths (Restores default values if empty)
 */
@@ -347,18 +355,20 @@ void C_CamMetTreeView::SetCurrentColumnWidths(const std::vector<sint32> & orc_Co
    else
    {
       //Default
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eTIME_STAMP), 150);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_ID), 81);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_NAME), 317);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DIR), 44);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DLC), 44);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DATA), 247);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_COUNTER), 97);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eTIME_STAMP),
+                           mhsn_COL_WIDTH_TIME_STAMP);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_ID), mhsn_COL_WIDTH_CAN_ID);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_NAME), mhsn_COL_WIDTH_CAN_NAME);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DIR), mhsn_COL_WIDTH_CAN_DIR);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DLC), mhsn_COL_WIDTH_CAN_DLC);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DATA), mhsn_COL_WIDTH_CAN_DATA);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_COUNTER),
+                           mhsn_COL_WIDTH_CAN_COUNTER);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current column widths
+/*! \brief  Get current column widths
 
    \return
    Current column widths
@@ -376,7 +386,7 @@ std::vector<sint32> C_CamMetTreeView::GetCurrentColumnWidths() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten show event slot
+/*! \brief  Overwritten show event slot
 
    Here: move scroll bar buttons, start delayed timer
 
@@ -391,7 +401,7 @@ void C_CamMetTreeView::showEvent(QShowEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten resize event slot
+/*! \brief  Overwritten resize event slot
 
    Here: move scroll bar buttons
 
@@ -405,7 +415,7 @@ void C_CamMetTreeView::resizeEvent(QResizeEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten selection changed event slot
+/*! \brief  Overwritten selection changed event slot
 
    Here: update model with current selection
 
@@ -443,11 +453,11 @@ void C_CamMetTreeView::selectionChanged(const QItemSelection & orc_Selected, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overridden key press event
+/*! \brief  Overridden key press event
 
    Here: Handle copy CAN message
 
-   \param[in,out] opc_Event  Pointer to key event
+   \param[in,out] opc_Event Pointer to key event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::keyPressEvent(QKeyEvent * const opc_Event)
@@ -464,7 +474,7 @@ void C_CamMetTreeView::keyPressEvent(QKeyEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Draw points for visualizing branches
+/*! \brief  Draw points for visualizing branches
 
    \param[in,out] opc_Painter Current painter
    \param[in]     orc_Rect    Rectangle area for drawing
@@ -589,7 +599,45 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Init context menu entries
+/*! \brief  Returns the hint for size column
+
+   Will be used when resizeColumnToContents is used for the specific column.
+   resizeColumnToContents is used by double click on the separator in the header too.
+
+   \param[in] osn_Column Index of column
+
+   \return
+   Width of column in pixel
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sintn C_CamMetTreeView::sizeHintForColumn(sintn osn_Column) const
+{
+   sintn sn_Size;
+   static const sintn hasn_Sizes[C_CamMetTreeModel::eCAN_COUNTER + 1] =
+   {
+      mhsn_COL_WIDTH_TIME_STAMP,
+      mhsn_COL_WIDTH_CAN_ID,
+      mhsn_COL_WIDTH_CAN_NAME,
+      mhsn_COL_WIDTH_CAN_DIR,
+      mhsn_COL_WIDTH_CAN_DLC,
+      mhsn_COL_WIDTH_CAN_DATA,
+      mhsn_COL_WIDTH_CAN_COUNTER
+   };
+
+   if (osn_Column <= C_CamMetTreeModel::eCAN_COUNTER)
+   {
+      sn_Size = hasn_Sizes[osn_Column];
+   }
+   else
+   {
+      sn_Size = C_OgeTreeViewToolTipBase::sizeHintForColumn(osn_Column);
+   }
+
+   return sn_Size;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Init context menu entries
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_SetupContextMenu(void)
@@ -614,7 +662,7 @@ void C_CamMetTreeView::m_SetupContextMenu(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show custom context menu
+/*! \brief  Show custom context menu
 
    \param[in] orc_Pos Local context menu position
 */
@@ -633,7 +681,7 @@ void C_CamMetTreeView::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Copy selected items to clipboard
+/*! \brief  Copy selected items to clipboard
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_CopySelection(void)
@@ -688,7 +736,7 @@ void C_CamMetTreeView::m_CopySelection(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Gets messages and bring them to the model
+/*! \brief  Gets messages and bring them to the model
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_HandleMessages(void)
@@ -702,7 +750,7 @@ void C_CamMetTreeView::m_HandleMessages(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add data to UI
+/*! \brief  Add data to UI
 
    \param[in] orc_Data New data
 */
@@ -741,7 +789,7 @@ void C_CamMetTreeView::m_UpdateUi(const std::list<C_CamMetTreeLoggerData> & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set child item stretch property for these rows
+/*! \brief  Set child item stretch property for these rows
 
    \param[in] orc_Indices Rows to stretch all child items for
 */
@@ -757,7 +805,7 @@ void C_CamMetTreeView::m_SetChildColumns(const std::vector<stw_types::sint32> & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set child item stretch property for this index
+/*! \brief  Set child item stretch property for this index
 
    \param[in] orc_ModelIndex Stretch all child items for this index
 */
@@ -780,7 +828,7 @@ void C_CamMetTreeView::m_SetChildColumns(const QModelIndex & orc_ModelIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set child item stretch property for all rows
+/*! \brief  Set child item stretch property for all rows
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_SetAllChildren(void)
@@ -793,7 +841,7 @@ void C_CamMetTreeView::m_SetAllChildren(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reposition the buttons as necessary
+/*! \brief  Reposition the buttons as necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_RepositionButtons(void)
@@ -809,7 +857,7 @@ void C_CamMetTreeView::m_RepositionButtons(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle action: scroll to top
+/*! \brief  Handle action: scroll to top
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_DoScrollTop(void)
@@ -818,7 +866,7 @@ void C_CamMetTreeView::m_DoScrollTop(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle action: scroll to bottom
+/*! \brief  Handle action: scroll to bottom
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_DoScrollBottom(void)
@@ -827,7 +875,7 @@ void C_CamMetTreeView::m_DoScrollBottom(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle user settings
+/*! \brief  Handle user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_RestoreUserSettings(void)
@@ -837,7 +885,7 @@ void C_CamMetTreeView::m_RestoreUserSettings(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Collapse all messages and update geometry
+/*! \brief  Collapse all messages and update geometry
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_CollapseAll(void)
@@ -847,7 +895,7 @@ void C_CamMetTreeView::m_CollapseAll(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Expand all messages and update geometry
+/*! \brief  Expand all messages and update geometry
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_ExpandAll(void)
@@ -857,7 +905,7 @@ void C_CamMetTreeView::m_ExpandAll(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle collapse event
+/*! \brief  Handle collapse event
 
    Here: select collapsed item if child was selected before
 
@@ -898,7 +946,7 @@ void C_CamMetTreeView::m_OnCollapse(const QModelIndex & orc_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current column position indices
+/*! \brief  Get current column position indices
 
    \return
    Current column position indices
@@ -916,7 +964,7 @@ std::vector<sint32> C_CamMetTreeView::m_GetCurrentColumnPositionIndices(void) co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set column position indices
+/*! \brief  Set column position indices
 
    \param[in] orc_NewColPositionIndices New column position indices
 */
@@ -960,7 +1008,7 @@ void C_CamMetTreeView::m_SetColumnPositionIndices(const std::vector<sint32> & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if columns in expected sorting order
+/*! \brief  Check if columns in expected sorting order
 
    \param[in] orc_NewColPositionIndices Expected sorting order
 
@@ -987,7 +1035,7 @@ bool C_CamMetTreeView::m_ColumnsSortedAsExpected(const std::vector<sint32> & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle sorting allowed state depending on current state
+/*! \brief  Handle sorting allowed state depending on current state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_HandleSorting(void)
@@ -1020,9 +1068,9 @@ void C_CamMetTreeView::m_HandleSorting(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Draw L part of branch
 
-   \param[in,out]   opc_Painter Painter to draw with
-   \param[in]       orc_TopLeft Top left point
-   \param[in]       os32_Offset Offset to paint at
+   \param[in,out] opc_Painter Painter to draw with
+   \param[in]     orc_TopLeft Top left point
+   \param[in]     os32_Offset Offset to paint at
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::mh_DrawL(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const sint32 os32_Offset)
@@ -1043,9 +1091,9 @@ void C_CamMetTreeView::mh_DrawL(QPainter * const opc_Painter, const QPoint & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Draw "|-" part of branch
 
-   \param[in,out]   opc_Painter Painter to draw with
-   \param[in]       orc_TopLeft Top left point
-   \param[in]       os32_Offset Offset to paint at
+   \param[in,out] opc_Painter Painter to draw with
+   \param[in]     orc_TopLeft Top left point
+   \param[in]     os32_Offset Offset to paint at
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::mh_DrawPlus(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const sint32 os32_Offset)
@@ -1062,9 +1110,9 @@ void C_CamMetTreeView::mh_DrawPlus(QPainter * const opc_Painter, const QPoint & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Draw vertical line of branch
 
-   \param[in,out]   opc_Painter Painter to draw with
-   \param[in]       orc_TopLeft Top left point
-   \param[in]       os32_Offset Offset to paint at
+   \param[in,out] opc_Painter Painter to draw with
+   \param[in]     orc_TopLeft Top left point
+   \param[in]     os32_Offset Offset to paint at
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::mh_DrawVLine(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const sint32 os32_Offset)

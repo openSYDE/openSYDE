@@ -52,7 +52,7 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListPasteCommand::C_SdNdeUnoDataPoolListPasteCommand(const uint32 & oru32_NodeIndex,
                                                                        const uint32 & oru32_DataPoolIndex,
-                                                                       stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                                                       stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                                                        QUndoCommand * const opc_Parent) :
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex,
                                               opc_DataPoolListsTreeWidget, std::vector<stw_types::uint32>(),

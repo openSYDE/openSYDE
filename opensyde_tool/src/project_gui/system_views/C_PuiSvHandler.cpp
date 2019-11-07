@@ -2331,6 +2331,31 @@ sint32 C_PuiSvHandler::CheckViewReconnectNecessary(const uint32 ou32_ViewIndex, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get namespace for ID
+
+   \param[in] orc_Id ID
+
+   \return
+   Namespace
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSvHandler::h_GetNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
+{
+   QString c_Retval;
+
+   if (orc_Id.GetIsValid())
+   {
+      c_Retval = C_PuiSdHandler::h_GetInstance()->GetNamespace(orc_Id);
+      if (orc_Id.GetUseArrayElementIndex())
+      {
+         //Append array element index
+         c_Retval += QString(C_GtGetText::h_GetText("[%1]")).arg(orc_Id.GetArrayElementIndex());
+      }
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check bus for disabled look
 
    \param[in] ou32_ViewIndex View index
@@ -2987,6 +3012,7 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementMoved(const uint32 ou32_Node
    \param[in] oe_Type            New element type
    \param[in] oq_IsArray         New array type
    \param[in] ou32_ArraySize     New array size
+   \param[in] oq_IsString        Flag if new type is string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou32_NodeIndex,
@@ -2994,13 +3020,15 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou
                                                                  const uint32 ou32_ListIndex,
                                                                  const uint32 ou32_ElementIndex,
                                                                  const C_OSCNodeDataPoolContent::E_Type oe_Type,
-                                                                 const bool oq_IsArray, const uint32 ou32_ArraySize)
+                                                                 const bool oq_IsArray, const uint32 ou32_ArraySize,
+                                                                 const bool oq_IsString)
 {
    for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListElementArrayChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
-                                                        ou32_ElementIndex, oe_Type, oq_IsArray, ou32_ArraySize);
+                                                        ou32_ElementIndex, oe_Type, oq_IsArray, ou32_ArraySize,
+                                                        oq_IsString);
    }
 }
 

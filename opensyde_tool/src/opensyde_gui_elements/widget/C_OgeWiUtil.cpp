@@ -412,7 +412,7 @@ QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString
                                        const QString & orc_StartingFolder, const QString & orc_Filter,
                                        const QString & orc_DefaultFileName, const QFileDialog::Options oc_Option)
 {
-   QString c_Retval;
+   QString c_Retval = "";
    bool q_Stop = false;
    QFileDialog c_FileDialog(opc_Parent, orc_Heading, orc_StartingFolder, orc_Filter);
 
@@ -430,21 +430,15 @@ QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString
 
          if (c_FullFilePath != "")
          {
-            const QFileInfo c_Info(c_FullFilePath);
-            if (C_OSCUtils::h_CheckValidCName(c_Info.baseName().toStdString().c_str(),
-                                              std::numeric_limits<uint16>::max()) == true)
+            // check if file name contains invalid characters
+            if (C_OSCUtils::h_CheckValidFilePath(c_FullFilePath.toStdString().c_str()) == true)
             {
                c_Retval = c_FullFilePath;
                q_Stop = true;
             }
             else
             {
-               C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::eERROR);
-               c_MessageBox.SetHeading(orc_Heading);
-               c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                      "File name invalid. "
-                                                      "Only alphanumeric characters and \"_\" are allowed.")));
-               c_MessageBox.Execute();
+               C_OgeWiUtil::h_ShowPathInvalidError(opc_Parent, c_FullFilePath);
             }
          }
          else
@@ -460,6 +454,24 @@ QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString
    }
    return c_Retval;
    //lint -e{1746} Necessary because needs default parameter and is not recognized as const
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Show error popup for information about invalid paths.
+
+   \param[in]       opc_Parent         parent widget (for parent of message box)
+   \param[in]       orc_InvalidPaths   Paths that contain invalid characters
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiUtil::h_ShowPathInvalidError(QWidget * const opc_Parent, const QString & orc_InvalidPaths)
+{
+   C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Path"));
+   c_Message.SetDescription(C_GtGetText::h_GetText("Path contains invalid characters."));
+   c_Message.SetDetails(QString(C_GtGetText::h_GetText("Path(s):\n%1")).arg(orc_InvalidPaths));
+
+   c_Message.Execute();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

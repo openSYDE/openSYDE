@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get highest parent
+/*! \brief  Get highest parent
 
    \param[in,out] opc_Item Item to get highest parent from
 
@@ -69,7 +69,7 @@ QGraphicsItem * C_SebUtil::h_GetHighestParent(QGraphicsItem * const opc_Item)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get highest parent
+/*! \brief  Get highest parent
 
    \param[in,out] opc_Item Item to get highest parent from
 
@@ -104,7 +104,7 @@ const QGraphicsItem * C_SebUtil::h_GetHighestParent(const QGraphicsItem * const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checks the file for existence of the file and file format
+/*! \brief  Checks the file for existence of the file and file format
 
    Supported image formats:
    - jpg
@@ -112,7 +112,7 @@ const QGraphicsItem * C_SebUtil::h_GetHighestParent(const QGraphicsItem * const 
    - png
    - bmp
 
-   \param[in]     orc_FilePath   Path of file
+   \param[in] orc_FilePath Path of file
 
    \return
    true     File exist and is an image
@@ -144,7 +144,7 @@ bool C_SebUtil::h_CheckFilePathForImage(QString & orc_FilePath)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add offset for line item
+/*! \brief  Add offset for line item
 
    \param[in] orc_LineBase Line base item to add offset for
    \param[in] orc_Offset   Offset for all items
@@ -159,7 +159,7 @@ void C_SebUtil::h_AddLineOffset(C_PuiBsLineBase & orc_LineBase, const QPointF & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUtil::C_SebUtil()

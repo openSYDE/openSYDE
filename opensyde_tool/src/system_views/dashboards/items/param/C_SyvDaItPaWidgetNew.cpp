@@ -428,7 +428,7 @@ void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
       QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(
          pc_ParamWidget->GetPopUpParent(), pc_ParamWidget->GetPopUpParent());
       C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, this->mu32_ViewIndex, true,
-                                                                                    false, true, true, true);
+                                                                                    false, true, false, true, true);
 
       //Resize
       c_New->SetSize(QSize(800, 800));
@@ -1049,7 +1049,8 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
                           c_It != c_AffectedElementValues.end(); ++c_It)
                      {
                         const C_PuiSvDbNodeDataPoolListElementId c_Id(c_It->first,
-                                                                      C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+                                                                      C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false,
+                                                                      0UL);
                         this->mpc_DataWidget->AddNewNvmValueIntoQueue(c_Id,
                                                                       c_It->second.c_Actual);
                      }

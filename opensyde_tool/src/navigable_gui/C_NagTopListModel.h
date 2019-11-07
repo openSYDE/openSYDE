@@ -33,14 +33,10 @@ public:
    void SetContent(const std::vector<QString> & orc_Content);
    void SetError(const std::vector<bool> & orc_Error);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-
-   // Basic functionality:
-   //lint -e{1735} Suppression, because default parameters are identical
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
+   // and default parameters are identical.
+   //lint -save -e1960 -e1735
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
-
-   //lint -e{1735} Suppression, because default parameters are identical
    virtual QVariant data(const QModelIndex & orc_Index, const stw_types::sintn osn_Role =
                             static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    //lint -restore

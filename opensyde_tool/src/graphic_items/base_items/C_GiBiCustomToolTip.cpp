@@ -31,7 +31,7 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiCustomToolTip::C_GiBiCustomToolTip() :
@@ -41,7 +41,7 @@ C_GiBiCustomToolTip::C_GiBiCustomToolTip() :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiCustomToolTip::~C_GiBiCustomToolTip()
@@ -49,7 +49,7 @@ C_GiBiCustomToolTip::~C_GiBiCustomToolTip()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore default tool tip
+/*! \brief  Restore default tool tip
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiCustomToolTip::RestoreDefaultToolTip()
@@ -60,7 +60,7 @@ void C_GiBiCustomToolTip::RestoreDefaultToolTip()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set default tool tip heading
+/*! \brief  Set default tool tip heading
 
    \param[in] orc_Text New text
 */
@@ -72,7 +72,7 @@ void C_GiBiCustomToolTip::SetDefaultToolTipHeading(const QString & orc_Text)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set default tool tip content
+/*! \brief  Set default tool tip content
 
    \param[in] orc_Text New text
 */
@@ -84,7 +84,7 @@ void C_GiBiCustomToolTip::SetDefaultToolTipContent(const QString & orc_Text)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set default tool tip type
+/*! \brief  Set default tool tip type
 
    \param[in] oe_Type Tool tip type
 */
@@ -96,7 +96,7 @@ void C_GiBiCustomToolTip::SetDefaultToolTipType(const C_NagToolTip::E_Type oe_Ty
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set temporary tool tip heading
+/*! \brief  Set temporary tool tip heading
 
    \param[in] orc_TemporaryToolTip New text
 */
@@ -107,7 +107,7 @@ void C_GiBiCustomToolTip::SetTemporaryToolTipHeading(const QString & orc_Tempora
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set temporary tool tip content
+/*! \brief  Set temporary tool tip content
 
    \param[in] orc_TemporaryToolTip New text
 */
@@ -118,7 +118,7 @@ void C_GiBiCustomToolTip::SetTemporaryToolTipContent(const QString & orc_Tempora
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current tool tip heading
+/*! \brief  Get current tool tip heading
 
    \return
    Current heading
@@ -130,7 +130,7 @@ QString C_GiBiCustomToolTip::GetCurrentToolTipHeading(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current tool tip content
+/*! \brief  Get current tool tip content
 
    \return
    Current content
@@ -142,7 +142,7 @@ QString C_GiBiCustomToolTip::GetCurrentToolTipContent(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current tool tip type
+/*! \brief  Get current tool tip type
 
    \return
    Current tool tip type
@@ -154,7 +154,7 @@ C_NagToolTip::E_Type C_GiBiCustomToolTip::GetCurrentToolTipType(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if tool tip not empty
+/*! \brief  Check if tool tip not empty
 
    \return
    true:  Tool tip not empty
@@ -167,7 +167,7 @@ bool C_GiBiCustomToolTip::NotEmpty() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Deactivate tool tip temporarily
+/*! \brief  Deactivate tool tip temporarily
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiCustomToolTip::DeactivateToolTipTemporarily(void)

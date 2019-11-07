@@ -48,20 +48,17 @@ min-height: 15px;
 stw_opensyde_gui--C_CamGenTableView QScrollBar,
 stw_opensyde_gui--C_CamGenSigTableView QScrollBar,
 stw_opensyde_gui--C_CamMetWidget QAbstractItemView QScrollBar,
-stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar,
-QAbstractItemView[View="CompleterDark"] QScrollBar
+stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar
 {
 border-style:none;
 }
 
-stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar:horizontal,
-QAbstractItemView[View="CompleterDark"] QScrollBar:horizontal
+stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar:horizontal
 {
 height:5px; /*real height of scroll bar is 5px; Real height = height - padding-bottom/top */
 }
 
-stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar:vertical,
-QAbstractItemView[View="CompleterDark"] QScrollBar:vertical
+stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar:vertical
 {
 width:5px; /*real width of scroll bar is 5px; Real width = width - padding-bottom/top */
 }
@@ -109,14 +106,32 @@ padding-bottom:6px;
 /*List/table scrollbar*/
 stw_opensyde_gui--C_CamMosFilterWidget QScrollBar:vertical
 {
-width:8px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
-padding-left:3px;
-padding-right:0px;
+width:11px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-left:0px;
+padding-right:6px;
 padding-top:0px;
 padding-bottom:0px;
 }
 
 stw_opensyde_gui--C_CamMosFilterWidget QScrollBar:horizontal
+{
+height:8px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
+padding-top:3px;
+padding-bottom:0px;
+padding-left:0px;
+padding-right:0px;
+}
+
+stw_opensyde_gui--C_CamMosDatabaseWidget QScrollBar:vertical
+{
+width:11px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-left:0px;
+padding-right:6px;
+padding-top:0px;
+padding-bottom:0px;
+}
+
+stw_opensyde_gui--C_CamMosDatabaseWidget QScrollBar:horizontal
 {
 height:8px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
 padding-top:3px;

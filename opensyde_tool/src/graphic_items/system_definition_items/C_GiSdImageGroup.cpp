@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -52,17 +52,16 @@ C_GiSdImageGroup::C_GiSdImageGroup(const sint32 & ors32_Index, const uint64 & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]     ors32_Index   Index of data element in system definition
-   \param[in]     oru64_ID      Unique ID
-   \param[in]     orc_Image     Image
-   \param[in]     orf64_Width   Width of image view
-   \param[in]     orf64_Height  Height of image view
-   \param[in]     orc_ImagePath Filepath to the image
-   \param[in,out] opc_Parent    Optional pointer to parent
+   \param[in]     ors32_Index Index of data element in system definition
+   \param[in]     oru64_ID    Unique ID
+   \param[in]     of64_Width  Width of image view
+   \param[in]     of64_Height Height of image view
+   \param[in]     orc_Image   Image
+   \param[in,out] opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSdImageGroup::C_GiSdImageGroup(const sint32 & ors32_Index, const uint64 & oru64_ID, const float64 of64_Width,
@@ -74,7 +73,7 @@ C_GiSdImageGroup::C_GiSdImageGroup(const sint32 & ors32_Index, const uint64 & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for initially loading internal data
+/*! \brief  Function for initially loading internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdImageGroup::LoadData(void)
@@ -88,7 +87,7 @@ void C_GiSdImageGroup::LoadData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for updating internal data
+/*! \brief  Slot function for updating internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdImageGroup::UpdateData(void)
@@ -100,7 +99,7 @@ void C_GiSdImageGroup::UpdateData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete data in system definition
+/*! \brief  Delete data in system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdImageGroup::DeleteData(void)

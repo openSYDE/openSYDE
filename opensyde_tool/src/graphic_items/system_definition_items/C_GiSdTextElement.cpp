@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -52,7 +52,7 @@ C_GiSdTextElement::C_GiSdTextElement(const sint32 & ors32_Index, const uint64 & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -69,7 +69,7 @@ C_GiSdTextElement::C_GiSdTextElement(const sint32 & ors32_Index, const uint64 & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for initially loading internal data
+/*! \brief  Function for initially loading internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdTextElement::LoadData(void)
@@ -86,7 +86,7 @@ void C_GiSdTextElement::LoadData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for updating internal data
+/*! \brief  Slot function for updating internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdTextElement::UpdateData(void)
@@ -100,14 +100,14 @@ void C_GiSdTextElement::UpdateData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete data in system definition
+/*! \brief  Delete data in system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdTextElement::DeleteData(void)
 {
    C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.erase(
       C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.begin() +
-            ms32_Index);
+      ms32_Index);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

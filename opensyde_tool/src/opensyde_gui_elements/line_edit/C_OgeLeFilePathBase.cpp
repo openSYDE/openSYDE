@@ -126,6 +126,15 @@ void C_OgeLeFilePathBase::InsertVariable(const QString & orc_Variable)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown text based on the current set path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeLeFilePathBase::UpdateText(void)
+{
+   this->setText(QString(this->mc_Path));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overridden focus in event slot
 
    Here: show full path

@@ -61,7 +61,7 @@ public:
    void HandleElements(void);
    void InitText(void) const;
    void LoadUserSettings(void);
-   void SaveUserSettings(void) const;
+   void SaveUserSettings(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -97,6 +97,7 @@ private:
    Ui::C_NagNaviBarWidget * mpc_Ui;
    QTimer mc_TimerAnimation;
    bool mq_Loaded;
+   bool mq_NodeSectionSizeLoaded;
    bool mq_Maximized;
    stw_types::sintn msn_StepSize;
 

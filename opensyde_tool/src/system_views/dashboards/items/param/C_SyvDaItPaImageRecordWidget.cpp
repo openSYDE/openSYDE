@@ -158,15 +158,17 @@ void C_SyvDaItPaImageRecordWidget::InitText(void)
    this->mpc_Ui->pc_LabelValidateFile->setText(QString(C_GtGetText::h_GetText("Validate File(s)")));
 
    this->mpc_Ui->pc_LabelHeadingSelectFile->setText(C_GtGetText::h_GetText("File"));
-   this->mpc_Ui->pc_LabelStepDescription->setText(C_GtGetText::h_GetText("Choose a path to save the file to and click "
-                                                                         "\"Read Parameters\" to start the parameter set record process."));
+   this->mpc_Ui->pc_LabelStepDescription->setText(
+      C_GtGetText::h_GetText("Choose a path to save the file to and click "
+                             "\"Read Parameters\" to start the parameter set record process."));
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
    this->mpc_Ui->pc_CommentText->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
    this->mpc_Ui->pc_LabelHeadingConfirm->setText(C_GtGetText::h_GetText("Read Parameter Lists"));
    this->mpc_Ui->pc_LineEditPath->setPlaceholderText(C_GtGetText::h_GetText(""));
-   this->mpc_Ui->pc_LabelMultipleNodes->setText(C_GtGetText::h_GetText(
-                                                   "Attention: Recording for multiple nodes will result in one file per node."
-                                                   " Name format: \"<SelectedPathAndFileName>_<NodeName>.syde_psi\""));
+   this->mpc_Ui->pc_LabelMultipleNodes->setText(
+      C_GtGetText::h_GetText(
+         "Attention: Recording for multiple nodes will result in one file per node."
+         " Name format: \"<SelectedPathAndFileName>_<NodeName>.syde_psi\""));
 
    this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Read Parameters")));
    this->mpc_Ui->pc_CbConfirm->setText(QString(C_GtGetText::h_GetText(
@@ -292,8 +294,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
       {
          if (("." + c_BaseInfo.completeSuffix()) == mhc_FILE_EXTENSION)
          {
-            if (C_OSCUtils::h_CheckValidCName(c_BaseInfo.baseName().toStdString().c_str(),
-                                              std::numeric_limits<uint16>::max()))
+            if (C_OSCUtils::h_CheckValidFilePath(c_BaseInfo.absoluteFilePath().toStdString().c_str()) == true)
             {
                // Check if file exists already
                QFile c_File;
@@ -401,9 +402,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
             {
                C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
-               c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                      "File name invalid. Only alphanumeric characters and \"_\" are "
-                                                      "allowed.")));
+               c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("File path contains invalid characters.")));
                c_MessageBox.Execute();
             }
          }
@@ -634,9 +633,10 @@ sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(const QString & or
 
    for (uint32 u32_ItNode = 0U; (u32_ItNode < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR); ++u32_ItNode)
    {
-      s32_Return = this->mrc_ComDriver.NvmSafeCreateCleanFileWithoutCRC(this->mc_AllNodeIndexes[u32_ItNode], this->m_GetPathForNode(
-                                                                           this->mc_AllNodeIndexes[u32_ItNode],
-                                                                           this->mc_FilePath), c_FileInfo);
+      s32_Return = this->mrc_ComDriver.NvmSafeCreateCleanFileWithoutCRC(
+         this->mc_AllNodeIndexes[u32_ItNode],
+         this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_ItNode], this->mc_FilePath),
+         c_FileInfo);
    }
 
    if (s32_Return != C_NO_ERR)
@@ -658,7 +658,7 @@ sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(const QString & or
          c_ErrorText = "Could not write to file (e.g. missing write permissions or missing directory).";
          break;
       default:
-         c_ErrorText = "Creating file failed with unknown reason.";
+         c_ErrorText = QString("Creating file failed with unknown reason (%1).").arg(s32_Return);
          break;
       }
 
@@ -708,12 +708,10 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
       for (u32_Counter = 0U; u32_Counter < this->mc_AllNodeIndexes.size(); ++u32_Counter)
       {
          // Step 5
-         s32_Return = this->mrc_ComDriver.NvmSafeCheckParameterFileContents(this->mc_AllNodeIndexes[u32_Counter],
-                                                                            this->m_GetPathForNode(this->
-                                                                                                   mc_AllNodeIndexes[
-                                                                                                      u32_Counter],
-                                                                                                   this->mc_FilePath),
-                                                                            c_DataPoolListsForEachNode[u32_Counter]);
+         s32_Return = this->mrc_ComDriver.NvmSafeCheckParameterFileContents(
+            this->mc_AllNodeIndexes[u32_Counter],
+            this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_Counter], this->mc_FilePath),
+            c_DataPoolListsForEachNode[u32_Counter]);
 
          if (s32_Return != C_NO_ERR)
          {
@@ -730,15 +728,14 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
                              " \"C_OSCNode\" is set in \"C_OSCDataDealer\".";
                break;
             case C_RANGE:
-               c_ErrorText = "Path does not match the path of the preceding function calls or "
-                             "node index out of range.";
+               c_ErrorText = "Path does not match the path of the preceding function calls or node index out of range.";
                break;
             case C_RD_WR:
                c_ErrorText = "Specified file does not exist "
                              " specified file is present but structure is invalid (e.g. invalid XML file)";
                break;
             default:
-               c_ErrorText = "Read back of file failed with unknown reason.";
+               c_ErrorText = QString("Read back of file failed with unknown reason (%1).").arg(s32_Return);
                break;
             }
 
@@ -796,11 +793,11 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
             const QString c_PathHtml = C_Uti::h_GetLink(c_Path, mc_STYLE_GUIDE_COLOR_LINK, "file:///" + c_Path);
 
             // Node name
-            if (!oq_IsConfirm)
+            if (oq_IsConfirm == false)
             {
                c_Text += "<div>" + QString(C_GtGetText::h_GetText("Path: %1")).arg(c_PathHtml) + "</div>";
             }
-            if (oq_IsConfirm)
+            if (oq_IsConfirm == true)
             {
                c_Text += "<div><u>";
             }
@@ -810,7 +807,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
             }
             c_Text += QString(C_GtGetText::h_GetText("Node")) + " - " +
                       QString(pc_OSCNode->c_Properties.c_Name.c_str());
-            if (oq_IsConfirm)
+            if (oq_IsConfirm == true)
             {
                c_Text += "</u>";
             }
@@ -840,7 +837,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
 
                   if (pc_OSCDataPool != NULL)
                   {
-                     if (oq_IsConfirm)
+                     if (oq_IsConfirm == true)
                      {
                         c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
                      }
@@ -856,7 +853,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                if (pc_OSCList != NULL)
                {
                   // Listname
-                  if (oq_IsConfirm)
+                  if (oq_IsConfirm == true)
                   {
                      c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
                   }
@@ -924,9 +921,9 @@ void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
 
    for (uint32 u32_ItNode = 0U; (u32_ItNode < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR); ++u32_ItNode)
    {
-      s32_Return = this->mrc_ComDriver.NvmSafeUpdateCRCForFile(this->mc_AllNodeIndexes[u32_ItNode], this->m_GetPathForNode(
-                                                                  this->mc_AllNodeIndexes[u32_ItNode],
-                                                                  this->mc_FilePath));
+      s32_Return = this->mrc_ComDriver.NvmSafeUpdateCRCForFile(
+         this->mc_AllNodeIndexes[u32_ItNode],
+         this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_ItNode], this->mc_FilePath));
    }
 
    if (s32_Return == C_NO_ERR)
@@ -958,7 +955,7 @@ void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
          c_ErrorText = "Path does not match the path of the preceding function calls.";
          break;
       default:
-         c_ErrorText = "Validating file failed with unknown reason.";
+         c_ErrorText = QString("Validating file failed with unknown reason (%1).").arg(s32_Return);
          break;
       }
 
@@ -1118,13 +1115,12 @@ void C_SyvDaItPaImageRecordWidget::m_Timer(void)
 void C_SyvDaItPaImageRecordWidget::m_ReportError(const QString & orc_FunctionName, const QString & orc_ErrorText,
                                                  const stw_types::sint32 os32_ErrorCode)
 {
-   QString c_Text = "Function " + orc_FunctionName +
-                    " ended with error code \"" + C_Uti::h_StwError(os32_ErrorCode) + "\"";
+   const QString c_Text = "Function " + orc_FunctionName +
+                          " ended with error code \"" + C_Uti::h_StwError(os32_ErrorCode) + "\"";
 
    C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
 
-   osc_write_log_info("Write NVM parameters",
-                      c_Text.toStdString().c_str());
+   osc_write_log_info("Write NVM parameters", c_Text.toStdString().c_str());
 
    c_Message.SetDescription(QString(C_GtGetText::h_GetText("Function %1 ended with error.")).arg(orc_FunctionName));
    c_Message.SetDetails(QString(C_GtGetText::h_GetText("Error code:\n %1 \nError text: \n %2"))
@@ -1160,45 +1156,39 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
    case C_OVERFLOW:
       c_Description += "Wrong sequence of function calls";
       C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
+      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
+                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_RANGE:
       c_Description += "Datapool list IDs invalid";
       C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
+      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
+                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_CHECKSUM:
       c_Description += "CRC over the values of a parameter list read from the ECU does not match those values";
       C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
+      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
+                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_CONFIG:
       c_Description += "No valid diagnostic protocol is set";
       c_Description += "or no valid pointer to the original instance of \"C_OSCNode\" is set in \"C_OSCDataDealer\"";
       C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
+      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
+                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_NOACT:
       c_Description += "Server communication protocol service could not be requested";
       C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
+      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
+                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Server communication protocol service has timed out";
       C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
+      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
+                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_WARN:
       c_Description += "Server communication protocol service error response was received";
@@ -1226,16 +1216,14 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
          break;
       }
       C_OSCLoggingHandler::h_Flush();
-      c_Details += QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                     mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                     c_Log);
+      c_Details += QString(C_GtGetText::h_GetText("\nSee log file for details:")) +
+                   C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
       C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
+      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
+                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    default:
       //Should not happen

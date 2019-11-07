@@ -111,11 +111,3 @@ margin-top:1px;
 margin-left:-4px;
 margin-right:6px;
 }
-
-/* -- Completer -- */
-QAbstractItemView[View="CompleterDark"]
-{
-outline:none;
-border-style:solid;
-border-width:1px;
-}

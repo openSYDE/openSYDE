@@ -57,9 +57,11 @@ C_SyvManager::C_SyvManager(QObject * const opc_Parent) :
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle add new view action
+
+   \param[in]  oq_SendSigChangeMode    Flag for sending the signal SigChangeMode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvManager::AddView(void)
+void C_SyvManager::AddView(const bool oq_SendSigChangeMode)
 {
    const uint32 u32_NewViewIndex = C_PuiSvHandler::h_GetInstance()->GetViewCount();
    QString c_SubMode;
@@ -72,9 +74,14 @@ void C_SyvManager::AddView(void)
    C_SyvUtil::h_GetViewDisplayName(u32_NewViewIndex, ms32_SUBMODE_SYSVIEW_SETUP, c_SubMode, c_SubSubMode);
 
    //Trigger reload
-   Q_EMIT this->SigReloadNaviBarSystemViewContent();
-   //Select new view
-   Q_EMIT this->SigChangeMode(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP, u32_NewViewIndex, c_SubMode, c_SubSubMode);
+   Q_EMIT (this->SigReloadNaviBarSystemViewContent());
+
+   if (oq_SendSigChangeMode == true)
+   {
+      //Select new view
+      Q_EMIT (this->SigChangeMode(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP, u32_NewViewIndex, c_SubMode,
+                                 c_SubSubMode));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,6 +95,8 @@ void C_SyvManager::UpdateAllViewNames(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle initial view setup
+
+   If a new view is created the function does not change to the new created view
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::HandleInitialSystemView(void)
@@ -95,7 +104,7 @@ void C_SyvManager::HandleInitialSystemView(void)
    //Check if new project
    if (C_PuiSvHandler::h_GetInstance()->GetViewCount() == 0UL)
    {
-      this->AddView();
+      this->AddView(false);
    }
 }
 

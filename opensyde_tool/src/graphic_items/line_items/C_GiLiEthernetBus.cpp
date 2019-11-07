@@ -16,6 +16,7 @@
 
 #include "C_GiLiEthernetBus.h"
 #include "C_OgePopUpDialog.h"
+#include "C_GtGetText.h"
 #include "C_GiSyBaseWidget.h"
 #include "C_GiSyLineWidget.h"
 #include "gitypes.h"
@@ -26,7 +27,6 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString mc_NAME_ETHERNET = "BUS ETHERNET";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -39,16 +39,16 @@ const QString mc_NAME_ETHERNET = "BUS ETHERNET";
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]     ors32_Index          Index of data element in system definition
-   \param[in]     oru64_ID             Unique ID
-   \param[in]     opc_TextElementName  Pointer to text element for showing bus name
-   \param[in]     oq_DoErrorCheck      Optional flag to trigger error check directly in constructor
-   \param[in]     opc_Points           Points for line
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in]     ors32_Index         Index of data element in system definition
+   \param[in]     oru64_ID            Unique ID
+   \param[in]     opc_TextElementName Pointer to text element for showing bus name
+   \param[in]     oq_DoErrorCheck     Optional flag to trigger error check directly in constructor
+   \param[in]     opc_Points          Points for line
+   \param[in,out] opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiEthernetBus::C_GiLiEthernetBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64_ID,
@@ -59,7 +59,7 @@ C_GiLiEthernetBus::C_GiLiEthernetBus(const stw_types::sint32 & ors32_Index, cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -69,7 +69,7 @@ C_GiLiEthernetBus::~C_GiLiEthernetBus()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this itme
+/*! \brief  Returns the type of this itme
 
    \return  ID
 */
@@ -80,7 +80,10 @@ sintn C_GiLiEthernetBus::type() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Open style dialog
+/*! \brief  Open style dialog
+
+   \retval true   style dialog was accepted
+   \retval false  style dialog was rejected
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiLiEthernetBus::OpenStyleDialog(void)
@@ -89,7 +92,8 @@ bool C_GiLiEthernetBus::OpenStyleDialog(void)
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
-   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, mc_NAME_ETHERNET, false);
+   C_GiSyBaseWidget * pc_Dialog =
+      new C_GiSyBaseWidget(*c_New, stw_opensyde_gui_logic::C_GtGetText::h_GetText("Ethernet Bus"), false);
    C_GiSyLineWidget * pc_SettingsWidget = new C_GiSyLineWidget(C_GiSyLineWidget::E_Type::eETHERNET_BUS, *pc_Dialog);
 
    pc_SettingsWidget->SetLineColor(this->GetColor());
@@ -135,7 +139,10 @@ void C_GiLiEthernetBus::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Return bus type
+/*! \brief  Return bus type
+
+   \return
+   Bus type (CAN or Ethernet)
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_core::C_OSCSystemBus::E_Type C_GiLiEthernetBus::GetType() const

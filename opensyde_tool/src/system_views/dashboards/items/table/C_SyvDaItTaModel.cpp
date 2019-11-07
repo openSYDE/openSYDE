@@ -24,10 +24,11 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
 #include "C_GiSvDaTableBase.h"
-#include "C_SdNdeDataPoolUtil.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_SyvDaItTaModel.h"
 #include "C_GiSvDaTableBase.h"
+#include "C_OSCNodeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -162,6 +163,7 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
          this->mc_UnscaledLastDataValues.clear();
          this->mc_UnscaledMaxValues.clear();
          this->mc_UnscaledMinValues.clear();
+         this->mc_ArrayItemIndex.clear();
          this->mc_Names.clear();
          this->mc_Units.clear();
          this->mc_Transparency.clear();
@@ -172,6 +174,7 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
          this->mc_UnscaledLastDataValues.reserve(u32_Count);
          this->mc_UnscaledMaxValues.reserve(u32_Count);
          this->mc_UnscaledMinValues.reserve(u32_Count);
+         this->mc_ArrayItemIndex.reserve(u32_Count);
          this->mc_Names.reserve(u32_Count);
          this->mc_Units.reserve(u32_Count);
          this->mc_InterpretAsStringFlags.reserve(u32_Count);
@@ -203,23 +206,33 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
                   tgl_assert(pc_OSCElement != NULL);
                   if (pc_OSCElement != NULL)
                   {
-                     C_SdNdeDataPoolContentUtil::E_ValueChangedTo e_FullyUsefulAndTotallyNecessaryVariable;
+                     C_OSCNodeDataPoolContentUtil::E_ValueChangedTo e_FullyUsefulAndTotallyNecessaryVariable;
                      C_OSCNodeDataPoolContent c_Val = pc_OSCElement->c_MinValue;
                      std::vector<float64> c_Values;
-                     C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(pc_OSCElement->c_MinValue, c_Values);
+                     C_SdNdeDpContentUtil::h_GetValuesAsFloat64(pc_OSCElement->c_MinValue, c_Values);
                      this->mc_UnscaledMinValues.push_back(c_Values);
                      //Set unscaled starting value to 0 if possible
-                     C_SdNdeDataPoolContentUtil::h_SetValueInMinMaxRange(pc_OSCElement->c_MinValue,
-                                                                         pc_OSCElement->c_MaxValue, c_Val,
-                                                                         e_FullyUsefulAndTotallyNecessaryVariable,
-                                                                         C_SdNdeDataPoolContentUtil::eTO_ZERO);
-                     C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(c_Val, c_Values);
+                     C_OSCNodeDataPoolContentUtil::h_SetValueInMinMaxRange(pc_OSCElement->c_MinValue,
+                                                                           pc_OSCElement->c_MaxValue, c_Val,
+                                                                           e_FullyUsefulAndTotallyNecessaryVariable,
+                                                                           C_OSCNodeDataPoolContentUtil::eTO_ZERO);
+                     C_SdNdeDpContentUtil::h_GetValuesAsFloat64(c_Val, c_Values);
                      this->mc_UnscaledLastDataValues.push_back(c_Values);
-                     C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(pc_OSCElement->c_MaxValue, c_Values);
+                     C_SdNdeDpContentUtil::h_GetValuesAsFloat64(pc_OSCElement->c_MaxValue, c_Values);
                      this->mc_UnscaledMaxValues.push_back(c_Values);
+                     this->mc_ArrayItemIndex.push_back(pc_ElementId->GetArrayElementIndexOrZero());
+
                      if (rc_Config.c_DisplayName.compare("") == 0)
                      {
-                        this->mc_Names.push_back(pc_OSCElement->c_Name.c_str());
+                        if (pc_ElementId->GetUseArrayElementIndex())
+                        {
+                           this->mc_Names.push_back(QString("%1[%2]").arg(pc_OSCElement->c_Name.c_str()).arg(
+                                                       pc_ElementId->GetArrayElementIndex()));
+                        }
+                        else
+                        {
+                           this->mc_Names.push_back(pc_OSCElement->c_Name.c_str());
+                        }
                      }
                      else
                      {
@@ -234,9 +247,16 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
                         this->mc_Units.push_back(rc_Config.c_ElementScaling.c_Unit);
                      }
                      //Percentage
-                     if (pc_OSCElement->GetArray() == true)
+                     if (pc_OSCElement->GetArray())
                      {
-                        this->mc_ShowPercentage.push_back(false);
+                        if (pc_ElementId->GetUseArrayElementIndex())
+                        {
+                           this->mc_ShowPercentage.push_back(true);
+                        }
+                        else
+                        {
+                           this->mc_ShowPercentage.push_back(false);
+                        }
                      }
                      else
                      {
@@ -261,6 +281,7 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
                   this->mc_UnscaledMaxValues.push_back(c_Empty);
                   this->mc_UnscaledMinValues.push_back(c_Empty);
                   this->mc_UnscaledLastDataValues.push_back(c_Empty);
+                  this->mc_ArrayItemIndex.push_back(0UL);
                }
             }
          }
@@ -301,7 +322,7 @@ void C_SyvDaItTaModel::UpdateValue(void)
                   {
                      const C_PuiSvDbNodeDataElementConfig & rc_Config =
                         pc_Item->c_DataPoolElementsConfig[u32_ItConfig];
-                     if (rc_Config.c_ElementId == c_Id)
+                     if (rc_Config.c_ElementId.CheckSameDataElement(c_Id))
                      {
                         //Set unscaled value
                         if (u32_ItConfig < this->mc_UnscaledLastDataValues.size())
@@ -1464,17 +1485,19 @@ float32 C_SyvDaItTaModel::GetPercentage(const uint32 ou32_Index) const
 {
    float32 f32_Retval = 0.0F;
 
-   if (((((((ou32_Index < this->mc_UnscaledLastDataValues.size()) &&
-            (ou32_Index < this->mc_UnscaledMinValues.size())) &&
-           (ou32_Index < this->mc_UnscaledMaxValues.size()) &&
-           (this->mc_UnscaledLastDataValues[ou32_Index].size() > 0)) &&
-          (this->mc_UnscaledMinValues[ou32_Index].size() > 0)) &&
-         (this->mc_UnscaledMaxValues[ou32_Index].size() > 0)) && (ou32_Index < this->mc_ShowPercentage.size())) &&
+   if (((((((((ou32_Index < this->mc_UnscaledLastDataValues.size()) &&
+              (ou32_Index < this->mc_UnscaledMinValues.size())) &&
+             (ou32_Index < this->mc_UnscaledMaxValues.size())) &&
+            (ou32_Index < this->mc_ArrayItemIndex.size())) &&
+           (this->mc_UnscaledLastDataValues[ou32_Index].size() > this->mc_ArrayItemIndex[ou32_Index])) &&
+          (this->mc_UnscaledMinValues[ou32_Index].size() > this->mc_ArrayItemIndex[ou32_Index])) &&
+         (this->mc_UnscaledMaxValues[ou32_Index].size() > this->mc_ArrayItemIndex[ou32_Index])) &&
+        (ou32_Index < this->mc_ShowPercentage.size())) &&
        (this->mc_ShowPercentage[ou32_Index] == true))
    {
-      const float64 & rf64_Value = this->mc_UnscaledLastDataValues[ou32_Index][0];
-      const float64 & rf64_Min = this->mc_UnscaledMinValues[ou32_Index][0];
-      const float64 & rf64_Max = this->mc_UnscaledMaxValues[ou32_Index][0];
+      const float64 & rf64_Value = this->mc_UnscaledLastDataValues[ou32_Index][this->mc_ArrayItemIndex[ou32_Index]];
+      const float64 & rf64_Min = this->mc_UnscaledMinValues[ou32_Index][this->mc_ArrayItemIndex[ou32_Index]];
+      const float64 & rf64_Max = this->mc_UnscaledMaxValues[ou32_Index][this->mc_ArrayItemIndex[ou32_Index]];
       const float64 f64_Range = rf64_Max - rf64_Min;
       if (f64_Range > 0.0)
       {
@@ -1505,27 +1528,44 @@ QString C_SyvDaItTaModel::GetValue(const uint32 ou32_Index) const
 {
    QString c_Retval = "";
 
-   if ((this->mpc_Data != NULL) &&
-       ((ou32_Index < this->mc_UnscaledLastDataValues.size()) && (ou32_Index < this->mc_InterpretAsStringFlags.size())))
+   if (((((this->mpc_Data != NULL) &&
+          (ou32_Index < this->mc_UnscaledLastDataValues.size())) &&
+         (ou32_Index < this->mc_InterpretAsStringFlags.size())) && (ou32_Index < this->mc_ShowPercentage.size())) &&
+       (ou32_Index < this->mc_ArrayItemIndex.size()))
    {
       if (this->mc_InterpretAsStringFlags[ou32_Index] == false)
       {
          if (this->mc_UnscaledLastDataValues[ou32_Index].size() > 1)
          {
-            for (uint32 u32_It = 0; u32_It < this->mc_UnscaledLastDataValues[ou32_Index].size(); ++u32_It)
+            if (this->mc_ShowPercentage[ou32_Index])
             {
-               if (u32_It > 0)
-               {
-                  c_Retval += ";";
-               }
-
-               c_Retval +=
-                  this->mpc_Data->GetUnscaledValueAsScaledString(this->mc_UnscaledLastDataValues[ou32_Index][u32_It],
+               //Single value of array
+               c_Retval =
+                  this->mpc_Data->GetUnscaledValueAsScaledString(this->mc_UnscaledLastDataValues[ou32_Index][this->
+                                                                                                             mc_ArrayItemIndex
+                                                                                                             [ou32_Index
+                                                                                                             ]],
                                                                  ou32_Index);
+            }
+            else
+            {
+               //Complete array
+               for (uint32 u32_It = 0; u32_It < this->mc_UnscaledLastDataValues[ou32_Index].size(); ++u32_It)
+               {
+                  if (u32_It > 0)
+                  {
+                     c_Retval += ";";
+                  }
+
+                  c_Retval +=
+                     this->mpc_Data->GetUnscaledValueAsScaledString(this->mc_UnscaledLastDataValues[ou32_Index][u32_It],
+                                                                    ou32_Index);
+               }
             }
          }
          else if (this->mc_UnscaledLastDataValues[ou32_Index].size() == 1)
          {
+            //Single value
             c_Retval = this->mpc_Data->GetUnscaledValueAsScaledString(this->mc_UnscaledLastDataValues[ou32_Index][0UL],
                                                                       ou32_Index);
          }
@@ -1546,7 +1586,7 @@ QString C_SyvDaItTaModel::GetValue(const uint32 ou32_Index) const
             c_VecValues[u32_Counter] = static_cast<sint8>(this->mc_UnscaledLastDataValues[ou32_Index][u32_Counter]);
          }
 
-         c_Retval = C_SdNdeDataPoolUtil::h_ConvertToString(c_VecValues);
+         c_Retval = C_SdNdeDpUtil::h_ConvertToString(c_VecValues);
       }
    }
 

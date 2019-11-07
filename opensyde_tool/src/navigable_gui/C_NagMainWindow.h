@@ -82,7 +82,8 @@ private:
                          stw_types::uint32 & oru32_Index, QString & orc_Name, QString & orc_SubItemName,
                          stw_types::uint32 & oru32_Flag);
    void m_ShowSysDefItem(const stw_types::sint32 os32_SubMode, const stw_types::uint32 ou32_Index = 0U,
-                         const QString & orc_Name = "", const stw_types::uint32 ou32_Flag = 0U);
+                         const QString & orc_Name = "", const QString & orc_SubName = "",
+                         const stw_types::uint32 ou32_Flag = 0U);
    void m_ShowSysViewItem(stw_types::sint32 & ors32_SubMode, const stw_types::uint32 ou32_Index = 0U,
                           const QString & orc_Name = "", const QString & orc_SubSubModeName = "",
                           const stw_types::uint32 ou32_Flag = 0U);

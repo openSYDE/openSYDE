@@ -18,6 +18,7 @@
 #include "C_SdBueUnoManager.h"
 #include "C_OgeTreeWidgetToolTipBase.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
+#include "C_OSCCanMessageIdentificationIndices.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -40,7 +41,8 @@ public:
    virtual QSize sizeHint(void) const override;
    //lint -restore
 
-   void SetNodeDataPool(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
+   void SetNodeId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
+                  const std::vector<stw_types::uint32> & orc_DatapoolIndexes);
    void SetBusId(const stw_types::uint32 ou32_BusIndex);
    void SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value);
    void DeselectAllItems(void);
@@ -77,6 +79,7 @@ public:
    void OnMessageIdChange(void);
    void OnMessageNameChange(void);
    void OnSignalNameChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void OnNodeDisconnected(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
    void RecheckErrorGlobal(const bool & orq_HandleSelection = true);
    void RecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const bool & orq_AllowMessageIdUpdate = true);
@@ -130,7 +133,8 @@ private:
    void m_TreeSizeChanged(void);
    void m_ScrollBarRangeChanged(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
    stw_types::sint32 m_GetFirstConnectedNodeAndInterface(stw_types::uint32 & oru32_NodeIndex,
-                                                         stw_types::uint32 & oru32_InterfaceIndex) const;
+                                                         stw_types::uint32 & oru32_InterfaceIndex,
+                                                         stw_types::uint32 & oru32_DatapoolIndex) const;
    stw_types::sint32 m_MapMessageIdToInternalMessageIndex(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
       stw_types::uint32 & oru32_InternalMessageIndex) const;
@@ -170,9 +174,10 @@ private:
    std::vector<std::vector<stw_types::uint32> > mc_SelectedSignals;
    bool mq_StopSigSelectionChanged;
    bool mq_ModeSingleNode;
-   stw_types::uint32 mu32_NodeIndex;
-   stw_types::uint32 mu32_InterfaceIndex;
-   stw_types::uint32 mu32_BusIndex;
+   stw_types::uint32 mu32_NodeIndex;                  // Used by node mode
+   stw_types::uint32 mu32_InterfaceIndex;             // Used by node mode
+   std::vector<stw_types::uint32> mc_DatapoolIndexes; // Used by node mode
+   stw_types::uint32 mu32_BusIndex;                   // Used by bus mode
    stw_opensyde_core::C_OSCCanProtocol::E_Type me_ProtocolType;
    bool mq_NoSelectionUpdate;
 };

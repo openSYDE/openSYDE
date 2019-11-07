@@ -16,6 +16,7 @@
 #include "C_PuiSdUtil.h"
 #include "C_PuiSdHandler.h"
 #include "C_GtGetText.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -40,7 +41,7 @@ using namespace stw_scl;
 /*! \brief   Check name not used in existing items
 
    \param[in] orc_ExistingStrings Existing item names
-   \param[in] orc_ProposedName    Proposal for item name
+   \param[in] orc_Proposal        Proposal for item name
    \param[in] opu32_SkipIndex     Optional parameter to skip one index
                                   (Use-case: skip current item to avoid conflict with itself)
 
@@ -229,6 +230,38 @@ QString C_PuiSdUtil::h_GetInterfaceName(const C_OSCSystemBus::E_Type oe_Type, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get related COMM protocol of a datapool.
+
+   Indices must belong to a COMM datapool! Asserts else.
+
+   \param[in]       ou32_NodeIndex        Node index
+   \param[in]       ou32_DatapoolIndex    Datapool index
+
+   \return
+   protocol type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCCanProtocol::E_Type C_PuiSdUtil::h_GetRelatedCANProtocolType(const uint32 ou32_NodeIndex,
+                                                                  const uint32 ou32_DatapoolIndex)
+{
+   C_OSCCanProtocol::E_Type e_Return = C_OSCCanProtocol::eLAYER2;
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+
+   tgl_assert(pc_Node != NULL);
+   if (pc_Node != NULL)
+   {
+      const C_OSCCanProtocol * const pc_Protocol = pc_Node->GetRelatedCANProtocolConst(ou32_DatapoolIndex);
+      tgl_assert(pc_Protocol != NULL);
+      if (pc_Protocol != NULL)
+      {
+         e_Return = pc_Protocol->e_Type;
+      }
+   }
+
+   return e_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert com datapool element index to message ID
 
    \param[in]  orc_ElementID     Datapool element ID
@@ -248,6 +281,7 @@ sint32 C_PuiSdUtil::h_ConvertIndex(const C_OSCNodeDataPoolListElementId & orc_El
 
    //Node
    orc_MessageID.u32_NodeIndex = orc_ElementID.u32_NodeIndex;
+   orc_MessageID.u32_DatapoolIndex = orc_ElementID.u32_DataPoolIndex;
    if (pc_Node != NULL)
    {
       bool q_Found = false;
@@ -269,7 +303,8 @@ sint32 C_PuiSdUtil::h_ConvertIndex(const C_OSCNodeDataPoolListElementId & orc_El
          const C_OSCCanMessageContainer * const pc_Container =
             C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_MessageID.u32_NodeIndex,
                                                                             orc_MessageID.e_ComProtocol,
-                                                                            orc_MessageID.u32_InterfaceIndex);
+                                                                            orc_MessageID.u32_InterfaceIndex,
+                                                                            orc_MessageID.u32_DatapoolIndex);
          if ((pc_Container != NULL) && (pc_List != NULL))
          {
             const std::vector<C_OSCCanMessage> * pc_Messages;
@@ -321,18 +356,16 @@ sint32 C_PuiSdUtil::h_ConvertFromSignalIndex(const C_OSCCanMessageIdentification
                                              C_OSCNodeDataPoolListElementId & orc_ElementID)
 {
    sint32 s32_Retval = C_RANGE;
-   const C_OSCCanProtocol * const pc_Protocol = C_PuiSdHandler::h_GetInstance()->GetCanProtocol(
-      orc_MessageID.u32_NodeIndex, orc_MessageID.e_ComProtocol);
    const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPool(
-      orc_MessageID.u32_NodeIndex, orc_MessageID.e_ComProtocol);
+      orc_MessageID.u32_NodeIndex, orc_MessageID.e_ComProtocol, orc_MessageID.u32_DatapoolIndex);
 
    //Node
    orc_ElementID.u32_NodeIndex = orc_MessageID.u32_NodeIndex;
-   if ((pc_Protocol != NULL) && (pc_DataPool != NULL))
+   if (pc_DataPool != NULL)
    {
       const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageID);
       //Datapool
-      orc_ElementID.u32_DataPoolIndex = pc_Protocol->u32_DataPoolIndex;
+      orc_ElementID.u32_DataPoolIndex = orc_MessageID.u32_DatapoolIndex;
       //List
       if (((C_OSCCanProtocol::h_GetComListIndex(*pc_DataPool, orc_MessageID.u32_InterfaceIndex,
                                                 orc_MessageID.q_MessageIsTx,

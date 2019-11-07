@@ -41,6 +41,8 @@ public:
    static QString h_ConvertDataPoolTypeToString(const stw_opensyde_core::C_OSCNodeDataPool::E_Type & ore_Type);
    static QString h_GetInterfaceName(const stw_opensyde_core::C_OSCSystemBus::E_Type oe_Type,
                                      const stw_types::uint8 ou8_InterfaceNumber);
+   static stw_opensyde_core::C_OSCCanProtocol::E_Type h_GetRelatedCANProtocolType(
+      const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DatapoolIndex);
    static stw_types::sint32 h_ConvertIndex(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ElementID,
                                            stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageID,
                                            stw_types::uint32 & oru32_SignalIndex);

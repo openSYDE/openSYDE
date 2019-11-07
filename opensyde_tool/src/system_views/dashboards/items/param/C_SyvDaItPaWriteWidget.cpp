@@ -22,8 +22,8 @@
 #include "C_Uti.h"
 #include "C_SyvDaItUtil.h"
 #include "C_PuiSdHandler.h"
-#include "C_SdNdeDataPoolUtil.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_PuiSvDbDataElementHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
@@ -683,13 +683,13 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
                {
                   if (rc_CurUiListElement.q_InterpretAsString == true)
                   {
-                     const QString c_Tmp = "\"" + C_SdNdeDataPoolUtil::h_ConvertToString(pc_OSCElement->c_NvmValue) +
+                     const QString c_Tmp = "\"" + C_SdNdeDpUtil::h_ConvertToString(pc_OSCElement->c_NvmValue) +
                                            "\"";
                      c_NvmValues.push_back(c_Tmp);
                   }
                   else
                   {
-                     C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledString(
+                     C_SdNdeDpContentUtil::h_GetValuesAsScaledString(
                         pc_OSCElement->c_NvmValue,
                         pc_OSCList->c_Elements[u32_ElementCounter].f64_Factor,
                         pc_OSCList->c_Elements[u32_ElementCounter].f64_Offset,
@@ -1156,11 +1156,11 @@ QString C_SyvDaItPaWriteWidget::m_GetSuspectElementReport(void) const
             QString c_Actual;
             QString c_Entry;
             //Mark as suspect
-            C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledCombinedString(c_It->second.c_Expected,
+            C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(c_It->second.c_Expected,
                                                                           pc_Element->f64_Factor,
                                                                           pc_Element->f64_Offset, c_Expected);
             c_Expected += QString(" ") + pc_Element->c_Unit.c_str();
-            C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledCombinedString(c_It->second.c_Actual,
+            C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(c_It->second.c_Actual,
                                                                           pc_Element->f64_Factor,
                                                                           pc_Element->f64_Offset, c_Actual);
             c_Actual += QString(" ") + pc_Element->c_Unit.c_str();
@@ -1274,7 +1274,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
                                                                                                   c_Log);
       break;
    case C_NOACT:
-      c_Description += "Could not send request (e.g. TX buffer full)";
+      c_Description += "Could not send request (e.g. Tx buffer full)";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
@@ -1399,7 +1399,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
                                                                                                   c_Log);
       break;
    case C_NOACT:
-      c_Description += "Could not send request (e.g. TX buffer full)";
+      c_Description += "Could not send request (e.g. Tx buffer full)";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
@@ -1535,7 +1535,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
                                                                                                   c_Log);
       break;
    case C_NOACT:
-      c_Description += "Could not send request (e.g. TX buffer full)";
+      c_Description += "Could not send request (e.g. Tx buffer full)";
       break;
    case C_WARN:
       c_Description += "Server sent error response";
@@ -1633,7 +1633,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
                                                                                                   c_Log);
       break;
    case C_NOACT:
-      c_Description += "Could not send request (e.g. TX buffer full)";
+      c_Description += "Could not send request (e.g. Tx buffer full)";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,

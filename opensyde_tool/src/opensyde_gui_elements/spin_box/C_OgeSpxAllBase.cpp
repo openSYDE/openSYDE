@@ -68,9 +68,53 @@ void C_OgeSpxAllBase::ActivateDefaultToolTip(void)
 
    //Translation: 1=Minimum value, 2=Maximum value
    const QString c_Content =
-      QString(C_GtGetText::h_GetText("Minimum: %1\nMaximum: %2")).arg(this->m_GetMinimum()).arg(this->m_GetMaximum());
+      QString(C_GtGetText::h_GetText("Minimum: %1\nMaximum: %2")).arg(this->m_GetMinimumString()).arg(this->m_GetMaximumString());
 
    this->SetToolTipInformation(c_Heading, c_Content);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get minimum string
+
+   \return
+    Minimum string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxAllBase::m_GetMinimumString() const
+{
+   QString c_Retval;
+
+   if (this->mc_UserMinValString.isEmpty())
+   {
+      c_Retval = this->m_GetMinimumRawString();
+   }
+   else
+   {
+      c_Retval = this->mc_UserMinValString;
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get maximum string
+
+   \return
+   Maximum string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxAllBase::m_GetMaximumString() const
+{
+   QString c_Retval;
+
+   if (this->mc_UserMaxValString.isEmpty())
+   {
+      c_Retval = this->m_GetMaximumRawString();
+   }
+   else
+   {
+      c_Retval = this->mc_UserMaxValString;
+   }
+   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

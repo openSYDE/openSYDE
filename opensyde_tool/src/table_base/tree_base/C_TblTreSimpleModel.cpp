@@ -32,7 +32,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -46,7 +46,7 @@ C_TblTreSimpleModel::C_TblTreSimpleModel(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data index
+/*! \brief  Get data index
 
    \param[in] osn_Row    Row
    \param[in] osn_Column Column
@@ -90,7 +90,7 @@ QModelIndex C_TblTreSimpleModel::index(const sintn osn_Row, const sintn osn_Colu
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get parent index
+/*! \brief  Get parent index
 
    Warning: currently this implementation works,
             but if a tree requires more layers this implementation has to be adapted
@@ -126,7 +126,7 @@ QModelIndex C_TblTreSimpleModel::parent(const QModelIndex & orc_Index) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get tree row count
+/*! \brief  Get tree row count
 
    \param[in] orc_Parent Parent
 

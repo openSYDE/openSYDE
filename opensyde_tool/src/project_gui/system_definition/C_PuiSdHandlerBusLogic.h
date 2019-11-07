@@ -58,19 +58,30 @@ public:
 
    //Can protocol getter
    const stw_opensyde_core::C_OSCCanProtocol * GetCanProtocol(const stw_types::uint32 & oru32_NodeIndex,
-                                                              const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType)
-   const;
+                                                              const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
+                                                              const stw_types::uint32 ou32_DatapoolIndex) const;
    const stw_opensyde_core::C_OSCNodeDataPool * GetOSCCanDataPool(const stw_types::uint32 & oru32_NodeIndex,
-                                                                  const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType)
+                                                                  const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType, const stw_types::uint32 & oru32_DatapoolIndex)
    const;
+   std::vector<const stw_opensyde_core::C_OSCNodeDataPool *> GetOSCCanDataPools(
+      const stw_types::uint32 & oru32_NodeIndex,
+      const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType) const;
    const C_PuiSdNodeDataPool * GetUiCanDataPool(const stw_types::uint32 & oru32_NodeIndex,
-                                                const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType) const;
+                                                const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
+                                                const stw_types::uint32 & oru32_DatapoolIndex) const;
    const C_PuiSdNodeCanProtocol * GetUiCanProtocolConst(const stw_types::uint32 & oru32_NodeIndex,
-                                                        const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType)
+                                                        const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
+                                                        const stw_types::uint32 ou32_DatapoolIndex)
    const;
    const stw_opensyde_core::C_OSCCanMessageContainer * GetCanProtocolMessageContainer(
       const stw_types::uint32 & oru32_NodeIndex, const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
+      const stw_types::uint32 & oru32_InterfaceIndex, const stw_types::uint32 ou32_DatapoolIndex) const;
+   std::vector<const stw_opensyde_core::C_OSCCanMessageContainer *> GetCanProtocolMessageContainers(
+      const stw_types::uint32 & oru32_NodeIndex, const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
       const stw_types::uint32 & oru32_InterfaceIndex) const;
+   stw_types::sint32 GetCanProtocolType(const stw_types::uint32 ou32_NodeIndex,
+                                        const stw_types::uint32 ou32_DatapoolIndex,
+                                        stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType) const;
    const stw_opensyde_core::C_OSCCanMessage * GetCanMessage(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    stw_types::sint32 GetCanMessageComplete(
@@ -80,7 +91,7 @@ public:
       std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
       std::vector<C_PuiSdNodeCanSignal> & orc_UISignals) const;
    const stw_opensyde_core::C_OSCNodeDataPoolList * GetOSCCanDataPoolList(const stw_types::uint32 & oru32_NodeIndex,
-                                                                          const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType, const stw_types::uint32 & oru32_InterfaceIndex,
+                                                                          const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType, const stw_types::uint32 & oru32_InterfaceIndex, const stw_types::uint32 ou32_DatapoolIndex,
                                                                           const bool & orq_MessageIsTx) const;
    const stw_opensyde_core::C_OSCCanSignal * GetCanSignal(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -112,9 +123,6 @@ public:
    void SetCanProtocolMessageContainerConnected(const stw_types::uint32 ou32_NodeIndex,
                                                 const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ComType,
                                                 const stw_types::uint32 ou32_InterfaceIndex, const bool oq_Value);
-   stw_types::sint32 ChangeCanProtocolType(const stw_types::uint32 & oru32_NodeIndex,
-                                           const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_PreviousComType,
-                                           const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_NewComType);
    stw_types::sint32 SetCanMessageProperties(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId, const bool & orq_NewMessageIsTx,
       const stw_opensyde_core::C_OSCCanMessage & orc_Message);
@@ -137,7 +145,8 @@ public:
    //Can protocol add/delete/move
    stw_types::sint32 AddCanMessage(const stw_types::uint32 & oru32_NodeIndex,
                                    const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
-                                   const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                   const stw_types::uint32 & oru32_InterfaceIndex,
+                                   const stw_types::uint32 ou32_DatapoolIndex, const bool & orq_MessageIsTx,
                                    const stw_opensyde_core::C_OSCCanMessage & orc_Message, const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement>
                                    & orc_OSCSignalCommons,
                                    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
@@ -186,9 +195,10 @@ protected:
    std::map<stw_scl::C_SCLString, bool> m_GetExistingSignalNames(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    C_PuiSdNodeCanProtocol * m_GetUiCanProtocol(const stw_types::uint32 & oru32_NodeIndex,
-                                               const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType);
+                                               const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
+                                               const stw_types::uint32 ou32_DatapoolIndex);
    const C_PuiSdNodeDataPoolList  * m_GetUiCanDataPoolList(const stw_types::uint32 & oru32_NodeIndex,
-                                                           const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType, const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx)
+                                                           const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType, const stw_types::uint32 & oru32_InterfaceIndex, const stw_types::uint32 ou32_DatapoolIndex, const bool & orq_MessageIsTx)
    const;
    stw_types::sint32 m_InsertUiCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                           const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,

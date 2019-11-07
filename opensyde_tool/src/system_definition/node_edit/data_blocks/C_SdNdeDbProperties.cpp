@@ -39,8 +39,10 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V1 = 1;
-const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V2 = 0;
+const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V1 = 0;
+const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V2 = 1;
+const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V3 = 2;
+// when adding new versions do not forget to update mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -167,7 +169,7 @@ C_SdNdeDbProperties::~C_SdNdeDbProperties(void)
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDbProperties::h_GetBinaryWindowSize(void)
 {
-   return QSize(900, 524);
+   return QSize(850, 524);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -179,7 +181,7 @@ QSize C_SdNdeDbProperties::h_GetBinaryWindowSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDbProperties::h_GetDefaultWindowSize(void)
 {
-   return QSize(900, 946);
+   return QSize(1000, 946);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -204,8 +206,10 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelCodeStructure->setText(C_GtGetText::h_GetText("Code Structure Version"));
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
-   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V2, C_GtGetText::h_GetText("Version 2"));
+   this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V1, C_GtGetText::h_GetText("Version 1"));
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V2, C_GtGetText::h_GetText("Version 2"));
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V3, C_GtGetText::h_GetText("Version 3"));
    this->mpc_Ui->pc_LabelHeadingDatapools->setText(C_GtGetText::h_GetText("Owned Datapools"));
    this->mpc_Ui->pc_LabelDataPoolsEmpty->setText("No assigned Datapools, \nadd any via the '+' button");
    this->mpc_Ui->pc_CommentText->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
@@ -259,12 +263,16 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
                              "Absolute or relative to openSYDE.exe."));
    this->mpc_Ui->pc_LabelCodeStructure->SetToolTipInformation(
       C_GtGetText::h_GetText("Code Structure Version"),
-      C_GtGetText::h_GetText("Version of structure for generated code. Which version to select depends on what your "
-                             "physical target supports. See target documentation for further information about "
-                             "support of version 2.\n"
-                             " - Version 2: Support of COMM messages with multiplexing\n"
-                             " - Version 1: Compatibility mode for previous versions of provided tools \n"
-                             "   (might not take all supported project properties into account)"));
+      QString(C_GtGetText::h_GetText("Version of structure for generated code. Which version to select depends on what "
+                                     "your physical target supports. See target documentation for further information about "
+                                     "supported versions.\n"
+                                     " - %1: Compatibility mode for previous versions of provided tools \n"
+                                     "   (might not take all supported project properties into account)\n"
+                                     " - %2: Support of COMM messages with multiplexing\n"
+                                     " - %3: Support for flexible placement of embedded RAM variables"))
+      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V1))
+      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V2))
+      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V3)));
    this->mpc_Ui->pc_LabelIDE->SetToolTipInformation(
       C_GtGetText::h_GetText("IDE Call"),
       C_GtGetText::h_GetText("Command line IDE call. Absolute or relative to working directory. Make sure to escape "
@@ -320,13 +328,21 @@ void C_SdNdeDbProperties::ApplyNewData(C_OSCNodeApplication & orc_Application) c
    orc_Application.c_CodeGeneratorPath =
       this->mpc_Ui->pc_LineEditCodeGenerator->GetPath().toStdString().c_str();
    orc_Application.c_GeneratePath = this->mpc_Ui->pc_LineEditCodeGenerate->GetPath().toStdString().c_str();
-   if (this->mpc_Ui->pc_ComboBoxCode->currentIndex() == mhsn_VERSION_INDEX_V1)
+   switch (this->mpc_Ui->pc_ComboBoxCode->currentIndex())
    {
+   case mhsn_VERSION_INDEX_V1:
       orc_Application.u16_GenCodeVersion = 1U;
-   }
-   else
-   {
+      break;
+   case mhsn_VERSION_INDEX_V2:
       orc_Application.u16_GenCodeVersion = 2U;
+      break;
+   case mhsn_VERSION_INDEX_V3:
+      orc_Application.u16_GenCodeVersion = 3U;
+      break;
+   default:
+      orc_Application.u16_GenCodeVersion = 3U;
+      tgl_assert(false); // combo box has unknown index should never happen
+      break;
    }
 }
 
@@ -595,8 +611,6 @@ QString C_SdNdeDbProperties::m_CheckID(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check all paths for invalid characters
 
-   Only alphanumerical characters and "_" is allowed.
-
    \return
    error text of paths
 */
@@ -624,22 +638,37 @@ QString C_SdNdeDbProperties::m_CheckPaths(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check all paths for invalid characters
+/*! \brief   Check path for invalid characters
 
-   Only alphanumerical characters and "_" is allowed.
+   See C_OSCUtils for details about valid characters.
 
    \return
-   error path (empty if no error occured)
+   error path plus newline (empty if no error occured)
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDbProperties::m_CheckPath(const QString & orc_Path) const
 {
    QString c_Return = "";
 
-   if (C_OSCUtils::h_IsStringNiceifiedForFileName(orc_Path.toStdString().c_str()) == false)
+   // empty is allowed and resolved with relative path
+   if (orc_Path.isEmpty() == false)
    {
-      c_Return = orc_Path;
-      c_Return += "\n";
+      const QString c_ProjectPath =
+         C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
+
+      const QString c_ResolvedPath = C_PuiUtil::h_ResolvePlaceholderVariables(orc_Path, c_ProjectPath);
+
+      // use resolve engine to check resulting path
+      if (C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == false)
+
+      {
+         c_Return = orc_Path;
+         if (orc_Path != c_ResolvedPath)
+         {
+            c_Return += C_GtGetText::h_GetText(" (resolved: ") + c_ResolvedPath + ")";
+         }
+         c_Return += "\n";
+      }
    }
 
    return c_Return;
@@ -816,14 +845,23 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
    this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(orc_Application.c_CodeGeneratorPath.c_str(), C_Uti::h_GetExePath());
    this->mpc_Ui->pc_LineEditCodeGenerate->SetDbProjectPath(c_ProjectPath);
    this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(orc_Application.c_GeneratePath.c_str(), c_ProjectPath);
-   if (orc_Application.u16_GenCodeVersion == 1U)
+   switch (orc_Application.u16_GenCodeVersion)
    {
+   case 1U:
       this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V1);
-   }
-   else
-   {
+      break;
+   case 2U:
       this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V2);
+      break;
+   case 3U:
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V3);
+      break;
+   default:
+      // latest is greatest
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V3);
+      break;
    }
+
    //Section 3
    m_InitDataPoolsSection();
 
@@ -1013,7 +1051,7 @@ void C_SdNdeDbProperties::m_OnClickClearProject(void) const
    this->mpc_Ui->pc_LineEditIDE->setText("");
    this->mpc_Ui->pc_LineEditCodeGenerator->SetPath("", "");
    this->mpc_Ui->pc_LineEditCodeGenerate->SetPath("", "");
-   this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(0);
+   this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V3); // latest is greatest
 }
 
 //----------------------------------------------------------------------------------------------------------------------

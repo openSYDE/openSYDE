@@ -31,7 +31,7 @@ SOURCES += ../src/main.cpp\
     ../libs/opensyde_core/kefex_diaglib/tgl_windows/TGLUtils.cpp \
     ../libs/opensyde_core/C_OSCZipData.cpp \
     ../src/system_definition/C_SdTopologyWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolEditWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.cpp \
     ../src/system_views/C_SyvHandlerWidget.cpp \
     ../src/user_settings/C_UsHandler.cpp \
     ../libs/opensyde_core/project/C_OSCProject.cpp \
@@ -142,7 +142,7 @@ SOURCES += ../src/main.cpp\
     ../src/system_definition/managers/undo/C_SdManUnoTopologyChangeInterfaceCommand.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabGroupItem.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabGroupSubItem.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDatapoolProperties.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpProperties.cpp \
     ../libs/opensyde_core/project/system/C_OSCSystemFilerUtil.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeApplication.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeComInterfaceSettings.cpp \
@@ -163,9 +163,9 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/label/C_OgeLabListHeaderHeading.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabListHeaderHighlighted.cpp \
     ../libs/opensyde_core/C_OSCUtils.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListHeaderWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListsTreeWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListHeaderWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListsTreeWidget.cpp \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolManager.cpp \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListMoveCommand.cpp \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListPasteCommand.cpp \
@@ -174,11 +174,11 @@ SOURCES += ../src/main.cpp\
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListAddDeleteBaseCommand.cpp \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListAddCommand.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodeEditWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorListWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolViewWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorItemWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorListDelegate.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpViewWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListDelegate.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesWidget.cpp \
     ../src/opensyde_gui_elements/C_OgeFrameSeparator.cpp \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddCommand.cpp \
@@ -190,8 +190,8 @@ SOURCES += ../src/main.cpp\
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListManager.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabCategoryHeading.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabCategorySubHeading.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableDelegate.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableModel.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableDelegate.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableModel.cpp \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoUtil.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabNodeType.cpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxArrow.cpp \
@@ -216,7 +216,7 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/widget/C_OgeWiProgressLog.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiUtil.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiBopperle.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableView.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableView.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxTristate.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxTristateBase.cpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxText.cpp \
@@ -224,12 +224,12 @@ SOURCES += ../src/main.cpp\
     ../src/system_definition/node_edit/C_SdNdeComIfSettingsTableDelegate.cpp \
     ../src/util/C_Uti.cpp \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddSpecificCommand.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorItemUsageWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListsWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorUsageWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemUsageWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListsWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorUsageWidget.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabStatusInformation.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabStatusInformationSmall.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolUtil.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpUtil.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabNodeDataPoolSelectedItems.cpp \
     ../src/system_definition/C_SdHandlerWidget.cpp \
     ../src/project_gui/system_definition/C_PuiSdUtil.cpp \
@@ -247,12 +247,12 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxNumber.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxTableComIf.cpp \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementDataChangeCommand.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableHeaderView.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableHeaderView.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxTransparentToolBarSearch.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeToolBarSearch.cpp \
     ../src/project_operations/C_PopUtil.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabListLink.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetWidget.cpp \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListDataChangeCommand.cpp \
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListAddCommand.cpp \
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand.cpp \
@@ -262,9 +262,9 @@ SOURCES += ../src/main.cpp\
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListMoveCommand.cpp \
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListAddSpecificCommand.cpp \
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListManager.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetDelegate.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetModel.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetView.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetDelegate.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetModel.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetView.cpp \
     ../src/opensyde_gui_elements/C_OgeTreeWidgetToolBarSearch.cpp \
     ../src/navigable_gui/C_NagToolBarSearchResults.cpp \
     ../src/system_definition/C_SdSearchTreeWidget.cpp \
@@ -272,16 +272,16 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/label/C_OgeLabToolBarSearchResultTitle.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabToolBarSearchResultSubtitle.cpp \
     ../src/opensyde_gui_elements/C_OgeTreeWidgetToolBarSearchItemDelegate.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListModelViewManager.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListModelViewManager.cpp \
     ../src/system_definition/node_edit/undo/array_editor/C_SdNdeUnoAedDataPoolListDataChangeCommand.cpp \
     ../src/system_definition/node_edit/undo/array_editor/C_SdNdeUnoAedDataPoolListManager.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListArrayEditDelegate.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListArrayEditModel.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListArrayEditView.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListArrayEditWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListArrayEditDelegate.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListArrayEditModel.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListArrayEditView.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListArrayEditWidget.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabToolBarNoSearchResult.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListComHeaderWidget.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolComListWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListComHeaderWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpComListWidget.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabComListHeader.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabComListHeaderLink.cpp \
     ../src/opensyde_gui_elements/C_OgeTransparentScrollArea.cpp \
@@ -377,13 +377,13 @@ SOURCES += ../src/main.cpp\
     ../src/project_gui/system_definition/C_PuiSdTextElementBus.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedElided.cpp \
     ../src/opensyde_gui_elements/C_OgeToolTipBase.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableErrorManager.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListErrorManager.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetHeaderView.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableErrorManager.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListErrorManager.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetHeaderView.cpp \
     ../src/system_definition/node_edit/C_SdNdeSingleHeaderView.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListHeaderUsageWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListHeaderUsageWidget.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiWithToolTip.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListPopUp.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListPopUp.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxListHeader.cpp \
     ../src/system_definition/C_SdNodeComIfSetupWidget.cpp \
     ../src/system_definition/C_SdNodeToNodeConnectionSetupWidget.cpp \
@@ -598,7 +598,7 @@ SOURCES += ../src/main.cpp\
     ../src/system_views/dashboards/items/param/array_editor/C_SyvDaItPaArModel.cpp \
     ../src/system_views/dashboards/items/param/array_editor/C_SyvDaItPaArDelegate.cpp \
     ../src/system_views/dashboards/items/param/array_editor/C_SyvDaItPaArView.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolContentUtil.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpContentUtil.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxInt64AutoFix.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFix.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxAutoFixBase.cpp \
@@ -718,8 +718,8 @@ SOURCES += ../src/main.cpp\
     ../src/com_import_export/C_CieDataPoolListAdapter.cpp \
     ../src/com_import_export/C_CieUtil.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabToolboxHeadingGroupBold.cpp \
-    ../src/com_import_export/C_CieDataPoolComListDBCImportWidget.cpp \
-    ../src/com_import_export/C_CieDataPoolComListImportReportWidget.cpp \
+    ../src/com_import_export/C_CieDBCImportNodeSelectWidget.cpp \
+    ../src/com_import_export/C_CieImportReportWidget.cpp \
     ../src/system_definition/bus_edit/undo/C_SdBueUnoBusProtNodeCreateCommand.cpp \
     ../src/user_settings/C_UsNodeDatapoolList.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedContextMenuBase.cpp \
@@ -730,7 +730,7 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/C_OgeTreeViewToolTipBase.cpp \
     ../src/opensyde_gui_elements/C_OgeListWidgetToolTipBase.cpp \
     ../src/system_views/C_SyvManager.cpp \
-    ../src/com_import_export/C_CieDataPoolComListExportReportWidget.cpp \
+    ../src/com_import_export/C_CieExportReportWidget.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxAllBase.cpp \
     ../src/system_views/system_update/C_SyvUpHexFileView.cpp \
     ../src/com_import_export/C_RtfExportWidget.cpp \
@@ -839,7 +839,7 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/widget/C_OgeWiParamSpinBoxGroup.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeParam.cpp \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaValuePairs.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListsTreeDelegate.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListsTreeDelegate.cpp \
     ../src/graphic_items/system_view_items/C_GiSvCANBus.cpp \
     ../src/graphic_items/system_view_items/C_GiSvEthernetBus.cpp \
     ../src/graphic_items/system_view_items/C_GiSvTextElementBus.cpp \
@@ -851,10 +851,10 @@ SOURCES += ../src/main.cpp\
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.cpp \
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorAddWidget.cpp \
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.cpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerFilerV2.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddListWidget.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorAddListWidget.cpp \
     ../src/project_gui/system_definition/C_PuiSdSharedDatapools.cpp \
     ../src/project_gui/system_views/C_PuiSvHandlerFilerV1.cpp \
     ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetInterpretedData.cpp \
@@ -903,7 +903,22 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSectionSelected.cpp \
     ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.cpp \
-    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp \
+    ../src/system_definition/bus_edit/C_SdBueMessageRxDatapoolEntry.cpp \
+    ../src/system_definition/bus_edit/C_SdBueMessageRxTimeoutConfig.cpp \
+    ../src/com_import_export/C_CieImportDatapoolSelectWidget.cpp \
+    ../src/graphic_items/style_setup/C_GiSyColorSelectWidget.cpp \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcWidget.cpp \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcOverviewTreeModel.cpp \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcOverviewTreeView.cpp \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.cpp \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeModel.cpp \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeView.cpp \
+    ../src/graphic_items/style_setup/C_ColorPickingEventFilter.cpp \
+    ../src/graphic_items/style_setup/C_ColorOptions.cpp \
+    ../src/graphic_items/style_setup/C_PlatformColorHelper.cpp \
+    ../src/graphic_items/style_setup/C_ColorShower.cpp \
+    ../src/graphic_items/style_setup/C_ColorShowLabel.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/gui/precomp_headers.h
 
@@ -927,7 +942,7 @@ HEADERS  += \
     ../libs/opensyde_core/project/system/C_OSCSystemDefinitionFiler.h \
     ../libs/opensyde_core/C_OSCZipData.h \
     ../src/system_definition/C_SdTopologyWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolEditWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.h \
     ../src/system_views/C_SyvHandlerWidget.h \
     ../src/user_settings/C_UsHandler.h \
     ../src/constants.h \
@@ -1036,7 +1051,7 @@ HEADERS  += \
     ../src/system_definition/managers/undo/C_SdManUnoTopologyChangeInterfaceCommand.h \
     ../src/opensyde_gui_elements/label/C_OgeLabGroupItem.h \
     ../src/opensyde_gui_elements/label/C_OgeLabGroupSubItem.h \
-    ../src/system_definition/node_edit/C_SdNdeDatapoolProperties.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpProperties.h \
     ../libs/opensyde_core/project/system/C_OSCSystemFilerUtil.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeApplication.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeComInterfaceSettings.h \
@@ -1057,9 +1072,9 @@ HEADERS  += \
     ../src/opensyde_gui_elements/label/C_OgeLabListHeaderHeading.h \
     ../src/opensyde_gui_elements/label/C_OgeLabListHeaderHighlighted.h \
     ../libs/opensyde_core/C_OSCUtils.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListHeaderWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListsTreeWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListHeaderWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListsTreeWidget.h \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolManager.h \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListMoveCommand.h \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListPasteCommand.h \
@@ -1068,11 +1083,11 @@ HEADERS  += \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListAddDeleteBaseCommand.h \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListAddCommand.h \
     ../src/system_definition/node_edit/C_SdNdeNodeEditWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorListWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolViewWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorItemWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorListDelegate.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpViewWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListDelegate.h \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesWidget.h \
     ../src/opensyde_gui_elements/C_OgeFrameSeparator.h \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddCommand.h \
@@ -1084,8 +1099,8 @@ HEADERS  += \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListManager.h \
     ../src/opensyde_gui_elements/label/C_OgeLabCategoryHeading.h \
     ../src/opensyde_gui_elements/label/C_OgeLabCategorySubHeading.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableDelegate.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableModel.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableDelegate.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableModel.h \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoUtil.h \
     ../src/opensyde_gui_elements/label/C_OgeLabNodeType.h \
     ../src/opensyde_gui_elements/group_box/C_OgeGbx.h \
@@ -1110,7 +1125,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/widget/C_OgeWiProgressLog.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiUtil.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiBopperle.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableView.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableView.h \
     ../src/opensyde_gui_elements/check_box/C_OgeChxTristate.h \
     ../src/opensyde_gui_elements/check_box/C_OgeChxTristateBase.h \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxText.h \
@@ -1118,12 +1133,12 @@ HEADERS  += \
     ../src/system_definition/node_edit/C_SdNdeComIfSettingsTableDelegate.h \
     ../src/util/C_Uti.h \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddSpecificCommand.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorItemUsageWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListsWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorUsageWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemUsageWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListsWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorUsageWidget.h \
     ../src/opensyde_gui_elements/label/C_OgeLabStatusInformation.h \
     ../src/opensyde_gui_elements/label/C_OgeLabStatusInformationSmall.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolUtil.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpUtil.h \
     ../src/opensyde_gui_elements/label/C_OgeLabNodeDataPoolSelectedItems.h \
     ../src/system_definition/C_SdHandlerWidget.h \
     ../src/project_gui/system_definition/C_PuiSdUtil.h \
@@ -1141,12 +1156,12 @@ HEADERS  += \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxNumber.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxTableComIf.h \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementDataChangeCommand.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableHeaderView.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableHeaderView.h \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxTransparentToolBarSearch.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeToolBarSearch.h \
     ../src/project_operations/C_PopUtil.h \
     ../src/opensyde_gui_elements/label/C_OgeLabListLink.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetWidget.h \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListDataChangeCommand.h \
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListAddCommand.h \
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand.h \
@@ -1156,9 +1171,9 @@ HEADERS  += \
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListMoveCommand.h \
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListAddSpecificCommand.h \
     ../src/system_definition/node_edit/undo/data_set/C_SdNdeUnoDasDataPoolListManager.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetDelegate.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetModel.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetView.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetDelegate.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetModel.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetView.h \
     ../src/opensyde_gui_elements/C_OgeTreeWidgetToolBarSearch.h \
     ../src/navigable_gui/C_NagToolBarSearchResults.h \
     ../src/system_definition/C_SdSearchTreeWidget.h \
@@ -1166,16 +1181,16 @@ HEADERS  += \
     ../src/opensyde_gui_elements/label/C_OgeLabToolBarSearchResultTitle.h \
     ../src/opensyde_gui_elements/label/C_OgeLabToolBarSearchResultSubtitle.h \
     ../src/opensyde_gui_elements/C_OgeTreeWidgetToolBarSearchItemDelegate.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListModelViewManager.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListModelViewManager.h \
     ../src/system_definition/node_edit/undo/array_editor/C_SdNdeUnoAedDataPoolListDataChangeCommand.h \
     ../src/system_definition/node_edit/undo/array_editor/C_SdNdeUnoAedDataPoolListManager.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListArrayEditDelegate.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListArrayEditModel.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListArrayEditView.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListArrayEditWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListArrayEditDelegate.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListArrayEditModel.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListArrayEditView.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListArrayEditWidget.h \
     ../src/opensyde_gui_elements/label/C_OgeLabToolBarNoSearchResult.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListComHeaderWidget.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolComListWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListComHeaderWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpComListWidget.h \
     ../src/opensyde_gui_elements/label/C_OgeLabComListHeader.h \
     ../src/opensyde_gui_elements/label/C_OgeLabComListHeaderLink.h \
     ../src/opensyde_gui_elements/C_OgeTransparentScrollArea.h \
@@ -1271,13 +1286,13 @@ HEADERS  += \
     ../src/project_gui/system_definition/C_PuiSdTextElementBus.h \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedElided.h \
     ../src/opensyde_gui_elements/C_OgeToolTipBase.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableErrorManager.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListErrorManager.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetHeaderView.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableErrorManager.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListErrorManager.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetHeaderView.h \
     ../src/system_definition/node_edit/C_SdNdeSingleHeaderView.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListHeaderUsageWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListHeaderUsageWidget.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiWithToolTip.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListPopUp.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListPopUp.h \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxListHeader.h \
     ../src/system_definition/C_SdNodeComIfSetupWidget.h \
     ../src/system_definition/C_SdNodeToNodeConnectionSetupWidget.h \
@@ -1494,7 +1509,7 @@ HEADERS  += \
     ../src/system_views/dashboards/items/param/array_editor/C_SyvDaItPaArModel.h \
     ../src/system_views/dashboards/items/param/array_editor/C_SyvDaItPaArDelegate.h \
     ../src/system_views/dashboards/items/param/array_editor/C_SyvDaItPaArView.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolContentUtil.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpContentUtil.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxInt64AutoFix.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFix.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxAutoFixBase.h \
@@ -1642,8 +1657,8 @@ HEADERS  += \
     ../src/com_import_export/C_CieDataPoolListStructure.h \
     ../src/com_import_export/C_CieUtil.h \
     ../src/opensyde_gui_elements/label/C_OgeLabToolboxHeadingGroupBold.h \
-    ../src/com_import_export/C_CieDataPoolComListDBCImportWidget.h \
-    ../src/com_import_export/C_CieDataPoolComListImportReportWidget.h \
+    ../src/com_import_export/C_CieDBCImportNodeSelectWidget.h \
+    ../src/com_import_export/C_CieImportReportWidget.h \
     ../src/system_definition/bus_edit/undo/C_SdBueUnoBusProtNodeCreateCommand.h \
     ../src/user_settings/C_UsNodeDatapoolList.h \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedContextMenuBase.h \
@@ -1654,7 +1669,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/C_OgeTreeViewToolTipBase.h \
     ../src/opensyde_gui_elements/C_OgeListWidgetToolTipBase.h \
     ../src/system_views/C_SyvManager.h \
-    ../src/com_import_export/C_CieDataPoolComListExportReportWidget.h \
+    ../src/com_import_export/C_CieExportReportWidget.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxAllBase.h \
     ../src/system_views/system_update/C_SyvUpHexFileView.h \
     ../src/com_import_export/C_RtfExportWidget.h \
@@ -1748,7 +1763,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/widget/C_OgeWiParamSpinBoxGroup.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeParam.h \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaValuePairs.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListsTreeDelegate.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListsTreeDelegate.h \
     ../src/graphic_items/system_view_items/C_GiSvCANBus.h \
     ../src/graphic_items/system_view_items/C_GiSvEthernetBus.h \
     ../src/graphic_items/system_view_items/C_GiSvTextElementBus.h \
@@ -1760,10 +1775,10 @@ HEADERS  += \
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.h \
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorAddWidget.h \
     ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.h \
     ../src/project_gui/system_definition/C_PuiSdHandlerFilerV2.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddListWidget.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorAddListWidget.h \
     ../src/project_gui/system_definition/C_PuiSdSharedDatapools.h \
     ../src/project_gui/system_views/C_PuiSvHandlerFilerV1.h \
     ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetInterpretedData.h \
@@ -1812,11 +1827,26 @@ HEADERS  += \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxNavigationSectionSelected.h \
     ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.h \
-    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h \
+    ../src/system_definition/bus_edit/C_SdBueMessageRxDatapoolEntry.h \
+    ../src/system_definition/bus_edit/C_SdBueMessageRxTimeoutConfig.h \
+    ../src/com_import_export/C_CieImportDatapoolSelectWidget.h \
+    ../src/graphic_items/style_setup/C_GiSyColorSelectWidget.h \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcWidget.h \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcOverviewTreeModel.h \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcOverviewTreeView.h \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.h \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeModel.h \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeView.h \
+    ../src/graphic_items/style_setup/C_ColorPickingEventFilter.h \
+    ../src/graphic_items/style_setup/C_ColorOptions.h \
+    ../src/graphic_items/style_setup/C_PlatformColorHelper.h \
+    ../src/graphic_items/style_setup/C_ColorShower.h \
+    ../src/graphic_items/style_setup/C_ColorShowLabel.h
 
 FORMS    += \
     ../src/system_definition/C_SdTopologyWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolEditWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.ui \
     ../src/system_views/C_SyvHandlerWidget.ui \
     ../src/opensyde_gui_elements/C_OgePopUpDialog.ui \
     ../src/opensyde_gui_elements/widget/C_OgeWiHover.ui \
@@ -1834,23 +1864,23 @@ FORMS    += \
     ../src/graphic_items/style_setup/C_GiSyBoundaryWidget.ui \
     ../src/graphic_items/style_setup/C_GiSyTextElementWidget.ui \
     ../src/graphic_items/style_setup/C_GiSyLineWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDatapoolProperties.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListTableWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListHeaderWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpProperties.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListTableWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListHeaderWidget.ui \
     ../src/system_definition/node_edit/C_SdNdeNodeEditWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolViewWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorItemWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpViewWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemWidget.ui \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListsWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListsWidget.ui \
     ../src/system_definition/C_SdHandlerWidget.ui \
     ../src/system_definition/bus_edit/C_SdBueBusEditWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListDataSetWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListDataSetWidget.ui \
     ../src/navigable_gui/C_NagToolBarSearchResults.ui \
     ../src/opensyde_gui_elements/C_OgeTreeWidgetToolBarSearchItemWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListArrayEditWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListComHeaderWidget.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolComListWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListArrayEditWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListComHeaderWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpComListWidget.ui \
     ../src/system_definition/bus_edit/C_SdBueBusEditPropertiesWidget.ui \
     ../src/system_definition/bus_edit/C_SdBueComIfDescriptionWidget.ui \
     ../src/system_definition/bus_edit/C_SdBueMessageSignalEditWidget.ui \
@@ -1864,7 +1894,7 @@ FORMS    += \
     ../src/system_views/dashboards/C_SyvDaDashboardsWidget.ui \
     ../src/system_views/dashboards/C_SyvDaDashboardWidget.ui \
     ../src/system_views/dashboards/C_SyvDaDashboardToolbox.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListPopUp.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpListPopUp.ui \
     ../src/system_definition/C_SdNodeComIfSetupWidget.ui \
     ../src/system_definition/C_SdNodeToNodeConnectionSetupWidget.ui \
     ../src/system_views/system_setup/C_SyvSeSetupWidget.ui \
@@ -1914,9 +1944,9 @@ FORMS    += \
     ../src/system_definition/node_edit/C_SdNdeProgrammingOptions.ui \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.ui \
     ../src/system_definition/bus_edit/C_SdBueNodeSelectorCheckBoxItemWidget.ui \
-    ../src/com_import_export/C_CieDataPoolComListDBCImportWidget.ui \
-    ../src/com_import_export/C_CieDataPoolComListImportReportWidget.ui \
-    ../src/com_import_export/C_CieDataPoolComListExportReportWidget.ui \
+    ../src/com_import_export/C_CieDBCImportNodeSelectWidget.ui \
+    ../src/com_import_export/C_CieImportReportWidget.ui \
+    ../src/com_import_export/C_CieExportReportWidget.ui \
     ../src/system_views/system_update/C_SyvUpHexFileView.ui \
     ../src/com_import_export/C_RtfExportWidget.ui \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaWidgetNew.ui \
@@ -1934,14 +1964,19 @@ FORMS    += \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbDataPoolEntry.ui \
     ../src/implementation/C_ImpCodeGenerationReportWidget.ui \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaImportReport.ui \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorAddWidget.ui \
     ../src/system_views/system_update/C_SyvUpParamSetFileInfoPopUp.ui \
     ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.ui \
     ../src/system_views/system_update/C_SyvUpInformationWidget.ui \
     ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.ui \
     ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.ui \
     ../src/system_views/dashboards/C_SyvDaDashboardInteraction.ui \
-    ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.ui
+    ../src/system_views/dashboards/items/chart/C_SyvDaItChartSettingsWidget.ui \
+    ../src/system_definition/bus_edit/C_SdBueMessageRxDatapoolEntry.ui \
+    ../src/system_definition/bus_edit/C_SdBueMessageRxTimeoutConfig.ui \
+    ../src/com_import_export/C_CieImportDatapoolSelectWidget.ui \
+    ../src/graphic_items/style_setup/C_GiSyColorSelectWidget.ui \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcWidget.ui
 
 INCLUDEPATH += ../src \
                ../src/com_import_export \
@@ -1973,6 +2008,8 @@ INCLUDEPATH += ../src \
                ../src/system_definition/managers/undo \
                ../src/system_definition/node_edit \
                ../src/system_definition/node_edit/data_blocks \
+               ../src/system_definition/node_edit/datapools \
+               ../src/system_definition/node_edit/halc \
                ../src/system_definition/node_edit/undo \
                ../src/system_definition/node_edit/undo/array_editor \
                ../src/system_definition/node_edit/undo/list_element \

@@ -46,7 +46,11 @@ using namespace stw_opensyde_gui_elements;
 C_OgeSpxToolTipBase::C_OgeSpxToolTipBase(QWidget * const opc_Parent) :
    QSpinBox(opc_Parent),
    C_OgeSpxAllBase(),
-   mpc_ContextMenu(NULL)
+   mpc_ContextMenu(NULL),
+   mq_ShowSpecialMin(false),
+   msn_SpecialMinValue(0),
+   mq_ShowSpecialMax(false),
+   msn_SpecialMaxValue(0)
 {
    //This function does indeed call virtual functions so do not call this one in the base class
    ActivateDefaultToolTip();
@@ -89,19 +93,9 @@ bool C_OgeSpxToolTipBase::m_IsEnabled(void) const
    Minimum as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeSpxToolTipBase::m_GetMinimum(void) const
+QString C_OgeSpxToolTipBase::m_GetMinimumRawString(void) const
 {
-   QString c_Retval;
-
-   if (this->displayIntegerBase() == 16)
-   {
-      c_Retval = "0x" + QString::number(this->minimum(), 16);
-   }
-   else
-   {
-      c_Retval = QString::number(this->minimum());
-   }
-   return c_Retval;
+   return this->m_ConvertNumToString(this->minimum());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,19 +105,9 @@ QString C_OgeSpxToolTipBase::m_GetMinimum(void) const
    Maximum as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeSpxToolTipBase::m_GetMaximum(void) const
+QString C_OgeSpxToolTipBase::m_GetMaximumRawString(void) const
 {
-   QString c_Retval;
-
-   if (this->displayIntegerBase() == 16)
-   {
-      c_Retval = "0x" + QString::number(this->maximum(), 16);
-   }
-   else
-   {
-      c_Retval = QString::number(this->maximum());
-   }
-   return c_Retval;
+   return this->m_ConvertNumToString(this->maximum());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -155,24 +139,34 @@ bool C_OgeSpxToolTipBase::m_CallBaseEvent(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set minimum value (simple wrapper with tool tip update)
 
-   \param[in] osn_Value New minimum value
+   \param[in] osn_Value        New minimum value
+   \param[in] oq_ShowSpecial   Show special
+   \param[in] osn_SpecialValue Special value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxToolTipBase::SetMinimumCustom(const stw_types::sintn osn_Value)
+void C_OgeSpxToolTipBase::SetMinimumCustom(const stw_types::sintn osn_Value, const bool oq_ShowSpecial,
+                                           const sintn osn_SpecialValue)
 {
    this->setMinimum(osn_Value);
+   this->mq_ShowSpecialMin = oq_ShowSpecial;
+   this->msn_SpecialMinValue = osn_SpecialValue;
    this->ActivateDefaultToolTip();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set maximum value (simple wrapper with tool tip update)
 
-   \param[in] osn_Value New maximum value
+   \param[in] osn_Value        New maximum value
+   \param[in] oq_ShowSpecial   Show special
+   \param[in] osn_SpecialValue Special value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxToolTipBase::SetMaximumCustom(const stw_types::sintn osn_Value)
+void C_OgeSpxToolTipBase::SetMaximumCustom(const stw_types::sintn osn_Value, const bool oq_ShowSpecial,
+                                           const sintn osn_SpecialValue)
 {
    this->setMaximum(osn_Value);
+   this->mq_ShowSpecialMax = oq_ShowSpecial;
+   this->msn_SpecialMaxValue = osn_SpecialValue;
    this->ActivateDefaultToolTip();
 }
 
@@ -337,4 +331,72 @@ void C_OgeSpxToolTipBase::m_Paste() const
 void C_OgeSpxToolTipBase::m_Delete() const
 {
    this->lineEdit()->del();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert num to string
+
+   \param[in] osn_Value Value
+
+   \return
+   Converted num as string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxToolTipBase::m_ConvertNumToString(const sintn osn_Value) const
+{
+   QString c_Retval;
+
+   if (this->displayIntegerBase() == 16)
+   {
+      c_Retval = "0x" + QString::number(osn_Value, 16);
+   }
+   else
+   {
+      c_Retval = QString::number(osn_Value);
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get minimum string
+
+   \return
+   Minimum string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxToolTipBase::m_GetMinimumString() const
+{
+   QString c_Retval;
+
+   if (this->mq_ShowSpecialMin)
+   {
+      c_Retval = this->m_ConvertNumToString(this->msn_SpecialMinValue);
+   }
+   else
+   {
+      c_Retval = this->m_ConvertNumToString(this->minimum());
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get maximum string
+
+   \return
+   Maximum string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxToolTipBase::m_GetMaximumString() const
+{
+   QString c_Retval;
+
+   if (this->mq_ShowSpecialMax)
+   {
+      c_Retval = this->m_ConvertNumToString(this->msn_SpecialMaxValue);
+   }
+   else
+   {
+      c_Retval = this->m_ConvertNumToString(this->maximum());
+   }
+   return c_Retval;
 }

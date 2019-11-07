@@ -31,6 +31,7 @@
 #include "C_OSCExportNode.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_OgeWiUtil.h"
 #include "C_Uti.h"
 #include "C_PopUtil.h"
 #include "C_OSCUtils.h"
@@ -328,12 +329,10 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          c_MessageResult.SetDescription(C_GtGetText::h_GetText("Code generation failed."));
          //Update log file
          C_OSCLoggingHandler::h_Flush();
-         QString c_Details =
-            QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
-            arg(C_GtGetText::h_GetText("For details see ")).
-            arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
-            arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-            arg(C_GtGetText::h_GetText("log file"));
+         const QString c_Details = C_GtGetText::h_GetText("For details see ") +
+                                   C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                                    C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
+                                   C_GtGetText::h_GetText(" or log file(s) of code generator(s).");
          c_MessageResult.SetDetails(c_Details);
          c_MessageResult.Execute();
       }
@@ -664,7 +663,7 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
 
    Check if path could be made relative and ask user if she wants to save the path
    relative or absolute.
-   The function checks orc_Path for valid characters. See C_OSCUtils::h_IsStringNiceifiedForFileName for
+   The function checks orc_Path for valid characters. See C_OSCUtils::h_IsStringNiceifiedForFilePath for
    details of the check. If the check fails an empty string will be returned.
 
    Note: If one of the paths is empty this simply returns the given path.
@@ -689,14 +688,9 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
    QString c_PathAbsolute;
 
    // Check first if path is a valid path with no unwanted characters
-   if (C_OSCUtils::h_IsStringNiceifiedForFileName(orc_Path.toStdString().c_str()) == false)
+   if (C_OSCUtils::h_CheckValidFilePath(orc_Path.toStdString().c_str()) == false)
    {
-      C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Path"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("The path contains invalid characters."));
-      c_Message.SetDetails(QString(C_GtGetText::h_GetText("Path: %1")).arg(orc_Path));
-      c_Message.Execute();
-
+      C_OgeWiUtil::h_ShowPathInvalidError(opc_Parent, orc_Path);
       c_Return = "";
    }
    else if (C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, c_PathAbsolute, c_PathRelative) == true)
@@ -770,7 +764,7 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
       // Check first if all paths are valid paths with no unwanted characters
       for (s32_Pos = 0; s32_Pos < c_Return.size(); ++s32_Pos)
       {
-         if (C_OSCUtils::h_IsStringNiceifiedForFileName(c_Return[s32_Pos].toStdString().c_str()) == false)
+         if (C_OSCUtils::h_CheckValidFilePath(c_Return[s32_Pos].toStdString().c_str()) == false)
          {
             c_InvalidPaths += "- " + c_Return[s32_Pos] + "\n";
          }
@@ -778,12 +772,7 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
 
       if (c_InvalidPaths.size() > 0)
       {
-         C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Paths"));
-         c_Message.SetDescription(C_GtGetText::h_GetText("At least one path contains invalid characters."));
-         c_Message.SetDetails(QString(C_GtGetText::h_GetText("Paths:\n%1")).arg(c_InvalidPaths));
-         c_Message.Execute();
-
+         C_OgeWiUtil::h_ShowPathInvalidError(opc_Parent, c_InvalidPaths);
          c_Return.clear();
       }
 

@@ -31,7 +31,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblTreItem::C_TblTreItem(void) :
@@ -43,7 +43,7 @@ C_TblTreItem::C_TblTreItem(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Search for index in child items
+/*! \brief  Search for index in child items
 
    Info: this function only searches for this index in the first layer
 

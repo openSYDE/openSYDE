@@ -661,11 +661,12 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromString(std::vector<C
    \param[in] orc_UISignals               Signal ui data
    \param[in] orc_OwnerNodeName           Owner node names
    \param[in] orc_OwnerNodeInterfaceIndex Owner node interface index
+   \param[in] orc_OwnerNodeDatapoolIndex  Owner node Datapool index
    \param[in] orc_OwnerIsTxFlag           Owner has message as TX flags
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & orc_Messages,
-                                          const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex,
+                                          const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<stw_types::uint32> > & orc_OwnerNodeDatapoolIndex,
                                           const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag)
 {
    QString c_String;
@@ -717,8 +718,10 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & o
 
    //Owner
    tgl_assert((orc_OwnerNodeName.size() == orc_OwnerNodeInterfaceIndex.size()) &&
+              (orc_OwnerNodeName.size() == orc_OwnerNodeDatapoolIndex.size()) &&
               (orc_OwnerNodeName.size() == orc_OwnerIsTxFlag.size()));
    if ((orc_OwnerNodeName.size() == orc_OwnerNodeInterfaceIndex.size()) &&
+       (orc_OwnerNodeName.size() == orc_OwnerNodeDatapoolIndex.size()) &&
        (orc_OwnerNodeName.size() == orc_OwnerIsTxFlag.size()))
    {
       c_StringXml.CreateAndSelectNodeChild("parents");
@@ -726,11 +729,14 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & o
       {
          const std::vector<QString>  & rc_OwnerNodeName = orc_OwnerNodeName[u32_ItMessage];
          const std::vector<uint32>  & rc_OwnerNodeInterfaceIndex = orc_OwnerNodeInterfaceIndex[u32_ItMessage];
+         const std::vector<uint32>  & rc_OwnerNodeDatapoolIndex = orc_OwnerNodeDatapoolIndex[u32_ItMessage];
          const std::vector<bool>  & rc_OwnerIsTxFlag = orc_OwnerIsTxFlag[u32_ItMessage];
          c_StringXml.CreateAndSelectNodeChild("message-parents");
          tgl_assert((rc_OwnerNodeName.size() == rc_OwnerNodeInterfaceIndex.size()) &&
+                    (rc_OwnerNodeName.size() == rc_OwnerNodeDatapoolIndex.size()) &&
                     (rc_OwnerNodeName.size() == rc_OwnerIsTxFlag.size()));
          if ((rc_OwnerNodeName.size() == rc_OwnerNodeInterfaceIndex.size()) &&
+             (rc_OwnerNodeName.size() == rc_OwnerNodeDatapoolIndex.size()) &&
              (rc_OwnerNodeName.size() == rc_OwnerIsTxFlag.size()))
          {
             for (uint32 u32_ItOwner = 0; u32_ItOwner < rc_OwnerNodeName.size(); ++u32_ItOwner)
@@ -738,6 +744,7 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & o
                const QString & rc_CurName = rc_OwnerNodeName[u32_ItOwner];
                c_StringXml.CreateAndSelectNodeChild("message-parent");
                c_StringXml.SetAttributeUint32("interface-index", rc_OwnerNodeInterfaceIndex[u32_ItOwner]);
+               c_StringXml.SetAttributeUint32("datapool-index", rc_OwnerNodeDatapoolIndex[u32_ItOwner]);
                c_StringXml.SetAttributeBool("message-was-tx", rc_OwnerIsTxFlag[u32_ItOwner]);
                c_StringXml.CreateNodeChild("name", rc_CurName.toStdString().c_str());
                //Return
@@ -764,6 +771,7 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & o
    \param[out] orc_UISignals               Signal ui data
    \param[out] orc_OwnerNodeName           Owner node names
    \param[out] orc_OwnerNodeInterfaceIndex Owner node interface index
+   \param[out] orc_OwnerNodeDatapoolIndex  Owner node Datapool index
    \param[out] orc_OwnerIsTxFlag           Owner has message as TX flags
 
    \return
@@ -772,7 +780,7 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & o
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Messages,
-                                           std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, std::vector<std::vector<QString> > & orc_OwnerNodeName, std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex,
+                                           std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, std::vector<std::vector<QString> > & orc_OwnerNodeName, std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex, std::vector<std::vector<uint32> > & orc_OwnerNodeDatapoolIndex,
                                            std::vector<std::vector<bool> > & orc_OwnerIsTxFlag)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -863,6 +871,7 @@ sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Me
                                     {
                                        std::vector<QString>  c_OwnerNodeName;
                                        std::vector<uint32>  c_OwnerNodeInterfaceIndex;
+                                       std::vector<uint32>  c_OwnerNodeDatapoolIndex;
                                        std::vector<bool>  c_OwnerIsTxFlag;
                                        stw_scl::C_SCLString c_CurrentNode2 = c_StringXml.SelectNodeChild(
                                           "message-parent");
@@ -873,6 +882,8 @@ sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Me
                                              //Read
                                              c_OwnerNodeInterfaceIndex.push_back(c_StringXml.GetAttributeUint32(
                                                                                     "interface-index"));
+                                             c_OwnerNodeDatapoolIndex.push_back(c_StringXml.GetAttributeUint32(
+                                                                                   "datapool-index"));
                                              c_OwnerIsTxFlag.push_back(c_StringXml.GetAttributeBool("message-was-tx"));
                                              if (c_StringXml.SelectNodeChild("name") == "name")
                                              {
@@ -889,6 +900,7 @@ sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Me
                                        }
                                        orc_OwnerNodeName.push_back(c_OwnerNodeName);
                                        orc_OwnerNodeInterfaceIndex.push_back(c_OwnerNodeInterfaceIndex);
+                                       orc_OwnerNodeDatapoolIndex.push_back(c_OwnerNodeDatapoolIndex);
                                        orc_OwnerIsTxFlag.push_back(c_OwnerIsTxFlag);
                                        c_CurrentNode = c_StringXml.SelectNodeNext("message-parents");
                                     }

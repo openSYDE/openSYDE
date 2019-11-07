@@ -233,12 +233,7 @@ void C_NagUseCaseViewWidget::SetUseCaseWidget(C_NagUseCaseWidget * const opc_Wid
 
       // set the text of labels
       this->ms32_Mode = os32_Mode;
-      this->ms32_Submode = os32_SubMode;
-      this->mc_ItemName = orc_ItemName;
-      this->mc_ItemSubSubName = orc_ItemSubSubName;
-      this->mq_CombineItemAndSubSubName = oq_CombineItemAndSubSubName;
-      this->InitText();
-      this->InitBackground();
+      this->UpdateUseCaseWidget(os32_SubMode, orc_ItemName, orc_ItemSubSubName, oq_CombineItemAndSubSubName);
    }
 }
 

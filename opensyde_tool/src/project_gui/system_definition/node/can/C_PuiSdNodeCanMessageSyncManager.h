@@ -44,7 +44,8 @@ public:
    static void h_GetConnectedAndActiveInterfaces(const stw_types::uint32 ou32_BusIndex,
                                                  const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComProtocol,
                                                  std::vector<stw_types::uint32> & orc_NodeIndexes,
-                                                 std::vector<stw_types::uint32> & orc_InterfaceIndexes);
+                                                 std::vector<stw_types::uint32> & orc_InterfaceIndexes,
+                                                 std::vector<stw_types::uint32> & orc_DatapoolIndexes);
 
    //Wrapped functions
    //Can protocol set
@@ -57,11 +58,11 @@ public:
    stw_types::sint32 SetCanMessageReceiveTimeout(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
       const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-      const stw_types::uint32 ou32_ReceiveTimeout) const;
+      const stw_types::uint32 ou32_DatapoolIndex, const stw_types::uint32 ou32_ReceiveTimeout) const;
    stw_types::sint32 SetCanMessageReceiveTimeoutAutoFlag(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
       const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-      const bool oq_UseAutoReceiveTimeout) const;
+      const stw_types::uint32 ou32_DatapoolIndex, const bool oq_UseAutoReceiveTimeout) const;
    stw_types::sint32 SetCanSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                   const stw_types::uint32 & oru32_SignalIndex,
                                   const stw_opensyde_core::C_OSCCanSignal & orc_OSCSignal,
@@ -79,7 +80,8 @@ public:
    //Can protocol add/delete/move
    stw_types::sint32 AddCanMessage(const stw_types::uint32 & oru32_NodeIndex,
                                    const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
-                                   const stw_types::uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
+                                   const stw_types::uint32 & oru32_InterfaceIndex,
+                                   const stw_types::uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                    const stw_opensyde_core::C_OSCCanMessage & orc_Message,
                                    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals, stw_types::uint32 & oru32_MessageIndex);
    stw_types::sint32 InsertCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -88,13 +90,16 @@ public:
    stw_types::sint32 DeleteCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    stw_types::sint32 ChangeCanMessageTx(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                         const stw_types::uint32 & oru32_NodeIndex,
-                                        const stw_types::uint32 & oru32_InterfaceIndex);
+                                        const stw_types::uint32 & oru32_InterfaceIndex,
+                                        const stw_types::uint32 ou32_DatapoolIndex);
    stw_types::sint32 AddCanMessageRx(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                     const stw_types::uint32 & oru32_NodeIndex,
-                                     const stw_types::uint32 & oru32_InterfaceIndex);
+                                     const stw_types::uint32 ou32_NodeIndex,
+                                     const stw_types::uint32 ou32_InterfaceIndex,
+                                     const stw_types::uint32 ou32_DatapoolIndex);
    stw_types::sint32 DeleteCanMessageRx(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                        const stw_types::uint32 & oru32_NodeIndex,
-                                        const stw_types::uint32 & oru32_InterfaceIndex);
+                                        const stw_types::uint32 ou32_NodeIndex,
+                                        const stw_types::uint32 ou32_InterfaceIndex,
+                                        const stw_types::uint32 ou32_DatapoolIndex);
    stw_types::sint32 AddCanSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                   const stw_opensyde_core::C_OSCCanSignal & orc_Signal,
                                   const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
@@ -110,6 +115,8 @@ public:
                                      const stw_types::uint32 & oru32_SignalIndex) const;
    std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> GetMatchingMessageVector(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
+
+   void ReplaceMessageIdWithMatchingId(stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
 
    //Error checks
    bool CheckCriticalMessageId(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;

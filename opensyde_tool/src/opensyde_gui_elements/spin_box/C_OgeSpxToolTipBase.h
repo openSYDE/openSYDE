@@ -31,8 +31,10 @@ class C_OgeSpxToolTipBase :
 public:
    C_OgeSpxToolTipBase(QWidget * const opc_Parent = NULL);
 
-   void SetMinimumCustom(const stw_types::sintn osn_Value);
-   void SetMaximumCustom(const stw_types::sintn osn_Value);
+   void SetMinimumCustom(const stw_types::sintn osn_Value, const bool oq_ShowSpecial = false,
+                         const stw_types::sintn osn_SpecialValue = 0);
+   void SetMaximumCustom(const stw_types::sintn osn_Value, const bool oq_ShowSpecial = false,
+                         const stw_types::sintn osn_SpecialValue = 0);
 
 private:
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
@@ -47,15 +49,25 @@ private:
    void m_Paste() const;
    void m_Delete() const;
 
+   QString m_ConvertNumToString(const stw_types::sintn osn_Value) const;
+
+   bool mq_ShowSpecialMin;
+   stw_types::sintn msn_SpecialMinValue;
+   bool mq_ShowSpecialMax;
+   stw_types::sintn msn_SpecialMaxValue;
+
 protected:
+   virtual QString m_GetMinimumString(void) const;
+   virtual QString m_GetMaximumString(void) const;
+
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
    virtual bool event(QEvent * const opc_Event) override;
    //lint -restore
 
    virtual bool m_IsEnabled(void) const override;
-   virtual QString m_GetMinimum(void) const override;
-   virtual QString m_GetMaximum(void) const override;
+   virtual QString m_GetMinimumRawString(void) const override;
+   virtual QString m_GetMaximumRawString(void) const override;
    virtual void m_SetMouseTracking(const bool oq_Active) override;
    virtual bool m_CallBaseEvent(QEvent * const opc_Event) override;
 };

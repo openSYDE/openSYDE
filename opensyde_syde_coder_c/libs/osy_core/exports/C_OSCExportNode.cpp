@@ -70,7 +70,7 @@ C_OSCExportNode::C_OSCExportNode(void)
    \return
    C_NO_ERR  Operation success
    C_RD_WR   Operation failure: cannot store files
-   C_NOACT   Application is not of type ePROGRAMMABLE_APPLICATION
+   C_NOACT   Application is not of type ePROGRAMMABLE_APPLICATION or has unknown code structure version
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
              Data pool does not provide information about owning application or refers to an invalid application
              ApplicationIndex references invalid application
@@ -93,10 +93,16 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
    {
       s32_Retval = mh_CheckPrerequisites(orc_Node);
    }
+
+   // check application prerequisites
    if (s32_Retval == C_NO_ERR)
    {
-      //we only need to create code for programmable applications
-      if (orc_Node.c_Applications[ou16_ApplicationIndex].e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+      const C_OSCNodeApplication & rc_Application = orc_Node.c_Applications[ou16_ApplicationIndex];
+      if (
+         //we only need to create code for programmable applications
+         (rc_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION) ||
+         //check if the code structure version is unknown
+         (rc_Application.u16_GenCodeVersion > 3U))
       {
          s32_Retval = C_NOACT;
       }
@@ -156,8 +162,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                q_Create = true;
             }
             //if the data pool is not owned by this application, but that application runs the protocol driver,
-            // then
-            // make the data pool known as remote data pool
+            // then make the data pool known as remote data pool
             else if (ou16_ApplicationIndex == orc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex)
             {
                q_IsRemote = true;
@@ -172,6 +177,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
             {
                //create source code
                const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
+               const uint16 u16_GenCodeVersion = orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion;
                uint8 u8_ProcessId;
                uint8 u8_DataPoolIndexRemote;
 
@@ -204,20 +210,18 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                   s32_Retval = C_OSCExportNode::mh_GetAdaptedComDataPool(orc_Node, u32_ItDataPool, c_DataPool);
                   tgl_assert(s32_Retval == C_NO_ERR);
                   //Export
-                  s32_Retval =
-                     C_OSCExportDataPool::h_CreateSourceCode(orc_Path, c_DataPool,
-                                                             u8_DataPoolIndexWithinApplication,
-                                                             q_IsRemote, u8_DataPoolIndexRemote,
-                                                             u8_ProcessId, orc_ExportToolInfo);
+                  s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, c_DataPool,
+                                                                       u8_DataPoolIndexWithinApplication,
+                                                                       q_IsRemote, u8_DataPoolIndexRemote,
+                                                                       u8_ProcessId, orc_ExportToolInfo);
                }
                else
                {
                   //Export
-                  s32_Retval =
-                     C_OSCExportDataPool::h_CreateSourceCode(orc_Path, rc_DataPool,
-                                                             u8_DataPoolIndexWithinApplication,
-                                                             q_IsRemote, u8_DataPoolIndexRemote,
-                                                             u8_ProcessId, orc_ExportToolInfo);
+                  s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, rc_DataPool,
+                                                                       u8_DataPoolIndexWithinApplication,
+                                                                       q_IsRemote, u8_DataPoolIndexRemote,
+                                                                       u8_ProcessId, orc_ExportToolInfo);
                }
                //Handle file names
                if (s32_Retval == C_NO_ERR)
@@ -256,14 +260,14 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
                     ++u32_ItInterface)
                {
-                  const C_OSCCanMessageContainer & rc_ComMessageContainer =
-                     rc_Protocol.c_ComMessages[u32_ItInterface];
+                  const C_OSCCanMessageContainer & rc_ComMessageContainer = rc_Protocol.c_ComMessages[u32_ItInterface];
                   if ((rc_ComMessageContainer.c_TxMessages.size() > 0) ||
                       (rc_ComMessageContainer.c_RxMessages.size() > 0))
                   {
                      s32_Retval =
                         C_OSCExportCommunicationStack::h_CreateSourceCode(orc_Path, orc_Node, ou16_ApplicationIndex,
                                                                           static_cast<uint8>(u32_ItInterface),
+                                                                          rc_Protocol.u32_DataPoolIndex,
                                                                           rc_Protocol.e_Type, orc_ExportToolInfo);
                      //Handle file names
                      if (s32_Retval == C_NO_ERR)

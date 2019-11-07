@@ -76,11 +76,12 @@ public:
    virtual void SetErrorForInvalidDlc(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ElementId,
                                       const stw_types::uint8 ou8_DLC);
    virtual void SetDrawingActive(const bool oq_Active);
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-   //lint -e{1735} Suppression, because default parameters are identical
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
+   // and default parameters are identical.
+   //lint -save -e1960 -e1735
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget = NULL) override;
+   //lint restore
 
    virtual void ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager, const bool oq_Active);
 
@@ -189,6 +190,8 @@ private:
    void m_ManualOperationStarted(void);
    void m_ManualOperationFinished(void);
    bool m_CheckNodeActive(const stw_types::uint32 ou32_NodeIndex) const;
+   bool m_CheckElementAlreadyRead(const stw_types::uint32 ou32_ItemIndex,
+                                  const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

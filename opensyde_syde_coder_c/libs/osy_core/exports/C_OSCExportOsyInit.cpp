@@ -217,10 +217,10 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       //get size of greatest element so we know how to set up the buffers
       //add protocol overhead for DPD and NVM access services (greatest overhead: write_memory_by_address)
       u32_BufferSize = mh_GetSizeOfLargestDataPoolElement(orc_Node.c_DataPools) + 11U;
-      //consider minimum for non-DPD services (greatest size for osy server: routine control DP meta data)
-      if (u32_BufferSize < 43U)
+      //consider minimum for non-DP services
+      if (u32_BufferSize < hu8_MIN_SIZE_DPD_BUF_INSTANCE)
       {
-         u32_BufferSize = 43U;
+         u32_BufferSize = hu8_MIN_SIZE_DPD_BUF_INSTANCE;
       }
       //limit to maximum service size; larger access must be segmented by protocol driver
       if (u32_BufferSize > C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE)

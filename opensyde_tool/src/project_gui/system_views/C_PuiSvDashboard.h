@@ -129,7 +129,8 @@ public:
                                                   const stw_types::uint32 ou32_ListIndex,
                                                   const stw_types::uint32 ou32_ElementIndex,
                                                   const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_Type,
-                                                  const bool oq_IsArray, const stw_types::uint32 ou32_ArraySize);
+                                                  const bool oq_IsArray, const stw_types::uint32 ou32_ArraySize,
+                                                  const bool oq_IsString);
    void OnSyncNodeDataPoolListElementAccessChanged(const stw_types::uint32 ou32_NodeIndex,
                                                    const stw_types::uint32 ou32_DataPoolIndex,
                                                    const stw_types::uint32 ou32_ListIndex,

@@ -30,8 +30,9 @@ class C_SdBueUnoMessageAddDeleteBaseCommand :
 {
 public:
    C_SdBueUnoMessageAddDeleteBaseCommand(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                         C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
-                                         stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, const QString & orc_Text = "",
+                                         C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, stw_opensyde_gui::
+                                         C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
+                                         const QString & orc_Text = "",
                                          QUndoCommand * const opc_Parent = NULL);
 
 protected:

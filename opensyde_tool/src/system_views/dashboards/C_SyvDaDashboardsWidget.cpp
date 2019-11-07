@@ -659,6 +659,21 @@ void C_SyvDaDashboardsWidget::m_UpdateShowValues(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize C_SyvComDriverDiag
+
+   \return
+   C_NO_ERR      Operation success
+   C_NOACT       No active nodes
+   C_CONFIG      Invalid system definition/view configuration or mpc_ComDriver is NULL
+   C_RD_WR       Configured communication DLL does not exist
+   C_OVERFLOW    Unknown transport protocol or unknown diagnostic server for at least one node
+   C_BUSY        System view error detected
+   C_COM         CAN initialization failed
+   C_CHECKSUM    Internal buffer overflow detected
+   C_RD_WR       Active bus index invalid
+   C_RANGE       Routing configuration failed
+*/
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
 {
    sint32 s32_Retval;
@@ -903,7 +918,8 @@ void C_SyvDaDashboardsWidget::m_ConnectStepFinished(void)
 
       s32_Retval = this->m_InitOsyDriver(c_Message);
 
-      if (s32_Retval == C_NO_ERR)
+      if ((s32_Retval == C_NO_ERR) ||
+          (s32_Retval == C_NOACT))
       {
          //Continue with set diagnostic mode
          this->mpc_ConnectionThread->SetSetDiagnosticModeParameters(this->mpc_ComDriver);

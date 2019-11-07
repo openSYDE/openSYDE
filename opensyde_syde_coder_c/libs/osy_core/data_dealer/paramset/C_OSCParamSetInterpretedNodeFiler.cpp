@@ -171,7 +171,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
       }
       else
       {
-         osc_write_log_error("Loading Dataset data", "Could not find \"datapool\" node.");
+         osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"interpreted\".\"datapool\" node.");
          s32_Retval = C_CONFIG;
       }
       //Check  number of found data pools
@@ -186,6 +186,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
    }
    else
    {
+      osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"interpreted\" node.");
       s32_Retval = C_CONFIG;
    }
    return s32_Retval;
@@ -302,6 +303,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OSCParamSet
       }
       else
       {
+         osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"interpreted\".\"datapool\".\"lists\".\"list\" node.");
          s32_Retval = C_CONFIG;
       }
       //Return
@@ -309,6 +311,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OSCParamSet
    }
    else
    {
+      osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"interpreted\".\"datapool\".\"lists\" node.");
       s32_Retval = C_CONFIG;
    }
    return s32_Retval;

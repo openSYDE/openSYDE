@@ -36,7 +36,8 @@ class C_SdBueMessageSelectorWidget :
 public:
    explicit C_SdBueMessageSelectorWidget(QWidget * const opc_Parent = NULL);
    virtual ~C_SdBueMessageSelectorWidget();
-   void SetNodeDataPool(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex) const;
+   void SetNodeId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
+                  const std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;
    void SetBusId(const stw_types::uint32 ou32_BusIndex) const;
    void SetUndoManager(stw_opensyde_gui_logic::C_SdBueUnoManager * const opc_Value) const;
    void SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value) const;
@@ -46,6 +47,7 @@ public:
    void OnMessageIdChange(void) const;
    void OnMessageNameChange(void) const;
    void OnSignalNameChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
+   void OnNodeDisconnected(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex) const;
    void RecheckErrorGlobal(void) const;
    void RecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void SetInitialFocus(void) const;

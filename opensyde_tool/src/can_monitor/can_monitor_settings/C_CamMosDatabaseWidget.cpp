@@ -148,7 +148,9 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
          if ((os32_Result == C_WARN) ||
              ((os32_Result == C_NO_ERR) && (this->mc_DatabasesToLoad[0]->GetDatabaseData().s32_BusIndex < 0)))
          {
-            QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+            // Pop up dialog (use scroll area widget as parent to make sure scroll bars are styled correctly)
+            QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
+                                                                    this->mpc_Ui->pc_ScrollAreaContents);
 
             C_CamMosDatabaseBusSelectionPopup * pc_Dialog =
                new C_CamMosDatabaseBusSelectionPopup(orc_Busses, this->mc_DatabasesToLoad[0]->GetDatabaseData(),
@@ -320,16 +322,29 @@ void C_CamMosDatabaseWidget::OnSigSavedAsNew(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::AddDroppedDatabase(const QString & orc_Path)
 {
-   C_CamProDatabaseData c_Database;
+   // if necessary adapt .syde path to .syde_sysdef
+   const QFileInfo c_FileInfo = QFileInfo(orc_Path); // dropped paths are always absolute so no problems
+   const QString c_Path = C_CamMosDatabaseItemWidget::h_AdaptPathToSystemDefinitionIfNecessary(c_FileInfo);
 
-   c_Database.c_Name = C_CamUti::h_AskUserToSaveRelativePath(this, orc_Path,
-                                                             C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+   // check if already used
+   if (C_CamMosDatabaseItemWidget::h_IsDatabaseAlreadyUsed(c_Path, this) == false)
+   {
+      C_CamProDatabaseData c_Database;
 
-   // add in data handling
-   C_CamProHandler::h_GetInstance()->AddDatabase(c_Database);
+      const QString c_DatabaseName =
+         C_CamUti::h_AskUserToSaveRelativePath(this, c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
 
-   // add new widget (GUI)
-   this->m_AddDatabaseWidget(c_Database);
+      // if path contains invalid characters this returned empty
+      if (c_DatabaseName.isEmpty() == false)
+      {
+         c_Database.c_Name = c_DatabaseName;
+         // add in data handling
+         C_CamProHandler::h_GetInstance()->AddDatabase(c_Database);
+
+         // add new widget (GUI)
+         this->m_AddDatabaseWidget(c_Database);
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -392,11 +407,10 @@ void C_CamMosDatabaseWidget::m_InitUi(void)
    this->mpc_Ui->pc_LabNoDatabase->setText(
       C_GtGetText::h_GetText("No databases are declared.\nAdd any via \"Add Database\"."));
 
-   // initialize scroll bar
-   this->mpc_Ui->pc_ScrollArea->DeactivateScrollbarResize();
-
    connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigExpandSection,
            this, &C_CamMosDatabaseWidget::m_OnExpand);
+   connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigHide,
+           this, &C_CamMosDatabaseWidget::SigHide);
    connect(this->mpc_Ui->pc_BtnAdd, &C_CamOgePubSettingsAdd::clicked, this, &C_CamMosDatabaseWidget::m_OnAddClicked);
 }
 
@@ -457,14 +471,20 @@ void C_CamMosDatabaseWidget::m_OnAddClicked()
    // do not add if path is empty
    if (c_Name != "")
    {
-      c_Database.c_Name = C_CamUti::h_AskUserToSaveRelativePath(this, c_Name,
-                                                                C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+      const QString c_DatabaseName =
+         C_CamUti::h_AskUserToSaveRelativePath(this, c_Name, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
 
-      // add in data handling
-      C_CamProHandler::h_GetInstance()->AddDatabase(c_Database);
+      // if path contains invalid characters this returned empty
+      if (c_DatabaseName.isEmpty() == false)
+      {
+         c_Database.c_Name = c_DatabaseName;
 
-      // add new widget (GUI)
-      this->m_AddDatabaseWidget(c_Database);
+         // add in data handling
+         C_CamProHandler::h_GetInstance()->AddDatabase(c_Database);
+
+         // add new widget (GUI)
+         this->m_AddDatabaseWidget(c_Database);
+      }
    }
 }
 

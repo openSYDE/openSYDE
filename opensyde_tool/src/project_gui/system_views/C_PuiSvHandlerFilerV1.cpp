@@ -1761,7 +1761,7 @@ void C_PuiSvHandlerFilerV1::mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & 
          //Return
          orc_XMLParser.SelectNodeParent();
       }
-      orc_Id = C_PuiSvDbNodeDataPoolListElementId(c_Base, e_SourceType, q_IsValid,
+      orc_Id = C_PuiSvDbNodeDataPoolListElementId(c_Base, e_SourceType, false, 0UL, q_IsValid,
                                                   e_InvalidTypePlaceholder,
                                                   c_InvalidNamePlaceholder);
    }

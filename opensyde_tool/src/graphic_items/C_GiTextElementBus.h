@@ -55,9 +55,9 @@ public:
    void SetErrorState(const bool oq_Error);
    void SetDisabledLook(const bool oq_Disabled);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-   //lint -e{1735} Suppression, because default parameters are identical
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
+   // and default parameters are identical.
+   //lint -save -e1960 -e1735
    virtual void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                       QWidget * const opc_Widget = NULL) override;
    //lint -restore

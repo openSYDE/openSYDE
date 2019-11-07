@@ -36,11 +36,12 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCCanMessageIdentificationIndices::C_OSCCanMessageIdentificationIndices(void) :
-   u32_NodeIndex(0),
+   u32_NodeIndex(0U),
    e_ComProtocol(C_OSCCanProtocol::eLAYER2),
-   u32_InterfaceIndex(0),
+   u32_InterfaceIndex(0U),
+   u32_DatapoolIndex(0U),
    q_MessageIsTx(false),
-   u32_MessageIndex(0)
+   u32_MessageIndex(0U)
 {
 }
 
@@ -50,16 +51,18 @@ C_OSCCanMessageIdentificationIndices::C_OSCCanMessageIdentificationIndices(void)
    \param[in] ou32_NodeIndex      Node index
    \param[in] oe_ComProtocol      Com protocol
    \param[in] ou32_InterfaceIndex Interface index
+   \param[in] ou32_DatapoolIndex  Datapool index
    \param[in] oq_MessageIsTx      Flag if message is tx, false: rx assumed
    \param[in] ou32_MessageIndex   Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCCanMessageIdentificationIndices::C_OSCCanMessageIdentificationIndices(const uint32 ou32_NodeIndex,
-                                                                           const C_OSCCanProtocol::E_Type oe_ComProtocol, const uint32 ou32_InterfaceIndex, const bool oq_MessageIsTx,
+                                                                           const C_OSCCanProtocol::E_Type oe_ComProtocol, const uint32 ou32_InterfaceIndex, const uint32 ou32_DatapoolIndex, const bool oq_MessageIsTx,
                                                                            const uint32 ou32_MessageIndex) :
    u32_NodeIndex(ou32_NodeIndex),
    e_ComProtocol(oe_ComProtocol),
    u32_InterfaceIndex(ou32_InterfaceIndex),
+   u32_DatapoolIndex(ou32_DatapoolIndex),
    q_MessageIsTx(oq_MessageIsTx),
    u32_MessageIndex(ou32_MessageIndex)
 {
@@ -78,45 +81,7 @@ C_OSCCanMessageIdentificationIndices::C_OSCCanMessageIdentificationIndices(const
 bool C_OSCCanMessageIdentificationIndices::operator ==(const C_OSCCanMessageIdentificationIndices & orc_Cmp) const
 {
    return (((((orc_Cmp.u32_NodeIndex == this->u32_NodeIndex) && (orc_Cmp.e_ComProtocol == this->e_ComProtocol)) &&
-             (orc_Cmp.u32_InterfaceIndex == this->u32_InterfaceIndex)) &&
+             (orc_Cmp.u32_InterfaceIndex == this->u32_InterfaceIndex) &&
+             (orc_Cmp.u32_DatapoolIndex == this->u32_DatapoolIndex)) &&
             (orc_Cmp.q_MessageIsTx == this->q_MessageIsTx)) && (orc_Cmp.u32_MessageIndex == this->u32_MessageIndex));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add readable stream output
-
-   \param[in,out] orc_Stream Stream
-   \param[in]     orc_Id     ID to add
-
-   \return
-   Stream including ID
-*/
-//----------------------------------------------------------------------------------------------------------------------
-std::ostream & operator <<(std::ostream & orc_Stream, const C_OSCCanMessageIdentificationIndices & orc_Id)
-{
-   std::string c_Tx;
-   std::string c_Type;
-   switch (orc_Id.e_ComProtocol)
-   {
-   case C_OSCCanProtocol::eLAYER2:
-      c_Type = "L2";
-      break;
-   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
-      c_Type = "COPS";
-      break;
-   case C_OSCCanProtocol::eECES:
-      c_Type = "ECES";
-      break;
-   }
-   if (orc_Id.q_MessageIsTx == true)
-   {
-      c_Tx = "Tx";
-   }
-   else
-   {
-      c_Tx = "Rx";
-   }
-   orc_Stream << "(" << orc_Id.u32_NodeIndex << "," << c_Type << "," << orc_Id.u32_InterfaceIndex << "," << c_Tx <<
-      "," << orc_Id.u32_MessageIndex << ")";
-   return orc_Stream;
 }

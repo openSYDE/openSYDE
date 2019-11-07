@@ -14,6 +14,7 @@
 
 #include <QFileInfo>
 #include <QDir>
+#include <QSettings>
 
 #include "stwerrors.h"
 #include "constants.h"
@@ -824,6 +825,7 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
 
    // Sys def bus edit splitters
    orc_Ini.WriteInteger("SdBusEdit", "TreeSplitterX", orc_UserSettings.GetSdBusEditTreeSplitterX());
+   orc_Ini.WriteInteger("SdBusEdit", "TreeSplitterX2", orc_UserSettings.GetSdBusEditTreeSplitterX2());
    orc_Ini.WriteInteger("SdBusEdit", "LayoutSplitterX", orc_UserSettings.GetSdBusEditLayoutSplitterX());
 }
 
@@ -1725,6 +1727,8 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    // Sys def bus edit splitters
    s32_Value = orc_Ini.ReadInteger("SdBusEdit", "TreeSplitterX", 0);
    orc_UserSettings.SetSdBusEditTreeSplitterX(s32_Value);
+   s32_Value = orc_Ini.ReadInteger("SdBusEdit", "TreeSplitterX2", 0);
+   orc_UserSettings.SetSdBusEditTreeSplitterX2(s32_Value);
    s32_Value = orc_Ini.ReadInteger("SdBusEdit", "LayoutSplitterX", 0);
    orc_UserSettings.SetSdBusEditLayoutSplitterX(s32_Value);
 }

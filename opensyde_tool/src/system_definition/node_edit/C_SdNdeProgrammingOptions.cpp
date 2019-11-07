@@ -105,15 +105,10 @@ void C_SdNdeProgrammingOptions::InitStaticNames(void) const
 
    this->mpc_Ui->pc_LabelDPDHeading->setText(C_GtGetText::h_GetText("Diagnostic Protocol Driver"));
    this->mpc_Ui->pc_LabelDPD->setText(C_GtGetText::h_GetText("Diagnostic protocol driver is implemented by"));
-   this->mpc_Ui->pc_LabelNBT->setText(C_GtGetText::h_GetText("Number of buffered CAN TX messages"));
-   this->mpc_Ui->pc_LabelNBR->setText(C_GtGetText::h_GetText("Number of buffered CAN RX routing messages"));
+   this->mpc_Ui->pc_LabelNBT->setText(C_GtGetText::h_GetText("Number of buffered CAN Tx messages"));
+   this->mpc_Ui->pc_LabelNBR->setText(C_GtGetText::h_GetText("Number of buffered CAN Rx routing messages"));
    this->mpc_Ui->pc_LabelMNO->setText(C_GtGetText::h_GetText(
                                          "Max number of cyclic/event driven transmissions in parallel"));
-
-   this->mpc_Ui->pc_LabelCPD->setText(C_GtGetText::h_GetText("Process Data Exchange Stacks"));
-   this->mpc_Ui->pc_LabelOL2->setText(C_GtGetText::h_GetText("OSI Layer 2 protocol stack is implemented by"));
-   this->mpc_Ui->pc_LabelEEPD->setText(C_GtGetText::h_GetText("ECES protocol stack is implemented by"));
-   this->mpc_Ui->pc_LabelEOPD->setText(C_GtGetText::h_GetText("ECOS protocol stack is implemented by"));
 
    //Tool tips
    this->mpc_Ui->pc_LabelDPDHeading->SetToolTipInformation(C_GtGetText::h_GetText("Diagnostic Protocol Driver"),
@@ -124,35 +119,20 @@ void C_SdNdeProgrammingOptions::InitStaticNames(void) const
                                                     C_GtGetText::h_GetText(
                                                        "To which application should the diagnostic protocol driver be added?"));
    this->mpc_Ui->pc_LabelNBT->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                       "Number of buffered CAN TX messages"),
+                                                       "Number of buffered CAN Tx messages"),
                                                     C_GtGetText::h_GetText(
-                                                       "Maximum number of CAN TX messages the server can buffer. (Used for all transferred CAN messages)"
+                                                       "Maximum number of CAN Tx messages the server can buffer. (Used for all transferred CAN messages)"
                                                        "\nDefault value: 585"));
    this->mpc_Ui->pc_LabelNBR->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                       "Number of buffered CAN RX routing messages"),
+                                                       "Number of buffered CAN Rx routing messages"),
                                                     C_GtGetText::h_GetText(
-                                                       "Maximum number of CAN RX routing messages the server can buffer before the client has to wait for an acknowledge."
+                                                       "Maximum number of CAN Rx routing messages the server can buffer before the client has to wait for an acknowledge."
                                                        "\nDefault value: 585"));
    this->mpc_Ui->pc_LabelMNO->SetToolTipInformation(C_GtGetText::h_GetText(
                                                        "Max number of cyclic/event driven transmissions in parallel"),
                                                     C_GtGetText::h_GetText(
                                                        "This refers to the maximum number of parallel cyclic and event driven diagnostic transmissions you are allowed to configure for this server.\n"
                                                        "\nDefault value: 64"));
-   this->mpc_Ui->pc_LabelCPD->SetToolTipInformation(C_GtGetText::h_GetText("Process Data Exchange Stacks"),
-                                                    C_GtGetText::h_GetText(
-                                                       "The process data exchange stacks provide drivers for sending and receiving CAN messages containing process data.\n"
-                                                       "The contained data is read from resp. written to openSYDE Datapools.\n"
-                                                       "Three different communication protocols are supported.\n"));
-   this->mpc_Ui->pc_LabelOL2->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                       "OSI Layer 2 Protocol Stack is implemented by"),
-                                                    C_GtGetText::h_GetText(
-                                                       "Which application implements the OSI Layer 2 protocol stack?"));
-   this->mpc_Ui->pc_LabelEEPD->SetToolTipInformation(C_GtGetText::h_GetText("ECES protocol stack is implemented by"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Which application implements the ESX CAN efficient safety protocol stack?"));
-   this->mpc_Ui->pc_LabelEOPD->SetToolTipInformation(C_GtGetText::h_GetText("ECOS protocol stack is implemented by"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Which application implements the ESX CANopen safety protocol stack?"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -245,13 +225,9 @@ void C_SdNdeProgrammingOptions::m_Load(void) const
 
    if (pc_Node != NULL)
    {
-      QString c_Text;
       sint32 s32_Counter = 0;
       sint32 s32_DataBlockIndex = -1;
-      const C_OSCNodeDataPool * const pc_OSCDataPoolL2 = pc_Node->GetComDataPoolConst(C_OSCCanProtocol::eLAYER2);
-      const C_OSCNodeDataPool * const pc_OSCDataPoolEE = pc_Node->GetComDataPoolConst(C_OSCCanProtocol::eECES);
-      const C_OSCNodeDataPool * const pc_OSCDataPoolEO =
-         pc_Node->GetComDataPoolConst(C_OSCCanProtocol::eCAN_OPEN_SAFETY);
+
       //DPD
       //Add all programmable applications and map data block index to combo box index
       for (uint32 u32_ItDataBlock = 0; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
@@ -287,65 +263,6 @@ void C_SdNdeProgrammingOptions::m_Load(void) const
          pc_Node->c_Properties.c_OpenSYDEServerSettings.u16_MaxMessageBufferTx);
       this->mpc_Ui->pc_SpinBoxParallelTransmissions->setValue(
          pc_Node->c_Properties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions);
-
-      //Com protocols
-      if (pc_OSCDataPoolL2 != NULL)
-      {
-         if ((pc_OSCDataPoolL2->s32_RelatedDataBlockIndex >= 0) &&
-             (static_cast<uint32>(pc_OSCDataPoolL2->s32_RelatedDataBlockIndex) < pc_Node->c_Applications.size()))
-         {
-            const C_OSCNodeApplication & rc_Application =
-               pc_Node->c_Applications[static_cast<uint32>(pc_OSCDataPoolL2->s32_RelatedDataBlockIndex)];
-            c_Text = rc_Application.c_Name.c_str();
-         }
-         else
-         {
-            c_Text = C_GtGetText::h_GetText("Application not assigned");
-         }
-      }
-      else
-      {
-         c_Text = C_GtGetText::h_GetText("not used");
-      }
-      this->mpc_Ui->pc_LabelOL2Value->setText(c_Text);
-      if (pc_OSCDataPoolEE != NULL)
-      {
-         if ((pc_OSCDataPoolEE->s32_RelatedDataBlockIndex >= 0) &&
-             (static_cast<uint32>(pc_OSCDataPoolEE->s32_RelatedDataBlockIndex) < pc_Node->c_Applications.size()))
-         {
-            const C_OSCNodeApplication & rc_Application =
-               pc_Node->c_Applications[static_cast<uint32>(pc_OSCDataPoolEE->s32_RelatedDataBlockIndex)];
-            c_Text = rc_Application.c_Name.c_str();
-         }
-         else
-         {
-            c_Text = C_GtGetText::h_GetText("Application not assigned");
-         }
-      }
-      else
-      {
-         c_Text = C_GtGetText::h_GetText("not used");
-      }
-      this->mpc_Ui->pc_LabelEEPDValue->setText(c_Text);
-      if (pc_OSCDataPoolEO != NULL)
-      {
-         if ((pc_OSCDataPoolEO->s32_RelatedDataBlockIndex >= 0) &&
-             (static_cast<uint32>(pc_OSCDataPoolEO->s32_RelatedDataBlockIndex) < pc_Node->c_Applications.size()))
-         {
-            const C_OSCNodeApplication & rc_Application =
-               pc_Node->c_Applications[static_cast<uint32>(pc_OSCDataPoolEO->s32_RelatedDataBlockIndex)];
-            c_Text = rc_Application.c_Name.c_str();
-         }
-         else
-         {
-            c_Text = C_GtGetText::h_GetText("Application not assigned");
-         }
-      }
-      else
-      {
-         c_Text = C_GtGetText::h_GetText("not used");
-      }
-      this->mpc_Ui->pc_LabelEOPDValue->setText(c_Text);
    }
 }
 

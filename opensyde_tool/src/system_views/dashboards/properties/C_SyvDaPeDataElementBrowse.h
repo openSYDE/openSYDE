@@ -38,7 +38,8 @@ public:
    explicit C_SyvDaPeDataElementBrowse(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                        const stw_types::uint32 ou32_ViewIndex, const bool oq_MultiSelect,
                                        const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
-                                       const bool oq_Show64BitValues, const bool oq_ShowNVMLists);
+                                       const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues,
+                                       const bool oq_ShowNVMLists);
    ~C_SyvDaPeDataElementBrowse(void);
 
    void InitStaticNames(void) const;
@@ -65,6 +66,7 @@ private:
    static stw_types::sint32 mhs32_LastSelectedComboBoxIndex;
    bool mq_ShowOnlyWriteElements;
    bool mq_ShowArrayElements;
+   bool mq_ShowArrayIndexElements;
    bool mq_Show64BitValues;
 
    void m_OkClicked(void);

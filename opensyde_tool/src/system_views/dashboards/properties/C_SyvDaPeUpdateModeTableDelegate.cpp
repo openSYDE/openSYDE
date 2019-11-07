@@ -16,7 +16,7 @@
 #include "C_GtGetText.h"
 #include "C_OgeCbxTable.h"
 #include "C_PuiSvHandler.h"
-#include "C_SdNdeDataPoolUtil.h"
+#include "C_SdNdeDpUtil.h"
 #include "C_OgeSpxFactorTable.h"
 #include "C_TblTreDelegateUtil.h"
 #include "C_OgeSpxInt64FactorTable.h"

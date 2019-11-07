@@ -37,7 +37,7 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -56,7 +56,7 @@ C_TblViewToolTipBase::C_TblViewToolTipBase(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblViewToolTipBase::~C_TblViewToolTipBase(void)
@@ -66,7 +66,7 @@ C_TblViewToolTipBase::~C_TblViewToolTipBase(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse move event slot
+/*! \brief  Overwritten mouse move event slot
 
    Here: Handle tooltip if necessary
 
@@ -80,7 +80,7 @@ void C_TblViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten default event slot
+/*! \brief  Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -237,7 +237,7 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Hide tooltip
+/*! \brief  Hide tooltip
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblViewToolTipBase::m_HideToolTip(void)
@@ -253,7 +253,7 @@ void C_TblViewToolTipBase::m_HideToolTip(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle mouse move (tool tip related)
+/*! \brief  Handle mouse move (tool tip related)
 
    \param[in] orc_GlobalPos Global mouse pos
 */

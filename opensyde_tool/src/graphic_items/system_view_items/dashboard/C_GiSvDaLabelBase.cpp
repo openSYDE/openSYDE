@@ -23,7 +23,7 @@
 #include "C_SyvDaPeBase.h"
 #include "C_SyvDaPeLabel.h"
 #include "C_GiSvDaLabelBase.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -202,7 +202,7 @@ void C_GiSvDaLabelBase::UpdateShowValue(void)
 {
    float64 f64_Value;
 
-   if (this->m_GetLastValue(0, f64_Value, false) == C_NO_ERR)
+   if (this->m_GetLastValue(0UL, f64_Value, false) == C_NO_ERR)
    {
       if (this->mpc_LabelWidget != NULL)
       {
@@ -286,6 +286,7 @@ bool C_GiSvDaLabelBase::CallProperties(void)
          {
             c_ElementId = C_PuiSvDbNodeDataPoolListElementId(0, 0, 0, 0,
                                                              C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
+                                                             false, 0UL,
                                                              false);
             c_Scaling = C_PuiSvDbDataElementScaling();
          }
@@ -449,7 +450,17 @@ void C_GiSvDaLabelBase::m_UpdateCaption(const C_PuiSvDbLabel & orc_Data) const
                                                                           rc_CurItem.c_ElementId.u32_ElementIndex);
             if (pc_Element != NULL)
             {
-               this->mpc_LabelWidget->SetCaption(pc_Element->c_Name.c_str());
+               QString c_Caption;
+               if (rc_CurItem.c_ElementId.GetUseArrayElementIndex())
+               {
+                  c_Caption = QString("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                     rc_CurItem.c_ElementId.GetArrayElementIndex());
+               }
+               else
+               {
+                  c_Caption = pc_Element->c_Name.c_str();
+               }
+               this->mpc_LabelWidget->SetCaption(c_Caption);
             }
             else
             {
@@ -495,7 +506,16 @@ void C_GiSvDaLabelBase::m_UpdateStaticValue(const stw_opensyde_gui_logic::C_PuiS
             if (pc_Element != NULL)
             {
                float64 f64_Value;
-               pc_Element->c_MinValue.GetAnyValueAsFloat64(f64_Value, 0);
+               uint32 u32_Index;
+               if (rc_Config.c_ElementId.GetUseArrayElementIndex())
+               {
+                  u32_Index = rc_Config.c_ElementId.GetArrayElementIndex();
+               }
+               else
+               {
+                  u32_Index = 0UL;
+               }
+               pc_Element->c_MinValue.GetAnyValueAsFloat64(f64_Value, u32_Index);
                c_Text = this->GetUnscaledValueInRangeAsScaledString(0.0);
                this->mpc_LabelWidget->SetUnit(pc_Element->c_Unit.c_str());
             }

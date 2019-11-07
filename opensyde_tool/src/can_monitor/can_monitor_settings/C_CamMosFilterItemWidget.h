@@ -60,9 +60,9 @@ private:
    void m_OnEdit(void);
    void m_OnRemove(void);
    void m_OnChxToggle(const bool & orq_Checked);
-
    void m_ButtonPressed(void);
    void m_ButtonReleased(void);
+   void m_SetFilterNameElided(void) const;
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions

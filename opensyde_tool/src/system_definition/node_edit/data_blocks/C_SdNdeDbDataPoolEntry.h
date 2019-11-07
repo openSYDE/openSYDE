@@ -12,7 +12,7 @@
 #define C_SDNDEDBDATAPOOLENTRY_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QWidget>
+#include "C_OgeWiWithToolTip.h"
 #include "stwtypes.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -28,7 +28,7 @@ namespace stw_opensyde_gui
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeDbDataPoolEntry :
-   public QWidget
+   public stw_opensyde_gui_elements::C_OgeWiWithToolTip
 {
    Q_OBJECT
 
@@ -49,7 +49,7 @@ private:
    const stw_types::uint32 mu32_DataPoolIndex;
 
    void m_OnDeleteClick(void);
-   void m_Init(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex) const;
+   void m_Init(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
 
    //Avoid call
    C_SdNdeDbDataPoolEntry(const C_SdNdeDbDataPoolEntry &);

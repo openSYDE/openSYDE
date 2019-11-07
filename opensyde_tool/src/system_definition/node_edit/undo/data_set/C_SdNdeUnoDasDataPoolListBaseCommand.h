@@ -15,7 +15,7 @@
 
 #include <QString>
 #include <QUndoCommand>
-#include "C_SdNdeDataPoolListModelViewManager.h"
+#include "C_SdNdeDpListModelViewManager.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -31,14 +31,14 @@ public:
    C_SdNdeUnoDasDataPoolListBaseCommand(const stw_types::uint32 & oru32_NodeIndex,
                                         const stw_types::uint32 & oru32_DataPoolIndex,
                                         const stw_types::uint32 & oru32_DataPoolListIndex,
-                                        C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                        C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
                                         const QString & orc_Text = "", QUndoCommand * const opc_Parent = NULL);
 
 protected:
    const stw_types::uint32 mu32_NodeIndex;
    const stw_types::uint32 mu32_DataPoolIndex;
    const stw_types::uint32 mu32_DataPoolListIndex;
-   C_SdNdeDataPoolListModelViewManager * const mpc_DataPoolListModelViewManager;
+   C_SdNdeDpListModelViewManager * const mpc_DataPoolListModelViewManager;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

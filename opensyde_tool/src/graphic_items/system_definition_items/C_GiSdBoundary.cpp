@@ -34,15 +34,15 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]     ors32_Index  Index of data element in system definition
-   \param[in]     oru64_ID     Unique ID
-   \param[in]     orf64_Width  Width of node
-   \param[in]     orf64_Height Height of node
-   \param[in,out] opc_Parent   Optional pointer to parent
+   \param[in]     ors32_Index Index of data element in system definition
+   \param[in]     oru64_ID    Unique ID
+   \param[in]     of64_Width  Width of node
+   \param[in]     of64_Height Height of node
+   \param[in,out] opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSdBoundary::C_GiSdBoundary(const sint32 & ors32_Index, const uint64 & oru64_ID, const float64 of64_Width,
@@ -53,7 +53,7 @@ C_GiSdBoundary::C_GiSdBoundary(const sint32 & ors32_Index, const uint64 & oru64_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for initially loading internal data
+/*! \brief  Function for initially loading internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdBoundary::LoadData(void)
@@ -67,7 +67,7 @@ void C_GiSdBoundary::LoadData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for updating internal data
+/*! \brief  Slot function for updating internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdBoundary::UpdateData(void)
@@ -79,13 +79,13 @@ void C_GiSdBoundary::UpdateData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete data in system definition
+/*! \brief  Delete data in system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdBoundary::DeleteData(void)
 {
    C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.erase(
-            C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.begin() + ms32_Index);
+      C_PuiSdHandler::h_GetInstance()->c_Elements.c_Boundaries.begin() + ms32_Index);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

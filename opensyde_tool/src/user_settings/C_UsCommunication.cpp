@@ -15,6 +15,7 @@
 #include "C_UsCommunication.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 

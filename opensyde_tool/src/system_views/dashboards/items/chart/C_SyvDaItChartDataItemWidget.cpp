@@ -22,7 +22,8 @@
 #include "C_UtiStyleSheets.h"
 #include "C_OgeWiUtil.h"
 #include "C_SyvUtil.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
+#include "C_OSCNodeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -158,6 +159,10 @@ void C_SyvDaItChartDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementC
       if (pc_OscElement != NULL)
       {
          c_Name = pc_OscElement->c_Name.c_str();
+         if (orc_DataPoolElementId.GetUseArrayElementIndex())
+         {
+            c_Name = QString("%1[%2]").arg(c_Name).arg(orc_DataPoolElementId.GetArrayElementIndex());
+         }
       }
    }
 
@@ -177,10 +182,10 @@ void C_SyvDaItChartDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementC
          if (f64_Value < 0.0)
          {
             // Do not use the minimum
-            C_SdNdeDataPoolContentUtil::h_SetValueInContent(0.0, c_Tmp, 0UL);
+            C_OSCNodeDataPoolContentUtil::h_SetValueInContent(0.0, c_Tmp, 0UL);
          }
-         C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(c_Tmp, pc_OscElement->f64_Factor,
-                                                              pc_OscElement->f64_Offset, c_Value, 0UL);
+         C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_Tmp, pc_OscElement->f64_Factor,
+                                                        pc_OscElement->f64_Offset, c_Value, 0UL);
       }
       this->mpc_Ui->pc_LabelValue->setText(c_Value + " " + this->mc_Unit);
    }
@@ -377,9 +382,17 @@ bool C_SyvDaItChartDataItemWidget::event(QEvent * const opc_Event)
          //get element name as heading
          if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataPoolElementId) != NULL)
          {
-            c_ToolTipHeading =
+            const QString c_Name =
                C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataPoolElementId)->c_Name.
                c_str();
+            if (this->mc_DataPoolElementId.GetUseArrayElementIndex())
+            {
+               c_ToolTipHeading = QString("%1[%2]").arg(c_Name).arg(this->mc_DataPoolElementId.GetArrayElementIndex());
+            }
+            else
+            {
+               c_ToolTipHeading = c_Name;
+            }
          }
 
          c_ToolTip = C_SyvUtil::h_GetCommonDashboardItemToolTip(this->mu32_ViewIndex,

@@ -19,7 +19,7 @@
 #include "CSCLChecksums.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvDashboard.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_OSCNodeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -1512,6 +1512,7 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_Node
    \param[in] oe_Type            New element type
    \param[in] oq_IsArray         New array type
    \param[in] ou32_ArraySize     New array size
+   \param[in] oq_IsString        Flag if new type is string
 
    \return
    True  Some elements invalidated
@@ -1523,50 +1524,83 @@ bool C_PuiSvDashboard::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou
                                                                  const uint32 ou32_ListIndex,
                                                                  const uint32 ou32_ElementIndex,
                                                                  const C_OSCNodeDataPoolContent::E_Type oe_Type,
-                                                                 const bool oq_IsArray, const uint32 ou32_ArraySize)
+                                                                 const bool oq_IsArray, const uint32 ou32_ArraySize,
+                                                                 const bool oq_IsString)
 {
    bool q_Retval = false;
 
    std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
    m_GetAllWidgetItems(c_Widgets);
 
-   //Only critical if element was turned into an array
-   if (oq_IsArray == true)
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
-      for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      if (pc_Widget != NULL)
       {
-         C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
-         if (pc_Widget != NULL)
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size();
+              ++u32_ItElement)
          {
-            //Skip widgets which support array type
-            if ((C_PuiSvDashboard::h_GetWidgetType(pc_Widget) != C_PuiSvDbDataElement::eTABLE) &&
-                (C_PuiSvDashboard::h_GetWidgetType(pc_Widget) != C_PuiSvDbDataElement::ePARAM))
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+               pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            //Check if this is the same data element
+            if ((rc_DataElementId.CheckSameDataElement(
+                    C_PuiSvDbNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                       ou32_ElementIndex,
+                                                       C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
+                                                       false,
+                                                       0UL))) ||
+                (rc_DataElementId.CheckSameDataElement(
+                    C_PuiSvDbNodeDataPoolListElementId(
+                       ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                       ou32_ElementIndex, C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL, false, 0UL))))
             {
-               for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size();
-                    ++u32_ItElement)
+               //Only critical if element was turned into an array
+               if (oq_IsArray)
                {
-                  C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
-                     pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
-                  C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
-                  if ((rc_DataElementId ==
-                       C_PuiSvDbNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
-                                                          ou32_ElementIndex,
-                                                          C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)) ||
-                      (rc_DataElementId ==
-                       C_PuiSvDbNodeDataPoolListElementId(
-                          ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
-                          ou32_ElementIndex, C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL)))
+                  //Skip widgets which support array type
+                  if ((C_PuiSvDashboard::h_GetWidgetType(pc_Widget) != C_PuiSvDbDataElement::eTABLE) &&
+                      (C_PuiSvDashboard::h_GetWidgetType(pc_Widget) != C_PuiSvDbDataElement::ePARAM))
                   {
                      mh_MarkInvalid(rc_DataElementId);
                      q_Retval = true;
                   }
                }
+               //Handle indices
+               if (rc_DataElementId.GetUseArrayElementIndex())
+               {
+                  //Char elements not supported
+                  if (oq_IsString)
+                  {
+                     mh_MarkInvalid(rc_DataElementId);
+                     q_Retval = true;
+                  }
+                  else
+                  {
+                     //Array element index can no longer be used
+                     if (oq_IsArray == false)
+                     {
+                        mh_MarkInvalid(rc_DataElementId);
+                        q_Retval = true;
+                     }
+                     else
+                     {
+                        //Check index out of range
+                        if (ou32_ArraySize <= rc_DataElementId.GetArrayElementIndex())
+                        {
+                           mh_MarkInvalid(rc_DataElementId);
+                           q_Retval = true;
+                        }
+                     }
+                  }
+               }
             }
          }
       }
-      //Probably not necessary
-      m_SyncCleanUpParams();
    }
+   //Probably not necessary
+   m_SyncCleanUpParams();
+
    //For param widgets we need to sync the array size
    for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
    {
@@ -1586,7 +1620,8 @@ bool C_PuiSvDashboard::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou
                if (rc_DataElementId ==
                    C_PuiSvDbNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
                                                       ou32_ElementIndex,
-                                                      C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT))
+                                                      C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false,
+                                                      0UL))
                {
                   C_OSCNodeDataPoolContent & rc_CurElement = pc_ParamWidgets->c_ListValues[u32_ItElement];
 
@@ -1642,11 +1677,12 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAccessChanged(const uint32 o
                   if ((rc_DataElementId ==
                        C_PuiSvDbNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
                                                           ou32_ElementIndex,
-                                                          C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)) ||
+                                                          C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false,
+                                                          0UL)) ||
                       (rc_DataElementId ==
                        C_PuiSvDbNodeDataPoolListElementId(
                           ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
-                          ou32_ElementIndex, C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL)))
+                          ou32_ElementIndex, C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL, false, 0UL)))
                   {
                      mh_MarkInvalid(rc_DataElementId);
                   }
@@ -2437,7 +2473,8 @@ sint32 C_PuiSvDashboard::AddParamNewDataPoolElement(const uint32 ou32_ParamWidge
          C_PuiSvDbNodeDataElementConfig c_NewConfig;
          std::vector<sint32> c_InitalColWidth;
          c_NewConfig.c_ElementId = C_PuiSvDbNodeDataPoolListElementId(orc_NewId,
-                                                                      C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+                                                                      C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false,
+                                                                      0UL);
          //Add all necessary elements
          rc_ParamWidget.c_DataPoolElementsConfig.push_back(c_NewConfig);
          rc_ParamWidget.c_DataSetSelectionIndices.push_back(-1);
@@ -2449,13 +2486,13 @@ sint32 C_PuiSvDashboard::AddParamNewDataPoolElement(const uint32 ou32_ParamWidge
          }
          else
          {
-            C_SdNdeDataPoolContentUtil::E_ValueChangedTo e_Tmp;
+            C_OSCNodeDataPoolContentUtil::E_ValueChangedTo e_Tmp;
             C_OSCNodeDataPoolContent c_Content;
             //Init content
             c_Content = pc_Element->c_MinValue;
-            tgl_assert(C_SdNdeDataPoolContentUtil::h_SetValueInMinMaxRange(
+            tgl_assert(C_OSCNodeDataPoolContentUtil::h_SetValueInMinMaxRange(
                           pc_Element->c_MinValue, pc_Element->c_MaxValue, c_Content, e_Tmp,
-                          C_SdNdeDataPoolContentUtil::eTO_ZERO) == C_NO_ERR);
+                          C_OSCNodeDataPoolContentUtil::eTO_ZERO) == C_NO_ERR);
             rc_ParamWidget.c_ListValues.push_back(c_Content);
          }
          rc_ParamWidget.c_ColWidth.push_back(c_InitalColWidth);
@@ -2499,7 +2536,8 @@ sint32 C_PuiSvDashboard::AddParamNewDataPoolElement(const uint32 ou32_ParamWidge
                //Append new item if not already existing
                C_PuiSvDbExpandedTreeIndex c_NewItem;
                c_NewItem.c_ExpandedId = C_PuiSvDbNodeDataPoolListElementId(orc_NewId,
-                                                                           C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+                                                                           C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false,
+                                                                           0UL);
                c_NewItem.u32_Layer = u32_ItRelevantLayer;
                rc_ParamWidget.c_ExpandedItems.push_back(c_NewItem);
             }

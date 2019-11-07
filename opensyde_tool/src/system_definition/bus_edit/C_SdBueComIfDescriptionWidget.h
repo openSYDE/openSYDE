@@ -43,8 +43,8 @@ public:
    virtual ~C_SdBueComIfDescriptionWidget(void);
 
    void InitStaticNames(void) const;
-   void SetNodeDataPool(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
-                        const stw_types::uint32 ou32_ListIndex);
+   void SetNodeId(const stw_types::uint32 ou32_NodeIndex, const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol,
+                  const stw_types::uint32 ou32_InterfaceIndex);
    void SetBusId(const stw_types::uint32 ou32_BusIndex);
    void Reload(void);
    void PartialReload(void);
@@ -60,8 +60,7 @@ public:
    void AddSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                   const stw_types::uint16 ou16_StartBit) const;
    void AddSignalMultiplexed(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                             const stw_types::uint16 ou16_StartBit,
-                             const stw_types::uint16 ou16_MultiplexValue) const;
+                             const stw_types::uint16 ou16_StartBit, const stw_types::uint16 ou16_MultiplexValue) const;
    void CopySignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                    const stw_types::uint32 ou32_SignalIndex) const;
    void CutSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -125,9 +124,10 @@ private:
    const;
 
    Ui::C_SdBueComIfDescriptionWidget * mpc_Ui;
-   stw_types::uint32 mu32_BusIndex;
-   stw_types::uint32 mu32_NodeIndex;
-   stw_types::uint32 mu32_InterfaceIndex;
+   stw_types::uint32 mu32_BusIndex;                   // For bus mode
+   stw_types::uint32 mu32_NodeIndex;                  // For single node mode
+   stw_types::uint32 mu32_InterfaceIndex;             // For single node mode
+   std::vector<stw_types::uint32> mc_DatapoolIndexes; // For single node mode
    bool mq_ModeSingleNode;
    bool mq_IndexValid;
    stw_opensyde_gui_logic::C_SdBueUnoManager mc_UndoManager;

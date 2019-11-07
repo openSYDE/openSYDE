@@ -27,9 +27,10 @@
 #include "TGLTime.h"
 #include "TGLUtils.h"
 #include "C_OSCLoggingHandler.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSvData.h"
+#include "C_OSCNodeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -792,7 +793,9 @@ void C_SyvDaItChartWidget::AddDataSerieContent(const C_PuiSvDbNodeDataPoolListEl
       for (u32_ConfigCounter = 0U; u32_ConfigCounter < this->mc_Data.c_DataPoolElementsConfig.size();
            ++u32_ConfigCounter)
       {
-         if ((this->mc_Data.c_DataPoolElementsConfig[u32_ConfigCounter].c_ElementId == orc_DataPoolElementId) &&
+         const C_PuiSvDbNodeDataPoolListElementId & rc_CurDataPoolElementId =
+            this->mc_Data.c_DataPoolElementsConfig[u32_ConfigCounter].c_ElementId;
+         if ((rc_CurDataPoolElementId.CheckSameDataElement(orc_DataPoolElementId)) &&
              (u32_ConfigCounter < this->mc_DataPoolElementsDataSeries.size()))
          {
             QLineSeries * const pc_LineSerie = this->mc_DataPoolElementsDataSeries[u32_ConfigCounter];
@@ -803,6 +806,7 @@ void C_SyvDaItChartWidget::AddDataSerieContent(const C_PuiSvDbNodeDataPoolListEl
                float64 f64_Value = 0.0;
                C_OSCNodeDataPoolContent c_Tmp = this->mc_DataPoolElementContentMin[u32_ConfigCounter];
                QString c_Value;
+               const uint32 u32_Index = rc_CurDataPoolElementId.GetArrayElementIndexOrZero();
 
                tgl_assert(orc_Values.size() == orc_Timestamps.size());
 
@@ -873,9 +877,9 @@ void C_SyvDaItChartWidget::AddDataSerieContent(const C_PuiSvDbNodeDataPoolListEl
                }
 
                // Show the last value in the selector widget
-               C_SdNdeDataPoolContentUtil::h_SetValueInContent(f64_Value, c_Tmp, 0UL);
+               C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_Value, c_Tmp, u32_Index);
                // No need of scaling here, it is already scaled
-               C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(c_Tmp, 1.0, 0.0, c_Value, 0UL);
+               C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_Tmp, 1.0, 0.0, c_Value, u32_Index);
                this->mpc_Ui->pc_ChartSelectorWidget->UpdateDataSerieValue(u32_ConfigCounter, c_Value);
             }
          }

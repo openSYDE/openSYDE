@@ -4,7 +4,7 @@ stw_opensyde_gui--C_NagTopList::item,
 stw_opensyde_gui--C_NagViewList,
 stw_opensyde_gui--C_SyvDcConnectedNodeList,
 stw_opensyde_gui--C_SyvDcExistingNodeList,
-stw_opensyde_gui--C_SdNdeDataPoolSelectorListWidget,
+stw_opensyde_gui--C_SdNdeDpSelectorListWidget,
 stw_opensyde_gui--C_SyvUpUpdatePackageListWidget
 {
 outline: none;
@@ -21,9 +21,9 @@ stw_opensyde_gui--C_SdTopologyListWidget::item:hover,
 stw_opensyde_gui--C_SdNdeDbListWidget,
 stw_opensyde_gui--C_SdNdeDbListWidget::item:selected,
 stw_opensyde_gui--C_SdNdeDbListWidget::item:hover,
-stw_opensyde_gui--C_SdNdeDataPoolSelectorListWidget,
-stw_opensyde_gui--C_SdNdeDataPoolSelectorListWidget::item:selected,
-stw_opensyde_gui--C_SdNdeDataPoolSelectorListWidget::item:hover,
+stw_opensyde_gui--C_SdNdeDpSelectorListWidget,
+stw_opensyde_gui--C_SdNdeDpSelectorListWidget::item:selected,
+stw_opensyde_gui--C_SdNdeDpSelectorListWidget::item:hover,
 stw_opensyde_gui--C_SyvUpUpdatePackageListWidget,
 stw_opensyde_gui--C_SyvUpUpdatePackageListWidget::item:selected,
 stw_opensyde_gui--C_SyvUpUpdatePackageListWidget::item:hover
@@ -32,7 +32,7 @@ border-style: none;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_SdNdeDataPoolSelectorAddListWidget
+stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget
 {
 border-style: solid;
 border-width: 1px;
@@ -40,7 +40,7 @@ border-width: 1px;
 
 /* --------------------------------------------------------------------- */
 /* padding does not work on list widget item when the border of the item is not set to 0 explicitly */
-stw_opensyde_gui--C_SdNdeDataPoolSelectorAddListWidget::item
+stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget::item
 {
 border: 0px;
 padding-left: 5px;

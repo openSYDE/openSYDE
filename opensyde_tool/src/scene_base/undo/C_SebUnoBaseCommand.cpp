@@ -33,7 +33,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Scene  Pointer to currently active scene
    \param[in]     orc_IDs    Affected unique IDs
@@ -50,7 +50,7 @@ C_SebUnoBaseCommand::C_SebUnoBaseCommand(QGraphicsScene * const opc_Scene, const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Copy constructor
+/*! \brief  Copy constructor
 
    \param[in]     opc_Prev   Original command
    \param[in,out] opc_Parent Optional pointer to parent
@@ -64,7 +64,7 @@ C_SebUnoBaseCommand::C_SebUnoBaseCommand(const C_SebUnoBaseCommand * const opc_P
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -74,7 +74,7 @@ C_SebUnoBaseCommand::~C_SebUnoBaseCommand(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get pointers for connected items
+/*! \brief  Get pointers for connected items
 
    \return
    array with items:
@@ -94,7 +94,7 @@ vector<QGraphicsItem *> C_SebUnoBaseCommand::m_GetSceneItems(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get pointer for connected item
+/*! \brief  Get pointer for connected item
 
    \param[in] oru64_ID Unique ID
 
@@ -123,7 +123,7 @@ QGraphicsItem * C_SebUnoBaseCommand::m_GetSceneItem(const uint64 & oru64_ID) con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if merge possible (=same IDs affected)
+/*! \brief  Check if merge possible (=same IDs affected)
 
    \param[in] opc_Command Command to merge with
 
@@ -157,7 +157,10 @@ bool C_SebUnoBaseCommand::m_MergePossible(const C_SebUnoBaseCommand * const opc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all unique IDs
+/*! \brief  Get all unique IDs
+
+   \return
+   All unique IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
 const std::vector<uint64> C_SebUnoBaseCommand::GetIDs(void) const

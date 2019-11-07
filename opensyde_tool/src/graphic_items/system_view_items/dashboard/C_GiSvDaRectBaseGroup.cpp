@@ -34,7 +34,7 @@
 #include "TGLUtils.h"
 #include "C_UtiStyleSheets.h"
 #include "C_PuiSdHandler.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_OSCNodeDataPoolListElement.h"
 #include "C_OgeWiCustomMessage.h"
 
@@ -576,7 +576,7 @@ void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
          if (s32_Return == C_NO_ERR)
          {
             // Update the value
-            C_SdNdeDataPoolContentUtil::h_SetScaledValueInContent(this->mf64_WriteValue, c_OscElement.c_Value,
+            C_SdNdeDpContentUtil::h_SetScaledValueInContent(this->mf64_WriteValue, c_OscElement.c_Value,
                                                                   c_Scaling.f64_Factor, c_Scaling.f64_Offset);
             //Compensate floating point precision
             if ((c_OscElement.c_Value <= c_OscElement.c_MaxValue) == false)
@@ -668,7 +668,7 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
             c_Description = C_GtGetText::h_GetText("Operation did not get a response within timeout interval.");
             break;
          case C_NOACT:
-            c_Description = C_GtGetText::h_GetText("Operation could not send request (e.g. TX buffer full).");
+            c_Description = C_GtGetText::h_GetText("Operation could not send request (e.g. Tx buffer full).");
             break;
          case C_WARN:
             if (this->mq_ReadItem == true)
@@ -1357,7 +1357,16 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
                         if (pc_Element != NULL)
                         {
                            //Add name
-                           c_ManualItems += QString(pc_Element->c_Name.c_str()) + "\n";
+                           if (c_Id.GetUseArrayElementIndex())
+                           {
+                              c_ManualItems += QString("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                                 c_Id.GetArrayElementIndex());
+                           }
+                           else
+                           {
+                              c_ManualItems += QString(pc_Element->c_Name.c_str());
+                           }
+                           c_ManualItems += "\n";
                         }
                      }
                   }
@@ -1381,7 +1390,16 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
                   if (pc_Element != NULL)
                   {
                      //Add name
-                     c_ManualItems += QString(pc_Element->c_Name.c_str()) + "\n";
+                     if (c_Id.GetUseArrayElementIndex())
+                     {
+                        c_ManualItems += QString("%1[%2]").arg(pc_Element->c_Name.c_str()).arg(
+                           c_Id.GetArrayElementIndex());
+                     }
+                     else
+                     {
+                        c_ManualItems += QString(pc_Element->c_Name.c_str());
+                     }
+                     c_ManualItems += "\n";
                   }
                }
             }
@@ -1438,7 +1456,7 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
             {
                c_Content += "\n";
             }
-            c_Content += C_GtGetText::h_GetText("- There is a signal of a inactive bus");
+            c_Content += C_GtGetText::h_GetText("- There is a signal of an inactive bus");
          }
       }
       //Check if redisplay necessary
@@ -1473,7 +1491,17 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
          {
             if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id) != NULL)
             {
-               c_Heading = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id)->c_Name.c_str();
+               const QString c_ElementName =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id)->c_Name.c_str();
+               if (c_Id.GetUseArrayElementIndex())
+               {
+                  c_Heading = QString("%1[%2]").arg(c_ElementName).arg(
+                     c_Id.GetArrayElementIndex());
+               }
+               else
+               {
+                  c_Heading = c_ElementName;
+               }
             }
          }
       }
@@ -1933,7 +1961,16 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
          {
             if ((c_ElementId.GetIsValid() == true) && (m_CheckNodeActive(c_ElementId.u32_NodeIndex) == true))
             {
-               Q_EMIT this->SigDataPoolRead(c_ElementId);
+               //-1 because we already prepared for the next element!
+               if (this->m_CheckElementAlreadyRead(this->mu32_NextManualActionIndex - 1UL, c_ElementId) == false)
+               {
+                  Q_EMIT this->SigDataPoolRead(c_ElementId);
+               }
+               else
+               {
+                  //Skip to next element
+                  this->m_ManualRead();
+               }
             }
             else
             {
@@ -2162,4 +2199,35 @@ bool C_GiSvDaRectBaseGroup::m_CheckNodeActive(const uint32 ou32_NodeIndex) const
    }
 
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if the element was already read, assuming the order was in the internally stored data element order
+
+   \param[in] ou32_ItemIndex Internally stored data element order index
+   \param[in] orc_Id         ID of the current index
+
+   \retval   true    Already read
+   \retval   false   New read required
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::m_CheckElementAlreadyRead(const uint32 ou32_ItemIndex,
+                                                      const C_PuiSvDbNodeDataPoolListElementId & orc_Id) const
+{
+   bool q_AlreadyRead = false;
+
+   for (uint32 u32_ItItem = 0UL; (u32_ItItem < this->GetWidgetDataPoolElementCount()) && (u32_ItItem < ou32_ItemIndex);
+        ++u32_ItItem)
+   {
+      C_PuiSvDbNodeDataPoolListElementId c_CurId;
+      if (this->GetDataPoolElementIndex(u32_ItItem, c_CurId) == C_NO_ERR)
+      {
+         if (c_CurId.CheckSameDataElement(orc_Id))
+         {
+            q_AlreadyRead = true;
+            break;
+         }
+      }
+   }
+   return q_AlreadyRead;
 }

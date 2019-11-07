@@ -52,7 +52,6 @@ Q_SIGNALS:
    void SigAppDisplay(void);
    void SigErrorChange(void) const;
    void SigReloadDataPools(void);
-   void SigCheckDataPoolInteraction(void);
    void SigOpenDataPool(const stw_types::uint32 ou32_DataPoolIndex);
 
 protected:

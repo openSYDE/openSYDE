@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -54,7 +54,7 @@ C_GiLiTemporaryLine::C_GiLiTemporaryLine(QGraphicsItem * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -64,7 +64,7 @@ C_GiLiTemporaryLine::~C_GiLiTemporaryLine()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle mouse position change
+/*! \brief  Handle mouse position change
 
    \param[in] orc_Pos New mouse position
 */

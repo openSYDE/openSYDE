@@ -23,9 +23,9 @@
 #include "TGLUtils.h"
 
 #include "C_OSCNodeDataPoolContent.h"
-#include "C_SdNdeDataPoolContentUtil.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_CieUtil.h"
+#include "C_OSCNodeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -370,6 +370,8 @@ sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMes
                                          C_CieConverter::C_CIENodeMessage & orc_Message)
 {
    sint32 s32_Return = stw_errors::C_NO_ERR;
+   bool q_MultiplexedMessage = false;
+   bool q_MessageAdapted = false;
 
    orc_Message.c_CanMessage.c_Name = orc_DbcMessage.name.c_str();
    orc_Message.c_CanMessage.c_Comment = orc_DbcMessage.comment.c_str();
@@ -391,7 +393,8 @@ sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMes
    // get all signal definitions for this message
    for (auto c_DbcSignal : orc_DbcMessage.signals)
    {
-      if (mh_GetSignal(c_DbcSignal.second, orc_Message) != stw_errors::C_NO_ERR)
+      // If a multiplexer signal exists the message is a multiplexed message
+      if (mh_GetSignal(c_DbcSignal.second, q_MultiplexedMessage, q_MessageAdapted, orc_Message) != stw_errors::C_NO_ERR)
       {
          s32_Return = stw_errors::C_WARN;
       }
@@ -403,31 +406,91 @@ sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMes
       s32_Return = stw_errors::C_WARN;
    }
 
+   if (q_MessageAdapted == true)
+   {
+      s32_Return = stw_errors::C_WARN;
+      osc_write_log_warning("DBC file import",
+                            "CAN Message \"" + orc_Message.c_CanMessage.c_Name +
+                            "\" was adapted due to a multiplexed message.");
+      orc_Message.c_Warnings.Append("The multiplexer signal properties were adapted due to a multiplexed message.\n"
+                                    "Multiplexer signal restrictions:\n"
+                                    "- Auto min/max: active\n"
+                                    "- Factor: 1\n"
+                                    "- Offset: 0\n"
+                                    "- Init value: 0\n"
+                                    "- Unit: disabled\n"
+                                    "- Length: Maximum 16 bit\n"
+                                    "- Type: unsigned");
+   }
+
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get signal definition
 
-   \param[in]  orc_DbcSignal         signal definition from DBC file
-   \param[out] orc_Message           target message definitions
+   \param[in]      orc_DbcSignal                signal definition from DBC file
+   \param[in,out]  orq_MultiplexerSignalExists  flag if signal is multiplexer signal, will not be reset to false
+   \param[in,out]  orq_SignalAdapted            flag if signal was adapted, will not be reset to false
+   \param[out]     orc_Message                  target message definitions
 
    \return
    C_NO_ERR    all data successfully retrieved
    C_WARN      unknown parameter found -> default value set and warning reported
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal,
-                                    C_CieConverter::C_CIENodeMessage & orc_Message)
+sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, bool & orq_MultiplexerSignalExists,
+                                    bool & orq_SignalAdapted, C_CieConverter::C_CIENodeMessage & orc_Message)
 {
    sint32 s32_Return = stw_errors::C_NO_ERR;
 
    std::map<uintn, std::string>::const_iterator c_ItValueDescr;
-
    C_CieConverter::C_CIECanSignal c_Signal;
+   bool q_MultiplexerSignal = false;
+
+   // Handle multiplexing information
+   if (orc_DbcSignal.multiplexorSwitch == true)
+   {
+      c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL;
+      c_Signal.u16_MultiplexValue = 0; //
+      q_MultiplexerSignal = true;
+   }
+   else if (orc_DbcSignal.multiplexedSignal == true)
+   {
+      c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL;
+      c_Signal.u16_MultiplexValue = orc_DbcSignal.multiplexerSwitchValue;
+   }
+   else
+   {
+      c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_DEFAULT;
+      c_Signal.u16_MultiplexValue = 0; // default
+   }
 
    c_Signal.u16_ComBitStart = static_cast<uint16>(orc_DbcSignal.startBit);
-   c_Signal.u16_ComBitLength = static_cast<uint16>(orc_DbcSignal.bitSize);
+   if ((q_MultiplexerSignal == true) &&
+       (orc_DbcSignal.bitSize > 16U))
+   {
+      // Multiplexer signal restriction
+      c_Signal.u16_ComBitLength = 16U;
+      orq_SignalAdapted = true;
+   }
+   else
+   {
+      c_Signal.u16_ComBitLength = static_cast<uint16>(orc_DbcSignal.bitSize);
+   }
+
+   // avoid bit length 0
+   if (c_Signal.u16_ComBitLength == 0U)
+   {
+      C_SCLString c_String = orc_DbcSignal.name.c_str();
+
+      c_Signal.u16_ComBitLength = 1U;
+      osc_write_log_warning("DBC file import",
+                            "Invalid bit length of signal \"" + c_String + "\". Bit length set to \"1\".");
+      orc_Message.c_Warnings.Append("Invalid bit length of signal \"" + c_String + "\". Bit length set to \"1\".");
+      s32_Return = stw_errors::C_WARN;
+   }
+
    if ((orc_DbcSignal.byteOrder == Vector::DBC::ByteOrder::Motorola) ||
        (orc_DbcSignal.byteOrder == Vector::DBC::ByteOrder::BigEndian))
    {
@@ -461,33 +524,41 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal,
 
    c_Signal.c_Element.c_Name = orc_DbcSignal.name.c_str();
    c_Signal.c_Element.c_Comment = orc_DbcSignal.comment.c_str();
-   c_Signal.c_Element.f64_Factor = orc_DbcSignal.factor;
-   c_Signal.c_Element.f64_Offset = orc_DbcSignal.offset;
-   c_Signal.c_Element.c_Unit = orc_DbcSignal.unit.c_str();
-   if (mh_GetSignalValues(orc_DbcSignal, c_Signal.c_Element, orc_Message.c_Warnings) != stw_errors::C_NO_ERR)
+   if (q_MultiplexerSignal == false)
+   {
+      c_Signal.c_Element.f64_Factor = orc_DbcSignal.factor;
+      c_Signal.c_Element.f64_Offset = orc_DbcSignal.offset;
+      c_Signal.c_Element.c_Unit = orc_DbcSignal.unit.c_str();
+   }
+   else
+   {
+      // Multiplexer signal restriction
+      if ((orc_DbcSignal.factor != 1.0) ||
+          (orc_DbcSignal.offset != 0.0) ||
+          (orc_DbcSignal.unit != ""))
+      {
+         orq_SignalAdapted = true;
+      }
+
+      c_Signal.c_Element.f64_Factor = 1.0;
+      c_Signal.c_Element.f64_Offset = 0.0;
+      c_Signal.c_Element.c_Unit = "";
+   }
+
+   if (mh_GetSignalValues(orc_DbcSignal, q_MultiplexerSignal, orq_SignalAdapted,
+                          c_Signal.c_Element, orc_Message.c_Warnings) != stw_errors::C_NO_ERR)
    {
       s32_Return = stw_errors::C_WARN;
    }
 
-   // Handle multiplexing information
-   if (orc_DbcSignal.multiplexorSwitch == true)
-   {
-      c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL;
-      c_Signal.u16_MultiplexValue = 0; //
-   }
-   else if (orc_DbcSignal.multiplexedSignal == true)
-   {
-      c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL;
-      c_Signal.u16_MultiplexValue = orc_DbcSignal.multiplexerSwitchValue;
-   }
-   else
-   {
-      c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_DEFAULT;
-      c_Signal.u16_MultiplexValue = 0; // default
-   }
    C_CieImportDbc::mh_VerifySignalValueTable(c_Signal);
 
    orc_Message.c_CanMessage.c_Signals.push_back(c_Signal);
+
+   if (q_MultiplexerSignal == true)
+   {
+      orq_MultiplexerSignalExists = true;
+   }
 
    return s32_Return;
 }
@@ -535,17 +606,19 @@ void C_CieImportDbc::mh_VerifySignalValueTable(C_CieConverter::C_CIECanSignal & 
 
    Set minimum and maximum values for a signal.
 
-   \param[in]  orc_DbcSignal         signal definition from DBC file
-   \param[out] orc_Element           element for CAN message signals
-   \param[out] orc_WarningMessages   list of warnings for each message
+   \param[in]      orc_DbcSignal         signal definition from DBC file
+   \param[in]      oq_MultiplexerSignal  flag if signal is multiplexer signal
+   \param[in,out]  orq_SignalAdapted     flag if signal was adapted, will not be reset to false
+   \param[out]     orc_Element           element for CAN message signals
+   \param[out]     orc_WarningMessages   list of warnings for each message
 
    \return
    C_NO_ERR    all data successfully retrieved
    C_WARN      unknown parameter found -> default value set and error reported
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSignal,
-                                          C_CieConverter::C_CIEDataPoolElement & orc_Element,
+sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSignal, const bool oq_MultiplexerSignal,
+                                          bool & orq_SignalAdapted, C_CieConverter::C_CIEDataPoolElement & orc_Element,
                                           C_SCLStringList & orc_WarningMessages)
 {
    sint32 s32_Return = stw_errors::C_NO_ERR;
@@ -562,6 +635,63 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
    float64 f64_MinValuePhy;                // used to display warning messages with physical values to user
    float64 f64_MaxValuePhy;                //                             -"-
    float64 f64_InitialValuePhy;            //                             -"-
+
+   // Check if adaptions are necessary due to a multiplexer signal
+   if (oq_MultiplexerSignal == true)
+   {
+      // Multiplexer signal restrictions
+      if ((c_DbcSignal.extendedValueType != Vector::DBC::Signal::ExtendedValueType::Integer) &&
+          (c_DbcSignal.extendedValueType != Vector::DBC::Signal::ExtendedValueType::Undefined))
+      {
+         c_DbcSignal.extendedValueType = Vector::DBC::Signal::ExtendedValueType::Integer;
+         orq_SignalAdapted = true;
+      }
+
+      if (c_DbcSignal.valueType != Vector::DBC::ValueType::Unsigned)
+      {
+         c_DbcSignal.valueType = Vector::DBC::ValueType::Unsigned;
+         orq_SignalAdapted = true;
+      }
+
+      // avoid bit length 0
+      if (c_DbcSignal.bitSize == 0)
+      {
+         c_DbcSignal.bitSize = 1U;
+         orq_SignalAdapted = true;
+      }
+
+      if (c_DbcSignal.bitSize > 16U)
+      {
+         c_DbcSignal.bitSize = 16U;
+         orq_SignalAdapted = true;
+      }
+
+      if (c_DbcSignal.factor != 1.0)
+      {
+         c_DbcSignal.factor = 1.0;
+         orq_SignalAdapted = true;
+      }
+
+      if (c_DbcSignal.offset != 0.0)
+      {
+         c_DbcSignal.offset = 0.0;
+         orq_SignalAdapted = true;
+      }
+
+      // 0.0 equals auto
+      if (c_DbcSignal.maximumPhysicalValue != 0.0)
+      {
+         c_DbcSignal.maximumPhysicalValue = 0.0;
+         orq_SignalAdapted = true;
+      }
+
+      // 0.0 equals auto
+      if (c_DbcSignal.minimumPhysicalValue != 0.0)
+      {
+         c_DbcSignal.minimumPhysicalValue = 0.0;
+         orq_SignalAdapted = true;
+      }
+   }
 
    // extendedValueType is currently set only in case of variable type float or double
    if ((c_DbcSignal.extendedValueType == Vector::DBC::Signal::ExtendedValueType::Integer) ||
@@ -692,8 +822,8 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
       s32_Return = stw_errors::C_WARN;
    }
    // set values via comfort data pool util interface
-   C_SdNdeDataPoolContentUtil::h_SetValueInContent(f64_MinValue, orc_Element.c_MinValue);
-   C_SdNdeDataPoolContentUtil::h_SetValueInContent(f64_MaxValue, orc_Element.c_MaxValue);
+   C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_MinValue, orc_Element.c_MinValue);
+   C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_MaxValue, orc_Element.c_MaxValue);
 
    // get optional initial value if available
    C_OSCNodeDataPoolContent c_InitialValue;
@@ -732,6 +862,15 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
          f64_InitialValue = f64_DEFAULT;
          s32_Return = stw_errors::C_WARN;
       }
+
+      if ((oq_MultiplexerSignal == true) &&
+          (f64_InitialValue != 0.0))
+      {
+         // Multiplexer signal restrictions
+         f64_InitialValue = 0.0;
+         orq_SignalAdapted = true;
+      }
+
       f64_InitialValuePhy = (f64_InitialValue * c_DbcSignal.factor) + c_DbcSignal.offset;
 
       // check if raw value of DBC signal are in range for data type
@@ -747,14 +886,14 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
          s32_Return = stw_errors::C_WARN;
       }
       // set available initial value
-      C_SdNdeDataPoolContentUtil::h_SetValueInContent(f64_InitialValue, c_InitialValue);
+      C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_InitialValue, c_InitialValue);
       // set value in range, leave initial value if in range
-      C_SdNdeDataPoolContentUtil::E_ValueChangedTo eValueChangedTo;
-      sint32 s32_Tmp = C_SdNdeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_Element.c_MinValue,
-                                                                           orc_Element.c_MaxValue,
-                                                                           c_InitialValue,
-                                                                           eValueChangedTo,
-                                                                           C_SdNdeDataPoolContentUtil::eLEAVE_VALUE);
+      C_OSCNodeDataPoolContentUtil::E_ValueChangedTo eValueChangedTo;
+      sint32 s32_Tmp = C_OSCNodeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_Element.c_MinValue,
+                                                                             orc_Element.c_MaxValue,
+                                                                             c_InitialValue,
+                                                                             eValueChangedTo,
+                                                                             C_OSCNodeDataPoolContentUtil::eLEAVE_VALUE);
       if (s32_Tmp == stw_errors::C_RANGE)
       {
          // min and max values are interchanged
@@ -772,17 +911,17 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
       }
       else
       {
-         if (eValueChangedTo != C_SdNdeDataPoolContentUtil::eNO_CHANGE)
+         if (eValueChangedTo != C_OSCNodeDataPoolContentUtil::eNO_CHANGE)
          {
             // value was out of range, take closer min or max value
             s32_Return = stw_errors::C_WARN;
             C_SCLString c_PlaceholderMinMax;
-            if (eValueChangedTo == C_SdNdeDataPoolContentUtil::eMIN)
+            if (eValueChangedTo == C_OSCNodeDataPoolContentUtil::eMIN)
             {
                c_PlaceholderMinMax = "minimum";
                f64_InitialValue = f64_MinValue; // set value for later datatype range check
             }
-            else if (eValueChangedTo == C_SdNdeDataPoolContentUtil::eMAX)
+            else if (eValueChangedTo == C_OSCNodeDataPoolContentUtil::eMAX)
             {
                c_PlaceholderMinMax = "maximum";
                f64_InitialValue = f64_MaxValue; // set value for later datatype range check
@@ -809,15 +948,26 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
       // Hint: No range check for global or default initial raw value datatype of DBC signal
       //       because range conflicts can happen very often in dependence of DBC file.
 
-      // set initial value to default
-      C_SdNdeDataPoolContentUtil::h_SetValueInContent(f64_DEFAULT, c_InitialValue);
+      if (oq_MultiplexerSignal == false)
+      {
+         // set initial value to default
+         C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_DEFAULT, c_InitialValue);
+      }
+      else
+      {
+         // Multiplexer signal -> restriction to zero but no warning due to no real change
+         // set initial value to zero
+         C_OSCNodeDataPoolContentUtil::h_SetValueInContent(0.0, c_InitialValue);
+         f64_InitialValue = 0.0;
+      }
+
       // set value in range, leave default initial value if in range
-      C_SdNdeDataPoolContentUtil::E_ValueChangedTo eValueChangedTo;
-      sint32 s32_Tmp = C_SdNdeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_Element.c_MinValue,
-                                                                           orc_Element.c_MaxValue,
-                                                                           c_InitialValue,
-                                                                           eValueChangedTo,
-                                                                           C_SdNdeDataPoolContentUtil::eLEAVE_VALUE);
+      C_OSCNodeDataPoolContentUtil::E_ValueChangedTo eValueChangedTo;
+      sint32 s32_Tmp = C_OSCNodeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_Element.c_MinValue,
+                                                                             orc_Element.c_MaxValue,
+                                                                             c_InitialValue,
+                                                                             eValueChangedTo,
+                                                                             C_OSCNodeDataPoolContentUtil::eLEAVE_VALUE);
       if (s32_Tmp == stw_errors::C_RANGE)
       {
          // min and max values are interchanged
@@ -835,7 +985,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
       }
       else
       {
-         if (eValueChangedTo == C_SdNdeDataPoolContentUtil::eNO_CHANGE)
+         if (eValueChangedTo == C_OSCNodeDataPoolContentUtil::eNO_CHANGE)
          {
             f64_InitialValuePhy = (f64_InitialValue * c_DbcSignal.factor) + c_DbcSignal.offset;
             if (mhq_DefaultValueDefined == false) // true is standard case; if false, then openSYDE default value is
@@ -855,7 +1005,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
             // initial value was not in min and max range, took closer min or max value
             C_SCLString c_PlaceholderMinMax;
             C_SCLString c_PlaceholderValue;
-            if (eValueChangedTo == C_SdNdeDataPoolContentUtil::eMIN)
+            if (eValueChangedTo == C_OSCNodeDataPoolContentUtil::eMIN)
             {
                c_PlaceholderMinMax = "minimum";
                c_PlaceholderValue = C_SCLString(QString::number(f64_MinValuePhy).toStdString().c_str());
@@ -894,6 +1044,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
          }
       }
    }
+
    // check if raw value of DBC signal are in range for data type after it was set automatically
    if (mh_CheckRange(f64_InitialValue, e_CurrentType) != stw_errors::C_NO_ERR)
    {

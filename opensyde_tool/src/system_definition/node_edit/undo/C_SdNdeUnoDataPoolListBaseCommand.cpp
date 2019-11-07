@@ -43,7 +43,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListBaseCommand::C_SdNdeUnoDataPoolListBaseCommand(const uint32 & oru32_NodeIndex,
                                                                      const uint32 & oru32_DataPoolIndex,
-                                                                     stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget, const QString & orc_Text,
+                                                                     stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget, const QString & orc_Text,
                                                                      QUndoCommand * const opc_Parent) :
    QUndoCommand(orc_Text, opc_Parent),
    mu32_NodeIndex(oru32_NodeIndex),

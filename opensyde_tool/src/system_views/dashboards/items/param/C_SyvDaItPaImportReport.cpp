@@ -16,9 +16,9 @@
 #include "constants.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
-#include "C_SdNdeDataPoolUtil.h"
+#include "C_SdNdeDpUtil.h"
 #include "C_SyvDaItPaImportReport.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "ui_C_SyvDaItPaImportReport.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -423,7 +423,7 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
                               if (pc_Element->c_Name == rc_Element.c_Name)
                               {
                                  QString c_Value;
-                                 C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledCombinedString(rc_Element.c_NvmValue,
+                                 C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(rc_Element.c_NvmValue,
                                                                                                pc_Element->f64_Factor,
                                                                                                pc_Element->f64_Offset,
                                                                                                c_Value);
@@ -432,8 +432,8 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
                                  {
                                     const QString c_Description = QString(
                                        C_GtGetText::h_GetText("Specified type in project: %1, found type in file: %2")).
-                                                                  arg(C_SdNdeDataPoolUtil::h_ConvertContentTypeToString(
-                                                                         pc_Element->GetType())).arg(C_SdNdeDataPoolUtil::h_ConvertContentTypeToString(
+                                                                  arg(C_SdNdeDpUtil::h_ConvertContentTypeToString(
+                                                                         pc_Element->GetType())).arg(C_SdNdeDpUtil::h_ConvertContentTypeToString(
                                                                                                         rc_Element
                                                                                                         .c_NvmValue.
                                                                                                         GetType()));
@@ -481,9 +481,9 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
                                  {
                                     QString c_Min;
                                     QString c_Max;
-                                    C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledCombinedString(
+                                    C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(
                                        pc_Element->c_MinValue, pc_Element->f64_Factor, pc_Element->f64_Offset, c_Min);
-                                    C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledCombinedString(
+                                    C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(
                                        pc_Element->c_MaxValue, pc_Element->f64_Factor, pc_Element->f64_Offset, c_Max);
                                     const QString c_Description =
                                        QString(C_GtGetText::h_GetText(

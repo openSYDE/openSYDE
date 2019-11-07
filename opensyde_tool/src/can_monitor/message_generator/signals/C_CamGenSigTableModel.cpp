@@ -25,7 +25,8 @@
 #include "C_CamProHandler.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_CamGenSigTableModel.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
+#include "C_OSCNodeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -48,7 +49,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
 */
@@ -60,7 +61,7 @@ C_CamGenSigTableModel::C_CamGenSigTableModel(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle signal reload on external trigger
+/*! \brief  Handle signal reload on external trigger
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableModel::TriggerSignalReload(void)
@@ -70,7 +71,7 @@ void C_CamGenSigTableModel::TriggerSignalReload(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set current message index
+/*! \brief  Set current message index
 
    \param[in] ou32_Message Message index
 */
@@ -93,7 +94,7 @@ void C_CamGenSigTableModel::SetMessage(const uint32 ou32_Message)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update the message DLC
+/*! \brief  Update the message DLC
 
    \param[in] ou32_MessageIndex Message index
 */
@@ -108,7 +109,7 @@ void C_CamGenSigTableModel::UpdateMessageDLC(const uint32 ou32_MessageIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get header data
+/*! \brief  Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -159,7 +160,7 @@ QVariant C_CamGenSigTableModel::headerData(const sintn osn_Section, const Qt::Or
             c_Retval = C_GtGetText::h_GetText("CAN message signal name");
             break;
          case eBIT_POS:
-            c_Retval = C_GtGetText::h_GetText("CAN message signal bit position");
+            c_Retval = C_GtGetText::h_GetText("CAN message signal start bit position");
             break;
          case eRAW:
             c_Retval = C_GtGetText::h_GetText("CAN message signal raw value (= as seen on CAN)");
@@ -181,7 +182,7 @@ QVariant C_CamGenSigTableModel::headerData(const sintn osn_Section, const Qt::Or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get table column count
+/*! \brief  Get table column count
 
    \param[in] orc_Parent Parent
 
@@ -208,7 +209,7 @@ sintn C_CamGenSigTableModel::columnCount(const QModelIndex & orc_Parent) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get table row count
+/*! \brief  Get table row count
 
    Compare with file header description.
 
@@ -277,7 +278,7 @@ sintn C_CamGenSigTableModel::rowCount(const QModelIndex & orc_Parent) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data at index
+/*! \brief  Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
@@ -329,9 +330,15 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                   {
                   case eNAME:
                      pc_OsySignalCommon = m_GetSignalInterpretedOsyCommon(u32_Index);
-                     if (pc_OsySignalCommon != NULL)
+                     pc_OsySignal = m_GetSignalInterpretedOsy(u32_Index);
+                     if ((pc_OsySignalCommon != NULL) && (pc_OsySignal != NULL))
                      {
-                        c_Retval = pc_OsySignalCommon->c_Name.c_str();
+                        QString c_Name = pc_OsySignalCommon->c_Name.c_str();
+                        if (pc_OsySignal->e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+                        {
+                           c_Name = QString("%1 (Multiplexer)").arg(c_Name);
+                        }
+                        c_Retval = c_Name;
                      }
                      else
                      {
@@ -339,7 +346,12 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                            m_GetSignalInterpretedDbc(u32_Index);
                         if (pc_DbcSignal != NULL)
                         {
-                           c_Retval = pc_DbcSignal->c_Element.c_Name.c_str();
+                           QString c_Name = pc_DbcSignal->c_Element.c_Name.c_str();
+                           if (pc_DbcSignal->e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+                           {
+                              c_Name = QString("%1 (Multiplexer)").arg(c_Name);
+                           }
+                           c_Retval = c_Name;
                         }
                         else
                         {
@@ -584,7 +596,7 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set data at index
+/*! \brief  Set data at index
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
@@ -685,8 +697,8 @@ bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVarian
                   f64_Offset = 0.0;
                }
                //Convert to content (unscaled)
-               C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(orc_Value, c_Value, f64_Factor,
-                                                                                   f64_Offset, 0UL);
+               C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_Value, c_Value, f64_Factor,
+                                                                             f64_Offset, 0UL);
             }
 
             //Convert to one format
@@ -804,7 +816,7 @@ bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVarian
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get flags for item
+/*! \brief  Get flags for item
 
    \param[in] orc_Index Item
 
@@ -872,7 +884,7 @@ Qt::ItemFlags C_CamGenSigTableModel::flags(const QModelIndex & orc_Index) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Column to enum conversion
+/*! \brief  Column to enum conversion
 
    \param[in] os32_Column Column
 
@@ -908,7 +920,7 @@ C_CamGenSigTableModel::E_Columns C_CamGenSigTableModel::h_ColumnToEnum(const sin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Enum to column conversion
+/*! \brief  Enum to column conversion
 
    \param[in] oe_Value Enum value
 
@@ -943,7 +955,7 @@ sint32 C_CamGenSigTableModel::h_EnumToColumn(const C_CamGenSigTableModel::E_Colu
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if message in interpreted display mode
+/*! \brief  Check if message in interpreted display mode
 
    \return
    True  Interpreted display mode
@@ -972,7 +984,7 @@ bool C_CamGenSigTableModel::m_CheckInterpretedMode(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get  interpreted OSY message
+/*! \brief  Get  interpreted OSY message
 
    \return
    Interpreted OSY message
@@ -993,7 +1005,7 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamGenSigTableModel::m_GetMessageIn
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get interpreted OSY signal
+/*! \brief  Get interpreted OSY signal
 
    \param[in] ou32_Index Signal index
 
@@ -1016,7 +1028,7 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get list for interpreted OSY list
+/*! \brief  Get list for interpreted OSY list
 
    \return
    List for interpreted OSY list
@@ -1037,7 +1049,7 @@ const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamGenSigTableModel::m_GetMes
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get interpreted OSY signal common part
+/*! \brief  Get interpreted OSY signal common part
 
    \param[in] ou32_Index Signal index
 
@@ -1061,7 +1073,7 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get interpreted DBC message
+/*! \brief  Get interpreted DBC message
 
    \return
    Interpreted DBC message
@@ -1082,7 +1094,7 @@ const C_CieConverter::C_CIECanMessage * C_CamGenSigTableModel::m_GetMessageInter
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get interpreted DBC signal
+/*! \brief  Get interpreted DBC signal
 
    \param[in] ou32_Index Signal index
 
@@ -1104,7 +1116,7 @@ const C_CieConverter::C_CIECanSignal * C_CamGenSigTableModel::m_GetSignalInterpr
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Decode raw value into C_OSCNodeDataPoolContent
+/*! \brief  Decode raw value into C_OSCNodeDataPoolContent
 
    Based on: DBC
 
@@ -1127,7 +1139,7 @@ C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_DecodeRawToContentDbc(const s
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if a checkbox is possible for the raw value
+/*! \brief  Check if a checkbox is possible for the raw value
 
    \param[in] orc_Min Minimum value
    \param[in] orc_Max Maximum value
@@ -1151,8 +1163,8 @@ bool C_CamGenSigTableModel::m_CheckUseCheckBox(const C_OSCNodeDataPoolContent & 
       //Check exact min and max values
       uint64 u64_Min;
       uint64 u64_Max;
-      C_SdNdeDataPoolContentUtil::h_GetAnyValueAsUint64(orc_Min, u64_Min, 0UL);
-      C_SdNdeDataPoolContentUtil::h_GetAnyValueAsUint64(orc_Max, u64_Max, 0UL);
+      C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(orc_Min, u64_Min, 0UL);
+      C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(orc_Max, u64_Max, 0UL);
       if ((u64_Min == 0ULL) && (u64_Max == 1ULL))
       {
          q_Retval = true;
@@ -1162,7 +1174,7 @@ bool C_CamGenSigTableModel::m_CheckUseCheckBox(const C_OSCNodeDataPoolContent & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle all requests for column "Raw" in interpreted mode
+/*! \brief  Handle all requests for column "Raw" in interpreted mode
 
    \param[in] ou32_Index Row index
    \param[in] osn_Role   Requested role type
@@ -1207,13 +1219,13 @@ QVariant C_CamGenSigTableModel::m_HandleColRawInterpreted(const uint32 ou32_Inde
                if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
                {
                   QString c_DisplayValue;
-                  C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(c_ConvertedContent, 1.0, 0.0,
-                                                                       c_DisplayValue, 0UL);
+                  C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_ConvertedContent, 1.0, 0.0,
+                                                                 c_DisplayValue, 0UL);
                   c_Retval = c_DisplayValue;
                }
                else
                {
-                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(c_ConvertedContent, 0UL);
+                  c_Retval = C_SdNdeDpContentUtil::h_ConvertContentToGeneric(c_ConvertedContent, 0UL);
                }
             }
          }
@@ -1244,14 +1256,14 @@ QVariant C_CamGenSigTableModel::m_HandleColRawInterpreted(const uint32 ou32_Inde
                   if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
                   {
                      QString c_DisplayValue;
-                     C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(c_ConvertedContent, 1.0, 0.0, c_DisplayValue,
-                                                                          0UL);
+                     C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_ConvertedContent, 1.0, 0.0, c_DisplayValue,
+                                                                    0UL);
                      c_Retval = c_DisplayValue;
                   }
                   else
                   {
-                     c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent, 1.0,
-                                                                                            0.0, 0UL);
+                     c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent, 1.0,
+                                                                                      0.0, 0UL);
                   }
                }
             }
@@ -1351,10 +1363,10 @@ QVariant C_CamGenSigTableModel::m_HandleColRawInterpreted(const uint32 ou32_Inde
             //Generic spin box parameters
             QStringList c_List;
             //Min
-            QString c_Tmp = C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(c_Min);
+            QString c_Tmp = C_SdNdeDpContentUtil::h_GetAllContentAsString(c_Min);
             c_List.push_back(c_Tmp);
             //Max
-            c_Tmp = C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(c_Max);
+            c_Tmp = C_SdNdeDpContentUtil::h_GetAllContentAsString(c_Max);
             c_List.push_back(c_Tmp);
             //Factor
             c_Tmp = QString::number(1.0);
@@ -1384,10 +1396,10 @@ QVariant C_CamGenSigTableModel::m_HandleColRawInterpreted(const uint32 ou32_Inde
                //Generic spin box parameters
                QStringList c_List;
                //Min
-               QString c_Tmp = C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(c_Min);
+               QString c_Tmp = C_SdNdeDpContentUtil::h_GetAllContentAsString(c_Min);
                c_List.push_back(c_Tmp);
                //Max
-               c_Tmp = C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(c_Max);
+               c_Tmp = C_SdNdeDpContentUtil::h_GetAllContentAsString(c_Max);
                c_List.push_back(c_Tmp);
                //Factor
                c_Tmp = QString::number(1.0);
@@ -1405,7 +1417,7 @@ QVariant C_CamGenSigTableModel::m_HandleColRawInterpreted(const uint32 ou32_Inde
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle all requests for column "Physical" in interpreted mode
+/*! \brief  Handle all requests for column "Physical" in interpreted mode
 
    \param[in] ou32_Index Row index
    \param[in] osn_Role   Requested role type
@@ -1440,18 +1452,18 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
                if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
                {
                   QString c_DisplayValue;
-                  C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(c_ConvertedContent,
-                                                                       pc_OsySignalCommon->f64_Factor,
-                                                                       pc_OsySignalCommon->f64_Offset,
-                                                                       c_DisplayValue, 0UL);
+                  C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_ConvertedContent,
+                                                                 pc_OsySignalCommon->f64_Factor,
+                                                                 pc_OsySignalCommon->f64_Offset,
+                                                                 c_DisplayValue, 0UL);
                   c_Retval = c_DisplayValue;
                }
                else
                {
-                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent,
-                                                                                         pc_OsySignalCommon->f64_Factor,
-                                                                                         pc_OsySignalCommon->f64_Offset,
-                                                                                         0UL);
+                  c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent,
+                                                                                   pc_OsySignalCommon->f64_Factor,
+                                                                                   pc_OsySignalCommon->f64_Offset,
+                                                                                   0UL);
                }
             }
          }
@@ -1473,10 +1485,10 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
                if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
                {
                   QString c_DisplayValue;
-                  C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(c_ConvertedContent,
-                                                                       pc_DbcSignal->c_Element.f64_Factor,
-                                                                       pc_DbcSignal->c_Element.f64_Offset,
-                                                                       c_DisplayValue, 0UL);
+                  C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_ConvertedContent,
+                                                                 pc_DbcSignal->c_Element.f64_Factor,
+                                                                 pc_DbcSignal->c_Element.f64_Offset,
+                                                                 c_DisplayValue, 0UL);
                   c_Retval = c_DisplayValue;
                }
                else
@@ -1484,15 +1496,15 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
                   //Value table needs raw value
                   if (pc_DbcSignal->c_ValueDescription.size() > 0UL)
                   {
-                     c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent, 1.0,
-                                                                                            0.0, 0UL);
+                     c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent, 1.0,
+                                                                                      0.0, 0UL);
                   }
                   else
                   {
-                     c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent,
-                                                                                            pc_DbcSignal->c_Element.f64_Factor,
-                                                                                            pc_DbcSignal->c_Element.f64_Offset,
-                                                                                            0UL);
+                     c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_ConvertedContent,
+                                                                                      pc_DbcSignal->c_Element.f64_Factor,
+                                                                                      pc_DbcSignal->c_Element.f64_Offset,
+                                                                                      0UL);
                   }
                }
             }
@@ -1593,10 +1605,10 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
          //Generic spin box parameters
          QStringList c_List;
          //Min
-         QString c_Tmp = C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(c_Min);
+         QString c_Tmp = C_SdNdeDpContentUtil::h_GetAllContentAsString(c_Min);
          c_List.push_back(c_Tmp);
          //Max
-         c_Tmp = C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(c_Max);
+         c_Tmp = C_SdNdeDpContentUtil::h_GetAllContentAsString(c_Max);
          c_List.push_back(c_Tmp);
          //Factor
          c_Tmp = QString::number(pc_OsySignalCommon->f64_Factor);
@@ -1619,10 +1631,10 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
             //Generic spin box parameters
             QStringList c_List;
             //Min
-            QString c_Tmp = C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(c_Min);
+            QString c_Tmp = C_SdNdeDpContentUtil::h_GetAllContentAsString(c_Min);
             c_List.push_back(c_Tmp);
             //Max
-            c_Tmp = C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(c_Max);
+            c_Tmp = C_SdNdeDpContentUtil::h_GetAllContentAsString(c_Max);
             c_List.push_back(c_Tmp);
             //Factor
             c_Tmp = QString::number(pc_DbcSignal->c_Element.f64_Factor);
@@ -1639,7 +1651,7 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility so set a boolean in a content structure
+/*! \brief  Utility so set a boolean in a content structure
 
    true -> 1
    false -> 0
@@ -1756,7 +1768,7 @@ void C_CamGenSigTableModel::mh_SetBoolInContent(C_OSCNodeDataPoolContent & orc_V
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function to get border (min/max) values depending on current bit length
+/*! \brief  Function to get border (min/max) values depending on current bit length
 
    \param[in] orc_InitValue  Init value to use for output content type
    \param[in] ou16_BitLength Signal bit length (only supported up to 64 bit)
@@ -1776,11 +1788,11 @@ C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_GetBorderValue(const C_OSCNod
    {
       if (oq_IsMin)
       {
-         C_SdNdeDataPoolContentUtil::h_InitMin(c_Retval);
+         C_SdNdeDpContentUtil::h_InitMin(c_Retval);
       }
       else
       {
-         C_SdNdeDataPoolContentUtil::h_InitMax(c_Retval);
+         C_SdNdeDpContentUtil::h_InitMax(c_Retval);
       }
       //Error handling
       osc_write_log_warning("Message signal edit", "Signals over 64 bit are not supported");
@@ -1972,7 +1984,7 @@ C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_GetBorderValue(const C_OSCNod
             }
          }
          //Apply value
-         C_SdNdeDataPoolContentUtil::h_SetValueInContent(f64_Base, c_Retval, 0UL);
+         C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_Base, c_Retval, 0UL);
          break;
       }
    }
@@ -1981,7 +1993,7 @@ C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_GetBorderValue(const C_OSCNod
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get maximum value for an unsigned variable with the specified number of bits
+/*! \brief  Get maximum value for an unsigned variable with the specified number of bits
 
    \param[in] ou16_Bit Number of bits for variable (only supported up to 64 bit)
 
@@ -2086,7 +2098,7 @@ uint16 C_CamGenSigTableModel::m_GetMultiplexerValue(const C_OSCCanMessage * cons
                   const C_OSCNodeDataPoolContent c_ConvertedContent =
                      C_CamGenSigUtil::h_DecodeRawToContentSignal(
                         c_RawData, rc_Sig, pc_OsySignalCommon->c_MinValue);
-                  C_SdNdeDataPoolContentUtil::h_GetAnyValueAsSint64(c_ConvertedContent, s64_Tmp, 0UL);
+                  C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(c_ConvertedContent, s64_Tmp, 0UL);
                   u16_Retval = static_cast<sint32>(s64_Tmp);
                }
                break;
@@ -2103,7 +2115,7 @@ uint16 C_CamGenSigTableModel::m_GetMultiplexerValue(const C_OSCCanMessage * cons
                sint64 s64_Tmp;
                const C_OSCNodeDataPoolContent c_ConvertedContent = C_CamGenSigTableModel::mh_DecodeRawToContentDbc(
                   c_RawData, rc_Sig);
-               C_SdNdeDataPoolContentUtil::h_GetAnyValueAsSint64(c_ConvertedContent, s64_Tmp, 0UL);
+               C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(c_ConvertedContent, s64_Tmp, 0UL);
                u16_Retval = static_cast<sint32>(s64_Tmp);
                break;
             }
@@ -2259,7 +2271,7 @@ uint32 C_CamGenSigTableModel::m_TranslateRowToIndex(const sint32 os32_Row) const
 
    \param[in] opc_OsyMessage OSY message
    \param[in] opc_DbcMessage DBC message
-   \param[in] os32_MuxValue  Current mux value
+   \param[in] ou16_MuxValue  Mux value
 
    \return
    Start bit locations for the current mux value

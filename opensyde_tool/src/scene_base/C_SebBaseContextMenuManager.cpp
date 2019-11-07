@@ -38,7 +38,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager::C_SebBaseContextMenuManager() :
@@ -122,7 +122,7 @@ C_SebBaseContextMenuManager::C_SebBaseContextMenuManager() :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -133,11 +133,11 @@ C_SebBaseContextMenuManager::~C_SebBaseContextMenuManager()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handles a context menu event and shows the context menu with the necessary actions
+/*! \brief  Handles a context menu event and shows the context menu with the necessary actions
 
-   \param[in]     opc_Event            Event identification and information
-   \param[in]     orc_SelectedItems    All selected and for the context menu relevant items
-   \param[in]     orq_ShowPaste        Indicator if paste functionality is available
+   \param[in] opc_Event         Event identification and information
+   \param[in] orc_SelectedItems All selected and for the context menu relevant items
+   \param[in] orq_ShowPaste     Indicator if paste functionality is available
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event,
@@ -322,7 +322,7 @@ void C_SebBaseContextMenuManager::m_RemoveBendLine(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Align left
+/*! \brief  Align left
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignLeft(void)
@@ -331,7 +331,7 @@ void C_SebBaseContextMenuManager::m_AlignLeft(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Align horizontal center
+/*! \brief  Align horizontal center
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignHorizontalCenter(void)
@@ -340,7 +340,7 @@ void C_SebBaseContextMenuManager::m_AlignHorizontalCenter(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Align right
+/*! \brief  Align right
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignRight(void)
@@ -349,7 +349,7 @@ void C_SebBaseContextMenuManager::m_AlignRight(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Align top
+/*! \brief  Align top
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignTop(void)
@@ -358,7 +358,7 @@ void C_SebBaseContextMenuManager::m_AlignTop(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Align vertical center
+/*! \brief  Align vertical center
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignVerticalCenter(void)
@@ -367,7 +367,7 @@ void C_SebBaseContextMenuManager::m_AlignVerticalCenter(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Align bottom
+/*! \brief  Align bottom
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignBottom(void)

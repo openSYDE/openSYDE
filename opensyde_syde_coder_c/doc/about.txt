@@ -14,3 +14,7 @@ MS Windows 7 and 10
 Usage:
 ======
 Call the binary without any parameters or with "-h" to print the available command line parameters to the console.
+
+Help:
+=====
+See openSYDE user manual (section SYDE coder C) for further information.

@@ -44,7 +44,7 @@ public:
    void SetTSPPath(const QString & orc_New);
    stw_types::uint32 GetTSPApplicationCount(void) const;
    void AddSelectedProject(const stw_types::uint32 ou32_TSPIndex,
-                           stw_opensyde_core::C_OSCNodeApplication & orc_Application) const;
+                           stw_opensyde_core::C_OSCNodeApplication & orc_Application, QString & orc_Warnings) const;
    void HandleCodeGenerationConfig(void) const;
 
 protected:

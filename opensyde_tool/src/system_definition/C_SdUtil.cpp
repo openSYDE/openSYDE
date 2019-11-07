@@ -30,8 +30,8 @@
 #include "C_GtGetText.h"
 #include "C_SdTooltipUtil.h"
 #include "C_OgeWiCustomMessage.h"
-#include "C_SdNdeDataPoolContentUtil.h"
-#include "C_SdNdeDataPoolUtil.h"
+#include "C_SdNdeDpContentUtil.h"
+#include "C_SdNdeDpUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -68,6 +68,8 @@ C_SdUtil::C_SdUtil(void)
    \param[in]  orc_NodeIndices      Node indices (match with interface indices expected)
    \param[in]  orc_InterfaceIndices Interface indices (match with node indices expected)
    \param[out] orc_Names            Generate node & interface names
+   \param[in]  opc_DatapoolIndices  Optional pointer to Datapool indices (match with node indices expected)
+   \param[out] opc_DatapoolNames    Optional pointer to found Datapool names
 
    \return
    C_NO_ERR Operation success
@@ -75,7 +77,9 @@ C_SdUtil::C_SdUtil(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
-                            const std::vector<uint32> & orc_InterfaceIndices, std::vector<QString> & orc_Names)
+                            const std::vector<uint32> & orc_InterfaceIndices, std::vector<QString> & orc_Names,
+                            const std::vector<uint32> * const opc_DatapoolIndices,
+                            std::vector<QString> * const opc_DatapoolNames)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -90,10 +94,20 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
       {
          for (uint32 u32_NodeCounter = 0U; u32_NodeCounter < (orc_NodeIndices.size() - 1UL); ++u32_NodeCounter)
          {
-            const uint32 u32_NextElement = u32_NodeCounter + 1U;
-            if (orc_NodeIndices[u32_NodeCounter] == orc_NodeIndices[u32_NextElement])
+            for (uint32 u32_NextNodeCounter = u32_NodeCounter + 1U;
+                 u32_NextNodeCounter < (orc_NodeIndices.size());
+                 ++u32_NextNodeCounter)
             {
-               c_SetNodesWithMultipleItf.insert(orc_NodeIndices[u32_NodeCounter]);
+               // Check for same node index but different interface index
+               // The Datapool index is not relevant for this comparison, but can cause multiple
+               // entries with same node index and interface index, so iterating through all entries
+               if ((orc_NodeIndices[u32_NodeCounter] == orc_NodeIndices[u32_NextNodeCounter]) &&
+                   (orc_InterfaceIndices[u32_NodeCounter] != orc_InterfaceIndices[u32_NextNodeCounter]))
+               {
+                  c_SetNodesWithMultipleItf.insert(orc_NodeIndices[u32_NodeCounter]);
+                  // Node index found, check next node
+                  break;
+               }
             }
          }
       }
@@ -111,6 +125,19 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
             s32_Retval = h_GetName(orc_NodeIndices[u32_NodeCounter], c_TmpName);
          }
          orc_Names.push_back(c_TmpName);
+
+         if ((opc_DatapoolIndices != NULL) && (opc_DatapoolNames != NULL) &&
+             (orc_NodeIndices.size() == opc_DatapoolIndices->size()))
+         {
+            // Get the matching Datapool name
+            const C_OSCNodeDataPool * const pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+               orc_NodeIndices[u32_NodeCounter], (*opc_DatapoolIndices)[u32_NodeCounter]);
+
+            if (pc_Dp != NULL)
+            {
+               opc_DatapoolNames->push_back(pc_Dp->c_Name.c_str());
+            }
+         }
       }
    }
    else
@@ -764,7 +791,7 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message,  cons
                              orc_Message.u32_CanId, 0, 16).arg(
                              mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX, 0, 16).arg(
                              mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN, 0, 16));
-         orc_Message.u32_CanId = 0x7FF;
+         orc_Message.u32_CanId = mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX;
       }
       //TX method always cyclic
       if (orc_Message.e_TxMethod != C_OSCCanMessage::eTX_METHOD_CYCLIC)
@@ -997,7 +1024,6 @@ bool C_SdUtil::h_CheckNodeInterfaceConnected(const std::vector<C_OSCNodeComInter
    The total number of datapools is bounded above by mu32_NODE_DATA_POOL_MAX.
 
    \param[in]     oru32_NodeIndex         node index
-   \param[in]     ore32_DataPoolType      data pool type
    \param[in]     orq_AlreadyChecked      for pre-checking cases (true: we know that the number exceeds the maximum)
    \param[in]     opc_Parent              parent widget
 
@@ -1006,8 +1032,8 @@ bool C_SdUtil::h_CheckNodeInterfaceConnected(const std::vector<C_OSCNodeComInter
       false: total number exceeds maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const C_OSCNodeDataPool::E_Type & ore_DataPoolType,
-                                     const bool & orq_AlreadyChecked, QWidget * const opc_Parent)
+bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const bool & orq_AlreadyChecked,
+                                     QWidget * const opc_Parent)
 {
    bool q_Return = false;
 
@@ -1032,17 +1058,6 @@ bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const C_OSC
             c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
                                                    "The allowed maximum number of Datapools is %1.")).
                                         arg(mu32_NODE_DATA_POOL_MAX));
-            c_MessageBox.Execute();
-         }
-         else if ((pc_Node->c_ComProtocols.size() >= mu32_NODE_DATA_POOL_COM_MAX) &&
-                  (ore_DataPoolType == C_OSCNodeDataPool::eCOM))
-         {
-            C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
-            c_MessageBox.SetHeading(C_GtGetText::h_GetText("COMM Datapool add"));
-            c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                   "The allowed maximum number of COMM Datapools is %1.")).
-                                        arg(mu32_NODE_DATA_POOL_COM_MAX));
-            c_MessageBox.SetDetails(C_GtGetText::h_GetText("There is maximum one Datapool per CAN protocol allowed."));
             c_MessageBox.Execute();
          }
          else
@@ -1374,7 +1389,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
          c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Value type: "));
          if (pc_UIElement->q_InterpretAsString == false)
          {
-            c_ToolTipContent.append(C_SdNdeDataPoolUtil::h_ConvertContentTypeToString(
+            c_ToolTipContent.append(C_SdNdeDpUtil::h_ConvertContentTypeToString(
                                        pc_DpListElement->c_Value.GetType()));
          }
          else
@@ -1412,9 +1427,9 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
 
             // min
             c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Min: "));
-            C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_MinValue,
-                                                                  pc_DpListElement->f64_Factor,
-                                                                  pc_DpListElement->f64_Offset, c_HelpVector);
+            C_SdNdeDpContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_MinValue,
+                                                            pc_DpListElement->f64_Factor,
+                                                            pc_DpListElement->f64_Offset, c_HelpVector);
             c_HelpString = "";
             for (uint32 u32_Pos = 0; u32_Pos < c_HelpVector.size(); u32_Pos++)
             {
@@ -1433,9 +1448,9 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
             // max
             c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Max: "));
             c_HelpVector.clear();
-            C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_MaxValue,
-                                                                  pc_DpListElement->f64_Factor,
-                                                                  pc_DpListElement->f64_Offset, c_HelpVector);
+            C_SdNdeDpContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_MaxValue,
+                                                            pc_DpListElement->f64_Factor,
+                                                            pc_DpListElement->f64_Offset, c_HelpVector);
             c_HelpString = "";
             for (uint32 u32_Pos = 0; u32_Pos < c_HelpVector.size(); u32_Pos++)
             {
@@ -1480,9 +1495,9 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
                c_ToolTipContent.append(pc_DpList->c_DataSets[u32_PosDataset].c_Name.c_str());
                c_ToolTipContent.append(": ");
                c_HelpVector.clear();
-               C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_DataSetValues[u32_PosDataset],
-                                                                     pc_DpListElement->f64_Factor,
-                                                                     pc_DpListElement->f64_Offset, c_HelpVector);
+               C_SdNdeDpContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_DataSetValues[u32_PosDataset],
+                                                               pc_DpListElement->f64_Factor,
+                                                               pc_DpListElement->f64_Offset, c_HelpVector);
                c_HelpString = "";
                for (uint32 u32_PosArray = 0; u32_PosArray < c_HelpVector.size(); u32_PosArray++)
                {
@@ -1497,7 +1512,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
 
          // access
          c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Access: "));
-         c_ToolTipContent.append(C_SdNdeDataPoolUtil::h_ConvertElementAccessToString(pc_DpListElement->e_Access));
+         c_ToolTipContent.append(C_SdNdeDpUtil::h_ConvertElementAccessToString(pc_DpListElement->e_Access));
          c_ToolTipContent.append("\n");
 
          // case NVM

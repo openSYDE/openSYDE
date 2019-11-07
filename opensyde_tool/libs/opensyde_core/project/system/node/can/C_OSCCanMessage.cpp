@@ -97,6 +97,7 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
 {
    bool q_Retval;
    bool q_LayoutConflict;
+   bool q_BorderConflict;
    bool q_NameConflict;
    bool q_NoMultiplexerButMultiplexed;
    bool q_MultiplexedValueOutOfRange;
@@ -108,7 +109,6 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
 
    if (c_It == hc_PreviousResults.end())
    {
-      bool q_BorderConflict;
       bool q_NameInvalid;
       bool q_MinOverMax;
       bool q_ValueBelowMin;
@@ -131,8 +131,10 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
          q_Retval = true;
       }
       //Append for possible reusing this result (without conflict checks)
-      if (((((q_BorderConflict == false) && (q_NameInvalid == false)) && (q_MinOverMax == false)) &&
-           (q_ValueBelowMin == false)) && (q_ValueOverMax == false))
+      if ((q_NameInvalid == false) &&
+          (q_MinOverMax == false) &&
+          (q_ValueBelowMin == false) &&
+          (q_ValueOverMax == false))
       {
          hc_PreviousResults[c_Hashes] = false;
       }
@@ -144,11 +146,15 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
    else
    {
       //Do separate conflict checks, then reuse previous non conflict value
-      this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, NULL, &q_NameConflict, NULL, NULL,
+      this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, &q_BorderConflict, &q_NameConflict,
+                                     NULL, NULL,
                                      NULL, NULL, &q_NoMultiplexerButMultiplexed, &q_MultiplexedValueOutOfRange,
                                      ou32_CANMessageValidSignalsDLCOffset);
-      if ((((q_NameConflict == true) || (q_LayoutConflict == true)) || (q_NoMultiplexerButMultiplexed == true)) ||
-          (q_MultiplexedValueOutOfRange == true))
+      if ((q_NameConflict == true) ||
+          (q_LayoutConflict == true) ||
+          (q_NoMultiplexerButMultiplexed == true) ||
+          (q_MultiplexedValueOutOfRange == true) ||
+          (q_BorderConflict == true))
       {
          q_Retval = true;
       }

@@ -22,8 +22,8 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
 #include "C_SyvDaItPaArModel.h"
-#include "C_SdNdeDataPoolUtil.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -206,7 +206,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
             {
                if (this->mq_ECUValues == true)
                {
-                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_Element->c_NvmValue,
+                  c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_Element->c_NvmValue,
                                                                                          pc_Element->f64_Factor,
                                                                                          pc_Element->f64_Offset,
                                                                                          static_cast<uint32>(orc_Index.
@@ -217,7 +217,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
                   const C_OSCNodeDataPoolContent * const pc_Data = this->GetElementData();
                   if (pc_Data != NULL)
                   {
-                     c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(*pc_Data,
+                     c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(*pc_Data,
                                                                                             pc_Element->f64_Factor,
                                                                                             pc_Element->f64_Offset,
                                                                                             static_cast<uint32>(
@@ -291,7 +291,7 @@ bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant &
                   {
                      const uint32 u32_Index = static_cast<uint32>(orc_Index.column());
                      C_OSCNodeDataPoolContent & rc_Content = c_Copy.c_ListValues[this->mu32_ElementIndex];
-                     C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(orc_Value, rc_Content,
+                     C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_Value, rc_Content,
                                                                                          pc_OSCElement->f64_Factor,
                                                                                          pc_OSCElement->f64_Offset,
                                                                                          u32_Index);

@@ -14,16 +14,15 @@
 #include "precomp_headers.h"
 
 #include <QDir>
-#include <QCompleter>
 #include <QDirModel>
 #include <QScrollBar>
-#include <QStyledItemDelegate>
 #include <QFileDialog>
 #include <QDateTime>
 
 #include "C_CamMosLoggingWidget.h"
 #include "ui_C_CamMosLoggingWidget.h"
 
+#include "C_OSCUtils.h"
 #include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
 #include "C_UsHandler.h"
@@ -38,6 +37,7 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
+
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -63,9 +63,6 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
    mpc_Ui(new Ui::C_CamMosLoggingWidget),
    mq_Online(false)
 {
-   QCompleter * pc_Completer;
-   QStyledItemDelegate * pc_ItemDelegate;
-
    this->mpc_Ui->setupUi(this);
 
    // initialize background color
@@ -106,18 +103,6 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
                              "  - Overwrite an existing file but warn before doing so.\n"
                              "  - Overwrite an existing file without warning."));
 
-   //Auto completion
-   pc_Completer = new QCompleter(this);
-   pc_Completer->setModel(new QDirModel(QStringList(), QDir::AllDirs | QDir::Drives | QDir::NoDotAndDotDot, QDir::Name,
-                                        pc_Completer));
-   //this code allows to handle the QListView::item in stylesheets
-   pc_ItemDelegate = new QStyledItemDelegate();
-
-   C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(pc_Completer->popup(), "View", "CompleterDark");
-   pc_Completer->popup()->setItemDelegate(pc_ItemDelegate);
-
-   this->mpc_Ui->pc_LeFolder->setCompleter(pc_Completer);
-
    // initialize combo boxes
    this->mpc_Ui->pc_CbxFormat->addItem("ASC");
    this->mpc_Ui->pc_CbxFormat->addItem("BLF");
@@ -133,6 +118,8 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
    // connections
    connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigExpandSection,
            this, &C_CamMosLoggingWidget::m_OnExpand);
+   connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigHide,
+           this, &C_CamMosLoggingWidget::SigHide);
    connect(this->mpc_Ui->pc_WiHeader, &C_CamOgeWiSettingSubSection::SigToggled, this,
            &C_CamMosLoggingWidget::m_OnToggled);
    connect(C_CamProHandler::h_GetInstance(), &C_CamProHandler::SigNewConfiguration,
@@ -149,8 +136,6 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_PubBrowse, &C_CamOgePubDarkBrowse::clicked, this, &C_CamMosLoggingWidget::m_OnBrowse);
    connect(this->mpc_Ui->pc_PubVariables, &C_CamOgePubPathVariables::SigVariableSelected,
            this, &C_CamMosLoggingWidget::m_InsertPathVar);
-
-   //lint -e{429}  no memory leak because of the parent of pc_Completer & pc_ItemDelegate and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -227,7 +212,7 @@ void C_CamMosLoggingWidget::OnSigLogFileAddResult(const sint32 os32_Result)
 /*! \brief   Trigger new log file location (relative to project).
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosLoggingWidget::OnSigSavedAsNew(void) const
+void C_CamMosLoggingWidget::OnSigSavedAsNew(void)
 {
    this->m_OnFolderEdited();
 }
@@ -237,6 +222,23 @@ void C_CamMosLoggingWidget::OnSigSavedAsNew(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_LoadConfig(void) const
+{
+   const C_CamProLoggingData c_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
+
+   this->m_LoadFolderConfig();
+
+   // remaining values
+   this->mpc_Ui->pc_LeFile->setText(c_LoggingData.c_FileName);
+   this->mpc_Ui->pc_CbxOverwrite->setCurrentIndex(static_cast<sintn>(c_LoggingData.e_OverwriteMode));
+   this->mpc_Ui->pc_CbxFormat->setCurrentIndex(static_cast<sintn>(c_LoggingData.e_FileFormat));
+   this->mpc_Ui->pc_WiHeader->SetToggleState(c_LoggingData.q_Enabled);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load folder configuration.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosLoggingWidget::m_LoadFolderConfig(void) const
 {
    const C_CamProLoggingData c_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
 
@@ -252,12 +254,6 @@ void C_CamMosLoggingWidget::m_LoadConfig(void) const
       this->mpc_Ui->pc_LeFolder->SetPath(c_LoggingData.c_Directory,
                                          C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
    }
-
-   // remaining values
-   this->mpc_Ui->pc_LeFile->setText(c_LoggingData.c_FileName);
-   this->mpc_Ui->pc_CbxOverwrite->setCurrentIndex(static_cast<sintn>(c_LoggingData.e_OverwriteMode));
-   this->mpc_Ui->pc_CbxFormat->setCurrentIndex(static_cast<sintn>(c_LoggingData.e_FileFormat));
-   this->mpc_Ui->pc_WiHeader->SetToggleState(c_LoggingData.q_Enabled);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -293,12 +289,58 @@ void C_CamMosLoggingWidget::m_OnToggled(const bool oq_Enabled)
 /*! \brief   Slot for folder line edit editing finished signal.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosLoggingWidget::m_OnFolderEdited(void) const
+void C_CamMosLoggingWidget::m_OnFolderEdited(void)
 {
-   const QString c_Path = this->mpc_Ui->pc_LeFolder->GetPath();
+   const QString c_Path =  this->mpc_Ui->pc_LeFolder->GetPath();
+   const QString c_ResolvedPath = C_CamUti::h_ResolvePlaceholderVariables(c_Path);
 
-   // update data handling
-   C_CamProHandler::h_GetInstance()->SetLoggingDirectory(c_Path);
+   if (stw_opensyde_core::C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == true)
+   {
+      // update data handling
+      C_CamProHandler::h_GetInstance()->SetLoggingDirectory(c_Path);
+   }
+   else
+   {
+      // Invalid name: revert and inform user
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+      const QString c_Heading = C_GtGetText::h_GetText("Logging directory");
+      const QString c_MessageText =
+         C_GtGetText::h_GetText("Invalid directory detected. For more information see details.");
+      QString c_Details;
+
+      if (c_Path.isEmpty() == false)
+      {
+         c_Details = C_GtGetText::h_GetText("The directory contains invalid characters:\n");
+         c_Details += c_Path;
+
+         if (c_Path != c_ResolvedPath)
+         {
+            c_Details += C_GtGetText::h_GetText(" (resolved: ") + c_ResolvedPath + ")";
+         }
+      }
+      else
+      {
+         c_Details = C_GtGetText::h_GetText("The path is empty.");
+      }
+
+      // disconnect to ignore editingFinished signal on focus lose because of popup
+      disconnect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeFilePath::editingFinished,
+                 this, &C_CamMosLoggingWidget::m_OnFolderEdited);
+      c_Message.SetHeading(c_Heading);
+      c_Message.SetDescription(c_MessageText);
+      c_Message.SetDetails(c_Details);
+      c_Message.Execute();
+
+      this->m_LoadFolderConfig();
+
+      if (this->mpc_Ui->pc_LeFolder->hasFocus() == true)
+      {
+         this->mpc_Ui->pc_LeFolder->UpdateText();
+      }
+
+      connect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeFilePath::editingFinished,
+              this, &C_CamMosLoggingWidget::m_OnFolderEdited);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -306,10 +348,48 @@ void C_CamMosLoggingWidget::m_OnFolderEdited(void) const
    brief   Slot for file name line edit editing finished signal.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosLoggingWidget::m_OnFileNameEdited(void) const
+void C_CamMosLoggingWidget::m_OnFileNameEdited(void)
 {
-   // update data handling
-   C_CamProHandler::h_GetInstance()->SetLoggingFileName(this->mpc_Ui->pc_LeFile->text());
+   const QString c_FileName = this->mpc_Ui->pc_LeFile->text();
+   const bool q_ValidName = stw_opensyde_core::C_OSCUtils::h_CheckValidFileName(c_FileName.toStdString().c_str());
+
+   if ((q_ValidName == true) && (c_FileName != ""))
+   {
+      // update data handling
+      C_CamProHandler::h_GetInstance()->SetLoggingFileName(c_FileName);
+   }
+   else
+   {
+      // Invalid path: revert and inform user
+      const C_CamProLoggingData c_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
+
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+      const QString c_Heading = C_GtGetText::h_GetText("Logging directory");
+      const QString c_MessageText =
+         C_GtGetText::h_GetText("Invalid file name detected. For more information see details.");
+      QString c_Details;
+
+      if (c_FileName != "")
+      {
+         c_Details = C_GtGetText::h_GetText("The file name contains invalid characters:\n");
+         c_Details += c_FileName;
+      }
+      else
+      {
+         c_Details = C_GtGetText::h_GetText("The file name is empty.");
+      }
+
+      // disconnect to ignore editingFinished signal on focus lose because of popup
+      disconnect(this->mpc_Ui->pc_LeFile, &C_OgeLeDark::editingFinished, this,
+                 &C_CamMosLoggingWidget::m_OnFileNameEdited);
+      c_Message.SetHeading(c_Heading);
+      c_Message.SetDescription(c_MessageText);
+      c_Message.SetDetails(c_Details);
+      c_Message.Execute();
+      connect(this->mpc_Ui->pc_LeFile, &C_OgeLeDark::editingFinished, this, &C_CamMosLoggingWidget::m_OnFileNameEdited);
+
+      this->mpc_Ui->pc_LeFile->setText(c_LoggingData.c_FileName);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -368,8 +448,13 @@ void C_CamMosLoggingWidget::m_OnBrowse(void)
    {
       c_Path =
          C_CamUti::h_AskUserToSaveRelativePath(this, c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
-      this->mpc_Ui->pc_LeFolder->SetPath(c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
-      m_OnFolderEdited();
+
+      // if path contains invalid characters this returned empty
+      if (c_Path.isEmpty() == false)
+      {
+         this->mpc_Ui->pc_LeFolder->SetPath(c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+         this->m_OnFolderEdited();
+      }
    }
 }
 
@@ -379,7 +464,7 @@ void C_CamMosLoggingWidget::m_OnBrowse(void)
    \param[in]       orc_Variable     path variable
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosLoggingWidget::m_InsertPathVar(const QString & orc_Variable) const
+void C_CamMosLoggingWidget::m_InsertPathVar(const QString & orc_Variable)
 {
    this->mpc_Ui->pc_LeFolder->InsertVariable(orc_Variable);
    this->m_OnFolderEdited();

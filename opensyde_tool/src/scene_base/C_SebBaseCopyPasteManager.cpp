@@ -32,7 +32,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebBaseCopyPasteManager::C_SebBaseCopyPasteManager(void) :
@@ -42,7 +42,7 @@ C_SebBaseCopyPasteManager::C_SebBaseCopyPasteManager(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebBaseCopyPasteManager::~C_SebBaseCopyPasteManager(void)
@@ -50,9 +50,12 @@ C_SebBaseCopyPasteManager::~C_SebBaseCopyPasteManager(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set new position
+/*! \brief  Get point difference
 
    \param[in] orc_Position New position
+
+   \return
+   Point difference
 */
 //----------------------------------------------------------------------------------------------------------------------
 QPointF C_SebBaseCopyPasteManager::GetDiff(const QPointF & orc_Position) const
@@ -61,7 +64,7 @@ QPointF C_SebBaseCopyPasteManager::GetDiff(const QPointF & orc_Position) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get paste counter
+/*! \brief  Get paste counter
 
    \return
    Paste counter value
@@ -73,7 +76,7 @@ uint32 C_SebBaseCopyPasteManager::GetPasteCounter(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Increment paste counter
+/*! \brief  Increment paste counter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseCopyPasteManager::IncrementPasteCounter(void)
@@ -82,7 +85,7 @@ void C_SebBaseCopyPasteManager::IncrementPasteCounter(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Evaluate all items to get top left point
+/*! \brief  Evaluate all items to get top left point
 
    \param[in] opc_Data Data
 */
@@ -124,10 +127,13 @@ void C_SebBaseCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get minimal point
+/*! \brief  Get minimal point
 
    \param[in] orc_P1 Point 1
    \param[in] orc_P2 Point 2
+
+   \return
+   Minimal point
 */
 //----------------------------------------------------------------------------------------------------------------------
 QPointF C_SebBaseCopyPasteManager::mh_Min(const QPointF & orc_P1, const QPointF & orc_P2)
@@ -136,7 +142,7 @@ QPointF C_SebBaseCopyPasteManager::mh_Min(const QPointF & orc_P1, const QPointF 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Consider this point for original position
+/*! \brief  Consider this point for original position
 
    \param[in] orc_P New point
 */

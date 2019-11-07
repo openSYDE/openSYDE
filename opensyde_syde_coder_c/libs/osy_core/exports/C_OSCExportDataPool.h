@@ -34,6 +34,7 @@ public:
 
    static void h_GetFileName(const C_OSCNodeDataPool & orc_DataPool, stw_scl::C_SCLString & orc_FileName);
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path,
+                                               const stw_types::uint16 ou16_GenCodeVersion,
                                                const C_OSCNodeDataPool & orc_DataPool,
                                                const stw_types::uint8 ou8_DataPoolIndex, const bool oq_IsRemote,
                                                const stw_types::uint8 ou8_DataPoolIndexRemote,
@@ -49,13 +50,15 @@ private:
                                                         const C_OSCNodeDataPool & orc_DataPool,
                                                         const stw_types::uint8 ou8_DataPoolIndex,
                                                         const stw_scl::C_SCLString & orc_ProjectId,
+                                                        const stw_types::uint16 ou16_GenCodeVersion,
                                                         const stw_types::uint8 ou8_DataPoolIndexRemote,
                                                         const stw_types::uint8 ou8_ProcessId, const bool oq_IsRemote);
    static stw_types::sint32 mh_CreateHeaderFile(const stw_scl::C_SCLString & orc_ExportToolInfo,
                                                 const stw_scl::C_SCLString & orc_Path,
                                                 const C_OSCNodeDataPool & orc_DataPool,
                                                 const stw_types::uint8 ou8_DataPoolIndex,
-                                                const stw_scl::C_SCLString & orc_ProjectId, const bool oq_IsRemote);
+                                                const stw_scl::C_SCLString & orc_ProjectId,
+                                                const stw_types::uint16 ou16_GenCodeVersion, const bool oq_IsRemote);
 
    static void mh_AddHeader(const stw_scl::C_SCLString & orc_ExportToolInfo, stw_scl::C_SCLStringList & orc_Data,
                             const C_OSCNodeDataPool & orc_DataPool, const bool oq_FileType);
@@ -63,11 +66,13 @@ private:
                               const bool oq_FileType);
    static void mh_AddDefines(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                              const stw_types::uint8 ou8_DataPoolIndex, const stw_scl::C_SCLString & orc_ProjectId,
-                             const bool oq_FileType, const bool oq_IsRemote);
+                             const stw_types::uint16 ou16_GenCodeVersion, const bool oq_FileType,
+                             const bool oq_IsRemote);
    static void mh_AddTypes(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                            const bool oq_FileType, const bool oq_IsRemote);
    static void mh_AddGlobalVariables(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
-                                     const bool oq_FileType, const bool oq_IsRemote);
+                                     const stw_types::uint16 ou16_GenCodeVersion, const bool oq_FileType,
+                                     const bool oq_IsRemote);
    static void mh_AddFunctionPrototypes(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                         const stw_scl::C_SCLString & orc_ProjectId);
    static void mh_AddModuleGlobal(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,

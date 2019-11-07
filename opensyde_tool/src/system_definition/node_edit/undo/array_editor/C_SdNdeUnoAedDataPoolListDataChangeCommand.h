@@ -15,8 +15,8 @@
 
 #include <QVariant>
 #include <QUndoCommand>
-#include "C_SdNdeDataPoolUtil.h"
-#include "C_SdNdeDataPoolListModelViewManager.h"
+#include "C_SdNdeDpUtil.h"
+#include "C_SdNdeDpListModelViewManager.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -33,11 +33,11 @@ public:
                                               const stw_types::uint32 & oru32_DataPoolIndex,
                                               const stw_types::uint32 & oru32_ListIndex,
                                               const stw_types::uint32 & oru32_ElementIndex,
-                                              const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType,
+                                              const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
                                               const stw_types::uint32 & oru32_DataSetIndex,
                                               const stw_types::uint32 & oru32_ArrayElementIndex,
                                               const QVariant & orc_NewData,
-                                              C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                              C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
                                               QUndoCommand * const opc_Parent = NULL);
    virtual void redo(void) override;
    virtual void undo(void) override;
@@ -50,13 +50,13 @@ private:
    const stw_types::uint32 mu32_DataPoolIndex;
    const stw_types::uint32 mu32_ListIndex;
    const stw_types::uint32 mu32_ElementIndex;
-   const C_SdNdeDataPoolUtil::E_ArrayEditType me_ArrayEditType;
+   const C_SdNdeDpUtil::E_ArrayEditType me_ArrayEditType;
    const stw_types::uint32 mu32_DataSetIndex;
    const stw_types::uint32 mu32_ItemIndex;
-   C_SdNdeDataPoolListModelViewManager * const mpc_DataPoolListModelViewManager;
+   C_SdNdeDpListModelViewManager * const mpc_DataPoolListModelViewManager;
 
    void m_Change(QVariant & orc_PreviousData, const QVariant & orc_NewData);
-   C_SdNdeDataPoolUtil::E_ElementDataChangeType m_ConvertToChangeType(void) const;
+   C_SdNdeDpUtil::E_ElementDataChangeType m_ConvertToChangeType(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

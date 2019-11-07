@@ -57,6 +57,7 @@ Q_SIGNALS:
    void SigRemoveDatabase(const QString & orc_Path, const bool oq_IsUpdate);
    void SigActivateDatabase(const QString & orc_Path, const bool oq_Active);
    void SigSetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const stw_types::uint32 ou32_BusIndex);
+   void SigHide(void);
 
 private:
    Ui::C_CamMosDatabaseWidget * mpc_Ui;

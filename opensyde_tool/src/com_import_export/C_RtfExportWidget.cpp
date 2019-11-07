@@ -175,34 +175,37 @@ sint32 C_RtfExportWidget::GetRtfPath(C_SCLString & orc_RtfPath) const
    // get full RTF path of widget Ui
    orc_RtfPath = C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
 
-   // check if directory exists
-   if (TGL_DirectoryExists(TGL_ExtractFilePath(orc_RtfPath)) == true)
+   // check if path fulfills our path requirements
+   if (C_OSCUtils::h_CheckValidFilePath(orc_RtfPath) == true)
    {
-      // check if file name is valid
-      C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_RtfPath);
-      if (c_FileExtAct.LowerCase() == ".rtf")
+      // check if directory exists
+      if (TGL_DirectoryExists(TGL_ExtractFilePath(orc_RtfPath)) == true)
       {
-         QFileInfo c_Info(orc_RtfPath.c_str());
-         if (C_OSCUtils::h_CheckValidCName(c_Info.baseName().toStdString().c_str(),
-                                           std::numeric_limits<uint16>::max()))
+         // check if file name is valid
+         C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_RtfPath);
+         if (c_FileExtAct.LowerCase() == ".rtf")
          {
-            if (TGL_FileExists(orc_RtfPath) == true)
+            QFileInfo c_Info(orc_RtfPath.c_str());
+            if (C_OSCUtils::h_CheckValidFileName(c_Info.baseName().toStdString().c_str()))
             {
-               s32_Return = C_WARN;
+               if (TGL_FileExists(orc_RtfPath) == true)
+               {
+                  s32_Return = C_WARN;
+               }
+               else
+               {
+                  s32_Return = C_NO_ERR;
+               }
             }
             else
             {
-               s32_Return = C_NO_ERR;
+               s32_Return = C_CHECKSUM;
             }
          }
          else
          {
-            s32_Return = C_CHECKSUM;
+            s32_Return = C_NOACT;
          }
-      }
-      else
-      {
-         s32_Return = C_NOACT;
       }
    }
 
@@ -236,7 +239,7 @@ sint32 C_RtfExportWidget::GetCompanyName(C_SCLString & orc_CompanyName) const
 
    \return
    C_NO_ERR    valid RTF file path or empty string
-   C_CONFIG    file does not exist
+   C_CONFIG    file path invalid or file  does not exist
    C_NOACT     invalid file format (not .jpg or .png)
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -247,30 +250,35 @@ sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) 
    // get company logo path
    orc_CompanyLogoPath = this->mpc_Ui->pc_EditLogoPath->GetPath().toStdString().c_str();
 
-   if (orc_CompanyLogoPath != "")
+   // check if path fulfills our path requirements
+   if (C_OSCUtils::h_CheckValidFilePath(orc_CompanyLogoPath) == true)
    {
-      // make absolute path if necessary
-      orc_CompanyLogoPath = C_PuiUtil::h_GetAbsolutePathFromProject(orc_CompanyLogoPath.c_str()).toStdString().c_str();
-
-      // check if file exists
-      if (TGL_FileExists(orc_CompanyLogoPath) == true)
+      if (orc_CompanyLogoPath != "")
       {
-         // check if file name is valid
-         C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_CompanyLogoPath);
-         if ((c_FileExtAct.LowerCase() == ".jpg") || (c_FileExtAct.LowerCase() == ".png"))
+         // make absolute path if necessary
+         orc_CompanyLogoPath =
+            C_PuiUtil::h_GetAbsolutePathFromProject(orc_CompanyLogoPath.c_str()).toStdString().c_str();
+
+         // check if file exists
+         if (TGL_FileExists(orc_CompanyLogoPath) == true)
          {
-            s32_Return = C_NO_ERR;
-         }
-         else
-         {
-            s32_Return = C_NOACT;
+            // check if file name is valid
+            C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_CompanyLogoPath);
+            if ((c_FileExtAct.LowerCase() == ".jpg") || (c_FileExtAct.LowerCase() == ".png"))
+            {
+               s32_Return = C_NO_ERR;
+            }
+            else
+            {
+               s32_Return = C_NOACT;
+            }
          }
       }
-   }
-   else
-   {
-      // optional parameter, empty string is OK
-      s32_Return = C_NO_ERR;
+      else
+      {
+         // optional parameter, empty string is OK
+         s32_Return = C_NO_ERR;
+      }
    }
 
    return s32_Return;
@@ -723,12 +731,9 @@ void C_RtfExportWidget::m_LogoPathClicked(void)
    }
 
    const QString c_FilterName = QString(C_GtGetText::h_GetText("Image file (*.jpg *.png)"));
-   const QString c_FullLogoFilePath = QFileDialog::getOpenFileName(
-      this,
-      C_GtGetText::h_GetText("Select Company Logo"),
-      c_Folder,
-      c_FilterName,
-      NULL);
+   const QString c_FullLogoFilePath =
+      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Company Logo"),
+                                     c_Folder, c_FilterName, "",  QFileDialog::DontConfirmOverwrite);
 
    if (c_FullLogoFilePath != "")
    {
@@ -802,7 +807,7 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
       }
       else if (s32_Return == stw_errors::C_CHECKSUM)
       {
-         c_Description = "File name invalid. Only alphanumeric characters and \"_\" are allowed.";
+         c_Description = "File name is invalid.";
       }
       else
       {
@@ -832,7 +837,7 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
 
          if (s32_Return == stw_errors::C_CONFIG)
          {
-            c_Description = "File path for company logo invalid.";
+            c_Description = "File path for company logo is invalid.";
          }
          else
          {

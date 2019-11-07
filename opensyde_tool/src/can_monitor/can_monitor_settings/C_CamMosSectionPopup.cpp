@@ -104,10 +104,8 @@ void C_CamMosSectionPopup::SetWidget(QWidget * const opc_Widget)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosSectionPopup::DoMove(const QPoint & orc_Pos)
 {
-   QSize c_Size = this->sizeHint();
-   QPoint c_Pos = orc_Pos + QPoint(-c_Size.width(), -41); // to align to button
+   const QSize c_Size = this->sizeHint();
+   const QPoint c_Pos = orc_Pos + QPoint(-c_Size.width(), 15); // to align to button
 
-   // use map from global of parent of button
-   c_Pos = this->parentWidget()->parentWidget()->parentWidget()->mapFromGlobal(c_Pos);
    this->setGeometry(QRect(c_Pos, c_Size));
 }

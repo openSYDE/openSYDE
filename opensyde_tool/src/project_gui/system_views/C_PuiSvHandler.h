@@ -218,6 +218,7 @@ public:
    stw_types::sint32 CheckViewReconnectNecessary(const stw_types::uint32 ou32_ViewIndex, bool & orq_ReconnectNecessary);
 
    //Misc
+   static QString h_GetNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id);
    bool CheckBusDisabled(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_BusIndex) const;
    stw_types::sint32 ClearViewDashboardParamDataPoolElements(const stw_types::uint32 ou32_ViewIndex,
                                                              const stw_types::uint32 ou32_DashboardIndex,
@@ -301,7 +302,8 @@ private:
                                                     const stw_types::uint32 ou32_ListIndex,
                                                     const stw_types::uint32 ou32_ElementIndex,
                                                     const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_Type,
-                                                    const bool oq_IsArray, const stw_types::uint32 ou32_ArraySize);
+                                                    const bool oq_IsArray, const stw_types::uint32 ou32_ArraySize,
+                                                    const bool oq_IsString);
    void m_OnSyncNodeDataPoolListElementAccessChanged(const stw_types::uint32 ou32_NodeIndex,
                                                      const stw_types::uint32 ou32_DataPoolIndex,
                                                      const stw_types::uint32 ou32_ListIndex,

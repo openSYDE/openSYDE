@@ -50,7 +50,6 @@ Q_SIGNALS:
    //lint -restore
    void SigDelete(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex);
    void SigReloadDataPools(void);
-   void SigCheckDataPoolInteraction(void);
    void SigCheckNodeId(void);
    void SigOpenDataPool(const stw_types::uint32 ou32_DataPoolIndex);
 

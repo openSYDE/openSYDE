@@ -25,7 +25,7 @@
 #include "C_SyvDaPeBase.h"
 #include "C_SyvDaPePieChart.h"
 #include "C_PuiSvDbPieChart.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -259,7 +259,7 @@ bool C_GiSvDaPieChartBase::CallProperties(void)
          {
             c_ElementId = C_PuiSvDbNodeDataPoolListElementId(0, 0, 0, 0,
                                                              C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
-                                                             false);
+                                                             false, 0UL, false);
             c_Scaling = C_PuiSvDbDataElementScaling();
          }
 
@@ -400,8 +400,9 @@ void C_GiSvDaPieChartBase::m_UpdateStaticValues(void)
                                                                     c_ID.u32_ListIndex, c_ID.u32_ElementIndex);
       if (pc_Element != NULL)
       {
-         C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(pc_Element->c_MinValue, this->mf64_UnscaledMin);
-         C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, this->mf64_UnscaledMax);
+         const uint32 u32_Index = c_ID.GetArrayElementIndexOrZero();
+         C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MinValue, this->mf64_UnscaledMin, u32_Index);
+         C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, this->mf64_UnscaledMax, u32_Index);
 
          if (this->mpc_PieChartWidget != NULL)
          {

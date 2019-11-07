@@ -176,10 +176,10 @@ void C_PuiSdNodeCanMessageSyncManager::Init(const uint32 & oru32_NodeIndex, cons
       tgl_assert(false);
       break;
    }
-   mh_Init(oru32_NodeIndex, oru32_InterfaceIndex, e_OtherProtocol1, this->mc_MessageMatchesForOtherProtocols[0], NULL,
-           NULL);
-   mh_Init(oru32_NodeIndex, oru32_InterfaceIndex, e_OtherProtocol2, this->mc_MessageMatchesForOtherProtocols[1], NULL,
-           NULL);
+   mh_Init(oru32_NodeIndex, oru32_InterfaceIndex, e_OtherProtocol1,
+           this->mc_MessageMatchesForOtherProtocols[0], NULL, NULL);
+   mh_Init(oru32_NodeIndex, oru32_InterfaceIndex, e_OtherProtocol2,
+           this->mc_MessageMatchesForOtherProtocols[1], NULL, NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -201,20 +201,28 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
    \param[in]     ore_ComProtocol      Active protocol
    \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
    \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
+   \param[out]    orc_DatapoolIndexes  Vector with all Datapool indexes which are connected to the bus and associated
+                                       to the protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::h_GetConnectedAndActiveInterfaces(const uint32 ou32_BusIndex,
-                                                                         const C_OSCCanProtocol::E_Type & ore_ComProtocol, std::vector<uint32> & orc_NodeIndexes,
-                                                                         std::vector<uint32> & orc_InterfaceIndexes)
+                                                                         const C_OSCCanProtocol::E_Type & ore_ComProtocol, std::vector<uint32> & orc_NodeIndexes, std::vector<uint32> & orc_InterfaceIndexes,
+                                                                         std::vector<uint32> & orc_DatapoolIndexes)
 {
    //Init selector widget
    orc_NodeIndexes.clear();
    orc_InterfaceIndexes.clear();
-   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex,
-                                                                                      orc_NodeIndexes,
-                                                                                      orc_InterfaceIndexes);
+   orc_DatapoolIndexes.clear();
+
+   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeAndComDpIndexesOfBus(ou32_BusIndex,
+                                                                                              ore_ComProtocol,
+                                                                                              orc_NodeIndexes,
+                                                                                              orc_InterfaceIndexes,
+                                                                                              orc_DatapoolIndexes);
+
    //Remove all not connected
-   if (orc_NodeIndexes.size() == orc_InterfaceIndexes.size())
+   if ((orc_NodeIndexes.size() == orc_InterfaceIndexes.size()) &&
+       (orc_NodeIndexes.size() == orc_DatapoolIndexes.size()))
    {
       //lint -e{850} Index modified for erase index step
       for (uint32 u32_ItNode = 0; u32_ItNode < orc_NodeIndexes.size(); ++u32_ItNode)
@@ -222,13 +230,15 @@ void C_PuiSdNodeCanMessageSyncManager::h_GetConnectedAndActiveInterfaces(const u
          const C_OSCCanMessageContainer * const pc_Container =
             C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_NodeIndexes[u32_ItNode],
                                                                             ore_ComProtocol,
-                                                                            orc_InterfaceIndexes[u32_ItNode]);
+                                                                            orc_InterfaceIndexes[u32_ItNode],
+                                                                            orc_DatapoolIndexes[u32_ItNode]);
          if (pc_Container != NULL)
          {
             if (pc_Container->q_IsComProtocolUsedByInterface == false)
             {
                orc_NodeIndexes.erase(orc_NodeIndexes.begin() + u32_ItNode);
                orc_InterfaceIndexes.erase(orc_InterfaceIndexes.begin() + u32_ItNode);
+               orc_DatapoolIndexes.erase(orc_DatapoolIndexes.begin() + u32_ItNode);
                //Same index is new node/interface
                --u32_ItNode;
             }
@@ -238,6 +248,7 @@ void C_PuiSdNodeCanMessageSyncManager::h_GetConnectedAndActiveInterfaces(const u
             //Not even a data pool available
             orc_NodeIndexes.erase(orc_NodeIndexes.begin() + u32_ItNode);
             orc_InterfaceIndexes.erase(orc_InterfaceIndexes.begin() + u32_ItNode);
+            orc_DatapoolIndexes.erase(orc_DatapoolIndexes.begin() + u32_ItNode);
             //Same index is new node/interface
             --u32_ItNode;
          }
@@ -280,7 +291,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageDirection(
 
          //Probably helps if only the matching message ID is adapted to the new type....
          if ((rc_MatchingMessage.u32_NodeIndex == orc_MessageId.u32_NodeIndex) &&
-             (rc_MatchingMessage.u32_InterfaceIndex == orc_MessageId.u32_InterfaceIndex))
+             (rc_MatchingMessage.u32_InterfaceIndex == orc_MessageId.u32_InterfaceIndex) &&
+             (rc_MatchingMessage.u32_DatapoolIndex == orc_MessageId.u32_DatapoolIndex))
          {
             s32_Retval = C_PuiSdHandler::h_GetInstance()->SetCanMessageProperties(rc_MatchingMessage,
                                                                                   orq_NewMessageIsTx, c_MessageData);
@@ -290,7 +302,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageDirection(
                const C_OSCCanMessageContainer * const pc_MatchingMessageContainer =
                   C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(rc_MatchingMessage.u32_NodeIndex,
                                                                                   rc_MatchingMessage.e_ComProtocol,
-                                                                                  rc_MatchingMessage.u32_InterfaceIndex);
+                                                                                  rc_MatchingMessage.u32_InterfaceIndex,
+                                                                                  rc_MatchingMessage.u32_DatapoolIndex);
                if (pc_MatchingMessageContainer != NULL)
                {
                   const std::vector<C_OSCCanMessage> & rc_Messages = pc_MatchingMessageContainer->GetMessagesConst(
@@ -365,6 +378,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessagePropertiesWithoutDirection
    \param[in] orc_MessageId       Message identification indices -> message
    \param[in] ou32_NodeIndex      Node index -> which receiver
    \param[in] ou32_InterfaceIndex Interface index -> which receiver
+   \param[in] ou32_DatapoolIndex  Datapool index -> which receiver
    \param[in] ou32_ReceiveTimeout Receive timeout
 
    \return
@@ -374,7 +388,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessagePropertiesWithoutDirection
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeout(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 ou32_NodeIndex,
-   const uint32 ou32_InterfaceIndex, const uint32 ou32_ReceiveTimeout) const
+   const uint32 ou32_InterfaceIndex, const uint32 ou32_DatapoolIndex, const uint32 ou32_ReceiveTimeout) const
 {
    sint32 s32_Retval = C_RANGE;
    //Get all matching Ids
@@ -387,7 +401,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeout(
    {
       const C_OSCCanMessageIdentificationIndices & rc_CurMessageId = c_MatchingMessageIds[u32_ItMessageId];
       if ((rc_CurMessageId.u32_NodeIndex == ou32_NodeIndex) &&
-          (rc_CurMessageId.u32_InterfaceIndex == ou32_InterfaceIndex))
+          (rc_CurMessageId.u32_InterfaceIndex == ou32_InterfaceIndex) &&
+          (rc_CurMessageId.u32_DatapoolIndex == ou32_DatapoolIndex))
       {
          const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_CurMessageId);
 
@@ -420,6 +435,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeout(
    \param[in] orc_MessageId            Message identification indices -> message
    \param[in] ou32_NodeIndex           Node index -> which receiver
    \param[in] ou32_InterfaceIndex      Interface index -> which receiver
+   \param[in] ou32_DatapoolIndex       Datapool index -> which receiver
    \param[in] oq_UseAutoReceiveTimeout Auto receive timeout flag
 
    \return
@@ -429,7 +445,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeout(
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeoutAutoFlag(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 ou32_NodeIndex,
-   const uint32 ou32_InterfaceIndex, const bool oq_UseAutoReceiveTimeout) const
+   const uint32 ou32_InterfaceIndex, const uint32 ou32_DatapoolIndex, const bool oq_UseAutoReceiveTimeout) const
 {
    sint32 s32_Retval = C_RANGE;
    //Get all matching Ids
@@ -442,7 +458,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeoutAutoFlag(
    {
       const C_OSCCanMessageIdentificationIndices & rc_CurMessageId = c_MatchingMessageIds[u32_ItMessageId];
       if ((rc_CurMessageId.u32_NodeIndex == ou32_NodeIndex) &&
-          (rc_CurMessageId.u32_InterfaceIndex == ou32_InterfaceIndex))
+          (rc_CurMessageId.u32_InterfaceIndex == ou32_InterfaceIndex) &&
+          (rc_CurMessageId.u32_DatapoolIndex == ou32_DatapoolIndex))
       {
          const C_PuiSdNodeCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetUiCanMessage(
             rc_CurMessageId);
@@ -450,7 +467,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeoutAutoFlag(
          if (pc_Message != NULL)
          {
             C_PuiSdNodeCanMessage c_Copy = *pc_Message;
-            //Only set timeout value
+            //Only set timeout flag
             c_Copy.q_UseAutoReceiveTimeout = oq_UseAutoReceiveTimeout;
             s32_Retval = C_PuiSdHandler::h_GetInstance()->SetUiCanMessage(rc_CurMessageId,
                                                                           c_Copy);
@@ -584,15 +601,16 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignalPosition(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add can message
 
-   \param[in] oru32_NodeIndex      Node index
-   \param[in] ore_ComType          Can protocol type
-   \param[in] oru32_InterfaceIndex Node interface index
-   \param[in] orq_MessageIsTx      Flag if message is tx type (else rx type assumed)
-   \param[in] orc_Message          Message data
-   \param[in] orc_OSCSignalCommons Signals data (osc common)
-   \param[in] orc_UISignalCommons  Signals data (ui common)
-   \param[in] orc_UISignals        Signals data (ui)
-   \param[in] oru32_MessageIndex   New message index, only valid if C_NO_ERR
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  ore_ComType          Can protocol type
+   \param[in]  oru32_InterfaceIndex Node interface index
+   \param[in]  oru32_DatapoolIndex  Datapool index
+   \param[in]  orq_MessageIsTx      Flag if message is tx type (else rx type assumed)
+   \param[in]  orc_Message          Message data
+   \param[in]  orc_OSCSignalCommons Signals data (osc common)
+   \param[in]  orc_UISignalCommons  Signals data (ui common)
+   \param[in]  orc_UISignals        Signals data (ui)
+   \param[out] oru32_MessageIndex   New message index, only valid if C_NO_ERR
 
    \return
    C_NO_ERR Operation success
@@ -602,7 +620,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignalPosition(
 sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessage(const uint32 & oru32_NodeIndex,
                                                        const C_OSCCanProtocol::E_Type & ore_ComType,
                                                        const uint32 & oru32_InterfaceIndex,
-                                                       const bool & orq_MessageIsTx,
+                                                       const uint32 & oru32_DatapoolIndex, const bool & orq_MessageIsTx,
                                                        const C_OSCCanMessage & orc_Message,
                                                        const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
                                                        uint32 & oru32_MessageIndex)
@@ -610,14 +628,13 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessage(const uint32 & oru32_Node
    sint32 s32_Retval = C_RANGE;
    const C_OSCCanMessageContainer * const pc_MessageContainer =
       C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(oru32_NodeIndex, ore_ComType,
-                                                                      oru32_InterfaceIndex);
+                                                                      oru32_InterfaceIndex, oru32_DatapoolIndex);
 
    if (pc_MessageContainer != NULL)
    {
       const std::vector<C_OSCCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(orq_MessageIsTx);
       const C_OSCCanMessageIdentificationIndices c_MessageId(oru32_NodeIndex, ore_ComType, oru32_InterfaceIndex,
-                                                             orq_MessageIsTx,
-                                                             rc_Messages.size());
+                                                             oru32_DatapoolIndex, orq_MessageIsTx, rc_Messages.size());
       s32_Retval = this->InsertCanMessage(c_MessageId, orc_Message,
                                           orc_OSCSignalCommons,
                                           orc_UISignalCommons, orc_UISignals);
@@ -693,6 +710,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanMessage(const C_OSCCanMessageI
    \param[in] orc_MessageId        Message identification indices
    \param[in] oru32_NodeIndex      New transmitter node index
    \param[in] oru32_InterfaceIndex New transmitter node interface index
+   \param[in] ou32_DatapoolIndex   New transmitter node Datapool index
 
    \return
    C_NO_ERR Operation success
@@ -701,20 +719,23 @@ sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanMessage(const C_OSCCanMessageI
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdNodeCanMessageSyncManager::ChangeCanMessageTx(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                             const uint32 & oru32_NodeIndex,
-                                                            const uint32 & oru32_InterfaceIndex)
+                                                            const uint32 & oru32_InterfaceIndex,
+                                                            const uint32 ou32_DatapoolIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
    const C_OSCCanMessageContainer * const pc_MessageContainer =
       C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(oru32_NodeIndex,
                                                                       orc_MessageId.e_ComProtocol,
-                                                                      oru32_InterfaceIndex);
+                                                                      oru32_InterfaceIndex,
+                                                                      ou32_DatapoolIndex);
 
    if (pc_MessageContainer != NULL)
    {
       const std::vector<C_OSCCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(true);
       const uint32 u32_MessageIndex = rc_Messages.size();
       const C_OSCCanMessageIdentificationIndices c_NewId(oru32_NodeIndex, orc_MessageId.e_ComProtocol,
-                                                         oru32_InterfaceIndex, true, u32_MessageIndex);
+                                                         oru32_InterfaceIndex, ou32_DatapoolIndex, true,
+                                                         u32_MessageIndex);
       const uint32 u32_MatchingMessageIdsIndex = this->m_GetMatchingMessageVectorIndex(orc_MessageId);
       C_OSCCanMessage c_Message;
 
@@ -740,22 +761,23 @@ sint32 C_PuiSdNodeCanMessageSyncManager::ChangeCanMessageTx(const C_OSCCanMessag
       tgl_assert(C_PuiSdHandler::h_GetInstance()->InsertCanMessage(c_NewId, c_Message, c_OSCSignalCommons,
                                                                    c_UISignalCommons,
                                                                    c_UISignals, false) == C_NO_ERR);
-      //Delete existing tx and matching rx
+      //Delete existing Tx and matching Rx
       //lint -e{850} Index modified for erase index step
       for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
            ++u32_ItMessageId)
       {
          bool q_Deleted = false;
          const C_OSCCanMessageIdentificationIndices & rc_MessageId = c_MatchingMessageIds[u32_ItMessageId];
-         //Other tx
+         //Other Tx
          if (rc_MessageId.q_MessageIsTx == true)
          {
             s32_Retval = m_DeleteCanMessage(rc_MessageId, false);
             q_Deleted = true;
          }
-         //Matching rx
-         else if (((rc_MessageId.u32_NodeIndex == c_NewId.u32_NodeIndex) &&
-                   (rc_MessageId.u32_InterfaceIndex == c_NewId.u32_InterfaceIndex)) &&
+         //Matching Rx
+         // All Rx variants of the node, interface and protocol with all Datapools must be removed
+         else if ((rc_MessageId.u32_NodeIndex == c_NewId.u32_NodeIndex) &&
+                  (rc_MessageId.u32_InterfaceIndex == c_NewId.u32_InterfaceIndex) &&
                   (rc_MessageId.e_ComProtocol == c_NewId.e_ComProtocol))
          {
             s32_Retval = m_DeleteCanMessage(rc_MessageId, false);
@@ -798,8 +820,9 @@ sint32 C_PuiSdNodeCanMessageSyncManager::ChangeCanMessageTx(const C_OSCCanMessag
 /*! \brief   Add can message receiver
 
    \param[in] orc_MessageId        Message identification indices
-   \param[in] oru32_NodeIndex      New receiver node index
-   \param[in] oru32_InterfaceIndex New receiver node interface index
+   \param[in] ou32_NodeIndex       New receiver node index
+   \param[in] ou32_InterfaceIndex  New receiver node interface index
+   \param[in] ou32_DatapoolIndex   Node Datapool index
 
    \return
    C_NO_ERR Operation success
@@ -807,21 +830,23 @@ sint32 C_PuiSdNodeCanMessageSyncManager::ChangeCanMessageTx(const C_OSCCanMessag
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessageRx(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                         const uint32 & oru32_NodeIndex,
-                                                         const uint32 & oru32_InterfaceIndex)
+                                                         const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
+                                                         const uint32 ou32_DatapoolIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
    const C_OSCCanMessageContainer * const pc_MessageContainer =
-      C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(oru32_NodeIndex,
+      C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(ou32_NodeIndex,
                                                                       orc_MessageId.e_ComProtocol,
-                                                                      oru32_InterfaceIndex);
+                                                                      ou32_InterfaceIndex,
+                                                                      ou32_DatapoolIndex);
 
-   if ((pc_MessageContainer != NULL) && (pc_MessageContainer->q_IsComProtocolUsedByInterface == true))
+   if (pc_MessageContainer != NULL)
    {
       const std::vector<C_OSCCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(false);
       const uint32 u32_MessageIndex = rc_Messages.size();
-      const C_OSCCanMessageIdentificationIndices c_NewId(oru32_NodeIndex, orc_MessageId.e_ComProtocol,
-                                                         oru32_InterfaceIndex, false, u32_MessageIndex);
+      const C_OSCCanMessageIdentificationIndices c_NewId(ou32_NodeIndex, orc_MessageId.e_ComProtocol,
+                                                         ou32_InterfaceIndex, ou32_DatapoolIndex, false,
+                                                         u32_MessageIndex);
       const uint32 u32_MatchingMessageIdsIndex = this->m_GetMatchingMessageVectorIndex(orc_MessageId);
       C_OSCCanMessage c_Message;
 
@@ -860,8 +885,9 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessageRx(const C_OSCCanMessageId
 /*! \brief   Delete can message receiver
 
    \param[in] orc_MessageId        Message identification indices
-   \param[in] oru32_NodeIndex      Previous receiver node index
-   \param[in] oru32_InterfaceIndex Previous receiver node interface index
+   \param[in] ou32_NodeIndex       Previous receiver node index
+   \param[in] ou32_InterfaceIndex  Previous receiver node interface index
+   \param[in] ou32_DatapoolIndex   Node Datapool index
 
    \return
    C_NO_ERR Operation success
@@ -869,8 +895,9 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessageRx(const C_OSCCanMessageId
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanMessageRx(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                            const uint32 & oru32_NodeIndex,
-                                                            const uint32 & oru32_InterfaceIndex)
+                                                            const uint32 ou32_NodeIndex,
+                                                            const uint32 ou32_InterfaceIndex,
+                                                            const uint32 ou32_DatapoolIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -885,8 +912,10 @@ sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanMessageRx(const C_OSCCanMessag
       const C_OSCCanMessageIdentificationIndices & rc_MessageId = c_MatchingMessageIds[u32_ItMessageId];
 
       //protocol does not need to be checked as the matching messages should only match if they are of the same protocol
-      if (((rc_MessageId.q_MessageIsTx == false) && (rc_MessageId.u32_NodeIndex == oru32_NodeIndex)) &&
-          (rc_MessageId.u32_InterfaceIndex == oru32_InterfaceIndex))
+      if ((rc_MessageId.q_MessageIsTx == false) &&
+          (rc_MessageId.u32_NodeIndex == ou32_NodeIndex) &&
+          (rc_MessageId.u32_InterfaceIndex == ou32_InterfaceIndex) &&
+          (rc_MessageId.u32_DatapoolIndex == ou32_DatapoolIndex))
       {
          s32_Retval = m_DeleteCanMessage(rc_MessageId, true);
       }
@@ -1036,6 +1065,40 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Searches a matching message id with an other node and interface index
+
+   If no other message id with an other node and interface index is available,
+   orc_MessageId will not be changed.
+   If an other message id was found, orc_MessageId will be set to the found matching message id
+
+   \param[in,out]     orc_MessageId              Message id for searching and the result
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdNodeCanMessageSyncManager::ReplaceMessageIdWithMatchingId(
+   C_OSCCanMessageIdentificationIndices & orc_MessageId) const
+{
+   const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds =
+      this->GetMatchingMessageVector(orc_MessageId);
+   uint32 u32_MatchingMsgCounter;
+
+   for (u32_MatchingMsgCounter = 0U; u32_MatchingMsgCounter < c_MatchingMessageIds.size();
+        ++u32_MatchingMsgCounter)
+   {
+      const C_OSCCanMessageIdentificationIndices & rc_MatchingMsgId =
+         c_MatchingMessageIds[u32_MatchingMsgCounter];
+
+      if ((orc_MessageId.u32_NodeIndex != rc_MatchingMsgId.u32_NodeIndex) ||
+          (orc_MessageId.u32_InterfaceIndex != rc_MatchingMsgId.u32_InterfaceIndex))
+      {
+         // A matching message id with an other node or interface index. It can be used as replacement
+         orc_MessageId = rc_MatchingMsgId;
+         break;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message ID matches a critical message ID (Message with two transmitters)
 
    \param[in] orc_MessageId Message identification indices
@@ -1169,7 +1232,8 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
          const C_OSCCanMessageContainer * const pc_MessageContainer =
             C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(rc_MessageId.u32_NodeIndex,
                                                                             rc_MessageId.e_ComProtocol,
-                                                                            rc_MessageId.u32_InterfaceIndex);
+                                                                            rc_MessageId.u32_InterfaceIndex,
+                                                                            rc_MessageId.u32_DatapoolIndex);
          if (pc_MessageContainer != NULL)
          {
             bool q_DelayTimeInvalid;
@@ -1194,7 +1258,7 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
             C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_MessageId);
          const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
             rc_MessageId.u32_NodeIndex, rc_MessageId.e_ComProtocol, rc_MessageId.u32_InterfaceIndex,
-            rc_MessageId.q_MessageIsTx);
+            rc_MessageId.u32_DatapoolIndex, rc_MessageId.q_MessageIsTx);
          if ((pc_Message != NULL) && (pc_List != NULL))
          {
             for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
@@ -1589,7 +1653,8 @@ bool C_PuiSdNodeCanMessageSyncManager::RecheckCriticalMessage(
                              ++c_ItDelteMessage)
                         {
                            tgl_assert(DeleteCanMessageRx(c_Alternative, c_ItDelteMessage->u32_NodeIndex,
-                                                         c_ItDelteMessage->u32_InterfaceIndex) == C_NO_ERR);
+                                                         c_ItDelteMessage->u32_InterfaceIndex,
+                                                         c_ItDelteMessage->u32_DatapoolIndex) == C_NO_ERR);
                            //Check if message matches current message ID and set alternative as new
                            //The currently known message id for the caller might be a RX message which just might have
                            //been deleted therefore its better to return the first found transmitter (still the same
@@ -1788,7 +1853,7 @@ void C_PuiSdNodeCanMessageSyncManager::m_RegisterIfNecessary(const C_OSCCanMessa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility function to check if message id alread stored
+/*! \brief   Utility function to check if message id already stored
 
    \param[in] orc_MessageId Message identification indices to search for
    \param[in] orc_Input     Message vector to check
@@ -1909,9 +1974,10 @@ void C_PuiSdNodeCanMessageSyncManager::mh_RemoveAndUpdateIndices(
       else
       {
          //Check if same vector
-         if ((((rc_MessageId.u32_NodeIndex == orc_MessageId.u32_NodeIndex) &&
-               (rc_MessageId.u32_InterfaceIndex == orc_MessageId.u32_InterfaceIndex)) &&
-              (rc_MessageId.e_ComProtocol == orc_MessageId.e_ComProtocol)) &&
+         if ((rc_MessageId.u32_NodeIndex == orc_MessageId.u32_NodeIndex) &&
+             (rc_MessageId.u32_InterfaceIndex == orc_MessageId.u32_InterfaceIndex) &&
+             (rc_MessageId.u32_DatapoolIndex == orc_MessageId.u32_DatapoolIndex) &&
+             (rc_MessageId.e_ComProtocol == orc_MessageId.e_ComProtocol) &&
              (rc_MessageId.q_MessageIsTx == orc_MessageId.q_MessageIsTx))
          {
             //Update all affected ones to changed position
@@ -1954,13 +2020,15 @@ sint32 C_PuiSdNodeCanMessageSyncManager::mh_GetNodeIndexesMatchingForMessage(
       const C_OSCCanMessageContainer * const pc_MessageContainer =
          C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_MessageId.u32_NodeIndex,
                                                                          orc_MessageId.e_ComProtocol,
-                                                                         orc_MessageId.u32_InterfaceIndex);
+                                                                         orc_MessageId.u32_InterfaceIndex,
+                                                                         orc_MessageId.u32_DatapoolIndex);
       tgl_assert(orc_MessageId.u32_InterfaceIndex < pc_OrgNode->c_Properties.c_ComInterfaces.size());
       if ((orc_MessageId.u32_InterfaceIndex < pc_OrgNode->c_Properties.c_ComInterfaces.size()) &&
           (pc_MessageContainer != NULL))
       {
          std::vector<uint32> c_NodeIndices;
          std::vector<uint32> c_InterfaceIndices;
+         std::vector<uint32> c_DatapoolIndices;
          const C_OSCNodeComInterfaceSettings & rc_ComInterface =
             pc_OrgNode->c_Properties.c_ComInterfaces[orc_MessageId.u32_InterfaceIndex];
          //Step 2: Find all other nodes and interfaces (if connected)
@@ -1969,15 +2037,30 @@ sint32 C_PuiSdNodeCanMessageSyncManager::mh_GetNodeIndexesMatchingForMessage(
          {
             C_PuiSdNodeCanMessageSyncManager::h_GetConnectedAndActiveInterfaces(rc_ComInterface.u32_BusIndex,
                                                                                 orc_MessageId.e_ComProtocol,
-                                                                                c_NodeIndices, c_InterfaceIndices);
+                                                                                c_NodeIndices, c_InterfaceIndices,
+                                                                                c_DatapoolIndices);
          }
          else
          {
-            c_NodeIndices.push_back(orc_MessageId.u32_NodeIndex);
-            c_InterfaceIndices.push_back(orc_MessageId.u32_InterfaceIndex);
+            // Add all Datapools for the protocol
+            uint32 u32_ProtCounter;
+
+            for (u32_ProtCounter = 0U; u32_ProtCounter < pc_OrgNode->c_ComProtocols.size(); ++u32_ProtCounter)
+            {
+               const C_OSCCanProtocol & rc_Prot =  pc_OrgNode->c_ComProtocols[u32_ProtCounter];
+
+               tgl_assert(orc_MessageId.u32_InterfaceIndex < rc_Prot.c_ComMessages.size());
+               if (rc_Prot.e_Type == orc_MessageId.e_ComProtocol)
+               {
+                  c_NodeIndices.push_back(orc_MessageId.u32_NodeIndex);
+                  c_InterfaceIndices.push_back(orc_MessageId.u32_InterfaceIndex);
+                  c_DatapoolIndices.push_back(rc_Prot.u32_DataPoolIndex);
+               }
+            }
          }
 
-         if (c_NodeIndices.size() == c_InterfaceIndices.size())
+         if ((c_NodeIndices.size() == c_InterfaceIndices.size()) &&
+             (c_NodeIndices.size() == c_DatapoolIndices.size()))
          {
             for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
             {
@@ -1986,14 +2069,17 @@ sint32 C_PuiSdNodeCanMessageSyncManager::mh_GetNodeIndexesMatchingForMessage(
                if (pc_Node != NULL)
                {
                   const C_OSCCanProtocol * const pc_Protocol = pc_Node->GetCANProtocolConst(
-                     orc_MessageId.e_ComProtocol);
+                     orc_MessageId.e_ComProtocol,
+                     c_DatapoolIndices[u32_ItNode]);
+
                   if (pc_Protocol != NULL)
                   {
                      if (c_InterfaceIndices[u32_ItNode] < pc_Protocol->c_ComMessages.size())
                      {
                         C_OSCCanMessageIdentificationIndices c_MessageId(c_NodeIndices[u32_ItNode],
                                                                          orc_MessageId.e_ComProtocol,
-                                                                         c_InterfaceIndices[u32_ItNode]);
+                                                                         c_InterfaceIndices[u32_ItNode],
+                                                                         c_DatapoolIndices[u32_ItNode], false);
                         const C_OSCCanMessageContainer & rc_MessageContainer =
                            pc_Protocol->c_ComMessages[c_InterfaceIndices[u32_ItNode]];
                         //Toggle tx and rx
@@ -2122,9 +2208,10 @@ void C_PuiSdNodeCanMessageSyncManager::mh_UpdateIndicesToNewCanMessage(
    {
       C_OSCCanMessageIdentificationIndices & rc_MessageId = orc_MessageIds[u32_ItMessage];
       //Check if same vector
-      if ((((rc_MessageId.u32_NodeIndex == orc_MessageId.u32_NodeIndex) &&
-            (rc_MessageId.u32_InterfaceIndex == orc_MessageId.u32_InterfaceIndex)) &&
-           (rc_MessageId.e_ComProtocol == orc_MessageId.e_ComProtocol)) &&
+      if ((rc_MessageId.u32_NodeIndex == orc_MessageId.u32_NodeIndex) &&
+          (rc_MessageId.u32_InterfaceIndex == orc_MessageId.u32_InterfaceIndex) &&
+          (rc_MessageId.u32_DatapoolIndex == orc_MessageId.u32_DatapoolIndex) &&
+          (rc_MessageId.e_ComProtocol == orc_MessageId.e_ComProtocol) &&
           (rc_MessageId.q_MessageIsTx == orc_MessageId.q_MessageIsTx))
       {
          //Update all affected ones to changed position
@@ -2211,19 +2298,24 @@ void C_PuiSdNodeCanMessageSyncManager::mh_Init(const uint32 & oru32_BusIndex,
 {
    std::vector<uint32> c_NodeIndexes;
    std::vector<uint32> c_InterfaceIndexes;
+   std::vector<uint32> c_DatapoolIndexes;
 
-   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(oru32_BusIndex,
-                                                                                      c_NodeIndexes,
-                                                                                      c_InterfaceIndexes);
+   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeAndComDpIndexesOfBus(oru32_BusIndex,
+                                                                                              ore_ComProtocol,
+                                                                                              c_NodeIndexes,
+                                                                                              c_InterfaceIndexes,
+                                                                                              c_DatapoolIndexes);
 
-   if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+   if ((c_NodeIndexes.size() == c_InterfaceIndexes.size()) &&
+       (c_NodeIndexes.size() == c_DatapoolIndexes.size()))
    {
       for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
       {
          const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes[u32_ItNode]);
          if (pc_Node != NULL)
          {
-            const C_OSCCanProtocol * const pc_Protcol = pc_Node->GetCANProtocolConst(ore_ComProtocol);
+            const C_OSCCanProtocol * const pc_Protcol = pc_Node->GetCANProtocolConst(ore_ComProtocol,
+                                                                                     c_DatapoolIndexes[u32_ItNode]);
             if (pc_Protcol != NULL)
             {
                if (c_InterfaceIndexes[u32_ItNode] < pc_Protcol->c_ComMessages.size())
@@ -2233,12 +2325,12 @@ void C_PuiSdNodeCanMessageSyncManager::mh_Init(const uint32 & oru32_BusIndex,
                   if (rc_MessageContainer.q_IsComProtocolUsedByInterface == true)
                   {
                      C_OSCCanMessageIdentificationIndices c_MessageId(c_NodeIndexes[u32_ItNode], ore_ComProtocol,
-                                                                      c_InterfaceIndexes[u32_ItNode]);
+                                                                      c_InterfaceIndexes[u32_ItNode],
+                                                                      c_DatapoolIndexes[u32_ItNode], true);
                      const std::vector<C_OSCCanMessage> & rc_TxMessages =  rc_MessageContainer.GetMessagesConst(true);
                      const std::vector<C_OSCCanMessage> & rc_RxMessages =  rc_MessageContainer.GetMessagesConst(false);
 
                      //Tx
-                     c_MessageId.q_MessageIsTx = true;
                      for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_TxMessages.size(); ++u32_ItMessage)
                      {
                         c_MessageId.u32_MessageIndex = u32_ItMessage;
@@ -2281,38 +2373,44 @@ void C_PuiSdNodeCanMessageSyncManager::mh_Init(const uint32 & oru32_NodeIndex, c
 
    if (pc_Node != NULL)
    {
-      const C_OSCCanProtocol * const pc_Protcol = pc_Node->GetCANProtocolConst(ore_ComProtocol);
-      if (pc_Protcol != NULL)
+      std::vector<const C_OSCCanProtocol *> c_Protocols = pc_Node->GetCANProtocolsConst(ore_ComProtocol);
+      uint32 u32_ProtocolCounter;
+
+      for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < c_Protocols.size(); ++u32_ProtocolCounter)
       {
-         if ((oru32_InterfaceIndex < pc_Protcol->c_ComMessages.size()) &&
-             (oru32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
+         const C_OSCCanProtocol * const pc_Protcol = c_Protocols[u32_ProtocolCounter];
+         if (pc_Protcol != NULL)
          {
-            const C_OSCCanMessageContainer & rc_MessageContainer =
-               pc_Protcol->c_ComMessages[oru32_InterfaceIndex];
-            const C_OSCNodeComInterfaceSettings & rc_Interface =
-               pc_Node->c_Properties.c_ComInterfaces[oru32_InterfaceIndex];
-            if ((rc_MessageContainer.q_IsComProtocolUsedByInterface == false) ||
-                (rc_Interface.q_IsBusConnected == false))
+            if ((oru32_InterfaceIndex < pc_Protcol->c_ComMessages.size()) &&
+                (oru32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
             {
-               C_OSCCanMessageIdentificationIndices c_MessageId(oru32_NodeIndex, ore_ComProtocol,
-                                                                oru32_InterfaceIndex);
-               const std::vector<C_OSCCanMessage> & rc_TxMessages =  rc_MessageContainer.GetMessagesConst(true);
-               const std::vector<C_OSCCanMessage> & rc_RxMessages =  rc_MessageContainer.GetMessagesConst(false);
-
-               //Tx
-               c_MessageId.q_MessageIsTx = true;
-               for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_TxMessages.size(); ++u32_ItMessage)
+               const C_OSCCanMessageContainer & rc_MessageContainer =
+                  pc_Protcol->c_ComMessages[oru32_InterfaceIndex];
+               const C_OSCNodeComInterfaceSettings & rc_Interface =
+                  pc_Node->c_Properties.c_ComInterfaces[oru32_InterfaceIndex];
+               if ((rc_MessageContainer.q_IsComProtocolUsedByInterface == false) ||
+                   (rc_Interface.q_IsBusConnected == false))
                {
-                  c_MessageId.u32_MessageIndex = u32_ItMessage;
-                  mh_RegisterIfNecessary(c_MessageId, orc_Output, opc_OutputUniqueIds, opc_CriticalMessageMatches);
-               }
+                  C_OSCCanMessageIdentificationIndices c_MessageId(oru32_NodeIndex, ore_ComProtocol,
+                                                                   oru32_InterfaceIndex, pc_Protcol->u32_DataPoolIndex,
+                                                                   true);
+                  const std::vector<C_OSCCanMessage> & rc_TxMessages =  rc_MessageContainer.GetMessagesConst(true);
+                  const std::vector<C_OSCCanMessage> & rc_RxMessages =  rc_MessageContainer.GetMessagesConst(false);
 
-               //Rx
-               c_MessageId.q_MessageIsTx = false;
-               for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_RxMessages.size(); ++u32_ItMessage)
-               {
-                  c_MessageId.u32_MessageIndex = u32_ItMessage;
-                  mh_RegisterIfNecessary(c_MessageId, orc_Output, opc_OutputUniqueIds, opc_CriticalMessageMatches);
+                  //Tx
+                  for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_TxMessages.size(); ++u32_ItMessage)
+                  {
+                     c_MessageId.u32_MessageIndex = u32_ItMessage;
+                     mh_RegisterIfNecessary(c_MessageId, orc_Output, opc_OutputUniqueIds, opc_CriticalMessageMatches);
+                  }
+
+                  //Rx
+                  c_MessageId.q_MessageIsTx = false;
+                  for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_RxMessages.size(); ++u32_ItMessage)
+                  {
+                     c_MessageId.u32_MessageIndex = u32_ItMessage;
+                     mh_RegisterIfNecessary(c_MessageId, orc_Output, opc_OutputUniqueIds, opc_CriticalMessageMatches);
+                  }
                }
             }
          }
@@ -2331,8 +2429,11 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
 {
    std::vector<C_OSCCanMessageIdentificationIndices> c_Retval;
    mh_Append(mh_GetUniqueMessages(this->mc_MessageMatches), c_Retval);
-   mh_Append(mh_GetUniqueMessages(this->mc_MessageMatchesForOtherProtocols[0]), c_Retval);
-   mh_Append(mh_GetUniqueMessages(this->mc_MessageMatchesForOtherProtocols[1]), c_Retval);
+   if (!this->mq_SingleNodeMode)
+   {
+      mh_Append(mh_GetUniqueMessages(this->mc_MessageMatchesForOtherProtocols[0]), c_Retval);
+      mh_Append(mh_GetUniqueMessages(this->mc_MessageMatchesForOtherProtocols[1]), c_Retval);
+   }
    return c_Retval;
 }
 

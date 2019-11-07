@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTableHeaderView::C_SyvDaItTableHeaderView(const Qt::Orientation & ore_Orientation,
                                                    QWidget * const opc_Parent) :
-   C_SdNdeDataPoolListTableHeaderView(ore_Orientation, opc_Parent),
+   C_SdNdeDpListTableHeaderView(ore_Orientation, opc_Parent),
    mq_CursorChanged(false)
 {
 }
@@ -96,5 +96,5 @@ bool C_SyvDaItTableHeaderView::event(QEvent * const opc_Event)
       // Nothing to do
    }
 
-   return C_SdNdeDataPoolListTableHeaderView::event(opc_Event);
+   return C_SdNdeDpListTableHeaderView::event(opc_Event);
 }

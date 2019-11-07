@@ -1,15 +1,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       header for class HexFile
+   \brief       header for class C_HexFile
 
-   defines the structure of class HexFile
+   defines the structure of class C_HexFile
 
    \copyright   Copyright 2000 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CHexfileH
-#define CHexfileH
+#ifndef CHEXFILEH
+#define CHEXFILEH
 
 #include <cstdio> //for "FILE"
 #include "stwtypes.h"
@@ -17,7 +17,6 @@
 
 namespace stw_hex_file
 {
-
 //----------------------------------------------------------------------------------------------------------------------
 // defines
 //----------------------------------------------------------------------------------------------------------------------
@@ -47,13 +46,13 @@ const stw_types::uint32 ERR_MASK              = 0xF0000000UL;
 // data structures
 //----------------------------------------------------------------------------------------------------------------------
 
-///Element fuer eine Zeile einer Hex-Datei (wird in einem dynamischen Ringpuffer angelegt)
+///Element for one line of a hex file (will be created in a dynamic ring buffer)
 struct STWHEXFILE_PACKAGE T_HexLine
 {
-  T_HexLine * pt_Prev;             ///< vorheriges Element
-  T_HexLine * pt_Next;             ///< naechstes Element
-  stw_types::uint32 u32_XAdr;      ///< Extended Adresse von Hex File Zeile
-  stw_types::uint8 * pu8_HexLine;  ///< Daten Hex Zeile in Hex ohne ':'
+   T_HexLine * pt_Prev;            ///< previous element
+   T_HexLine * pt_Next;            ///< next Element
+   stw_types::uint32 u32_XAdr;     ///< extended addresse of hex file line
+   stw_types::uint8 * pu8_HexLine; ///< binary data contained in hex line (without leading ":")
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,14 +63,14 @@ class STWHEXFILE_PACKAGE C_HexDataDumpBlock
 {
 public:
    stw_types::uint32 u32_AddressOffset;
-   stw_scl::SCLDynamicArray <stw_types::uint8> au8_Data;
+   stw_scl::SCLDynamicArray<stw_types::uint8> au8_Data;
 };
 
 ///Array of containers for memory dump data
 class STWHEXFILE_PACKAGE C_HexDataDump
 {
 public:
-   stw_scl::SCLDynamicArray <C_HexDataDumpBlock> at_Blocks;
+   stw_scl::SCLDynamicArray<C_HexDataDumpBlock> at_Blocks;
 };
 
 ///Handles reading and writing of hex files
@@ -81,6 +80,7 @@ class STWHEXFILE_PACKAGE C_HexFile
 private:
    C_HexFile(const C_HexFile & orc_Souce);               ///< not implemented -> prevent copying
    C_HexFile & operator = (const C_HexFile & orc_Souce); ///< not implemented -> prevent assignment
+
 public:
    C_HexFile(void);
    virtual ~C_HexFile(void);
@@ -96,31 +96,29 @@ public:
    //Reformat hex files (using C_HexDataDump internally; so no RAM penalty for gaps within hex file)
    stw_types::uint32 Optimize(const stw_types::uint32 ou32_RecSize);
 
-   //Datenzeiger auf ERSTES Element setzen (tHexLine)
-   //      und Daten von aktueller Hex Zeile zurueck geben
-   // Fehler: NULL Zeiger
+   //Set data pointer to first element (T_HexLine)
+   //      and return pointer to data of current hex line.
+   // Error: NULL pointer
    const stw_types::uint8 * LineInit(void);
 
-   // get pointer to binary data, destination address and size information
+   //Get pointer to binary data, destination address and size information
    const stw_types::uint8 * NextBinData(stw_types::uint32 & oru32_Address, stw_types::uint8 & oru8_Size);
 
-   //Daten von aktueller Hex Zeile zurueck geben
-   //      und Datenzeiger auf die naechste Zeile stellen
-   //      Nachdem die letzte Zeile aufgerufen ist -> Datenzeiger =NULL setzen
-   // Fehler: NULL Zeiger
+   //Get pointer to current hex line and advance data pointer to next line.
+   //After last line sets data pointer to NULL
+   // Error: NULL pointer
    const stw_types::uint8 * NextLine(void);
 
-   // Daten von aktueller Hex Zeile als String-Zeiger zurueck geben
-   //      und Datenzeiger auf die naechste Zeile stellen
-   //      Nachdem die letzte Zeile aufgerufen ist -> Datenzeiger =NULL setzen
-   // Fehler: NULL Zeiger
+   //Get pointer to data of current hex line as string and advance data pointer to next line.
+   //After last line sets data pointer to NULL
+   // Error: NULL pointer
    const stw_types::charn * NextLineString(void);
 
-   //Anzahl der Zeilen von Hex-File insgesamt
+   //Get total number of hex file lines
    stw_types::uint32 LineCount(void) const;
-   //Minmale Adresse Hex-File
+   //Get lowest occupied address in hex file
    stw_types::uint32 MinAdr(void) const;
-   //Maximale Adresse Hex-File
+   //Get highest occupied address in hex file
    stw_types::uint32 MaxAdr(void) const;
 
    stw_types::uint32 ByteCount(void) const;
@@ -147,16 +145,16 @@ public:
    stw_types::uint32 GetLastOverlayErrorAddress(void) const;
 
 protected:
-   stw_types::uint32 mu32_MinAdr;        // minimale Adresse Hex-Datei
-   stw_types::uint32 mu32_MaxAdr;        // maximale Adresse Hex-Datei
+   stw_types::uint32 mu32_MinAdr; // Lowest occupied address in hex file
+   stw_types::uint32 mu32_MaxAdr; // Highest occupied address in hex file
    stw_types::uint32 mu32_AdrOffs;
    stw_types::uint32 mu32_LineCount;
-   stw_types::uint32 mu32_LineCountNew;  // Anzahl der Hex Zeilen
+   stw_types::uint32 mu32_LineCountNew; //Total number of hex file lines
    stw_types::uint32 mu32_NumRawBytes;
    stw_types::uint8 mu8_MaxRecordLength; // Maximum detected record length when parsing hex file; set by LoadFromFile
-   const T_HexLine * mpt_DataEntry;         // Start von dynamischem Ringpuffer, der alle Hex Zeilen umfasst
-   const T_HexLine * mpt_HexData;           // aktuelle Position in Ringpuffer
-   T_HexLine * mpt_Prev;              // vorhergehendes Element von Ringpuffer
+   const T_HexLine * mpt_DataEntry;      // Start of dynamic ring buffer containing all hex lines
+   const T_HexLine * mpt_HexData;        // current position in ring buffer
+   T_HexLine * mpt_Prev;                 // previous element of ring buffer
 
    C_HexDataDump mc_Dump; //data in the form of an array of memory dump blocks
    bool mq_DumpIsDirty;   //flags whether dump has been compromised by changing hex data contents since it was
@@ -172,7 +170,7 @@ protected:
    static const stw_types::charn * HexLineString(const stw_types::uint8 * const opu8_HexLine);
    stw_types::uint32 GetIHexCommand(const stw_types::charn * const opcn_String, stw_types::uint8 & oru8_Command) const;
    stw_types::uint32 GetSRecordType(const stw_types::charn * const opcn_String, stw_types::uint8 & oru8_RecordType)
-                                    const;
+   const;
    stw_types::uint32 GetIntelAddress(const stw_types::charn * const opcn_String, const stw_types::uint8 ou8_Command,
                                      stw_types::uint32 & oru32_Adr) const;
    stw_types::uint32 GetSRecordAddress(const stw_types::charn * const opcn_String,
@@ -193,7 +191,7 @@ protected:
    static void SetByte(stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
                        const stw_types::uint8 ou8_Byte);
    static stw_types::uint32 GetWord(const stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
-                                   stw_types::uint32 & oru32_Word);
+                                    stw_types::uint32 & oru32_Word);
    static void SetWord(stw_types::charn * const opcn_String, const stw_types::uint32 ou32_Index,
                        const stw_types::uint32 ou32_Data);
 
@@ -202,7 +200,6 @@ protected:
                                             const stw_types::uint32 ou32_BufSize,
                                             const stw_types::uint16 ou16_PatternLength);
 };
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------

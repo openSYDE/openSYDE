@@ -39,6 +39,7 @@
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
+using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
@@ -643,9 +644,6 @@ void C_SdHandlerWidget::GenerateCode(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::Export(void)
 {
-   uint32 u32_NumOfInputNodes = 0;
-   uint32 u32_NumOfInputMessages = 0;
-
    std::set<uint32> c_CanMessageIds; // to count CAN messages
    uint32 u32_NumOfInputSignals = 0;
 
@@ -678,38 +676,52 @@ void C_SdHandlerWidget::Export(void)
          {
             std::vector<uint32> c_NodeIndexes;
             std::vector<uint32> c_InterfaceIndexes;
-            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_Index,
-                                                                                               c_NodeIndexes,
-                                                                                               c_InterfaceIndexes);
-            // for each node there must be an interface index therefore same size is guaranteed
-            tgl_assert(c_NodeIndexes.size() == c_InterfaceIndexes.size());
+            std::vector<uint32> c_DatapoolIndexes;
+            std::set<uint32> c_UniqueNodeIndexes;
+            uint32 u32_NumOfInputMessages;
 
-            // get selected CAN protocol
-            const Ui::C_SdBueBusEditWidget * const pc_SdBueBusEdit = this->mpc_ActBusEdit->GetUiWidget();
-            const C_OSCCanProtocol::E_Type e_ComType = pc_SdBueBusEdit->pc_WidgetComIfDescr->GetActProtocol();
+            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeAndComDpIndexesOfBus(
+               this->mu32_Index,
+               c_NodeIndexes,
+               c_InterfaceIndexes,
+               c_DatapoolIndexes);
+
+            // for each node there must be an interface index and a Datapool index therefore same size is guaranteed
+            tgl_assert(c_NodeIndexes.size() == c_InterfaceIndexes.size());
+            tgl_assert(c_NodeIndexes.size() == c_DatapoolIndexes.size());
 
             C_CieConverter::C_CIECommDefinition c_CommDef; // data structure for DBC file export
             c_CommDef.c_Bus.c_Name = pc_Bus->c_Name;
             c_CommDef.c_Bus.c_Comment = pc_Bus->c_Comment;
 
-            u32_NumOfInputNodes = c_NodeIndexes.size();
-            for (uint32 u32_Pos = 0; u32_Pos < u32_NumOfInputNodes; u32_Pos++)
+            for (uint32 u32_Pos = 0; u32_Pos < c_NodeIndexes.size(); u32_Pos++)
             {
-               uint32 u32_NodeIndex = c_NodeIndexes[u32_Pos];
-               uint32 u32_InterfaceIndex = c_InterfaceIndexes[u32_Pos];
-               const C_OSCCanMessageContainer * const pc_CanMessageContainer = C_PuiSdHandler::h_GetInstance()->
-                                                                               GetCanProtocolMessageContainer(
-                  u32_NodeIndex,
-                  e_ComType,
-                  u32_InterfaceIndex);
+               const uint32 u32_NodeIndex = c_NodeIndexes[u32_Pos];
+               const uint32 u32_InterfaceIndex = c_InterfaceIndexes[u32_Pos];
+               const uint32 u32_DatapoolIndex = c_DatapoolIndexes[u32_Pos];
+               C_OSCCanProtocol::E_Type e_ComType;
+
+               tgl_assert(C_PuiSdHandler::h_GetInstance()->GetCanProtocolType(u32_NodeIndex,
+                                                                              u32_DatapoolIndex,
+                                                                              e_ComType) == C_NO_ERR);
+               const C_OSCCanMessageContainer * const pc_CanMessageContainer =
+                  C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(
+                     u32_NodeIndex,
+                     e_ComType,
+                     u32_InterfaceIndex,
+                     u32_DatapoolIndex);
 
                // only export active devices
                if ((pc_CanMessageContainer != NULL) && (pc_CanMessageContainer->q_IsComProtocolUsedByInterface == true))
                {
-                  sint32 s32_Error = stw_errors::C_NO_ERR;
+                  sint32 s32_Error = C_NO_ERR;
                   stw_scl::C_SCLStringList c_Warnings;
                   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
                   C_CieConverter::C_CIENode c_CurrentCIENode;
+
+                  // The number of nodes is necessary.
+                  c_UniqueNodeIndexes.insert(u32_NodeIndex);
+
                   c_CurrentCIENode.c_Properties.c_Name = pc_Node->c_Properties.c_Name;
                   c_CurrentCIENode.c_Properties.c_Comment = pc_Node->c_Properties.c_Comment;
 
@@ -757,7 +769,7 @@ void C_SdHandlerWidget::Export(void)
 
                   u32_NumOfInputMessages = c_CanMessageIds.size();
 
-                  if (s32_Error != stw_errors::C_NO_ERR)
+                  if (s32_Error != C_NO_ERR)
                   {
                      // display warnings
                      C_OgeWiCustomMessage c_ExportWarnings(this, C_OgeWiCustomMessage::E_Type::eWARNING);
@@ -771,7 +783,7 @@ void C_SdHandlerWidget::Export(void)
             }
 
             // export to file
-            C_CieUtil::h_ExportFile(c_CommDef, this, u32_NumOfInputNodes, u32_NumOfInputMessages,
+            C_CieUtil::h_ExportFile(c_CommDef, this, c_UniqueNodeIndexes.size(), u32_NumOfInputMessages,
                                     u32_NumOfInputSignals);
          }
       }
@@ -856,7 +868,7 @@ void C_SdHandlerWidget::RtfExport(void)
             sint32 s32_Return = pc_DialogExportReport->ExportToRtf(c_RtfPath, c_CompanyName, c_CompanyLogoPath,
                                                                    this->mpc_Topology,
                                                                    c_Warnings, c_Error);
-            if (s32_Return == stw_errors::C_NO_ERR)
+            if (s32_Return == C_NO_ERR)
             {
                QString c_Details = QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
                                    arg(C_GtGetText::h_GetText("File saved at ")).
@@ -869,7 +881,7 @@ void C_SdHandlerWidget::RtfExport(void)
                c_MessageResult.SetDetails(c_Details);
                c_MessageResult.Execute();
             }
-            else if (s32_Return == stw_errors::C_WARN)
+            else if (s32_Return == C_WARN)
             {
                stw_scl::C_SCLString c_Details = "Warnings: \r\n" + c_Warnings.GetText();
 

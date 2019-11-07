@@ -45,6 +45,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigCANDllConfigured(void);
+   void SigHide(void);
 
 private:
    //Avoid call
@@ -62,7 +63,8 @@ private:
    void m_UpdateCANDllPath(void) const;
    void m_OnExpand(const bool oq_Expand) const;
    void m_OnBrowse(void);
-   void m_InsertPathVar(const QString & orc_Variable) const;
+   void m_InsertPathVar(const QString & orc_Variable);
+   void m_OnCustomDllEdited(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

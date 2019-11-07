@@ -178,12 +178,13 @@ uint32 C_SdNdeDbAddNewProject::GetTSPApplicationCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add selected project to application
 
-   \param[in]     ou32_TSPIndex   Application index in TSP
-   \param[in,out] orc_Application Application to apply new properties to
+   \param[in]     ou32_TSPIndex     Application index in TSP
+   \param[in,out] orc_Application   Application to apply new properties to
+   \param[out]    orc_Warnings      Warnings that occured
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex,
-                                                C_OSCNodeApplication & orc_Application) const
+void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OSCNodeApplication & orc_Application,
+                                                QString & orc_Warnings) const
 {
    if (ou32_TSPIndex < this->mc_Package.c_Applications.size())
    {
@@ -200,6 +201,15 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex,
                                         rc_SelectedApp.c_ProjectFolder.c_str()).toStdString().c_str();
       orc_Application.c_IDECall = rc_SelectedApp.c_IdeCall;
       orc_Application.u16_GenCodeVersion = rc_SelectedApp.u16_GenCodeVersion;
+
+      //do not allow to save higher value as highest known code structure version
+      if (orc_Application.u16_GenCodeVersion > mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION)
+      {
+         orc_Application.u16_GenCodeVersion = mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION;
+         orc_Warnings.append(QString(C_GtGetText::h_GetText("Code structure version of application %1 is unknown and "
+                                                            "therefore set to most recent version %2.\n")).
+                             arg(orc_Application.c_Name.c_str()).arg(mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION));
+      }
 
       //Handle default code generator flag
       if (rc_SelectedApp.q_IsStandardSydeCoderC == true)

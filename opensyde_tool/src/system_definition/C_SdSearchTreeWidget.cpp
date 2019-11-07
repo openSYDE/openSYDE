@@ -453,7 +453,7 @@ void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & o
 
             if (c_MessageName.contains(this->mc_SearchString, Qt::CaseInsensitive) == true)
             {
-               this->m_AddMessageResult(c_MessageName, u32_MessageCounter, true, static_cast<uint32>(s32_ListIndexRx),
+               this->m_AddMessageResult(c_MessageName, u32_MessageCounter, false, static_cast<uint32>(s32_ListIndexRx),
                                         c_ProtocolName, orc_CanProtocol.u32_DataPoolIndex, orc_NodeName,
                                         ou32_NodeIndex);
             }
@@ -794,11 +794,11 @@ void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, c
 
    if (oq_IsTx == true)
    {
-      c_Subtitle += "TX";
+      c_Subtitle += "Tx";
    }
    else
    {
-      c_Subtitle += "RX";
+      c_Subtitle += "Rx";
    }
 
    this->m_MarkResultString(c_ResultString);

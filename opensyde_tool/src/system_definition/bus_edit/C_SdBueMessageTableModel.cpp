@@ -22,6 +22,7 @@
 #include "C_SdBueMessageTableModel.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_SdUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -127,7 +128,7 @@ QVariant C_SdBueMessageTableModel::headerData(const sintn osn_Section, const Qt:
             c_Retval = C_GtGetText::h_GetText("DLC");
             break;
          case eTX_METHOD:
-            c_Retval = C_GtGetText::h_GetText("TX method");
+            c_Retval = C_GtGetText::h_GetText("Tx method");
             break;
          case eCYCLE_TIME:
             c_Retval = C_GtGetText::h_GetText("Cycle time [ms]");
@@ -308,8 +309,8 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                                  rc_CurMatchingId.u32_NodeIndex);
                               if (pc_Node != NULL)
                               {
-                                 c_Retval = QString(pc_Node->c_Properties.c_Name.c_str());
                                  q_Found = true;
+                                 c_Retval = m_CreateNodeName(rc_CurMatchingId, c_MatchingIds);
                               }
                            }
                         }
@@ -333,17 +334,12 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                            //Receiver
                            if (rc_CurMatchingId.q_MessageIsTx == false)
                            {
-                              const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-                                 rc_CurMatchingId.u32_NodeIndex);
-                              if (pc_Node != NULL)
+                              if (q_Found == true)
                               {
-                                 if (q_Found == true)
-                                 {
-                                    c_Output += ",";
-                                 }
-                                 c_Output += QString(pc_Node->c_Properties.c_Name.c_str());
-                                 q_Found = true;
+                                 c_Output += ", ";
                               }
+                              q_Found = true;
+                              c_Output += this->m_CreateNodeName(rc_CurMatchingId, c_MatchingIds);
                            }
                         }
                         if (q_Found == false)
@@ -425,6 +421,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                                  rc_MessageId.u32_NodeIndex,
                                  rc_MessageId.e_ComProtocol,
                                  rc_MessageId.u32_InterfaceIndex,
+                                 rc_MessageId.u32_DatapoolIndex,
                                  rc_MessageId.q_MessageIsTx);
                            if (pc_List != NULL)
                            {
@@ -706,4 +703,74 @@ sint32 C_SdBueMessageTableModel::ConvertRowToMessage(const sint32 & ors32_Row,
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Utility for getting Receiver/Transmitter node name for displaying
+
+   If a node has multiple COMM datapools of same protocol type or multiple CAN interfaces connected to this bus,
+   add these information to node name.
+
+   Examples: Node / Node (CAN1) / Node (Datapool, CAN1)
+
+   \param[in]       orc_CurMatchingId      ID of the message where the name is created for
+   \param[in]       orc_AllMatchingIds     All matching Ids (needed to find out if CAN interface is ambiguous)
+
+   \return
+   Name string       Examples: MyNode / MyNode (CAN1) / MyNode (MyDatapool, CAN1)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdBueMessageTableModel::m_CreateNodeName(const C_OSCCanMessageIdentificationIndices & orc_CurMatchingId,
+                                                   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_AllMatchingIds)
+const
+{
+   QString c_Return = "";
+
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_CurMatchingId.u32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      QString c_AdditionalInfo;
+
+      c_Return += QString(pc_Node->c_Properties.c_Name.c_str());
+
+      // Add additional info about Datapool and/or Interface if ambiguous
+      if (pc_Node->GetCANProtocolsConst(orc_CurMatchingId.e_ComProtocol).size() > 1)
+      {
+         // Add datapool name if datapool of this protocol type is ambiguous
+         c_AdditionalInfo +=
+            pc_Node->c_DataPools.at(orc_CurMatchingId.u32_DatapoolIndex).c_Name.c_str();
+      }
+
+      // Add CAN interface name if two CAN interfaces of one node participate
+
+      for (uint32 u32_ItOtherIds = 0; u32_ItOtherIds < orc_AllMatchingIds.size();
+           ++u32_ItOtherIds) // re-iterate all corresponding message indices to check for
+                             // same node and same datapool but different CAN interface
+      {
+         const C_OSCCanMessageIdentificationIndices & rc_OtherMatchingId =
+            orc_AllMatchingIds[u32_ItOtherIds];
+         if ((orc_CurMatchingId.u32_NodeIndex == rc_OtherMatchingId.u32_NodeIndex) &&
+             (orc_CurMatchingId.u32_DatapoolIndex == rc_OtherMatchingId.u32_DatapoolIndex) &&
+             (orc_CurMatchingId.u32_InterfaceIndex != rc_OtherMatchingId.u32_InterfaceIndex))
+         {
+            if (c_AdditionalInfo.isEmpty() == false)
+            {
+               c_AdditionalInfo += ", ";
+            }
+            c_AdditionalInfo +=
+               C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
+                                               static_cast<uint8> (orc_CurMatchingId.u32_InterfaceIndex));
+            break;
+         }
+      }
+
+      // finally add additional information to output
+      if (c_AdditionalInfo.isEmpty() == false)
+      {
+         c_Return += " (" + c_AdditionalInfo + ")";
+      }
+   }
+
+   return c_Return;
 }

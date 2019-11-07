@@ -113,7 +113,8 @@ private:
                                                      const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
                                                      const stw_types::uint16 ou16_MuxValue);
    stw_types::uint32 m_TranslateRowToIndex(const stw_types::sint32 os32_Row) const;
-   static std::vector<stw_types::uint16> mh_GetStartBits(const stw_opensyde_core::C_OSCCanMessage * const opc_OsyMessage,
+   static std::vector<stw_types::uint16> mh_GetStartBits(
+      const stw_opensyde_core::C_OSCCanMessage * const opc_OsyMessage,
       const C_CieConverter::C_CIECanMessage * const opc_DbcMessage, const stw_types::uint16 ou16_MuxValue);
 };
 

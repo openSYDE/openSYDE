@@ -30,6 +30,18 @@ class C_CamMosFilterTableView :
 
 public:
    C_CamMosFilterTableView(QWidget * const opc_Parent = NULL);
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   //lint -restore
+   void SigDeleteKeyPressed(void);
+
+protected:
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
+   //lint -restore
 
 private:
    C_TblDelegate mc_Delegate;

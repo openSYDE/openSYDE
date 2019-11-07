@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paint marked section
+/*! \brief  Paint marked section
 
    \param[in,out] opc_Painter                  Painter
    \param[in]     orc_CellRect                 Cell rectangle to draw in
@@ -240,7 +240,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paint string segment and update current top left position
+/*! \brief  Paint string segment and update current top left position
 
    Warning: painter is not saved/restored
 
@@ -300,7 +300,7 @@ bool C_TblDelegateUtil::h_PaintStringWithRestriction(QPainter * const opc_Painte
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblDelegateUtil::C_TblDelegateUtil(void)
@@ -353,7 +353,7 @@ sint32 C_TblDelegateUtil::mh_GetSegmentWidth(const QPoint & orc_TopLeft, const Q
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Create string list from input and standardize the segment lengths as necessary
+/*! \brief  Create string list from input and standardize the segment lengths as necessary
 
    \param[in]     orc_Input Input to segment and standardize
    \param[in,out] orq_IsHex Utility parameter to identify if the values are hex or decimal
@@ -385,7 +385,7 @@ QStringList C_TblDelegateUtil::mhc_CreateAndStandardizeStringList(const QString 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get color with specified transparency value
+/*! \brief  Get color with specified transparency value
 
    \param[in] orc_ColorBase    Base color
    \param[in] ocn_Transparency Desired transparency value

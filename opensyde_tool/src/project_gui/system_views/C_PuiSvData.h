@@ -13,6 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
+#include <set>
 #include <QMap>
 #include <QString>
 #include "C_PuiSvPc.h"
@@ -84,6 +85,7 @@ public:
    void SetDarkModeActive(const bool oq_Value);
    const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> & GetReadRailAssignments(
       void) const;
+   const std::set<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetWriteAssignments(void) const;
    stw_types::sint32 GetReadRailAssignment(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
                                            C_PuiSvReadDataConfiguration & orc_Config) const;
    void SetReadRailAssignments(const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
@@ -167,7 +169,8 @@ public:
                                                   const stw_types::uint32 ou32_ListIndex,
                                                   const stw_types::uint32 ou32_ElementIndex,
                                                   const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_Type,
-                                                  const bool oq_IsArray, const stw_types::uint32 ou32_ArraySize);
+                                                  const bool oq_IsArray, const stw_types::uint32 ou32_ArraySize,
+                                                  const bool oq_IsString);
    void OnSyncNodeDataPoolListElementAccessChanged(const stw_types::uint32 ou32_NodeIndex,
                                                    const stw_types::uint32 ou32_DataPoolIndex,
                                                    const stw_types::uint32 ou32_ListIndex,

@@ -72,6 +72,7 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_NagNaviBarWidget),
    mq_Loaded(false),
+   mq_NodeSectionSizeLoaded(false),
    mq_Maximized(true),
    ms32_ActiveMode(ms32_MODE_SYSDEF),
    ms32_ActiveSubMode(ms32_SUBMODE_SYSDEF_TOPOLOGY),
@@ -410,6 +411,7 @@ void C_NagNaviBarWidget::LoadUserSettings(void)
       const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetNaviBarNodeSectionSize();
 
       this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
+      this->mq_NodeSectionSizeLoaded = true;
    }
 }
 
@@ -417,7 +419,7 @@ void C_NagNaviBarWidget::LoadUserSettings(void)
 /*! \brief   Save splitter user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::SaveUserSettings(void) const
+void C_NagNaviBarWidget::SaveUserSettings(void)
 {
    if (this->mq_Loaded == true)
    {
@@ -425,14 +427,27 @@ void C_NagNaviBarWidget::SaveUserSettings(void) const
       {
          this->mpc_Ui->pc_ListViewViews->SaveUserSettings();
       }
-      else
+      else if (this->mq_NodeSectionSizeLoaded == true)
       {
          const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
 
-         if (c_Sizes.size() > 0)
+         // Save only in case of a valid value
+         // If the system view was opened and the system definition not, it can happen that no valid values will be
+         // saved
+         if ((c_Sizes.size() > 0) &&
+             (c_Sizes[0] > 0))
          {
             C_UsHandler::h_GetInstance()->SetNaviBarNodeSectionSize(c_Sizes.at(0));
          }
+
+         // Load and save are always called in combination.
+         // In case of a project switch, the setting of the previous project should not be overwritten
+         // when the system definition was not opened
+         this->mq_NodeSectionSizeLoaded = false;
+      }
+      else
+      {
+         // Nothing to do
       }
    }
 }

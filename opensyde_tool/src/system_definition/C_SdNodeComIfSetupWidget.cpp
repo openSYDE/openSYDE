@@ -215,7 +215,7 @@ void C_SdNodeComIfSetupWidget::m_OkClicked(void)
    }
    else
    {
-      C_SdUtil::h_CheckDatapoolNumber(mu32_NodeIndex, C_OSCNodeDataPool::eCOM, true, this);
+      C_SdUtil::h_CheckDatapoolNumber(mu32_NodeIndex, true, this);
    }
 }
 

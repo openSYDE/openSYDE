@@ -155,7 +155,7 @@
          <item row="0" column="0">
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="stw_opensyde_gui::C_SdNdeDataPoolEditWidget" name="pc_DataPoolEditWidget" native="true"/>
+            <widget class="stw_opensyde_gui::C_SdNdeDpEditWidget" name="pc_DataPoolEditWidget" native="true"/>
            </item>
           </layout>
          </item>
@@ -181,9 +181,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDataPoolEditWidget</class>
+   <class>stw_opensyde_gui::C_SdNdeDpEditWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeDataPoolEditWidget.h</header>
+   <header>C_SdNdeDpEditWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

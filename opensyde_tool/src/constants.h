@@ -158,7 +158,6 @@ const stw_types::uint8 mu8_MAX_NODE_ID_STW = static_cast<stw_types::uint8> (254)
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN = 0x101U;
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX = 0x17FU;
 const stw_types::uint32 mu32_NODE_DATA_POOL_MAX = 32U;
-const stw_types::uint32 mu32_NODE_DATA_POOL_COM_MAX = 3U;
 const stw_types::uint32 mu32_NODE_DATA_POOL_LIST_MAX = 128U;
 const stw_types::uint32 mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX = 2048U;
 //Bus edit
@@ -174,6 +173,25 @@ const stw_types::sint32 ms32_MESSAGE_BOX_DEFAULT_WIDTH = 600;
 //Icon Size
 const QSize mc_ICON_SIZE_24 = QSize(24, 24);
 const QSize mc_ICON_SIZE_20 = QSize(20, 20);
+
+// Paths
+const QString mc_DLL_PATH_PEAK = "STW_dlls\\stwpeak2\\stwpeak2.dll";
+const QString mc_DLL_PATH_VECTOR = "STW_dlls\\stwvec32\\stwvec32.dll";
+
+// Path variables
+const QString mc_PATH_VARIABLE_OPENSYDE_BIN = "%{OPENSYDE_BINARY}";
+const QString mc_PATH_VARIABLE_OPENSYDE_PROJ = "%{OPENSYDE_PROJECT}";
+const QString mc_PATH_VARIABLE_DATABLOCK_PROJ = "%{PROJECT_DIR}";
+const QString mc_PATH_VARIABLE_USER_NAME = "%{USER_NAME}";
+const QString mc_PATH_VARIABLE_COMPUTER_NAME = "%{COMPUTER_NAME}";
+
+// Identifier of update package subsections
+const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK = 0U;
+const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET = 1U;
+const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE = 2U;
+
+// Highest known generated code structure version
+const stw_types::uint16 mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION = 3U;
 
 //User roles
 //----------------------------------------------------------------------------------------------------------------------
@@ -236,22 +254,6 @@ const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST = static_
 //3: Offset (float64) encoded as string
 const stw_types::sintn msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST =
    static_cast<stw_types::sintn>(Qt::UserRole) + 78;
-
-// Paths
-const QString mc_DLL_PATH_PEAK = "STW_dlls\\stwpeak2\\stwpeak2.dll";
-const QString mc_DLL_PATH_VECTOR = "STW_dlls\\stwvec32\\stwvec32.dll";
-
-// Path variables
-const QString mc_PATH_VARIABLE_OPENSYDE_BIN = "%{OPENSYDE_BINARY}";
-const QString mc_PATH_VARIABLE_OPENSYDE_PROJ = "%{OPENSYDE_PROJECT}";
-const QString mc_PATH_VARIABLE_DATABLOCK_PROJ = "%{PROJECT_DIR}";
-const QString mc_PATH_VARIABLE_USER_NAME = "%{USER_NAME}";
-const QString mc_PATH_VARIABLE_COMPUTER_NAME = "%{COMPUTER_NAME}";
-
-// Identifier of update package subsections
-const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK = 0U;
-const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET = 1U;
-const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE = 2U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 

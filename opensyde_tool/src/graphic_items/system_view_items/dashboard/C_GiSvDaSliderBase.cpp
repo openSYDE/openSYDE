@@ -26,7 +26,7 @@
 #include "C_SyvDaPeBase.h"
 #include "C_SyvDaPeSlider.h"
 #include "C_PuiSdHandler.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_OSCNodeDataPoolListElement.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -301,6 +301,7 @@ bool C_GiSvDaSliderBase::CallProperties(void)
          {
             c_ElementId = C_PuiSvDbNodeDataPoolListElementId(0, 0, 0, 0,
                                                              C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
+                                                             false, 0UL,
                                                              false);
             c_Scaling = C_PuiSvDbDataElementScaling();
          }
@@ -434,13 +435,13 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                   float64 f64_Min;
                   float64 f64_ScaledMin;
                   float64 f64_Max;
-                  C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(pc_Element->c_MinValue, f64_Min);
+                  C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MinValue, f64_Min, 0UL);
                   this->mf64_UnscaledMinValue = f64_Min;
-                  C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, f64_Max);
+                  C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, f64_Max, 0UL);
                   f64_ScaledMin = C_OSCUtils::h_GetValueScaled(f64_Min,
                                                                rc_Config.c_ElementScaling.f64_Factor,
                                                                rc_Config.c_ElementScaling.f64_Offset);
-                  if (C_SdNdeDataPoolContentUtil::h_GetNumberOfAvailableSteps(pc_Element->c_MinValue,
+                  if (C_SdNdeDpContentUtil::h_GetNumberOfAvailableSteps(pc_Element->c_MinValue,
                                                                               pc_Element->c_MaxValue,
                                                                               u64_Steps, 0) == C_NO_ERR)
                   {

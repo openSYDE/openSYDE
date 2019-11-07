@@ -75,6 +75,7 @@ protected:
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected) override;
+   virtual stw_types::sintn sizeHintForColumn(stw_types::sintn osn_Column) const override;
    //lint -restore
 
 private:
@@ -110,6 +111,8 @@ private:
    //Avoid call
    C_CamGenTableView(const C_CamGenTableView &);
    C_CamGenTableView & operator =(const C_CamGenTableView &);
+
+   const static stw_types::sintn mhsn_COL_WIDTH_DATA;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

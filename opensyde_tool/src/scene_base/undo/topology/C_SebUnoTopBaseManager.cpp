@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Scene  Scene to use undo redo framework for
    \param[in,out] opc_Parent Optional pointer to parent
@@ -48,7 +48,7 @@ C_SebUnoTopBaseManager::C_SebUnoTopBaseManager(QGraphicsScene * const opc_Scene,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -58,7 +58,7 @@ C_SebUnoTopBaseManager::~C_SebUnoTopBaseManager(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register resize
+/*! \brief  Register resize
 
    \param[in] orc_Items                Affected items
    \param[in] ors32_InteractionPointID Interaction point ID
@@ -76,7 +76,7 @@ void C_SebUnoTopBaseManager::RegisterResizeLine(const QList<QGraphicsItem *> & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register complete move step
+/*! \brief  Register complete move step
 
    \param[in] orc_Items              Affected items
    \param[in] orc_PositionDifference Position difference
@@ -92,7 +92,7 @@ void C_SebUnoTopBaseManager::RegisterCompleteMoveStep(const QList<QGraphicsItem 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Do move sub line
+/*! \brief  Do move sub line
 
    \param[in] orc_Items              Affected items
    \param[in] orc_PositionDifference Position difference
@@ -109,9 +109,9 @@ void C_SebUnoTopBaseManager::RegisterMoveSubLine(const QList<QGraphicsItem *> & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save current bus connector state for later
+/*! \brief  Save current bus connector state for later
 
-   \param[in] orc_Points Bus connector
+   \param[in] opc_BusConnector Bus connector
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopBaseManager::SaveBusConnectorInitialPoints(const C_GiLiBusConnectorBase * const opc_BusConnector)
@@ -123,7 +123,7 @@ void C_SebUnoTopBaseManager::SaveBusConnectorInitialPoints(const C_GiLiBusConnec
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Do delete items
+/*! \brief  Do delete items
 
    \param[in] orc_Items Items
 */
@@ -141,7 +141,7 @@ void C_SebUnoTopBaseManager::m_CleanupAction(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if special handling for bus connectors necessary
+/*! \brief  Check if special handling for bus connectors necessary
 
    \param[in] orc_Items Affected items
 

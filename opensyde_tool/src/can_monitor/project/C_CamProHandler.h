@@ -101,6 +101,7 @@ public:
    //Search
    void GetAllMessagesFromDatabase(const QString & orc_File, QStringList * const opc_CompleteMessageNames,
                                    std::vector<stw_types::uint32> * const opc_MessageIndices) const;
+   bool CheckFilterNameAvailable(const QString & orc_Name) const;
 
    //Utility
    static QString h_GetCompleteMessageName(const C_CamProMessageData & orc_Message);

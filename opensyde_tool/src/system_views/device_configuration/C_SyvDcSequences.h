@@ -44,7 +44,6 @@ public:
    void SetNodeId(const stw_types::uint8 ou8_NodeId);
    void SetIpAddress(const stw_types::uint8 (&orau8_IpAddress)[4]);
 
-   static stw_scl::C_SCLString h_SerialNumberToString(const stw_types::uint8 (&orau8_SerialNumer)[6]);
    static bool h_SerialNumberFromStringToArray(const stw_scl::C_SCLString & orc_SerialNumber,
                                                stw_types::uint8 * const opu8_SerialNumer);
 

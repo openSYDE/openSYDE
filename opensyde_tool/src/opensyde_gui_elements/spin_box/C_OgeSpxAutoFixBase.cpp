@@ -15,7 +15,7 @@
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_OgeSpxAutoFixBase.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -71,7 +71,7 @@ void C_OgeSpxAutoFixBase::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
 {
    this->mc_UnscaledMin = orc_Min;
    this->mc_UnscaledMax = orc_Max;
-   if (C_SdNdeDataPoolContentUtil::h_GetNumberOfAvailableSteps(this->mc_UnscaledMin, this->mc_UnscaledMax,
+   if (C_SdNdeDpContentUtil::h_GetNumberOfAvailableSteps(this->mc_UnscaledMin, this->mc_UnscaledMax,
                                                                this->mu64_NumberOfStepsAvailable,
                                                                ou32_Index) != C_NO_ERR)
    {

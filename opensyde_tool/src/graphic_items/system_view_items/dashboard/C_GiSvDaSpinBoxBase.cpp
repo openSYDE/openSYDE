@@ -27,7 +27,7 @@
 #include "C_OgePopUpDialog.h"
 #include "C_SyvDaPeBase.h"
 #include "C_SyvDaPeSpinBox.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_OSCNodeDataPoolListElement.h"
 #include "C_PuiSdHandler.h"
 
@@ -158,7 +158,7 @@ void C_GiSvDaSpinBoxBase::UpdateData(void)
          if (this->mpc_SpinBoxWidget != NULL)
          {
             const QVariant c_QValue = this->mpc_SpinBoxWidget->GetValue();
-            tgl_assert(C_SdNdeDataPoolContentUtil::h_SimpleConvertFromVariant(c_QValue, c_Box.c_Value) == C_NO_ERR);
+            tgl_assert(C_SdNdeDpContentUtil::h_SimpleConvertFromVariant(c_QValue, c_Box.c_Value) == C_NO_ERR);
          }
          tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                         this->mu32_DashboardIndex,
@@ -294,7 +294,7 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
          {
             c_ElementId = C_PuiSvDbNodeDataPoolListElementId(0, 0, 0, 0,
                                                              C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
-                                                             false);
+                                                             false, 0UL, false);
             c_Scaling = C_PuiSvDbDataElementScaling();
          }
 
@@ -447,7 +447,7 @@ void C_GiSvDaSpinBoxBase::m_UpdateStaticValues(void)
             this->mpc_SpinBoxWidget->Init(pc_Element->c_MinValue, pc_Element->c_MaxValue, c_Scaling.f64_Factor,
                                           c_Scaling.f64_Offset);
             this->mpc_SpinBoxWidget->SetUnit(c_Scaling.c_Unit);
-            tgl_assert(C_SdNdeDataPoolContentUtil::h_SimpleConvertToVariant(pc_Box->c_Value, c_QValue) == C_NO_ERR);
+            tgl_assert(C_SdNdeDpContentUtil::h_SimpleConvertToVariant(pc_Box->c_Value, c_QValue) == C_NO_ERR);
             this->mpc_SpinBoxWidget->SetValue(c_QValue);
          }
       }

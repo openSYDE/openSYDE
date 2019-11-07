@@ -123,11 +123,13 @@ C_SdBueMessageSelectorWidget::~C_SdBueMessageSelectorWidget()
 
    \param[in] ou32_NodeIndex      Node index
    \param[in] ou32_InterfaceIndex Interface index
+   \param[in] orc_DatapoolIndexes All Datapool indexes associated to the same protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSelectorWidget::SetNodeDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex) const
+void C_SdBueMessageSelectorWidget::SetNodeId(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
+                                             const std::vector<uint32> & orc_DatapoolIndexes) const
 {
-   this->mpc_Ui->pc_MessageTreeWidget->SetNodeDataPool(ou32_NodeIndex, ou32_InterfaceIndex);
+   this->mpc_Ui->pc_MessageTreeWidget->SetNodeId(ou32_NodeIndex, ou32_InterfaceIndex, orc_DatapoolIndexes);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -241,6 +243,19 @@ void C_SdBueMessageSelectorWidget::OnMessageNameChange(void) const
 void C_SdBueMessageSelectorWidget::OnSignalNameChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->OnSignalNameChange(orc_MessageId);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   In case of a disconnected node update of the unique message ids
+
+   \param[in]     ou32_NodeIndex      Node index
+   \param[in]     ou32_InterfaceIndex Interface index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorWidget::OnNodeDisconnected(const uint32 ou32_NodeIndex,
+                                                      const uint32 ou32_InterfaceIndex) const
+{
+   this->mpc_Ui->pc_MessageTreeWidget->OnNodeDisconnected(ou32_NodeIndex, ou32_InterfaceIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -691,7 +706,7 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
 void C_SdBueMessageSelectorWidget::m_OnSignalCountOfMessageChanged(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
-   Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
+   Q_EMIT (this->SigSignalCountOfMessageChanged(orc_MessageId));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -700,7 +715,7 @@ void C_SdBueMessageSelectorWidget::m_OnSignalCountOfMessageChanged(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_OnMessageCountChanged(void)
 {
-   Q_EMIT this->SigMessageCountChanged();
+   Q_EMIT (this->SigMessageCountChanged());
 
    //Text
    this->mpc_Ui->pc_PbTreeWidgetRoot->setText(QString(C_GtGetText::h_GetText("Messages (%1)")).arg(this->mpc_Ui->

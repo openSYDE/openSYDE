@@ -240,7 +240,7 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>10</width>
+              <width>4</width>
               <height>12</height>
              </size>
             </property>
@@ -285,7 +285,7 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>10</width>
+              <width>5</width>
               <height>20</height>
              </size>
             </property>
@@ -296,13 +296,13 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>30</height>
+              <height>28</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>30</height>
+              <height>28</height>
              </size>
             </property>
             <property name="font">
@@ -328,7 +328,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>10</width>
+           <width>5</width>
            <height>20</height>
           </size>
          </property>
@@ -370,7 +370,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>10</width>
+           <width>5</width>
            <height>20</height>
           </size>
          </property>
@@ -421,15 +421,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabSvgOnly.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
    <header>C_OgeGbxTransparent.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>

@@ -58,12 +58,13 @@ C_SdBueUnoMessageAddCommand::C_SdBueUnoMessageAddCommand(const C_OSCCanMessageId
    \param[in] orc_UISignals               Signals data (ui)
    \param[in] orc_OwnerNodeName           Owner node names
    \param[in] orc_OwnerNodeInterfaceIndex Owner node interface index
+   \param[in] orc_OwnerNodeDatapoolIndex  Owner node Datapool index
    \param[in] orc_OwnerIsTxFlag           Owner has message as TX flags
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Message,
                                                  const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
-                                                 const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals, const std::vector<QString>  & orc_OwnerNodeName, const std::vector<stw_types::uint32>  & orc_OwnerNodeInterfaceIndex,
+                                                 const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals, const std::vector<QString>  & orc_OwnerNodeName, const std::vector<stw_types::uint32>  & orc_OwnerNodeInterfaceIndex, const std::vector<stw_types::uint32> & orc_OwnerNodeDatapoolIndex,
                                                  const std::vector<bool>  & orc_OwnerIsTxFlag)
 {
    this->mc_Message = orc_Message;
@@ -71,8 +72,10 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Mes
    this->mc_UISignalCommons = orc_UISignalCommons;
    this->mc_UISignals = orc_UISignals;
    //Convert to internal structure
-   if (((orc_OwnerNodeName.size() == orc_OwnerNodeInterfaceIndex.size()) &&
-        (orc_OwnerNodeName.size() == orc_OwnerIsTxFlag.size())) && (orc_OwnerNodeName.size() > 0UL))
+   if ((orc_OwnerNodeName.size() == orc_OwnerNodeInterfaceIndex.size()) &&
+       (orc_OwnerNodeName.size() == orc_OwnerNodeDatapoolIndex.size()) &&
+       (orc_OwnerNodeName.size() == orc_OwnerIsTxFlag.size()) &&
+       (orc_OwnerNodeName.size() > 0UL))
    {
       bool q_First = true;
       for (stw_types::uint32 u32_ItOwner = 0; u32_ItOwner < orc_OwnerNodeName.size(); ++u32_ItOwner)
@@ -88,13 +91,15 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Mes
             if ((pc_Node != NULL) && (pc_Node->c_Properties.c_Name == rc_CurName.toStdString().c_str()))
             {
                const C_OSCCanMessageContainer * const pc_Container =
-                  C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(u32_ItNode,
-                                                                                  this->mc_LastMessageId.e_ComProtocol,
-                                                                                  orc_OwnerNodeInterfaceIndex[
-                                                                                     u32_ItOwner]);
+                  C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(
+                     u32_ItNode,
+                     this->mc_LastMessageId.e_ComProtocol,
+                     orc_OwnerNodeInterfaceIndex[u32_ItOwner],
+                     orc_OwnerNodeDatapoolIndex[u32_ItOwner]);
+
                c_CurId.u32_NodeIndex = u32_ItNode;
                //Check if valid
-               if ((pc_Container != NULL) && (pc_Container->q_IsComProtocolUsedByInterface == true))
+               if (pc_Container != NULL)
                {
                   q_Found = true;
                   //There actually could be better matches in other nodes if this one does not work in any way
@@ -107,6 +112,7 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Mes
             //Assign other values
             c_CurId.e_ComProtocol = this->mc_LastMessageId.e_ComProtocol;
             c_CurId.u32_InterfaceIndex = orc_OwnerNodeInterfaceIndex[u32_ItOwner];
+            c_CurId.u32_DatapoolIndex = orc_OwnerNodeDatapoolIndex[u32_ItOwner];
             c_CurId.q_MessageIsTx = orc_OwnerIsTxFlag[u32_ItOwner];
             //First one has to replace default message ID
             if (q_First == true)
@@ -119,6 +125,7 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Mes
                bool q_AlreadyAdded = false;
                //Only add if unique (might prevent strange behavior)
                if ((this->mc_LastMessageId.u32_NodeIndex == c_CurId.u32_NodeIndex) &&
+                   (this->mc_LastMessageId.u32_DatapoolIndex == c_CurId.u32_DatapoolIndex) &&
                    (this->mc_LastMessageId.u32_InterfaceIndex == c_CurId.u32_InterfaceIndex))
                {
                   q_AlreadyAdded = true;
@@ -129,6 +136,7 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Mes
                   {
                      const C_OSCCanMessageIdentificationIndices & rc_CurId = this->mc_MatchingIds[u32_ItId];
                      if ((rc_CurId.u32_NodeIndex == c_CurId.u32_NodeIndex) &&
+                         (rc_CurId.u32_DatapoolIndex == c_CurId.u32_DatapoolIndex) &&
                          (rc_CurId.u32_InterfaceIndex == c_CurId.u32_InterfaceIndex))
                      {
                         q_AlreadyAdded = true;

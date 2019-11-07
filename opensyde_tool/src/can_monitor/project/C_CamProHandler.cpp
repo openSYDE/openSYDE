@@ -122,7 +122,7 @@ const QString C_CamProHandler::GetCustomCANDllPath() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get CAN Dll type. (PEAK = 0,Vector = 1, Other = 2)
+/*! \brief   Get CAN Dll type.
 
    \return   CAN Dll type
 */
@@ -754,6 +754,36 @@ void C_CamProHandler::GetAllMessagesFromDatabase(const QString & orc_File, QStri
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if any filter uses the provided name
+
+   Attention: Calling this with name of an existing filter returns false.
+
+   \param[in]     orc_Name    Filter name to check for
+
+   \return
+   true  Available
+   false Already in use
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamProHandler::CheckFilterNameAvailable(const QString & orc_Name) const
+{
+   bool q_Retval = true;
+
+   std::vector<C_CamProFilterData>::const_iterator c_It;
+   for (c_It = this->mc_Filters.begin(); c_It != this->mc_Filters.end(); c_It++)
+   {
+      const C_CamProFilterData & rc_CurrentFilter = *c_It;
+      if(rc_CurrentFilter.c_Name == orc_Name)
+      {
+         q_Retval = false;
+         break;
+      }
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get the complete message name to display
 
    \param[in] orc_Message Message to get the name from
@@ -972,7 +1002,7 @@ void C_CamProHandler::Clear(const bool oq_UpdateUserSettings)
 
    this->mc_Messages.clear();
    this->mc_Filters.clear();
-   this->mq_FiltersActive = true;
+   this->mq_FiltersActive = false;
    this->mc_Databases.clear();
    this->mc_File = "";
    this->me_CANDllType = ePEAK;
@@ -1007,7 +1037,7 @@ C_CamProHandler * C_CamProHandler::h_GetInstance(void)
 //----------------------------------------------------------------------------------------------------------------------
 C_CamProHandler::C_CamProHandler(void) :
    mu32_FileHash(0UL),
-   mq_FiltersActive(true),
+   mq_FiltersActive(false),
    me_CANDllType(ePEAK)
 {
    //init hash

@@ -101,8 +101,8 @@ C_PopSaveAsDialogWidget::~C_PopSaveAsDialogWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopSaveAsDialogWidget::InitStaticNames(void) const
 {
-   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("PROJECT OPERATION"));
-   this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Save Project as"));
+   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Project"));
+   this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Save As"));
    this->mpc_Ui->pc_LabelHeadingPreview->setText(C_GtGetText::h_GetText("Location"));
    this->mpc_Ui->pc_LabelName->setText(C_GtGetText::h_GetText("Project Name"));
    this->mpc_Ui->pc_LabelPath->setText(C_GtGetText::h_GetText("Path"));
@@ -281,63 +281,63 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
    const QString c_BasePath = this->mpc_Ui->pc_LineEditPath->GetPath();
    const QString c_Name = this->mpc_Ui->pc_LineEditName->text();
 
-   if ((c_BasePath.compare("") != 0) && (c_Name.compare("") != 0))
-   {
-      if (C_OSCUtils::h_CheckValidCName(c_Name.toStdString().c_str(), std::numeric_limits<uint16>::max()))
-      {
-         const QString c_Path = c_BasePath + '/' + c_Name;
-         const QString c_FilePathAndName = c_Path + '/' + c_Name + ".syde";
-         QDir c_Dir(c_Path);
+   const bool q_ValidName = C_OSCUtils::h_CheckValidFileName(c_Name.toStdString().c_str());
+   const bool q_ValidPath = C_OSCUtils::h_CheckValidFilePath(c_BasePath.toStdString().c_str());
 
-         if (c_Dir.exists() == false)
+   if ((q_ValidName == true) && (q_ValidPath == true))
+   {
+      const QString c_Path = c_BasePath + '/' + c_Name;
+      const QString c_FilePathAndName = c_Path + '/' + c_Name + ".syde";
+      QDir c_Dir(c_Path);
+
+      if (c_Dir.exists() == false)
+      {
+         bool q_UseV2;
+         c_Dir.mkdir(c_Path);
+         if (this->mpc_Ui->pc_ComboBoxVersion->currentIndex() == C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V2)
          {
-            bool q_UseV2;
-            c_Dir.mkdir(c_Path);
-            if (this->mpc_Ui->pc_ComboBoxVersion->currentIndex() == C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V2)
-            {
-               q_UseV2 = true;
-            }
-            else
-            {
-               q_UseV2 = false;
-            }
-            if (m_SaveToFile(c_FilePathAndName, q_UseV2) == C_NO_ERR)
-            {
-               // accept dialog if successfully saved
-               this->mrc_ParentDialog.accept();
-            }
-            QApplication::restoreOverrideCursor();
+            q_UseV2 = true;
          }
          else
          {
-            QApplication::restoreOverrideCursor();
-            C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::E_Type::eERROR);
-            c_Box.SetHeading(C_GtGetText::h_GetText("Project save"));
-            c_Box.SetDescription(C_GtGetText::h_GetText(
-                                    "A project with this name already exists. Choose another name."));
-            c_Box.Execute();
+            q_UseV2 = false;
          }
+         if (m_SaveToFile(c_FilePathAndName, q_UseV2) == C_NO_ERR)
+         {
+            // accept dialog if successfully saved
+            this->mrc_ParentDialog.accept();
+         }
+         QApplication::restoreOverrideCursor();
       }
       else
       {
-         QApplication::restoreOverrideCursor();
          C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::E_Type::eERROR);
+         QApplication::restoreOverrideCursor();
          c_Box.SetHeading(C_GtGetText::h_GetText("Project save"));
-         c_Box.SetDescription(C_GtGetText::h_GetText(
-                                 "Project name is invalid. Only alphanumeric characters and \"_\" are allowed."));
+         c_Box.SetDescription(C_GtGetText::h_GetText("A project with this name already exists. Choose another name."));
          c_Box.Execute();
       }
    }
    else
    {
-      QApplication::restoreOverrideCursor();
-      const QString c_LName = this->mpc_Ui->pc_LabelName->text();
-      const QString c_Path = this->mpc_Ui->pc_LabelPath->text();
       C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::E_Type::eERROR);
+      QApplication::restoreOverrideCursor();
+      QString c_Details = C_GtGetText::h_GetText("Invalid content: \n");
+      if (q_ValidName == false)
+      {
+         c_Details += (c_Name.isEmpty()) ?  C_GtGetText::h_GetText("Empty project name") : c_Name;
+         c_Details += "\n";
+      }
+
+      if (q_ValidPath == false)
+      {
+         c_Details += (c_BasePath.isEmpty()) ?  C_GtGetText::h_GetText("Empty project path") : c_BasePath;
+      }
+
       c_Box.SetHeading(C_GtGetText::h_GetText("Save project as"));
-      //Translation: 1: Project name 2: Project path
-      c_Box.SetDescription(QString(C_GtGetText::h_GetText("Please insert a valid string for both %1 and %2.")).
-                           arg(c_LName.toLower(), c_Path.toLower()));
+      c_Box.SetDescription(C_GtGetText::h_GetText("Name or/and path is empty or contains invalid characters. "
+                                                  "Please choose valid name and path."));
+      c_Box.SetDetails(c_Details);
       c_Box.Execute();
    }
 }

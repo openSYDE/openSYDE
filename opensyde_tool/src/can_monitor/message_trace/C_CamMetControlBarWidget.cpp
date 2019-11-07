@@ -37,7 +37,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -107,7 +107,7 @@ C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetControlBarWidget::~C_CamMetControlBarWidget()
@@ -119,7 +119,7 @@ C_CamMetControlBarWidget::~C_CamMetControlBarWidget()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize all displayed static names
+/*! \brief  Initialize all displayed static names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::InitStaticNames() const
@@ -171,7 +171,7 @@ void C_CamMetControlBarWidget::InitStaticNames() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load all user settings
+/*! \brief  Load all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::LoadUserSettings(void) const
@@ -185,7 +185,7 @@ void C_CamMetControlBarWidget::LoadUserSettings(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save all user settings
+/*! \brief  Save all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::SaveUserSettings(void) const
@@ -198,7 +198,7 @@ void C_CamMetControlBarWidget::SaveUserSettings(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Stopping logging in case of an error
+/*! \brief  Stopping logging in case of an error
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::StopLogging(void)
@@ -207,7 +207,7 @@ void C_CamMetControlBarWidget::StopLogging(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle toggle of action playing state
+/*! \brief  Handle toggle of action playing state
 
    \param[in] oq_Playing Is playing flag
 */
@@ -242,7 +242,7 @@ void C_CamMetControlBarWidget::m_HandleTogglePlay(const bool oq_Playing)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle stop button press
+/*! \brief  Handle stop button press
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_HandleStop(void)
@@ -256,7 +256,7 @@ void C_CamMetControlBarWidget::m_HandleStop(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle selected protocol change
+/*! \brief  Handle selected protocol change
 
    \param[in] osn_Index Selected protocol index
 */
@@ -267,9 +267,9 @@ void C_CamMetControlBarWidget::m_OnProtocolIndexChange(const sintn osn_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the protocol type
+/*! \brief  Returns the protocol type
 
-   \param[in]     os32_Protocol         Index of protocol
+   \param[in] os32_Protocol Index of protocol
 
    \return
    Protocol type as enum
@@ -307,7 +307,7 @@ stw_cmon_protocol::e_CMONL7Protocols C_CamMetControlBarWidget::mh_GetProtocolFro
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle the tree visibility
+/*! \brief  Handle the tree visibility
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_HandleTreeVisibility(void)
@@ -327,9 +327,9 @@ void C_CamMetControlBarWidget::m_HandleTreeVisibility(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set display mode: display unique messages
+/*! \brief  Set display mode: display unique messages
 
-   \param[in] oq_Value New value
+   \param[in] oq_Active Active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_HandleToggleDisplayMode(const bool oq_Active)

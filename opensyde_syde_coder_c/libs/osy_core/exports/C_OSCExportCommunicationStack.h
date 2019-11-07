@@ -40,6 +40,7 @@ public:
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path, const C_OSCNode & orc_Node,
                                                const stw_types::uint16 ou16_ApplicationIndex,
                                                const stw_types::uint8 ou8_InterfaceIndex,
+                                               const stw_types::uint32 ou32_DatapoolIndex,
                                                const C_OSCCanProtocol::E_Type & ore_Protocol,
                                                const stw_scl::C_SCLString & orc_ExportToolInfo = "");
 

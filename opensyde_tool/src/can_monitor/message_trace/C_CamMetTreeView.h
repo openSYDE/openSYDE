@@ -72,6 +72,7 @@ protected:
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void drawBranches(QPainter * const opc_Painter, const QRect & orc_Rect,
                              const QModelIndex & orc_Index) const override;
+   virtual stw_types::sintn sizeHintForColumn(stw_types::sintn osn_Column) const override;
    //lint -restore
 
 private:
@@ -117,6 +118,14 @@ private:
                            const stw_types::sint32 os32_Offset);
    static void mh_DrawVLine(QPainter * const opc_Painter, const QPoint & orc_TopLeft,
                             const stw_types::sint32 os32_Offset);
+
+   const static stw_types::sintn mhsn_COL_WIDTH_TIME_STAMP;
+   const static stw_types::sintn mhsn_COL_WIDTH_CAN_ID;
+   const static stw_types::sintn mhsn_COL_WIDTH_CAN_NAME;
+   const static stw_types::sintn mhsn_COL_WIDTH_CAN_DIR;
+   const static stw_types::sintn mhsn_COL_WIDTH_CAN_DLC;
+   const static stw_types::sintn mhsn_COL_WIDTH_CAN_DATA;
+   const static stw_types::sintn mhsn_COL_WIDTH_CAN_COUNTER;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

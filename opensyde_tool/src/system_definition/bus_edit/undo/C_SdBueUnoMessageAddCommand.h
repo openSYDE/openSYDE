@@ -36,6 +36,7 @@ public:
                        const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
                        const std::vector<QString> & orc_OwnerNodeName,
                        const std::vector<stw_types::uint32> & orc_OwnerNodeInterfaceIndex,
+                       const std::vector<stw_types::uint32> & orc_OwnerNodeDatapoolIndex,
                        const std::vector<bool> & orc_OwnerIsTxFlag);
 
    stw_opensyde_core::C_OSCCanMessageIdentificationIndices GetLastMessageId(void) const;

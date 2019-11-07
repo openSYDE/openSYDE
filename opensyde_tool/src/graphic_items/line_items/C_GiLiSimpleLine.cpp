@@ -36,7 +36,7 @@ using namespace stw_types;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -49,7 +49,7 @@ C_GiLiSimpleLine::C_GiLiSimpleLine(QGraphicsItem * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -59,7 +59,7 @@ C_GiLiSimpleLine::~C_GiLiSimpleLine()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this itme
+/*! \brief  Returns the type of this itme
 
    \return  ID
 */
@@ -70,7 +70,7 @@ sintn C_GiLiSimpleLine::type() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set line width
+/*! \brief  Set line width
 
    \param[in] ors32_Width New line width
 */
@@ -84,7 +84,7 @@ void C_GiLiSimpleLine::SetWidth(const stw_types::sint32 & ors32_Width)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set color
+/*! \brief  Set color
 
    \param[in] orc_Color New color
 */
@@ -98,7 +98,10 @@ void C_GiLiSimpleLine::SetColor(const QColor & orc_Color)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get width
+/*! \brief  Get width
+
+   \return
+   Width
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiLiSimpleLine::GetWidth() const
@@ -109,7 +112,10 @@ sint32 C_GiLiSimpleLine::GetWidth() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get color
+/*! \brief  Get color
+
+   \return
+   Color
 */
 //----------------------------------------------------------------------------------------------------------------------
 QColor C_GiLiSimpleLine::GetColor() const
@@ -120,10 +126,13 @@ QColor C_GiLiSimpleLine::GetColor() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the position
+/*! \brief  Returns the position
 
    Returns the position which is most top left. The return value is either the start point p1
    or the end point p2 of the line.
+
+   \return
+   Position
 */
 //----------------------------------------------------------------------------------------------------------------------
 QPointF C_GiLiSimpleLine::GetPos(void) const
@@ -157,7 +166,10 @@ QPointF C_GiLiSimpleLine::GetPos(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the coordinates of P1 of the line
+/*! \brief  Returns the coordinates of P1 of the line
+
+   \return
+   Position of P1
 */
 //----------------------------------------------------------------------------------------------------------------------
 QPointF C_GiLiSimpleLine::GetP1() const
@@ -166,7 +178,10 @@ QPointF C_GiLiSimpleLine::GetP1() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the coordinates of P2 of the line
+/*! \brief  Returns the coordinates of P2 of the line
+
+   \return
+   Position of P2
 */
 //----------------------------------------------------------------------------------------------------------------------
 QPointF C_GiLiSimpleLine::GetP2() const

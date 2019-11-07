@@ -32,7 +32,7 @@ class C_SdNdeUnoDataPoolListAddDeleteBaseCommand :
 public:
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand(const stw_types::uint32 & oru32_NodeIndex,
                                               const stw_types::uint32 & oru32_DataPoolIndex,
-                                              stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                              stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                               const std::vector<stw_types::uint32> & orc_Indices, const QString & orc_Text = "",
                                               QUndoCommand * const opc_Parent = NULL);
 

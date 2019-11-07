@@ -30,7 +30,7 @@ class C_SyvManager :
 public:
    C_SyvManager(QObject * const opc_Parent = NULL);
 
-   void AddView(void);
+   void AddView(const bool oq_SendSigChangeMode = true);
    void UpdateAllViewNames(void) const;
    void HandleInitialSystemView(void);
    void RenameView(const stw_types::uint32 ou32_Index, const QString & orc_Name) const;

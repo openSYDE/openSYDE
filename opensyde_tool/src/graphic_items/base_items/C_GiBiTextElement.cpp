@@ -19,6 +19,7 @@
 #include "C_GiBiTextElement.h"
 #include "C_GiCustomFunctions.h"
 #include "C_OgePopUpDialog.h"
+#include "C_GtGetText.h"
 #include "C_GiSyBaseWidget.h"
 #include "C_GiSyTextElementWidget.h"
 #include "C_PuiSdDataElement.h"
@@ -37,8 +38,6 @@ const float64 mf64_ActionPointOffsetBoundary = 10.0;
 const float64 C_GiBiTextElement::mhf64_MinWidthTextElement = 70.0;
 const float64 C_GiBiTextElement::mhf64_MinHeightTextElement = 20.0;
 
-const QString mc_NAME_TEXT_ELEMENT = "TEXT ELEMENT";
-
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
@@ -50,7 +49,7 @@ const QString mc_NAME_TEXT_ELEMENT = "TEXT ELEMENT";
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -71,7 +70,7 @@ C_GiBiTextElement::C_GiBiTextElement(const stw_types::uint64 & oru64_ID, const b
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -125,7 +124,7 @@ void C_GiBiTextElement::m_Init()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   default destructor
+/*! \brief  default destructor
 
    Clean up.
 */
@@ -136,7 +135,7 @@ C_GiBiTextElement::~C_GiBiTextElement()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this itme
+/*! \brief  Returns the type of this itme
 
    \return  ID
 */
@@ -147,7 +146,7 @@ sintn C_GiBiTextElement::type() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Open style dialog
+/*! \brief  Open style dialog
 
    \param[in] oq_DarkMode Optional dark mode flag
 
@@ -163,7 +162,7 @@ bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
-   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, mc_NAME_TEXT_ELEMENT, oq_DarkMode);
+   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Text Element"), oq_DarkMode);
    C_GiSyTextElementWidget * pc_SettingsWidget = new C_GiSyTextElementWidget(*pc_Dialog);
 
    pc_SettingsWidget->SetFontColor(this->GetFontColor());
@@ -208,7 +207,7 @@ void C_GiBiTextElement::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore default mouse cursor
+/*! \brief  Restore default mouse cursor
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiTextElement::RestoreDefaultCursor(void)
@@ -230,9 +229,9 @@ void C_GiBiTextElement::SetTemporaryCursor(const QCursor & orc_TemporaryCursor)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set shown text
+/*! \brief  Set shown text
 
-   \param[in] orc_Text   New text
+   \param[in] orc_Text New text
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiTextElement::SetText(const QString & orc_Text)
@@ -241,9 +240,9 @@ void C_GiBiTextElement::SetText(const QString & orc_Text)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set font style
+/*! \brief  Set font style
 
-   \param[in] orc_Font   New font style configuration
+   \param[in] orc_Font New font style configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiTextElement::SetFontStyle(const QFont & orc_Font)
@@ -252,7 +251,7 @@ void C_GiBiTextElement::SetFontStyle(const QFont & orc_Font)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set font color
+/*! \brief  Set font color
 
    \param[in] orc_Color New color
 */
@@ -263,7 +262,7 @@ void C_GiBiTextElement::SetFontColor(const QColor & orc_Color)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get displayed text
+/*! \brief  Get displayed text
 
    \return
    Plain text
@@ -275,7 +274,7 @@ QString C_GiBiTextElement::GetText() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get font style
+/*! \brief  Get font style
 
    \return
    Font style
@@ -287,7 +286,7 @@ QFont C_GiBiTextElement::GetFontStyle() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get font color
+/*! \brief  Get font color
 
    \return
    Font color
@@ -299,7 +298,7 @@ QColor C_GiBiTextElement::GetFontColor() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper function to apply style and trigger updates
+/*! \brief  Helper function to apply style and trigger updates
 
    \param[in] orc_Font  New font
    \param[in] orc_Color New color
@@ -313,9 +312,9 @@ void C_GiBiTextElement::ApplyStyle(const QFont & orc_Font, const QColor & orc_Co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Setting the flag if the text element is editable
+/*! \brief  Setting the flag if the text element is editable
 
-   \param[in]     oq_Editable    Flag for editing the content of the text element
+   \param[in] oq_Editable Flag for editing the content of the text element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiTextElement::SetEditable(const bool oq_Editable)
@@ -325,7 +324,7 @@ void C_GiBiTextElement::SetEditable(const bool oq_Editable)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for initially loading internal data
+/*! \brief  Function for initially loading internal data
 
    \param[in,out] opc_Data    Text element data
    \param[in]     oq_DarkMode Optional flag if dark mode is active
@@ -349,7 +348,7 @@ void C_GiBiTextElement::m_LoadTextElementData(const C_PuiBsTextElement * const o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for updating internal data
+/*! \brief  Slot function for updating internal data
 
    \param[in,out] opc_Data    Text element data
    \param[in]     oq_DarkMode Optional flag if dark mode is active
@@ -379,9 +378,9 @@ void C_GiBiTextElement::m_ResizeUpdateItems(const float64 of64_DiffWidth, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overridden key press event
+/*! \brief  Overridden key press event
 
-   \param[in,out] opc_Event  Pointer to key event
+   \param[in,out] opc_Event Pointer to key event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiTextElement::keyPressEvent(QKeyEvent * const opc_Event)
@@ -404,7 +403,7 @@ void C_GiBiTextElement::keyPressEvent(QKeyEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse move event slot
+/*! \brief  Overwritten mouse move event slot
 
    Here: do not allow mouse move when editor mode active
 
@@ -420,10 +419,10 @@ void C_GiBiTextElement::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten itemChange event slot
+/*! \brief  Overwritten itemChange event slot
 
-   \param[in]  oe_Change  Indicator what changed
-   \param[in]  orc_Value  Value corresponding to change
+   \param[in] oe_Change Indicator what changed
+   \param[in] orc_Value Value corresponding to change
 
    \return
    new value
@@ -457,7 +456,7 @@ QVariant C_GiBiTextElement::itemChange(const GraphicsItemChange oe_Change, const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten scene event filter event slot
+/*! \brief  Overwritten scene event filter event slot
 
    Prevent single click the text item to select it with one click.
 
@@ -510,7 +509,7 @@ bool C_GiBiTextElement::sceneEventFilter(QGraphicsItem * const opc_Watched, QEve
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   React to text interaction mode change
+/*! \brief  React to text interaction mode change
 
    \param[in] orq_On Flag if text interaction mode is currently active
 */

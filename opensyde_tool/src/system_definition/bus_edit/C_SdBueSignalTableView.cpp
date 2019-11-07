@@ -92,8 +92,7 @@ C_SdBueSignalTableView::C_SdBueSignalTableView(QWidget * const opc_Parent) :
    this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
    this->verticalHeader()->setMinimumSectionSize(40);
    this->verticalHeader()->setMaximumSectionSize(40);
-   this->
-   verticalHeader()->setDefaultSectionSize(40);
+   this->verticalHeader()->setDefaultSectionSize(40);
    //Icon
    // make sure to resize to icon size
    this->horizontalHeader()->resizeSection(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eICON), 42);
@@ -160,6 +159,7 @@ sintn C_SdBueSignalTableView::GetCountRows(void) const
 {
    return this->mc_Model.rowCount();
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse move event slot
 

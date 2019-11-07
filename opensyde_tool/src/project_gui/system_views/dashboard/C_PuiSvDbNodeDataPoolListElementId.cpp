@@ -37,6 +37,8 @@ using namespace stw_opensyde_gui_logic;
 C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(void) :
    C_OSCNodeDataPoolListElementId(),
    me_Type(eDATAPOOL_ELEMENT),
+   mq_UseArrayElementIndex(false),
+   mu32_ArrayElementIndex(0UL),
    mq_IsValid(true),
    me_InvalidTypePlaceholder(C_OSCNodeDataPool::eDIAG)
 {
@@ -47,18 +49,25 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(void) :
 
    \param[in] orc_Base                   Standard node data pool list element identification indices
    \param[in] oe_Type                    Enum to denote the source type
+   \param[in] oq_UseArrayElementIndex    Flag to use array element index
+   \param[in] ou32_ArrayElementIndex     Array element index
    \param[in] oq_IsValid                 Invalid flag
    \param[in] oe_InvalidTypePlaceholder  Type placeholder to be used in case of invalid state
    \param[in] orc_InvalidNamePlaceholder Name placeholder to be used in case of invalid state
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const C_OSCNodeDataPoolListElementId & orc_Base,
-                                                                       const E_Type oe_Type, const bool oq_IsValid,
+                                                                       const E_Type oe_Type,
+                                                                       const bool oq_UseArrayElementIndex,
+                                                                       const stw_types::uint32 ou32_ArrayElementIndex,
+                                                                       const bool oq_IsValid,
                                                                        const C_OSCNodeDataPool::E_Type oe_InvalidTypePlaceholder,
                                                                        const QString & orc_InvalidNamePlaceholder) :
    C_OSCNodeDataPoolListElementId(orc_Base.u32_NodeIndex, orc_Base.u32_DataPoolIndex, orc_Base.u32_ListIndex,
                                   orc_Base.u32_ElementIndex),
    me_Type(oe_Type),
+   mq_UseArrayElementIndex(oq_UseArrayElementIndex),
+   mu32_ArrayElementIndex(ou32_ArrayElementIndex),
    mq_IsValid(oq_IsValid),
    me_InvalidTypePlaceholder(oe_InvalidTypePlaceholder),
    mc_InvalidNamePlaceholder(orc_InvalidNamePlaceholder)
@@ -73,6 +82,8 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const C_O
    \param[in] ou32_ListIndex             List index
    \param[in] ou32_ElementIndex          Element index
    \param[in] oe_Type                    Enum to denote the source type
+   \param[in] oq_UseArrayElementIndex    Flag to use array element index
+   \param[in] ou32_ArrayElementIndex     Array element index
    \param[in] oq_IsValid                 Invalid flag
    \param[in] oe_InvalidTypePlaceholder  Type placeholder to be used in case of invalid state
    \param[in] orc_InvalidNamePlaceholder Name placeholder to be used in case of invalid state
@@ -82,11 +93,16 @@ C_PuiSvDbNodeDataPoolListElementId::C_PuiSvDbNodeDataPoolListElementId(const stw
                                                                        const stw_types::uint32 ou32_DataPoolIndex,
                                                                        const stw_types::uint32 ou32_ListIndex,
                                                                        const stw_types::uint32 ou32_ElementIndex,
-                                                                       const E_Type oe_Type, const bool oq_IsValid,
+                                                                       const E_Type oe_Type,
+                                                                       const bool oq_UseArrayElementIndex,
+                                                                       const stw_types::uint32 ou32_ArrayElementIndex,
+                                                                       const bool oq_IsValid,
                                                                        const C_OSCNodeDataPool::E_Type oe_InvalidTypePlaceholder,
                                                                        const QString & orc_InvalidNamePlaceholder) :
    C_OSCNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex),
    me_Type(oe_Type),
+   mq_UseArrayElementIndex(oq_UseArrayElementIndex),
+   mu32_ArrayElementIndex(ou32_ArrayElementIndex),
    mq_IsValid(oq_IsValid),
    me_InvalidTypePlaceholder(oe_InvalidTypePlaceholder),
    mc_InvalidNamePlaceholder(orc_InvalidNamePlaceholder)
@@ -120,13 +136,50 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & 
       }
       else if (this->mq_IsValid == pc_NonBase->mq_IsValid)
       {
+         //Check type
          if (this->me_Type > pc_NonBase->GetType())
          {
             q_Retval = false;
          }
          else if (this->me_Type == pc_NonBase->GetType())
          {
-            q_Retval = C_OSCNodeDataPoolListElementId::operator <(orc_Cmp);
+            if (this->mq_UseArrayElementIndex == false)
+            {
+               if (this->mq_UseArrayElementIndex == pc_NonBase->GetUseArrayElementIndex())
+               {
+                  //Ignore array element index
+                  q_Retval = C_OSCNodeDataPoolListElementId::operator <(orc_Cmp);
+               }
+               else
+               {
+                  //Just define an order for inequality case
+                  q_Retval = false;
+               }
+            }
+            else
+            {
+               if (this->mq_UseArrayElementIndex == pc_NonBase->GetUseArrayElementIndex())
+               {
+                  //Check array element index
+                  if (this->mu32_ArrayElementIndex > pc_NonBase->GetArrayElementIndex())
+                  {
+                     q_Retval = false;
+                  }
+                  else if (this->mu32_ArrayElementIndex == pc_NonBase->GetArrayElementIndex())
+                  {
+                     q_Retval = C_OSCNodeDataPoolListElementId::operator <(orc_Cmp);
+                  }
+                  else
+                  {
+                     q_Retval = true;
+                  }
+               }
+               else
+               {
+                  //Just define an order for inequality case
+                  q_Retval = true;
+               }
+            }
          }
          else
          {
@@ -170,15 +223,69 @@ bool C_PuiSvDbNodeDataPoolListElementId::operator ==(const C_OSCNodeDataPoolId &
       if (pc_NonBase != NULL)
       {
          // In case of a false valid flag, we can not trust the indices
-         if ((this->mq_IsValid == pc_NonBase->mq_IsValid) &&
-             (this->mq_IsValid == true) &&
-             (this->me_Type == pc_NonBase->GetType()))
+         if (((this->mq_IsValid == pc_NonBase->mq_IsValid) &&
+              (this->mq_IsValid == true) &&
+              (this->me_Type == pc_NonBase->GetType())) &&
+             (this->mq_UseArrayElementIndex == pc_NonBase->GetUseArrayElementIndex()))
          {
-            q_Retval = true;
+            //Only check array element index if relevant
+            if (this->mq_UseArrayElementIndex)
+            {
+               if (this->mu32_ArrayElementIndex == pc_NonBase->GetArrayElementIndex())
+               {
+                  q_Retval = true;
+               }
+            }
+            else
+            {
+               q_Retval = true;
+            }
          }
       }
    }
 
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if both elements use the same data element ID as a base
+
+   \param[in] orc_OtherId Compared instance
+
+   \return
+   True  Current base data element ID equal to orc_OtherId
+   False Else
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbNodeDataPoolListElementId::CheckSameDataElement(const C_PuiSvDbNodeDataPoolListElementId & orc_OtherId)
+const
+{
+   bool q_Retval;
+
+   if ((this->GetIsValid() == false) || (orc_OtherId.GetIsValid() == false))
+   {
+      q_Retval = false;
+   }
+   else
+   {
+      if ((this->GetUseArrayElementIndex() == false) && (orc_OtherId.GetUseArrayElementIndex() == false))
+      {
+         //Same result as comparison
+         q_Retval = *this == orc_OtherId;
+      }
+      else
+      {
+         if (this->me_Type == orc_OtherId.GetType())
+         {
+            //Same result as base comparison
+            q_Retval = C_OSCNodeDataPoolListElementId::operator ==(orc_OtherId);
+         }
+         else
+         {
+            q_Retval = false;
+         }
+      }
+   }
    return q_Retval;
 }
 
@@ -268,4 +375,71 @@ C_PuiSvDbNodeDataPoolListElementId::E_Type C_PuiSvDbNodeDataPoolListElementId::G
 void C_PuiSvDbNodeDataPoolListElementId::SetType(const C_PuiSvDbNodeDataPoolListElementId::E_Type oe_Type)
 {
    this->me_Type = oe_Type;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get array element index
+
+   \return
+   Current array element index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::uint32 C_PuiSvDbNodeDataPoolListElementId::GetArrayElementIndex() const
+{
+   return this->mu32_ArrayElementIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Combine array index valid check with return of array index, with default zero if index invalid
+
+   \return
+   Index to use
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::uint32 C_PuiSvDbNodeDataPoolListElementId::GetArrayElementIndexOrZero(void) const
+{
+   stw_types::uint32 u32_Retval;
+   if (this->mq_IsValid)
+   {
+      u32_Retval = this->mu32_ArrayElementIndex;
+   }
+   else
+   {
+      u32_Retval = 0UL;
+   }
+   return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set array element index
+
+   \param[in] ou32_Value New array element index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDbNodeDataPoolListElementId::SetArrayElementIndex(const stw_types::uint32 ou32_Value)
+{
+   this->mu32_ArrayElementIndex = ou32_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get array element index usage flag
+
+   \return
+   Current array element index usage flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSvDbNodeDataPoolListElementId::GetUseArrayElementIndex(void) const
+{
+   return this->mq_UseArrayElementIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set array element index usage flag
+
+   \param[in] ou32_Value New array element index usage flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDbNodeDataPoolListElementId::SetUseArrayElementIndex(const bool oq_Value)
+{
+   this->mq_UseArrayElementIndex = oq_Value;
 }

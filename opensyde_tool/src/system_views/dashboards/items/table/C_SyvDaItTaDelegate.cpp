@@ -17,7 +17,7 @@
 #include "stwtypes.h"
 #include "constants.h"
 #include "C_SyvDaItTaModel.h"
-#include "C_SdNdeDataPoolUtil.h"
+#include "C_SdNdeDpUtil.h"
 #include "C_SyvDaItTaDelegate.h"
 #include "C_TblTreDelegateUtil.h"
 
@@ -156,7 +156,7 @@ void C_SyvDaItTaDelegate::paint(QPainter * const opc_Painter, const QStyleOption
                                 const QModelIndex & orc_Index) const
 {
    //Draw background (used to fill in transparent grid)
-   C_SdNdeDataPoolUtil::h_DrawTableBackgroundGeneric(opc_Painter, orc_Option, this->mc_BackgroundColorDefault,
+   C_SdNdeDpUtil::h_DrawTableBackgroundGeneric(opc_Painter, orc_Option, this->mc_BackgroundColorDefault,
                                                      this->mc_BackgroundColorAlternating,
                                                      this->mc_BackgroundColorSelection);
    //Draw element

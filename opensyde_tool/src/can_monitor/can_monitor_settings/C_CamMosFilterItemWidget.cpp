@@ -17,10 +17,12 @@
 #include "C_CamMosFilterItemWidget.h"
 #include "ui_C_CamMosFilterItemWidget.h"
 
+#include "constants.h"
+#include "C_GtGetText.h"
+#include "C_Uti.h"
+#include "C_OgeWiUtil.h"
 #include "C_OgePopUpDialog.h"
 #include "C_CamMosFilterPopup.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
@@ -57,11 +59,15 @@ C_CamMosFilterItemWidget::C_CamMosFilterItemWidget(const C_CamProFilterData & or
 {
    this->mpc_Ui->setupUi(this);
 
+   // label style
+   this->mpc_Ui->pc_LabFilter->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_LabFilter->SetForegroundColor(0);
+   this->mpc_Ui->pc_LabFilter->SetFontPixel(13);
+
    // initialize filter
    this->mc_Filter = orc_Filter;
 
    // buttons
-   this->mpc_Ui->pc_CheckBox->setText(mc_Filter.c_Name);
    this->mpc_Ui->pc_PbEdit->SetSvg("://images/IconEdit.svg", "://images/IconEditDisabled.svg",
                                    "://images/IconEditHovered.svg");
    this->mpc_Ui->pc_PbRemove->SetSvg("://images/IconClearGray.svg", "://images/IconClearGrayDisabled.svg",
@@ -70,8 +76,9 @@ C_CamMosFilterItemWidget::C_CamMosFilterItemWidget(const C_CamProFilterData & or
    this->mpc_Ui->pc_PbEdit->setVisible(false);
    this->mpc_Ui->pc_PbRemove->setVisible(false);
 
-   // check box
+   // check box and label (use extra label for better tooltip handling)
    this->mpc_Ui->pc_CheckBox->setChecked(mc_Filter.q_Enabled);
+   this->m_SetFilterNameElided();
 
    // tool tips
    this->mpc_Ui->pc_PbEdit->SetToolTipInformation(C_GtGetText::h_GetText("Edit"),
@@ -234,7 +241,7 @@ void C_CamMosFilterItemWidget::m_OnEdit()
 
          // adapt item widget
          this->m_CreateTooltipInformation();
-         this->mpc_Ui->pc_CheckBox->setText(this->mc_Filter.c_Name);
+         this->m_SetFilterNameElided();
       }
    }
    if (c_New != NULL)
@@ -292,6 +299,19 @@ void C_CamMosFilterItemWidget::m_ButtonReleased(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set filter name and elide with ... if too long for current widget size.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterItemWidget::m_SetFilterNameElided(void) const
+{
+   const QFontMetrics c_Metric = QFontMetrics(C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13));
+
+   this->mpc_Ui->pc_LabFilter->setText(c_Metric.elidedText(this->mc_Filter.c_Name, Qt::ElideRight,
+                                                           this->mpc_Ui->pc_LabFilter->width() - 44));
+   // padding 44 for 2 buttons a 16px and 2x padding a 6px
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overridden event function.
 
     Here: Show or hide buttons
@@ -320,6 +340,11 @@ bool C_CamMosFilterItemWidget::event(QEvent * const opc_Event)
          this->mpc_Ui->pc_PbEdit->setVisible(true);
          this->mpc_Ui->pc_PbRemove->setVisible(true);
          this->SetBackgroundColor(3);
+      }
+      else if (opc_Event->type() == QEvent::Resize)
+      {
+         // elide text if necessary
+         this->m_SetFilterNameElided();
       }
       else
       {

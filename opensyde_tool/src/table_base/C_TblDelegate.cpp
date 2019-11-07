@@ -21,7 +21,7 @@
 #include "C_CamOgeLeTableEdit.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_CamOgeCbxTableSmall.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 #include "C_CamOgeWiSpinBoxGroupTable.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -46,7 +46,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
 */
@@ -58,7 +58,7 @@ C_TblDelegate::C_TblDelegate(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten create editor event slot
+/*! \brief  Overwritten create editor event slot
 
    Here: Create appropriate editor widget
 
@@ -112,8 +112,8 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
             bool q_Ok;
             const QString & rc_Factor = c_StringList.at(2);
             const QString & rc_Offset = c_StringList.at(3);
-            tgl_assert(C_SdNdeDataPoolContentUtil::h_SetAllContentFromString(c_StringList.at(0), c_Min) == C_NO_ERR);
-            tgl_assert(C_SdNdeDataPoolContentUtil::h_SetAllContentFromString(c_StringList.at(1), c_Max) == C_NO_ERR);
+            tgl_assert(C_SdNdeDpContentUtil::h_SetAllContentFromString(c_StringList.at(0), c_Min) == C_NO_ERR);
+            tgl_assert(C_SdNdeDpContentUtil::h_SetAllContentFromString(c_StringList.at(1), c_Max) == C_NO_ERR);
             f64_Factor = rc_Factor.toDouble(&q_Ok);
             tgl_assert(q_Ok == true);
             f64_Offset = rc_Offset.toDouble(&q_Ok);
@@ -134,7 +134,7 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten set editor data event slot
+/*! \brief  Overwritten set editor data event slot
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
@@ -187,7 +187,7 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten set model data event slot
+/*! \brief  Overwritten set model data event slot
 
    Here: Pass relevant data
 
@@ -243,13 +243,13 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overridden paint method.
+/*! \brief  Overridden paint method.
 
    Here: Center icon and deactivate icon highlighting.
 
-   \param[in]     opc_Painter       pointer to painter
-   \param[in]     orc_Option        style option
-   \param[in]     orc_Index         model index
+   \param[in] opc_Painter pointer to painter
+   \param[in] orc_Option  style option
+   \param[in] orc_Index   model index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
@@ -278,7 +278,7 @@ void C_TblDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewIt
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Create generic combo box interaction element
+/*! \brief  Create generic combo box interaction element
 
    \param[in,out] opc_Parent Optional pointer to parent
 
@@ -292,7 +292,7 @@ C_OgeCbxTableBase * C_TblDelegate::m_CreateComboBox(QWidget * const opc_Parent) 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Create generic line edit interaction element
+/*! \brief  Create generic line edit interaction element
 
    \param[in,out] opc_Parent Optional pointer to parent
 
@@ -306,7 +306,7 @@ C_TblEditLineEditBase * C_TblDelegate::m_CreateLineEdit(QWidget * const opc_Pare
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Create generic spin box interaction element
+/*! \brief  Create generic spin box interaction element
 
    \param[in,out] opc_Parent Optional pointer to parent
 
@@ -320,7 +320,7 @@ C_OgeWiSpinBoxGroup * C_TblDelegate::m_CreateSpinBox(QWidget * const opc_Parent)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get interaction element value as enum from index
+/*! \brief  Get interaction element value as enum from index
 
    \param[in] orc_Index Index
 
@@ -350,15 +350,15 @@ E_UserRoleInteractionElementValue C_TblDelegate::mh_GetInteractionElementValue(c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Create widget to use for editing this value
+/*! \brief  Create widget to use for editing this value
 
-   \param[in,out] opc_Parent           Parent widget
-   \param[in]     orc_Index            Correlating index
-   \param[in]     orc_Min              Minimum value(s)
-   \param[in]     orc_Max              Maximum value(s)
-   \param[in]     of64_Factor          Scaling factor
-   \param[in]     of64_Offset          Scaling offset
-   \param[in]     oru32_ArrayIndex     Array index to access single element
+   \param[in,out] opc_Parent       Parent widget
+   \param[in]     orc_Index        Correlating index
+   \param[in]     orc_Min          Minimum value(s)
+   \param[in]     orc_Max          Maximum value(s)
+   \param[in]     of64_Factor      Scaling factor
+   \param[in]     of64_Offset      Scaling offset
+   \param[in]     oru32_ArrayIndex Array index to access single element
 
    \return
    Editor widget
@@ -388,7 +388,7 @@ QWidget * C_TblDelegate::m_CreateGenericEditor(QWidget * const opc_Parent, const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set value to widget used for editing this value
+/*! \brief  Set value to widget used for editing this value
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
@@ -427,7 +427,7 @@ void C_TblDelegate::m_CommitData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set model value from widget used to edit this value
+/*! \brief  Set model value from widget used to edit this value
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object

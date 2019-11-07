@@ -41,7 +41,7 @@ using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sint32 C_CamMainWindow::mhs32_SettingsSplitterMax = 350;
-const sint32 C_CamMainWindow::mhs32_MessageGenSplitterMax = 190;
+const sint32 C_CamMainWindow::mhs32_MessageGenSplitterMax = 120;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -697,6 +697,7 @@ bool C_CamMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
             {
                if ((c_File.suffix().compare("syde_cam", Qt::CaseInsensitive) == 0) ||
                    (c_File.suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0) ||
+                   (c_File.suffix().compare("syde", Qt::CaseInsensitive) == 0) ||
                    (c_File.suffix().compare("dbc", Qt::CaseInsensitive) == 0))
                {
                   q_Retval = true;

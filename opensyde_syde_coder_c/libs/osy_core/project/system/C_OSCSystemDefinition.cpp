@@ -1011,19 +1011,25 @@ sint32 C_OSCSystemDefinition::CheckMessageMatch(const C_OSCCanMessageIdentificat
          {
             const C_OSCNode & rc_Node1 = this->c_Nodes[orc_MessageId1.u32_NodeIndex];
             const C_OSCNode & rc_Node2 = this->c_Nodes[orc_MessageId2.u32_NodeIndex];
-            const C_OSCNodeDataPool * const pc_DataPool1 = rc_Node1.GetComDataPoolConst(orc_MessageId1.e_ComProtocol);
-            const C_OSCNodeDataPool * const pc_DataPool2 = rc_Node2.GetComDataPoolConst(orc_MessageId2.e_ComProtocol);
-            const C_OSCCanProtocol * const pc_Protocol1 = rc_Node1.GetCANProtocolConst(orc_MessageId1.e_ComProtocol);
-            const C_OSCCanProtocol * const pc_Protocol2 = rc_Node2.GetCANProtocolConst(orc_MessageId2.e_ComProtocol);
+            const C_OSCNodeDataPool * const pc_DataPool1 =
+               rc_Node1.GetComDataPoolConst(orc_MessageId1.e_ComProtocol, orc_MessageId1.u32_DatapoolIndex);
+            const C_OSCNodeDataPool * const pc_DataPool2 =
+               rc_Node2.GetComDataPoolConst(orc_MessageId2.e_ComProtocol, orc_MessageId2.u32_DatapoolIndex);
+            const C_OSCCanProtocol * const pc_Protocol1 =
+               rc_Node1.GetCANProtocolConst(orc_MessageId1.e_ComProtocol, orc_MessageId1.u32_DatapoolIndex);
+            const C_OSCCanProtocol * const pc_Protocol2 =
+               rc_Node2.GetCANProtocolConst(orc_MessageId2.e_ComProtocol, orc_MessageId2.u32_DatapoolIndex);
+
             if (((pc_DataPool1 != NULL) && (pc_DataPool2 != NULL)) &&
                 ((pc_Protocol1 != NULL) && (pc_Protocol2 != NULL)))
             {
-               const C_OSCNodeDataPoolList * const pc_List1 = C_OSCCanProtocol::h_GetComListConst(*pc_DataPool1,
-                                                                                                  orc_MessageId1.u32_InterfaceIndex,
-                                                                                                  orc_MessageId1.q_MessageIsTx);
-               const C_OSCNodeDataPoolList * const pc_List2 = C_OSCCanProtocol::h_GetComListConst(*pc_DataPool2,
-                                                                                                  orc_MessageId2.u32_InterfaceIndex,
-                                                                                                  orc_MessageId2.q_MessageIsTx);
+               const C_OSCNodeDataPoolList * const pc_List1 =
+                  C_OSCCanProtocol::h_GetComListConst(*pc_DataPool1, orc_MessageId1.u32_InterfaceIndex,
+                                                      orc_MessageId1.q_MessageIsTx);
+               const C_OSCNodeDataPoolList * const pc_List2 =
+                  C_OSCCanProtocol::h_GetComListConst(*pc_DataPool2, orc_MessageId2.u32_InterfaceIndex,
+                                                      orc_MessageId2.q_MessageIsTx);
+
                if (((orc_MessageId1.u32_InterfaceIndex < pc_Protocol1->c_ComMessages.size()) &&
                     (orc_MessageId2.u32_InterfaceIndex < pc_Protocol2->c_ComMessages.size())) &&
                    ((pc_List1 != NULL) && (pc_List2 != NULL)))
@@ -1208,193 +1214,28 @@ sint32 C_OSCSystemDefinition::CheckMessageMatch(const C_OSCCanMessageIdentificat
 void C_OSCSystemDefinition::GetNodeIndexesOfBus(const uint32 ou32_BusIndex, std::vector<uint32> & orc_NodeIndexes,
                                                 std::vector<uint32> & orc_InterfaceIndexes) const
 {
-   uint32 u32_NodeIndex;
-   uint32 u32_ComInterfaces;
-
-   // check all nodes
-   for (u32_NodeIndex = 0U; u32_NodeIndex < this->c_Nodes.size(); ++u32_NodeIndex)
-   {
-      const C_OSCNode & rc_Node = this->c_Nodes[u32_NodeIndex];
-
-      // check all com interfaces of the node
-      for (u32_ComInterfaces = 0U;
-           u32_ComInterfaces < rc_Node.c_Properties.c_ComInterfaces.size();
-           ++u32_ComInterfaces)
-      {
-         // is the bus connected
-         if (rc_Node.c_Properties.c_ComInterfaces[u32_ComInterfaces].q_IsBusConnected == true)
-         {
-            // check the connections
-            if (rc_Node.c_Properties.c_ComInterfaces[u32_ComInterfaces].u32_BusIndex == ou32_BusIndex)
-            {
-               // node is connected to the bus
-               orc_NodeIndexes.push_back(u32_NodeIndex);
-               orc_InterfaceIndexes.push_back(u32_ComInterfaces);
-            }
-         }
-      }
-   }
+   m_GetNodeAndComDpIndexesOfBus(ou32_BusIndex, NULL, orc_NodeIndexes, orc_InterfaceIndexes, NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get message receivers indices
+/*! \brief   Returns all node and Datapool indexes which are connected to the bus
 
-   \param[in]  ou32_BusIndex        Bus index
-   \param[in]  orc_MessageName      Message name
-   \param[out] orc_NodeIndices      Node receivers indices
-   \param[out] orc_InterfaceIndices Node receivers interfaces indices
+   \param[in]     ou32_BusIndex        Bus index
+   \param[in]     ore_ComProtocol      Specific protocol
+   \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
+   \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
+   \param[out]    orc_DatapoolIndexes  Vector with all Datapool ids which are connected to the bus and are associated
+                                       to the protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSystemDefinition::GetMessageReceiversIndices(const uint32 ou32_BusIndex, const C_SCLString & orc_MessageName,
-                                                       std::vector<uint32> & orc_NodeIndices,
-                                                       std::vector<uint32> & orc_InterfaceIndices) const
+void C_OSCSystemDefinition::GetNodeAndComDpIndexesOfBus(const uint32 ou32_BusIndex,
+                                                        const C_OSCCanProtocol::E_Type & ore_ComProtocol,
+                                                        std::vector<uint32> & orc_NodeIndexes,
+                                                        std::vector<uint32> & orc_InterfaceIndexes,
+                                                        std::vector<uint32> & orc_DatapoolIndexes) const
 {
-   // check all nodes
-   for (uint32 u32_NodeIndex = 0; u32_NodeIndex < this->c_Nodes.size(); ++u32_NodeIndex)
-   {
-      const C_OSCNode & rc_Node = this->c_Nodes[u32_NodeIndex];
-
-      // check all com interfaces of the node
-      for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_Node.c_Properties.c_ComInterfaces.size();
-           ++u32_ItComInterface)
-      {
-         // is the bus connected
-         if (rc_Node.c_Properties.c_ComInterfaces[u32_ItComInterface].q_IsBusConnected == true)
-         {
-            // check the connections
-            if (rc_Node.c_Properties.c_ComInterfaces[u32_ItComInterface].u32_BusIndex == ou32_BusIndex)
-            {
-               bool q_Found = false;
-               //Match
-               //For each com interface
-               for (uint8 u8_ItComDataPool = 0; (u8_ItComDataPool < 3) && (q_Found == false); ++u8_ItComDataPool)
-               {
-                  const C_OSCCanProtocol * pc_Protocol;
-                  switch (u8_ItComDataPool)
-                  {
-                  case 0:
-                     pc_Protocol = rc_Node.GetCANProtocolConst(C_OSCCanProtocol::eLAYER2);
-                     break;
-                  case 1:
-                     pc_Protocol = rc_Node.GetCANProtocolConst(C_OSCCanProtocol::eECES);
-                     break;
-                  case 2:
-                     pc_Protocol = rc_Node.GetCANProtocolConst(C_OSCCanProtocol::eCAN_OPEN_SAFETY);
-                     break;
-                  default:
-                     pc_Protocol = NULL;
-                     break;
-                  }
-                  if (pc_Protocol != NULL)
-                  {
-                     if (u32_ItComInterface < pc_Protocol->c_ComMessages.size())
-                     {
-                        const C_OSCCanMessageContainer & rc_MessageContainer =
-                           pc_Protocol->c_ComMessages[u32_ItComInterface];
-                        const std::vector<C_OSCCanMessage> & rc_Messages =
-                           rc_MessageContainer.GetMessagesConst(false);
-
-                        //Search for message
-                        for (uint32 u32_ItMessage = 0;
-                             (u32_ItMessage < rc_Messages.size()) && (q_Found == false);
-                             ++u32_ItMessage)
-                        {
-                           const C_OSCCanMessage & rc_Message = rc_Messages[u32_ItMessage];
-                           if (rc_Message.c_Name == orc_MessageName)
-                           {
-                              orc_NodeIndices.push_back(u32_NodeIndex);
-                              orc_InterfaceIndices.push_back(u32_ItComInterface);
-                              q_Found = true;
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get message transmitters indices
-
-   \param[in]  ou32_BusIndex        Bus index
-   \param[in]  orc_MessageName      Message name
-   \param[out] orc_NodeIndices      Node transmitters indices
-   \param[out] orc_InterfaceIndices Node transmitters interfaces indices
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OSCSystemDefinition::GetMessageTransmittersIndices(const uint32 ou32_BusIndex,
-                                                          const C_SCLString & orc_MessageName,
-                                                          std::vector<uint32> & orc_NodeIndices,
-                                                          std::vector<uint32> & orc_InterfaceIndices) const
-{
-   // check all nodes
-   for (uint32 u32_NodeIndex = 0; u32_NodeIndex < this->c_Nodes.size(); ++u32_NodeIndex)
-   {
-      const C_OSCNode & rc_Node = this->c_Nodes[u32_NodeIndex];
-
-      // check all com interfaces of the node
-      for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_Node.c_Properties.c_ComInterfaces.size();
-           ++u32_ItComInterface)
-      {
-         // is the bus connected
-         if (rc_Node.c_Properties.c_ComInterfaces[u32_ItComInterface].q_IsBusConnected == true)
-         {
-            // check the connections
-            if (rc_Node.c_Properties.c_ComInterfaces[u32_ItComInterface].u32_BusIndex == ou32_BusIndex)
-            {
-               bool q_Found = false;
-               //Match
-               //For each com interface
-               for (uint8 u8_ItComDataPool = 0; (u8_ItComDataPool < 3) && (q_Found == false); ++u8_ItComDataPool)
-               {
-                  const C_OSCCanProtocol * pc_Protocol;
-                  switch (u8_ItComDataPool)
-                  {
-                  case 0:
-                     pc_Protocol = rc_Node.GetCANProtocolConst(C_OSCCanProtocol::eLAYER2);
-                     break;
-                  case 1:
-                     pc_Protocol = rc_Node.GetCANProtocolConst(C_OSCCanProtocol::eECES);
-                     break;
-                  case 2:
-                     pc_Protocol = rc_Node.GetCANProtocolConst(C_OSCCanProtocol::eCAN_OPEN_SAFETY);
-                     break;
-                  default:
-                     pc_Protocol = NULL;
-                     break;
-                  }
-                  if (pc_Protocol != NULL)
-                  {
-                     if (u32_ItComInterface < pc_Protocol->c_ComMessages.size())
-                     {
-                        const C_OSCCanMessageContainer & rc_MessageContainer =
-                           pc_Protocol->c_ComMessages[u32_ItComInterface];
-                        const std::vector<C_OSCCanMessage> & rc_Messages =
-                           rc_MessageContainer.GetMessagesConst(true);
-
-                        //Search for message
-                        for (uint32 u32_ItMessage = 0;
-                             (u32_ItMessage < rc_Messages.size()) && (q_Found == false);
-                             ++u32_ItMessage)
-                        {
-                           const C_OSCCanMessage & rc_Message = rc_Messages[u32_ItMessage];
-                           if (rc_Message.c_Name == orc_MessageName)
-                           {
-                              orc_NodeIndices.push_back(u32_NodeIndex);
-                              orc_InterfaceIndices.push_back(u32_ItComInterface);
-                              q_Found = true;
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
+   m_GetNodeAndComDpIndexesOfBus(ou32_BusIndex, &ore_ComProtocol, orc_NodeIndexes, orc_InterfaceIndexes,
+                                 &orc_DatapoolIndexes);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1467,4 +1308,74 @@ uint32 C_OSCSystemDefinition::m_GetRelatedProtocolHash(const uint32 ou32_NodeInd
       }
    }
    return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns all node and Datapool indexes which are connected to the bus
+
+   \param[in]     ou32_BusIndex        Bus index
+   \param[in]     ore_ComProtocol      Optional: Specific protocol
+   \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
+   \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
+   \param[out]    orc_DatapoolIndexes  Optional: Vector with all Datapool ids which are connected to the bus
+                                       If ore_ComProtocol is not NULL the Datapool will be checked if it is
+                                       associated to the protocol type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCSystemDefinition::m_GetNodeAndComDpIndexesOfBus(const uint32 ou32_BusIndex,
+                                                          const C_OSCCanProtocol::E_Type * const ope_ComProtocol,
+                                                          std::vector<uint32> & orc_NodeIndexes,
+                                                          std::vector<uint32> & orc_InterfaceIndexes,
+                                                          std::vector<uint32> * const opc_DatapoolIndexes) const
+{
+   uint32 u32_NodeIndex;
+   uint32 u32_ComInterfaces;
+
+   // check all nodes
+   for (u32_NodeIndex = 0U; u32_NodeIndex < this->c_Nodes.size(); ++u32_NodeIndex)
+   {
+      const C_OSCNode & rc_Node = this->c_Nodes[u32_NodeIndex];
+
+      // check all com interfaces of the node
+      for (u32_ComInterfaces = 0U;
+           u32_ComInterfaces < rc_Node.c_Properties.c_ComInterfaces.size();
+           ++u32_ComInterfaces)
+      {
+         // is the bus connected
+         if (rc_Node.c_Properties.c_ComInterfaces[u32_ComInterfaces].q_IsBusConnected == true)
+         {
+            // check the connections
+            if (rc_Node.c_Properties.c_ComInterfaces[u32_ComInterfaces].u32_BusIndex == ou32_BusIndex)
+            {
+               // node is connected to the bus
+               if (opc_DatapoolIndexes == NULL)
+               {
+                  // Only nodes and interfaces are relevant
+                  orc_NodeIndexes.push_back(u32_NodeIndex);
+                  orc_InterfaceIndexes.push_back(u32_ComInterfaces);
+               }
+               else
+               {
+                  // Getting the Datapool indexes of all COM Datapools for the specific protocol
+                  uint32 u32_ProtocolCounter;
+
+                  for (u32_ProtocolCounter = 0U; u32_ProtocolCounter < rc_Node.c_ComProtocols.size();
+                       ++u32_ProtocolCounter)
+                  {
+                     const C_OSCCanProtocol & rc_Prot = rc_Node.c_ComProtocols[u32_ProtocolCounter];
+
+                     // If the protocol is relevant, check for it
+                     if ((ope_ComProtocol == NULL) ||
+                         (rc_Prot.e_Type == (*ope_ComProtocol)))
+                     {
+                        orc_NodeIndexes.push_back(u32_NodeIndex);
+                        orc_InterfaceIndexes.push_back(u32_ComInterfaces);
+                        opc_DatapoolIndexes->push_back(rc_Prot.u32_DataPoolIndex);
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
 }

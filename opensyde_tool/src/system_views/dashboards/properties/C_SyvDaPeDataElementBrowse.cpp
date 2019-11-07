@@ -41,19 +41,21 @@ stw_types::sint32 C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = 
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent               Optional pointer to parent
-   \param[in]     ou32_ViewIndex           View index
-   \param[in]     oq_MultiSelect           Optional flag to allow multi selection
-   \param[in]     oq_ShowOnlyWriteElements Optional flag to show only writable elements
-   \param[in]     oq_ShowArrayElements     Optional flag to hide all array elements (if false)
-   \param[in]     oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
-   \param[in]     oq_ShowNVMLists          Optional flag to only show NVM LISTs
+   \param[in,out] opc_Parent                Optional pointer to parent
+   \param[in]     ou32_ViewIndex            View index
+   \param[in]     oq_MultiSelect            Optional flag to allow multi selection
+   \param[in]     oq_ShowOnlyWriteElements  Optional flag to show only writable elements
+   \param[in]     oq_ShowArrayElements      Optional flag to hide all array elements (if false)
+   \param[in]     oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
+   \param[in]     oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
+   \param[in]     oq_ShowNVMLists           Optional flag to only show NVM LISTs
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Parent, const uint32 ou32_ViewIndex,
                                                        const bool oq_MultiSelect, const bool oq_ShowOnlyWriteElements,
-                                                       const bool oq_ShowArrayElements, const bool oq_Show64BitValues,
-                                                       const bool oq_ShowNVMLists) :
+                                                       const bool oq_ShowArrayElements,
+                                                       const bool oq_ShowArrayIndexElements,
+                                                       const bool oq_Show64BitValues, const bool oq_ShowNVMLists) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeDataElementBrowse),
    mpc_ContextMenu(NULL),
@@ -88,18 +90,19 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
    // Save the flags for m_SwitchType slot for combo box
    this->mq_ShowOnlyWriteElements = oq_ShowOnlyWriteElements;
    this->mq_ShowArrayElements = oq_ShowArrayElements;
+   this->mq_ShowArrayIndexElements = oq_ShowArrayIndexElements;
    this->mq_Show64BitValues = oq_Show64BitValues;
 
    // set title
    if (oq_ShowNVMLists == true)
    {
-      this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("NVM LIST")));
+      this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("NVM List")));
       this->mpc_Ui->pc_ComboBoxType->setVisible(false);
       this->mpc_Ui->pc_LabelDataElement->setText(C_GtGetText::h_GetText("Select NVM List"));
    }
    else
    {
-      this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("DATA ELEMENT")));
+      this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("Data Element")));
       this->mpc_Ui->pc_ComboBoxType->setVisible(true);
       this->mpc_Ui->pc_LabelDataElement->setText(C_GtGetText::h_GetText("Select Data Element"));
 
@@ -120,6 +123,7 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
    if (q_TreeFilled == false)
    {
       this->mpc_Ui->pc_TreeView->InitSV(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                                        oq_ShowArrayIndexElements,
                                         oq_Show64BitValues,
                                         oq_ShowNVMLists);
    }
@@ -326,7 +330,7 @@ void C_SyvDaPeDataElementBrowse::m_OnSearch(const QString & orc_Text) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Switch displayed type
 
-   \param[in] osn_Index                Type index
+   \param[in] osn_Index Type index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_SwitchType(const sintn osn_Index) const
@@ -335,10 +339,11 @@ void C_SyvDaPeDataElementBrowse::m_SwitchType(const sintn osn_Index) const
    {
    case C_SyvDaPeDataElementBrowse::mhsn_INDEX_DATAPOOL_ELEMENT:
       this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eDATAPOOL_ELEMENT, this->mq_ShowOnlyWriteElements,
-                                            this->mq_ShowArrayElements, this->mq_Show64BitValues);
+                                            this->mq_ShowArrayElements, this->mq_ShowArrayIndexElements,
+                                            this->mq_Show64BitValues);
       break;
    case C_SyvDaPeDataElementBrowse::mhsn_INDEX_BUS_SIGNAL:
-      this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eBUS_SIGNAL, false, false, true);
+      this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eBUS_SIGNAL, false, false, false, true);
       break;
    default:
       //Unknown

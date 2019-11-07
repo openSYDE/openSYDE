@@ -13,7 +13,7 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
-#include "C_SdNdeDataPoolUtil.h"
+#include "C_SdNdeDpUtil.h"
 #include "C_SyvDaItPaArDelegate.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -86,7 +86,7 @@ void C_SyvDaItPaArDelegate::setEditorData(QWidget * const opc_Editor, const QMod
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
    {
-      C_SdNdeDataPoolUtil::h_SetGenericEditorDataVariable(opc_Editor, orc_Index);
+      C_SdNdeDpUtil::h_SetGenericEditorDataVariable(opc_Editor, orc_Index);
    }
 }
 
@@ -105,7 +105,7 @@ void C_SyvDaItPaArDelegate::setModelData(QWidget * const opc_Editor, QAbstractIt
 {
    if (((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true))
    {
-      C_SdNdeDataPoolUtil::h_SetModelGenericDataVariable(opc_Editor, opc_Model, orc_Index);
+      C_SdNdeDpUtil::h_SetModelGenericDataVariable(opc_Editor, opc_Model, orc_Index);
    }
 }
 
@@ -143,7 +143,7 @@ QWidget * C_SyvDaItPaArDelegate::m_CreateEditor(QWidget * const opc_Parent, cons
          const C_OSCNodeDataPoolListElement * const pc_Element = this->mpc_Model->GetOSCElement();
          if (pc_Element != NULL)
          {
-            pc_Retval = C_SdNdeDataPoolUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
+            pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
                                                                    pc_Element->c_MaxValue, pc_Element->f64_Factor,
                                                                    pc_Element->f64_Offset,
                                                                    static_cast<uint32>(orc_Index.column()), false);

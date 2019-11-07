@@ -30,7 +30,9 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
+
+   \param[in,out] opc_Parent Parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoMoveCommandGroup::C_SebUnoMoveCommandGroup(QUndoCommand * const opc_Parent) :

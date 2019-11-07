@@ -78,7 +78,7 @@ SOURCES +=\
     ../src/system_views/communication/C_SyvComDriverThread.cpp \
     ../libs/opensyde_core/logging/C_OSCLoggingHandler.cpp \
     ../src/com_import_export/C_CieImportDbc.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolContentUtil.cpp\
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpContentUtil.cpp\
     ../libs/opensyde_core/kefex_diaglib/DLStrings.cpp \
     ../libs/opensyde_core/kefex_diaglib/CSCLResourceStrings.cpp \
     ../libs/opensyde_core/kefex_diaglib/stwcompid.c \
@@ -298,7 +298,8 @@ SOURCES +=\
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxTableBase.cpp \
     ../src/can_monitor/message_trace/C_CamMetTreeLoggerDataGreyOutInformation.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.cpp \
-    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/can_monitor/precomp_headers.h
 
@@ -389,7 +390,7 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../libs/dbc_driver_library/src/Vector/DBC.h \
     ../src/com_import_export/C_CieImportDbc.h \
     ../src/com_import_export/C_CieConverter.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolContentUtil.h \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpContentUtil.h \
     ../libs/opensyde_core/kefex_diaglib/DLStrings.h \
     ../libs/opensyde_core/kefex_diaglib/CSCLResourceStrings.h \
     ../libs/opensyde_core/kefex_diaglib/stwcompid.h \
@@ -710,7 +711,8 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxTableBase.h \
     ../src/can_monitor/message_trace/C_CamMetTreeLoggerDataGreyOutInformation.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.h \
-    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h
+    ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.h
 
 FORMS    += \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.ui \
@@ -785,7 +787,7 @@ INCLUDEPATH += ../src \
                ../src/table_base \
                ../src/table_base/tree_base \
                ../src/system_definition \
-               ../src/system_definition/node_edit \
+               ../src/system_definition/node_edit/datapools \
                ../src/system_views/communication \
                ../src/project_operations/ \
                ../src/gettext \

@@ -331,7 +331,7 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                                   QString("Node \"%1\" - DataPoolSetEventDataRate - error: %2\n"
                                           "C_RANGE    parameter out of range (checked by client-side function)\n"
                                           "C_TIMEOUT  expected response not received within timeout\n"
-                                          "C_NOACT    could not send request (e.g. TX buffer full)\n"
+                                          "C_NOACT    could not send request (e.g. Tx buffer full)\n"
                                           "C_CONFIG   pre-requisites not correct; e.g. driver not initialized\n"
                                           "C_WARN     error response\n"
                                           "C_RD_WR    malformed protocol response\n").arg(QString(m_GetActiveNodeName(
@@ -427,7 +427,7 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                   c_Details = C_GtGetText::h_GetText("Parameter out of range (checked by client-side function)");
                   break;
                case C_NOACT:
-                  c_Details = C_GtGetText::h_GetText("Could not send request (e.g. TX buffer full)");
+                  c_Details = C_GtGetText::h_GetText("Could not send request (e.g. Tx buffer full)");
                   break;
                case C_CONFIG:
                   c_Details = C_GtGetText::h_GetText("Pre-requisites not correct; e.g. driver not initialized");
@@ -1081,6 +1081,8 @@ sint32 C_SyvComDriverDiag::PollNvmSafeReadParameterValues(const uint32 ou32_Node
 
    \return
    C_NO_ERR   data saved
+   C_RANGE    Node index out of range
+              File already exists
    C_OVERFLOW Wrong sequence of function calls
    C_CONFIG   Internal data invalid
    C_BUSY     file already exists
@@ -1104,8 +1106,7 @@ const
       C_SyvComDataDealer * const pc_DataDealer = mc_DataDealers[u32_ActiveIndex];
       if (pc_DataDealer != NULL)
       {
-         s32_Return = C_NO_ERR;
-         pc_DataDealer->NvmSafeCreateCleanFileWithoutCRC(c_Path, orc_FileInfo);
+         s32_Return = pc_DataDealer->NvmSafeCreateCleanFileWithoutCRC(c_Path, orc_FileInfo);
       }
       else
       {
@@ -1127,6 +1128,7 @@ const
    C_NO_ERR   data read
    C_OVERFLOW Wrong sequence of function calls
    C_RANGE    Path does not match the path of the preceding function calls
+              Node index out of range
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
 */
@@ -1146,8 +1148,7 @@ sint32 C_SyvComDriverDiag::NvmSafeReadFileWithoutCRC(const uint32 ou32_NodeIndex
       C_SyvComDataDealer * const pc_DataDealer = mc_DataDealers[u32_ActiveIndex];
       if (pc_DataDealer != NULL)
       {
-         s32_Return = C_NO_ERR;
-         pc_DataDealer->NvmSafeReadFileWithoutCRC(c_Path);
+         s32_Return = pc_DataDealer->NvmSafeReadFileWithoutCRC(c_Path);
       }
       else
       {
@@ -1202,6 +1203,7 @@ sint32 C_SyvComDriverDiag::NvmSafeCheckParameterFileContents(const uint32 ou32_N
    C_NO_ERR   CRC updated
    C_OVERFLOW Wrong sequence of function calls
    C_RANGE    Path does not match the path of the preceding function calls
+              Node index out of range
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
 */
@@ -1221,8 +1223,7 @@ sint32 C_SyvComDriverDiag::NvmSafeUpdateCRCForFile(const uint32 ou32_NodeIndex, 
       C_SyvComDataDealer * const pc_DataDealer = mc_DataDealers[u32_ActiveIndex];
       if (pc_DataDealer != NULL)
       {
-         s32_Return = C_NO_ERR;
-         pc_DataDealer->NvmSafeUpdateCRCForFile(c_Path);
+         s32_Return = pc_DataDealer->NvmSafeUpdateCRCForFile(c_Path);
       }
       else
       {
@@ -1676,12 +1677,18 @@ sint32 C_SyvComDriverDiag::m_InitDiagNodes(void)
       //request all transmissions that are configured for the current view
       const QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> & rc_Transmissions =
          pc_View->GetReadRailAssignments();
+      const std::set<C_OSCNodeDataPoolListElementId> c_WriteElements = pc_View->GetWriteAssignments();
 
       // Get all nodes which has used datapool elements on this dashboard
       for (QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration>::const_iterator c_ItElement =
               rc_Transmissions.begin(); c_ItElement != rc_Transmissions.end(); ++c_ItElement)
       {
          this->mc_DiagNodes.insert(c_ItElement.key().u32_NodeIndex);
+      }
+      for (std::set<C_OSCNodeDataPoolListElementId>::const_iterator c_ItWriteElement =
+              c_WriteElements.begin(); c_ItWriteElement != c_WriteElements.end(); ++c_ItWriteElement)
+      {
+         this->mc_DiagNodes.insert((*c_ItWriteElement).u32_NodeIndex);
       }
    }
 
@@ -1950,7 +1957,7 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -1980,8 +1987,6 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
                   // TODO BAY: Activate when supporting Kefex on dashboard
 
                   /*
-                  // TODO Get all information from the core
-
                   uint8 u8_DataPoolIndex;
                   uint16 u16_NumberOfDataPoolElements;
                   uint16 u16_DataPoolVersion;
@@ -2040,6 +2045,13 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
          }
       }
    }
+   else if ((this->mq_Initialized == true) &&
+            (this->mc_DiagProtocols.size() == 0U) &&
+            (this->mc_ActiveNodesIndexes.size() == 0U))
+   {
+      // Special case: No error. No connectable nodes, but nodes third party nodes could be active
+      s32_Retval = C_NO_ERR;
+   }
    else
    {
       s32_Retval = C_CONFIG;
@@ -2058,7 +2070,7 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
    \return
    C_NO_ERR   Datapools are as expected
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -2162,16 +2174,16 @@ sint32 C_SyvComDriverDiag::mh_CheckDatapools(const C_OSCNode * const opc_Node,
          }
          else
          {
-            c_ErrorReason = "The read of the Datapool meta data of Datapool " + QString(rc_Datapool.c_Name.c_str()) +
-                            "failed with error " + QString(C_OSCLoggingHandler::h_StwError(s32_Return).c_str()) +
+            c_ErrorReason = "The read of the Datapool meta data of Datapool \"" + QString(rc_Datapool.c_Name.c_str()) +
+                            "\" failed with error " + QString(C_OSCLoggingHandler::h_StwError(s32_Return).c_str()) +
                             " and negative response code: " + QString::number(u8_ErrorCode);
          }
       }
       else
       {
          // Service error
-         c_ErrorReason = "The read of the Datapool meta data of Datapool " + QString(rc_Datapool.c_Name.c_str()) +
-                         "failed with error " + QString(C_OSCLoggingHandler::h_StwError(s32_Return).c_str());
+         c_ErrorReason = "The read of the Datapool meta data of Datapool \"" + QString(rc_Datapool.c_Name.c_str()) +
+                         "\" failed with error " + QString(C_OSCLoggingHandler::h_StwError(s32_Return).c_str());
       }
 
       if (s32_Return != C_NO_ERR)

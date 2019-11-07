@@ -37,7 +37,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Scene  Pointer to currently active scene
    \param[in]     orc_IDs    Affected unique IDs
@@ -53,7 +53,7 @@ C_SebUnoAddDeleteBaseCommand::C_SebUnoAddDeleteBaseCommand(QGraphicsScene * cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Store items in new structure and save indices in map
+/*! \brief  Store items in new structure and save indices in map
 
    \param[in,out] orc_Storage             Data structure to store data in
    \param[in,out] orc_MapTypeAndIndexToID Map to locate new items

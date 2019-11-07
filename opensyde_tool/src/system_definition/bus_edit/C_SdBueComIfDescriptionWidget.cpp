@@ -18,10 +18,12 @@
 #include "ui_C_SdBueComIfDescriptionWidget.h"
 
 #include "stwerrors.h"
+#include "TGLUtils.h"
 #include "C_UsHandler.h"
 #include "C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand.h"
 #include "C_Uti.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_GtGetText.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -54,9 +56,9 @@ using namespace stw_opensyde_core;
 C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueComIfDescriptionWidget),
-   mu32_BusIndex(0),
-   mu32_NodeIndex(0),
-   mu32_InterfaceIndex(0),
+   mu32_BusIndex(0U),
+   mu32_NodeIndex(0U),
+   mu32_InterfaceIndex(0U),
    mq_ModeSingleNode(false),
    mq_IndexValid(false),
    mc_UndoManager(NULL)
@@ -181,33 +183,37 @@ C_SdBueComIfDescriptionWidget::~C_SdBueComIfDescriptionWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::InitStaticNames(void) const
 {
+   QString c_Protocol;
+
    // tooltip Layer 2
-   this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(0, "OSI Layer 2",
-                                                             C_GtGetText::h_GetText(
-                                                                "Edit Messages and Signals of protocol type OSI Layer 2."));
+   c_Protocol = C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eLAYER2);
+   this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(
+      0, c_Protocol, QString(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1.")).arg(c_Protocol));
 
    // tooltip ECeS
-   this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(1, "ECeS",
-                                                             C_GtGetText::h_GetText(
-                                                                "Edit Messages and Signals of protocol type ECeS (ESX CAN efficient safety protocol)."));
+   c_Protocol = C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eECES);
+   this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(
+      1, c_Protocol, QString(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1 "
+                                                    "(ESX CAN efficient safety protocol).")).arg(c_Protocol));
 
    // tooltip ECoS
-   this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(2, "ECoS",
-                                                             C_GtGetText::h_GetText(
-                                                                "Edit Messages and Signals of protocol type ECoS (ESX CANopen safety protocol)."));
+   c_Protocol = C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eECES);
+   this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(
+      2, c_Protocol, QString(C_GtGetText::h_GetText("Edit Messages and Signals of protocol type %1 "
+                                                    "(ESX CANopen safety protocol).")).arg(c_Protocol));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the node 'mode' of the widget with all necessary indexes
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
+   \param[in] ou32_NodeIndex        Node index
+   \param[in] oe_Protocol           Current protocol
+   \param[in] ou32_InterfaceIndex   List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueComIfDescriptionWidget::SetNodeDataPool(const stw_types::uint32 ou32_NodeIndex,
-                                                    const stw_types::uint32 ou32_DataPoolIndex,
-                                                    const stw_types::uint32 ou32_ListIndex)
+void C_SdBueComIfDescriptionWidget::SetNodeId(const stw_types::uint32 ou32_NodeIndex,
+                                              const C_OSCCanProtocol::E_Type oe_Protocol,
+                                              const stw_types::uint32 ou32_InterfaceIndex)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -216,8 +222,9 @@ void C_SdBueComIfDescriptionWidget::SetNodeDataPool(const stw_types::uint32 ou32
    this->m_SaveMessageUserSettings();
 
    this->mu32_NodeIndex = ou32_NodeIndex;
-   //For each interface two lists
-   this->mu32_InterfaceIndex = ou32_ListIndex / 2;
+   this->mu32_InterfaceIndex = ou32_InterfaceIndex;
+   //Even if this widget isn't visible, its index is still used
+   this->m_SetProtocol(oe_Protocol);
 
    if ((pc_Layout != NULL) && (this->mq_ModeSingleNode == false))
    {
@@ -232,18 +239,22 @@ void C_SdBueComIfDescriptionWidget::SetNodeDataPool(const stw_types::uint32 ou32
    //Set flag
    this->mq_IndexValid = true;
 
-   //Map data pool to com protocol
+   //Map com protocol to Datapools
+   this->mc_DatapoolIndexes.clear();
+
+   tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
       for (uint32 u32_ItProtocol = 0; u32_ItProtocol < pc_Node->c_ComProtocols.size(); ++u32_ItProtocol)
       {
          const C_OSCCanProtocol & rc_Protocol = pc_Node->c_ComProtocols[u32_ItProtocol];
-         if (rc_Protocol.u32_DataPoolIndex == ou32_DataPoolIndex)
+         if (rc_Protocol.e_Type == oe_Protocol)
          {
-            //Even if this widget isn't visible, its index is still used
-            m_SetProtocol(rc_Protocol.e_Type);
+            this->mc_DatapoolIndexes.push_back(rc_Protocol.u32_DataPoolIndex);
          }
       }
+      // At least one Datapool must exist
+      tgl_assert(this->mc_DatapoolIndexes.size() > 0);
    }
 
    m_ReloadMessages();
@@ -254,8 +265,8 @@ void C_SdBueComIfDescriptionWidget::SetNodeDataPool(const stw_types::uint32 ou32
    this->mpc_Ui->pc_NodeSelectorWidget->setVisible(false);
    this->mpc_Ui->pc_ProtocolTabWidget->setVisible(false);
 
-   //For each interface two lists
-   this->mpc_Ui->pc_MsgSigEditWidget->SetNodeDataPool(ou32_NodeIndex, ou32_ListIndex / 2);
+   this->mpc_Ui->pc_MsgSigEditWidget->SetNodeId(ou32_NodeIndex, this->mu32_InterfaceIndex,
+                                                this->mc_DatapoolIndexes);
 
    //handle initial focus
    this->mpc_Ui->pc_MessageSelectorWidget->SetInitialFocus();
@@ -620,7 +631,7 @@ void C_SdBueComIfDescriptionWidget::m_ConnectNodeToProt(const uint32 ou32_NodeIn
    this->mc_UndoManager.DoConnectNodeToProt(ou32_NodeIndex, ou32_InterfaceIndex,
                                             this->GetActProtocol(), this);
    m_OnConnectionChange();
-   Q_EMIT this->SigChanged();
+   Q_EMIT (this->SigChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -631,17 +642,21 @@ void C_SdBueComIfDescriptionWidget::m_ConnectNodeToProtAndAddDataPool(const uint
                                                           this->GetActProtocol(),
                                                           this);
    m_OnConnectionChange();
-   Q_EMIT this->SigChanged();
+   Q_EMIT (this->SigChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_DisconnectNodeFromProt(const uint32 ou32_NodeIndex,
                                                              const uint32 ou32_InterfaceIndex)
 {
+   // Inform the tree and message signal widget before the old message ids are probably deleted
+   this->mpc_Ui->pc_MessageSelectorWidget->OnNodeDisconnected(ou32_NodeIndex, ou32_InterfaceIndex);
+   this->mpc_Ui->pc_MsgSigEditWidget->OnNodeDisconnected(ou32_NodeIndex, ou32_InterfaceIndex);
+
    this->mc_UndoManager.DoDisconnectNodeFromProt(ou32_NodeIndex, ou32_InterfaceIndex,
                                                  this->GetActProtocol(), this);
    m_OnConnectionChange();
-   Q_EMIT this->SigChanged();
+   Q_EMIT (this->SigChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -651,7 +666,7 @@ void C_SdBueComIfDescriptionWidget::m_AddDataPool(const uint32 ou32_NodeIndex, c
                                       this->GetActProtocol(),
                                       this);
    m_OnConnectionChange();
-   Q_EMIT this->SigChanged();
+   Q_EMIT (this->SigChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -681,7 +696,8 @@ void C_SdBueComIfDescriptionWidget::m_ReloadMessages(void)
    else
    {
       this->mc_MessageSyncManager.Init(this->mu32_NodeIndex, this->mu32_InterfaceIndex, this->GetActProtocol());
-      this->mpc_Ui->pc_MessageSelectorWidget->SetNodeDataPool(this->mu32_NodeIndex, this->mu32_InterfaceIndex);
+      this->mpc_Ui->pc_MessageSelectorWidget->SetNodeId(this->mu32_NodeIndex, this->mu32_InterfaceIndex,
+                                                        this->mc_DatapoolIndexes);
    }
 
    //Message tree
@@ -720,8 +736,22 @@ C_OSCCanProtocol::E_Type C_SdBueComIfDescriptionWidget::GetActProtocol(void) con
 void C_SdBueComIfDescriptionWidget::TriggerLoadOfSplitterUserSettings(void) const
 {
    const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdBusEditTreeSplitterX();
+   const sint32 s32_SecondSegmentWidth = C_UsHandler::h_GetInstance()->GetSdBusEditTreeSplitterX2();
 
-   this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
+   if (s32_SecondSegmentWidth == 0)
+   {
+      this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
+   }
+   else
+   {
+      if (s32_FirstSegmentWidth != 0)
+      {
+         QList<sintn> c_List;
+         c_List.push_back(s32_FirstSegmentWidth);
+         c_List.push_back(s32_SecondSegmentWidth);
+         this->mpc_Ui->pc_Splitter->setSizes(c_List);
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -758,6 +788,15 @@ void C_SdBueComIfDescriptionWidget::TriggerSaveOfSplitterUserSettings(void) cons
             if (sn_Size > 0)
             {
                C_UsHandler::h_GetInstance()->SetSdBusEditTreeSplitterX(sn_Size);
+            }
+            if (c_Sizes.size() > 1)
+            {
+               const sintn sn_Size2 = c_Sizes.at(1);
+               //Avoid saving invalid values
+               if (sn_Size2 > 0)
+               {
+                  C_UsHandler::h_GetInstance()->SetSdBusEditTreeSplitterX2(sn_Size2);
+               }
             }
          }
       }
@@ -905,7 +944,7 @@ void C_SdBueComIfDescriptionWidget::m_RecheckError(const C_OSCCanMessageIdentifi
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnMessagesSelected(void) const
 {
-   this->mpc_Ui->pc_MsgSigEditWidget->setVisible(false);
+   this->mpc_Ui->pc_MsgSigEditWidget->Hide();
    this->mpc_Ui->pc_MsgSigTableWidget->setVisible(true);
    //Update messages (All properties changes may be missing)
    this->mpc_Ui->pc_MsgSigTableWidget->UpdateData();
@@ -976,11 +1015,14 @@ void C_SdBueComIfDescriptionWidget::m_SaveMessageUserSettings(void) const
       }
       else
       {
+         // Save the user settings for node mode in the first protocol Datapool user settings
+         // The selected message has no relation to the used Datapool index in this logic. The name is used as
+         // identifier.
          const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
          const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPool(
-            this->mu32_NodeIndex, e_SelectedProtocol);
+            this->mu32_NodeIndex, e_SelectedProtocol, this->mc_DatapoolIndexes[0]);
          const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
-            this->mu32_NodeIndex, e_SelectedProtocol, this->mu32_InterfaceIndex, true);
+            this->mu32_NodeIndex, e_SelectedProtocol, this->mu32_InterfaceIndex, this->mc_DatapoolIndexes[0], true);
          if (((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL))
          {
             //Set
@@ -1023,11 +1065,13 @@ void C_SdBueComIfDescriptionWidget::m_RestoreMessageUserSettings(void)
    }
    else
    {
+      // Save the user settings for node mode in the first protocol Datapool user settings
+      // The selected message has no relation to the used Datapool index in this logic. The name is used as identifier.
       const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
       const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPool(
-         this->mu32_NodeIndex, e_SelectedProtocol);
+         this->mu32_NodeIndex, e_SelectedProtocol, this->mc_DatapoolIndexes[0]);
       const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
-         this->mu32_NodeIndex, e_SelectedProtocol, this->mu32_InterfaceIndex, true);
+         this->mu32_NodeIndex, e_SelectedProtocol, this->mu32_InterfaceIndex, this->mc_DatapoolIndexes[0], true);
       if (((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL))
       {
          //Do not allow change of protocol as this may be different from the expected value in the default case
@@ -1037,6 +1081,7 @@ void C_SdBueComIfDescriptionWidget::m_RestoreMessageUserSettings(void)
             pc_Node->c_Properties.c_Name.c_str());
          const C_UsNodeDatapool c_UserSettingsDataPool = c_UserSettingsNode.GetDatapool(pc_DataPool->c_Name.c_str());
          const C_UsCommunication c_UserSettingsList = c_UserSettingsDataPool.GetCommList(pc_List->c_Name.c_str());
+
          //Get
          c_UserSettingsList.GetLastSelectedMessage(e_Tmp, q_MessageSelected, c_SelectedMessageName,
                                                    q_SignalSelected, c_SelectedSignalName);
@@ -1110,6 +1155,7 @@ const
          if (ou32_DataPoolIndex == pc_Node->c_ComProtocols[u32_Counter].u32_DataPoolIndex)
          {
             orc_MessageId.e_ComProtocol = pc_Node->c_ComProtocols[u32_Counter].e_Type;
+
             // get the message container, we need it later
             if (orc_MessageId.u32_InterfaceIndex < pc_Node->c_ComProtocols[u32_Counter].c_ComMessages.size())
             {
@@ -1129,6 +1175,7 @@ const
          if (pc_OscList != NULL)
          {
             orc_MessageId.u32_NodeIndex = ou32_NodeIndex;
+            orc_MessageId.u32_DatapoolIndex = ou32_DataPoolIndex;
 
             orc_MessageId.q_MessageIsTx = C_OSCCanProtocol::h_ListIsComTx(*pc_OscList);
 

@@ -45,13 +45,13 @@ const stw_types::uint8 C_GiLiLine::mhu8_AnimationStepCount = 60;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]     orc_Points      Points for line
-   \param[in]     orq_MiddleLine  Indicator if line(s) should have a different colored central line
-   \param[in,out] opc_Parent      Optional pointer to parent
+   \param[in]     opc_Points     Points for line
+   \param[in]     orq_MiddleLine Indicator if line(s) should have a different colored central line
+   \param[in,out] opc_Parent     Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiLine::C_GiLiLine(const std::vector<QPointF> * const opc_Points, const bool & orq_MiddleLine,
@@ -98,7 +98,7 @@ C_GiLiLine::C_GiLiLine(const std::vector<QPointF> * const opc_Points, const bool
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -108,7 +108,7 @@ C_GiLiLine::~C_GiLiLine()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize class
+/*! \brief  Initialize class
 
    \param[in] orc_Points Initial points
 */
@@ -137,7 +137,7 @@ void C_GiLiLine::Init(const std::vector<QPointF> & orc_Points)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this item
+/*! \brief  Returns the type of this item
 
    \return  ID
 */
@@ -148,7 +148,7 @@ sintn C_GiLiLine::type() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper to handle line creation
+/*! \brief  Helper to handle line creation
 
    \param[in] ors32_Index Index of creation
 */
@@ -177,7 +177,7 @@ void C_GiLiLine::m_AddLineAt(const stw_types::sint32 & ors32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper to handle line removal
+/*! \brief  Helper to handle line removal
 
    \param[in] ors32_Index Index of line
 */
@@ -203,7 +203,7 @@ void C_GiLiLine::m_RemoveLineAt(const sint32 & ors32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Helper to handle line update
+/*! \brief  Helper to handle line update
 
    \param[in] ors32_LineIndex Index of changed line
 */
@@ -224,7 +224,7 @@ void C_GiLiLine::m_UpdateLine(const stw_types::sint32 & ors32_LineIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Apply offset to line ends
+/*! \brief  Apply offset to line ends
 
    \param[in,out] orc_Polygon Polygon to adapt
 */
@@ -262,7 +262,7 @@ void C_GiLiLine::m_ApplyOffset(QPolygonF & orc_Polygon) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   First draft for animation steps
+/*! \brief  First draft for animation steps
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::m_UpdateAnimation(void)
@@ -279,9 +279,10 @@ void C_GiLiLine::m_UpdateAnimation(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set color
+/*! \brief  Set color
 
-   \param[in] orc_Color New color
+   \param[in] orc_Color     New color
+   \param[in] oq_SendUpdate Send update
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::m_SetColor(const QColor & orc_Color, const bool oq_SendUpdate)
@@ -303,7 +304,7 @@ void C_GiLiLine::m_SetColor(const QColor & orc_Color, const bool oq_SendUpdate)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get desired animation step count
+/*! \brief  Get desired animation step count
 
    \return
    Desired animation step count
@@ -325,7 +326,7 @@ uint8 C_GiLiLine::m_GetAnimationStepCount(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set interaction point width
+/*! \brief  Set interaction point width
 
    \param[in] orf64_Value New value
 */
@@ -346,10 +347,10 @@ void C_GiLiLine::SetInteractionWidth(const stw_types::float64 & orf64_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds a new point with specific coordinates
+/*! \brief  Adds a new point with specific coordinates
 
-   \param[in] ors32_Index  Index of changed point
-   \param[in] orc_Pos      New position of point
+   \param[in] ors32_Index Index of changed point
+   \param[in] orc_Pos     New position of point
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::AddPoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
@@ -360,10 +361,10 @@ void C_GiLiLine::AddPoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of specific point coordinates
+/*! \brief  Update of specific point coordinates
 
-   \param[in] ors32_Index  Index of changed point
-   \param[in] orc_Pos      New position of point
+   \param[in] ors32_Index Index of changed point
+   \param[in] orc_Pos     New position of point
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::UpdatePoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
@@ -388,9 +389,9 @@ void C_GiLiLine::UpdatePoint(const sint32 & ors32_Index, const QPointF & orc_Pos
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Removes a specific point
+/*! \brief  Removes a specific point
 
-   \param[in] ors32_Index  Index of point
+   \param[in] ors32_Index Index of point
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::RemovePoint(const sint32 & ors32_Index)
@@ -412,7 +413,7 @@ void C_GiLiLine::RemovePoint(const sint32 & ors32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set line width
+/*! \brief  Set line width
 
    \param[in] ors32_Width New line width
 */
@@ -432,7 +433,7 @@ void C_GiLiLine::SetWidth(const stw_types::sint32 & ors32_Width)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set color
+/*! \brief  Set color
 
    \param[in] orc_Color New color
 */
@@ -445,7 +446,7 @@ void C_GiLiLine::SetColor(const QColor & orc_Color)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set middle line color
+/*! \brief  Set middle line color
 
    \param[in] orc_Color New color
 */
@@ -458,7 +459,7 @@ void C_GiLiLine::SetMiddleLineColor(const QColor & orc_Color)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set middle line active
+/*! \brief  Set middle line active
 
    \param[in] orq_MiddleLine New value
 */
@@ -471,7 +472,7 @@ void C_GiLiLine::SetMiddleLine(const bool & orq_MiddleLine)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set line style
+/*! \brief  Set line style
 
    \param[in] ore_Type New line style
 */
@@ -505,9 +506,9 @@ void C_GiLiLine::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set offset for line start
+/*! \brief  Set offset for line start
 
-   \param[in] ors32_Offset New offset
+   \param[in] orf64_Offset New offset
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetOffsetStart(const float64 & orf64_Offset)
@@ -516,9 +517,9 @@ void C_GiLiLine::SetOffsetStart(const float64 & orf64_Offset)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set offset for line end
+/*! \brief  Set offset for line end
 
-   \param[in] ors32_Offset New offset
+   \param[in] orf64_Offset New offset
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetOffsetEnd(const float64 & orf64_Offset)
@@ -527,7 +528,7 @@ void C_GiLiLine::SetOffsetEnd(const float64 & orf64_Offset)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set item disabled look flag
+/*! \brief  Set item disabled look flag
 
    \param[in] oq_Disabled Flag if item is disabled
 */
@@ -548,7 +549,9 @@ void C_GiLiLine::SetDisabledLook(const bool oq_Disabled)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get width
+/*! \brief  Get width
+
+   \return Line width
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiLiLine::GetWidth() const
@@ -557,7 +560,9 @@ sint32 C_GiLiLine::GetWidth() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get color
+/*! \brief  Get color
+
+   \return Line color
 */
 //----------------------------------------------------------------------------------------------------------------------
 QColor C_GiLiLine::GetColor() const
@@ -566,7 +571,9 @@ QColor C_GiLiLine::GetColor() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get middle line color
+/*! \brief  Get middle line color
+
+   \return Middle line color
 */
 //----------------------------------------------------------------------------------------------------------------------
 QColor C_GiLiLine::GetMiddleLineColor() const
@@ -575,7 +582,9 @@ QColor C_GiLiLine::GetMiddleLineColor() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get lines
+/*! \brief  Get lines
+
+   \return  Interactable segments of line
 */
 //----------------------------------------------------------------------------------------------------------------------
 QVector<C_GiLiLineConnection *> C_GiLiLine::GetLines(void) const
@@ -584,7 +593,10 @@ QVector<C_GiLiLineConnection *> C_GiLiLine::GetLines(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get middle line indicator
+/*! \brief  Get middle line indicator
+
+   \retval  true     has middle line
+   \retval  false    no middle line
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiLiLine::GetMiddleLine(void) const
@@ -593,7 +605,7 @@ bool C_GiLiLine::GetMiddleLine(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set animation status
+/*! \brief  Set animation status
 
    \param[in] oq_Active          Animation active flag
    \param[in] oq_Inverse         Optional flag to animate in inverse direction
@@ -633,7 +645,7 @@ void C_GiLiLine::SetAnimated(const bool oq_Active, const bool oq_Inverse, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten paint event slot
+/*! \brief  Overwritten paint event slot
 
    Here: Draw segmented line
 
@@ -749,7 +761,7 @@ void C_GiLiLine::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsI
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Return more accurate shape
+/*! \brief  Return more accurate shape
 
    \return  The painter path as polygon
 */
@@ -763,7 +775,7 @@ QPainterPath C_GiLiLine::shape(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Find closest point in shape to scene position
+/*! \brief  Find closest point in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
    \param[out] orc_Closest    Closest point in shape

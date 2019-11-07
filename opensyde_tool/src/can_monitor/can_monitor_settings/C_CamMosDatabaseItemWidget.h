@@ -13,6 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QDateTime>
+#include <QFileInfo>
 
 #include "C_OgeWiOnlyBackground.h"
 #include "C_CamProDatabaseData.h"
@@ -58,6 +59,8 @@ public:
    stw_opensyde_gui_logic::C_CamProDatabaseData GetDatabaseData(void) const;
 
    static QString h_BrowseForDatabasePath(QWidget * const opc_Parent = NULL);
+   static QString h_AdaptPathToSystemDefinitionIfNecessary(const QFileInfo & orc_SydeFile);
+   static bool h_IsDatabaseAlreadyUsed(const QString & orc_AbsolutePath, QWidget * const opc_Parent = NULL);
    static void h_AppendMessageWarningIfNecessary(const QString & orc_File, QString & orc_Description,
                                                  QString & orc_Details);
 
@@ -93,7 +96,7 @@ private:
    void m_OnRemove(void);
    void m_OnChxToggle(const bool & orq_Checked);
    void m_SetMinimizedPath(void) const;
-
+   void m_EnableCheckBoxTooltip(const bool oq_Enabled);
    void m_ButtonPressed(void);
    void m_ButtonReleased(void);
 

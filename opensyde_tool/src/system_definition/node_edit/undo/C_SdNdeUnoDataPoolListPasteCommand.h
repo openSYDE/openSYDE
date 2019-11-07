@@ -28,7 +28,7 @@ class C_SdNdeUnoDataPoolListPasteCommand :
 public:
    C_SdNdeUnoDataPoolListPasteCommand(const stw_types::uint32 & oru32_NodeIndex,
                                       const stw_types::uint32 & oru32_DataPoolIndex,
-                                      stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                      stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                       QUndoCommand * const opc_Parent = NULL);
    bool InitialSetup(const stw_types::uint32 & oru32_FirstIndex);
    virtual void redo(void) override;

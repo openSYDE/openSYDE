@@ -168,4 +168,9 @@ void C_CamOgeWiSettingSubSection::mousePressEvent(QMouseEvent * const opc_Event)
    {
       this->mpc_Ui->pc_PbExpColl->toggle();
    }
+   else
+   {
+      // Popup mode. Hide the widget.
+      Q_EMIT(this->SigHide());
+   }
 }

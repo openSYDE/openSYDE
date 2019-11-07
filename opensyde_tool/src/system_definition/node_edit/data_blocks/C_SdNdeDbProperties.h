@@ -64,6 +64,7 @@ private:
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
    static const stw_types::sintn mhsn_VERSION_INDEX_V1;
    static const stw_types::sintn mhsn_VERSION_INDEX_V2;
+   static const stw_types::sintn mhsn_VERSION_INDEX_V3;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);

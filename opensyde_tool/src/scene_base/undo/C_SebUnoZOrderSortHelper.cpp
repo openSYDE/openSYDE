@@ -40,7 +40,7 @@ C_SebUnoZOrderSortHelper::C_SebUnoZOrderSortHelper(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Compare item 1 to 2
+/*! \brief  Compare item 1 to 2
 
    Primary sorting criteria: alphabetical
 

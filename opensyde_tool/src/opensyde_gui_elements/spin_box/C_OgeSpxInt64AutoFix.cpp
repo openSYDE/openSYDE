@@ -20,7 +20,7 @@
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
 #include "C_OgeSpxInt64AutoFix.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -264,15 +264,15 @@ void C_OgeSpxInt64AutoFix::m_Init(void)
       {
          if (this->GetIsUnsigned() == true)
          {
-            C_SdNdeDataPoolContentUtil::h_GetAnyValueAsUint64(this->mc_UnscaledMin, u64_ScaledMin, this->mu32_Index);
-            C_SdNdeDataPoolContentUtil::h_GetAnyValueAsUint64(this->mc_UnscaledMax, u64_ScaledMax, this->mu32_Index);
+            C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(this->mc_UnscaledMin, u64_ScaledMin, this->mu32_Index);
+            C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(this->mc_UnscaledMax, u64_ScaledMax, this->mu32_Index);
             c_ScaledMin = QVariant(u64_ScaledMin);
             c_ScaledMax = QVariant(u64_ScaledMax);
          }
          else
          {
-            C_SdNdeDataPoolContentUtil::h_GetAnyValueAsSint64(this->mc_UnscaledMin, s64_ScaledMin, this->mu32_Index);
-            C_SdNdeDataPoolContentUtil::h_GetAnyValueAsSint64(this->mc_UnscaledMax, s64_ScaledMax, this->mu32_Index);
+            C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(this->mc_UnscaledMin, s64_ScaledMin, this->mu32_Index);
+            C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(this->mc_UnscaledMax, s64_ScaledMax, this->mu32_Index);
             c_ScaledMin = QVariant(s64_ScaledMin);
             c_ScaledMax = QVariant(s64_ScaledMax);
          }

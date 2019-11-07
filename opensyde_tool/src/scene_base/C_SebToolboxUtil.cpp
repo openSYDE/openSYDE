@@ -41,7 +41,7 @@ const stw_types::sintn C_SebToolboxUtil::hsn_HeadingSpacerSizeBottom = 6;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Create new C_SdTopologyListWidget with heading
+/*! \brief  Create new C_SdTopologyListWidget with heading
 
    \param[in]     orc_Name        Heading for list
    \param[in,out] opc_Layout      Layout to add list to
@@ -90,7 +90,7 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new section heading
+/*! \brief  Add new section heading
 
    \param[in]     orc_Name           Heading name
    \param[in,out] opc_Layout         Layout to add heading to
@@ -133,7 +133,7 @@ void C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, QVBoxLayout * c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add free elements to specified list widget
+/*! \brief  Add free elements to specified list widget
 
    \param[in,out] opc_ListWidget List widget to add free elements to
 */
@@ -158,7 +158,7 @@ void C_SebToolboxUtil::h_InitFreeElements(QListWidget * const opc_ListWidget)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add specified item to list
+/*! \brief  Add specified item to list
 
    \param[in,out] opc_ListWidget     List
    \param[in]     orc_Text           Item text
@@ -196,7 +196,7 @@ void C_SebToolboxUtil::h_AddElementToList(QListWidget * const opc_ListWidget, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Append final spacer to layout
+/*! \brief  Append final spacer to layout
 
    \param[in,out] opc_Layout     Layout to append spacer to
    \param[in,out] opc_ListWidget Last list widget
@@ -228,7 +228,7 @@ void C_SebToolboxUtil::h_AddFinalSpacer(QVBoxLayout * const opc_Layout, QListWid
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebToolboxUtil::C_SebToolboxUtil(void)

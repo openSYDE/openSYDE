@@ -36,13 +36,13 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]       oru64_ID             Unique ID
-   \param[in]       orc_ImagePath        File path of image
-   \param[in,out]   opc_Parent           Optional pointer to parent
+   \param[in]     oru64_ID      Unique ID
+   \param[in]     orc_ImagePath File path of image
+   \param[in,out] opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const QString & orc_ImagePath,
@@ -53,16 +53,15 @@ C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const QString & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in]       oru64_ID             Unique ID
-   \param[in]       orc_Image            Image
-   \param[in]       orf64_Width          Width of image view
-   \param[in]       orf64_Height         Height of image view
-   \param[in]       orc_ImagePath        File path to the image
-   \param[in,out]   opc_Parent           Optional pointer to parent
+   \param[in]     oru64_ID    Unique ID
+   \param[in]     of64_Width  Width of image view
+   \param[in]     of64_Height Height of image view
+   \param[in]     orc_Image   Image
+   \param[in,out] opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const float64 of64_Width, const float64 of64_Height,
@@ -74,7 +73,7 @@ C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const float64 of64_W
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this item
+/*! \brief  Returns the type of this item
 
    \return  ID
 */
@@ -98,9 +97,9 @@ void C_GiBiImageGroup::SetZValueCustom(const float64 of64_ZValue)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update internal data
+/*! \brief  Update internal data
 
-   \param[in]  orc_Data       Image data
+   \param[in] orc_Data Image data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiImageGroup::m_UpdateData(C_PuiBsImage & orc_Data) const

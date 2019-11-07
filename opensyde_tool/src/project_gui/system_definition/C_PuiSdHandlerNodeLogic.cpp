@@ -49,7 +49,7 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     orc_Name                  Node name to check for
    \param[in]     opu32_NodeIndexToSkip     Optional parameter to skip one index
                                             (Use-case: skip current node to avoid conflict with itself)
-   \param[in,out] opc_ExistingDatapoolNames Optional parameter to list all OTHER existing node names
+   \param[in,out] opc_ExistingNames         Optional parameter to list all OTHER existing node names
 
    \return
    true  Available
@@ -3705,7 +3705,8 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElement(const uint32 & oru32_Node
                                                                      oru32_DataPoolListElementIndex,
                                                                      orc_OSCContent.GetType(),
                                                                      orc_OSCContent.GetArray(),
-                                                                     orc_OSCContent.GetArraySize());
+                                                                     orc_OSCContent.GetArraySize(),
+                                                                     orc_UIContent.q_InterpretAsString);
                }
                if (rc_OSCDataElement.e_Access != orc_OSCContent.e_Access)
                {
@@ -5153,7 +5154,8 @@ void C_PuiSdHandlerNodeLogic::m_SetUpComDataPool(const uint32 & oru32_NodeIndex,
                C_PuiSdNodeCanMessageContainer c_UiMessageContainer;
                C_OSCCanProtocol c_Protocol;
                C_OSCCanMessageContainer c_New;
-               c_New.q_IsComProtocolUsedByInterface = false;
+               uint32 u32_CanCounter = 0U;
+
                c_Protocol.u32_DataPoolIndex = oru32_DataPoolIndex;
                c_Protocol.e_Type = ore_ComProtocolType;
                c_Protocol.c_ComMessages.reserve(rc_OSCNode.c_Properties.c_ComInterfaces.size());
@@ -5163,11 +5165,34 @@ void C_PuiSdHandlerNodeLogic::m_SetUpComDataPool(const uint32 & oru32_NodeIndex,
                {
                   const C_OSCNodeComInterfaceSettings & rc_Interface =
                      rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItMessageContainer];
+
                   //Do not create any list for Ethernet
                   if (rc_Interface.e_InterfaceType == C_OSCSystemBus::eCAN)
                   {
+                     uint32 u32_ComProtocolCounter;
+
+                     c_New.q_IsComProtocolUsedByInterface = false;
+
+                     // Check already existing protocols of same type if the are used by the interface
+                     for (u32_ComProtocolCounter = 0U; u32_ComProtocolCounter < rc_OSCNode.c_ComProtocols.size();
+                          ++u32_ComProtocolCounter)
+                     {
+                        const C_OSCCanProtocol & rc_Protocol = rc_OSCNode.c_ComProtocols[u32_ComProtocolCounter];
+
+                        if ((ore_ComProtocolType == rc_Protocol.e_Type) &&
+                            (u32_CanCounter < rc_Protocol.c_ComMessages.size()) &&
+                            (rc_Protocol.c_ComMessages[u32_CanCounter].q_IsComProtocolUsedByInterface == true))
+                        {
+                           // The same protocol type is already used on the same CAN interface
+                           c_New.q_IsComProtocolUsedByInterface = true;
+                           break;
+                        }
+                     }
+
                      c_Protocol.c_ComMessages.push_back(c_New);
                      c_UiProtocol.c_ComMessages.push_back(c_UiMessageContainer);
+
+                     ++u32_CanCounter;
                   }
                }
                rc_OSCNode.c_ComProtocols.push_back(c_Protocol);

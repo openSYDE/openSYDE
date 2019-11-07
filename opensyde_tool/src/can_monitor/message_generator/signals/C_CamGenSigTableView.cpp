@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
 */
@@ -86,7 +86,7 @@ C_CamGenSigTableView::C_CamGenSigTableView(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -97,7 +97,7 @@ C_CamGenSigTableView::~C_CamGenSigTableView(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle signal reload on external trigger
+/*! \brief  Handle signal reload on external trigger
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::TriggerSignalReload(void)
@@ -107,7 +107,7 @@ void C_CamGenSigTableView::TriggerSignalReload(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set current message index
+/*! \brief  Set current message index
 
    \param[in] ou32_Message Message index
 */
@@ -122,7 +122,7 @@ void C_CamGenSigTableView::SetMessage(const uint32 ou32_Message)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update the message DLC
+/*! \brief  Update the message DLC
 
    \param[in] ou32_MessageIndex Message index
 */
@@ -134,7 +134,7 @@ void C_CamGenSigTableView::UpdateMessageDLC(const uint32 ou32_MessageIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore column widths
+/*! \brief  Restore column widths
 
    \param[in] orc_ColumnWidths Stored column widths (Restores default values if empty)
 */
@@ -186,7 +186,7 @@ void C_CamGenSigTableView::SetCurrentColumnWidths(const std::vector<sint32> & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current column widths
+/*! \brief  Get current column widths
 
    \return
    Current column widths
@@ -204,7 +204,7 @@ std::vector<sint32> C_CamGenSigTableView::GetCurrentColumnWidths(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save all user settings
+/*! \brief  Save all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::SaveUserSettings(void) const
@@ -213,7 +213,7 @@ void C_CamGenSigTableView::SaveUserSettings(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle user settings
+/*! \brief  Handle user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::LoadUserSettings(void)
@@ -222,7 +222,7 @@ void C_CamGenSigTableView::LoadUserSettings(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten show event slot
+/*! \brief  Overwritten show event slot
 
    Here: move scroll bar buttons
 
@@ -236,7 +236,7 @@ void C_CamGenSigTableView::showEvent(QShowEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten key press event slot
+/*! \brief  Overwritten key press event slot
 
    Here: Forward necessary keys
 
@@ -264,7 +264,7 @@ void C_CamGenSigTableView::keyPressEvent(QKeyEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten resize event slot
+/*! \brief  Overwritten resize event slot
 
    Here: move scroll bar buttons
 
@@ -278,7 +278,7 @@ void C_CamGenSigTableView::resizeEvent(QResizeEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Reposition the buttons as necessary
+/*! \brief  Reposition the buttons as necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::m_RepositionButtons(void)
@@ -290,7 +290,7 @@ void C_CamGenSigTableView::m_RepositionButtons(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update the persistent editor widgets
+/*! \brief  Update the persistent editor widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::m_SetPersistentEditorWidgets(void)

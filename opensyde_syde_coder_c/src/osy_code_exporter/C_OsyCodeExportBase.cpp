@@ -74,8 +74,7 @@ void C_OsyCodeExportBase::m_PrintCommandLineParameters(void) const
       "-e      --erasefolder          Erase target directory and all subdirectories <don't>           -e\n";
    std::cout <<
       "-h      --help                 Print command line parameters\n";
-   std::cout << "Parameters that have a \"Default\" are optional. All others are mandatory.\n";
-   std::cout << "\n";
+   std::cout << "Parameters that have a \"Default\" are optional. All others are mandatory.\n" << &std::endl;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -158,7 +157,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
 
    m_PrintBanner();
 
-   std::cout << "Version: " << mc_ExeVersion.c_str() << "\n";
+   std::cout << "Version: " << mc_ExeVersion.c_str() << &std::endl;
 
    //configure logging engine to log to local file:
    //remove pre-existing file:
@@ -199,6 +198,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
 {
    E_ResultCode e_Return = eRESULT_OK;
    sintn sn_Result;
+   C_SCLString c_Info = "";
    bool q_PrintCommandLineParameters = false;
    bool q_ParseError = false;
 
@@ -237,14 +237,17 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
    do
    {
       sintn sn_Index;
+
       sn_Result = getopt_long(osn_Argc, oapcn_Argv, "s:d:o:n:a:he", &ac_Options[0], &sn_Index);
       if (sn_Result != -1)
       {
          switch (sn_Result)
          {
          case 'd':
-            std::cout <<
-               "Information: Command line parameter --devicedefinition ignored (Device Definition is no longer required).\n";
+            c_Info = "Information: Command line parameter --devicedefinition ignored "
+                     "(Device Definition is no longer required).";
+            std::cout << c_Info.c_str() << &std::endl;
+            osc_write_log_info("Parse Command Line", c_Info);
             break;
          case 's':
             mc_SystemDefinitionFilePath = optarg;
@@ -287,13 +290,17 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
       if ((q_ParseError == true) || (mc_SystemDefinitionFilePath == "") || (mc_OutputPath == ""))
       {
          //print directly to console; no need for logging this user feedback
-         std::cout << "Error: Invalid or missing command line parameters.\n";
+         c_Info = "Invalid or missing command line parameters.";
+         std::cout << "Error: " << c_Info.c_str() << &std::endl;
+         osc_write_log_error("Parse Command Line", c_Info);
          m_PrintCommandLineParameters();
          e_Return = eRESULT_INVALID_CLI_PARAMETERS;
       }
       if ((mc_ApplicationName != "") && (mc_DeviceName == ""))
       {
-         std::cout << "Error: Command line switch \"-a\" may only be used in combination with \"-n\"\n";
+         c_Info = "Command line switch \"-a\" may only be used in combination with \"-n\"";
+         std::cout << "Error: " << c_Info.c_str() << &std::endl;
+         osc_write_log_error("Parse Command Line", c_Info);
          m_PrintCommandLineParameters();
          e_Return = eRESULT_INVALID_CLI_PARAMETERS;
       }
@@ -323,7 +330,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void
 
    if (s32_Return == C_NO_ERR)
    {
-      std::cout <<  "System Definition (*.syde_sysdef) loaded.\n";
+      std::cout <<  "System Definition (*.syde_sysdef) loaded." << &std::endl;
+      // loading system definition is logged to log file by C_OSCSystemDefinitionFiler
    }
    else
    {
@@ -343,10 +351,11 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void
    Paths of created file will be added to mc_CreatedFiles;
 
    \return
-   eRESULT_OK                           code created for all programmable application (might be zero applications :-))
-   eRESULT_CODE_GENERATION_ERROR        problems creating code for at least one programmable application
-   eRESULT_APPLICATION_NOT_FOUND        specified application not found
-   eRESULT_APPLICATION_NOT_PROGRAMMABLE specified application is not a programmable application
+   eRESULT_OK                                code created for all programmable application (might be zero applications)
+   eRESULT_CODE_GENERATION_ERROR             problems creating code for at least one programmable application
+   eRESULT_APPLICATION_NOT_FOUND             at least one application not found
+   eRESULT_APPLICATION_NOT_PROGRAMMABLE      at least one application is not a programmable application
+   eRESULT_APPLICATION_UNKNOWN_CODE_VERSION  at least one application has unknown code structure version
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_OSCNode & orc_Node,
@@ -365,32 +374,24 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
 
          if (rc_Application.c_Name.UpperCase() == mc_ApplicationName.UpperCase())
          {
+            std::vector<C_SCLString> c_CreatedFiles;
             if (rc_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
             {
                e_Return = eRESULT_APPLICATION_NOT_PROGRAMMABLE;
+               this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application, false,
+                                                    c_CreatedFiles);
+            }
+            else if (rc_Application.u16_GenCodeVersion > 3U)
+            {
+               this->m_PrintCodeFormatUnknownInfo(orc_Node.c_Properties.c_Name, rc_Application);
+               e_Return = eRESULT_APPLICATION_UNKNOWN_CODE_VERSION;
             }
             else
             {
-               std::vector<C_SCLString> c_CreatedFiles;
                e_Return = m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application), orc_OutputPath,
                                                   c_CreatedFiles);
-               if (e_Return == eRESULT_OK)
-               {
-                  const C_SCLString c_Text = "Code generated for device \"" + orc_Node.c_Properties.c_Name +
-                                             "\" application \"" + rc_Application.c_Name +
-                                             "\". Code format version: 0x" +
-                                             C_SCLString::IntToHex(rc_Application.u16_GenCodeVersion, 4U) + ".\n";
-                  std::cout << c_Text.c_str();
-                  std::cout << "Generated files:\n";
-                  for (uint32 u32_File = 0U; u32_File < c_CreatedFiles.size(); u32_File++)
-                  {
-                     std::cout << " " << c_CreatedFiles[u32_File].c_str() << "\n";
-                     //append list of files:
-                     mc_CreatedFiles.push_back(c_CreatedFiles[u32_File]);
-                  }
-               }
+               this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application, true, c_CreatedFiles);
             }
-
             q_Found = true;
             break;
          }
@@ -403,47 +404,128 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
    else
    {
       bool q_AtLeastOne = false;
-      for (uint32 u32_Application = 0U; u32_Application < orc_Node.c_Applications.size(); u32_Application++)
+      for (uint32 u32_Application = 0U; (u32_Application < orc_Node.c_Applications.size()) && (e_Return == eRESULT_OK);
+           u32_Application++)
       {
          const C_OSCNodeApplication & rc_Application = orc_Node.c_Applications[u32_Application];
          if (rc_Application.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
          {
             std::vector<C_SCLString> c_CreatedFiles;
-            const C_SCLString c_Path =
-               TGL_FileIncludeTrailingDelimiter(orc_OutputPath) +
-               C_OSCUtils::h_NiceifyStringForFileName(rc_Application.c_Name);
-
-            e_Return = m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application), c_Path, c_CreatedFiles);
-            if (e_Return == eRESULT_OK)
+            q_AtLeastOne = true;
+            if (rc_Application.u16_GenCodeVersion > 3U)
             {
-               const C_SCLString c_Text = "Code generated for device \"" + orc_Node.c_Properties.c_Name +
-                                          "\" application \"" + rc_Application.c_Name +
-                                          "\". Code format version: 0x" +
-                                          C_SCLString::IntToHex(rc_Application.u16_GenCodeVersion, 4U) + ".\n";
-               std::cout << c_Text.c_str();
-               std::cout << "Generated files:\n";
-               for (uint32 u32_File = 0U; u32_File < c_CreatedFiles.size(); u32_File++)
+               this->m_PrintCodeFormatUnknownInfo(orc_Node.c_Properties.c_Name, rc_Application);
+               e_Return = eRESULT_APPLICATION_UNKNOWN_CODE_VERSION;
+            }
+            else
+            {
+               const C_SCLString c_Path =
+                  TGL_FileIncludeTrailingDelimiter(orc_OutputPath) +
+                  C_OSCUtils::h_NiceifyStringForFileName(rc_Application.c_Name);
+               e_Return =
+                  m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application), c_Path, c_CreatedFiles);
+               if (e_Return == eRESULT_OK)
                {
-                  std::cout << " " << c_CreatedFiles[u32_File].c_str() << "\n";
-                  //append list of files:
-                  mc_CreatedFiles.push_back(c_CreatedFiles[u32_File]);
+                  this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application, true,
+                                                       c_CreatedFiles);
                }
-               q_AtLeastOne = true;
+               else
+               {
+                  this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application, false,
+                                                       c_CreatedFiles);
+               }
             }
          }
       }
       if (q_AtLeastOne == false)
       {
-         std::cout << "Not generating code for device \"" << orc_Node.c_Properties.c_Name.c_str() <<
-            "\" as it has no programmable application defined.\n";
+         C_SCLString c_Info = "Not generating code for device \"" + orc_Node.c_Properties.c_Name +
+                              "\" as it has no programmable application defined.";
+         std::cout << c_Info.c_str() << &std::endl;
+         osc_write_log_info("Code Generation", c_Info);
       }
    }
+
    if (e_Return != eRESULT_OK)
    {
-      std::cout << "Could not generate code for device \"" << orc_Node.c_Properties.c_Name.c_str() << "\"\n";
+      const C_SCLString c_Info = "Error occured on code generation for device \"" + orc_Node.c_Properties.c_Name +
+                                 "\". Stopped code generation.";
+      std::cout << c_Info.c_str() << &std::endl;
+      osc_write_log_error("Code Generation", c_Info);
    }
 
    return e_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Utility for putting together information about unknown code format version.
+
+   \param[in]       orc_NodeName             Node name
+   \param[in]       orc_Application          Application information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OsyCodeExportBase::m_PrintCodeFormatUnknownInfo(const C_SCLString & orc_NodeName,
+                                                       const C_OSCNodeApplication & orc_Application)
+{
+   std::vector<C_SCLString> c_CreatedFiles; // not used but necessary for m_PrintCodeCreationInformation
+   const C_SCLString c_Info = "Code version 0x" +
+                              C_SCLString::IntToHex(orc_Application.u16_GenCodeVersion, 4U) + " is unknown.";
+   this->m_PrintCodeCreationInformation(orc_NodeName, orc_Application, false, c_CreatedFiles);
+
+   std::cout << c_Info.c_str() << &std::endl;
+   osc_write_log_info("Code Generation", c_Info);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Utility for putting together information for console output.
+
+   \param[in]       orc_NodeName             Node name
+   \param[in]       orc_Application          Application information
+   \param[in]       oq_GenerationSuccessful  Flag if code was created or not
+   \param[in]       orc_CreatedFiles         List of generated files (only valid if oq_GenerationSuccessful is true)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OsyCodeExportBase::m_PrintCodeCreationInformation(const C_SCLString & orc_NodeName,
+                                                         const C_OSCNodeApplication & orc_Application,
+                                                         const bool oq_GenerationSuccessful,
+                                                         std::vector<C_SCLString> & orc_CreatedFiles)
+{
+   C_SCLString c_Text;
+
+   if (oq_GenerationSuccessful == true)
+   {
+      c_Text += "Generated code ";
+   }
+   else
+   {
+      c_Text += "Could not generate code ";
+   }
+   c_Text += "for device \"" + orc_NodeName + "\" application \"" + orc_Application.c_Name +
+             "\" in code format version 0x" + C_SCLString::IntToHex(orc_Application.u16_GenCodeVersion, 4U) + ".";
+
+   if (oq_GenerationSuccessful == true)
+   {
+      c_Text += "\nGenerated files:";
+      for (uint32 u32_File = 0U; u32_File < orc_CreatedFiles.size(); u32_File++)
+      {
+         c_Text += "\n " + orc_CreatedFiles[u32_File];
+         //append list of files:
+         mc_CreatedFiles.push_back(orc_CreatedFiles[u32_File]);
+      }
+   }
+
+   // print to console
+   std::cout << c_Text.c_str() << &std::endl;
+
+   // print to log file
+   if (oq_GenerationSuccessful == true)
+   {
+      osc_write_log_info("Code Generation", c_Text);
+   }
+   else
+   {
+      osc_write_log_error("Code Generation", c_Text);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -456,14 +538,15 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
    The actual code generation for each application will be done in a virtual function.
 
    \return
-   eRESULT_OK                            code created for all programmable application
-   eRESULT_ERASE_TARGET_FOLDER_ERROR     could not erase pre-existing target folder
-   eRESULT_CREATE_TARGET_FOLDER_ERROR    could not create target folder
-   eRESULT_CODE_GENERATION_ERROR         problems creating code for at least one programmable application
-   eRESULT_APPLICATION_DEVICE_NOT_FOUND  device specified on command line does not exist
-   eRESULT_APPLICATION_DEVICE_NOT_COMPATIBLE  device specified on command line does not support openSYDE
-   eRESULT_APPLICATION_NOT_FOUND         application specified on command line does not exist
-   eRESULT_APPLICATION_NOT_PROGRAMMABLE  application specified on command line is not defined as "programmable"
+   eRESULT_OK                                   code created for all programmable application
+   eRESULT_ERASE_TARGET_FOLDER_ERROR            could not erase pre-existing target folder
+   eRESULT_CREATE_TARGET_FOLDER_ERROR           could not create target folder
+   eRESULT_CODE_GENERATION_ERROR                problems creating code for at least one programmable application
+   eRESULT_APPLICATION_DEVICE_NOT_FOUND         device specified on command line does not exist
+   eRESULT_APPLICATION_DEVICE_NOT_COMPATIBLE    device specified on command line does not support openSYDE
+   eRESULT_APPLICATION_NOT_FOUND                application specified on command line does not exist
+   eRESULT_APPLICATION_NOT_PROGRAMMABLE         application specified on command line is not defined as "programmable"
+   eRESULT_APPLICATION_UNKNOWN_CODE_VERSION     at least one application has unknown code structure version
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
@@ -477,14 +560,19 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
       if (TGL_DirectoryExists(mc_OutputPath) == true)
       {
          sint32 s32_Return;
-         std::cout << "Clearing pre-existing target folder (" << mc_OutputPath.c_str() << ").\n";
+         C_SCLString c_Info = "Clearing pre-existing target folder (" + mc_OutputPath + ").";
+         std::cout << c_Info.c_str() << &std::endl;
+         osc_write_log_info("Code Generation", c_Info);
 
          //remove all folder contents (but keep folder itself)
          s32_Return = TGL_RemoveDirectory(mc_OutputPath, true);
          if (s32_Return != 0)
          {
+            c_Info = "Could not clear pre-existing target folder (" + mc_OutputPath + ").";
+            std::cout << "Error: " << c_Info.c_str() << &std::endl;
+            osc_write_log_error("Code Generation", c_Info);
+
             e_Return = eRESULT_ERASE_TARGET_FOLDER_ERROR;
-            std::cout << "Error: could not clear pre-existing target folder (" << mc_OutputPath.c_str() << ").\n";
          }
       }
    }
@@ -493,14 +581,19 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
       if (TGL_DirectoryExists(mc_OutputPath) == false)
       {
          sint32 s32_Return;
-         std::cout << "Creating target folder (" << mc_OutputPath.c_str() << ").\n";
+         C_SCLString c_Info = "Creating target folder (" + mc_OutputPath + ").";
+         std::cout << c_Info.c_str() << &std::endl;
+         osc_write_log_info("Code Generation", c_Info);
 
          //create target folder if required:
          s32_Return = C_OSCUtils::h_CreateFolderRecursively(mc_OutputPath);
          if (s32_Return != C_NO_ERR)
          {
+            c_Info = "Could not create target folder (" + mc_OutputPath + ").";
+            std::cout << "Error: " << c_Info.c_str() << &std::endl;
+            osc_write_log_error("Code Generation", c_Info);
+
             e_Return = eRESULT_CREATE_TARGET_FOLDER_ERROR;
-            std::cout << "Error: could not create target folder (" << mc_OutputPath.c_str() << ").\n";
          }
       }
    }
@@ -552,8 +645,10 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
             }
             else
             {
-               std::cout << "Not generating code for device \"" << rc_Node.c_Properties.c_Name.c_str() <<
-                  "\" as it is not an openSYDE node.\n";
+               const C_SCLString c_Info = "Not generating code for device \"" + rc_Node.c_Properties.c_Name +
+                                          "\" as it is not an openSYDE node.";
+               std::cout << c_Info.c_str() << &std::endl;
+               osc_write_log_info("Code Generation", c_Info);
             }
          }
       }
@@ -611,19 +706,19 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Exit(const E_ResultCode o
       c_Text += "(Could not write file with list of generated files \"" + mc_ListOfFilesFileName + "\")";
       break;
    case eRESULT_ERASE_TARGET_FOLDER_ERROR:
-      c_Text += "(could not erase pre-existing target folder)";
+      c_Text += "(Could not erase pre-existing target folder)";
       break;
    case eRESULT_CREATE_TARGET_FOLDER_ERROR:
-      c_Text += "(could not create target folder)";
+      c_Text += "(Could not create target folder)";
       break;
    case eRESULT_INVALID_CLI_PARAMETERS:
       c_Text += "(Invalid command line parameters)";
       break;
    case eRESULT_SYSTEM_DEFINITION_OPEN_ERROR:
-      c_Text += "(Specified system definition could not be loaded (see log file for details))";
+      c_Text += "(Specified system definition could not be loaded)";
       break;
    case eRESULT_CODE_GENERATION_ERROR:
-      c_Text += "(Could not generate code for at least one application (see log file for details))";
+      c_Text += "(Could not generate code for at least one application)";
       break;
    case eRESULT_DEVICE_NOT_FOUND:
       c_Text += "(Device specified on command line does not exist)";
@@ -637,11 +732,23 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Exit(const E_ResultCode o
    case eRESULT_APPLICATION_NOT_PROGRAMMABLE:
       c_Text += "(Application specified on command line is not defined as \"programmable\")";
       break;
+   case eRESULT_APPLICATION_UNKNOWN_CODE_VERSION:
+      c_Text += "(At least one application has unknown code format version)";
+      break;
    default:
       c_Text += "(Undefined result)";
       break;
    }
-   std::cout << c_Text.c_str() << ".\n";
+
+   std::cout << c_Text.c_str() << &std::endl;
+   if (e_Return == eRESULT_OK)
+   {
+      osc_write_log_info("Finish Code Generation", c_Text);
+   }
+   else
+   {
+      osc_write_log_error("Finish Code Generation", c_Text);
+   }
 
    return e_Return;
 }

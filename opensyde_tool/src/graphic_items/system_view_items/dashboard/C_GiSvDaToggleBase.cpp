@@ -26,7 +26,7 @@
 #include "C_OgePopUpDialog.h"
 #include "C_SyvDaPeBase.h"
 #include "C_SyvDaPeToggle.h"
-#include "C_SdNdeDataPoolContentUtil.h"
+#include "C_SdNdeDpContentUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -245,7 +245,7 @@ bool C_GiSvDaToggleBase::CallProperties(void)
          {
             c_ElementId = C_PuiSvDbNodeDataPoolListElementId(0, 0, 0, 0,
                                                              C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
-                                                             false);
+                                                             false, 0UL, false);
             c_Scaling = C_PuiSvDbDataElementScaling();
          }
 
@@ -559,8 +559,8 @@ bool C_GiSvDaToggleBase::m_CheckHasValidElements(QString & orc_FirstInvalidEleme
                {
                   std::vector<float64> c_Min;
                   std::vector<float64> c_Max;
-                  C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(pc_Element->c_MinValue, c_Min);
-                  C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(pc_Element->c_MaxValue, c_Max);
+                  C_SdNdeDpContentUtil::h_GetValuesAsFloat64(pc_Element->c_MinValue, c_Min);
+                  C_SdNdeDpContentUtil::h_GetValuesAsFloat64(pc_Element->c_MaxValue, c_Max);
                   if ((c_Min.size() == c_Max.size()) && (c_Min.size() == 1UL))
                   {
                      const float64 f64_MinScaled = C_OSCUtils::h_GetValueScaled(c_Min[0], c_Scaling.f64_Factor,

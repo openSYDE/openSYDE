@@ -1960,6 +1960,8 @@ void C_PuiSvHandlerFiler::mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & or
                                                   u32_ElementIndex);
       C_OSCNodeDataPool::E_Type e_InvalidTypePlaceholder = C_OSCNodeDataPool::eDIAG;
       QString c_InvalidNamePlaceholder = "";
+      uint32 q_UseArrayElementIndex;
+      uint32 u32_ArrayElementIndex;
       C_PuiSvDbNodeDataPoolListElementId::E_Type e_SourceType;
 
       //Return
@@ -1987,7 +1989,25 @@ void C_PuiSvHandlerFiler::mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & or
          //Return
          orc_XMLParser.SelectNodeParent();
       }
-      orc_Id = C_PuiSvDbNodeDataPoolListElementId(c_Base, e_SourceType, q_IsValid,
+      if (orc_XMLParser.AttributeExists("array-element-index"))
+      {
+         u32_ArrayElementIndex = orc_XMLParser.GetAttributeUint32("array-element-index");
+      }
+      else
+      {
+         u32_ArrayElementIndex = 0UL;
+      }
+      if (orc_XMLParser.AttributeExists("use-array-element-index"))
+      {
+         q_UseArrayElementIndex = orc_XMLParser.GetAttributeBool("use-array-element-index");
+      }
+      else
+      {
+         q_UseArrayElementIndex = false;
+      }
+      //lint -e{1786,1960}   false positive, probably wrong constructor selected
+      orc_Id = C_PuiSvDbNodeDataPoolListElementId(c_Base, e_SourceType, q_UseArrayElementIndex, u32_ArrayElementIndex,
+                                                  q_IsValid,
                                                   e_InvalidTypePlaceholder,
                                                   c_InvalidNamePlaceholder);
    }
@@ -3264,6 +3284,8 @@ void C_PuiSvHandlerFiler::mh_SaveUiIndex(const C_PuiSvDbNodeDataPoolListElementI
                                          C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeBool("is-valid", orc_Id.GetIsValid());
+   orc_XMLParser.SetAttributeBool("use-array-element-index", orc_Id.GetUseArrayElementIndex());
+   orc_XMLParser.SetAttributeUint32("array-element-index", orc_Id.GetArrayElementIndex());
    orc_XMLParser.CreateAndSelectNodeChild("index");
    orc_XMLParser.SetAttributeUint32("node", orc_Id.u32_NodeIndex);
    orc_XMLParser.SetAttributeUint32("data-pool", orc_Id.u32_DataPoolIndex);

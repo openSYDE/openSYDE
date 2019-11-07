@@ -51,7 +51,7 @@ const QFont C_CamMetTreeDelegate::mhc_DefaultFont = C_Uti::h_GetFontPixel(mc_STY
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -65,7 +65,7 @@ C_CamMetTreeDelegate::C_CamMetTreeDelegate(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeDelegate::~C_CamMetTreeDelegate(void)
@@ -79,7 +79,7 @@ C_CamMetTreeDelegate::~C_CamMetTreeDelegate(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paint item
+/*! \brief  Paint item
 
    Here: notify model to unlock data requests (performance)
 
@@ -127,7 +127,7 @@ void C_CamMetTreeDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overloaded size hint
+/*! \brief  Overloaded size hint
 
    Adapt the size to get an even number of pixels for each item.
    Reason: Drawing of the points for the branches. Only with an even number of pixel it works out
@@ -149,7 +149,7 @@ QSize C_CamMetTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paint icon
+/*! \brief  Paint icon
 
    Warning: no support for other icon positions
 
@@ -201,7 +201,7 @@ void C_CamMetTreeDelegate::m_StoreRenderer(const QString & orc_Path, QSvgRendere
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paint child section
+/*! \brief  Paint child section
 
    \param[in,out] opc_Painter  Painter
    \param[in]     orc_CellRect Cell rectangle to draw in
@@ -302,7 +302,7 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get maximum length of strings
+/*! \brief  Get maximum length of strings
 
    \param[in] orc_Names Strings to evaluate
 
@@ -325,7 +325,7 @@ sint32 C_CamMetTreeDelegate::mh_GetMaxLength(const QStringList & orc_Names)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get vector of all restricted column sizes
+/*! \brief  Get vector of all restricted column sizes
 
    \param[in] oq_IsThirdLayer Flag if these are for the third layer
 
@@ -359,7 +359,7 @@ std::vector<sint32> C_CamMetTreeDelegate::mh_GetChildColWidths(const bool oq_IsT
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get alignment flags for top items
+/*! \brief  Get alignment flags for top items
 
    \return
    Alignment flags for top items
@@ -378,7 +378,7 @@ std::vector<QFlags<Qt::AlignmentFlag> > C_CamMetTreeDelegate::mh_GetTopAlignment
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get spaces between top items
+/*! \brief  Get spaces between top items
 
    \return
    Spaces between top items

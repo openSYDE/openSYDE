@@ -325,7 +325,7 @@ sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const u
                {
                   std::stringstream c_Stream;
                   const uint32 u32_Id = u32_CobId & 0x1FFFFFFFUL;
-                  c_Stream << "Skipped message ";
+                  c_Stream << "Skipped message as marked as inactive (highest bit set in COB_ID) ";
                   c_Stream << &std::hex << u32_Id;
                   mh_AddUserMessage(ou32_StartingId + u32_ItMessage, "COB-ID used by PDO",
                                     c_Stream.str().c_str(), 1L, true);

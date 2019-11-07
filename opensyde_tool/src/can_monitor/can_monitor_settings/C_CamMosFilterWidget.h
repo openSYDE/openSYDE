@@ -51,6 +51,7 @@ Q_SIGNALS:
    void SigAddFilterItems(const QList<stw_opensyde_gui_logic::C_CamProFilterItemData> & orc_FilterItems);
    void SigRemoveFilterItems(const QList<stw_opensyde_gui_logic::C_CamProFilterItemData> & orc_FilterItems);
    void SigRemoveAllFilters(void);
+   void SigHide(void);
 
 private:
    Ui::C_CamMosFilterWidget * mpc_Ui;

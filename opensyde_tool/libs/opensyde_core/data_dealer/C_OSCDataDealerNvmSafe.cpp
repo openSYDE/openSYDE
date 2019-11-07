@@ -950,6 +950,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
 
    \return
    C_NO_ERR   data saved
+   C_RANGE    file already exists
    C_OVERFLOW Wrong sequence of function calls
    C_BUSY     file already exists
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
@@ -1293,15 +1294,16 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadFileWithCRC(const C_SCLString & orc_Pa
    \param[out] ors32_ResultDetail Result detail
 
    \return
-   Return     Error Detail
-   C_NO_ERR   1            File successfully written to ECU
-   C_OVERFLOW 5            Wrong sequence of function calls
-              6            Path mismatch with previous function call
-   C_CONFIG   1            No valid diagnostic protocol is set in "C_OSCDataDealer"
-              2            No valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
-   C_NOACT    1            Communication protocol service could not be requested
-   C_TIMEOUT  1            Communication protocol service has timed out
-   C_WARN     1            Communication protocol service error response was received
+   Return        Error Detail
+   C_NO_ERR      1            File successfully written to ECU
+   C_OVERFLOW    5            Wrong sequence of function calls
+                 6            Path mismatch with previous function call
+   C_CONFIG      1            No valid diagnostic protocol is set in "C_OSCDataDealer"
+                 2            No valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
+   C_NOACT       1            Communication protocol service could not be requested
+   C_TIMEOUT     1            Communication protocol service has timed out
+   C_WARN        1            Communication protocol service error response was received
+   C_UNKNOWN_ERR <undefined>  Communication protocol failed with non-specified error code
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteParameterSetFile(const C_SCLString & orc_Path, sint32 & ors32_ResultDetail)
@@ -1345,16 +1347,16 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteParameterSetFile(const C_SCLString & 
                         s32_Retval = C_WARN;
                         ors32_ResultDetail = 1;
                         break;
-                     case C_NO_ERR: //unexpected
+                     case C_NO_ERR: //positive result
                         ors32_ResultDetail = 1;
                         break;
                      default:
                         //Not documented error was returned by function
                         s32_Retval = C_UNKNOWN_ERR;
-                        osc_write_log_info("Parametrization", "Not documented error was returned by NvmWrite");
+                        osc_write_log_info("Parametrization", "Not documented error code " +
+                                           C_SCLString::IntToStr(s32_Retval) + " was returned by NvmWrite");
                         break;
                      }
-
                      if (s32_Retval != C_NO_ERR)
                      {
                         break;

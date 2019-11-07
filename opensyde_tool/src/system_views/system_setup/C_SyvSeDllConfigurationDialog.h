@@ -64,9 +64,10 @@ private:
    void m_TestConnectionClicked(void) const;
    void m_ConcretDllClicked(void) const;
    void m_OtherDllClicked(void) const;
+   void m_OnBrowse(void) const;
 
    void m_ShowCustomDllPath(const bool oq_Active) const;
-   void m_OnBrowse(void);
+   bool m_CheckCustomDllPath(void) const;
    QString m_GetAbsoluteDllPath(void) const;
 
    Ui::C_SyvSeDllConfigurationDialog * mpc_Ui;

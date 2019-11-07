@@ -55,10 +55,27 @@ C_CamMosFilterTableView::C_CamMosFilterTableView(QWidget * const opc_Parent) :
    //Deactivate
    this->verticalHeader()->setVisible(false);
 
-   this->setFocusPolicy(Qt::NoFocus);
    this->setSelectionBehavior(QAbstractItemView::SelectRows);
    this->setSelectionMode(QAbstractItemView::SingleSelection);
 
    this->setMinimumHeight(100);
    this->setMaximumHeight(100);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
+
+   Here: handle delete key press
+
+   \param[in,out] opc_Event Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterTableView::keyPressEvent(QKeyEvent * const opc_Event)
+{
+   if (opc_Event->key() == static_cast<sintn>(Qt::Key_Delete))
+   {
+      Q_EMIT (this->SigDeleteKeyPressed());
+   }
+
+   C_TblViewToolTipBase::keyPressEvent(opc_Event);
 }

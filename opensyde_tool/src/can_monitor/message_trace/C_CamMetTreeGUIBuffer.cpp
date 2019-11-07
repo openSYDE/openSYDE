@@ -30,7 +30,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -47,7 +47,7 @@ C_CamMetTreeGUIBuffer::C_CamMetTreeGUIBuffer(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new data into queue to update ui later
+/*! \brief  Add new data into queue to update ui later
 
    \param[in] orc_NewData Single, new data entry
 */
@@ -65,7 +65,7 @@ void C_CamMetTreeGUIBuffer::HandleData(const C_CamMetTreeLoggerData & orc_NewDat
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Removes all already added entries without reading
+/*! \brief  Removes all already added entries without reading
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeGUIBuffer::ClearBuffer(void)
@@ -76,7 +76,7 @@ void C_CamMetTreeGUIBuffer::ClearBuffer(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Trigger UI update
+/*! \brief  Trigger UI update
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeGUIBuffer::m_HandleUpdateUi(void)

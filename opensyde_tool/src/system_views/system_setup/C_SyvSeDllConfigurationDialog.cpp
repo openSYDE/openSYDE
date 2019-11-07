@@ -18,12 +18,14 @@
 #include "C_SyvSeDllConfigurationDialog.h"
 #include "ui_C_SyvSeDllConfigurationDialog.h"
 
+#include "C_OSCUtils.h"
 #include "C_Uti.h"
 #include "C_GtGetText.h"
 #include "CCAN.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_ImpUtil.h"
 #include "C_PuiUtil.h"
+#include "C_OgeWiUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -31,6 +33,7 @@ using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
+using namespace stw_opensyde_core;
 using namespace stw_can;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -264,7 +267,10 @@ void C_SyvSeDllConfigurationDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_OkClicked(void) const
 {
-   this->mrc_ParentDialog.accept();
+   if (this->m_CheckCustomDllPath() == true)
+   {
+      this->mrc_ParentDialog.accept();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -279,88 +285,97 @@ void C_SyvSeDllConfigurationDialog::m_CancelClicked(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_ConfigureDllClicked(void) const
 {
-   const QString c_Path = this->m_GetAbsoluteDllPath();
-
-   if (QFile::exists(c_Path) == true)
+   // check path for invalid signs for custom DLL
+   if (this->m_CheckCustomDllPath() == true)
    {
-      C_CAN c_Can;
-      const sint32 s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
+      const QString c_Path = this->m_GetAbsoluteDllPath();
 
-      if (s32_Return == C_NO_ERR)
+      if (QFile::exists(c_Path) == true)
       {
-         // let the user configure the DLL
-         c_Can.CAN_InteractiveSetup();
+         C_CAN c_Can;
+         const sint32 s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
+
+         if (s32_Return == C_NO_ERR)
+         {
+            // let the user configure the DLL
+            c_Can.CAN_InteractiveSetup();
+         }
+         else
+         {
+            C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
+            c_MessageBox.SetHeading(C_GtGetText::h_GetText("PC CAN Interface configuration"));
+            c_MessageBox.SetDescription(C_GtGetText::h_GetText("CAN DLL initialization not successful."));
+            c_MessageBox.Execute();
+         }
+         (void)c_Can.DLL_Close();
       }
       else
       {
          C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("PC CAN Interface configuration"));
-         c_MessageBox.SetDescription(C_GtGetText::h_GetText("CAN DLL initialization not successful."));
+         c_MessageBox.SetDescription(C_GtGetText::h_GetText("CAN DLL not found."));
          c_MessageBox.Execute();
       }
-      (void)c_Can.DLL_Close();
-   }
-   else
-   {
-      C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("PC CAN Interface configuration"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText("CAN DLL not found."));
-      c_MessageBox.Execute();
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_TestConnectionClicked(void) const
 {
-   // 3 of 4 message cases are of type "failed"
-   C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
-   QString c_Description;
-   const QString c_Path = this->m_GetAbsoluteDllPath();
-   const QString c_Heading = C_GtGetText::h_GetText("PC CAN Interface configuration");
-
-   if (QFile::exists(c_Path) == true)
+   // check path for invalid signs for custom DLL
+   if (this->m_CheckCustomDllPath() == true)
    {
-      C_CAN c_Can;
-      sint32 s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
-      if (s32_Return == C_NO_ERR)
-      {
-         // Test the CAN
-         if (this->mu64_Bitrate > 0U)
-         {
-            uint64 u64_BitrateKbit = this->mu64_Bitrate / 1000U;
-            s32_Return = c_Can.CAN_Init(static_cast<sint32>(u64_BitrateKbit));
-         }
-         else
-         {
-            s32_Return = c_Can.CAN_Init();
-         }
+      // 3 of 4 message cases are of type "failed"
+      C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
+      QString c_Description;
+      const QString c_Path = this->m_GetAbsoluteDllPath();
+      const QString c_Heading = C_GtGetText::h_GetText("PC CAN Interface configuration");
 
+      if (QFile::exists(c_Path) == true)
+      {
+         C_CAN c_Can;
+         sint32 s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
          if (s32_Return == C_NO_ERR)
          {
-            c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eINFORMATION);
-            c_Description = C_GtGetText::h_GetText("Connection test successful. CAN Interface is ready for use.");
+            // Test the CAN
+            if (this->mu64_Bitrate > 0U)
+            {
+               uint64 u64_BitrateKbit = this->mu64_Bitrate / 1000U;
+               s32_Return = c_Can.CAN_Init(static_cast<sint32>(u64_BitrateKbit));
+            }
+            else
+            {
+               s32_Return = c_Can.CAN_Init();
+            }
+
+            if (s32_Return == C_NO_ERR)
+            {
+               c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eINFORMATION);
+               c_Description = C_GtGetText::h_GetText("Connection test successful. CAN Interface is ready for use.");
+            }
+            else
+            {
+               c_Description =
+                  C_GtGetText::h_GetText("CAN bus initialization not successful: could not initialize bus.");
+            }
+            (void)c_Can.CAN_Exit();
          }
          else
          {
-            c_Description = C_GtGetText::h_GetText("CAN bus initialization not successful: could not initialize bus.");
+            c_Description = C_GtGetText::h_GetText("CAN DLL initialization not successful: could not open DLL.");
          }
-         (void)c_Can.CAN_Exit();
+         (void)c_Can.DLL_Close();
       }
       else
       {
-         c_Description = C_GtGetText::h_GetText("CAN DLL initialization not successful: could not open DLL.");
+         c_Description = C_GtGetText::h_GetText("CAN DLL not found.");
       }
-      (void)c_Can.DLL_Close();
-   }
-   else
-   {
-      c_Description = C_GtGetText::h_GetText("CAN DLL not found.");
-   }
 
-   // Show the result
-   c_MessageBox.SetHeading(c_Heading);
-   c_MessageBox.SetDescription(c_Description);
-   c_MessageBox.Execute();
+      // Show the result
+      c_MessageBox.SetHeading(c_Heading);
+      c_MessageBox.SetDescription(c_Description);
+      c_MessageBox.Execute();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -377,6 +392,34 @@ void C_SyvSeDllConfigurationDialog::m_OtherDllClicked(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for browse button click.
+
+   Browse for CAN DLL.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvSeDllConfigurationDialog::m_OnBrowse(void) const
+{
+   QString c_Path = "";
+   QString c_Folder = C_PuiUtil::h_GetResolvedAbsPathFromExe(this->mpc_Ui->pc_LineEditCustomDllPath->GetPath());
+   const QString c_Filter = QString(C_GtGetText::h_GetText("CAN DLL ")) + "(*.dll)";
+   QFileDialog c_Dialog(this->parentWidget(), C_GtGetText::h_GetText("Select CAN DLL"), c_Folder, c_Filter);
+
+   c_Dialog.setDefaultSuffix(".dll");
+
+   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      c_Path = c_Dialog.selectedFiles().at(0);
+      // check if relative path is possible and appreciated
+      c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this->parentWidget(), c_Path, C_Uti::h_GetExePath());
+
+      if (c_Path != "")
+      {
+         this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_ShowCustomDllPath(const bool oq_Active) const
 {
    this->mpc_Ui->pc_LabelCustomDllPath->setVisible(oq_Active);
@@ -386,31 +429,35 @@ void C_SyvSeDllConfigurationDialog::m_ShowCustomDllPath(const bool oq_Active) co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot for browse button click.
-
-   Browse for CAN DLL.
+/*! \brief  If custom DLL is selected check if path contains invalid characters
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvSeDllConfigurationDialog::m_OnBrowse(void)
+bool C_SyvSeDllConfigurationDialog::m_CheckCustomDllPath(void) const
 {
-   QString c_Path = "";
-   QString c_Folder = C_PuiUtil::h_GetResolvedAbsPathFromExe(this->mpc_Ui->pc_LineEditCustomDllPath->GetPath());
-   const QString c_Filter = QString(C_GtGetText::h_GetText("CAN DLL ")) + "(*.dll)";
-   QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select CAN DLL"), c_Folder, c_Filter);
+   bool q_Return = true;
 
-   c_Dialog.setDefaultSuffix(".dll");
-
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   if (this->GetDllType() == C_PuiSvPc::eOTHER)
    {
-      c_Path = c_Dialog.selectedFiles().at(0);
-      // check if relative path is possible and appreciated
-      c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, C_Uti::h_GetExePath());
-
-      if (c_Path != "")
+      const QString c_ResolvedPath =  C_PuiUtil::h_ResolvePlaceholderVariables(this->GetCustomDllPath());
+      if (c_ResolvedPath.isEmpty() == true)
       {
-         this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
+         C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eERROR);
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("PC CAN Interface configuration"));
+         c_MessageBox.SetDescription(C_GtGetText::h_GetText("CAN DLL path is empty. Please choose a valid path."));
+         c_MessageBox.Execute();
+         q_Return = false;
+      }
+      else
+      {
+         if (C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == false)
+         {
+            C_OgeWiUtil::h_ShowPathInvalidError(this->parentWidget(), c_ResolvedPath);
+            q_Return = false;
+         }
       }
    }
+
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

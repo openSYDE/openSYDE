@@ -244,8 +244,8 @@ void C_OSCRoutingCalculation::m_SearchRoute(void)
          }
          else
          {
-            osc_write_log_error("Routing calculation", "No route found (target node index: " +
-                                C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
+            osc_write_log_info("Routing calculation", "No route found (target node index: " +
+                               C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
             // No route available
             this->ms32_ResultState = C_COM;
          }
@@ -326,15 +326,15 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
    {
       // Minimum one function (diagnosis or update) is active but no bus is connected to a matching interface
       // No routing possible
-      osc_write_log_error("Routing calculation", "No connected bus found (target node index: " +
-                          C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
+      osc_write_log_info("Routing calculation", "No connected bus found (target node index: " +
+                         C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
       s32_Return = C_COM;
    }
    else
    {
       // Target node must not be routed, because the relevant function is deactivated on all busses
-      osc_write_log_error("Routing calculation", "No usable bus found (target node index: " +
-                          C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
+      osc_write_log_info("Routing calculation", "No usable bus found (target node index: " +
+                         C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
       s32_Return = C_NOACT;
    }
 

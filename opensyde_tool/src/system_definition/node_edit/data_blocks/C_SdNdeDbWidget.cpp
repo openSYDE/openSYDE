@@ -211,6 +211,7 @@ void C_SdNdeDbWidget::UpdateDataPools(void)
       if (pc_Node->c_DataPools.size() > 0UL)
       {
          QString c_Text;
+         QString c_Temp;
          //Add link for each data pool
          for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
          {
@@ -224,12 +225,20 @@ void C_SdNdeDbWidget::UpdateDataPools(void)
 
                   if (c_Text.isEmpty() == false)
                   {
-                     c_Text += "; <br/>";
+                     c_Text += "<br/>";
                   }
-                  c_Text += QString(C_Uti::h_GetLink(QString("%1_(%2)").arg(rc_DataPool.c_Name.c_str()).arg(
-                                                        C_PuiSdUtil::h_ConvertDataPoolTypeToString(rc_DataPool.
-                                                                                                   e_Type)),
-                                                     mc_STYLE_GUIDE_COLOR_6, QString::number(u32_ItDataPool)));
+
+                  c_Temp = rc_DataPool.c_Name.c_str();
+                  c_Temp += " (" + C_PuiSdUtil::h_ConvertDataPoolTypeToString(rc_DataPool.e_Type) ;
+                  if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
+                  {
+                     c_Temp += ", ";
+                     c_Temp += C_GtGetText::h_GetText("Protocol: ");
+                     c_Temp += C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCANProtocolType(
+                                                                             this->mu32_NodeIndex, u32_ItDataPool));
+                  }
+                  c_Temp += ")";
+                  c_Text += QString(C_Uti::h_GetLink(c_Temp, mc_STYLE_GUIDE_COLOR_6, QString::number(u32_ItDataPool)));
                }
             }
          }

@@ -102,10 +102,7 @@ C_CamMosDatabaseItemWidget::C_CamMosDatabaseItemWidget(const C_CamProDatabaseDat
                                                                            "(*.syde_sysdef or *.dbc)."));
    this->mpc_Ui->pc_PbRemove->SetToolTipInformation(C_GtGetText::h_GetText("Delete"),
                                                     C_GtGetText::h_GetText("Delete this database."));
-   this->mpc_Ui->pc_CheckBox->SetToolTipInformation(C_GtGetText::h_GetText("Enable Database"),
-                                                    C_GtGetText::h_GetText(
-                                                       "Check to interpret messages with this database or uncheck "
-                                                       "to remove interpretation."));
+   this->m_EnableCheckBoxTooltip(true); // set tooltip of pc_CheckBox
 
    // hide buttons on start
    this->mpc_Ui->pc_PbSelectBus->setVisible(false);
@@ -185,7 +182,7 @@ void C_CamMosDatabaseItemWidget::SetState(const C_CamMosDatabaseItemWidget::E_Lo
       break;
    case eWRONG_FORMAT:
       c_ToolTip = C_GtGetText::h_GetText(
-         "File format is not supported. Only files of format *.dbc and *.syde_sysdef are supported.\n "
+         "File format is not supported. Only files of format *.dbc and *.syde_sysdef are supported.\n"
          "This database will not be used.");
       q_Error = true;
       break;
@@ -205,13 +202,23 @@ void C_CamMosDatabaseItemWidget::SetState(const C_CamMosDatabaseItemWidget::E_Lo
    this->mpc_Ui->pc_LabIcon->SetSvg(c_Icon);
    this->mpc_Ui->pc_LabIcon->SetToolTipInformation("Database Status", c_ToolTip, e_Type);
 
-   // disable remove and browse in loading state and enable select bus button only if successfully loaded
-   this->mpc_Ui->pc_PbSelectBus->setEnabled(q_EnableBusSelectButton);
+   // disable remove and browse in loading state
    this->mpc_Ui->pc_PbBrowse->setEnabled(q_EnableButtons);
    this->mpc_Ui->pc_PbRemove->setEnabled(q_EnableButtons);
 
-   // gray out label in error case
+   // enable select bus button only on success
+   this->mpc_Ui->pc_PbSelectBus->setEnabled(q_EnableBusSelectButton);
+
+   // disable label and checkbox in error case and enable else
    this->mpc_Ui->pc_LabDatabase->setEnabled(!q_Error);
+   this->mpc_Ui->pc_CheckBox->setEnabled(!q_Error);
+   this->m_EnableCheckBoxTooltip(!q_Error);
+
+   // in error case only set unchecked
+   if (q_Error == true)
+   {
+      this->mpc_Ui->pc_CheckBox->setChecked(false);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -398,7 +405,7 @@ QString C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(QWidget * const opc_
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_CamMosDatabaseItemWidget * pc_DatabaseItemWidget = dynamic_cast<C_CamMosDatabaseItemWidget *>(opc_Parent);
-   const QString c_Filter = QString(C_GtGetText::h_GetText("CAN Database File ")) + "(*.syde_sysdef | *.dbc)";
+   const QString c_Filter = QString(C_GtGetText::h_GetText("CAN Database File ")) + "(*.syde_sysdef | *.dbc | *.syde)";
    QString c_Folder = "";
    QString c_Return = "";
    QFileDialog c_Dialog(opc_Parent, C_GtGetText::h_GetText("Select Database"), c_Folder, c_Filter);
@@ -434,36 +441,103 @@ QString C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(QWidget * const opc_
 
    if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      c_Return = c_Dialog.selectedFiles().at(0);
+      c_Return = c_Dialog.selectedFiles().at(0); // always absolute so no problems
       // "" is returned if user canceled
       if (c_Return != "")
       {
+         const QFileInfo c_FileInfo = QFileInfo(c_Return);
          // store new user settings
-         C_UsHandler::h_GetInstance()->SetLastKnownDatabasePath(QFileInfo(c_Return).absoluteDir().absolutePath());
+         C_UsHandler::h_GetInstance()->SetLastKnownDatabasePath(c_FileInfo.absoluteDir().absolutePath());
 
-         // check if database already exists
-         for (uint32 u32_Pos = 0; u32_Pos < C_CamProHandler::h_GetInstance()->GetDatabases().size(); u32_Pos++)
+         // if necessary adapt .syde path to .syde_sysdef
+         c_Return = C_CamMosDatabaseItemWidget::h_AdaptPathToSystemDefinitionIfNecessary(c_FileInfo);
+
+         // check if database is already used
+         if (C_CamMosDatabaseItemWidget::h_IsDatabaseAlreadyUsed(c_Return, opc_Parent) == true)
          {
-            if (C_CamUti::h_GetAbsPathFromProj(C_CamProHandler::h_GetInstance()->GetDatabases()[u32_Pos].c_Name) ==
-                c_Return) // compare absolute paths
-            {
-               // inform user
-               C_OgeWiCustomMessage c_Message(opc_Parent);
-               c_Message.SetHeading(C_GtGetText::h_GetText("Database Loading"));
-               c_Message.SetDescription(
-                  QString(C_GtGetText::h_GetText("The database %1 is already used and not added again.")).
-                  arg(c_Return));
-               c_Message.Execute();
-
-               // return empty path
-               c_Return = "";
-               break;
-            }
+            // return empty path
+            c_Return = "";
          }
       }
    }
 
    return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if database is already used and inform user if so
+
+   Make sure that input QFileInfo is valid (i.e. created with absolute and nonempty path).
+
+   \param[in]    orc_SydeFile   absolute path to .syde file
+
+   \return
+   system definition path (always absolute)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_CamMosDatabaseItemWidget::h_AdaptPathToSystemDefinitionIfNecessary(const QFileInfo & orc_SydeFile)
+{
+   QString c_Return = orc_SydeFile.absoluteFilePath();
+
+   if (orc_SydeFile.suffix().compare("syde", Qt::CaseInsensitive) == 0)
+   {
+      // first try file version V3, i.e. system definition file is in sub directory
+      QString c_SysdefFile =
+         orc_SydeFile.absolutePath() + "/system_definition/" + orc_SydeFile.baseName() + ".syde_sysdef";
+
+      if (QFileInfo(c_SysdefFile).exists() == true)
+      {
+         c_Return = c_SysdefFile;
+      }
+      else
+      {
+         // now try file version V2, i.e. system definition file is beneath .syde file
+         c_SysdefFile = orc_SydeFile.absolutePath() + "/" + orc_SydeFile.baseName() + ".syde_sysdef";
+
+         if (QFileInfo(c_SysdefFile).exists() == true)
+         {
+            c_Return = c_SysdefFile;
+         }
+      }
+   }
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if database is already used and inform user if so
+
+   \param[in]    opc_Parent         pointer to parent (to integrate browse window correctly)
+   \param[in]    orc_AbsolutePath   absolute path to new database
+
+   \retval true: database already used
+   \retval false: database not present
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamMosDatabaseItemWidget::h_IsDatabaseAlreadyUsed(const QString & orc_AbsolutePath, QWidget * const opc_Parent)
+{
+   bool q_Return = false;
+
+   // check if database already exists
+   for (uint32 u32_Pos = 0; u32_Pos < C_CamProHandler::h_GetInstance()->GetDatabases().size(); u32_Pos++)
+   {
+      if (C_CamUti::h_GetAbsPathFromProj(C_CamProHandler::h_GetInstance()->GetDatabases()[u32_Pos].c_Name) ==
+          orc_AbsolutePath) // compare absolute paths
+      {
+         // inform user
+         C_OgeWiCustomMessage c_Message(opc_Parent);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Database Loading"));
+         c_Message.SetDescription(
+            QString(C_GtGetText::h_GetText("The database %1 is already used and not added again.")).
+            arg(orc_AbsolutePath));
+         c_Message.Execute();
+
+         // return true
+         q_Return = true;
+         break;
+      }
+   }
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -578,20 +652,26 @@ void C_CamMosDatabaseItemWidget::m_OnBrowse()
       //Replace
       if (q_Continue)
       {
-         this->mc_Database.c_Name =
+         const QString c_DatabaseName =
             C_CamUti::h_AskUserToSaveRelativePath(this, c_Name, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
 
-         // reset buses and bus index
-         this->mc_Busses.clear();
-         this->mc_Database.s32_BusIndex = -1;
-         this->mc_FileTimeStamp = QDateTime(QFileInfo(c_Name).lastModified()); // set new timestamp
+         // if path contains invalid characters this returned empty
+         if (c_DatabaseName.isEmpty() == false)
+         {
+            this->mc_Database.c_Name = c_DatabaseName;
 
-         // update GUI
-         this->m_SetMinimizedPath();
-         this->UpdateTooltip();
+            // reset buses and bus index
+            this->mc_Busses.clear();
+            this->mc_Database.s32_BusIndex = -1;
+            this->mc_FileTimeStamp = QDateTime(QFileInfo(c_Name).lastModified()); // set new timestamp
 
-         // update data handling
-         Q_EMIT (this->SigUpdateDatabasePath(this, this->mc_Database, false));
+            // update GUI
+            this->m_SetMinimizedPath();
+            this->UpdateTooltip();
+
+            // update data handling
+            Q_EMIT (this->SigUpdateDatabasePath(this, this->mc_Database, false));
+         }
       }
    }
 }
@@ -623,13 +703,33 @@ void C_CamMosDatabaseItemWidget::m_OnChxToggle(const bool & orq_Checked)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_SetMinimizedPath(void) const
 {
-   QFont c_Font = mc_STYLE_GUIDE_FONT_REGULAR_13;
-
-   c_Font.setPixelSize(c_Font.pointSize());
+   const QFont c_Font = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13);
 
    this->mpc_Ui->pc_LabDatabase->setText(C_Uti::h_MinimizePath(this->mc_Database.c_Name, c_Font,
                                                                this->mpc_Ui->pc_LabDatabase->width(), 66));
    // padding 66 for 3 buttons a 16px and 3x padding a 6px
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Enable tool tip of checkbox.
+
+
+
+   \param[in]  oq_Enabled   tool tip content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosDatabaseItemWidget::m_EnableCheckBoxTooltip(const bool oq_Enabled)
+{
+   if (oq_Enabled == true)
+   {
+      this->mpc_Ui->pc_CheckBox->SetToolTipInformation(
+         C_GtGetText::h_GetText("Enable Database"),
+         C_GtGetText::h_GetText("Check to interpret messages with this database or uncheck to remove interpretation."));
+   }
+   else
+   {
+      this->mpc_Ui->pc_CheckBox->SetToolTipInformation("", "");
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -672,8 +772,7 @@ bool C_CamMosDatabaseItemWidget::event(QEvent * const opc_Event)
 {
    if (this->isEnabled() == true)
    {
-      if ((opc_Event->type() == QEvent::Leave) &&
-          (this->mq_ButtonPressed == false))
+      if ((opc_Event->type() == QEvent::Leave) && (this->mq_ButtonPressed == false))
       {
          // Set only invisible when no button of this item is pressed. See function m_ButtonPressed for
          // a detailed description
@@ -684,12 +783,21 @@ bool C_CamMosDatabaseItemWidget::event(QEvent * const opc_Event)
       }
       else if (opc_Event->type() == QEvent::Enter)
       {
-         if (QFileInfo(this->mc_Database.c_Name).suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0)
+         // show select bus button only if openSYDE system definition and state ok
+         // (its disabled anyway but tooltip would appear)
+         if ((QFileInfo(this->mc_Database.c_Name).suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0) &&
+             (this->me_State == eOK))
          {
             this->mpc_Ui->pc_PbSelectBus->setVisible(true);
          }
-         this->mpc_Ui->pc_PbBrowse->setVisible(true);
-         this->mpc_Ui->pc_PbRemove->setVisible(true);
+
+         // show browse and remove button only if not loading (they are disabled anyway but tooltips would appear)
+         if (this->me_State != eLOADING)
+         {
+            this->mpc_Ui->pc_PbBrowse->setVisible(true);
+            this->mpc_Ui->pc_PbRemove->setVisible(true);
+         }
+
          this->SetBackgroundColor(3);
       }
       else

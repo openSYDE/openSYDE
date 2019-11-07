@@ -451,7 +451,7 @@ void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_So
 
       // show popup dialog
       QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-      C_SyvDaDashboardTabProperties * pc_Dialog = new C_SyvDaDashboardTabProperties(*c_New, "DASHBOARD TAB",
+      C_SyvDaDashboardTabProperties * pc_Dialog = new C_SyvDaDashboardTabProperties(*c_New, "Dashboard Tab",
                                                                                     u32_DashboardIndex,
                                                                                     mpc_Dashboard->GetViewIndex());
 

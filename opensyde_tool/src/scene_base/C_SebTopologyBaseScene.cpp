@@ -52,9 +52,9 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
-   \param[in,out] opc_Parent              Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebTopologyBaseScene::C_SebTopologyBaseScene(QObject * const opc_Parent) :
@@ -63,7 +63,7 @@ C_SebTopologyBaseScene::C_SebTopologyBaseScene(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   default destructor
+/*! \brief  default destructor
 
    Clean up.
 */
@@ -73,7 +73,7 @@ C_SebTopologyBaseScene::~C_SebTopologyBaseScene()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load system definition
+/*! \brief  Load system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::Load(void)
@@ -94,7 +94,7 @@ void C_SebTopologyBaseScene::Load(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checking the nodes for errors
+/*! \brief  Checking the nodes for errors
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::CheckAllItemsForChanges(void) const
@@ -153,7 +153,7 @@ void C_SebTopologyBaseScene::m_LoadProject(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load subset of system definition entries
+/*! \brief  Load subset of system definition entries
 
    \param[in] orc_NodeIndices              Node indices to add
    \param[in] orc_BusIndices               Bus indices to add
@@ -495,7 +495,7 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get new unique ID
+/*! \brief  Get new unique ID
 
    \param[in] opc_IDMap                    Optional map for item to id
    \param[in] oru32_Index                  Optional current index
@@ -545,7 +545,7 @@ uint64 C_SebTopologyBaseScene::m_GetNewUniqueBusConnectorID(const QMap<C_PuiBsTe
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new bus text element to scene and connect signals
+/*! \brief  Add new bus text element to scene and connect signals
 
    \param[in,out] opc_Item Pointer to new bus text element
 */
@@ -557,7 +557,7 @@ void C_SebTopologyBaseScene::m_AddBusTextElementToScene(C_GiTextElementBus * con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new node to scene and connect signals
+/*! \brief  Add new node to scene and connect signals
 
    \param[in,out] opc_NodeGraphicsItem Pointer to new node
 */
@@ -575,7 +575,7 @@ void C_SebTopologyBaseScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsI
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new bus to scene and connect signals
+/*! \brief  Add new bus to scene and connect signals
 
    \param[in,out] opc_BusGraphicsItem Pointer to new bus
 */
@@ -592,7 +592,7 @@ void C_SebTopologyBaseScene::m_AddBusToScene(C_GiLiBus * const opc_BusGraphicsIt
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new bus connector to scene and connect signals
+/*! \brief  Add new bus connector to scene and connect signals
 
    \param[in,out] opc_BusConnectorGraphicsItem Connector item
 */
@@ -609,7 +609,7 @@ void C_SebTopologyBaseScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new bus connector base item to scene and connect signals
+/*! \brief  Add new bus connector base item to scene and connect signals
 
    \param[in,out] opc_BusConnectorGraphicsItem Connector item
 */
@@ -640,7 +640,7 @@ void C_SebTopologyBaseScene::m_AddBusConnectorBaseToScene(C_GiLiBusConnectorBase
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize scene undo manager connections
+/*! \brief  Initialize scene undo manager connections
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_InitSceneUndoManager(void)
@@ -658,7 +658,7 @@ void C_SebTopologyBaseScene::m_InitSceneUndoManager(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore default cursors for all items
+/*! \brief  Restore default cursors for all items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_RestoreCursors(void) const
@@ -678,7 +678,7 @@ void C_SebTopologyBaseScene::m_RestoreCursors(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten mouse move event slot
+/*! \brief  Overwritten mouse move event slot
 
    Here: Signal bus text mouse move update
 

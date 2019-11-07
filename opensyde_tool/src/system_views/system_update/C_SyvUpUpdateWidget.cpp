@@ -29,6 +29,7 @@
 #include "C_OgeWiUtil.h"
 #include "DLLocalize.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_OSCUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -890,9 +891,8 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
          this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Flash count: %1")).arg(rc_Info.c_MoreInformation.
                                                                                          u32_FlashCount));
          this->m_UpdateReportText(
-            QString(C_GtGetText::h_GetText("Device serial number: %1")).arg(mh_SerialNumberToString(rc_Info.
-                                                                                                    c_MoreInformation.
-                                                                                                    au8_EcuSerialNumber)));
+            QString(C_GtGetText::h_GetText("Device serial number: %1")).arg(
+               C_OSCUtils::h_SerialNumberToString(&rc_Info.c_MoreInformation.au8_EcuSerialNumber[0]).c_str()));
          this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Device article number: %1")).arg(rc_Info.
                                                                                                    c_MoreInformation.
                                                                                                    u32_EcuArticleNumber));
@@ -1708,7 +1708,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                      // Nodes precondition error
                      c_Message.SetDescription(C_GtGetText::h_GetText(
                                                  "There are nodes, which do not support writing"
-                                                 " parameter set images files."));
+                                                 " parameter set image files."));
                      c_Message.SetDetails(c_Details);
                      c_Message.Execute();
                   }
@@ -2277,27 +2277,6 @@ std::vector<bool> C_SyvUpUpdateWidget::m_GetIsFileBasedFlagForEach(void) const
       }
    }
    return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-QString C_SyvUpUpdateWidget::mh_SerialNumberToString(const uint8 oau8_SerialNumer[])
-{
-   QString c_Result = "";
-   uint32 u32_Counter;
-
-   for (u32_Counter = 0U; u32_Counter < 6; ++u32_Counter)
-   {
-      QString c_Part = QString::number(oau8_SerialNumer[u32_Counter], 16);
-      c_Part = c_Part.rightJustified(2, '0');
-      c_Result += c_Part;
-      //Add point after first and fourth byte
-      if ((u32_Counter == 0) || (u32_Counter == 3))
-      {
-         c_Result += ".";
-      }
-   }
-
-   return c_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -115,6 +115,7 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::Add(void)
       tgl_assert(this->mpc_MessageSyncManager->AddCanMessage(this->mc_LastMessageId.u32_NodeIndex,
                                                              this->mc_LastMessageId.e_ComProtocol,
                                                              this->mc_LastMessageId.u32_InterfaceIndex,
+                                                             this->mc_LastMessageId.u32_DatapoolIndex,
                                                              this->mc_LastMessageId.q_MessageIsTx,
                                                              this->mc_Message,
                                                              this->mc_OSCSignalCommons,
@@ -126,12 +127,14 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::Add(void)
          const C_OSCCanMessageIdentificationIndices & rc_CurMessageId = this->mc_MatchingIds[u32_ItMessage];
          //Skip already added one
          if ((rc_CurMessageId.u32_NodeIndex != this->mc_LastMessageId.u32_NodeIndex) ||
-             (rc_CurMessageId.u32_InterfaceIndex != this->mc_LastMessageId.u32_InterfaceIndex))
+             (rc_CurMessageId.u32_InterfaceIndex != this->mc_LastMessageId.u32_InterfaceIndex) ||
+             (rc_CurMessageId.u32_DatapoolIndex != this->mc_LastMessageId.u32_DatapoolIndex))
          {
             //Always add as RX
             tgl_assert(this->mpc_MessageSyncManager->AddCanMessageRx(this->mc_LastMessageId,
                                                                      rc_CurMessageId.u32_NodeIndex,
-                                                                     rc_CurMessageId.u32_InterfaceIndex) ==
+                                                                     rc_CurMessageId.u32_InterfaceIndex,
+                                                                     rc_CurMessageId.u32_DatapoolIndex) ==
                        C_NO_ERR);
             //Change to TX
             if (rc_CurMessageId.q_MessageIsTx == true)
@@ -139,13 +142,17 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::Add(void)
                const C_OSCCanMessageContainer * const pc_Container =
                   C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(rc_CurMessageId.u32_NodeIndex,
                                                                                   this->mc_LastMessageId.e_ComProtocol,
-                                                                                  rc_CurMessageId.u32_InterfaceIndex);
+                                                                                  rc_CurMessageId.u32_InterfaceIndex,
+                                                                                  rc_CurMessageId.u32_DatapoolIndex);
+
                if ((pc_Container != NULL) && (pc_Container->c_RxMessages.size() > 0UL))
                {
                   //Should be the newest RX message
                   const C_OSCCanMessageIdentificationIndices c_Tmp(rc_CurMessageId.u32_NodeIndex,
                                                                    this->mc_LastMessageId.e_ComProtocol,
-                                                                   rc_CurMessageId.u32_InterfaceIndex, false,
+                                                                   rc_CurMessageId.u32_InterfaceIndex,
+                                                                   rc_CurMessageId.u32_DatapoolIndex,
+                                                                   false,
                                                                    pc_Container->c_RxMessages.size() - 1UL);
                   tgl_assert(this->mpc_MessageSyncManager->SetCanMessageDirection(c_Tmp, true) ==
                              C_NO_ERR);
@@ -232,19 +239,21 @@ sint32 C_SdBueUnoMessageAddDeleteBaseCommand::mh_CheckSync(const C_OSCCanMessage
       if (pc_OSCNode->c_DataPools.size() == pc_UiNode->c_UIDataPools.size())
       {
          const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPool(
-            orc_MessageId.u32_NodeIndex, orc_MessageId.e_ComProtocol);
+            orc_MessageId.u32_NodeIndex, orc_MessageId.e_ComProtocol, orc_MessageId.u32_DatapoolIndex);
          const C_PuiSdNodeDataPool * const pc_UiDataPool = C_PuiSdHandler::h_GetInstance()->GetUiCanDataPool(
-            orc_MessageId.u32_NodeIndex, orc_MessageId.e_ComProtocol);
+            orc_MessageId.u32_NodeIndex, orc_MessageId.e_ComProtocol, orc_MessageId.u32_DatapoolIndex);
          if ((pc_OSCDataPool != NULL) && (pc_UiDataPool != NULL))
          {
             if (pc_OSCNode->c_ComProtocols.size() == pc_UiNode->c_UICanProtocols.size())
             {
                const C_OSCCanProtocol * const pc_OSCProtocol = C_PuiSdHandler::h_GetInstance()->GetCanProtocol(
                   orc_MessageId.u32_NodeIndex,
-                  orc_MessageId.e_ComProtocol);
+                  orc_MessageId.e_ComProtocol,
+                  orc_MessageId.u32_DatapoolIndex);
                const C_PuiSdNodeCanProtocol * const pc_UiProtocol =
                   C_PuiSdHandler::h_GetInstance()->GetUiCanProtocolConst(orc_MessageId.u32_NodeIndex,
-                                                                         orc_MessageId.e_ComProtocol);
+                                                                         orc_MessageId.e_ComProtocol,
+                                                                         orc_MessageId.u32_DatapoolIndex);
                if ((pc_OSCProtocol != NULL) && (pc_UiProtocol != NULL))
                {
                   if (pc_OSCProtocol->c_ComMessages.size() == pc_UiProtocol->c_ComMessages.size())

@@ -15,8 +15,8 @@
 
 #include <QUndoCommand>
 #include "stwtypes.h"
-#include "C_SdNdeDataPoolUtil.h"
-#include "C_SdNdeDataPoolListModelViewManager.h"
+#include "C_SdNdeDpUtil.h"
+#include "C_SdNdeDpListModelViewManager.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -32,10 +32,10 @@ public:
 
    void DoDataChangeElements(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
                              const stw_types::uint32 & oru32_ListIndex, const stw_types::uint32 & oru32_ElementIndex,
-                             const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType,
+                             const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
                              const stw_types::uint32 & oru32_DataSetIndex,
                              const stw_types::uint32 & oru32_ArrayElementIndex, const QVariant & orc_NewData,
-                             C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager);
+                             C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager);
    QUndoCommand * TakeUndoCommand(void);
 
 private:

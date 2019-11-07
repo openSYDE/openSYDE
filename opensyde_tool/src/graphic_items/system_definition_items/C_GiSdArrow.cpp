@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -64,7 +64,7 @@ C_GiSdArrow::C_GiSdArrow(const sint32 & ors32_Index, const uint64 & oru64_ID,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for initially loading internal data
+/*! \brief  Function for initially loading internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdArrow::LoadData(void)
@@ -79,7 +79,7 @@ void C_GiSdArrow::LoadData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update internal data
+/*! \brief  Update internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdArrow::UpdateData(void)
@@ -92,7 +92,7 @@ void C_GiSdArrow::UpdateData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete internal data
+/*! \brief  Delete internal data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSdArrow::DeleteData(void)

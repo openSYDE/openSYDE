@@ -15,9 +15,9 @@
 #include "stwtypes.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdUtil.h"
-#include "C_SdNdeDataPoolListTableView.h"
-#include "C_SdNdeDataPoolListTableModel.h"
-#include "C_SdNdeDataPoolListDataSetView.h"
+#include "C_SdNdeDpListTableView.h"
+#include "C_SdNdeDpListTableModel.h"
+#include "C_SdNdeDpListDataSetView.h"
 #include "C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand.h"
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -51,7 +51,7 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand(
    const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
-   C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
    const std::vector<uint32> & orc_Indices, const QString & orc_Text, QUndoCommand * const opc_Parent) :
    C_SdNdeUnoDasDataPoolListBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                         opc_DataPoolListModelViewManager,
@@ -69,20 +69,20 @@ void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Add(void)
 {
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
-      C_SdNdeDataPoolListDataSetModel * const pc_DataSetModel = this->mpc_DataPoolListModelViewManager->GetDataSetModel(
+      C_SdNdeDpListDataSetModel * const pc_DataSetModel = this->mpc_DataPoolListModelViewManager->GetDataSetModel(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex,
          this->mu32_DataPoolListIndex);
       if (pc_DataSetModel != NULL)
       {
-         C_SdNdeDataPoolListTableModel * const pc_ElementModel =
+         C_SdNdeDpListTableModel * const pc_ElementModel =
             this->mpc_DataPoolListModelViewManager->GetElementModel(
                this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                this->mu32_DataPoolListIndex);
-         C_SdNdeDataPoolListTableView * const pc_ElementView =
+         C_SdNdeDpListTableView * const pc_ElementView =
             this->mpc_DataPoolListModelViewManager->GetElementView(
                this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                this->mu32_DataPoolListIndex);
-         C_SdNdeDataPoolListDataSetView * const pc_View = this->mpc_DataPoolListModelViewManager->GetDataSetView(
+         C_SdNdeDpListDataSetView * const pc_View = this->mpc_DataPoolListModelViewManager->GetDataSetView(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex,
             this->mu32_DataPoolListIndex);
          m_SortAscending();
@@ -134,16 +134,16 @@ void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Delete(void)
 {
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
-      C_SdNdeDataPoolListDataSetModel * const pc_DataSetModel = this->mpc_DataPoolListModelViewManager->GetDataSetModel(
+      C_SdNdeDpListDataSetModel * const pc_DataSetModel = this->mpc_DataPoolListModelViewManager->GetDataSetModel(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex,
          this->mu32_DataPoolListIndex);
       if (pc_DataSetModel != NULL)
       {
-         C_SdNdeDataPoolListTableModel * const pc_ElementModel =
+         C_SdNdeDpListTableModel * const pc_ElementModel =
             this->mpc_DataPoolListModelViewManager->GetElementModel(
                this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                this->mu32_DataPoolListIndex);
-         C_SdNdeDataPoolListDataSetView * const pc_View = this->mpc_DataPoolListModelViewManager->GetDataSetView(
+         C_SdNdeDpListDataSetView * const pc_View = this->mpc_DataPoolListModelViewManager->GetDataSetView(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex,
             this->mu32_DataPoolListIndex);
          this->mc_OSCNames.resize(this->mc_Indices.size());

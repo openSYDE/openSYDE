@@ -283,7 +283,8 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                             C_GtGetText::h_GetText(
                                                                "This property shows if the device is user programmable."
                                                                "\nDefined in read only *.syde_devdef file."
-                                                               "\n\nIf enabled, Data Blocks of type \"Programmable Application\" can be created."));
+                                                               "\n\nIf enabled, Data Blocks of type \"Programmable Application\" can be created "
+                                                               "and code generation feature can be used."));
 
    this->mpc_Ui->pc_LabelProtocol->SetToolTipInformation(C_GtGetText::h_GetText("Protocol Support"),
                                                          C_GtGetText::h_GetText(
@@ -1324,10 +1325,6 @@ void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row, const 
    {
       if (pc_Node != NULL)
       {
-         //make copy for restoring
-         //const C_OSCNodeComInterfaceSettings::C_IpAddress c_Copy =
-         // pc_Node->c_Properties.c_ComInterfaces[ou32_Row].c_Ip;
-
          //Set parent for better hierarchy handling via window manager
          QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
          C_SdNdeIpAddressConfigurationWidget * const pc_Dialog =

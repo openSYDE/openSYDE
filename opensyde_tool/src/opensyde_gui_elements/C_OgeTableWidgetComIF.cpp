@@ -4,9 +4,6 @@
    \brief       Table Widget for Node COM Interface Settings  (implementation)
 
    Table Widget for Node COM Interface Settings.
-   This class does not contain any functionality,
-   but needs to exist, to have a unique group,
-   to apply a specific stylesheet for.
 
    \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -68,8 +65,6 @@ C_OgeTableWidgetComIF::C_OgeTableWidgetComIF(QWidget * const opc_Parent) :
    this->setFrameShadow(QAbstractItemView::Shadow::Plain);
    this->setFrameShape(QAbstractItemView::Shape::NoFrame);
    this->setEditTriggers(EditTrigger::DoubleClicked | EditTrigger::CurrentChanged | EditTrigger::SelectedClicked);
-   //this->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-   //this->horizontalHeader()->setStretchLastSection(true);
 
    this->mc_HoveredRow.s32_Row = -1;
    this->mc_HoveredRow.s32_Col = -1;

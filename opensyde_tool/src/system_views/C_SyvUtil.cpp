@@ -379,7 +379,7 @@ QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32 ou32_ViewIndex,
    c_DashboardDescription += QString("   ") + C_GtGetText::h_GetText("Source: ");
    if (orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
    {
-      c_DashboardDescription += C_PuiSdHandler::h_GetInstance()->GetNamespace(orc_Id);
+      c_DashboardDescription += C_PuiSvHandler::h_GetNamespace(orc_Id);
    }
    else
    {

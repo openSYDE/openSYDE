@@ -52,7 +52,7 @@ const QString C_CamMetTreeModel::mhc_IconSignalSelected = "://images/IconSignalS
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -98,7 +98,7 @@ C_CamMetTreeModel::C_CamMetTreeModel(QObject * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeModel::~C_CamMetTreeModel(void)
@@ -106,7 +106,7 @@ C_CamMetTreeModel::~C_CamMetTreeModel(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Continues the gray out engine
+/*! \brief  Continues the gray out engine
 
    Calculation of an offset to all saved unique messages timestamps to compensate the pause time
 */
@@ -154,7 +154,7 @@ void C_CamMetTreeModel::Continue(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Pauses the gray out engine
+/*! \brief  Pauses the gray out engine
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::Pause(void)
@@ -168,7 +168,7 @@ void C_CamMetTreeModel::Pause(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Pauses the gray out engine
+/*! \brief  Pauses the gray out engine
 
    Calculation of the offset is not necessary. Stop can only be followed by start
    and start resets the offset in any case.
@@ -180,7 +180,7 @@ void C_CamMetTreeModel::Stop(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Continues the gray out engine and resets the pause offset
+/*! \brief  Continues the gray out engine and resets the pause offset
 
    The offset is not necessary on a restart
 */
@@ -191,7 +191,7 @@ void C_CamMetTreeModel::Start(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function to lock up all data requests (performance)
+/*! \brief  Function to lock up all data requests (performance)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::LockData(void)
@@ -200,7 +200,7 @@ void C_CamMetTreeModel::LockData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function to unlock up all data requests (performance)
+/*! \brief  Function to unlock up all data requests (performance)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::UnlockData(void)
@@ -209,7 +209,7 @@ void C_CamMetTreeModel::UnlockData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle action: clear data
+/*! \brief  Handle action: clear data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::ActionClearData(void)
@@ -228,7 +228,7 @@ void C_CamMetTreeModel::ActionClearData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add specified strings as rows
+/*! \brief  Add specified strings as rows
 
    \param[in] orc_Data New row content
 
@@ -246,7 +246,7 @@ std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLogge
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set current selection
+/*! \brief  Set current selection
 
    \param[in] os32_SelectedParentRow  Current selected parent index
    \param[in] os32_SelectedChildIndex Current selected child index
@@ -288,7 +288,7 @@ void C_CamMetTreeModel::SetSelection(const sint32 os32_SelectedParentRow, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set display mode: display tree
+/*! \brief  Set display mode: display tree
 
    \param[in] oq_Value New value
 */
@@ -307,7 +307,7 @@ void C_CamMetTreeModel::SetDisplayTree(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set display mode: display unique messages
+/*! \brief  Set display mode: display unique messages
 
    \param[in] oq_Value New value
 */
@@ -331,7 +331,7 @@ void C_CamMetTreeModel::SetDisplayUniqueMessages(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set display style for CAN ID and CAN data
+/*! \brief  Set display style for CAN ID and CAN data
 
    \param[in] oq_Value New value
 */
@@ -350,7 +350,7 @@ void C_CamMetTreeModel::SetDisplayAsHex(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set display style for timestamp
+/*! \brief  Set display style for timestamp
 
    \param[in] oq_Value New value
 */
@@ -366,7 +366,7 @@ void C_CamMetTreeModel::SetDisplayTimestampRelative(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns display style for CAN ID and CAN data
+/*! \brief  Returns display style for CAN ID and CAN data
 
    \return
    true     Displaying hex
@@ -379,7 +379,7 @@ bool C_CamMetTreeModel::GetDisplayAsHex(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns display style for timestamp
+/*! \brief  Returns display style for timestamp
 
    \return
    true     Displaying relative timestamp
@@ -392,7 +392,7 @@ bool C_CamMetTreeModel::GetDisplayTimestampRelative(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all messages
+/*! \brief  Get all messages
 
    Intended only for protocol changes
 
@@ -421,7 +421,7 @@ std::vector<C_CamMetTreeLoggerData *> C_CamMetTreeModel::GetAllMessagesForProtoc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal a change of protocol related data
+/*! \brief  Signal a change of protocol related data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SignalProtocolChange(void)
@@ -433,7 +433,7 @@ void C_CamMetTreeModel::SignalProtocolChange(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get header data
+/*! \brief  Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -524,7 +524,7 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data index
+/*! \brief  Get data index
 
    \param[in] osn_Row    Row
    \param[in] osn_Column Column
@@ -550,7 +550,7 @@ QModelIndex C_CamMetTreeModel::index(const sintn osn_Row, const sintn osn_Column
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get parent index
+/*! \brief  Get parent index
 
    \param[in] orc_Index Index
 
@@ -570,7 +570,7 @@ QModelIndex C_CamMetTreeModel::parent(const QModelIndex & orc_Index) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get tree column count
+/*! \brief  Get tree column count
 
    \param[in] orc_Parent Parent
 
@@ -604,7 +604,7 @@ sintn C_CamMetTreeModel::columnCount(const QModelIndex & orc_Parent) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get tree row count
+/*! \brief  Get tree row count
 
    \param[in] orc_Parent Parent
 
@@ -641,7 +641,7 @@ sintn C_CamMetTreeModel::rowCount(const QModelIndex & orc_Parent) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get data at index
+/*! \brief  Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
@@ -1038,9 +1038,9 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Column to enum conversion
+/*! \brief  Column to enum conversion
 
-   \param[in]  os32_Column Column
+   \param[in] os32_Column Column
 
    \return
    Enum value
@@ -1079,7 +1079,7 @@ C_CamMetTreeModel::E_Columns C_CamMetTreeModel::h_ColumnToEnum(const sint32 os32
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Enum to column conversion
+/*! \brief  Enum to column conversion
 
    \param[in] oe_Value Enum value
 
@@ -1124,7 +1124,7 @@ sint32 C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_V
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get message at row
+/*! \brief  Get message at row
 
    \param[in] osn_Row Current row
 
@@ -1194,7 +1194,7 @@ uint32 C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const QModelIndex & orc
 /*! \brief  Translate message tree indices to signal index
 
    \param[in] os32_MessageIndex  Top level row
-   \param[in] ou32_SignalIndex   First level row
+   \param[in] os32_SignalIndex   Signal index
    \param[in] os32_SignalIndexL2 Second level row (optional)
 
    \return
@@ -1278,7 +1278,7 @@ uint32 C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const sint32 os32_Messa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add specified strings as rows
+/*! \brief  Add specified strings as rows
 
    Only handle continuous mode storage
 
@@ -1419,7 +1419,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add specified strings as rows
+/*! \brief  Add specified strings as rows
 
    Only handle unique mode storage
 
@@ -1614,7 +1614,7 @@ sint32 C_CamMetTreeModel::m_GetPosIndexForUniqueMessage(const C_SCLString & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Timer function for handling gray out engine
+/*! \brief  Timer function for handling gray out engine
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_GrayOutTimer(void)
@@ -1724,9 +1724,9 @@ void C_CamMetTreeModel::m_GrayOutTimer(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Detects the necessary transparency step dependent of the difference time
+/*! \brief  Detects the necessary transparency step dependent of the difference time
 
-   \param[in]     ou32_DiffTime  Difference time
+   \param[in] ou32_DiffTime Difference time
 
    \return
    Detected transparency step
@@ -1761,7 +1761,7 @@ sintn C_CamMetTreeModel::mh_GetTransparencyStep(const uint32 ou32_DiffTime)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get list of strings
+/*! \brief  Get list of strings
 
    \param[in] orc_Message Message to evaluate
 
@@ -1791,7 +1791,7 @@ std::vector<QStringList> C_CamMetTreeModel::mh_GetCount(const C_CamMetTreeLogger
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Resize string to the specified maximum length if the string exceeds this limit
+/*! \brief  Resize string to the specified maximum length if the string exceeds this limit
 
    \param[in,out] orc_Str        String that will get resized if necessary
    \param[in]     os32_MaxLength Maximum length the string may not exceed after calling this function
@@ -2071,7 +2071,6 @@ C_CamMetTreeLoggerDataGreyOutInformation C_CamMetTreeModel::mh_ExtractPreviousGr
    \param[in]     orc_StoredGrayOutInformation Stored gray out information
    \param[in]     oq_UpdateDataTimeStamp       Flag to update the data timestamps
    \param[in]     ou32_PrevMsgTimeStamp        Previous message timestamp
-
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::mh_ApplyPreviousGreyOutInformation(C_CamMetTreeLoggerData & orc_Message,
@@ -2209,6 +2208,7 @@ bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint
 
    \param[in,out] orc_PreviousMessage Previous message content
    \param[in]     orc_NewMessage      New message content
+   \param[in]     os32_MuxValue       Mux value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(C_CamMetTreeLoggerData & orc_PreviousMessage,

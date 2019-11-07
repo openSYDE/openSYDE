@@ -1071,7 +1071,7 @@ bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMe
 
             if (orc_MessageData.c_Signals.size() > 0)
             {
-               const C_OSCComMessageLoggerDataSignal & rc_Signal =
+               C_OSCComMessageLoggerDataSignal & rc_Signal =
                   orc_MessageData.c_Signals[orc_MessageData.c_Signals.size() - 1];
 
                if (rc_Signal.q_DlcError == false)
@@ -1079,6 +1079,7 @@ bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMe
                   try
                   {
                      u16_MultiplexerValue = static_cast<uint16>(rc_Signal.c_RawValueDec.ToInt());
+                     rc_Signal.c_Name += " (Multiplexer)";
                      q_MultiplexerFound = true;
                      u32_MultiplexerIndex = u32_Counter;
                   }

@@ -54,26 +54,30 @@ private:
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
    // usually the table model is a member of the view, but because most access is from this popup class we put it here
    stw_opensyde_gui_logic::C_CamMosFilterTableModel * mpc_TableModel;
+   const QString mc_UneditedName; // initial name needed on accept for not triggering duplicate check
 
-   void m_InitStaticNames(void);
+   void m_InitStaticNames(void) const;
    void m_InitStaticGUIElements(void) const;
    void m_InitFromData(const stw_opensyde_gui_logic::C_CamProFilterData & orc_FilterData) const;
    void m_UpdateSettingsSection(const stw_opensyde_gui_logic::C_CamProFilterItemData & orc_FilterItemData) const;
    void m_ShowNoFilter(const bool oq_NoFilter) const;
    void m_ShowTypeSpecificWidgets(const stw_types::sint32 os32_NewType) const;
    void m_UpdateLineEdits(const stw_types::uint32 ou32_RowIndex) const;
-   void m_OnCancel(void);
+   void m_OnCancel(void) const;
    void m_OnOk(void);
-   void m_OnAddFilterItem(void);
-   void m_OnIndexClicked(const QModelIndex & orc_NewIndex);
-   void m_OnTypeChanged(const stw_types::sint32 os32_NewType);
-   void m_OnRadioButtonToggle(const bool oq_Checked);
+   void m_OnAddFilterItem(void) const;
+   void m_OnIndexClicked(const QModelIndex & orc_NewIndex) const;
+   void m_OnDeleteKeyPressed(void) const;
+   void m_OnRowChanged(const QModelIndex & orc_NewIndex, const QModelIndex & orc_PrevIndex) const;
+   void m_OnTypeChanged(const stw_types::sint32 os32_NewType) const;
+   void m_OnRadioButtonToggle(const bool oq_Checked) const;
    void m_OnStartIdEdited(void);
    void m_OnEndIdEdited(void);
    void m_OnExtendedToggled(const bool oq_Checked);
    void m_OnAddFromDatabase(void);
    stw_types::sint32 m_GetCurrentSelectedRowIndex(void) const;
    void m_UpdateTitleFilterItemCount(void) const;
+   void m_SetMessageDataFromDatabase(const stw_types::uint32 ou32_CanId, const bool oq_IsExtended);
    static QString mh_GetValueAsHex(const stw_types::uint32 u32_Value);
 
    //Avoid call

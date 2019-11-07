@@ -636,6 +636,45 @@ const QMap<C_OSCNodeDataPoolListElementId,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all elements assigned to at least on write widget
+
+   \return
+   Set of element ids with all write elements
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::set<C_OSCNodeDataPoolListElementId> C_PuiSvData::GetWriteAssignments(void) const
+{
+   std::set<C_OSCNodeDataPoolListElementId> c_WriteElements;
+   uint32 u32_DashboardCounter;
+
+   for (u32_DashboardCounter = 0U; u32_DashboardCounter < this->mc_Dashboards.size(); ++u32_DashboardCounter)
+   {
+      std::vector<const C_PuiSvDbWidgetBase *> c_Widgets;
+      this->mc_Dashboards[u32_DashboardCounter].GetAllWidgetItems(c_Widgets);
+      uint32 u32_WidgetCounter;
+
+      for (u32_WidgetCounter = 0U; u32_WidgetCounter < c_Widgets.size(); ++u32_WidgetCounter)
+      {
+         const C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_WidgetCounter];
+
+         if ((pc_Widget != NULL) &&
+             (pc_Widget->IsReadElement() == false))
+         {
+            uint32 u32_ElementConfig;
+
+            for (u32_ElementConfig = 0U; u32_ElementConfig < pc_Widget->c_DataPoolElementsConfig.size();
+                 ++u32_ElementConfig)
+            {
+               c_WriteElements.insert(pc_Widget->c_DataPoolElementsConfig[u32_ElementConfig].c_ElementId);
+            }
+         }
+      }
+   }
+
+   return c_WriteElements;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns a specific rail assignment
 
    \param[in]  orc_Id       ID
@@ -1045,7 +1084,7 @@ void C_PuiSvData::OnSyncNodeAdded(const uint32 ou32_Index)
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeAdded(c_Id, ou32_Index);
       if (c_Id.GetIsValid() == true)
       {
@@ -1085,7 +1124,7 @@ void C_PuiSvData::OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(c_Id, ou32_Index);
       if (c_Id.GetIsValid() == true)
       {
@@ -1140,7 +1179,7 @@ void C_PuiSvData::OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, const uin
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeDataPoolAdded(c_Id, ou32_NodeIndex, ou32_DataPoolIndex);
       if (c_Id.GetIsValid() == true)
       {
@@ -1175,7 +1214,7 @@ void C_PuiSvData::OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, const uin
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeDataPoolMoved(c_Id, ou32_NodeIndex, ou32_DataPoolSourceIndex,
                                                   ou32_DataPoolTargetIndex);
       if (c_Id.GetIsValid() == true)
@@ -1209,7 +1248,7 @@ void C_PuiSvData::OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_NodeIndex
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeDataPoolAboutToBeDeleted(c_Id, ou32_NodeIndex, ou32_DataPoolIndex);
       if (c_Id.GetIsValid() == true)
       {
@@ -1294,7 +1333,7 @@ void C_PuiSvData::OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, const
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeDataPoolListAdded(c_Id, ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex);
       if (c_Id.GetIsValid() == true)
       {
@@ -1331,7 +1370,7 @@ void C_PuiSvData::OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, const
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeDataPoolListMoved(c_Id, ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListSourceIndex,
                                                       ou32_ListTargetIndex);
       if (c_Id.GetIsValid() == true)
@@ -1367,7 +1406,7 @@ void C_PuiSvData::OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_NodeI
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeDataPoolListAboutToBeDeleted(c_Id, ou32_NodeIndex, ou32_DataPoolIndex,
                                                                  ou32_ListIndex);
       if (c_Id.GetIsValid() == true)
@@ -1469,7 +1508,7 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementAdded(const uint32 ou32_NodeIndex
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAdded(c_Id, ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
                                                              ou32_ElementIndex);
       if (c_Id.GetIsValid() == true)
@@ -1551,7 +1590,7 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_NodeIndex
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementMoved(c_Id, ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
                                                              ou32_ElementSourceIndex, ou32_ElementTargetIndex);
       if (c_Id.GetIsValid() == true)
@@ -1574,13 +1613,15 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_NodeIndex
    \param[in] oe_Type            New element type
    \param[in] oq_IsArray         New array type
    \param[in] ou32_ArraySize     New array size
+   \param[in] oq_IsString        Flag if new type is string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou32_NodeIndex,
                                                             const uint32 ou32_DataPoolIndex,
                                                             const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex,
                                                             const C_OSCNodeDataPoolContent::E_Type oe_Type,
-                                                            const bool oq_IsArray, const uint32 ou32_ArraySize)
+                                                            const bool oq_IsArray, const uint32 ou32_ArraySize,
+                                                            const bool oq_IsString)
 {
    bool q_Changed = false;
 
@@ -1589,7 +1630,7 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou32_No
       C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[u32_ItDashboard];
       if (rc_Dashboard.OnSyncNodeDataPoolListElementArrayChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
                                                                  ou32_ElementIndex, oe_Type, oq_IsArray,
-                                                                 ou32_ArraySize) == true)
+                                                                 ou32_ArraySize, oq_IsString) == true)
       {
          q_Changed = true;
       }
@@ -1681,7 +1722,7 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32 ou3
         c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id = C_PuiSvDbNodeDataPoolListElementId(
-         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         c_ItReadItem.key(), C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false, 0UL);
       C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAboutToBeDeleted(c_Id, ou32_NodeIndex, ou32_DataPoolIndex,
                                                                         ou32_ListIndex, ou32_ElementIndex);
       if (c_Id.GetIsValid() == true)
@@ -2739,7 +2780,7 @@ void C_PuiSvData::InitFromSystemDefintion(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check name not used in existing dashboards
 
-   \param[in] orc_ProposedName     Proposal for item dashboard
+   \param[in] orc_Proposal         Proposal for item dashboard
    \param[in] opu32_DashboardIndex Optional parameter to skip one index
                                    (Use-case: skip current dashboards to avoid conflict with itself)
 

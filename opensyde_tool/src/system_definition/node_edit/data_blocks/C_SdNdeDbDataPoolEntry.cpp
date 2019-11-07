@@ -47,7 +47,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbDataPoolEntry::C_SdNdeDbDataPoolEntry(const stw_types::uint32 ou32_NodeIndex,
                                                const stw_types::uint32 ou32_DataPoolIndex, QWidget * const opc_Parent) :
-   QWidget(opc_Parent),
+   stw_opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDbDataPoolEntry),
    mu32_DataPoolIndex(ou32_DataPoolIndex)
 {
@@ -88,17 +88,27 @@ void C_SdNdeDbDataPoolEntry::m_OnDeleteClick(void)
    \param[in] ou32_DataPoolIndex Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbDataPoolEntry::m_Init(const stw_types::uint32 ou32_NodeIndex,
-                                    const stw_types::uint32 ou32_DataPoolIndex) const
+void C_SdNdeDbDataPoolEntry::m_Init(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex)
 {
-   const C_OSCNodeDataPool * const pc_Datapol = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(ou32_NodeIndex,
-                                                                                                ou32_DataPoolIndex);
+   const C_OSCNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(ou32_NodeIndex,
+                                                                                                 ou32_DataPoolIndex);
 
-   if (pc_Datapol != NULL)
+   if (pc_Datapool != NULL)
    {
-      const QString c_Text = QString("%1 (%2)").arg(pc_Datapol->c_Name.c_str()).arg(C_PuiSdUtil::
-                                                                                    h_ConvertDataPoolTypeToString(
-                                                                                       pc_Datapol->e_Type));
+      QString c_Text;
+
+      c_Text = pc_Datapool->c_Name.c_str();
+      c_Text += " (";
+      c_Text += C_PuiSdUtil::h_ConvertDataPoolTypeToString(pc_Datapool->e_Type);
+      if (pc_Datapool->e_Type == C_OSCNodeDataPool::eCOM)
+      {
+         c_Text += ", ";
+         c_Text += C_GtGetText::h_GetText("Protocol: ");
+         c_Text += C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCANProtocolType(
+                                                                 ou32_NodeIndex, ou32_DataPoolIndex));
+      }
+      c_Text += ")";
       this->mpc_Ui->pc_LabelName->setText(c_Text);
+      this->SetToolTipInformation(c_Text, pc_Datapool->c_Comment.c_str());
    }
 }

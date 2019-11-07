@@ -32,7 +32,7 @@ using namespace stw_opensyde_gui;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiSizeableItem::C_GiBiSizeableItem() :
@@ -42,7 +42,7 @@ C_GiBiSizeableItem::C_GiBiSizeableItem() :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    \param[in] of64_Width  Width
    \param[in] of64_Height Height
@@ -55,7 +55,7 @@ C_GiBiSizeableItem::C_GiBiSizeableItem(const float64 of64_Width, const float64 o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiBiSizeableItem::~C_GiBiSizeableItem()
@@ -63,7 +63,7 @@ C_GiBiSizeableItem::~C_GiBiSizeableItem()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the size as rectangle
+/*! \brief  Returns the size as rectangle
 
    \return  Rectangle with actual size
 */

@@ -35,7 +35,7 @@ using namespace stw_types;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -55,7 +55,7 @@ C_GiLiInteractionPoint::C_GiLiInteractionPoint(const sint32 & ors32_PointIndex, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -65,7 +65,7 @@ C_GiLiInteractionPoint::~C_GiLiInteractionPoint()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the type of this item
+/*! \brief  Returns the type of this item
 
    \return  ID
 */
@@ -76,7 +76,7 @@ sintn C_GiLiInteractionPoint::type() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set point index
+/*! \brief  Set point index
 
    \param[in] ors32_PointIndex Index of the corresponding point
 */
@@ -87,7 +87,7 @@ void C_GiLiInteractionPoint::SetPointIndex(const stw_types::sint32 & ors32_Point
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get point index
+/*! \brief  Get point index
 
    \return   Index of the corresponding point
 */
@@ -98,7 +98,7 @@ sint32 C_GiLiInteractionPoint::GetPointIndex(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Restore default mouse cursor
+/*! \brief  Restore default mouse cursor
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiInteractionPoint::RestoreDefaultCursor(void)
@@ -118,7 +118,7 @@ void C_GiLiInteractionPoint::SetTemporaryCursor(const QCursor & orc_TemporaryCur
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set default mouse cursor
+/*! \brief  Set default mouse cursor
 
    \param[in] orc_Value New default mouse cursor
 */
@@ -130,12 +130,15 @@ void C_GiLiInteractionPoint::SetDefaultCursor(const QCursor & orc_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten itemChange event slot
+/*! \brief  Overwritten itemChange event slot
 
    Here: Signal position change
 
    \param[in,out] oe_Change Indicator what changed
    \param[in]     orc_Value Value corresponding to change
+
+   \return
+   new value
 */
 //----------------------------------------------------------------------------------------------------------------------
 QVariant C_GiLiInteractionPoint::itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value)

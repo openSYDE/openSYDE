@@ -20,6 +20,7 @@
 #include "C_OgeWiUtil.h"
 #include "TGLUtils.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_CamProHandler.h"
 #include "C_CamDbHandler.h"
 #include "C_CamMosDatabaseSelectionPopup.h"
 
@@ -57,7 +58,8 @@ C_CamMosFilterPopup::C_CamMosFilterPopup(const stw_opensyde_gui_logic::C_CamProF
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CamMosFilterPopup),
    mrc_ParentDialog(orc_Parent),
-   mpc_TableModel(new stw_opensyde_gui_logic::C_CamMosFilterTableModel)
+   mpc_TableModel(new stw_opensyde_gui_logic::C_CamMosFilterTableModel),
+   mc_UneditedName(orc_FilterData.c_Name)
 {
    C_CamProFilterData c_FilterData = orc_FilterData;
 
@@ -71,6 +73,10 @@ C_CamMosFilterPopup::C_CamMosFilterPopup(const stw_opensyde_gui_logic::C_CamProF
 
    // initialize static names
    this->m_InitStaticNames();
+
+   // set ID minima
+   this->mpc_Ui->pc_LeCanIdStart->SetMinFromVariant("0x0");
+   this->mpc_Ui->pc_LeCanIdEnd->SetMinFromVariant("0x0");
 
    // initialize data for filters of type CAN ID
    for (sint32 s32_Pos = 0; s32_Pos < c_FilterData.c_FilterItems.size(); s32_Pos++)
@@ -103,6 +109,10 @@ C_CamMosFilterPopup::C_CamMosFilterPopup(const stw_opensyde_gui_logic::C_CamProF
    connect(this->mpc_Ui->pc_PubAddFromDatabase, &C_OgePubConfigure::clicked, this,
            &C_CamMosFilterPopup::m_OnAddFromDatabase);
    connect(this->mpc_Ui->pc_TableView, &C_CamMosFilterTableView::clicked, this, &C_CamMosFilterPopup::m_OnIndexClicked);
+   connect(this->mpc_Ui->pc_TableView->selectionModel(), &QItemSelectionModel::currentRowChanged,
+           this, &C_CamMosFilterPopup::m_OnRowChanged);
+   connect(this->mpc_Ui->pc_TableView, &C_CamMosFilterTableView::SigDeleteKeyPressed,
+           this, &C_CamMosFilterPopup::m_OnDeleteKeyPressed);
    connect(this->mpc_Ui->pc_RabPass, &C_OgeRabProperties::toggled, this, &C_CamMosFilterPopup::m_OnRadioButtonToggle);
    connect(this->mpc_Ui->pc_LeCanIdStart, &C_CamOgeLeIDPopUp::editingFinished, this,
            &C_CamMosFilterPopup::m_OnStartIdEdited);
@@ -136,7 +146,7 @@ C_CamProFilterData C_CamMosFilterPopup::GetFilterData(void) const
 {
    C_CamProFilterData c_Retval;
 
-   c_Retval.c_Name = this->mpc_Ui->pc_LineEditName->text();
+   c_Retval.c_Name = this->mpc_Ui->pc_LineEditName->text().trimmed(); // cut white space from both ends
    c_Retval.c_Comment = this->mpc_Ui->pc_TedComment->toPlainText();
    c_Retval.c_FilterItems = this->mpc_TableModel->GetFilterItemsData();
    // c_Retval.q_Enabled can not be edited in this dialog
@@ -164,7 +174,7 @@ void C_CamMosFilterPopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
           (opc_KeyEvent->modifiers().testFlag(Qt::ShiftModifier) == false))
       {
-         this->mrc_ParentDialog.accept();
+         this->m_OnOk();
       }
       else
       {
@@ -181,7 +191,7 @@ void C_CamMosFilterPopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 /*! \brief   Initialize all displayed static names
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterPopup::m_InitStaticNames(void)
+void C_CamMosFilterPopup::m_InitStaticNames(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Filter"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Configuration"));
@@ -224,11 +234,11 @@ void C_CamMosFilterPopup::m_InitStaticNames(void)
    this->mpc_Ui->pc_LabCanIdEnd->SetToolTipInformation(C_GtGetText::h_GetText("Message ID"),
                                                        C_GtGetText::h_GetText("ID of last filtered message."));
    this->mpc_Ui->pc_CheckBoxExtended->SetToolTipInformation(C_GtGetText::h_GetText("Extended"),
-                                                            C_GtGetText::h_GetText("Message ID is in extended format."));
+                                                            C_GtGetText::h_GetText(
+                                                               "CAN Message ID is in extended format."));
    this->mpc_Ui->pc_PubAddFromDatabase->SetToolTipInformation(C_GtGetText::h_GetText("Add from database"),
                                                               C_GtGetText::h_GetText(
                                                                  "Add message from configured database."));
-   this->mpc_Ui->pc_LeCanIdStart->SetMinFromVariant("0x0");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -381,7 +391,7 @@ void C_CamMosFilterPopup::m_UpdateSettingsSection(const C_CamProFilterItemData &
 
    // mode
    this->mpc_Ui->pc_RabPass->setChecked(orc_FilterItemData.q_PassFilter);
-   this->mpc_Ui->pc_RabStop->setChecked(!this->mpc_Ui->pc_RabPass->isChecked());
+   this->mpc_Ui->pc_RabStop->setChecked(!orc_FilterItemData.q_PassFilter);
 
    // message IDs
    // second parameter of int type is important for line edit data handling
@@ -389,7 +399,8 @@ void C_CamMosFilterPopup::m_UpdateSettingsSection(const C_CamProFilterItemData &
                                                  static_cast<uint64>(orc_FilterItemData.u32_StartId));
    this->mpc_Ui->pc_LeCanIdEnd->SetFromVariant(mh_GetValueAsHex(orc_FilterItemData.u32_EndId),
                                                static_cast<uint64>(orc_FilterItemData.u32_EndId));
-   // ID min/max (for tool tip)
+
+   // ID min/max (for tool tip in initial case)
    if (static_cast<bool>(orc_FilterItemData.u8_ExtendedId) == true)
    {
       this->mpc_Ui->pc_LeCanIdStart->SetMaxFromVariant("0x1FFFFFFF");
@@ -401,7 +412,7 @@ void C_CamMosFilterPopup::m_UpdateSettingsSection(const C_CamProFilterItemData &
       this->mpc_Ui->pc_LeCanIdEnd->SetMaxFromVariant("0x7FF");
    }
 
-   // extended ID
+   // extended flag
    this->mpc_Ui->pc_CheckBoxExtended->setChecked(static_cast<bool>(orc_FilterItemData.u8_ExtendedId));
 }
 
@@ -484,7 +495,7 @@ void C_CamMosFilterPopup::m_UpdateLineEdits(const uint32 ou32_RowIndex) const
 /*! \brief   Slot of Cancel button click
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterPopup::m_OnCancel(void)
+void C_CamMosFilterPopup::m_OnCancel(void) const
 {
    this->mrc_ParentDialog.reject();
 }
@@ -495,14 +506,46 @@ void C_CamMosFilterPopup::m_OnCancel(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnOk(void)
 {
-   this->mrc_ParentDialog.accept();
+   const QString c_Name = this->mpc_Ui->pc_LineEditName->text().trimmed();
+   C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+   bool q_Accept = true;
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("Filter Name"));
+
+   // do not allow empty names
+   if (c_Name.isEmpty() == true)
+   {
+      q_Accept = false;
+      c_Message.SetDescription(C_GtGetText::h_GetText("Filter name is empty. Choose a valid name."));
+   }
+   else
+   {
+      // check if name is duplicate (only if edited to avoid comparison with itself)
+      if (c_Name != this->mc_UneditedName)
+      {
+         if (C_CamProHandler::h_GetInstance()->CheckFilterNameAvailable(c_Name) == false)
+         {
+            q_Accept = false;
+            c_Message.SetDescription(C_GtGetText::h_GetText("Filter name is already used. Choose another name."));
+         }
+      }
+   }
+
+   if (q_Accept == true)
+   {
+      this->mrc_ParentDialog.accept();
+   }
+   else
+   {
+      c_Message.Execute();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of add filter item button click
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterPopup::m_OnAddFilterItem(void)
+void C_CamMosFilterPopup::m_OnAddFilterItem(void) const
 {
    std::vector<uint32> c_IndexVector;
    uint32 u32_NewIndex;
@@ -514,17 +557,22 @@ void C_CamMosFilterPopup::m_OnAddFilterItem(void)
    // select new row
    this->mpc_Ui->pc_TableView->clearSelection();
    this->mpc_Ui->pc_TableView->selectRow(u32_NewIndex);
-   this->m_OnIndexClicked(this->mpc_TableModel->index(u32_NewIndex, 0));
+   this->mpc_Ui->pc_TableView->setFocus();
 
    // update filter items count
    this->m_UpdateTitleFilterItemCount();
+
+   // show or hide table and settings
+   this->m_ShowNoFilter(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of index/row click of table view.
+
+   Here: detect remove click and delete if so
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterPopup::m_OnIndexClicked(const QModelIndex & orc_NewIndex)
+void C_CamMosFilterPopup::m_OnIndexClicked(const QModelIndex & orc_NewIndex) const
 {
    sint32 s32_Row = orc_NewIndex.row();
    const sint32 s32_Column = orc_NewIndex.column();
@@ -538,11 +586,41 @@ void C_CamMosFilterPopup::m_OnIndexClicked(const QModelIndex & orc_NewIndex)
 
       // update filter items count
       this->m_UpdateTitleFilterItemCount();
-   }
 
-   // update settings section (get this data after possible delete!)
+      // show or hide table and settings
+      this->m_ShowNoFilter(this->mpc_TableModel->rowCount() == 0);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot of delete key button press signal from table view.
+
+   Delete filter item on delete key press.
+
+   \param[in]       os32_CurrentRow    currently selected row
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterPopup::m_OnDeleteKeyPressed(void) const
+{
+   // deletion is handled by index click so we call index click with index of current row and column "Remove"
+   const QModelIndex c_Index =
+      this->mpc_TableModel->index(this->m_GetCurrentSelectedRowIndex(),
+                                  C_CamMosFilterTableModel::h_EnumToColumn(C_CamMosFilterTableModel::eREMOVE));
+
+   this->m_OnIndexClicked(c_Index);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of current index/row change of table view (e.g. by arrow navigation).
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterPopup::m_OnRowChanged(const QModelIndex & orc_NewIndex, const QModelIndex & orc_PrevIndex) const
+{
+   Q_UNUSED(orc_PrevIndex)
+
+   // update settings section
    const QList<C_CamProFilterItemData> & rc_Data = this->mpc_TableModel->GetFilterItemsData();
-   const sint32 s32_SelectedRowIndex = this->m_GetCurrentSelectedRowIndex();
+   const sint32 s32_SelectedRowIndex = orc_NewIndex.row();
 
    // if there is no selected index something really went wrong
    tgl_assert(s32_SelectedRowIndex < rc_Data.size());
@@ -550,9 +628,6 @@ void C_CamMosFilterPopup::m_OnIndexClicked(const QModelIndex & orc_NewIndex)
    {
       this->m_UpdateSettingsSection(rc_Data[s32_SelectedRowIndex]);
    }
-
-   // show or hide table and settings
-   this->m_ShowNoFilter(this->mpc_TableModel->rowCount() == 0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -561,7 +636,7 @@ void C_CamMosFilterPopup::m_OnIndexClicked(const QModelIndex & orc_NewIndex)
    \param[in]     os32_NewType     new index (corresponds to type)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterPopup::m_OnTypeChanged(const sint32 os32_NewType)
+void C_CamMosFilterPopup::m_OnTypeChanged(const sint32 os32_NewType) const
 {
    const sint32 s32_CurrentRowIndex = this->m_GetCurrentSelectedRowIndex();
 
@@ -596,7 +671,7 @@ void C_CamMosFilterPopup::m_OnTypeChanged(const sint32 os32_NewType)
    \param[in]     oq_Checked     true: pass, false: stop
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterPopup::m_OnRadioButtonToggle(const bool oq_Checked)
+void C_CamMosFilterPopup::m_OnRadioButtonToggle(const bool oq_Checked) const
 {
    const sint32 s32_CurrentRowIndex = this->m_GetCurrentSelectedRowIndex();
 
@@ -736,8 +811,25 @@ void C_CamMosFilterPopup::m_OnExtendedToggled(const bool oq_Checked)
       }
       else
       {
+         QString c_ErrorDescription;
+         QVariant c_Value;
+
          this->mpc_Ui->pc_LeCanIdStart->SetMaxFromVariant("0x7FF");
          this->mpc_Ui->pc_LeCanIdEnd->SetMaxFromVariant("0x7FF");
+
+         // when changing from extended to standard a range check is necessary
+         if ((this->mpc_Ui->pc_LeCanIdStart->GetValueAsVariant(c_Value, c_ErrorDescription) != C_NO_ERR) ||
+             (this->mpc_Ui->pc_LeCanIdEnd->GetValueAsVariant(c_Value, c_ErrorDescription) != C_NO_ERR))
+         {
+            // reset extended flag and inform user
+            this->mpc_Ui->pc_CheckBoxExtended->setChecked(true);
+            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eWARNING);
+            c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Flag"));
+            c_Message.SetDescription(
+               C_GtGetText::h_GetText("Current CAN message ID is out of range of standard format. To remove the "
+                                      "extended flag, first set CAN ID to 0x7FF or less."));
+            c_Message.Execute();
+         }
       }
    }
 }
@@ -775,11 +867,7 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
             // Update message of given CAN ID
             if (pc_Message != NULL)
             {
-               const sint32 s32_CurrentRowIndex = this->m_GetCurrentSelectedRowIndex();
-
-               this->mpc_TableModel->SetFilterItemIDs(s32_CurrentRowIndex, pc_Message->u32_CanId,
-                                                      pc_Message->u32_CanId);
-               this->m_UpdateLineEdits(s32_CurrentRowIndex);
+               this->m_SetMessageDataFromDatabase(pc_Message->u32_CanId, pc_Message->q_IsExtended);
             }
          }
          else if (c_FileInfo.suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0)
@@ -795,11 +883,7 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
                // Update message of given CAN ID
                if (pc_Message != NULL)
                {
-                  const sint32 s32_CurrentRowIndex = this->m_GetCurrentSelectedRowIndex();
-
-                  this->mpc_TableModel->SetFilterItemIDs(s32_CurrentRowIndex, pc_Message->u32_CanId,
-                                                         pc_Message->u32_CanId);
-                  this->m_UpdateLineEdits(s32_CurrentRowIndex);
+                  this->m_SetMessageDataFromDatabase(pc_Message->u32_CanId, pc_Message->q_IsExtended);
                }
             }
          }
@@ -823,20 +907,7 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMosFilterPopup::m_GetCurrentSelectedRowIndex(void) const
 {
-   sint32 s32_RetVal = -1;
-   const QModelIndexList c_IndexList = this->mpc_Ui->pc_TableView->selectionModel()->selectedRows();
-
-   // we use single selection so it should be impossible to select more than one row; just to make sure:
-   if (c_IndexList.size() == 1)
-   {
-      const QModelIndex & rc_CurrentIndex = c_IndexList[0];
-      if (rc_CurrentIndex.isValid() == true)
-      {
-         s32_RetVal = rc_CurrentIndex.row();
-      }
-   }
-
-   return s32_RetVal;
+   return this->mpc_Ui->pc_TableView->currentIndex().row();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -847,6 +918,40 @@ void C_CamMosFilterPopup::m_UpdateTitleFilterItemCount(void) const
 {
    this->mpc_Ui->pc_LabelFilterItems->setText(
       QString(C_GtGetText::h_GetText("Filter Items (%1)")).arg(this->mpc_TableModel->rowCount()));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set Message ID and extended flag from database.
+
+   Includes reset of extended flag if something went wrong. Detailed function description (optional).
+
+   \param[in]       u32_CanId      Message ID
+   \param[in]       oq_IsExtended  Extended flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterPopup::m_SetMessageDataFromDatabase(const uint32 ou32_CanId, const bool oq_IsExtended)
+{
+   QVariant c_CanIdBefore;
+   QVariant c_CanIdAfter;
+   QString c_Errors = "";
+
+   // remember previous values
+   const bool q_WasExtended = this->mpc_Ui->pc_CheckBoxExtended->isChecked();
+   tgl_assert(this->mpc_Ui->pc_LeCanIdStart->GetValueAsVariant(c_CanIdBefore, c_Errors) == C_NO_ERR);
+
+   // set information in line edit and check box to use line edits min/max handling
+   this->mpc_Ui->pc_CheckBoxExtended->setChecked(oq_IsExtended);
+   this->mpc_Ui->pc_LeCanIdStart->setText(mh_GetValueAsHex(ou32_CanId));
+
+   // trigger change
+   this->m_OnStartIdEdited();
+
+   // reset extended flag if ID did not change
+   tgl_assert(this->mpc_Ui->pc_LeCanIdStart->GetValueAsVariant(c_CanIdAfter, c_Errors) == C_NO_ERR);
+   if ((c_CanIdBefore == c_CanIdAfter) && (this->mpc_Ui->pc_CheckBoxExtended->isChecked() != q_WasExtended))
+   {
+      this->mpc_Ui->pc_CheckBoxExtended->setChecked(q_WasExtended);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
