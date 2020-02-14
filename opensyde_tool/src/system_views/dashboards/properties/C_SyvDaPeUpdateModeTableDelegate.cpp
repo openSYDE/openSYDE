@@ -43,6 +43,8 @@ using namespace stw_opensyde_gui_elements;
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
+
+   \param[in]  ou32_ViewIndex   View index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeTableDelegate::C_SyvDaPeUpdateModeTableDelegate(const uint32 ou32_ViewIndex) :

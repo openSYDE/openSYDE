@@ -231,6 +231,27 @@ void C_SyvDaTearOffWidget::SetEditMode(const bool oq_Active)
 
    this->mpc_Dashboard->SetEditMode(oq_Active);
 
+   if (oq_Active == true)
+   {
+      //Handle button
+      this->mpc_Ui->pc_PbConfirm->SetSvg("://images/system_views/IconConfirm.svg");
+      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(22, 22));
+      this->mpc_Ui->pc_PbConfirm->SetMargins(12, 20);
+      this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
+   }
+   else
+   {
+      //Handle button
+      this->mpc_Ui->pc_PbConfirm->SetSvg("://images/main_page_and_navi_bar/IconEdit.svg",
+                                         "://images/IconEditDisabledBright.svg");
+      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(24, 24));
+      this->mpc_Ui->pc_PbConfirm->SetMargins(16, 25);
+      this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Edit"));
+
+      //Also should remember settings
+      this->Save();
+   }
+
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBox, "Edit", oq_Active);
 }
 
@@ -248,6 +269,17 @@ void C_SyvDaTearOffWidget::SetDarkMode(const bool oq_Active)
    }
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBox, "DarkMode", oq_Active);
    this->mpc_Ui->pc_WidgetTab->SetDarkMode(oq_Active);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the confirm button enabled or disabled
+
+   \param[in] oq_Enabled   Flag for enabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaTearOffWidget::SetEnabled(const bool oq_Enabled) const
+{
+   this->mpc_Ui->pc_PbConfirm->setEnabled(oq_Enabled);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -298,7 +330,7 @@ void C_SyvDaTearOffWidget::SetErrorForFailedCyclicElementIdRegistrations(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
-   \param[in]     orc_AllDataDealer    Reference to vector with all data dealer
+   \param[in]     orc_ComDriver    Com driver containing information about all data dealer
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) const
@@ -441,6 +473,8 @@ void C_SyvDaTearOffWidget::m_OnCopy(C_OgeWiDashboardTab * const opc_Source) cons
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Open popup to edit dashboard tab properties
+
+   \param[in] opc_Source Signal source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_Source)

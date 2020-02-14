@@ -53,7 +53,7 @@ public:
    C_OSCNodeDataPoolContent c_Value;                      ///< Current value(s) for complete data element
    C_OSCNodeDataPoolContent c_NvmValue;                   ///< Current value(s) for complete data element in NVM
    bool q_NvMValueChanged;                                ///< Flag if the NvM element value was changed
-   bool q_IsValid;                                        ///< Flag if the NvM element value was read from ECU
+   bool q_NvmValueIsValid;                                ///< Flag if the NvM element value was read from ECU
    stw_types::uint32 u32_NvMStartAddress;                 ///< NvM address of data element
 
    void SetType(const C_OSCNodeDataPoolContent::E_Type & ore_Value);

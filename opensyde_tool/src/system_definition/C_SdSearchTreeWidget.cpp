@@ -41,6 +41,7 @@ const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_INDEX_5 = static_cast<sintn>(Qt:
 const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_PARAMETER = 0U;
 const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_VARIABLE = 1U;
 const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_SIGNAL = 2U;
+const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_HALC = 3U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -397,6 +398,9 @@ void C_SdSearchTreeWidget::m_SearchDataPoolContent(const C_OSCNodeDataPool & orc
             case C_OSCNodeDataPool::eCOM:
                u8_Type = mhu8_DATAELEMENT_TYPE_SIGNAL;
                break;
+            case C_OSCNodeDataPool::eHALC:
+               u8_Type = mhu8_DATAELEMENT_TYPE_HALC;
+               break;
             }
 
             this->m_AddDataElementsResult(c_DataElementName, u32_DataElementCounter, c_ListName, u32_ListCounter,
@@ -433,7 +437,7 @@ void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & o
          const sint32 s32_ListIndexRx =
             C_OSCCanProtocol::h_GetListIndex(*pc_DataPool, u32_MessageContainerCounter, false);
 
-         // search the TX messages
+         // search the Tx messages
          for (u32_MessageCounter = 0U; u32_MessageCounter < rc_TxMessages.size(); ++u32_MessageCounter)
          {
             c_MessageName = rc_TxMessages[u32_MessageCounter].c_Name.c_str();
@@ -446,7 +450,7 @@ void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & o
             }
          }
 
-         // search the RX messages
+         // search the Rx messages
          for (u32_MessageCounter = 0U; u32_MessageCounter < rc_RxMessages.size(); ++u32_MessageCounter)
          {
             c_MessageName = rc_RxMessages[u32_MessageCounter].c_Name.c_str();
@@ -850,9 +854,13 @@ void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataEleme
    {
       pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconParameter);
    }
-   else
+   else if (ou8_Type == mhu8_DATAELEMENT_TYPE_SIGNAL)
    {
       pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconSignal);
+   }
+   else
+   {
+      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconVariable);
    }
 
    ++this->mu32_DataElementsFound;

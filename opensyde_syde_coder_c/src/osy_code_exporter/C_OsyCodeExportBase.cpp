@@ -330,7 +330,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void
 
    if (s32_Return == C_NO_ERR)
    {
-      std::cout <<  "System Definition (*.syde_sysdef) loaded." << &std::endl;
+      std::cout <<  "System Definition successfully loaded: " << mc_SystemDefinitionFilePath.c_str() << &std::endl;
       // loading system definition is logged to log file by C_OSCSystemDefinitionFiler
    }
    else
@@ -381,7 +381,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
                this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application, false,
                                                     c_CreatedFiles);
             }
-            else if (rc_Application.u16_GenCodeVersion > 3U)
+            else if (rc_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
             {
                this->m_PrintCodeFormatUnknownInfo(orc_Node.c_Properties.c_Name, rc_Application);
                e_Return = eRESULT_APPLICATION_UNKNOWN_CODE_VERSION;
@@ -412,7 +412,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
          {
             std::vector<C_SCLString> c_CreatedFiles;
             q_AtLeastOne = true;
-            if (rc_Application.u16_GenCodeVersion > 3U)
+            if (rc_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
             {
                this->m_PrintCodeFormatUnknownInfo(orc_Node.c_Properties.c_Name, rc_Application);
                e_Return = eRESULT_APPLICATION_UNKNOWN_CODE_VERSION;

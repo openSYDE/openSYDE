@@ -136,7 +136,7 @@ bool C_PopFileTableDelegate::SetClickedRow(const stw_types::sint32 & ors32_Value
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set model for column look up
 
-   \param[in] opc_Model Model for column look up
+   \param[in] opc_Value Model for column look up
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableDelegate::SetModel(const QAbstractTableModel * const opc_Value)

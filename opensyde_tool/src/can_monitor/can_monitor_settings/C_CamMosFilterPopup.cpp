@@ -49,8 +49,8 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in]     orc_FilterData    filter data (name, comment, ...)
-   \param[in,out] orc_Parent        Reference to parent
+   \param[in]      orc_FilterData   filter data (name, comment, ...)
+   \param[in,out]  orc_Parent       Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterPopup::C_CamMosFilterPopup(const stw_opensyde_gui_logic::C_CamProFilterData & orc_FilterData,
@@ -159,7 +159,7 @@ C_CamProFilterData C_CamMosFilterPopup::GetFilterData(void) const
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -343,6 +343,8 @@ void C_CamMosFilterPopup::m_InitStaticGUIElements(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize data from filter data.
+
+   \param[in]  orc_FilterData    Filter data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_InitFromData(const stw_opensyde_gui_logic::C_CamProFilterData & orc_FilterData) const
@@ -373,7 +375,7 @@ void C_CamMosFilterPopup::m_InitFromData(const stw_opensyde_gui_logic::C_CamProF
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update settings section (line edits, radio buttons, ...)
 
-   \param[in]     orc_FilterData    Filter item data the settings correspond to
+   \param[in]  orc_FilterItemData   Filter item data the settings correspond to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_UpdateSettingsSection(const C_CamProFilterItemData & orc_FilterItemData) const
@@ -419,7 +421,7 @@ void C_CamMosFilterPopup::m_UpdateSettingsSection(const C_CamProFilterItemData &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show label "No filter item" or table and settings.
 
-   \param[in]     oq_NoFilter    true: show label "No filter item"; false: show settings
+   \param[in]  oq_NoFilter    true: show label "No filter item"; false: show settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_ShowNoFilter(const bool oq_NoFilter) const
@@ -443,7 +445,7 @@ void C_CamMosFilterPopup::m_ShowNoFilter(const bool oq_NoFilter) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show type specific widgets.
 
-   \param[in]     os32_NewType     new index (corresponds to type)
+   \param[in]  os32_NewType   new index (corresponds to type)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_ShowTypeSpecificWidgets(const sint32 os32_NewType) const
@@ -472,6 +474,8 @@ void C_CamMosFilterPopup::m_ShowTypeSpecificWidgets(const sint32 os32_NewType) c
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update both line edit texts with table data.
+
+   \param[in]  ou32_RowIndex  Row index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_UpdateLineEdits(const uint32 ou32_RowIndex) const
@@ -570,6 +574,8 @@ void C_CamMosFilterPopup::m_OnAddFilterItem(void) const
 /*! \brief   Slot of index/row click of table view.
 
    Here: detect remove click and delete if so
+
+   \param[in]  orc_NewIndex   New index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnIndexClicked(const QModelIndex & orc_NewIndex) const
@@ -596,8 +602,6 @@ void C_CamMosFilterPopup::m_OnIndexClicked(const QModelIndex & orc_NewIndex) con
 /*! \brief  Slot of delete key button press signal from table view.
 
    Delete filter item on delete key press.
-
-   \param[in]       os32_CurrentRow    currently selected row
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnDeleteKeyPressed(void) const
@@ -612,6 +616,9 @@ void C_CamMosFilterPopup::m_OnDeleteKeyPressed(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of current index/row change of table view (e.g. by arrow navigation).
+
+   \param[in]  orc_NewIndex   New index
+   \param[in]  orc_PrevIndex  Previous index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnRowChanged(const QModelIndex & orc_NewIndex, const QModelIndex & orc_PrevIndex) const
@@ -633,7 +640,7 @@ void C_CamMosFilterPopup::m_OnRowChanged(const QModelIndex & orc_NewIndex, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot for combo box type selection.
 
-   \param[in]     os32_NewType     new index (corresponds to type)
+   \param[in]  os32_NewType   new index (corresponds to type)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnTypeChanged(const sint32 os32_NewType) const
@@ -668,7 +675,7 @@ void C_CamMosFilterPopup::m_OnTypeChanged(const sint32 os32_NewType) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of radio button "Pass" toggle.
 
-   \param[in]     oq_Checked     true: pass, false: stop
+   \param[in]  oq_Checked  true: pass, false: stop
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnRadioButtonToggle(const bool oq_Checked) const
@@ -791,7 +798,7 @@ void C_CamMosFilterPopup::m_OnEndIdEdited(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of check box "extended" toggle.
 
-   \param[in]     oq_Checked     true: extended, false: standard
+   \param[in]  oq_Checked  true: extended, false: standard
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnExtendedToggled(const bool oq_Checked)
@@ -857,12 +864,13 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
       if (c_SelectedItems.size() == 1)
       {
          const QFileInfo c_FileInfo(c_SelectedItems[0][0]);
+         const QString c_MessagePath = c_SelectedItems[0][0];
          const QString c_MessageName = c_SelectedItems[0][1];
          if (c_FileInfo.suffix().compare("dbc", Qt::CaseInsensitive) == 0)
          {
             //Get data
             const C_CieConverter::C_CIECanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetDbcMessage(
-               c_FileInfo.absoluteFilePath(), c_MessageName);
+               c_MessagePath, c_MessageName);
 
             // Update message of given CAN ID
             if (pc_Message != NULL)
@@ -873,12 +881,12 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
          else if (c_FileInfo.suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0)
          {
             //First prepare C_CamDbHandler
-            if (C_CamDbHandler::h_GetInstance()->FindOsyMessage(c_FileInfo.absoluteFilePath(),
+            if (C_CamDbHandler::h_GetInstance()->FindOsyMessage(c_MessagePath,
                                                                 c_MessageName) == C_NO_ERR)
             {
                //Get data
                const C_OSCCanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetOSCMessage(
-                  c_FileInfo.absoluteFilePath(), c_MessageName);
+                  c_MessagePath, c_MessageName);
 
                // Update message of given CAN ID
                if (pc_Message != NULL)
@@ -925,8 +933,8 @@ void C_CamMosFilterPopup::m_UpdateTitleFilterItemCount(void) const
 
    Includes reset of extended flag if something went wrong. Detailed function description (optional).
 
-   \param[in]       u32_CanId      Message ID
-   \param[in]       oq_IsExtended  Extended flag
+   \param[in]  ou32_CanId     Message ID
+   \param[in]  oq_IsExtended  Extended flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_SetMessageDataFromDatabase(const uint32 ou32_CanId, const bool oq_IsExtended)
@@ -937,6 +945,7 @@ void C_CamMosFilterPopup::m_SetMessageDataFromDatabase(const uint32 ou32_CanId, 
 
    // remember previous values
    const bool q_WasExtended = this->mpc_Ui->pc_CheckBoxExtended->isChecked();
+
    tgl_assert(this->mpc_Ui->pc_LeCanIdStart->GetValueAsVariant(c_CanIdBefore, c_Errors) == C_NO_ERR);
 
    // set information in line edit and check box to use line edits min/max handling
@@ -956,9 +965,14 @@ void C_CamMosFilterPopup::m_SetMessageDataFromDatabase(const uint32 ou32_CanId, 
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert int value to string.
+
+   \param[in]  ou32_Value  Value
+
+   \return
+   Hex value string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_CamMosFilterPopup::mh_GetValueAsHex(const uint32 u32_Value)
+QString C_CamMosFilterPopup::mh_GetValueAsHex(const uint32 ou32_Value)
 {
-   return "0x" + QString("%1").arg(u32_Value, 0, 16).toUpper();
+   return "0x" + QString("%1").arg(ou32_Value, 0, 16).toUpper();
 }

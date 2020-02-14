@@ -49,7 +49,7 @@ const QFont C_CamGenTableDelegate::mhc_HighlightFont = C_Uti::h_GetFontPixel(mc_
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenTableDelegate::C_CamGenTableDelegate(QObject * const opc_Parent) :
-   C_TblDelegate(opc_Parent)
+   C_CamTblDelegate(opc_Parent)
 {
 }
 

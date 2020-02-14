@@ -63,11 +63,9 @@ const QString C_SyvDaItPaWidgetNew::mhc_FILE_EXTENSION_PARAMSETIMAGE = ".syde_ps
 
    Set up GUI with all elements.
 
-   \param[in]     oru32_ViewIndex      View index
-   \param[in]     oru32_DashboardIndex Dashboard index
-   \param[in]     oru32_ParamIndex     Param index
-   \param[in]     opc_DataWidget       Data widget
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in]      oru32_ViewIndex  View index
+   \param[in]      opc_DataWidget   Data widget
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaWidgetNew::C_SyvDaItPaWidgetNew(const uint32 & oru32_ViewIndex,
@@ -146,7 +144,7 @@ void C_SyvDaItPaWidgetNew::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active      Flag if connection is active or not active now
+   \param[in]  oq_Active   Flag if connection is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ConnectionActiveChanged(const bool oq_Active)
@@ -177,7 +175,7 @@ void C_SyvDaItPaWidgetNew::ConnectionActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the com driver for parametrization functions
 
-   \param[in]  opc_ComDriver     Reference to the com driver
+   \param[in,out]  orc_ComDriver    Reference to the com driver
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetSyvComDriver(C_SyvComDriverDiag & orc_ComDriver)
@@ -197,7 +195,8 @@ void C_SyvDaItPaWidgetNew::UpdateECUValues(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle manual user operation finished event
 
-   \param[in] os32_Result Operation result
+   \param[in]  os32_Result    Operation result
+   \param[in]  ou8_NRC        NRC
 
    \return
    true  Operation was relevant and was handled
@@ -286,6 +285,7 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                      c_MessageResult.SetDescription(QString(C_GtGetText::h_GetText(
                                                                "Detected CRCs are invalid for at least one list.")));
                      c_MessageResult.SetDetails(c_ListsString);
+                     c_MessageResult.SetCustomMinHeight(180, 300);
                      c_MessageResult.Execute();
                   }
                   // Thread finished with last list
@@ -330,6 +330,7 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                                                                  "- Connection interrupted while connected\n"
                                                                  "- Node response time outside expected timing constraints\n"
                                                                  "  (node or bus may be overloaded)"));
+               c_MessageResult.SetCustomMinHeight(180, 300);
             }
             else if (s32_Result == C_WARN)
             {
@@ -378,11 +379,13 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                                                          "%1 responded with error response.")).arg(
                                                  c_Node));
                c_MessageResult.SetDetails(c_Details);
+               c_MessageResult.SetCustomMinHeight(180, 250);
             }
             else
             {
                c_MessageResult.SetDescription(C_GtGetText::h_GetText("Failure on manual read."));
                c_MessageResult.SetDetails(C_Uti::h_StwError(s32_Result));
+               c_MessageResult.SetCustomMinHeight(180, 250);
             }
             c_MessageResult.Execute();
             m_UpdateReadAllowedFlag(true);
@@ -397,12 +400,14 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dark flag value
 
-   \param[in] oq_Value New dark flag value
+   \param[in]  oq_Value    New dark flag value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetDark(const bool oq_Value) const
 {
    this->mpc_Ui->pc_TreeView->SetDark(oq_Value);
+   this->mpc_Ui->pc_PushButtonAdd->SetDarkMode(oq_Value);
+
    if (oq_Value == true)
    {
       this->mpc_Ui->pc_PushButtonAdd->SetSvg("://images/IconAddEnabledDarkMode.svg",
@@ -479,40 +484,6 @@ void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete action
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::ButtonDeleteClicked(void)
-{
-   C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
-
-   if (pc_ParamWidget != NULL)
-   {
-      C_OgeWiCustomMessage c_MessageBox(pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eQUESTION);
-
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parametrization Widget clear"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                     "Do you really want to clear all lists of the Parametrization Widget?"));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Clear"));
-      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
-      e_ReturnMessageBox = c_MessageBox.Execute();
-
-      if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
-      {
-         this->mpc_Ui->pc_TreeView->DeleteAll();
-         //Update selection
-         if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
-         {
-            this->m_HandleTreeInitAction();
-         }
-         this->m_UpdateButtons();
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle read selected items action
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -553,39 +524,6 @@ void C_SyvDaItPaWidgetNew::RecordSelected(void)
       this->mpc_Ui->pc_TreeView->GetAllSelectedListIds();
 
    this->m_RecordElements(c_SelectedListIds);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle remove selected items action
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::RemoveSelected(void)
-{
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
-
-   if (pc_ParamWidget != NULL)
-   {
-      C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
-      C_OgeWiCustomMessage c_MessageBox(pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eQUESTION);
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parametrization Widget delete selection"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                     "Do you really want to delete all selected lists of the Parametrization Widget?"));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
-      e_ReturnMessageBox = c_MessageBox.Execute();
-
-      if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
-      {
-         this->mpc_Ui->pc_TreeView->DeleteSelected();
-         //Update selection
-         if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
-         {
-            this->m_HandleTreeInitAction();
-         }
-         this->m_UpdateButtons();
-      }
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -651,7 +589,7 @@ std::vector<sint32> C_SyvDaItPaWidgetNew::GetCurrentColumnPositionIndices(void) 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply new column widths
 
-   \param[in] orc_NewColWidths New column widths
+   \param[in]  orc_NewColWidths  New column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetColumnWidth(const std::vector<sint32> & orc_NewColWidths) const
@@ -662,7 +600,7 @@ void C_SyvDaItPaWidgetNew::SetColumnWidth(const std::vector<sint32> & orc_NewCol
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set column position indices
 
-   \param[in] orc_NewColPositionIndices New column position indices
+   \param[in]  orc_NewColPositionIndices  New column position indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetColumnPositionIndices(const std::vector<sint32> & orc_NewColPositionIndices) const
@@ -685,7 +623,7 @@ std::vector<C_PuiSvDbExpandedTreeIndex> C_SyvDaItPaWidgetNew::GetAllExpandedTree
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set all items as expanded
 
-   \param[in] orc_Items Items to expand
+   \param[in]  orc_Items   Items to expand
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetAllExpandedTreeItems(const std::vector<C_PuiSvDbExpandedTreeIndex> & orc_Items) const
@@ -696,7 +634,7 @@ void C_SyvDaItPaWidgetNew::SetAllExpandedTreeItems(const std::vector<C_PuiSvDbEx
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of edit mode
 
-   \param[in]  oq_Active  Flag if edit mode is active or not active now
+   \param[in]  oq_Active   Flag if edit mode is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetEditModeActive(const bool oq_Active)
@@ -717,7 +655,7 @@ void C_SyvDaItPaWidgetNew::SetEditModeActive(const bool oq_Active)
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::paintEvent(QPaintEvent * const opc_Event)
@@ -760,106 +698,6 @@ void C_SyvDaItPaWidgetNew::m_ButtonRecordClicked(void)
    const std::vector<C_OSCNodeDataPoolListElementId> c_ListItemIds = this->mpc_Ui->pc_TreeView->GetAllListIds();
 
    m_RecordElements(c_ListItemIds);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::m_ButtonImportClicked(void)
-{
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
-
-   if (pc_ParamWidget != NULL)
-   {
-      bool q_Continue = false;
-      if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
-      {
-         q_Continue = true;
-      }
-      else
-      {
-         //Ask user
-         C_OgeWiCustomMessage c_MessageBox(pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eQUESTION);
-         C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
-         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Import configuration"));
-         c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to remove all existing lists in this "
-                                                            "widget and import lists from file?"));
-         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Import"));
-         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
-         e_ReturnMessageBox = c_MessageBox.Execute();
-
-         switch (e_ReturnMessageBox)
-         {
-         case C_OgeWiCustomMessage::eYES:
-            q_Continue = true;
-            break;
-         default:
-            // do not continue and do nothing
-            break;
-         }
-      }
-      if (q_Continue == true)
-      {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-         if (pc_View != NULL)
-         {
-            QString c_Folder;
-            QString c_File;
-
-            //User settings restore
-            c_Folder = C_Uti::h_CheckAndReplaceWithExePathIfNecessary(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
-                                                                         pc_View->GetName()).c_ParamImportPath);
-
-            // Import configuration from parameter set (image) file
-            c_File = QFileDialog::getOpenFileName(NULL,
-                                                  C_GtGetText::h_GetText("Import Parameter Set Configuration"),
-                                                  c_Folder, QString(C_GtGetText::h_GetText(
-                                                                       "openSYDE Parameter Set File")) +
-                                                  " (*" + mhc_FILE_EXTENSION_PARAMSET +
-                                                  " *" + mhc_FILE_EXTENSION_PARAMSETIMAGE + ")");
-
-            if (c_File.compare("") != 0)
-            {
-               C_OSCParamSetHandler c_ParamSetFileHandler;
-               sint32 s32_Result;
-
-               //User settings store
-               C_UsHandler::h_GetInstance()->SetProjSvParamImport(pc_View->GetName(), c_File);
-
-               s32_Result = c_ParamSetFileHandler.ReadFile(c_File.toStdString().c_str(), true, true);
-
-               if (s32_Result == C_NO_ERR)
-               {
-                  const C_OSCParamSetInterpretedData & rc_Data = c_ParamSetFileHandler.GetInterpretedData();
-                  s32_Result = this->m_FillDataFromImport(rc_Data.c_InterpretedNodes);
-
-                  if (s32_Result == C_NO_ERR)
-                  {
-                     // Reload the widget with the new configuration
-                     m_HandleTreeInitAction();
-                  }
-                  else
-                  {
-                     C_OgeWiCustomMessage c_MessageResultLoad(
-                        pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eERROR);
-                     c_MessageResultLoad.SetHeading(C_GtGetText::h_GetText("Import configuration"));
-                     c_MessageResultLoad.SetDescription(C_GtGetText::h_GetText("Could not load the file."));
-                     c_MessageResultLoad.SetDetails(C_GtGetText::h_GetText("Error code: \n") +
-                                                    QString::number(s32_Result));
-                     c_MessageResultLoad.Execute();
-                  }
-               }
-               else
-               {
-                  C_OgeWiCustomMessage c_MessageResultRead(
-                     pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eERROR);
-                  c_MessageResultRead.SetHeading(C_GtGetText::h_GetText("Import configuration"));
-                  c_MessageResultRead.SetDescription(C_GtGetText::h_GetText("Could not read the file."));
-                  c_MessageResultRead.Execute();
-               }
-            }
-         }
-      }
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -930,6 +768,7 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
          c_MessageResult.SetHeading(C_GtGetText::h_GetText("System Parametrization"));
          c_MessageResult.SetDescription(C_GtGetText::h_GetText(
                                            "Parametrization widget contains nodes, which are not active in current view."));
+         c_MessageResult.SetCustomMinHeight(180, 180);
          c_MessageResult.Execute();
          this->mq_ReadActive = false;
       }
@@ -939,6 +778,7 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
          c_MessageResult.SetHeading(C_GtGetText::h_GetText("System Parametrization"));
          c_MessageResult.SetDescription(C_GtGetText::h_GetText("Failure on read list."));
          c_MessageResult.SetDetails(C_Uti::h_StwError(s32_Result));
+         c_MessageResult.SetCustomMinHeight(180, 250);
          c_MessageResult.Execute();
          this->mq_ReadActive = false;
       }
@@ -947,6 +787,8 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle write action
+
+   \param[in]  orc_ChangedIds    Changed IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ChangedIds)
@@ -1091,6 +933,7 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
             c_MessageResult.SetDescription(C_GtGetText::h_GetText(
                                               "At least one of the selected lists contains invalid set"
                                               " values. Enter valid set values and retry."));
+            c_MessageResult.SetCustomMinHeight(180, 180);
             c_MessageResult.Execute();
          }
       }
@@ -1100,6 +943,7 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
          c_MessageResult.SetHeading(C_GtGetText::h_GetText("System Parametrization"));
          c_MessageResult.SetDescription(C_GtGetText::h_GetText(
                                            "Nothing to do for selected lists. Values on target device are up to date."));
+         c_MessageResult.SetCustomMinHeight(180, 180);
          c_MessageResult.Execute();
       }
    }
@@ -1108,9 +952,9 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle load action for specified list IDs
 
-   \param[in] orc_ElementIds   Element IDs to load for
-   \param[in] orc_Id           Trigger source ID
-   \param[in] ou32_ValidLayers Number of valid layers in trigger source ID
+   \param[in]  orc_ElementIds    Element IDs to load for
+   \param[in]  orc_Id            Trigger source ID
+   \param[in]  ou32_ValidLayers  Number of valid layers in trigger source ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ElementIds,
@@ -1225,6 +1069,7 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
                   pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eERROR);
                c_MessageResultRead.SetHeading(C_GtGetText::h_GetText("Import configuration"));
                c_MessageResultRead.SetDescription(C_GtGetText::h_GetText("Could not read the file."));
+               c_MessageResultRead.SetCustomMinHeight(180, 180);
                c_MessageResultRead.Execute();
             }
          }
@@ -1235,9 +1080,9 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle save action for specified list IDs
 
-   \param[in] orc_ListIds      List IDs to save for
-   \param[in] orc_Id           Trigger source ID
-   \param[in] ou32_ValidLayers Number of valid layers in trigger source ID
+   \param[in]  orc_ListIds       List IDs to save for
+   \param[in]  orc_Id            Trigger source ID
+   \param[in]  ou32_ValidLayers  Number of valid layers in trigger source ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds,
@@ -1465,6 +1310,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
                      c_MessageResultSave.SetDescription(C_GtGetText::h_GetText("Could not save the file."));
                      c_MessageResultSave.SetDetails(C_GtGetText::h_GetText("Error code: \n") +
                                                     QString::number(s32_Result));
+                     c_MessageResultSave.SetCustomMinHeight(180, 250);
                      c_MessageResultSave.Execute();
                   }
                   else
@@ -1478,6 +1324,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
                      c_MessageResultSave.SetDescription(C_GtGetText::h_GetText(
                                                            "Parameter Set File successfully created."));
                      c_MessageResultSave.SetDetails(c_Details);
+                     c_MessageResultSave.SetCustomMinHeight(180, 250);
                      c_MessageResultSave.Execute();
                   }
                }
@@ -1491,6 +1338,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
             c_MessageResult.SetHeading(C_GtGetText::h_GetText("Configuration export"));
             c_MessageResult.SetDescription(C_GtGetText::h_GetText("Could not create the file!"));
             c_MessageResult.SetDetails(C_GtGetText::h_GetText("Error code: \n") + QString::number(s32_Result));
+            c_MessageResult.SetCustomMinHeight(180, 250);
             c_MessageResult.Execute();
          }
       }
@@ -1502,6 +1350,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
          c_MessageResultCreate.SetHeading(C_GtGetText::h_GetText("Configuration export"));
          c_MessageResultCreate.SetDescription(C_GtGetText::h_GetText("Could not create the file!"));
          c_MessageResultCreate.SetDetails(C_GtGetText::h_GetText("Error code: \n") + QString::number(s32_Result));
+         c_MessageResultCreate.SetCustomMinHeight(180, 250);
          c_MessageResultCreate.Execute();
       }
    }
@@ -1510,7 +1359,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle record action for specified list IDs
 
-   \param[in] orc_ListIds List IDs to record for
+   \param[in]  orc_ListIds    List IDs to record for
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
@@ -1553,211 +1402,6 @@ void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OSCNodeDataPoolL
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaItPaWidgetNew::m_FillDataFromImport(const std::vector<C_OSCParamSetInterpretedNode> & orc_NewData)
-{
-   sint32 s32_Return = C_NO_ERR;
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-   if ((pc_ParamWidget != NULL) && (pc_View != NULL))
-   {
-      uint32 u32_IntNodeCounter;
-
-      // Remove old entries
-      tgl_assert(pc_ParamWidget->ClearParamItemDataElement() == C_NO_ERR);
-
-      for (u32_IntNodeCounter = 0U; u32_IntNodeCounter < orc_NewData.size(); ++u32_IntNodeCounter)
-      {
-         uint32 u32_SdNodeIndex;
-
-         // Search flag. Every interpreted node must be found in system definition
-         bool q_NodeFound = false;
-
-         // Search the matching node
-         for (u32_SdNodeIndex = 0U;
-              u32_SdNodeIndex < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize();
-              ++u32_SdNodeIndex)
-         {
-            const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_SdNodeIndex);
-            if (orc_NewData[u32_IntNodeCounter].c_Name == pc_Node->c_Properties.c_Name)
-            {
-               uint32 u32_IntDataPoolCounter;
-               C_OSCNodeDataPoolListElementId c_ElementId;
-
-               c_ElementId.u32_NodeIndex = u32_SdNodeIndex;
-               q_NodeFound = true;
-
-               for (u32_IntDataPoolCounter = 0U;
-                    u32_IntDataPoolCounter < orc_NewData[u32_IntNodeCounter].c_DataPools.size();
-                    ++u32_IntDataPoolCounter)
-               {
-                  uint32 u32_SdDataPoolIndex;
-
-                  // Search flag. Every interpreted datapool must be found in system definition
-                  bool q_DataPoolFound = false;
-
-                  // Search the matching datapool
-                  for (u32_SdDataPoolIndex = 0U;
-                       u32_SdDataPoolIndex < pc_Node->c_DataPools.size();
-                       ++u32_SdDataPoolIndex)
-                  {
-                     const C_OSCParamSetInterpretedDataPool & rc_IntDataPool =
-                        orc_NewData[u32_IntNodeCounter].c_DataPools[u32_IntDataPoolCounter];
-
-                     if (rc_IntDataPool.c_DataPoolInfo.c_Name == pc_Node->c_DataPools[u32_SdDataPoolIndex].c_Name)
-                     {
-                        uint32 u32_IntListCounter;
-                        uint32 u32_DataPoolCrc = 0;
-
-                        q_DataPoolFound = true;
-
-                        // Check datapool configuration
-                        pc_Node->c_DataPools[u32_SdDataPoolIndex].CalcDefinitionHash(u32_DataPoolCrc);
-                        if (rc_IntDataPool.c_DataPoolInfo.u32_DataPoolCrc != u32_DataPoolCrc)
-                        {
-                           // Checksum of datapool no identical
-                           s32_Return = C_CHECKSUM;
-                        }
-                        else if ((rc_IntDataPool.c_DataPoolInfo.au8_Version[0] !=
-                                  pc_Node->c_DataPools[u32_SdDataPoolIndex].au8_Version[0]) ||
-                                 (rc_IntDataPool.c_DataPoolInfo.au8_Version[1] !=
-                                  pc_Node->c_DataPools[u32_SdDataPoolIndex].au8_Version[1]) ||
-                                 (rc_IntDataPool.c_DataPoolInfo.au8_Version[2] !=
-                                  pc_Node->c_DataPools[u32_SdDataPoolIndex].au8_Version[2]))
-                        {
-                           s32_Return = C_CONFIG;
-                        }
-                        else
-                        {
-                           c_ElementId.u32_DataPoolIndex = u32_SdDataPoolIndex;
-
-                           for (u32_IntListCounter = 0U;
-                                u32_IntListCounter < rc_IntDataPool.c_Lists.size();
-                                ++u32_IntListCounter)
-                           {
-                              const C_OSCParamSetInterpretedList & rc_IntList =
-                                 rc_IntDataPool.c_Lists[u32_IntListCounter];
-                              uint32 u32_SdListIndex;
-
-                              // Search flag. Every interpreted list must be found in system definition
-                              bool q_ListFound = false;
-
-                              // Search the matching list
-                              for (u32_SdListIndex = 0U;
-                                   u32_SdListIndex < pc_Node->c_DataPools[u32_SdDataPoolIndex].c_Lists.size();
-                                   ++u32_SdListIndex)
-                              {
-                                 const C_OSCNodeDataPoolList & rc_List =
-                                    pc_Node->c_DataPools[u32_SdDataPoolIndex].c_Lists[u32_SdListIndex];
-                                 if (rc_IntList.c_Name == rc_List.c_Name)
-                                 {
-                                    const C_OSCNodeDataPoolListId c_ListId(c_ElementId.u32_NodeIndex,
-                                                                           c_ElementId.u32_DataPoolIndex,
-                                                                           u32_SdListIndex);
-                                    c_ElementId.u32_ListIndex = u32_SdListIndex;
-                                    q_ListFound = true;
-
-                                    //Check if list in use
-                                    if ((pc_View->CheckNvmParamListUsage(c_ListId) == false) &&
-                                        (rc_IntList.c_Elements.size() == rc_List.c_Elements.size()))
-                                    {
-                                       uint32 u32_SdElementIndex;
-
-                                       // Add all elements of list
-                                       for (u32_SdElementIndex = 0U;
-                                            u32_SdElementIndex < rc_List.c_Elements.size();
-                                            ++u32_SdElementIndex)
-                                       {
-                                          const C_OSCNodeDataPoolListElement & rc_Element =
-                                             rc_List.c_Elements[u32_SdElementIndex];
-                                          bool q_ElementFound = false;
-                                          c_ElementId.u32_ElementIndex = u32_SdElementIndex;
-                                          for (uint32 u32_IntElementIndex = 0U;
-                                               (u32_IntElementIndex < rc_IntList.c_Elements.size()) &&
-                                               (q_ElementFound == false);
-                                               ++u32_IntElementIndex)
-                                          {
-                                             const C_OSCParamSetInterpretedElement & rc_IntElement =
-                                                rc_IntList.c_Elements[u32_IntElementIndex];
-                                             if ((((rc_IntElement.c_Name == rc_Element.c_Name) &&
-                                                   (rc_IntElement.c_NvmValue.GetType() == rc_Element.GetType())) &&
-                                                  (rc_IntElement.c_NvmValue.GetArray() == rc_Element.GetArray())) &&
-                                                 (rc_IntElement.c_NvmValue.GetArraySize() == rc_Element.GetArraySize()))
-                                             {
-                                                q_ElementFound = true;
-                                                pc_ParamWidget->AddParamItemDataElement(c_ElementId,
-                                                                                        &rc_IntElement.c_NvmValue);
-                                             }
-                                          }
-                                          if (q_ElementFound == false)
-                                          {
-                                             pc_ParamWidget->AddParamItemDataElement(c_ElementId, NULL);
-                                          }
-                                       }
-                                    }
-
-                                    // List found, stop searching
-                                    break;
-                                 }
-                              }
-
-                              if (q_ListFound == false)
-                              {
-                                 s32_Return = C_RANGE;
-                              }
-
-                              if (s32_Return != C_NO_ERR)
-                              {
-                                 // List error, stop searching in interpreted data
-                                 break;
-                              }
-                           }
-                        }
-
-                        // Datapool found, stop further searching in system definition
-                        break;
-                     }
-                  }
-
-                  if (q_DataPoolFound == false)
-                  {
-                     s32_Return = C_RANGE;
-                  }
-
-                  if (s32_Return != C_NO_ERR)
-                  {
-                     // Datapool error, stop searching in interpreted data
-                     break;
-                  }
-               }
-
-               // Node found, stop further searching in system definition
-               break;
-            }
-         }
-
-         if (q_NodeFound == false)
-         {
-            s32_Return = C_RANGE;
-         }
-
-         if (s32_Return != C_NO_ERR)
-         {
-            // Error, stop searching in interpreted data
-            break;
-         }
-      }
-   }
-   else
-   {
-      s32_Return = C_RANGE;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply action
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1768,8 +1412,6 @@ void C_SyvDaItPaWidgetNew::m_ButtonApplyClicked(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update number of selection items
-
-   \param[in] ou32_Count New selection count
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_UpdateButtons(void)
@@ -1839,7 +1481,7 @@ void C_SyvDaItPaWidgetNew::m_HandleTreeInitAction(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   handle the tree read action
 
-   \param[in] orc_ListIds Current list IDs
+   \param[in]  orc_ListIds    Current list IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_HandleTreeReadAction(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
@@ -1854,7 +1496,7 @@ void C_SyvDaItPaWidgetNew::m_HandleTreeReadAction(const std::vector<C_OSCNodeDat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle list IDs write trigger
 
-   \param[in] orc_ListIds List IDs to write
+   \param[in]  orc_ListIds    List IDs to write
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_HandleWriteProcessTrigger(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
@@ -1877,7 +1519,7 @@ void C_SyvDaItPaWidgetNew::m_HandleWriteProcessTrigger(const std::vector<C_OSCNo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete the specified list IDs
 
-   \param[in] orc_ListIds List IDs to delete
+   \param[in]  orc_ListIds    List IDs to delete
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_HandleRemoveTrigger(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
@@ -1894,6 +1536,7 @@ void C_SyvDaItPaWidgetNew::m_HandleRemoveTrigger(const std::vector<C_OSCNodeData
                                   arg(orc_ListIds.size()));
       c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
       c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
       if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
@@ -1912,7 +1555,7 @@ void C_SyvDaItPaWidgetNew::m_HandleRemoveTrigger(const std::vector<C_OSCNodeData
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update the read allowed flag
 
-   \param[in] oq_NewValue Flag if read action is allowed now
+   \param[in]  oq_NewValue    Flag if read action is allowed now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_UpdateReadAllowedFlag(const bool oq_NewValue)
@@ -1924,9 +1567,9 @@ void C_SyvDaItPaWidgetNew::m_UpdateReadAllowedFlag(const bool oq_NewValue)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get default file name proposition for specified layer
 
-   \param[in] ou32_ViewIndex   View index
-   \param[in] orc_Id           ID to get default file name for
-   \param[in] ou32_ValidLayers Layer in ID to get default file name for
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  orc_Id            ID to get default file name for
+   \param[in]  ou32_ValidLayers  Layer in ID to get default file name for
 
    \return
    Default file name proposition for specified layer
@@ -1961,8 +1604,8 @@ QString C_SyvDaItPaWidgetNew::mh_GetDefaultFileName(const uint32 ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get file name for index
 
-   \param[in] orc_Id     ID to get file for
-   \param[in] ou32_Value Index to get file for
+   \param[in]  orc_Id      ID to get file for
+   \param[in]  ou32_Value  Index to get file for
 
    \return
    Get Name for current file

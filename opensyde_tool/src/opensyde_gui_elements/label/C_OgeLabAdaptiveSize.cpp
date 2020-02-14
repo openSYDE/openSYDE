@@ -37,7 +37,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeLabAdaptiveSize::C_OgeLabAdaptiveSize(QWidget * const opc_Parent) :
@@ -68,7 +68,7 @@ void C_OgeLabAdaptiveSize::AdjustFontToSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adjust font to specific size
 
-   \param[in] orc_Size Size to adjust font to
+   \param[in]  orc_Size    Size to adjust font to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabAdaptiveSize::AdjustFontToSpecificSize(const QSize & orc_Size)
@@ -83,7 +83,7 @@ void C_OgeLabAdaptiveSize::AdjustFontToSpecificSize(const QSize & orc_Size)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set allow automated font adjust flag
 
-   \param[in] orc_Value New allow automated font adjust flag
+   \param[in]  oq_Value    New allow automated font adjust flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabAdaptiveSize::SetAllowAutomatedAdaptation(const bool oq_Value)
@@ -95,7 +95,7 @@ void C_OgeLabAdaptiveSize::SetAllowAutomatedAdaptation(const bool oq_Value)
 
    Here: adjust font to size
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabAdaptiveSize::showEvent(QShowEvent * const opc_Event)
@@ -112,7 +112,7 @@ void C_OgeLabAdaptiveSize::showEvent(QShowEvent * const opc_Event)
 
    Here: Adapt font
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabAdaptiveSize::resizeEvent(QResizeEvent * const opc_Event)
@@ -122,16 +122,4 @@ void C_OgeLabAdaptiveSize::resizeEvent(QResizeEvent * const opc_Event)
    {
       AdjustFontToSize();
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current font metrics
-
-   \return
-   Current font metrics
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QFontMetrics C_OgeLabAdaptiveSize::m_GetFontMetrics(void) const
-{
-   return QFontMetrics(mc_LastFont);
 }

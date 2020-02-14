@@ -43,7 +43,7 @@ public:
    C_PuiSvDbProgressBar();
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
-   virtual bool IsReadElement(void) const;
+   virtual bool IsReadElement(void) const override;
 
    E_Type e_Type;
    E_Alignment e_Alignment;

@@ -45,7 +45,7 @@ C_SdBueMessageRxList::C_SdBueMessageRxList(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageRxList),
    mu32_LastKnownCycleTimeValue(0),
-   mq_AlwaysHide(false),
+   mq_TxMethodOnEvent(false),
    mq_ModeSingleNode(false)
 {
    mpc_Ui->setupUi(this);
@@ -86,10 +86,12 @@ void C_SdBueMessageRxList::InitStaticNames(void) const
 /*! \brief   Add all entries
 
    \param[in] orc_EntryNames                 Entry name
-   \param[in] orc_NodeIndexes                Node index (ID)
-   \param[in] orc_InterfaceIndexes           Interface Index (ID)
-   \param[in] orc_UseAutoReceiveTimeoutFlags Flag whether to use auto receive timeout or custom
-   \param[in] orc_ReceiveTimeoutValues       Receive timeout value
+   \param[in] orc_EntryDatapoolNames         Entry Datapool names
+   \param[in] orc_NodeIndexes                Node indexes (ID)
+   \param[in] orc_InterfaceIndexes           Interface Indexes (ID)
+   \param[in] orc_DatapoolIndexes            Datapool Indexes (ID)
+   \param[in] orc_ReceiveTimeoutModes        Receive timeout modes
+   \param[in] orc_ReceiveTimeoutValues       Receive timeout values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
@@ -97,21 +99,21 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
                                     const std::vector<uint32> & orc_NodeIndexes,
                                     const std::vector<uint32> & orc_InterfaceIndexes,
                                     const std::vector<uint32> & orc_DatapoolIndexes,
-                                    const std::vector<bool> & orc_UseAutoReceiveTimeoutFlags,
+                                    const std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes,
                                     const std::vector<uint32> & orc_ReceiveTimeoutValues)
 {
    Clear();
    //Can happen at start up
    if ((orc_EntryNames.size() == orc_NodeIndexes.size()) &&
        (orc_EntryNames.size() == orc_InterfaceIndexes.size()) &&
-       (orc_EntryNames.size() == orc_UseAutoReceiveTimeoutFlags.size()) &&
+       (orc_EntryNames.size() == orc_ReceiveTimeoutModes.size()) &&
        (orc_EntryNames.size() == orc_ReceiveTimeoutValues.size()) &&
        (orc_EntryNames.size() == orc_EntryDatapoolNames.size()) &&
        (orc_EntryNames.size() == orc_DatapoolIndexes.size()))
    {
       std::vector<uint32> c_NodeDatapoolIndexes;
       std::vector<QString> c_NodeDatapoolNames;
-      std::vector<bool> c_UseAutoReceiveTimeoutFlags;
+      std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_ReceiveTimeoutModes;
       std::vector<uint32> c_ReceiveTimeoutValues;
 
       this->mc_Entries.reserve(orc_EntryNames.size());
@@ -122,7 +124,7 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
          // Collecting all Datapool specific information for each Node Rx message
          c_NodeDatapoolIndexes.push_back(orc_DatapoolIndexes[u32_ItEntry]);
          c_NodeDatapoolNames.push_back(orc_EntryDatapoolNames[u32_ItEntry]);
-         c_UseAutoReceiveTimeoutFlags.push_back(orc_UseAutoReceiveTimeoutFlags[u32_ItEntry]);
+         c_ReceiveTimeoutModes.push_back(orc_ReceiveTimeoutModes[u32_ItEntry]);
          c_ReceiveTimeoutValues.push_back(orc_ReceiveTimeoutValues[u32_ItEntry]);
 
          // Check if all Datapools associated for the same Node and same Rx message are collected
@@ -135,20 +137,20 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
             connect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeToggled, this, &C_SdBueMessageRxList::SigNodeToggled);
             connect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeReceiveTimeout, this,
                     &C_SdBueMessageRxList::SigNodeReceiveTimeout);
-            connect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeUseAutoReceiveTimeout, this,
-                    &C_SdBueMessageRxList::SigNodeUseAutoReceiveTimeout);
+            connect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeReceiveTimeoutMode, this,
+                    &C_SdBueMessageRxList::SigNodeReceiveTimeoutMode);
             pc_Entry->Init(orc_EntryNames[u32_ItEntry], orc_NodeIndexes[u32_ItEntry], orc_InterfaceIndexes[u32_ItEntry],
-                           c_UseAutoReceiveTimeoutFlags, c_ReceiveTimeoutValues, c_NodeDatapoolIndexes,
+                           c_ReceiveTimeoutModes, c_ReceiveTimeoutValues, c_NodeDatapoolIndexes,
                            c_NodeDatapoolNames, true);
             pc_Entry->SetLastKnownCycleTimeValue(this->mu32_LastKnownCycleTimeValue);
-            pc_Entry->SetAlwaysHideTimeout(this->mq_AlwaysHide);
+            pc_Entry->SetTxMethodOnEvent(this->mq_TxMethodOnEvent);
             this->mpc_Ui->pc_VerticalLayout->insertWidget(this->mpc_Ui->pc_VerticalLayout->count() - 1, pc_Entry);
             this->mc_Entries.push_back(pc_Entry);
 
             // Node with specific interface and all associated Datapools finished.
             c_NodeDatapoolIndexes.clear();
             c_NodeDatapoolNames.clear();
-            c_UseAutoReceiveTimeoutFlags.clear();
+            c_ReceiveTimeoutModes.clear();
             c_ReceiveTimeoutValues.clear();
          }
       }
@@ -191,20 +193,20 @@ void C_SdBueMessageRxList::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set flag to always hide timeout section
+/*! \brief   Set flag of Tx method on event
 
-   \param[in] oq_Hide Flag to always hide timeout section
+   \param[in] oq_TxMethodOnEvent   Flag if Tx message mode is on event
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxList::SetAlwaysHideTimeout(const bool oq_Hide)
+void C_SdBueMessageRxList::SetTxMethodOnEvent(const bool oq_TxMethodOnEvent)
 {
-   this->mq_AlwaysHide = oq_Hide;
+   this->mq_TxMethodOnEvent = oq_TxMethodOnEvent;
    for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       if (pc_Entry != NULL)
       {
-         pc_Entry->SetAlwaysHideTimeout(oq_Hide);
+         pc_Entry->SetTxMethodOnEvent(oq_TxMethodOnEvent);
       }
    }
 }
@@ -214,7 +216,7 @@ void C_SdBueMessageRxList::SetAlwaysHideTimeout(const bool oq_Hide)
 
    \param[in] orc_NodeIndexes      Node indexes (ID)
    \param[in] orc_InterfaceIndexes Interface Indexes (ID)
-   \param[in] orc_InterfaceIndexes Datapool Indexes (ID)
+   \param[in] orc_DatapoolIndexes  Datapool Indexes (ID)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::CheckNodes(const std::vector<uint32> & orc_NodeIndexes,
@@ -301,8 +303,8 @@ void C_SdBueMessageRxList::Clear(void)
       disconnect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeToggled, this, &C_SdBueMessageRxList::SigNodeToggled);
       disconnect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeReceiveTimeout, this,
                  &C_SdBueMessageRxList::SigNodeReceiveTimeout);
-      disconnect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeUseAutoReceiveTimeout, this,
-                 &C_SdBueMessageRxList::SigNodeUseAutoReceiveTimeout);
+      disconnect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeReceiveTimeoutMode, this,
+                 &C_SdBueMessageRxList::SigNodeReceiveTimeoutMode);
       this->mpc_Ui->pc_VerticalLayout->removeWidget(pc_Entry);
       pc_Entry->deleteLater();
    }

@@ -102,6 +102,9 @@ private:
    void m_HideBigUpdateSummary(void) const;
    void m_HideSmallUpdateSummary(void) const;
 
+   void m_LoadUserSettings(void);
+   void m_SaveUserSettings(void) const;
+
    QTimer mc_Timer;
    QElapsedTimer mc_ElapsedTimer;
    QWinTaskbarProgress * mpc_Progress;

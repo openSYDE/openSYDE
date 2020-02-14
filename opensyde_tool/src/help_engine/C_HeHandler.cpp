@@ -55,7 +55,7 @@ C_HeHandler & C_HeHandler::GetInstance(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call help for current widget
 
-   \param[in] opc_Widget Current widget
+   \param[in]  orc_ClassName   Class name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)

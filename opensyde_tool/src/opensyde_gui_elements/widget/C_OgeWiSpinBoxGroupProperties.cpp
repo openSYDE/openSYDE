@@ -43,5 +43,5 @@ using namespace stw_opensyde_gui_elements;
 C_OgeWiSpinBoxGroupProperties::C_OgeWiSpinBoxGroupProperties(QWidget * const opc_Parent) :
    C_OgeWiSpinBoxGroup(opc_Parent)
 {
-   m_ResizeToDefault();
+   m_Resize();
 }

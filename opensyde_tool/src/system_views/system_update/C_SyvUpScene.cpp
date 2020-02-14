@@ -576,6 +576,8 @@ bool C_SyvUpScene::IsAnyItemAddable(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is movable on the scene
 
+   \param[in]  opc_Item    Graphics item to check
+
    \return
    true     Item is movable
    false    Item is not movable
@@ -589,6 +591,8 @@ bool C_SyvUpScene::IsItemMovable(const QGraphicsItem * const opc_Item) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is selectable on the scene
+
+   \param[in]  opc_Item    Graphics item to check
 
    \return
    true     Item is selectable

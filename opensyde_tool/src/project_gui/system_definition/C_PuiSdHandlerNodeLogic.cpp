@@ -19,6 +19,7 @@
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "constants.h"
+#include "C_GtGetText.h"
 #include "C_PuiSdUtil.h"
 #include "C_PuiSdHandlerNodeLogic.h"
 
@@ -46,10 +47,10 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any node uses the provided name
 
-   \param[in]     orc_Name                  Node name to check for
-   \param[in]     opu32_NodeIndexToSkip     Optional parameter to skip one index
-                                            (Use-case: skip current node to avoid conflict with itself)
-   \param[in,out] opc_ExistingNames         Optional parameter to list all OTHER existing node names
+   \param[in]      orc_Name               Node name to check for
+   \param[in]      opu32_NodeIndexToSkip  Optional parameter to skip one index
+                                        (Use-case: skip current node to avoid conflict with itself)
+   \param[in,out]  opc_ExistingNames      Optional parameter to list all OTHER existing node names
 
    \return
    true  Available
@@ -96,8 +97,11 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeNameAvailable(const C_SCLString & orc_Nam
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node ethernet configuration
 
-   \param[in] ou32_NodeIndex      Node index
-   \param[in] ou32_InterfaceIndex Interface index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  orc_Ip               Ip address
+   \param[in]  orc_NetMask          Net mask
+   \param[in]  orc_DefaultGateway   Default gateway
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::SetOSCNodeEthernetConfiguration(const uint32 ou32_NodeIndex,
@@ -136,7 +140,7 @@ void C_PuiSdHandlerNodeLogic::SetOSCNodeEthernetConfiguration(const uint32 ou32_
 
    Get UI node from array
 
-   \param[in] ors32_Index Index
+   \param[in]  oru32_Index    Index
 
    \return
    NULL Data not found
@@ -163,7 +167,7 @@ const C_PuiSdNode * C_PuiSdHandlerNodeLogic::GetUINode(const uint32 & oru32_Inde
 
    Get OSC node from array
 
-   \param[in] ors32_Index Index
+   \param[in]  oru32_Index    Index
 
    \return
    NULL Data not found
@@ -190,8 +194,8 @@ const C_OSCNode * C_PuiSdHandlerNodeLogic::GetOSCNodeConst(const uint32 & oru32_
 
    Warning: this function might be time consuming
 
-   \param[in]  oru32_Index Node index (ID)
-   \param[out] orc_Node    Sorted node
+   \param[in]   oru32_Index   Node index (ID)
+   \param[out]  orc_Node      Sorted node
 
    \return
    C_NO_ERR Operation success
@@ -235,7 +239,7 @@ sint32 C_PuiSdHandlerNodeLogic::GetSortedOSCNodeConst(const uint32 & oru32_Index
 
    Get non const OSC node from array
 
-   \param[in] ors32_Index Index
+   \param[in]  oru32_Index    Index
 
    \return
    NULL Data not found
@@ -260,8 +264,8 @@ C_OSCNode * C_PuiSdHandlerNodeLogic::GetOSCNode(const uint32 & oru32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set STW flashloader settings
 
-   \param[in] ou32_Index   Node index
-   \param[in] orc_Settings Settings
+   \param[in]  ou32_Index     Node index
+   \param[in]  orc_Settings   Settings
 
    \return
    C_NO_ERR Operation success
@@ -288,8 +292,8 @@ sint32 C_PuiSdHandlerNodeLogic::SetStwFlashloaderSettings(const uint32 ou32_Inde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node openSYDE server settings
 
-   \param[in] ou32_Index   Node index
-   \param[in] orc_Settings Settings
+   \param[in]  ou32_Index     Node index
+   \param[in]  orc_Settings   Settings
 
    \return
    C_NO_ERR Operation success
@@ -316,8 +320,8 @@ sint32 C_PuiSdHandlerNodeLogic::SetNodeOpenSYDEServerSettings(const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply node properties
 
-   \param[in] ou32_NodeIndex Node index
-   \param[in] orc_Properties New properties
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_Properties    New properties
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::SetOSCNodeProperties(const uint32 ou32_NodeIndex,
@@ -335,15 +339,15 @@ void C_PuiSdHandlerNodeLogic::SetOSCNodeProperties(const uint32 ou32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply node properties
 
-   \param[in] ou32_NodeIndex      Node index
-   \param[in] orc_Name            New name
-   \param[in] orc_Comment         New comment
-   \param[in] oe_DiagnosticServer New diagnostic server
-   \param[in] oe_FlashLoader      New flash loader
-   \param[in] orc_NodeIds         New node IDs
-   \param[in] orc_UpdateFlags     New update active flags
-   \param[in] orc_RoutingFlags    New routing active flags
-   \param[in] orc_DiagnosisFlags  New diagnosis active flags
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  orc_Name             New name
+   \param[in]  orc_Comment          New comment
+   \param[in]  oe_DiagnosticServer  New diagnostic server
+   \param[in]  oe_FlashLoader       New flash loader
+   \param[in]  orc_NodeIds          New node IDs
+   \param[in]  orc_UpdateFlags      New update active flags
+   \param[in]  orc_RoutingFlags     New routing active flags
+   \param[in]  orc_DiagnosisFlags   New diagnosis active flags
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::SetOSCNodePropertiesDetailed(const uint32 ou32_NodeIndex, const QString & orc_Name,
@@ -380,8 +384,8 @@ void C_PuiSdHandlerNodeLogic::SetOSCNodePropertiesDetailed(const uint32 ou32_Nod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set UI node box
 
-   \param[in] ou32_NodeIndex Node index
-   \param[in] orc_Box        Box data
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_Box           Box data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::SetUINodeBox(const uint32 ou32_NodeIndex, const C_PuiBsBox & orc_Box)
@@ -400,8 +404,8 @@ void C_PuiSdHandlerNodeLogic::SetUINodeBox(const uint32 ou32_NodeIndex, const C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add node
 
-   \param[in,out] orc_OSCNode   New OSC node (name might be modified by this function if not unique)
-   \param[in,out] orc_UINode    New UI node
+   \param[in,out]  orc_OSCNode   New OSC node (name might be modified by this function if not unique)
+   \param[in,out]  orc_UINode    New UI node
 
    \return
    Index of node  (0 -> first node)
@@ -437,7 +441,7 @@ uint32 C_PuiSdHandlerNodeLogic::AddNodeAndSort(C_OSCNode & orc_OSCNode, const C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove node
 
-   \param[in]   ou32_NodeIndex   Connector node index (0 -> first node)
+   \param[in]  ou32_NodeIndex    Connector node index (0 -> first node)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::RemoveNode(const uint32 ou32_NodeIndex)
@@ -458,8 +462,7 @@ void C_PuiSdHandlerNodeLogic::RemoveNode(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if there is a node conflict
 
-   \param[in]     oru32_NodeIndex Node index
-   \param[in,out] opc_NameMap     Optional map to use for name conflict check
+   \param[in]  oru32_NodeIndex   Node index
 
    \return
    true  Conflict
@@ -556,8 +559,8 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
 
    If no nodes are available, all CAN bitrates will be supported.
 
-   \param[in]     orc_Nodes         Vector with all relevant node indexes
-   \param[out]    orc_Bitrates      Result vector with all supported CAN bitrates
+   \param[in]   orc_Nodes     Vector with all relevant node indexes
+   \param[out]  orc_Bitrates  Result vector with all supported CAN bitrates
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::GetSupportedCanBitrates(const std::vector<uint32> & orc_Nodes,
@@ -625,6 +628,9 @@ void C_PuiSdHandlerNodeLogic::GetSupportedCanBitrates(const std::vector<uint32> 
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get OSC Nodes size
+
+   \return
+   total number of nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_PuiSdHandlerNodeLogic::GetOSCNodesSize(void) const
@@ -637,9 +643,9 @@ stw_types::uint32 C_PuiSdHandlerNodeLogic::GetOSCNodesSize(void) const
 
    Warning: not performance optimized so the output is clear
 
-   \param[in,out] opc_CriticalNodeNames              Conflicting node names
-   \param[in,out] opc_CriticalBusNames               Conflicting bus names
-   \param[in,out] opc_CriticalDatapoolNamespaceNames Conflicting datapool names
+   \param[in,out]  opc_CriticalNodeNames                 Conflicting node names
+   \param[in,out]  opc_CriticalBusNames                  Conflicting bus names
+   \param[in,out]  opc_CriticalDatapoolNamespaceNames    Conflicting datapool names
 
    \return
    True  Critical name conflict detected
@@ -745,12 +751,12 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add data pool
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] orc_OSCContent          OSC data pool content (name might be modified by this function if not unique)
-   \param[in] orc_UIContent           UI data pool content
-   \param[in] ore_ComProtocolType     Optional parameter for com protocol type
-   \param[in] orq_AllowNameAdaptation Optional parameter to disable automatic name adaptation
-   \param[in] orq_AllowDataAdaptation Optional parameter to disable automatic data adaptation
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  orc_OSCContent             OSC data pool content (name might be modified by this function if not unique)
+   \param[in]  orc_UIContent              UI data pool content
+   \param[in]  ore_ComProtocolType        Optional parameter for com protocol type
+   \param[in]  orq_AllowNameAdaptation    Optional parameter to disable automatic name adaptation
+   \param[in]  orq_AllowDataAdaptation    Optional parameter to disable automatic data adaptation
 
    \return
    C_NO_ERR OK
@@ -815,15 +821,58 @@ sint32 C_PuiSdHandlerNodeLogic::AddDataPool(const uint32 & oru32_NodeIndex, cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create and add automatically generated COMM Datapool
+
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  ore_ComProtocolType  Optional parameter for com protocol type
+
+   \return
+   C_NO_ERR OK
+   C_RANGE  Something out of range
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerNodeLogic::AddAutoGenCommDataPool(const uint32 & oru32_NodeIndex,
+                                                       const C_OSCCanProtocol::E_Type & ore_ComProtocolType)
+{
+   C_OSCNodeDataPool c_NewDatapool;
+   C_PuiSdNodeDataPool c_UIDataPool;
+   sint32 s32_Return;
+   QString c_Comment;
+   QString c_ProtocolName = C_PuiSdUtil::h_ConvertProtocolTypeToString(ore_ComProtocolType);
+
+   // add the new datapool
+   c_NewDatapool.e_Type = C_OSCNodeDataPool::eCOM;
+
+   c_Comment = C_GtGetText::h_GetText("Automatically generated Datapool for ");
+   c_Comment += c_ProtocolName;
+   c_Comment += C_GtGetText::h_GetText(" CAN communication");
+
+   // special case layer 2 -> no spaces and no underscore number at the end
+   c_ProtocolName = C_PuiSdUtil::h_ConvertProtocolTypeToDatapoolNameString(ore_ComProtocolType);
+
+   c_NewDatapool.c_Name = this->GetUniqueDataPoolName(oru32_NodeIndex, c_ProtocolName.toStdString().c_str());
+
+   c_NewDatapool.c_Comment = c_Comment.toStdString().c_str();
+
+   // set the default safety flag to true if protocol is a safety protocol
+   c_NewDatapool.q_IsSafety = ((ore_ComProtocolType == C_OSCCanProtocol::eCAN_OPEN_SAFETY) ||
+                               (ore_ComProtocolType == C_OSCCanProtocol::eECES));
+
+   s32_Return = this->AddDataPool(oru32_NodeIndex, c_NewDatapool, c_UIDataPool, ore_ComProtocolType);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert data pool at specific position
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Data pool index
-   \param[in] orc_OSCContent          OSC data pool content (name might be modified by this function if not unique)
-   \param[in] orc_UIContent           UI data pool content
-   \param[in] ore_ComProtocolType     Optional parameter for com protocol type
-   \param[in] orq_AllowNameAdaptation Optional parameter to disable automatic name adaptation
-   \param[in] orq_AllowDataAdaptation Optional parameter to disable automatic data adaptation
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  orc_OSCContent             OSC data pool content (name might be modified by this function if not unique)
+   \param[in]  orc_UIContent              UI data pool content
+   \param[in]  ore_ComProtocolType        Optional parameter for com protocol type
+   \param[in]  orq_AllowNameAdaptation    Optional parameter to disable automatic name adaptation
+   \param[in]  orq_AllowDataAdaptation    Optional parameter to disable automatic data adaptation
 
    \return
    C_NO_ERR OK
@@ -883,8 +932,8 @@ sint32 C_PuiSdHandlerNodeLogic::InsertDataPool(const uint32 & oru32_NodeIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove data pool
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
 
    \return
    C_NO_ERR OK
@@ -932,12 +981,12 @@ sint32 C_PuiSdHandlerNodeLogic::RemoveDataPool(const uint32 & oru32_NodeIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] oru32_DataPoolIndex   Data pool index
-   \param[in] orc_OSCContent        OSC data pool content
-   \param[in] orc_UIContent         UI data pool content
-   \param[in] oq_NewComProtocolType Flag if the COM protocol type was changed
-   \param[in] ore_ComProtocolType   Optional parameter for com protocol type
+   \param[in]  oru32_NodeIndex         Node index
+   \param[in]  oru32_DataPoolIndex     Data pool index
+   \param[in]  orc_OSCContent          OSC data pool content
+   \param[in]  orc_UIContent           UI data pool content
+   \param[in]  oq_NewComProtocolType   Flag if the COM protocol type was changed
+   \param[in]  ore_ComProtocolType     Optional parameter for com protocol type
 
    \return
    C_NO_ERR OK
@@ -1006,8 +1055,8 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPool(const uint32 & oru32_NodeIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Unassign data pool application
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
 
    \return
    C_NO_ERR Operation success
@@ -1043,9 +1092,9 @@ sint32 C_PuiSdHandlerNodeLogic::UnassignDataPoolApplication(const uint32 & oru32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Assign data pool application
 
-   \param[in] oru32_NodeIndex        Node index
-   \param[in] oru32_DataPoolIndex    Data pool index
-   \param[in] ors32_ApplicationIndex Application index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_DataPoolIndex      Data pool index
+   \param[in]  os32_ApplicationIndex   Application index
 
    \return
    C_NO_ERR Operation success
@@ -1081,10 +1130,10 @@ sint32 C_PuiSdHandlerNodeLogic::AssignDataPoolApplication(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data pool
 
-   \param[in]  oru32_NodeIndex     Node index
-   \param[in]  oru32_DataPoolIndex Data pool index
-   \param[out] orc_OSCContent      OSC data pool content
-   \param[out] orc_UIContent       UI data pool content
+   \param[in]   oru32_NodeIndex        Node index
+   \param[in]   oru32_DataPoolIndex    Data pool index
+   \param[out]  orc_OSCContent         OSC data pool content
+   \param[out]  orc_UIContent          UI data pool content
 
    \return
    C_NO_ERR OK
@@ -1117,8 +1166,8 @@ sint32 C_PuiSdHandlerNodeLogic::GetDataPool(const uint32 & oru32_NodeIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get unique data pool name based on proposal
 
-   \param[in] oru32_NodeIndex Node index
-   \param[in] orc_Proposal    Data pool name proposal
+   \param[in]  oru32_NodeIndex   Node index
+   \param[in]  orc_Proposal      Data pool name proposal
 
    \return
    Unique data pool name based on proposal
@@ -1133,8 +1182,8 @@ C_SCLString C_PuiSdHandlerNodeLogic::GetUniqueDataPoolName(const uint32 & oru32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get OSC data pool
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
 
    \return
    Found: Pointer to OSC data pool
@@ -1162,8 +1211,8 @@ const C_OSCNodeDataPool * C_PuiSdHandlerNodeLogic::GetOSCDataPool(const uint32 &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get UI data pool
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
 
    \return
    Found: Pointer to UI data pool
@@ -1191,9 +1240,9 @@ const C_PuiSdNodeDataPool * C_PuiSdHandlerNodeLogic::GetUIDataPool(const uint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data pool type
 
-   \param[in]  oru32_NodeIndex     Node index
-   \param[in]  oru32_DataPoolIndex Data pool index
-   \param[out] ore_Type            OSC data pool type
+   \param[in]   oru32_NodeIndex        Node index
+   \param[in]   oru32_DataPoolIndex    Data pool index
+   \param[out]  ore_Type               OSC data pool type
 
    \return
    C_NO_ERR OK
@@ -1229,9 +1278,9 @@ sint32 C_PuiSdHandlerNodeLogic::GetDataPoolType(const uint32 & oru32_NodeIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move datapool in node
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_SourceIndex   Source list index
-   \param[in] ou32_TargetIndex   Target list index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_SourceIndex  Source list index
+   \param[in]  ou32_TargetIndex  Target list index
 
    \return
    C_NO_ERR OK
@@ -1280,9 +1329,9 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPool(const uint32 ou32_NodeIndex, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get datapool index by type specific datapool index
 
-   \param[in] ou32_NodeIndex           Node index
-   \param[in] oe_DataPoolType          Type of datapool
-   \param[in] ou32_DataPoolTypeIndex   Type specific index of datapool
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  oe_DataPoolType         Type of datapool
+   \param[in]  ou32_DataPoolTypeIndex  Type specific index of datapool
 
    \return
    if datapool is found: zero based index
@@ -1309,11 +1358,11 @@ sint32 C_PuiSdHandlerNodeLogic::GetDataPoolIndex(const uint32 ou32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any data pool uses the provided name
 
-   \param[in]     oru32_NodeIndex           Node index
-   \param[in]     orc_Name                  Data pool name to check for
-   \param[in]     opu32_DataPoolIndexToSkip Optional parameter to skip one index
-                                            (Use-case: skip current data pool to avoid conflict with itself)
-   \param[in,out] opc_ExistingDatapoolNames Optional parameter to list all OTHER existing datapool names
+   \param[in]      oru32_NodeIndex              Node index
+   \param[in]      orc_Name                     Data pool name to check for
+   \param[in]      opu32_DataPoolIndexToSkip    Optional parameter to skip one index
+                                                (Use-case: skip current data pool to avoid conflict with itself)
+   \param[in,out]  opc_ExistingDatapoolNames    Optional parameter to list all OTHER existing datapool names
 
    \return
    true  Available
@@ -1365,7 +1414,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check all NVM datapools of a node for size error
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_NodeIndex    Node index
 
    \return
    true  Conflict
@@ -1428,8 +1477,8 @@ const C_PuiSdSharedDatapools & C_PuiSdHandlerNodeLogic::GetSharedDatapoolsConst(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add application
 
-   \param[in]     ou32_NodeIndex Node index
-   \param[in,out] orc_OSCContent Application content (Name might get changed)
+   \param[in]      ou32_NodeIndex   Node index
+   \param[in,out]  orc_OSCContent   Application content (Name might get changed)
 
    \return
    C_NO_ERR OK
@@ -1455,9 +1504,9 @@ sint32 C_PuiSdHandlerNodeLogic::AddApplication(const uint32 ou32_NodeIndex, C_OS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert application at specific position
 
-   \param[in]     oru32_NodeIndex       Node index
-   \param[in]     ou32_ApplicationIndex Application index
-   \param[in,out] orc_OSCContent        Application content (Name might get changed)
+   \param[in]      ou32_NodeIndex         Node index
+   \param[in]      ou32_ApplicationIndex  Application index
+   \param[in,out]  orc_OSCContent         Application content (Name might get changed)
 
    \return
    C_NO_ERR OK
@@ -1496,8 +1545,8 @@ sint32 C_PuiSdHandlerNodeLogic::InsertApplication(const uint32 ou32_NodeIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove application
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
 
    \return
    C_NO_ERR OK
@@ -1535,9 +1584,9 @@ sint32 C_PuiSdHandlerNodeLogic::RemoveApplication(const uint32 ou32_NodeIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set application
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] ou32_ApplicationIndex Application index
-   \param[in] orc_OSCContent        Application content
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
+   \param[in]  orc_OSCContent          Application content
 
    \return
    C_NO_ERR OK
@@ -1573,8 +1622,8 @@ sint32 C_PuiSdHandlerNodeLogic::SetApplication(const uint32 ou32_NodeIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get application
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
 
    \return
    NULL Application not found
@@ -1600,9 +1649,9 @@ const C_OSCNodeApplication * C_PuiSdHandlerNodeLogic::GetApplication(const uint3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move application in node
 
-   \param[in] ou32_NodeIndex   Node index
-   \param[in] ou32_SourceIndex Source application index
-   \param[in] ou32_TargetIndex Target application index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_SourceIndex  Source application index
+   \param[in]  ou32_TargetIndex  Target application index
 
    \return
    C_NO_ERR OK
@@ -1641,8 +1690,8 @@ sint32 C_PuiSdHandlerNodeLogic::MoveApplication(const uint32 ou32_NodeIndex, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get unique application name based on proposal
 
-   \param[in] oru32_NodeIndex Node index
-   \param[in] orc_Proposal    Application name proposal
+   \param[in]  oru32_NodeIndex   Node index
+   \param[in]  orc_Proposal      Application name proposal
 
    \return
    Unique application name based on proposal
@@ -1657,7 +1706,8 @@ C_SCLString C_PuiSdHandlerNodeLogic::GetUniqueApplicationName(const uint32 & oru
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get next unique application process ID
 
-   \param[in]  ou32_NodeIndex  Node index (ID)
+   \param[in]  ou32_NodeIndex    Node index (ID)
+   \param[in]  ou8_Proposal      Proposal
 
    \return
    Next unique application process ID
@@ -1723,8 +1773,8 @@ uint8 C_PuiSdHandlerNodeLogic::GetUniqueApplicationProcessId(const uint32 ou32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle automated programmable application assignment
 
-   \param[in]     ou32_NodeIndex         Node index (ID)
-   \param[in,out] ors32_ApplicationIndex Application index, which is adapted if necessary
+   \param[in]      ou32_NodeIndex            Node index (ID)
+   \param[in,out]  ors32_ApplicationIndex    Application index, which is adapted if necessary
 
    \return
    C_NO_ERR Operation success
@@ -1783,10 +1833,10 @@ sint32 C_PuiSdHandlerNodeLogic::GetNextProgrammableApplicationIndex(const uint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check application name valid
 
-   \param[in]  ou32_NodeIndex        Node index
-   \param[in]  orc_ApplicationName   Application name to check
-   \param[out] orq_Valid             Function result: flag if name is valid
-   \param[in]  opu32_SkipApplication Optional parameter to skip one application index
+   \param[in]   ou32_NodeIndex         Node index
+   \param[in]   orc_ApplicationName    Application name to check
+   \param[out]  orq_Valid              Function result: flag if name is valid
+   \param[in]   opu32_SkipApplication  Optional parameter to skip one application index
 
    \return
    C_NO_ERR Operation success
@@ -1834,7 +1884,7 @@ sint32 C_PuiSdHandlerNodeLogic::CheckApplicationName(const uint32 ou32_NodeIndex
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all programmable applications for one node
 
-   \param[in] ou32_NodeIndex Node index (ID)
+   \param[in]  ou32_NodeIndex    Node index (ID)
 
    \return
    All known programmable applications for this node (empty if index invalid)
@@ -1862,7 +1912,7 @@ std::vector<const C_OSCNodeApplication *> C_PuiSdHandlerNodeLogic::GetProgrammab
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all indices of programmable applications for one node
 
-   \param[in] ou32_NodeIndex Node index (ID)
+   \param[in]  ou32_NodeIndex    Node index (ID)
 
    \return
    All known programmable applications for this node (empty if index invalid)
@@ -1889,13 +1939,13 @@ std::vector<uint32> C_PuiSdHandlerNodeLogic::GetProgrammableAppIndices(const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert data pool list at specific position
 
-   \param[in] oru32_NodeIndex          Node index
-   \param[in] oru32_DataPoolIndex      Data pool index
-   \param[in] oru32_DataPoolListIndex  Data pool list index
-   \param[in] orc_OSCContent           OSC data pool list content
-                                       (name might be modified by this function if not unique)
-   \param[in] orc_UIContent            UI data pool list content
-   \param[in] oq_HandleSharedDatapools Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  orc_OSCContent             OSC data pool list content
+                                        (name might be modified by this function if not unique)
+   \param[in]  orc_UIContent              UI data pool list content
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -1995,10 +2045,10 @@ sint32 C_PuiSdHandlerNodeLogic::InsertDataPoolList(const uint32 & oru32_NodeInde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove data pool list
 
-   \param[in] oru32_NodeIndex          Node index
-   \param[in] oru32_DataPoolIndex      Data pool index
-   \param[in] oru32_DataPoolListIndex  Data pool list index
-   \param[in] oq_HandleSharedDatapools Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -2077,12 +2127,12 @@ sint32 C_PuiSdHandlerNodeLogic::RemoveDataPoolList(const uint32 & oru32_NodeInde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list
 
-   \param[in] oru32_NodeIndex          Node index
-   \param[in] oru32_DataPoolIndex      Data pool index
-   \param[in] oru32_DataPoolListIndex  Data pool list index
-   \param[in] orc_OSCContent           OSC data pool list content
-   \param[in] orc_UIContent            UI data pool list content
-   \param[in] oq_HandleSharedDatapools Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  orc_OSCContent             OSC data pool list content
+   \param[in]  orc_UIContent              UI data pool list content
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -2172,11 +2222,11 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolList(const uint32 & oru32_NodeIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list name
 
-   \param[in] oru32_NodeIndex          Node index
-   \param[in] oru32_DataPoolIndex      Data pool index
-   \param[in] oru32_DataPoolListIndex  Data pool list index
-   \param[in] orc_Value                New value
-   \param[in] oq_HandleSharedDatapools Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  orc_Value                  New value
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -2256,11 +2306,11 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListName(const uint32 & oru32_NodeInd
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list comment
 
-   \param[in] oru32_NodeIndex          Node index
-   \param[in] oru32_DataPoolIndex      Data pool index
-   \param[in] oru32_DataPoolListIndex  Data pool list index
-   \param[in] orc_Value                New value
-   \param[in] oq_HandleSharedDatapools Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  orc_Value                  New value
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -2341,11 +2391,11 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListComment(const uint32 & oru32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list nvm size
 
-   \param[in] oru32_NodeIndex          Node index
-   \param[in] oru32_DataPoolIndex      Data pool index
-   \param[in] oru32_DataPoolListIndex  Data pool list index
-   \param[in] ou32_Value               New value
-   \param[in] oq_HandleSharedDatapools Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  ou32_Value                 New value
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -2426,11 +2476,14 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListNVMSize(const uint32 & oru32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list nvm crc flag
 
-   \param[in] oru32_NodeIndex          Node index
-   \param[in] oru32_DataPoolIndex      Data pool index
-   \param[in] oru32_DataPoolListIndex  Data pool list index
-   \param[in] oq_Value                 New value
-   \param[in] oq_HandleSharedDatapools Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  oq_Value                   New value
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
+
+   \retval C_NO_ERR  everything ok
+   \retval C_RANGE   one of provided indices is out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListNVMCRC(const uint32 & oru32_NodeIndex,
@@ -2507,11 +2560,11 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListNVMCRC(const uint32 & oru32_NodeI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data pool list
 
-   \param[in]  oru32_NodeIndex         Node index
-   \param[in]  oru32_DataPoolIndex     Data pool index
-   \param[in]  oru32_DataPoolListIndex Data pool list index
-   \param[out] orc_OSCContent          OSC data pool list content
-   \param[out] orc_UIContent           UI data pool list content
+   \param[in]   oru32_NodeIndex           Node index
+   \param[in]   oru32_DataPoolIndex       Data pool index
+   \param[in]   oru32_DataPoolListIndex   Data pool list index
+   \param[out]  orc_OSCContent            OSC data pool list content
+   \param[out]  orc_UIContent             UI data pool list content
 
    \return
    C_NO_ERR OK
@@ -2547,12 +2600,12 @@ sint32 C_PuiSdHandlerNodeLogic::GetDataPoolList(const uint32 & oru32_NodeIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data pool list data set
 
-   \param[in]  oru32_NodeIndex                Node index
-   \param[in]  oru32_DataPoolIndex            Data pool index
-   \param[in]  oru32_DataPoolListIndex        Data pool list index
-   \param[in]  oru32_DataPoolListDataSetIndex Data pool list data set index
-   \param[out] orc_OSCName                    OSC data set name
-   \param[out] orc_OSCValues                  OSC data set values
+   \param[in]   oru32_NodeIndex                 Node index
+   \param[in]   oru32_DataPoolIndex             Data pool index
+   \param[in]   oru32_DataPoolListIndex         Data pool list index
+   \param[in]   oru32_DataPoolListDataSetIndex  Data pool list data set index
+   \param[out]  orc_OSCName                     OSC data set name
+   \param[out]  orc_OSCValues                   OSC data set values
 
    \return
    C_NO_ERR OK
@@ -2607,10 +2660,10 @@ sint32 C_PuiSdHandlerNodeLogic::GetDataPoolListDataSet(const uint32 & oru32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get OSC data pool list data set
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListDataSetIndex Data pool list data set index
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListDataSetIndex   Data pool list data set index
 
    \return
    Found: Pointer to OSC data pool list data set
@@ -2641,12 +2694,12 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list data set
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListDataSetIndex Data pool list data set index
-   \param[in] orc_OSCContent                 OSC data pool list element content
-   \param[in] oq_HandleSharedDatapools       Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListDataSetIndex   Data pool list data set index
+   \param[in]  orc_OSCContent                   OSC data pool list element content
+   \param[in]  oq_HandleSharedDatapools         Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -2731,14 +2784,14 @@ sint32 C_PuiSdHandlerNodeLogic::SetOSCNodeDataPoolDataSet(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert data pool list data set at specific position
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListDataSetIndex Data pool list data set index
-   \param[in] orc_OSCName                    OSC data pool list data set name
-                                             (name might be modified by this function if not unique)
-   \param[in] orc_OSCValues                  OSC data pool list data set values
-   \param[in] oq_HandleSharedDatapools       Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListDataSetIndex   Data pool list data set index
+   \param[in]  orc_OSCName                      OSC data pool list data set name
+                                              (name might be modified by this function if not unique)
+   \param[in]  orc_OSCValues                    OSC data pool list data set values
+   \param[in]  oq_HandleSharedDatapools         Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -2854,11 +2907,11 @@ sint32 C_PuiSdHandlerNodeLogic::InsertDataPoolListDataSet(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove data pool list data set
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListDataSetIndex Data pool list data set index
-   \param[in] oq_HandleSharedDatapools       Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListDataSetIndex   Data pool list data set index
+   \param[in]  oq_HandleSharedDatapools         Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -2961,12 +3014,12 @@ sint32 C_PuiSdHandlerNodeLogic::RemoveDataPoolListDataSet(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move data set in node data pool list
 
-   \param[in] oru32_NodeIndex             Node index
-   \param[in] oru32_DataPoolIndex         Data pool index
-   \param[in] oru32_DataPoolListIndex     Data pool list index
-   \param[in] oru32_SourceIndex           Source data set index
-   \param[in] oru32_TargetIndex           Target data set index
-   \param[in] oq_HandleSharedDatapools    Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  oru32_SourceIndex          Source data set index
+   \param[in]  oru32_TargetIndex          Target data set index
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -3082,9 +3135,9 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPoolListDataSet(const uint32 & oru32_Nod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get OSC data pool list
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Data pool index
-   \param[in] oru32_DataPoolListIndex Data pool list index
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
 
    \return
    Found: Pointer to OSC data pool list
@@ -3112,9 +3165,9 @@ const C_OSCNodeDataPoolList * C_PuiSdHandlerNodeLogic::GetOSCDataPoolList(const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get UI data pool list
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Data pool index
-   \param[in] oru32_DataPoolListIndex Data pool list index
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
 
    \return
    Found: Pointer to UI data pool list
@@ -3142,11 +3195,11 @@ const C_PuiSdNodeDataPoolList * C_PuiSdHandlerNodeLogic::GetUIDataPoolList(const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move list in node data pool
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
-   \param[in] oru32_SourceIndex   Source list index
-   \param[in] oru32_TargetIndex   Target list index
-   \param[in] oq_HandleSharedDatapools    Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_SourceIndex          Source list index
+   \param[in]  oru32_TargetIndex          Target list index
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -3224,11 +3277,11 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPoolList(const uint32 & oru32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any list uses the provided name
 
-   \param[in] oru32_NodeIndex               Node index
-   \param[in] oru32_DataPoolIndex           Data pool index
-   \param[in] orc_Name                      Data pool list name to check for
-   \param[in] opu32_DataPoolListIndexToSkip Optional parameter to skip one index
-                                            (Use-case: skip current data pool list to avoid conflict with itself)
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  orc_Name                         Data pool list name to check for
+   \param[in]  opu32_DataPoolListIndexToSkip    Optional parameter to skip one index
+                                                (Use-case: skip current data pool list to avoid conflict with itself)
 
    \return
    true  Available
@@ -3273,13 +3326,13 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any list data set uses the provided name
 
-   \param[in] oru32_NodeIndex                      Node index
-   \param[in] oru32_DataPoolIndex                  Data pool index
-   \param[in] oru32_ListIndex                      List index
-   \param[in] orc_Name                             Data pool list data set name to check for
-   \param[in] opu32_DataPoolListDataSetIndexToSkip Optional parameter to skip one index
-                                                   (Use-case: skip current data pool list data set
-                                                    to avoid conflict with itself)
+   \param[in]  oru32_NodeIndex                        Node index
+   \param[in]  oru32_DataPoolIndex                    Data pool index
+   \param[in]  oru32_ListIndex                        List index
+   \param[in]  orc_Name                               Data pool list data set name to check for
+   \param[in]  opu32_DataPoolListDataSetIndexToSkip   Optional parameter to skip one index
+                                                      (Use-case: skip current data pool list data set
+                                                      to avoid conflict with itself)
 
    \return
    true  Available
@@ -3326,11 +3379,11 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reserve data pool list elements section
 
-   \param[in] oru32_NodeIndex          Node index
-   \param[in] oru32_DataPoolIndex      Data pool index
-   \param[in] oru32_DataPoolListIndex  Data pool list index
-   \param[in] oru32_AdditionalElements Number of additional elements to reserve for
-   \param[in] oq_HandleSharedDatapools Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  oru32_AdditionalElements   Number of additional elements to reserve for
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -3421,14 +3474,14 @@ sint32 C_PuiSdHandlerNodeLogic::ReserveDataPoolListElements(const uint32 & oru32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert data pool list elements at specific position
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListElementIndex Data pool list element index
-   \param[in] orc_OSCContent                 OSC data pool list element content
-                                             (name might be modified by this function if not unique)
-   \param[in] orc_UIContent                  UI data pool list element content
-   \param[in] oq_HandleSharedDatapools       Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
+   \param[in]  orc_OSCContent                   OSC data pool list element content
+                                                (name might be modified by this function if not unique)
+   \param[in]  orc_UIContent                    UI data pool list element content
+   \param[in]  oq_HandleSharedDatapools         Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -3544,11 +3597,11 @@ sint32 C_PuiSdHandlerNodeLogic::InsertDataPoolListElement(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove data pool list element
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListElementIndex Data pool list element index
-   \param[in] oq_HandleSharedDatapools       Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
+   \param[in]  oq_HandleSharedDatapools         Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -3646,13 +3699,13 @@ sint32 C_PuiSdHandlerNodeLogic::RemoveDataPoolListElement(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list element
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListElementIndex Data pool list element index
-   \param[in] orc_OSCContent                 OSC data pool list element content
-   \param[in] orc_UIContent                  UI data pool list element content
-   \param[in] oq_HandleSharedDatapools       Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
+   \param[in]  orc_OSCContent                   OSC data pool list element content
+   \param[in]  orc_UIContent                    UI data pool list element content
+   \param[in]  oq_HandleSharedDatapools         Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -3771,12 +3824,12 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElement(const uint32 & oru32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data pool list element
 
-   \param[in]  oru32_NodeIndex                Node index
-   \param[in]  oru32_DataPoolIndex            Data pool index
-   \param[in]  oru32_DataPoolListIndex        Data pool list index
-   \param[in]  oru32_DataPoolListElementIndex Data pool list element index
-   \param[out] orc_OSCContent                 OSC data pool list element content
-   \param[out] orc_UIContent                  UI data pool list element content
+   \param[in]   oru32_NodeIndex                 Node index
+   \param[in]   oru32_DataPoolIndex             Data pool index
+   \param[in]   oru32_DataPoolListIndex         Data pool list index
+   \param[in]   oru32_DataPoolListElementIndex  Data pool list element index
+   \param[out]  orc_OSCContent                  OSC data pool list element content
+   \param[out]  orc_UIContent                   UI data pool list element content
 
    \return
    C_NO_ERR OK
@@ -3816,9 +3869,9 @@ sint32 C_PuiSdHandlerNodeLogic::GetDataPoolListElement(const uint32 & oru32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize data element name & comment
 
-   \param[in]     ore_Type       Data pool type
-   \param[in]     oq_IsSafety    Flag if datapool is safety datapool
-   \param[in,out] orc_OSCElement Data element
+   \param[in]      ore_Type         Data pool type
+   \param[in]      oq_IsSafety      Flag if datapool is safety datapool
+   \param[in,out]  orc_OSCElement   Data element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::h_InitDataElement(const C_OSCNodeDataPool::E_Type & ore_Type, const bool oq_IsSafety,
@@ -3851,7 +3904,10 @@ void C_PuiSdHandlerNodeLogic::h_InitDataElement(const C_OSCNodeDataPool::E_Type 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data pool type dependent element name
 
-   \param[in] ore_Type Data pool type
+   \param[in]  ore_Type    Data pool type
+
+   \return
+   Datapool type element name as string
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSdHandlerNodeLogic::h_GetElementTypeName(const C_OSCNodeDataPool::E_Type & ore_Type)
@@ -3869,6 +3925,7 @@ QString C_PuiSdHandlerNodeLogic::h_GetElementTypeName(const C_OSCNodeDataPool::E
    case C_OSCNodeDataPool::eCOM:
       c_Retval = "Signal";
       break;
+   case C_OSCNodeDataPool::eHALC:
    default:
       c_Retval = "Data Element";
       break;
@@ -3879,13 +3936,13 @@ QString C_PuiSdHandlerNodeLogic::h_GetElementTypeName(const C_OSCNodeDataPool::E
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list element min array value
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListElementIndex Data pool list element index
-   \param[in] oru32_ArrayIndex               Array index
-   \param[in] orc_OSCContent                 New value (Expected: No array & same type as in element)
-   \param[in] oq_HandleSharedDatapools       Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
+   \param[in]  oru32_ArrayIndex                 Array index
+   \param[in]  orc_OSCContent                   New value (Expected: No array & same type as in element)
+   \param[in]  oq_HandleSharedDatapools         Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -4017,13 +4074,13 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElementMinArray(const uint32 & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list element max array value
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListElementIndex Data pool list element index
-   \param[in] oru32_ArrayIndex               Array index
-   \param[in] orc_OSCContent                 New value (Expected: No array & same type as in element)
-   \param[in] oq_HandleSharedDatapools       Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
+   \param[in]  oru32_ArrayIndex                 Array index
+   \param[in]  orc_OSCContent                   New value (Expected: No array & same type as in element)
+   \param[in]  oq_HandleSharedDatapools         Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -4155,14 +4212,14 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElementMaxArray(const uint32 & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list element data set array value
 
-   \param[in] oru32_NodeIndex                       Node index
-   \param[in] oru32_DataPoolIndex                   Data pool index
-   \param[in] oru32_DataPoolListIndex               Data pool list index
-   \param[in] oru32_DataPoolListElementIndex        Data pool list element index
-   \param[in] oru32_DataPoolListElementDataSetIndex Data pool list element index
-   \param[in] oru32_ArrayIndex                      Array index
-   \param[in] orc_OSCContent                        New value (Expected: No array & same type as in element)
-   \param[in] oq_HandleSharedDatapools              Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex                        Node index
+   \param[in]  oru32_DataPoolIndex                    Data pool index
+   \param[in]  oru32_DataPoolListIndex                Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex         Data pool list element index
+   \param[in]  oru32_DataPoolListElementDataSetIndex  Data pool list element index
+   \param[in]  oru32_ArrayIndex                       Array index
+   \param[in]  orc_OSCContent                         New value (Expected: No array & same type as in element)
+   \param[in]  oq_HandleSharedDatapools               Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -4306,11 +4363,11 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElementDataSetArray(const uint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list element NVM value
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListElementIndex Data pool list element index
-   \param[in] orc_OSCContent                 New value
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
+   \param[in]  orc_OSCContent                   New value
 
    \return
    C_NO_ERR OK
@@ -4373,11 +4430,11 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElementNVMValue(const uint32 & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data pool list element NVM value changed flag
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListElementIndex Data pool list element index
-   \param[in] oq_NvmValueChanged             New flag
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
+   \param[in]  oq_NvmValueChanged               New flag
 
    \return
    C_NO_ERR OK
@@ -4439,10 +4496,10 @@ sint32 C_PuiSdHandlerNodeLogic::SetDataPoolListElementNVMValueChanged(const uint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get OSC data pool list element
 
-   \param[in] oru32_NodeIndex                Node index
-   \param[in] oru32_DataPoolIndex            Data pool index
-   \param[in] oru32_DataPoolListIndex        Data pool list index
-   \param[in] oru32_DataPoolListElementIndex Data pool list element index
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
 
    \return
    Found: Pointer to OSC data pool list element
@@ -4472,7 +4529,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get OSC data pool list element
 
-   \param[in] orc_Id Aggregated identification indices
+   \param[in]  orc_Id   Aggregated identification indices
 
    \return
    Found: Pointer to OSC data pool list element
@@ -4489,10 +4546,10 @@ const C_OSCNodeDataPoolListElement * C_PuiSdHandlerNodeLogic::GetOSCDataPoolList
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get UI data pool list element
 
-   \param[in] oru32_NodeIndex                 Node index
-   \param[in] oru32_DataPoolIndex             Data pool index
-   \param[in] oru32_DataPoolListIndex         Data pool list index
-   \param[in] oru32_DataPoolListElementIndex  Data pool list element index
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
 
    \return
    Found: Pointer to UI data pool list element
@@ -4522,12 +4579,12 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move element in node data pool list
 
-   \param[in] oru32_NodeIndex          Node index
-   \param[in] oru32_DataPoolIndex      Data pool index
-   \param[in] oru32_DataPoolListIndex  Data pool list index
-   \param[in] oru32_SourceIndex        Source list index
-   \param[in] oru32_TargetIndex        Target list index
-   \param[in] oq_HandleSharedDatapools Optional flag if the shared Datapools shall be updated too
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  oru32_SourceIndex          Source list index
+   \param[in]  oru32_TargetIndex          Target list index
+   \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
    \return
    C_NO_ERR OK
@@ -4633,13 +4690,13 @@ sint32 C_PuiSdHandlerNodeLogic::MoveDataPoolListElement(const uint32 & oru32_Nod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any list element uses the provided name
 
-   \param[in] oru32_NodeIndex                      Node index
-   \param[in] oru32_DataPoolIndex                  Data pool index
-   \param[in] oru32_ListIndex                      List index
-   \param[in] orc_Name                             Data pool list element name to check for
-   \param[in] opu32_DataPoolListElementIndexToSkip Optional parameter to skip one index
-                                                   (Use-case: skip current data pool list element
-                                                    to avoid conflict with itself)
+   \param[in]  oru32_NodeIndex                        Node index
+   \param[in]  oru32_DataPoolIndex                    Data pool index
+   \param[in]  oru32_ListIndex                        List index
+   \param[in]  orc_Name                               Data pool list element name to check for
+   \param[in]  opu32_DataPoolListElementIndexToSkip   Optional parameter to skip one index
+                                                      (Use-case: skip current data pool list element
+                                                      to avoid conflict with itself)
 
    \return
    true  Available
@@ -4686,7 +4743,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdHandlerNodeLogic::C_PuiSdHandlerNodeLogic(QObject * const opc_Parent) :
@@ -4714,6 +4771,8 @@ std::map<C_SCLString, bool> C_PuiSdHandlerNodeLogic::m_GetExistingNodeNames(void
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get pointers to all currently registered node application names
 
+   \param[in]  oru32_NodeIndex   Node index
+
    \return
    Vector of pointers to all currently registered node application names
 */
@@ -4736,7 +4795,7 @@ std::map<C_SCLString,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get pointers to all currently registered data pool names contained in the specified node
 
-   \param[in] oru32_NodeIndex Node index
+   \param[in]  oru32_NodeIndex   Node index
 
    \return
    Vector of pointers to all currently registered data pool names contained in the specified node
@@ -4760,8 +4819,8 @@ std::map<C_SCLString,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get pointers to all currently registered list names contained in the specified node data pool
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Node data pool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
 
    \return
    Vector of pointers to all currently registered list names contained in the specified node data pool
@@ -4786,9 +4845,9 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get pointers to all currently registered data set names contained in the specified node data pool list
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Node data pool index
-   \param[in] oru32_DataPoolListIndex Node data pool list index
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Node data pool index
+   \param[in]  oru32_DataPoolListIndex    Node data pool list index
 
    \return
    Vector of pointers to all currently registered data set names contained in the specified node data pool list
@@ -4816,9 +4875,9 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get pointers to all currently registered variable names contained in the specified node data pool list
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Node data pool index
-   \param[in] oru32_DataPoolListIndex Node data pool list index
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Node data pool index
+   \param[in]  oru32_DataPoolListIndex    Node data pool list index
 
    \return
    Vector of pointers to all currently registered variable names contained in the specified node data pool list
@@ -4846,8 +4905,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition application change
 
-   \param[in] ou32_NodeIndex        Node index
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationAdded(const uint32 ou32_NodeIndex,
@@ -4891,9 +4950,9 @@ void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationAdded(const uint32 ou32_NodeI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition application change
 
-   \param[in] ou32_NodeIndex              Node index
-   \param[in] ou32_ApplicationSourceIndex Application source index
-   \param[in] ou32_ApplicationTargetIndex Application target index
+   \param[in]  ou32_NodeIndex                Node index
+   \param[in]  ou32_ApplicationSourceIndex   Application source index
+   \param[in]  ou32_ApplicationTargetIndex   Application target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationMoved(const uint32 ou32_NodeIndex,
@@ -4986,8 +5045,8 @@ void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationMoved(const uint32 ou32_NodeI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition application change
 
-   \param[in] ou32_NodeIndex        Node index
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationAboutToBeDeleted(const uint32 ou32_NodeIndex,
@@ -5044,7 +5103,7 @@ void C_PuiSdHandlerNodeLogic::m_SyncNodeApplicationAboutToBeDeleted(const uint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle automated programmable application assignment for code generation settings
 
-   \param[in] ou32_NodeIndex Node index (ID)
+   \param[in]  ou32_NodeIndex    Node index (ID)
 
    \return
    C_NO_ERR Operation success
@@ -5081,10 +5140,10 @@ sint32 C_PuiSdHandlerNodeLogic::m_HandleNodeAutomatedProgrammableApplicationUpda
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize com data pool
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Data pool index
-   \param[in] orq_AllowDataAdaptation Optional parameter to disable automatic data adaptation
-   \param[in] ore_ComProtocolType     Optional parameter for com protocol type
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  orq_AllowDataAdaptation    Optional parameter to disable automatic data adaptation
+   \param[in]  ore_ComProtocolType        Optional parameter for com protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::m_SetUpComDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
@@ -5219,8 +5278,8 @@ void C_PuiSdHandlerNodeLogic::m_SetUpComDataPool(const uint32 & oru32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up com data pool
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerNodeLogic::m_CleanUpComDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)

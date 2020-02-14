@@ -47,7 +47,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxInt64AutoFix::C_OgeSpxInt64AutoFix(QWidget * const opc_Parent) :
@@ -72,7 +72,7 @@ sintn C_OgeSpxInt64AutoFix::GetLineEditWidth(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Fix string after user confirm
 
-   \param[in,out] orc_Input Current string
+   \param[in,out]  orc_Input  Current string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
@@ -153,8 +153,8 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Validate current input string
 
-   \param[in,out] orc_Input Input string
-   \param[in,out] orc_Pos   Position
+   \param[in,out]  orc_Input  Input string
+   \param[in,out]  orc_Pos    Position
 
    \return
    Invalid      Unusable
@@ -307,8 +307,8 @@ void C_OgeSpxInt64AutoFix::m_Init(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get value from string if any
 
-   \param[in]  orc_Value    Input string
-   \param[out] orf64_Output Output value
+   \param[in]   orc_Input     Input string
+   \param[out]  oru64_Output  Output value
 
    \return
    C_NO_ERR Operation success
@@ -331,8 +331,8 @@ sint32 C_OgeSpxInt64AutoFix::mh_GetUValue(const QString & orc_Input, uint64 & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get value from string if any
 
-   \param[in]  orc_Value    Input string
-   \param[out] orf64_Output Output value
+   \param[in]   orc_Input     Input string
+   \param[out]  ors64_Output  Output value
 
    \return
    C_NO_ERR Operation success

@@ -33,7 +33,7 @@ public:
    C_PuiBsTextElement(void);
    virtual ~C_PuiBsTextElement(void);
 
-   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
 
    QFont c_UIFontStyle;        ///< font style of text element
    QColor c_UIFontColorBright; ///< font color of text element in bright mode

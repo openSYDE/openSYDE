@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent        Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpUpdatePackageListDelegate::C_SyvUpUpdatePackageListDelegate(QObject * const opc_Parent) :
@@ -49,9 +49,9 @@ C_SyvUpUpdatePackageListDelegate::C_SyvUpUpdatePackageListDelegate(QObject * con
 
    Here: Draw widget for drag event
 
-   \param[in,out] opc_Painter Painter
-   \param[in,out] opc_Option  Option
-   \param[in,out] opc_Widget  Widget
+   \param[in,out]  opc_Painter   Painter
+   \param[in,out]  orc_Option    Option
+   \param[in,out]  orc_Index     Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
@@ -100,8 +100,8 @@ void C_SyvUpUpdatePackageListDelegate::paint(QPainter * const opc_Painter, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update index to paint widget in drag
 
-   \param[in] s32_Index          Update index for
-   \param[in] opc_MovingWidget   Actual widget which will be moved
+   \param[in]      s32_Index     Update index for
+   \param[in,out]  opc_Widget    Actual widget which will be moved
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListDelegate::StartPaint(const sint32 s32_Index,

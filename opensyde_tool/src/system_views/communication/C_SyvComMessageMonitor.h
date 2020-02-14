@@ -92,7 +92,6 @@ public:
 
 protected:
    stw_types::sint32 m_GetCanMessage(stw_opensyde_core::C_OSCComMessageLoggerData & orc_Message);
-   void m_GetCanMessages(QVector<stw_opensyde_core::C_OSCComMessageLoggerData> & orc_Messages);
 
    void m_UpdateProtocolString(stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData) const;
 

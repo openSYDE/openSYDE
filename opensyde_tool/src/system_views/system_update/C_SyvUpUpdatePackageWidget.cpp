@@ -41,7 +41,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpUpdatePackageWidget::C_SyvUpUpdatePackageWidget(QWidget * const opc_Parent) :
@@ -330,6 +330,7 @@ void C_SyvUpUpdatePackageWidget::m_ButtonClearAll(void) const
                                   "Do you really want to clear the configuration of Update Package?"));
    c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Clear"));
    c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+   c_MessageBox.SetCustomMinHeight(180, 180);
    e_ReturnMessageBox = c_MessageBox.Execute();
 
    if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
@@ -553,7 +554,7 @@ void C_SyvUpUpdatePackageWidget::m_SetUpdatePackageStatusNotLocked(const QString
       // flashware warnings
       if (orc_FlashwareWarningsApps.size() > 0)
       {
-         c_LabelText += C_GtGetText::h_GetText(" Flashware warnings occured!");
+         c_LabelText += C_GtGetText::h_GetText(" Flashware warnings!");
          c_TooltipContent += C_GtGetText::h_GetText("\n\nFlashware warnings:\n");
          c_TooltipContent += orc_FlashwareWarningsApps.join("\n");
       }

@@ -28,7 +28,7 @@ public:
    C_PuiSvDbPieChart(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
-   virtual bool IsReadElement(void) const;
+   virtual bool IsReadElement(void) const override;
 
    bool q_ShowUnit;
    bool q_ShowValue;

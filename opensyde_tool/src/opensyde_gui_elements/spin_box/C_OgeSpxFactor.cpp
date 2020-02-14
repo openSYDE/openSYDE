@@ -42,7 +42,7 @@ const stw_types::float64 C_OgeSpxFactor::mhf64_FACTOR_MIN = std::pow(10, -msn_DO
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxFactor::C_OgeSpxFactor(QWidget * const opc_Parent) :
@@ -59,7 +59,7 @@ C_OgeSpxFactor::C_OgeSpxFactor(QWidget * const opc_Parent) :
 
    Here: Skip 0
 
-   \param[in] osn_Steps Steps
+   \param[in]  osn_Steps   Steps
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxFactor::stepBy(const sintn osn_Steps)
@@ -97,8 +97,11 @@ void C_OgeSpxFactor::stepBy(const sintn osn_Steps)
 
    Here: Skip 0
 
-   \param[in] orc_Text Text
-   \param[in] orsn_Pos Pos
+   \param[in]  orc_Text    Text
+   \param[in]  orsn_Pos    Position
+
+   \return
+   Validation state (invalid, intermediate, valid)
 */
 //----------------------------------------------------------------------------------------------------------------------
 QValidator::State C_OgeSpxFactor::validate(QString & orc_Text, sintn & orsn_Pos) const

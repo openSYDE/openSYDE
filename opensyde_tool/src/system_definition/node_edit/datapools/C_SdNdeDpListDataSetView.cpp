@@ -149,7 +149,7 @@ C_SdNdeDpListDataSetView::~C_SdNdeDpListDataSetView(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::SetList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                             const uint32 & oru32_ListIndex)
+                                       const uint32 & oru32_ListIndex)
 {
    if (this->mpc_ModelViewManager != NULL)
    {
@@ -175,7 +175,7 @@ void C_SdNdeDpListDataSetView::SetList(const uint32 & oru32_NodeIndex, const uin
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListDataSetView::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                            const uint32 & oru32_ListIndex) const
+                                      const uint32 & oru32_ListIndex) const
 {
    bool q_Retval;
 
@@ -390,9 +390,8 @@ QUndoCommand * C_SdNdeDpListDataSetView::TakeUndoCommand(void)
    \param[in] ore_DataChangeType             Data change type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetView::OnDataChange(const uint32 & oru32_DataPoolListDataSetIndex,
-                                                  const QVariant & orc_NewData,
-                                                  const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType)
+void C_SdNdeDpListDataSetView::OnDataChange(const uint32 & oru32_DataPoolListDataSetIndex, const QVariant & orc_NewData,
+                                            const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType)
 {
    this->mc_UndoManager.DoDataChangeElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                              this->mu32_ListIndex,
@@ -529,7 +528,7 @@ void C_SdNdeDpListDataSetView::mouseMoveEvent(QMouseEvent * const opc_Event)
    sint32 s32_HoveredCol = -1;
    const QModelIndex c_HoveredIndex = this->indexAt(opc_Event->pos());
 
-   QTableView::mouseMoveEvent(opc_Event);
+   C_TblViewScroll::mouseMoveEvent(opc_Event);
 
    if (c_HoveredIndex.isValid())
    {
@@ -551,7 +550,7 @@ void C_SdNdeDpListDataSetView::mouseMoveEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::leaveEvent(QEvent * const opc_Event)
 {
-   QTableView::leaveEvent(opc_Event);
+   C_TblViewScroll::leaveEvent(opc_Event);
    if (this->mc_Delegate.SetHoveredCol(-1) == true)
    {
       this->update();
@@ -568,10 +567,10 @@ void C_SdNdeDpListDataSetView::leaveEvent(QEvent * const opc_Event)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::selectionChanged(const QItemSelection & orc_Selected,
-                                                      const QItemSelection & orc_Deselected)
+                                                const QItemSelection & orc_Deselected)
 {
    std::vector<uint32> c_SelectedIndices;
-   QTableView::selectionChanged(orc_Selected, orc_Deselected);
+   C_TblViewScroll::selectionChanged(orc_Selected, orc_Deselected);
 
    c_SelectedIndices = C_SdNdeDpUtil::h_ConvertVector(this->selectedIndexes(), false);
    C_Uti::h_Uniqueify(c_SelectedIndices);
@@ -626,7 +625,7 @@ void C_SdNdeDpListDataSetView::m_DeleteIndices(const std::vector<uint32> & orc_I
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::m_Move(const std::vector<uint32> & oru32_SourceIndices,
-                                            const std::vector<uint32> & oru32_TargetIndices)
+                                      const std::vector<uint32> & oru32_TargetIndices)
 {
    this->mc_UndoManager.DoMoveElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                        this->mpc_ModelViewManager,

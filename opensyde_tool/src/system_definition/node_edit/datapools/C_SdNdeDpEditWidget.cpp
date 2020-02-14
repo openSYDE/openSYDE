@@ -193,7 +193,7 @@ void C_SdNdeDpEditWidget::m_DataPoolSelected(const uint32 ou32_DataPoolIndex) co
 void C_SdNdeDpEditWidget::m_OnErrorChange(const bool & orq_Error) const
 {
    this->mpc_Ui->pc_WidgetDpView->SetActualDataPoolConflict(orq_Error);
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

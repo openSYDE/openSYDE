@@ -41,7 +41,7 @@ public:
    virtual void DeleteData(void) override;
 
    virtual void ConnectionActiveChanged(const bool oq_Active) override;
-   virtual void SendCurrentValue(void);
+   virtual void SendCurrentValue(void) override;
    virtual bool CallProperties(void) override;
 
    void UpdateTypePe(const stw_opensyde_gui_logic::C_PuiSvDbSpinBox::E_Type oe_Type, const bool oq_ShowUnit);

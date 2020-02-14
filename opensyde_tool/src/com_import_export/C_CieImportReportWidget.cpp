@@ -55,28 +55,25 @@ const QString C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START =
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent          Reference to parent
-   \param[in]     ou32_NodeIndex      Node index
-   \param[in]     oe_ProtocolType     Type of comm protocol
-   \param[in]     os32_DataPoolIndex  Index of node comm datapool (-1 if unknown)
-   \param[in]     ou32_InterfaceIndex Interface index
-   \param[in]     orc_FilePath        Loaded file path
+   \param[in,out]  orc_Parent                Reference to parent
+   \param[in]      orc_FilePath              Loaded file path
+   \param[in]      ou32_BusIndex             Bus index
+   \param[in]      oe_ProtocolType           Type of comm protocol
+   \param[in]      orc_ImportDataAssigned    Import data assigned
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CieImportReportWidget::C_CieImportReportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                 const uint32 ou32_NodeIndex,
+C_CieImportReportWidget::C_CieImportReportWidget(C_OgePopUpDialog & orc_Parent, const QString & orc_FilePath,
+                                                 const uint32 ou32_BusIndex,
                                                  const C_OSCCanProtocol::E_Type oe_ProtocolType,
-                                                 const sint32 os32_DataPoolIndex, const uint32 ou32_InterfaceIndex,
-                                                 const QString & orc_FilePath) :
+                                                 const std::vector<C_CieImportDataAssignment> & orc_ImportDataAssigned)
+   :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CieImportReportWidget),
    mrc_ParentDialog(orc_Parent),
-   mu32_NodeIndex(ou32_NodeIndex),
-   me_ProtocolType(oe_ProtocolType),
-   ms32_DataPoolIndex(os32_DataPoolIndex),
-   mu32_InterfaceIndex(ou32_InterfaceIndex),
    mc_FilePath(orc_FilePath),
-   mu32_NewMessageCount(0)
+   mu32_BusIndex(ou32_BusIndex),
+   me_ProtocolType(oe_ProtocolType),
+   mc_ImportedAssignedData(orc_ImportDataAssigned)
 {
    const QFileInfo c_FileInfo(orc_FilePath);
 
@@ -92,11 +89,14 @@ C_CieImportReportWidget::C_CieImportReportWidget(stw_opensyde_gui_elements::C_Og
                                                                                          toUpper()));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
 
+   //Trigger report
+   m_AdaptMessagesToProtocolType();
+   m_AdaptMessageNames();
+   tgl_assert(m_ShowReport() == C_NO_ERR);
+
    // connects
-   connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this,
-           &C_CieImportReportWidget::m_OkClicked);
-   connect(this->mpc_Ui->pc_BushButtonCancel, &QPushButton::clicked, this,
-           &C_CieImportReportWidget::m_CancelClicked);
+   connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_CieImportReportWidget::m_OkClicked);
+   connect(this->mpc_Ui->pc_BushButtonCancel, &QPushButton::clicked, this, &C_CieImportReportWidget::m_CancelClicked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -122,40 +122,11 @@ void C_CieImportReportWidget::InitStaticNames(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set message data for report
-
-   \param[in]  orc_Param    messages and signals data
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportReportWidget::SetMessageData(const C_CieDataPoolListStructure & orc_Param)
-{
-   sint32 s32_Retval;
-
-   //Copy to internal data
-   this->mc_ImportedData = orc_Param;
-
-   //Trigger report
-   m_AdaptMessagesToProtocolType();
-   m_AdaptMessageNames();
-   m_FixSignalCount();
-   s32_Retval = m_ShowReport();
-   if (s32_Retval != C_NO_ERR)
-   {
-      s32_Retval = C_RANGE;
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieImportReportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -190,63 +161,95 @@ void C_CieImportReportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 void C_CieImportReportWidget::m_OkClicked(void)
 {
    bool q_Continue = true;
-   sint32 s32_DatapoolIndexForNew = this->ms32_DataPoolIndex;
 
-   //  ask user for datapool if not already specified
-   if (s32_DatapoolIndexForNew < 0)
+   for (uint32 u32_ItNodes = 0; u32_ItNodes < this->mc_ImportedAssignedData.size(); u32_ItNodes++)
    {
-      // check if there is only one datapool of corresponding protocol type
-      if (C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPools(this->mu32_NodeIndex, this->me_ProtocolType).size() == 1)
-      {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
+      uint32 u32_NumberCOMMDps =
+         C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPools(rc_CurData.u32_OsyNodeIndex, this->me_ProtocolType).size();
 
-         // get datapool index of the corresponding datapool
-         if (pc_Node != NULL)
+      // reset
+      rc_CurData.s32_DatapoolIndexForNew = -1;
+
+      // we need a datapool index if there exist new messages
+      if (rc_CurData.u32_NewMessageCount > 0)
+      {
+         // first of all: if no COMM Datapool of this protocol exists add one
+         if (u32_NumberCOMMDps == 0)
          {
-            for (uint32 u32_ItDatapool = 0; u32_ItDatapool < pc_Node->c_DataPools.size(); ++u32_ItDatapool)
+            // No COM datapool yet. New one must be created if permissible
+            if (C_SdUtil::h_CheckDatapoolNumber(rc_CurData.u32_OsyNodeIndex, false, this) == true)
             {
-               if (pc_Node->c_DataPools[u32_ItDatapool].e_Type == C_OSCNodeDataPool::eCOM)
+               tgl_assert(C_PuiSdHandler::h_GetInstance()->AddAutoGenCommDataPool(rc_CurData.u32_OsyNodeIndex,
+                                                                                  this->me_ProtocolType) == C_NO_ERR);
+               u32_NumberCOMMDps++; // we just added one!
+            }
+            else
+            {
+               q_Continue = false;
+            }
+         }
+
+         // if there is exactly one datapool of this protocol type get its index
+         if (q_Continue == true)
+         {
+            if (u32_NumberCOMMDps == 1)
+            {
+               const C_OSCNode * const pc_Node =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(rc_CurData.u32_OsyNodeIndex);
+
+               // get datapool index of the corresponding datapool
+               if (pc_Node != NULL)
                {
-                  if (C_PuiSdUtil::h_GetRelatedCANProtocolType(this->mu32_NodeIndex,
-                                                               u32_ItDatapool) == this->me_ProtocolType)
+                  for (uint32 u32_ItDatapool = 0; u32_ItDatapool < pc_Node->c_DataPools.size(); ++u32_ItDatapool)
                   {
-                     s32_DatapoolIndexForNew = static_cast<sint32>(u32_ItDatapool);
-                     break;
+                     if (pc_Node->c_DataPools[u32_ItDatapool].e_Type == C_OSCNodeDataPool::eCOM)
+                     {
+                        if (C_PuiSdUtil::h_GetRelatedCANProtocolType(rc_CurData.u32_OsyNodeIndex,
+                                                                     u32_ItDatapool) == this->me_ProtocolType)
+                        {
+                           rc_CurData.s32_DatapoolIndexForNew = static_cast<sint32>(u32_ItDatapool);
+                           break;
+                        }
+                     }
                   }
                }
             }
-         }
-      }
-      else if (this->mu32_NewMessageCount > 0)
-      {
-         // ask user which comm datapool the new messages should get inserted at (only if new messages exist)
-         QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
-         C_CieImportDatapoolSelectWidget * const pc_DialogImportReport =
-            new C_CieImportDatapoolSelectWidget(*c_Popup, this->mu32_NodeIndex, this->me_ProtocolType);
+            else
+            {
+               // there are multiple COMM Datapools of this protocol:
+               // ask user which COMM Datapool the new messages should get inserted at
 
-         // resize
-         c_Popup->SetSize(QSize(700, 400));
+               QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+               C_CieImportDatapoolSelectWidget * const pc_DialogImportReport =
+                  new C_CieImportDatapoolSelectWidget(*c_Popup, rc_CurData.u32_OsyNodeIndex, this->me_ProtocolType);
 
-         // execute datapool popup
-         if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
-         {
-            s32_DatapoolIndexForNew = pc_DialogImportReport->GetSelectedDatapoolIndex();
-         }
-         else
-         {
-            q_Continue = false;
-         }
+               // resize
+               c_Popup->SetSize(QSize(700, 400));
 
-         if (c_Popup != NULL)
-         {
-            c_Popup->HideOverlay();
+               // execute datapool popup
+               if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+               {
+                  rc_CurData.s32_DatapoolIndexForNew = pc_DialogImportReport->GetSelectedDatapoolIndex();
+               }
+               else
+               {
+                  q_Continue = false;
+               }
+
+               if (c_Popup != NULL)
+               {
+                  c_Popup->HideOverlay();
+               }
+               //lint -e{429}  no memory leak because of the parent of pc_DialogImportReport and the Qt memory
+               // management
+            }
          }
-         //lint -e{429}  no memory leak because of the parent of pc_DialogImportReport and the Qt memory management
       }
       else
       {
-         // No Datapool for new content needed
-         s32_DatapoolIndexForNew = 0;
+         // index not needed but should be valid
+         rc_CurData.s32_DatapoolIndexForNew = 0;
       }
    }
 
@@ -254,8 +257,7 @@ void C_CieImportReportWidget::m_OkClicked(void)
    {
       // only accept if user did not cancel datapool selection (else caller does not know that user canceled)
       this->mrc_ParentDialog.accept();
-      tgl_assert(s32_DatapoolIndexForNew >= 0);
-      m_InsertMessages(s32_DatapoolIndexForNew);
+      m_InsertMessages();
    }
 }
 
@@ -269,20 +271,6 @@ void C_CieImportReportWidget::m_CancelClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Fix signal count
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CieImportReportWidget::m_FixSignalCount(void)
-{
-   mh_CutSignalCount(this->mc_ImportedData.c_Core.c_OSCRxMessageData, this->mc_ImportedData.c_Ui.c_UiRxMessageData,
-                     this->mc_ImportedData.c_Core.c_OSCRxSignalData, this->mc_ImportedData.c_Ui.c_UiRxSignalData,
-                     this->mc_ImportedData.c_Core.c_WarningMessagesPerRxMessage);
-   mh_CutSignalCount(this->mc_ImportedData.c_Core.c_OSCTxMessageData, this->mc_ImportedData.c_Ui.c_UiTxMessageData,
-                     this->mc_ImportedData.c_Core.c_OSCTxSignalData, this->mc_ImportedData.c_Ui.c_UiTxSignalData,
-                     this->mc_ImportedData.c_Core.c_WarningMessagesPerTxMessage);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt all stored message names as specified
 
    * Eliminate spaces
@@ -291,29 +279,34 @@ void C_CieImportReportWidget::m_FixSignalCount(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieImportReportWidget::m_AdaptMessageNames(void)
 {
-   uint32 u32_Count;
+   //Each imported node
+   for (uint32 u32_ItNodes = 0; u32_ItNodes < this->mc_ImportedAssignedData.size(); u32_ItNodes++)
+   {
+      uint32 u32_Count;
+      C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
 
-   //Each message
-   for (u32_Count = 0; u32_Count < this->mc_ImportedData.c_Core.c_OSCRxMessageData.size(); ++u32_Count)
-   {
-      C_OSCCanMessage & rc_CurMessage = this->mc_ImportedData.c_Core.c_OSCRxMessageData[u32_Count];
-      mh_AdaptName(rc_CurMessage.c_Name, rc_CurMessage.c_Comment);
-   }
-   for (u32_Count = 0; u32_Count < this->mc_ImportedData.c_Core.c_OSCTxMessageData.size(); ++u32_Count)
-   {
-      C_OSCCanMessage & rc_CurMessage = this->mc_ImportedData.c_Core.c_OSCTxMessageData[u32_Count];
-      mh_AdaptName(rc_CurMessage.c_Name, rc_CurMessage.c_Comment);
-   }
-   //Each signal
-   for (u32_Count = 0; u32_Count < this->mc_ImportedData.c_Core.c_OSCRxSignalData.size(); ++u32_Count)
-   {
-      C_OSCNodeDataPoolListElement & rc_CurSignal = this->mc_ImportedData.c_Core.c_OSCRxSignalData[u32_Count];
-      mh_AdaptName(rc_CurSignal.c_Name, rc_CurSignal.c_Comment);
-   }
-   for (u32_Count = 0; u32_Count < this->mc_ImportedData.c_Core.c_OSCTxSignalData.size(); ++u32_Count)
-   {
-      C_OSCNodeDataPoolListElement & rc_CurSignal = this->mc_ImportedData.c_Core.c_OSCTxSignalData[u32_Count];
-      mh_AdaptName(rc_CurSignal.c_Name, rc_CurSignal.c_Comment);
+      //Each message
+      for (u32_Count = 0; u32_Count < rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.size(); ++u32_Count)
+      {
+         C_OSCCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData[u32_Count];
+         mh_AdaptName(rc_CurMessage.c_Name, rc_CurMessage.c_Comment);
+      }
+      for (u32_Count = 0; u32_Count < rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.size(); ++u32_Count)
+      {
+         C_OSCCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData[u32_Count];
+         mh_AdaptName(rc_CurMessage.c_Name, rc_CurMessage.c_Comment);
+      }
+      //Each signal
+      for (u32_Count = 0; u32_Count < rc_CurData.c_ImportData.c_Core.c_OSCRxSignalData.size(); ++u32_Count)
+      {
+         C_OSCNodeDataPoolListElement & rc_CurSignal = rc_CurData.c_ImportData.c_Core.c_OSCRxSignalData[u32_Count];
+         mh_AdaptName(rc_CurSignal.c_Name, rc_CurSignal.c_Comment);
+      }
+      for (u32_Count = 0; u32_Count < rc_CurData.c_ImportData.c_Core.c_OSCTxSignalData.size(); ++u32_Count)
+      {
+         C_OSCNodeDataPoolListElement & rc_CurSignal = rc_CurData.c_ImportData.c_Core.c_OSCTxSignalData[u32_Count];
+         mh_AdaptName(rc_CurSignal.c_Name, rc_CurSignal.c_Comment);
+      }
    }
 }
 
@@ -323,187 +316,40 @@ void C_CieImportReportWidget::m_AdaptMessageNames(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieImportReportWidget::m_AdaptMessagesToProtocolType(void)
 {
-   //Each message
-   for (uint32 u32_ItMessage = 0; u32_ItMessage < this->mc_ImportedData.c_Core.c_OSCRxMessageData.size();
-        ++u32_ItMessage)
+   //Each imported node
+   for (uint32 u32_ItNodes = 0; u32_ItNodes < this->mc_ImportedAssignedData.size(); u32_ItNodes++)
    {
-      QString c_Infos;
-      QString & rc_CurInfoMessage = this->mc_ImportedData.c_Core.c_WarningMessagesPerRxMessage[u32_ItMessage];
-      C_OSCCanMessage & rc_CurMessage = this->mc_ImportedData.c_Core.c_OSCRxMessageData[u32_ItMessage];
-      C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, this->me_ProtocolType, &c_Infos);
-      //Add info
-      if (rc_CurInfoMessage.compare("") == 0)
+      C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
+      //Each Rx message
+      for (uint32 u32_ItMessage = 0;
+           u32_ItMessage < rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.size();
+           ++u32_ItMessage)
       {
-         //Empty
-         rc_CurInfoMessage += c_Infos;
-      }
-      else
-      {
-         //Not empty
-         rc_CurInfoMessage += "\n";
-         rc_CurInfoMessage += c_Infos;
-      }
-   }
-   //Each message
-   for (uint32 u32_ItMessage = 0; u32_ItMessage < this->mc_ImportedData.c_Core.c_OSCTxMessageData.size();
-        ++u32_ItMessage)
-   {
-      QString c_Infos;
-      QString & rc_CurInfoMessage = this->mc_ImportedData.c_Core.c_WarningMessagesPerTxMessage[u32_ItMessage];
-      C_OSCCanMessage & rc_CurMessage = this->mc_ImportedData.c_Core.c_OSCTxMessageData[u32_ItMessage];
-      C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, this->me_ProtocolType, &c_Infos);
-      //Add info
-      if (rc_CurInfoMessage.compare("") == 0)
-      {
-         //Empty
-         rc_CurInfoMessage += c_Infos;
-      }
-      else
-      {
-         //Not empty
-         rc_CurInfoMessage += "\n";
-         rc_CurInfoMessage += c_Infos;
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Cut signal count if necessary
-
-   \param[in] orc_OSCRxMessageData            Core RX message data
-   \param[in] orc_UiRxMessageData             UI RX message data
-   \param[in] orc_OSCRxSignalData             Core RX signal data
-   \param[in] orc_UiRxSignalData              UI RX signal data
-   \param[in] orc_WarningMessagesPerRxMessage Warning message vector for each message
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CieImportReportWidget::mh_CutSignalCount(std::vector<C_OSCCanMessage> & orc_OSCRxMessageData,
-                                                std::vector<C_PuiSdNodeCanMessage> & orc_UiRxMessageData,
-                                                std::vector<C_OSCNodeDataPoolListElement> & orc_OSCRxSignalData,
-                                                std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiRxSignalData,
-                                                std::vector<QString> & orc_WarningMessagesPerRxMessage)
-{
-   if ((((orc_OSCRxMessageData.size() == orc_UiRxMessageData.size()) &&
-         (orc_OSCRxMessageData.size() == orc_WarningMessagesPerRxMessage.size())) &&
-        (orc_OSCRxSignalData.size() == orc_UiRxSignalData.size())) &&
-       (mh_CheckAscendingSignalIndices(orc_OSCRxMessageData) == true))
-   {
-      //Each message
-      for (uint32 u32_ItMessage = 0; u32_ItMessage < orc_OSCRxMessageData.size(); ++u32_ItMessage)
-      {
-         C_OSCCanMessage & rc_CurOSCMessage = orc_OSCRxMessageData[u32_ItMessage];
-         C_PuiSdNodeCanMessage & rc_CurUiMessage = orc_UiRxMessageData[u32_ItMessage];
-         if ((rc_CurOSCMessage.c_Signals.size() > 64UL) &&
-             (rc_CurOSCMessage.c_Signals.size() == rc_CurUiMessage.c_Signals.size()))
+         QStringList c_Infos;
+         QString & rc_CurInfoMessage = rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerRxMessage[u32_ItMessage];
+         C_OSCCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData[u32_ItMessage];
+         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, this->me_ProtocolType, &c_Infos);
+         //Add info
+         if (rc_CurInfoMessage.isEmpty() == false)
          {
-            QString c_Infos = "Discarded following signals due to 64 signals limit:";
-            QString & rc_CurInfoMessage = orc_WarningMessagesPerRxMessage[u32_ItMessage];
-
-            //Discard signals
-            for (uint32 u32_ItDiscardedSignals = rc_CurOSCMessage.c_Signals.size(); u32_ItDiscardedSignals > 64UL;
-                 --u32_ItDiscardedSignals)
-            {
-               const C_OSCCanSignal & rc_Sig =
-                  rc_CurOSCMessage.c_Signals[static_cast<std::vector< C_OSCCanSignal>::size_type >
-                                             (u32_ItDiscardedSignals - 1UL)];
-               //Check if valid op
-               if (rc_Sig.u32_ComDataElementIndex < orc_OSCRxSignalData.size())
-               {
-                  //Remember name
-                  const C_OSCNodeDataPoolListElement & rc_SigData = orc_OSCRxSignalData[rc_Sig.u32_ComDataElementIndex];
-                  c_Infos += "\n";
-                  c_Infos += "\"" + QString(rc_SigData.c_Name.c_str()) + "\"";
-
-                  //Discard all data
-                  rc_CurOSCMessage.c_Signals.pop_back();
-                  rc_CurUiMessage.c_Signals.pop_back();
-                  orc_OSCRxSignalData.erase(orc_OSCRxSignalData.begin() + rc_Sig.u32_ComDataElementIndex);
-                  orc_UiRxSignalData.erase(orc_UiRxSignalData.begin() + rc_Sig.u32_ComDataElementIndex);
-               }
-               else
-               {
-                  tgl_assert(false);
-               }
-            }
-
-            //Renumber signals
-            mh_RenumberMessageSignalIndicesAscending(orc_OSCRxMessageData);
-
-            //Add info
-            if (rc_CurInfoMessage.compare("") == 0)
-            {
-               //Empty
-               rc_CurInfoMessage += c_Infos;
-            }
-            else
-            {
-               //Not empty
-               rc_CurInfoMessage += "\n";
-               rc_CurInfoMessage += c_Infos;
-            }
+            rc_CurInfoMessage += "\n";
          }
+         rc_CurInfoMessage += c_Infos.join("\n");
       }
-   }
-   else
-   {
-      tgl_assert(false);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if signal indices are ordered ascending
-
-   \param[in] orc_OSCRxMessageData Messages to check
-
-   \return
-   True  Ascending
-   False Unknown order
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_CieImportReportWidget::mh_CheckAscendingSignalIndices(const std::vector<C_OSCCanMessage> & orc_OSCRxMessageData)
-{
-   bool q_Retval = true;
-   sint64 s64_PrevIndex = -1;
-
-   for (uint32 u32_ItMsg = 0UL; (u32_ItMsg < orc_OSCRxMessageData.size()) && (q_Retval == true); ++u32_ItMsg)
-   {
-      const C_OSCCanMessage & rc_Msg = orc_OSCRxMessageData[u32_ItMsg];
-      for (uint32 u32_ItSig = 0UL; u32_ItSig < rc_Msg.c_Signals.size(); ++u32_ItSig)
+      //Each Tx message
+      for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.size();
+           ++u32_ItMessage)
       {
-         const C_OSCCanSignal & rc_Sig = rc_Msg.c_Signals[u32_ItSig];
-         const sint64 s64_Index = static_cast<sint64>(rc_Sig.u32_ComDataElementIndex);
-         if (s64_PrevIndex < s64_Index)
+         QStringList c_Infos;
+         QString & rc_CurInfoMessage = rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerTxMessage[u32_ItMessage];
+         C_OSCCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData[u32_ItMessage];
+         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, this->me_ProtocolType, &c_Infos);
+         //Add info
+         if (rc_CurInfoMessage.isEmpty() == false)
          {
-            s64_PrevIndex = s64_Index;
+            rc_CurInfoMessage += "\n";
          }
-         else
-         {
-            q_Retval = false;
-         }
-      }
-   }
-   return q_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Renumber all message signal indices ascending and continuous
-
-   \param[in,out] orc_OSCRxMessageData Message data to renumber
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CieImportReportWidget::mh_RenumberMessageSignalIndicesAscending(
-   std::vector<C_OSCCanMessage> & orc_OSCRxMessageData)
-{
-   uint32 u32_Counter = 0UL;
-
-   for (uint32 u32_ItMsg = 0UL; u32_ItMsg < orc_OSCRxMessageData.size(); ++u32_ItMsg)
-   {
-      C_OSCCanMessage & rc_Msg = orc_OSCRxMessageData[u32_ItMsg];
-      for (uint32 u32_ItSig = 0UL; u32_ItSig < rc_Msg.c_Signals.size(); ++u32_ItSig)
-      {
-         C_OSCCanSignal & rc_Sig = rc_Msg.c_Signals[u32_ItSig];
-         rc_Sig.u32_ComDataElementIndex = u32_Counter;
-         ++u32_Counter;
+         rc_CurInfoMessage += c_Infos.join("\n");
       }
    }
 }
@@ -514,7 +360,8 @@ void C_CieImportReportWidget::mh_RenumberMessageSignalIndicesAscending(
    * Eliminate spaces
    * Cut after 31 characters
 
-   \param[in,out] orc_Name Old/New name
+   \param[in,out]  orc_Name      Old/New name
+   \param[in,out]  orc_Comment   Comment
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieImportReportWidget::mh_AdaptName(stw_scl::C_SCLString & orc_Name, stw_scl::C_SCLString & orc_Comment)
@@ -567,166 +414,150 @@ void C_CieImportReportWidget::mh_AdaptName(stw_scl::C_SCLString & orc_Name, stw_
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportReportWidget::m_ShowReport(void)
 {
+   sint32 s32_Retval;
+   QString c_Table = "";
+   uint32 u32_MessageCount = 0U;
+
    //Check
-   sint32 s32_Retval = m_CheckMessages();
+   s32_Retval = m_CheckMessages();
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = m_CheckMessageMatches();
+   }
+
+   // Get table with message entries
+   if (s32_Retval == C_NO_ERR)
+   {
+      std::vector<C_OSCCanMessage> c_MessagesList; // for listing every message only once
+
+      //Each imported node
+      for (uint32 u32_ItNodes = 0; (u32_ItNodes < this->mc_ImportedAssignedData.size()) && (s32_Retval == C_NO_ERR);
+           u32_ItNodes++)
+      {
+         C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
+
+         rc_CurData.u32_NewMessageCount = 0UL;
+
+         //Tx
+         s32_Retval = mh_GetMessageEntries(u32_MessageCount, rc_CurData.u32_NewMessageCount, c_Table, c_MessagesList,
+                                           rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData,
+                                           rc_CurData.c_ImportData.c_Core.c_OSCTxSignalData,
+                                           rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerTxMessage,
+                                           rc_CurData.c_TxMessageOverrideIndices);
+         if (s32_Retval == C_NO_ERR)
+         {
+            //Rx
+            s32_Retval = mh_GetMessageEntries(u32_MessageCount, rc_CurData.u32_NewMessageCount, c_Table, c_MessagesList,
+                                              rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData,
+                                              rc_CurData.c_ImportData.c_Core.c_OSCRxSignalData,
+                                              rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerRxMessage,
+                                              rc_CurData.c_RxMessageOverrideIndices);
+         }
+      }
+   }
 
    if (s32_Retval == C_NO_ERR)
    {
-      if (m_CheckMessageMatches() == C_NO_ERR)
-      {
-         uint32 u32_NewEntryCount = 0UL;
-         uint32 u32_UpdatedEntryCount = 0UL;
-         QString c_TableNew;
-         QString c_TableUpdated;
-         sint32 s32_Result;
-         //Tx
-         s32_Result = mh_GetMessageEntries(u32_NewEntryCount, u32_UpdatedEntryCount, c_TableNew, c_TableUpdated,
-                                           this->mc_ImportedData.c_Core.c_OSCTxMessageData,
-                                           this->mc_ImportedData.c_Core.c_OSCTxSignalData,
-                                           this->mc_ImportedData.c_Core.c_WarningMessagesPerTxMessage,
-                                           this->mc_TxMessageOverrideIndices, true);
-         if (s32_Result == C_NO_ERR)
-         {
-            //Rx
-            s32_Result = mh_GetMessageEntries(u32_NewEntryCount, u32_UpdatedEntryCount, c_TableNew, c_TableUpdated,
-                                              this->mc_ImportedData.c_Core.c_OSCRxMessageData,
-                                              this->mc_ImportedData.c_Core.c_OSCRxSignalData,
-                                              this->mc_ImportedData.c_Core.c_WarningMessagesPerRxMessage,
-                                              this->mc_RxMessageOverrideIndices, false);
-            if (s32_Result == C_NO_ERR)
-            {
-               QString c_CompleteLog;
-               //Start
-               c_CompleteLog += "<html>";
-               c_CompleteLog += "<body>";
-               //File
-               c_CompleteLog += "<h3>";
-               c_CompleteLog += C_GtGetText::h_GetText("Source File Information");
-               c_CompleteLog += "</h3>";
-               c_CompleteLog += "<table><tr>";
-               c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
-               c_CompleteLog += C_GtGetText::h_GetText("Path:");
-               c_CompleteLog += "</td>";
-               c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
-               c_CompleteLog += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>").
-                                arg(this->mc_FilePath).
-                                arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                                arg(this->mc_FilePath);
-               c_CompleteLog += "</td></tr><tr>";
-               //Content
-               c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
-               c_CompleteLog += C_GtGetText::h_GetText("Read Content:");
-               c_CompleteLog += "</td>";
-               c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
-               //Add optional node name section
-               if (this->mc_ImportedData.c_NodeName.compare("") != 0)
-               {
-                  c_CompleteLog += QString(C_GtGetText::h_GetText("Node: %1; ")).arg(this->mc_ImportedData.c_NodeName);
-               }
-               //Translation: 1=Number of TX messages, 2=Number of RX messages
-               c_CompleteLog += QString(C_GtGetText::h_GetText("Messages: %1 Tx, %2 Rx;")).
-                                arg(this->mc_ImportedData.c_Core.c_OSCTxMessageData.size()).
-                                arg(this->mc_ImportedData.c_Core.c_OSCRxMessageData.size());
-               //Translation: 1=Number of signals
-               c_CompleteLog += QString(C_GtGetText::h_GetText(" Signals: %1")).arg(
-                  this->mc_ImportedData.c_Core.c_OSCTxSignalData.size() +
-                  this->mc_ImportedData.c_Core.c_OSCRxSignalData.size());
-               c_CompleteLog += "<br/>";
-               c_CompleteLog += C_GtGetText::h_GetText("For parsing errors, warnings and detailed information see ");
-               //Update log file
-               C_OSCLoggingHandler::h_Flush();
-               c_CompleteLog += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
-                                arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
-                                arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                                arg(C_GtGetText::h_GetText("log file"));
-               c_CompleteLog += "</td></tr></table>";
-               //Info
-               c_CompleteLog += "<h3>";
-               c_CompleteLog += C_GtGetText::h_GetText("Import Preview");
-               c_CompleteLog += "</h3>";
-               c_CompleteLog += "<p>";
-               c_CompleteLog += C_GtGetText::h_GetText("Info: Message and signal names are adapted as following:");
-               c_CompleteLog += "<br/>";
-               c_CompleteLog += "- ";
-               c_CompleteLog += C_GtGetText::h_GetText("Eliminate spaces");
-               c_CompleteLog += "<br/>";
-               c_CompleteLog += "- ";
-               c_CompleteLog += C_GtGetText::h_GetText("Cut to 31 characters");
-               c_CompleteLog += "</p>";
-               //Tables
-               if (u32_UpdatedEntryCount > 0UL)
-               {
-                  //Updated table
-                  c_CompleteLog += "<p><b>";
-                  //Translation: 1=Number of messages
-                  c_CompleteLog += QString(C_GtGetText::h_GetText("Updated messages (%1)")).arg(u32_UpdatedEntryCount);
-                  c_CompleteLog += "</b></p>";
-                  c_CompleteLog += "<table>";
-                  //Header
-                  c_CompleteLog += "<tr>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += "#</td>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += C_GtGetText::h_GetText("Type");
-                  c_CompleteLog += "</td>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += C_GtGetText::h_GetText("Name");
-                  c_CompleteLog += "</td>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += C_GtGetText::h_GetText("Signals");
-                  c_CompleteLog += "</td>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += C_GtGetText::h_GetText("Warnings");
-                  c_CompleteLog += "</td>";
-                  c_CompleteLog += "</tr>";
-                  //Content
-                  c_CompleteLog += c_TableUpdated;
-                  c_CompleteLog += "</table>";
-               }
-               if (u32_NewEntryCount > 0UL)
-               {
-                  //New table
-                  c_CompleteLog += "<p><b>";
-                  //Translation: 1=Number of messages
-                  c_CompleteLog += QString(C_GtGetText::h_GetText("New messages (%1)")).arg(u32_NewEntryCount);
-                  c_CompleteLog += "</b></p>";
-                  c_CompleteLog += "<table>";
-                  //Header
-                  c_CompleteLog += "<tr>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += "#</td>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += C_GtGetText::h_GetText("Type");
-                  c_CompleteLog += "</td>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += C_GtGetText::h_GetText("Name");
-                  c_CompleteLog += "</td>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += C_GtGetText::h_GetText("Signals");
-                  c_CompleteLog += "</td>";
-                  c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
-                  c_CompleteLog += C_GtGetText::h_GetText("Warnings");
-                  c_CompleteLog += "</td>";
-                  c_CompleteLog += "</tr>";
-                  //Content
-                  c_CompleteLog += c_TableNew;
-                  c_CompleteLog += "</table>";
-               }
-               //End
-               c_CompleteLog += "</body>";
-               c_CompleteLog += "</html>";
-               this->mpc_Ui->pc_TextBrowserReport->setHtml(c_CompleteLog);
-            }
-         }
+      QString c_CompleteLog;
 
-         // remember new message count
-         this->mu32_NewMessageCount = u32_NewEntryCount;
-      }
-      else
+      //Start
+      c_CompleteLog += "<html>";
+      c_CompleteLog += "<body>";
+      //File
+      c_CompleteLog += "<h3>";
+      c_CompleteLog += C_GtGetText::h_GetText("Source File Information");
+      c_CompleteLog += "</h3>";
+      c_CompleteLog += "<table><tr>";
+      c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
+      c_CompleteLog += C_GtGetText::h_GetText("Path:");
+      c_CompleteLog += "</td>";
+      c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
+      c_CompleteLog += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>").
+                       arg(this->mc_FilePath).
+                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+                       arg(this->mc_FilePath);
+      c_CompleteLog += "</td></tr><tr>";
+
+      //Content
+      c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
+      c_CompleteLog += C_GtGetText::h_GetText("Read Content:");
+      c_CompleteLog += "</td>";
+      c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
+      //Add node names
+      c_CompleteLog += C_GtGetText::h_GetText("Nodes: ");
+      for (uint32 u32_ItNodes = 0; u32_ItNodes < this->mc_ImportedAssignedData.size(); u32_ItNodes++)
       {
-         s32_Retval = C_CONFIG;
+         C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
+         c_CompleteLog += rc_CurData.c_ImportData.c_NodeName;
+         c_CompleteLog += QString(C_GtGetText::h_GetText(" (%1 Tx / %2 Rx); ")).
+                          arg(rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.size()).
+                          arg(rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.size());
       }
+      c_CompleteLog += "<br/>";
+      c_CompleteLog += C_GtGetText::h_GetText("For parsing errors, warnings and detailed information see ");
+      c_CompleteLog += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
+                       arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+                       arg(C_GtGetText::h_GetText("log file"));
+      c_CompleteLog += "</td></tr></table>";
+
+      //Update log file
+      C_OSCLoggingHandler::h_Flush();
+
+      //Info
+      c_CompleteLog += "<h3>";
+      c_CompleteLog += C_GtGetText::h_GetText("Import Preview");
+      c_CompleteLog += "</h3>";
+      c_CompleteLog += "<p>";
+      c_CompleteLog += C_GtGetText::h_GetText("Info: Message and signal names are adapted as follows:");
+      c_CompleteLog += "<br/>";
+      c_CompleteLog += "- ";
+      c_CompleteLog += C_GtGetText::h_GetText("Eliminate spaces");
+      c_CompleteLog += "<br/>";
+      c_CompleteLog += "- ";
+      c_CompleteLog += C_GtGetText::h_GetText("Cut to 31 characters");
+      c_CompleteLog += "</p>";
+
+      //Table
+
+      if (c_Table.isEmpty() == false)
+      {
+         //New table
+         c_CompleteLog += "<p><b>";
+         //Translation: 1=Number of messages
+         c_CompleteLog += QString(C_GtGetText::h_GetText("Import Messages (%1)")).arg(u32_MessageCount);
+         c_CompleteLog += "</b></p>";
+         c_CompleteLog += "<table>";
+         //Header
+         c_CompleteLog += "<tr>";
+         c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
+         c_CompleteLog += "#</td>";
+         c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
+         c_CompleteLog += C_GtGetText::h_GetText("Name");
+         c_CompleteLog += "</td>";
+         c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
+         c_CompleteLog += C_GtGetText::h_GetText("Signals");
+         c_CompleteLog += "</td>";
+         c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_HEADER_START;
+         c_CompleteLog += C_GtGetText::h_GetText("Warnings");
+         c_CompleteLog += "</td>";
+         c_CompleteLog += "</tr>";
+         //Content
+         c_CompleteLog += c_Table;
+         c_CompleteLog += "</table>";
+      }
+
+      //End
+      c_CompleteLog += "</body>";
+      c_CompleteLog += "</html>";
+      this->mpc_Ui->pc_TextBrowserReport->setHtml(c_CompleteLog);
    }
+
+   if (s32_Retval != C_NO_ERR)
+   {
+      s32_Retval = C_CONFIG;
+   }
+
    return s32_Retval;
 }
 
@@ -742,87 +573,103 @@ sint32 C_CieImportReportWidget::m_CheckMessages(void) const
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   if (this->mc_ImportedData.c_Core.c_OSCRxMessageData.size() != this->mc_ImportedData.c_Ui.c_UiRxMessageData.size())
+   //Each imported node
+   for (uint32 u32_ItNodes = 0; (u32_ItNodes < this->mc_ImportedAssignedData.size()) && (s32_Retval == C_NO_ERR);
+        u32_ItNodes++)
    {
-      s32_Retval = C_CONFIG;
-   }
-   else
-   {
-      uint32 u32_SignalSum = 0;
-      for (uint32 u32_ItMessage = 0; u32_ItMessage < this->mc_ImportedData.c_Core.c_OSCRxMessageData.size();
-           ++u32_ItMessage)
-      {
-         const C_OSCCanMessage & rc_OSCCurMessage = this->mc_ImportedData.c_Core.c_OSCRxMessageData[u32_ItMessage];
-         const C_PuiSdNodeCanMessage & rc_UiCurMessage = this->mc_ImportedData.c_Ui.c_UiRxMessageData[u32_ItMessage];
-         if (rc_OSCCurMessage.c_Signals.size() != rc_UiCurMessage.c_Signals.size())
-         {
-            s32_Retval = C_CONFIG;
-         }
-         for (uint32 u32_ItSignal = 0; u32_ItSignal < rc_OSCCurMessage.c_Signals.size(); ++u32_ItSignal)
-         {
-            const C_OSCCanSignal & rc_CurSignal = rc_OSCCurMessage.c_Signals[u32_ItSignal];
-            if (rc_CurSignal.u32_ComDataElementIndex >= this->mc_ImportedData.c_Core.c_OSCRxSignalData.size())
-            {
-               s32_Retval = C_CONFIG;
-            }
-         }
-         u32_SignalSum += rc_OSCCurMessage.c_Signals.size();
-      }
-      if (this->mc_ImportedData.c_Core.c_OSCRxSignalData.size() != u32_SignalSum)
-      {
-         s32_Retval = C_CONFIG;
-      }
-   }
-   if (this->mc_ImportedData.c_Core.c_OSCTxMessageData.size() != this->mc_ImportedData.c_Ui.c_UiTxMessageData.size())
-   {
-      s32_Retval = C_CONFIG;
-   }
-   else
-   {
-      uint32 u32_SignalSum = 0;
-      for (uint32 u32_ItMessage = 0; u32_ItMessage < this->mc_ImportedData.c_Core.c_OSCTxMessageData.size();
-           ++u32_ItMessage)
-      {
-         const C_OSCCanMessage & rc_OSCCurMessage = this->mc_ImportedData.c_Core.c_OSCTxMessageData[u32_ItMessage];
-         const C_PuiSdNodeCanMessage & rc_UiCurMessage = this->mc_ImportedData.c_Ui.c_UiTxMessageData[u32_ItMessage];
-         if (rc_OSCCurMessage.c_Signals.size() != rc_UiCurMessage.c_Signals.size())
-         {
-            s32_Retval = C_CONFIG;
-         }
-         for (uint32 u32_ItSignal = 0; u32_ItSignal < rc_OSCCurMessage.c_Signals.size(); ++u32_ItSignal)
-         {
-            const C_OSCCanSignal & rc_CurSignal = rc_OSCCurMessage.c_Signals[u32_ItSignal];
-            if (rc_CurSignal.u32_ComDataElementIndex >= this->mc_ImportedData.c_Core.c_OSCTxSignalData.size())
-            {
-               s32_Retval = C_CONFIG;
-            }
-         }
-         u32_SignalSum += rc_OSCCurMessage.c_Signals.size();
-      }
-      if (this->mc_ImportedData.c_Core.c_OSCTxSignalData.size() != u32_SignalSum)
-      {
-         s32_Retval = C_CONFIG;
-      }
-   }
-   if (this->mc_ImportedData.c_Core.c_OSCRxSignalData.size() != this->mc_ImportedData.c_Ui.c_UiRxSignalData.size())
-   {
-      s32_Retval = C_CONFIG;
-   }
-   if (this->mc_ImportedData.c_Core.c_OSCTxSignalData.size() != this->mc_ImportedData.c_Ui.c_UiTxSignalData.size())
-   {
-      s32_Retval = C_CONFIG;
-   }
-   if (this->mc_ImportedData.c_Core.c_OSCRxMessageData.size() !=
-       this->mc_ImportedData.c_Core.c_WarningMessagesPerRxMessage.size())
-   {
-      s32_Retval = C_CONFIG;
-   }
-   if (this->mc_ImportedData.c_Core.c_OSCTxMessageData.size() !=
-       this->mc_ImportedData.c_Core.c_WarningMessagesPerTxMessage.size())
-   {
-      s32_Retval = C_CONFIG;
-   }
+      const C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
 
+      if (rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.size() !=
+          rc_CurData.c_ImportData.c_Ui.c_UiRxMessageData.size())
+      {
+         s32_Retval = C_CONFIG;
+      }
+      else
+      {
+         uint32 u32_SignalSum = 0;
+         for (uint32 u32_ItMessage = 0;
+              (u32_ItMessage < rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.size()) && (s32_Retval == C_NO_ERR);
+              ++u32_ItMessage)
+         {
+            const C_OSCCanMessage & rc_OSCCurMessage = rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData[u32_ItMessage];
+            const C_PuiSdNodeCanMessage & rc_UiCurMessage =
+               rc_CurData.c_ImportData.c_Ui.c_UiRxMessageData[u32_ItMessage];
+            if (rc_OSCCurMessage.c_Signals.size() != rc_UiCurMessage.c_Signals.size())
+            {
+               s32_Retval = C_CONFIG;
+            }
+            for (uint32 u32_ItSignal = 0;
+                 (u32_ItSignal < rc_OSCCurMessage.c_Signals.size()) && (s32_Retval == C_NO_ERR); ++u32_ItSignal)
+            {
+               const C_OSCCanSignal & rc_CurSignal = rc_OSCCurMessage.c_Signals[u32_ItSignal];
+               if (rc_CurSignal.u32_ComDataElementIndex >= rc_CurData.c_ImportData.c_Core.c_OSCRxSignalData.size())
+               {
+                  s32_Retval = C_CONFIG;
+               }
+            }
+            u32_SignalSum += rc_OSCCurMessage.c_Signals.size();
+         }
+         if (rc_CurData.c_ImportData.c_Core.c_OSCRxSignalData.size() != u32_SignalSum)
+         {
+            s32_Retval = C_CONFIG;
+         }
+      }
+      if (rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.size() !=
+          rc_CurData.c_ImportData.c_Ui.c_UiTxMessageData.size())
+      {
+         s32_Retval = C_CONFIG;
+      }
+      else
+      {
+         uint32 u32_SignalSum = 0;
+         for (uint32 u32_ItMessage = 0;
+              (u32_ItMessage < rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.size()) && (s32_Retval == C_NO_ERR);
+              ++u32_ItMessage)
+         {
+            const C_OSCCanMessage & rc_OSCCurMessage = rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData[u32_ItMessage];
+            const C_PuiSdNodeCanMessage & rc_UiCurMessage =
+               rc_CurData.c_ImportData.c_Ui.c_UiTxMessageData[u32_ItMessage];
+            if (rc_OSCCurMessage.c_Signals.size() != rc_UiCurMessage.c_Signals.size())
+            {
+               s32_Retval = C_CONFIG;
+            }
+            for (uint32 u32_ItSignal = 0;
+                 (u32_ItSignal < rc_OSCCurMessage.c_Signals.size()) && (s32_Retval == C_NO_ERR); ++u32_ItSignal)
+            {
+               const C_OSCCanSignal & rc_CurSignal = rc_OSCCurMessage.c_Signals[u32_ItSignal];
+               if (rc_CurSignal.u32_ComDataElementIndex >= rc_CurData.c_ImportData.c_Core.c_OSCTxSignalData.size())
+               {
+                  s32_Retval = C_CONFIG;
+               }
+            }
+            u32_SignalSum += rc_OSCCurMessage.c_Signals.size();
+         }
+         if (rc_CurData.c_ImportData.c_Core.c_OSCTxSignalData.size() != u32_SignalSum)
+         {
+            s32_Retval = C_CONFIG;
+         }
+      }
+      if (rc_CurData.c_ImportData.c_Core.c_OSCRxSignalData.size() !=
+          rc_CurData.c_ImportData.c_Ui.c_UiRxSignalData.size())
+      {
+         s32_Retval = C_CONFIG;
+      }
+      if (rc_CurData.c_ImportData.c_Core.c_OSCTxSignalData.size() !=
+          rc_CurData.c_ImportData.c_Ui.c_UiTxSignalData.size())
+      {
+         s32_Retval = C_CONFIG;
+      }
+      if (rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.size() !=
+          rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerRxMessage.size())
+      {
+         s32_Retval = C_CONFIG;
+      }
+      if (rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.size() !=
+          rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerTxMessage.size())
+      {
+         s32_Retval = C_CONFIG;
+      }
+   }
    return s32_Retval;
 }
 
@@ -838,29 +685,38 @@ sint32 C_CieImportReportWidget::m_CheckMessageMatches(void)
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   // Make sure these are empty
-   this->mc_RxMessageOverrideIndices.clear();
-   this->mc_TxMessageOverrideIndices.clear();
-
-   std::vector<stw_opensyde_core::C_OSCCanMessage>::const_iterator c_DBCMessageIt;
-   std::pair<sint32, sint32> c_OverrideInfo;
-
-   // Check every Tx message of DBC
-   for (c_DBCMessageIt = this->mc_ImportedData.c_Core.c_OSCTxMessageData.begin();
-        c_DBCMessageIt != this->mc_ImportedData.c_Core.c_OSCTxMessageData.end();
-        ++c_DBCMessageIt)
+   //Each imported node
+   for (uint32 u32_ItNodes = 0; (u32_ItNodes < this->mc_ImportedAssignedData.size()) && (s32_Retval == C_NO_ERR);
+        u32_ItNodes++)
    {
-      s32_Retval = m_GetMessageOverrideInfo(*c_DBCMessageIt, true, c_OverrideInfo);
-      this->mc_TxMessageOverrideIndices.push_back(c_OverrideInfo);
-   }
+      C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
 
-   // Check every Rx message of DBC
-   for (c_DBCMessageIt = this->mc_ImportedData.c_Core.c_OSCRxMessageData.begin();
-        c_DBCMessageIt != this->mc_ImportedData.c_Core.c_OSCRxMessageData.end();
-        ++c_DBCMessageIt)
-   {
-      s32_Retval = m_GetMessageOverrideInfo(*c_DBCMessageIt, false, c_OverrideInfo);
-      this->mc_RxMessageOverrideIndices.push_back(c_OverrideInfo);
+      // Make sure these are empty
+      rc_CurData.c_RxMessageOverrideIndices.clear();
+      rc_CurData.c_TxMessageOverrideIndices.clear();
+
+      std::vector<stw_opensyde_core::C_OSCCanMessage>::const_iterator c_DBCMessageIt;
+      std::pair<sint32, sint32> c_OverrideInfo;
+
+      // Check every Tx message of DBC
+      for (c_DBCMessageIt = rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.begin();
+           (c_DBCMessageIt != rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.end()) && (s32_Retval == C_NO_ERR);
+           ++c_DBCMessageIt)
+      {
+         s32_Retval = m_GetMessageOverrideInfo(*c_DBCMessageIt, true, rc_CurData.u32_OsyNodeIndex,
+                                               rc_CurData.u32_OsyInterfaceIndex, c_OverrideInfo);
+         rc_CurData.c_TxMessageOverrideIndices.push_back(c_OverrideInfo);
+      }
+
+      // Check every Rx message of DBC
+      for (c_DBCMessageIt = rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.begin();
+           (c_DBCMessageIt != rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.end()) && (s32_Retval == C_NO_ERR);
+           ++c_DBCMessageIt)
+      {
+         s32_Retval = m_GetMessageOverrideInfo(*c_DBCMessageIt, false, rc_CurData.u32_OsyNodeIndex,
+                                               rc_CurData.u32_OsyInterfaceIndex, c_OverrideInfo);
+         rc_CurData.c_RxMessageOverrideIndices.push_back(c_OverrideInfo);
+      }
    }
 
    return s32_Retval;
@@ -869,9 +725,11 @@ sint32 C_CieImportReportWidget::m_CheckMessageMatches(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Compare a DBC message with existing messages to find out if the message is new or just an update.
 
-   \param[in]     orc_DBCMessageToFind       message from DBC file that should be checked for existing message
-   \param[in]     oq_Tx                      flag if message is Tx
-   \param[out]    orc_MessageOverrideInfo    pair of datapool index and index of message in corresponding protocol
+   \param[in]   orc_DBCMessageToFind      message from DBC file that should be checked for existing message
+   \param[in]   oq_Tx                     flag if message is Tx
+   \param[in]   ou32_OsyNodeIndex         Osy node index
+   \param[in]   ou32_OsyInterfaceIndex    Osy interface index
+   \param[out]  orc_MessageOverrideInfo   pair of datapool index and index of message in corresponding protocol
 
    \return
    C_NO_ERR Operation success
@@ -879,13 +737,18 @@ sint32 C_CieImportReportWidget::m_CheckMessageMatches(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportReportWidget::m_GetMessageOverrideInfo(const C_OSCCanMessage & orc_DBCMessageToFind, const bool oq_Tx,
-                                                         std::pair<sint32, sint32>  & orc_MessageOverrideInfo) const
+                                                         const uint32 ou32_OsyNodeIndex,
+                                                         const uint32 ou32_OsyInterfaceIndex,
+                                                         std::pair<stw_types::sint32,
+                                                                   stw_types::sint32> & orc_MessageOverrideInfo)
+const
 {
    sint32 s32_Retval = C_NO_ERR;
-   const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
    // reset
    orc_MessageOverrideInfo = std::make_pair(-1, -1);
+
+   const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_OsyNodeIndex);
 
    if (pc_Node != NULL)
    {
@@ -898,10 +761,10 @@ sint32 C_CieImportReportWidget::m_GetMessageOverrideInfo(const C_OSCCanMessage &
          const C_OSCCanProtocol * const pc_Protocol = *c_ProtocolIt;
          if (pc_Protocol != NULL)
          {
-            if (this->mu32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
+            if (ou32_OsyInterfaceIndex < pc_Protocol->c_ComMessages.size())
             {
                const C_OSCCanMessageContainer & rc_MessageContainer =
-                  pc_Protocol->c_ComMessages[this->mu32_InterfaceIndex];
+                  pc_Protocol->c_ComMessages[ou32_OsyInterfaceIndex];
                const std::vector<C_OSCCanMessage> & rc_Messages = rc_MessageContainer.GetMessagesConst(oq_Tx);
 
                // Check all existing messages for a match (CAN Id and Name)
@@ -929,6 +792,7 @@ sint32 C_CieImportReportWidget::m_GetMessageOverrideInfo(const C_OSCCanMessage &
          }
       }
    }
+
    else
    {
       s32_Retval = C_CONFIG;
@@ -939,59 +803,69 @@ sint32 C_CieImportReportWidget::m_GetMessageOverrideInfo(const C_OSCCanMessage &
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Basic implementation for insert messages action
-
-   \param[in]  ou32_DatpoolIndexForNewContent   Index of datapool where new messages shall be inserted
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieImportReportWidget::m_InsertMessages(const uint32 ou32_DatpoolIndexForNewContent) const
+void C_CieImportReportWidget::m_InsertMessages(void) const
 {
-   // Insert Tx messages
-   sint32 s32_Retval = mh_InsertMessages(this->mu32_NodeIndex, this->me_ProtocolType, this->mu32_InterfaceIndex,
-                                         ou32_DatpoolIndexForNewContent, true,
-                                         this->mc_ImportedData.c_Core.c_OSCTxMessageData,
-                                         this->mc_ImportedData.c_Ui.c_UiTxMessageData,
-                                         this->mc_ImportedData.c_Core.c_OSCTxSignalData,
-                                         this->mc_ImportedData.c_Ui.c_UiTxSignalData,
-                                         this->mc_TxMessageOverrideIndices);
-
-   tgl_assert(s32_Retval == C_NO_ERR);
-   if (s32_Retval == C_NO_ERR)
+   //Each imported node
+   for (uint32 u32_ItNodes = 0; u32_ItNodes < this->mc_ImportedAssignedData.size(); u32_ItNodes++)
    {
-      // Insert Rx messages
-      s32_Retval = mh_InsertMessages(this->mu32_NodeIndex, this->me_ProtocolType, this->mu32_InterfaceIndex,
-                                     ou32_DatpoolIndexForNewContent, false,
-                                     this->mc_ImportedData.c_Core.c_OSCRxMessageData,
-                                     this->mc_ImportedData.c_Ui.c_UiRxMessageData,
-                                     this->mc_ImportedData.c_Core.c_OSCRxSignalData,
-                                     this->mc_ImportedData.c_Ui.c_UiRxSignalData,
-                                     this->mc_RxMessageOverrideIndices);
-      tgl_assert(s32_Retval == C_NO_ERR);
+      const C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
+
+      tgl_assert(rc_CurData.s32_DatapoolIndexForNew >= 0);
+      if (rc_CurData.s32_DatapoolIndexForNew >= 0)
+      {
+         // Insert Tx messages
+         sint32 s32_Retval = mh_InsertMessages(rc_CurData.u32_OsyNodeIndex, this->me_ProtocolType,
+                                               rc_CurData.u32_OsyInterfaceIndex,
+                                               rc_CurData.s32_DatapoolIndexForNew, true,
+                                               rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData,
+                                               rc_CurData.c_ImportData.c_Ui.c_UiTxMessageData,
+                                               rc_CurData.c_ImportData.c_Core.c_OSCTxSignalData,
+                                               rc_CurData.c_ImportData.c_Ui.c_UiTxSignalData,
+                                               rc_CurData.c_TxMessageOverrideIndices);
+
+         tgl_assert(s32_Retval == C_NO_ERR);
+         if (s32_Retval == C_NO_ERR)
+         {
+            // Insert Rx messages
+            s32_Retval = mh_InsertMessages(rc_CurData.u32_OsyNodeIndex, this->me_ProtocolType,
+                                           rc_CurData.u32_OsyInterfaceIndex,
+                                           rc_CurData.s32_DatapoolIndexForNew, false,
+                                           rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData,
+                                           rc_CurData.c_ImportData.c_Ui.c_UiRxMessageData,
+                                           rc_CurData.c_ImportData.c_Core.c_OSCRxSignalData,
+                                           rc_CurData.c_ImportData.c_Ui.c_UiRxSignalData,
+                                           rc_CurData.c_RxMessageOverrideIndices);
+            tgl_assert(s32_Retval == C_NO_ERR);
+         }
+      }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Format multiple message entries in import report
 
-   \param[in,out] oru32_NewEntryCount        Number of entries in table for new messages
-   \param[in,out] oru32_UpdatedEntryCount    Number of entries in table for updated messages
-   \param[in,out] orc_TableNew               Current content of table for new messages
-   \param[in,out] orc_TableUpdated           Current content of table for updated messages
-   \param[in]     orc_OSCMessageData         Imported core message data for this message type (TX or RX)
-   \param[in]     orc_OSCAllSignalData       All signal data for this message type (TX or RX)
-   \param[in]     orc_InfoMessagesPerMessage Info messages for imported CAN messages for this message type (TX or RX)
-   \param[in]     orc_MessageOverrideIndices Indices indicating if message will get replaced or will be added
-   \param[in]     oq_IsTx                    Flag if messages are TX or RX
+   \param[in,out]  oru32_EntryCount             Number of entries in messages table
+   \param[out]     oru32_NewEntryCount          New entry count
+   \param[in,out]  orc_TableEntries             Current content of messages table
+   \param[in,out]  orc_MessageList              All already listed messages
+   \param[in]      orc_OSCMessageData           Imported core message data for this message type (Tx or Rx)
+   \param[in]      orc_OSCAllSignalData         All signal data for this message type (Tx or Rx)
+   \param[in]      orc_InfoMessagesPerMessage   Info messages for imported CAN messages for this message type (Tx or Rx)
+   \param[in]      orc_MessageOverrideIndices   Indices indicating if message will get replaced or will be added
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportReportWidget::mh_GetMessageEntries(uint32 & oru32_NewEntryCount, uint32 & oru32_UpdatedEntryCount,
-                                                     QString & orc_TableNew, QString & orc_TableUpdated,
+sint32 C_CieImportReportWidget::mh_GetMessageEntries(uint32 & oru32_EntryCount, uint32 & oru32_NewEntryCount,
+                                                     QString & orc_TableEntries,
+                                                     std::vector<C_OSCCanMessage> & orc_MessageList,
                                                      const std::vector<C_OSCCanMessage> & orc_OSCMessageData,
-                                                     const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const std::vector<QString> & orc_InfoMessagesPerMessage, const std::vector< std::pair<stw_types::sint32, stw_types::sint32> > & orc_MessageOverrideIndices,
-                                                     const bool oq_IsTx)
+                                                     const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const std::vector<QString> & orc_InfoMessagesPerMessage, const std::vector< std::pair<stw_types::sint32,
+                                                                                                                                                                                                                   stw_types::sint32> > & orc_MessageOverrideIndices)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -1001,26 +875,35 @@ sint32 C_CieImportReportWidget::mh_GetMessageEntries(uint32 & oru32_NewEntryCoun
    if ((orc_MessageOverrideIndices.size() == orc_OSCMessageData.size()) &&
        (orc_MessageOverrideIndices.size() == orc_InfoMessagesPerMessage.size()))
    {
-      const QString c_TableRowStart = "<tr>";
-      const QString c_TableRowEnd = "</tr>";
-
       for (uint32 u32_ItMessage = 0; u32_ItMessage < orc_MessageOverrideIndices.size(); ++u32_ItMessage)
       {
-         QString c_Entry;
-         if (orc_MessageOverrideIndices[u32_ItMessage].second >= 0L)
+         bool q_AddToTable = true;
+         // check if message is already in table
+         for (std::vector<C_OSCCanMessage>::const_iterator c_MessIt = orc_MessageList.begin();
+              c_MessIt != orc_MessageList.end(); ++c_MessIt)
          {
-            c_Entry = mh_GetMessageEntry(oru32_UpdatedEntryCount, orc_OSCMessageData[u32_ItMessage],
-                                         orc_OSCAllSignalData,
-                                         orc_InfoMessagesPerMessage[u32_ItMessage], oq_IsTx);
-            orc_TableUpdated += c_TableRowStart + c_Entry + c_TableRowEnd;
-            ++oru32_UpdatedEntryCount;
+            const C_OSCCanMessage & rc_Message = *c_MessIt;
+            if (!(rc_Message != orc_OSCMessageData[u32_ItMessage]))
+            {
+               q_AddToTable = false;
+               break;
+            }
          }
-         else
+
+         if (q_AddToTable == true)
          {
-            c_Entry = mh_GetMessageEntry(oru32_NewEntryCount, orc_OSCMessageData[u32_ItMessage],
-                                         orc_OSCAllSignalData,
-                                         orc_InfoMessagesPerMessage[u32_ItMessage], oq_IsTx);
-            orc_TableNew += c_TableRowStart + c_Entry + c_TableRowEnd;
+            orc_TableEntries += "<tr>";
+            orc_TableEntries += mh_GetMessageEntry(oru32_EntryCount, orc_OSCMessageData[u32_ItMessage],
+                                                   orc_OSCAllSignalData,
+                                                   orc_InfoMessagesPerMessage[u32_ItMessage]);
+            orc_TableEntries += "</tr>";
+            ++oru32_EntryCount;
+            orc_MessageList.push_back(orc_OSCMessageData[u32_ItMessage]);
+         }
+
+         // count if message is new for this node (needed later to know if datapool selection is obligatory)
+         if (orc_MessageOverrideIndices[u32_ItMessage].second < 0L)
+         {
             ++oru32_NewEntryCount;
          }
       }
@@ -1035,19 +918,18 @@ sint32 C_CieImportReportWidget::mh_GetMessageEntries(uint32 & oru32_NewEntryCoun
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Format one message entry in import report
 
-   \param[in] ou32_Index           Current index (Displayed)
-   \param[in] orc_CurMessage       Current message
-   \param[in] orc_OSCAllSignalData All signal data for this message type (TX or RX)
-   \param[in] orc_InfoMessages     All info messages for this message
-   \param[in] oq_IsTx              Flag if messages are TX or RX
+   \param[in]  ou32_Index              Current index (Displayed)
+   \param[in]  orc_CurMessage          Current message
+   \param[in]  orc_OSCAllSignalData    All signal data for this message type (Tx or Rx)
+   \param[in]  orc_InfoMessages        All info messages for this message
 
    \return
    One message entry in import report
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32 ou32_Index, const C_OSCCanMessage & orc_CurMessage,
-                                                    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const QString & orc_InfoMessages,
-                                                    const bool oq_IsTx)
+                                                    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData,
+                                                    const QString & orc_InfoMessages)
 {
    const QString c_TableEntryEnd = "</td>";
    const QString c_LineBreak = "<br/>";
@@ -1057,17 +939,6 @@ QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32 ou32_Index, con
    //Index
    c_Retval += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START + QString::number(ou32_Index + 1UL) +
                c_TableEntryEnd;
-   //Message type
-   c_Retval += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
-   if (oq_IsTx == true)
-   {
-      c_Retval += C_GtGetText::h_GetText("Tx");
-   }
-   else
-   {
-      c_Retval += C_GtGetText::h_GetText("Rx");
-   }
-   c_Retval += c_TableEntryEnd;
    //Message name
    //Translation: 1=CAN Message name, 2=CAN Message ID
    c_Retval += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START + QString("%1 (0x%2)").arg(
@@ -1114,15 +985,16 @@ QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32 ou32_Index, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert all specified messages into the specified message container
 
-   \param[in] ou32_NodeIndex             Node index (ID)
-   \param[in] oe_Type                    COMM protocol type (ID)
-   \param[in] ou32_InterfaceIndex        Interface index (ID)
-   \param[in] oq_MessagesAreTx           Flag if messages are TX (ID)
-   \param[in] orc_OSCMessageData         Imported core message data
-   \param[in] orc_UiMessageData          Imported UI message data
-   \param[in] orc_OSCSignalData          Imported core signal data
-   \param[in] orc_UiSignalData           Imported UI signal data
-   \param[in] orc_MessageOverrideIndices Indices indicating if message will get replaced or will be added
+   \param[in]  ou32_NodeIndex                   Node index (ID)
+   \param[in]  oe_Type                          COMM protocol type (ID)
+   \param[in]  ou32_InterfaceIndex              Interface index (ID)
+   \param[in]  ou32_DatapoolIndexForNewContent  Datapool index for new content
+   \param[in]  oq_MessagesAreTx                 Flag if messages are Tx (ID)
+   \param[in]  orc_OSCMessageData               Imported core message data
+   \param[in]  orc_UiMessageData                Imported UI message data
+   \param[in]  orc_OSCSignalData                Imported core signal data
+   \param[in]  orc_UiSignalData                 Imported UI signal data
+   \param[in]  orc_MessageOverrideIndices       Indices indicating if message will get replaced or will be added
 
    \return
    C_NO_ERR Operation success
@@ -1197,7 +1069,7 @@ sint32 C_CieImportReportWidget::mh_InsertMessages(const uint32 ou32_NodeIndex, c
                                                                ou32_DatapoolIndexForNewContent, oq_MessagesAreTx,
                                                                rc_CurMessage,
                                                                c_CurOSCSignalCommons, c_CurUISignalCommons,
-                                                               rc_UiMessage.c_Signals, false) != C_NO_ERR)
+                                                               rc_UiMessage, false) != C_NO_ERR)
             {
                s32_Retval = C_RANGE;
             }
@@ -1213,8 +1085,8 @@ sint32 C_CieImportReportWidget::mh_InsertMessages(const uint32 ou32_NodeIndex, c
 
                const stw_opensyde_core::C_OSCCanMessageContainer * pc_Container =
                   C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(ou32_NodeIndex, oe_Type,
-                                                                                  u32_PresentDatapoolIndex,
-                                                                                  ou32_InterfaceIndex);
+                                                                                  ou32_InterfaceIndex,
+                                                                                  u32_PresentDatapoolIndex);
                if ((pc_Container != NULL) && (ou32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
                {
                   const C_OSCCanMessageIdentificationIndices c_Id(
@@ -1272,7 +1144,7 @@ sint32 C_CieImportReportWidget::mh_InsertMessages(const uint32 ou32_NodeIndex, c
                         if (C_PuiSdHandler::h_GetInstance()->InsertCanMessage(c_Id, rc_CurMessage,
                                                                               c_CurOSCSignalCommons,
                                                                               c_CurUISignalCommons,
-                                                                              rc_UiMessage.c_Signals,
+                                                                              rc_UiMessage,
                                                                               false) != C_NO_ERR)
                         {
                            s32_Retval = C_RANGE;

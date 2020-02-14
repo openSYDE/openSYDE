@@ -43,8 +43,8 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Scene  Scene to use undo redo framework for
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Scene     Scene to use undo redo framework for
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyManager::C_SdManUnoTopologyManager(QGraphicsScene * const opc_Scene, QObject * const opc_Parent) :
@@ -67,9 +67,9 @@ C_SdManUnoTopologyManager::~C_SdManUnoTopologyManager(void)
 
    With check for z order priority
 
-   \param[in]     orc_SelectedItems All selected items
-   \param[in]     orc_Items         All items
-   \param[in]     oq_BringToFront   Flag if this is the bring to front action (otherwise send to back assumed)
+   \param[in]  orc_SelectedItems    All selected items
+   \param[in]  orc_Items            All items
+   \param[in]  oq_BringToFront      Flag if this is the bring to front action (otherwise send to back assumed)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_SelectedItems,
@@ -100,7 +100,7 @@ void C_SdManUnoTopologyManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_S
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do delete
 
-   \param[in,out] orc_Items Items to delete
+   \param[in,out]  orc_Items  Items to delete
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoDelete(const QList<QGraphicsItem *> & orc_Items)
@@ -133,10 +133,10 @@ void C_SdManUnoTopologyManager::DoDelete(const QList<QGraphicsItem *> & orc_Item
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add one element
 
-   \param[in]     ore_Type                  Type
-   \param[in]     oru64_UniqueID            Unique ID
-   \param[in]     orc_NewPos                Position
-   \param[in]     orc_AdditionalInformation Additional string information
+   \param[in]  ore_Type                   Type
+   \param[in]  oru64_UniqueID             Unique ID
+   \param[in]  orc_NewPos                 Position
+   \param[in]  orc_AdditionalInformation  Additional string information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddGeneric(const C_SdManUnoTopologyAddCommand::E_ElementType & ore_Type,
@@ -157,10 +157,10 @@ void C_SdManUnoTopologyManager::DoAddGeneric(const C_SdManUnoTopologyAddCommand:
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add one element
 
-   \param[in]     ore_Type                  Type
-   \param[in]     oru64_UniqueIDBus         Unique ID for bus element
-   \param[in]     oru64_UniqueIDBusName     Unique ID for bus name text element
-   \param[in]     orc_NewPos                Position
+   \param[in]  ore_Type                Type
+   \param[in]  oru64_UniqueIDBus       Unique ID for bus element
+   \param[in]  oru64_UniqueIDBusName   Unique ID for bus name text element
+   \param[in]  orc_NewPos              Position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_ElementType & ore_Type,
@@ -182,13 +182,12 @@ void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_E
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add one bus connector element
 
-   \param[in]     ore_Type             Type
-   \param[in]     oru64_UniqueID       Unique ID
-   \param[in]     orc_NewPos           Position
-   \param[in]     opc_Node             Node for bus connector creation
-   \param[in]     opc_Bus              Bus for bus connector creation
-   \param[in]     oru8_InterfaceNumber Interface number for bus connector creation
-   \param[in]     oru8_NodeId          New node id
+   \param[in]  oru64_UniqueID          Unique ID
+   \param[in]  orc_NewPos              Position
+   \param[in]  opc_Node                Node for bus connector creation
+   \param[in]  opc_Bus                 Bus for bus connector creation
+   \param[in]  oru8_InterfaceNumber    Interface number for bus connector creation
+   \param[in]  oru8_NodeId             New node id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID, const QPointF & orc_NewPos,
@@ -217,20 +216,26 @@ void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do add one node to node connection and create a new bus
 
-   \param[in] orc_FourUniqueIds         Four unique IDs for the four new items created by this action
-   \param[in] ore_BusType               Bus type to create
-   \param[in] orc_BusName               Bus name to use initially
-   \param[in] orc_BusPosition           Target bus position
-   \param[in] oru64_Node1UniqueID       Node 1 unique ID
-   \param[in] oru64_Node2UniqueID       Node 2 unique ID
-   \param[in] oru8_Node1InterfaceNumber Node 1 interface number
-   \param[in] oru8_Node2InterfaceNumber Node 2 interface number
-   \param[in] oru8_Node1NodeID          Node 1 node ID
-   \param[in] oru8_Node2NodeID          Node 2 node ID
+   \param[in]  orc_FourUniqueIds          Four unique IDs for the four new items created by this action
+   \param[in]  ore_BusType                Bus type to create
+   \param[in]  orc_BusName                Bus name to use initially
+   \param[in]  orc_BusPosition            Target bus position
+   \param[in]  oru64_Node1UniqueID        Node 1 unique ID
+   \param[in]  oru64_Node2UniqueID        Node 2 unique ID
+   \param[in]  oru8_Node1InterfaceNumber  Node 1 interface number
+   \param[in]  oru8_Node2InterfaceNumber  Node 2 interface number
+   \param[in]  oru8_Node1NodeID           Node 1 node ID
+   \param[in]  oru8_Node2NodeID           Node 2 node ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const std::vector<uint64> & orc_FourUniqueIds,
-                                                                         const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_BusType, const QString & orc_BusName, const QPointF & orc_BusPosition, const uint64 & oru64_Node1UniqueID, const uint64 & oru64_Node2UniqueID, const uint8 & oru8_Node1InterfaceNumber, const uint8 & oru8_Node2InterfaceNumber, const uint8 & oru8_Node1NodeID,
+void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const std::vector<uint64> & orc_FourUniqueIds, const stw_opensyde_core::C_OSCSystemBus::E_Type
+                                                                         & ore_BusType, const QString & orc_BusName,
+                                                                         const QPointF & orc_BusPosition,
+                                                                         const uint64 & oru64_Node1UniqueID,
+                                                                         const uint64 & oru64_Node2UniqueID,
+                                                                         const uint8 & oru8_Node1InterfaceNumber,
+                                                                         const uint8 & oru8_Node2InterfaceNumber,
+                                                                         const uint8 & oru8_Node1NodeID,
                                                                          const uint8 & oru8_Node2NodeID)
 {
    if (orc_FourUniqueIds.size() >= 4)
@@ -285,16 +290,16 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do add one node to node connection and use an existing bus
 
-   \param[in] orc_ThreeUniqueIds        Two unique IDs for the two new items created by this action
-   \param[in] oru64_BusUniqueID         Bus unique ID
-   \param[in] orc_Node1Position         Node 1 position
-   \param[in] orc_Node2Position         Node 2 position
-   \param[in] oru64_Node1UniqueID       Node 1 unique ID
-   \param[in] oru64_Node2UniqueID       Node 2 unique ID
-   \param[in] oru8_Node1InterfaceNumber Node 1 interface number
-   \param[in] oru8_Node2InterfaceNumber Node 2 interface number
-   \param[in] oru8_Node1NodeID          Node 1 node ID
-   \param[in] oru8_Node2NodeID          Node 2 node ID
+   \param[in]  orc_TwoUniqueIds           Two unique IDs for the two new items created by this action
+   \param[in]  oru64_BusUniqueID          Bus unique ID
+   \param[in]  orc_Node1Position          Node 1 position
+   \param[in]  orc_Node2Position          Node 2 position
+   \param[in]  oru64_Node1UniqueID        Node 1 unique ID
+   \param[in]  oru64_Node2UniqueID        Node 2 unique ID
+   \param[in]  oru8_Node1InterfaceNumber  Node 1 interface number
+   \param[in]  oru8_Node2InterfaceNumber  Node 2 interface number
+   \param[in]  oru8_Node1NodeID           Node 1 node ID
+   \param[in]  oru8_Node2NodeID           Node 2 node ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const std::vector<uint64> & orc_TwoUniqueIds,
@@ -338,10 +343,10 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new data based on a snapshot and reserved IDs
 
-   \param[in]     oru64_UniqueIDs        Reserved unique IDs for snapshot data
-   \param[in]     orc_Snapshot           Snapshot data
-   \param[in]     orc_NewPos             Position offset for all items
-   \param[in]     of64_HighestUsedZValue Highest used Z value
+   \param[in]  oru64_UniqueIDs         Reserved unique IDs for snapshot data
+   \param[in]  orc_Snapshot            Snapshot data
+   \param[in]  orc_NewPos              Position offset for all items
+   \param[in]  of64_HighestUsedZValue  Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_UniqueIDs,
@@ -360,12 +365,12 @@ void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reconnect to different node
 
-   \param[in] opc_BusConnector    Bus connector to reconnect
-   \param[in] opc_StartingNode    Initial node
-   \param[in] opc_LastNode        New node
-   \param[in] orc_ConnectionPos   Event position
-   \param[in] ors32_Interface     Interface to connect to
-   \param[in] oru8_NodeId         New node id
+   \param[in]  opc_BusConnector     Bus connector to reconnect
+   \param[in]  opc_StartingNode     Initial node
+   \param[in]  opc_LastNode         New node
+   \param[in]  orc_ConnectionPos    Event position
+   \param[in]  ors32_Interface      Interface to connect to
+   \param[in]  oru8_NodeId          New node id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const opc_BusConnector,
@@ -399,12 +404,12 @@ void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reconnect to different bus
 
-   \param[in] opc_BusConnector    Bus connector to reconnect
-   \param[in] opc_StartingNode    Initial bus
-   \param[in] opc_LastNode        New bus
-   \param[in] orc_ConnectionPos   Event position
-   \param[in] ors32_Interface     Interface to connect to
-   \param[in] oru8_NodeId         New node id
+   \param[in]  opc_BusConnector     Bus connector to reconnect
+   \param[in]  opc_StartingBus      Initial bus
+   \param[in]  opc_LastBus          Last bus
+   \param[in]  orc_ConnectionPos    Event position
+   \param[in]  ors32_Interface      Interface to connect to
+   \param[in]  oru8_NodeId          New node id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const opc_BusConnector,
@@ -438,11 +443,11 @@ void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change used node interface of bus connector
 
-   \param[in] opc_BusConnector             Bus connector to change interface of
-   \param[in] oru8_PreviousInterfaceNumber Last used interface number
-   \param[in] oru8_NewInterfaceNumber      New interface number to use
-   \param[in] oru8_PreviousNodeId          Previous node id
-   \param[in] oru8_NewNodeId               New node id
+   \param[in]  opc_BusConnector              Bus connector to change interface of
+   \param[in]  oru8_PreviousInterfaceNumber  Last used interface number
+   \param[in]  oru8_NewInterfaceNumber       New interface number to use
+   \param[in]  oru8_PreviousNodeId           Previous node id
+   \param[in]  oru8_NewNodeId                New node id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * const opc_BusConnector,
@@ -475,8 +480,8 @@ void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get new style command (Destruction has to be handled by calling function)
 
-   \param[in] orc_Items   Item IDs
-   \param[in] oq_DarkMode Optional flag if dark mode active
+   \param[in]  orc_Items      Item IDs
+   \param[in]  oq_DarkMode    Optional flag if dark mode active
 
    \return
    Valid pointer to new style command
@@ -491,7 +496,7 @@ C_SebUnoSetupStyleCommand * C_SdManUnoTopologyManager::m_GetNewStyleCommand(cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Merge specified command with previous command on stack
 
-   \param[in,out] opc_Command Command to add the last command on stack to
+   \param[in,out]  opc_Command   Command to add the last command on stack to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::m_MergeWithPrev(QUndoCommand * const opc_Command)
@@ -519,7 +524,7 @@ void C_SdManUnoTopologyManager::m_OnErrorChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add newest command to undo stack and signal error
 
-   \param[in,out] opc_UndoCommand New undo command to add to the stack
+   \param[in,out]  opc_UndoCommand  New undo command to add to the stack
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::m_DoPushAndSignalError(QUndoCommand * const opc_UndoCommand)

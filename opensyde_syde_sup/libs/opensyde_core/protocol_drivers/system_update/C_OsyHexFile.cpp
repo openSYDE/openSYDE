@@ -119,14 +119,17 @@ sint32 C_OsyHexFile::ScanDeviceIdFromHexFile(C_SCLString & orc_DeviceID)
 
    Scan through the hex-file and try to find the "application_info" structure.
    Then extract the information from it and return it.
-   Multiple instances of the application_info structure are considered an error.
+   Multiple instances of the application_info structure are considered an error
+   or warning depending on the device names reported in all application blocks.
 
    \param[out]    orc_InfoBlock        application info block found in hex file
 
    \return
    C_NO_ERR     everything OK (device ID in orc_DeviceID)
+   C_WARN       multiple application blocks detected in hex file but device names match
+                  output in this case is the first found application block
    C_NOACT      no application information block detected in hex file
-   C_OVERFLOW   multiple application information blocks detected in hex file
+   C_OVERFLOW   multiple application information blocks detected in hex file and device names differ
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OsyHexFile::ScanApplicationInformationBlockFromHexFile(C_XFLECUInformation & orc_InfoBlock)
@@ -143,7 +146,19 @@ sint32 C_OsyHexFile::ScanApplicationInformationBlockFromHexFile(C_XFLECUInformat
    }
    else if (c_InfoBlocks.GetLength() > 1)
    {
-      s32_Return = C_OVERFLOW;
+      for (sint32 s32_Pos = 1; s32_Pos < c_InfoBlocks.GetLength(); s32_Pos++)
+      {
+         // compare every device name with first device name, this is enough because all must be equal
+         if (c_InfoBlocks[0].GetDeviceID() != c_InfoBlocks[s32_Pos].GetDeviceID())
+         {
+            s32_Return = C_OVERFLOW;
+         }
+         else
+         {
+            orc_InfoBlock = c_InfoBlocks[0];
+            s32_Return = C_WARN;
+         }
+      }
    }
    else
    {

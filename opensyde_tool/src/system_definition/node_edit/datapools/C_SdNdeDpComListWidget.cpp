@@ -89,9 +89,9 @@ void C_SdNdeDpComListWidget::SetDataPool(const uint32 & oru32_NodeIndex, const u
       for (uint32 u32_ItList = 0; u32_ItList < pc_DataPool->c_Lists.size(); u32_ItList += 2)
       {
          C_SdNdeDpListComHeaderWidget * const pc_Widget = new C_SdNdeDpListComHeaderWidget(oru32_NodeIndex,
-                                                                                                       oru32_DataPoolIndex,
-                                                                                                       u32_ItList,
-                                                                                                       q_Alternating);
+                                                                                           oru32_DataPoolIndex,
+                                                                                           u32_ItList,
+                                                                                           q_Alternating);
          //List
          this->mpc_Ui->pc_VerticalLayout->insertWidget(static_cast<sintn>(u32_ItList / 2UL), pc_Widget, 0);
          //Connects

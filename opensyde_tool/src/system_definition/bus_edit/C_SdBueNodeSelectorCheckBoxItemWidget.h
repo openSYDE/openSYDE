@@ -45,7 +45,6 @@ public:
                                                   QWidget * const opc_Parent = NULL);
    ~C_SdBueNodeSelectorCheckBoxItemWidget();
 
-   void InitStaticNames(void) const;
    void GetIndexes(stw_types::uint32 & oru32_Index, stw_types::uint32 & oru32_SubIndex) const;
    void SetChecked(const bool oq_Checked);
    bool IsChecked(void) const;
@@ -59,7 +58,6 @@ Q_SIGNALS:
    //lint -restore
    void SigNodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                        const bool oq_Checked);
-   void SigComImport(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
 
 private:
    //Avoid call
@@ -68,7 +66,6 @@ private:
 
    void m_NodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                       const bool oq_Checked);
-   void m_ImportClicked(void);
    void m_AdaptIcon(const bool oq_Checked);
 
    Ui::C_SdBueNodeSelectorCheckBoxItemWidget * mpc_Ui;

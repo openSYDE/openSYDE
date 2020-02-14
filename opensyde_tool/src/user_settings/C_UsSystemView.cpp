@@ -58,8 +58,8 @@ C_UsSystemView::C_UsSystemView(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in] osn_SetupViewZoom Zoom init value
-   \param[in] orc_SetupViewPos  Position init value
+   \param[in]  osn_SetupViewZoom    Zoom init value
+   \param[in]  orc_SetupViewPos     Position init value
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_UsSystemView::C_UsSystemView(const sintn osn_SetupViewZoom, const QPoint & orc_SetupViewPos) :
@@ -109,8 +109,8 @@ const QMap<uint32, QMap<uint32, float64> > & C_UsSystemView::GetUpdateDataRateHi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add update data rate
 
-   \param[in] os32_Checksum          System setup checksum
-   \param[in] ou64_DataRateBytesPerS Data bytes per milli seconds
+   \param[in]  ou32_Checksum           System setup checksum
+   \param[in]  ou64_DataRateBytesPerS  Data bytes per milli seconds
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::AddUpdateDataRate(const uint32 ou32_Checksum, const uint64 ou64_DataRateBytesPerS)
@@ -122,8 +122,8 @@ void C_UsSystemView::AddUpdateDataRate(const uint32 ou32_Checksum, const uint64 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add update data rates per node
 
-   \param[in] os32_Checksum          System setup checksum
-   \param[in] orc_DataRateBytesPerMs Data bytes per milli seconds per node
+   \param[in]  ou32_Checksum           System setup checksum
+   \param[in]  orc_DataRateBytesPerMs  Data bytes per milli seconds per node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::AddUpdateDataRatePerNode(const uint32 ou32_Checksum, const QMap<uint32,
@@ -160,7 +160,7 @@ sint32 C_UsSystemView::GetUpdateHorizontalSplitterY() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set update splitter X value
 
-   \param[in] os32_Value New update splitter X value
+   \param[in]  os32_Value  New update splitter X value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetUpdateSplitterX(const sint32 os32_Value)
@@ -171,7 +171,7 @@ void C_UsSystemView::SetUpdateSplitterX(const sint32 os32_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set horizontal update splitter Y value
 
-   \param[in] os32_Value New update splitter Y value
+   \param[in]  os32_Value  New update splitter Y value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetUpdateHorizontalSplitterY(const sint32 os32_Value)
@@ -194,7 +194,7 @@ QPoint C_UsSystemView::GetUpdateProgressLogPos(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set update progress log position
 
-   \param[in] orc_Value New update progress log position
+   \param[in]  orc_Value   New update progress log position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetUpdateProgressLogPos(const QPoint & orc_Value)
@@ -217,7 +217,7 @@ QSize C_UsSystemView::GetUpdateProgressLogSize(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set update progress log size
 
-   \param[in] orc_Value New update progress log size
+   \param[in]  orc_Value   New update progress log size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetUpdateProgressLogSize(const QSize & orc_Value)
@@ -240,7 +240,7 @@ bool C_UsSystemView::GetUpdateProgressLogMaximized(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set update progress log maximized flag
 
-   \param[in] oq_BigVisible   true: big summary widget; false: small summary widget
+   \param[in]  oq_Value    Value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetUpdateProgressLogMaximized(const bool oq_Value)
@@ -250,6 +250,9 @@ void C_UsSystemView::SetUpdateProgressLogMaximized(const bool oq_Value)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get style type of project system view update summary widget
+
+   \retval true   big summary widget
+   \retval false  small summary widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_UsSystemView::GetUpdateSummaryBig(void) const
@@ -259,6 +262,8 @@ bool C_UsSystemView::GetUpdateSummaryBig(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set style type of project system view update summary widget
+
+   \param[in]  oq_Value    true: big summary widget; false: small summary widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetUpdateSummaryBig(const bool oq_Value)
@@ -267,7 +272,10 @@ void C_UsSystemView::SetUpdateSummaryBig(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get style type of project system view update summary widget
+/*! \brief   Get visibility of empty optional sections in update package
+
+   \retval true   show empty optional sections
+   \retval false  hide     -"-
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_UsSystemView::GetUpdatePackEmptyOptionalSectionsVisible(void) const
@@ -277,6 +285,8 @@ bool C_UsSystemView::GetUpdatePackEmptyOptionalSectionsVisible(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set style type of project system view update summary widget
+
+   \param[in]  oq_Visible  show/hide emtpy optional sections
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetUpdateEmptyOptionalSectionsVisible(const bool oq_Visible)
@@ -287,7 +297,7 @@ void C_UsSystemView::SetUpdateEmptyOptionalSectionsVisible(const bool oq_Visible
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get restored system view node user settings.
 
-   \param[in]       orc_NodeName    Node name (identifier)
+   \param[in]  orc_NodeName   Node name (identifier)
 
    \return
    Restored user settings if dashboard name was found; else default values.
@@ -301,8 +311,8 @@ C_UsSystemViewNode C_UsSystemView::GetSvNode(const QString & orc_NodeName) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set node section expanded flags.
 
-   \param[in]       orc_NodeName       Node name (identifier)
-   \param[in]       orc_ExpandedFlags  Expanded flags
+   \param[in]  orc_NodeName         Node name (identifier)
+   \param[in]  orc_ExpandedFlags    Expanded flags
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetNodeSectionsExpanded(const QString & orc_NodeName, const QMap<uint32, bool> & orc_ExpandedFlags)
@@ -336,7 +346,7 @@ const QList<QString> C_UsSystemView::GetViewNodesKeysInternal(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set the status for the navigation expansion state
 
-   \param[in] oq_NavigationExpandedStatus New navigation expansion state
+   \param[in]  oq_NavigationExpandedStatus   New navigation expansion state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetNavigationExpandedStatus(const bool oq_NavigationExpandedStatus)
@@ -359,7 +369,7 @@ bool C_UsSystemView::GetNavigationExpandedStatus(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard integrated tab index
 
-   \param[in] orc_DashboardName Dashboard name (identifier)
+   \param[in]  orc_DashboardName    Dashboard name (identifier)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetDashboardMainTab(const QString & orc_DashboardName)
@@ -381,11 +391,11 @@ void C_UsSystemView::SetDashboardMainTab(const QString & orc_DashboardName)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard torn off window data
 
-   \param[in] orc_DashboardName         Dashboard name (identifier)
-   \param[in] orc_Position              Torn off window position
-   \param[in] orc_Size                  Torn off window size
-   \param[in] oq_TornOffWindowMinimized Torn off window minimized flag
-   \param[in] oq_TornOffWindowMaximized Torn off window maximized flag
+   \param[in]  orc_DashboardName          Dashboard name (identifier)
+   \param[in]  orc_Position               Torn off window position
+   \param[in]  orc_Size                   Torn off window size
+   \param[in]  oq_TornOffWindowMinimized  Torn off window minimized flag
+   \param[in]  oq_TornOffWindowMaximized  Torn off window maximized flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetDashboardTearOffPosition(const QString & orc_DashboardName, const QPoint & orc_Position,
@@ -417,9 +427,9 @@ void C_UsSystemView::SetDashboardTearOffPosition(const QString & orc_DashboardNa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard scene position and zoom
 
-   \param[in] orc_DashboardName Dashboard name (identifier)
-   \param[in] orc_Position      Scene position
-   \param[in] osn_Zoom          Scene zoom
+   \param[in]  orc_DashboardName    Dashboard name (identifier)
+   \param[in]  orc_Position         Scene position
+   \param[in]  osn_Zoom             Scene zoom
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetProjSvDashboardScenePositionAndZoom(const QString & orc_DashboardName,
@@ -444,7 +454,7 @@ void C_UsSystemView::SetProjSvDashboardScenePositionAndZoom(const QString & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get restored dashboard user settings
 
-   \param[in] orc_DashboardName Dashboard name (identifier)
+   \param[in]  orc_DashboardName    Dashboard name (identifier)
 
    \return
    If not torn off and tab index smaller than 0: invalid
@@ -483,7 +493,7 @@ QPoint C_UsSystemView::GetDashboardToolboxPos(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard toolbox position
 
-   \param[in] orc_Value New dashboard toolbox position
+   \param[in]  orc_Value   New dashboard toolbox position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetDashboardToolboxPos(const QPoint & orc_Value)
@@ -506,7 +516,7 @@ QSize C_UsSystemView::GetDashboardToolboxSize(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard toolbox size
 
-   \param[in] orc_Value New dashboard toolbox size
+   \param[in]  orc_Value   New dashboard toolbox size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetDashboardToolboxSize(const QSize & orc_Value)
@@ -529,7 +539,7 @@ bool C_UsSystemView::GetDashboardToolboxMaximized(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard toolbox maximized flag
 
-   \param[in] orc_Value New dashboard toolbox maximized flag
+   \param[in]  oq_Value    New dashboard toolbox maximized flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetDashboardToolboxMaximized(const bool oq_Value)
@@ -552,7 +562,7 @@ stw_types::sint32 C_UsSystemView::GetDashboardSelectedTabIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard selected tab index
 
-   \param[in] orc_Value New dashboard selected tab index
+   \param[in]  orc_Value   New dashboard selected tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetDashboardSelectedTabIndex(const stw_types::sint32 & orc_Value)

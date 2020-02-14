@@ -46,8 +46,8 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     ou32_ViewIndex View index
-   \param[in,out] opc_Parent     Optional pointer to parent
+   \param[in]      ou32_ViewIndex   View index
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvTopologyBaseScene::C_SyvTopologyBaseScene(const stw_types::uint32 ou32_ViewIndex, QObject * const opc_Parent) :
@@ -140,6 +140,7 @@ void C_SyvTopologyBaseScene::Load(void)
          c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                         "Due to changes in SYSTEM DEFINITION the PC - connected bus has been changed.\n"
                                         "PC is connected to ") + c_BusName + C_GtGetText::h_GetText(" now."));
+         c_MessageBox.SetCustomMinHeight(180, 180);
          c_MessageBox.Execute();
       }
    }
@@ -148,7 +149,7 @@ void C_SyvTopologyBaseScene::Load(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy items to scene from copy paste manager
 
-   \param[in] opc_Pos Optional position offset
+   \param[in]  opc_Pos  Optional position offset
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
@@ -159,6 +160,8 @@ void C_SyvTopologyBaseScene::CopyFromManagerToScene(const QPointF * const opc_Po
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is deletable on the scene
+
+   \param[in]  opc_Item    Item to check
 
    \return
    true     Item is deletable
@@ -176,6 +179,8 @@ bool C_SyvTopologyBaseScene::IsItemDeletable(const QGraphicsItem * const opc_Ite
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is changeable in the zorder
 
+   \param[in]  opc_Item    Item to check
+
    \return
    true     Z order is changeable
    false    Z order is not changeable
@@ -191,6 +196,8 @@ bool C_SyvTopologyBaseScene::IsZOrderChangeable(const QGraphicsItem * const opc_
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item can be aligned
+
+   \param[in]  opc_Item    Item to check
 
    \return
    true     Item can be aligned
@@ -248,11 +255,11 @@ const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific CAN bus
 
-   \param[in]     ors32_Index          Index of data element in system definition
-   \param[in]     oru64_ID             Unique ID
-   \param[in]     opc_TextElementName  Pointer to text element for showing bus name
-   \param[in]     opc_Points           Points for line
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in]      ors32_Index            Index of data element in system definition
+   \param[in]      oru64_ID               Unique ID
+   \param[in]      opc_TextElementName    Pointer to text element for showing bus name
+   \param[in]      opc_Points             Points for line
+   \param[in,out]  opc_Parent             Optional pointer to parent
 
    \return
    Specific CAN bus
@@ -269,11 +276,11 @@ C_GiLiCANBus * C_SyvTopologyBaseScene::m_CreateCANBus(const sint32 & ors32_Index
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific ethernet bus
 
-   \param[in]     ors32_Index          Index of data element in system definition
-   \param[in]     oru64_ID             Unique ID
-   \param[in]     opc_TextElementName  Pointer to text element for showing bus name
-   \param[in]     opc_Points           Points for line
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in]      ors32_Index            Index of data element in system definition
+   \param[in]      oru64_ID               Unique ID
+   \param[in]      opc_TextElementName    Pointer to text element for showing bus name
+   \param[in]      opc_Points             Points for line
+   \param[in,out]  opc_Parent             Optional pointer to parent
 
    \return
    Specific ethernet bus
@@ -291,9 +298,12 @@ C_GiLiEthernetBus * C_SyvTopologyBaseScene::m_CreateEthernetBus(const sint32 & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific bus text element
 
-   \param[in]       ors32_Index          Index of data element in system definition
-   \param[in]       oru64_ID             Unique ID
-   \param[in,out]   opc_parent           Optional pointer to parent
+   \param[in]      ors32_Index   Index of data element in system definition
+   \param[in]      oru64_ID      Unique ID
+   \param[in,out]  opc_Parent    Optional pointer to parent
+
+   \return
+   Specific bus text element
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiTextElementBus * C_SyvTopologyBaseScene::m_CreateBusTextElement(const sint32 & ors32_Index, const uint64 & oru64_ID,
@@ -305,7 +315,7 @@ C_GiTextElementBus * C_SyvTopologyBaseScene::m_CreateBusTextElement(const sint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new bus to scene and connect signals
 
-   \param[in,out] opc_BusGraphicsItem Pointer to new bus
+   \param[in,out]  opc_BusGraphicsItem    Pointer to new bus
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddBusToScene(C_GiLiBus * const opc_BusGraphicsItem)
@@ -320,7 +330,7 @@ void C_SyvTopologyBaseScene::m_AddBusToScene(C_GiLiBus * const opc_BusGraphicsIt
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new bus connector to scene and connect signals
 
-   \param[in,out] opc_BusConnectorGraphicsItem Connector item
+   \param[in,out]  opc_BusConnectorGraphicsItem    Connector item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const opc_BusConnectorGraphicsItem)
@@ -337,7 +347,7 @@ void C_SyvTopologyBaseScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new text element to scene and connect signals
 
-   \param[in,out] opc_Item  Text element
+   \param[in,out]  opc_Item   Text element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddTextElementToScene(C_GiBiTextElement * const opc_Item)
@@ -352,7 +362,7 @@ void C_SyvTopologyBaseScene::m_AddTextElementToScene(C_GiBiTextElement * const o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new line arrow to scene and connect signals
 
-   \param[in,out] opc_Item Line arrow item
+   \param[in,out]  opc_Item   Line arrow item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddLineArrowToScene(C_GiBiArrow * const opc_Item)
@@ -367,7 +377,7 @@ void C_SyvTopologyBaseScene::m_AddLineArrowToScene(C_GiBiArrow * const opc_Item)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new boundary to scene and connect signals
 
-   \param[in,out] opc_Item  Boundary item
+   \param[in,out]  opc_Item   Boundary item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddBoundaryToScene(C_GiBiBoundary * const opc_Item)
@@ -381,7 +391,7 @@ void C_SyvTopologyBaseScene::m_AddBoundaryToScene(C_GiBiBoundary * const opc_Ite
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new image to scene and connect signals
 
-   \param[in,out] opc_Item  Image group item
+   \param[in,out]  opc_Item   Image group item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddImageGroupToScene(C_GiBiImageGroup * const opc_Item)
@@ -396,7 +406,7 @@ void C_SyvTopologyBaseScene::m_AddImageGroupToScene(C_GiBiImageGroup * const opc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new rectangle based item to scene and connect signals
 
-   \param[in,out] opc_Item Rectangle based item
+   \param[in,out]  opc_Item   Rectangle based item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddRectBaseGroupToScene(C_GiBiRectBaseGroup * const opc_Item)
@@ -410,7 +420,7 @@ void C_SyvTopologyBaseScene::m_AddRectBaseGroupToScene(C_GiBiRectBaseGroup * con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new line based item to scene and connect signals
 
-   \param[in,out] opc_Item  Line based item
+   \param[in,out]  opc_Item   Line based item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddLineGroupToScene(C_GiLiLineGroup * const opc_Item)
@@ -425,7 +435,7 @@ void C_SyvTopologyBaseScene::m_AddLineGroupToScene(C_GiLiLineGroup * const opc_I
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new PC bus connector item to scene and connect signals
 
-   \param[in,out] opc_PcBusConnectorGraphicsItem  PC bus connector item
+   \param[in,out]  opc_PcBusConnectorGraphicsItem  PC bus connector item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddPcBusConnectorToScene(C_GiSvPcBusConnector * const opc_PcBusConnectorGraphicsItem)
@@ -436,8 +446,8 @@ void C_SyvTopologyBaseScene::m_AddPcBusConnectorToScene(C_GiSvPcBusConnector * c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add data from mime data
 
-   \param[in] opc_MimeData Mime data to add to scene
-   \param[in] orc_Position Position to add data at
+   \param[in]  opc_MimeData   Mime data to add to scene
+   \param[in]  orc_Position   Position to add data at
 
    \return
    true: Item was added
@@ -531,8 +541,9 @@ C_GiLiBus * C_SyvTopologyBaseScene::m_CheckBusState(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add PC - bus connection item
 
-   \param[in]     opc_Bus Bus item
-   \param[in,out] opc_Pc  PC item
+   \param[in]      opc_Bus       Bus item
+   \param[in,out]  opc_Pc        PC item
+   \param[in]      orc_LineData  Line data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddPcBusConnector(const C_GiLiBus * const opc_Bus, C_GiBiConnectableItem * const opc_Pc,
@@ -569,7 +580,7 @@ void C_SyvTopologyBaseScene::m_AddPcBusConnector(const C_GiLiBus * const opc_Bus
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get initial connection point for any graphics item
 
-   \param[in] opc_Item Any graphics item
+   \param[in]  opc_Item    Any graphics item
 
    \return
    (0.0,0.0) Default
@@ -590,7 +601,7 @@ QPointF C_SyvTopologyBaseScene::mh_GetInitialConnectionPoint(const QGraphicsItem
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if PC bus reconnection necessary
 
-   \param[out] orc_BusName    - Name of the new connected bus
+   \param[out]  orc_BusName   - Name of the new connected bus
                               - Empty string if no new bus found
 
    \return

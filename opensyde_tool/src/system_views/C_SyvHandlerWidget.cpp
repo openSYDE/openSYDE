@@ -456,6 +456,11 @@ bool C_SyvHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
       // open project save
       this->SaveAs();
    }
+   else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F8))
+   {
+      // open color picker
+      this->OpenColorPicker();
+   }
    else
    {
       //Not handled

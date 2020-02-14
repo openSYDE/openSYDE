@@ -39,8 +39,8 @@ class C_SdNdeDpSelectorAddWidget :
 
 public:
    explicit C_SdNdeDpSelectorAddWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                             const stw_types::uint32 ou32_NodeIndex,
-                                             stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDataPool);
+                                       const stw_types::uint32 ou32_NodeIndex,
+                                       stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDataPool);
    ~C_SdNdeDpSelectorAddWidget(void);
 
    void InitStaticNames(void) const;

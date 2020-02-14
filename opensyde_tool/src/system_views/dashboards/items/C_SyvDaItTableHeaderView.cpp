@@ -69,6 +69,10 @@ C_SyvDaItTableHeaderView::~C_SyvDaItTableHeaderView(void)
    This will cause that the SplitHCursor will not be reseted if the user does not leave the header widget.
 
    \param[in,out] opc_Event Event identification and information
+
+   \return
+   True  Event was recognized and processed
+   False Event ignored
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItTableHeaderView::event(QEvent * const opc_Event)

@@ -86,7 +86,7 @@ void C_CamMetTreeGUIBuffer::m_HandleUpdateUi(void)
    c_BufferCopy = this->mc_Buffer;
    this->mc_Buffer.clear();
    this->mc_BufferMutex.unlock();
-   if (c_BufferCopy.size() > 0)
+   if (c_BufferCopy.empty() == false)
    {
       Q_EMIT this->SigUpdateUi(c_BufferCopy);
    }

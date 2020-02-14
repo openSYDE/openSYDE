@@ -40,7 +40,8 @@ public:
    void DoAddGeneric(const C_PuiSvDbDataElement::E_Type & ore_Type, const stw_types::uint64 & oru64_UniqueID,
                      const QPointF & orc_NewPos, const stw_types::float64 of64_ZValue, const bool & orq_DarkModeDefault,
                      const QString & orc_AdditionalInformation = "");
-   void DoAddSnapshot(const std::vector<stw_types::uint64> & oru64_UniqueIDs, const C_SyvDaDashboardSnapshot & orc_Snapshot,
+   void DoAddSnapshot(const std::vector<stw_types::uint64> & oru64_UniqueIDs,
+                      const C_SyvDaDashboardSnapshot & orc_Snapshot,
                       const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
                                  stw_opensyde_gui_logic::C_PuiSvReadDataConfiguration> & orc_RestoredRails,
                       const QPointF & orc_NewPos, const stw_types::float64 of64_HighestUsedZValue);

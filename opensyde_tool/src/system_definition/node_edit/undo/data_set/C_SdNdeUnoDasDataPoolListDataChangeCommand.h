@@ -31,7 +31,10 @@ public:
    C_SdNdeUnoDasDataPoolListDataChangeCommand(const stw_types::uint32 & oru32_NodeIndex,
                                               const stw_types::uint32 & oru32_DataPoolIndex,
                                               const stw_types::uint32 & oru32_DataPoolListIndex,
-                                              C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const stw_types::uint32 & oru32_DataPoolListDataSetIndex, const QVariant & orc_NewData, const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType,
+                                              C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
+                                              const stw_types::uint32 & oru32_DataPoolListDataSetIndex,
+                                              const QVariant & orc_NewData,
+                                              const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType,
                                               QUndoCommand * const opc_Parent = NULL);
    virtual void redo(void) override;
    virtual void undo(void) override;

@@ -64,7 +64,7 @@ const QString C_SyvUpUpdatePackageListWidget::mhc_CONFIG_FILE_TYPE = ".syde_up";
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpUpdatePackageListWidget::C_SyvUpUpdatePackageListWidget(QWidget * const opc_Parent) :
@@ -116,7 +116,7 @@ C_SyvUpUpdatePackageListWidget::~C_SyvUpUpdatePackageListWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the view index and initializes the nodes in the list
 
-   \param[in]     ou32_ViewIndex         View index
+   \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
@@ -257,7 +257,7 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateStarted(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the widget when the application update was started
 
-   \param[in]     ou32_NodeIndex         Index of node
+   \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationStarted(const uint32 ou32_NodeIndex)
@@ -288,7 +288,7 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationStarted(const uint32 ou
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the widget when the application update was finished
 
-   \param[in]     ou32_NodeIndex         Index of node
+   \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationFinished(const uint32 ou32_NodeIndex) const
@@ -318,7 +318,7 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationFinished(const uint32 o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the widget when the application update hat an error
 
-   \param[in]     ou32_NodeIndex         Index of node
+   \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationError(const uint32 ou32_NodeIndex) const
@@ -348,7 +348,7 @@ void C_SyvUpUpdatePackageListWidget::SetUpdateApplicationError(const uint32 ou32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal the widget to discard all device application information
 
-   \param[in] ou32_NodeIndex Index of node
+   \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::DiscardApplicationStatus(const uint32 ou32_NodeIndex) const
@@ -429,8 +429,8 @@ void C_SyvUpUpdatePackageListWidget::SetDisconnected(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update device information
 
-   \param[in] orc_NodeIndexes       Node indices
-   \param[in] orc_DeviceInformation Device info
+   \param[in]  orc_NodeIndexes         Node indices
+   \param[in]  orc_DeviceInformation   Device info
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeIndexes,
@@ -471,8 +471,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   short description of function
 
-   \param[in]     ou32_NodeIndex         Index of node
-   \param[in]     ou8_Progress           Entire progress of node of update process
+   \param[in]  ou32_NodeIndex    Index of node
+   \param[in]  ou8_Progress      Entire progress of node of update process
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::SetNodeProgress(const uint32 ou32_NodeIndex, const uint8 ou8_Progress) const
@@ -587,6 +587,7 @@ void C_SyvUpUpdatePackageListWidget::ExportConfig(void)
          c_MessageResultSave.SetHeading(C_GtGetText::h_GetText("Update Package configuration export"));
          c_MessageResultSave.SetDescription(C_GtGetText::h_GetText("Could not save the file."));
          c_MessageResultSave.SetDetails(C_GtGetText::h_GetText("Error code: \n") + QString::number(s32_Result));
+         c_MessageResultSave.SetCustomMinHeight(180, 250);
          c_MessageResultSave.Execute();
       }
    }
@@ -603,81 +604,90 @@ void C_SyvUpUpdatePackageListWidget::ImportConfig(void)
    const QString c_Folder = this->m_GetDialogPath();
    const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE Update Package Configuration File")) + "(*" +
                             mhc_CONFIG_FILE_TYPE + ")";
-   const QString c_FileName =
-      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Import Update Package Configuration"), c_Folder,
-                                     c_Filter, "", QFileDialog::DontConfirmOverwrite);
 
-   if (c_FileName != "")
+   QFileDialog c_Dialog(this->parentWidget(), C_GtGetText::h_GetText(
+                           "openSYDE Update Package Configuration File"), c_Folder, c_Filter);
+
+   c_Dialog.setDefaultSuffix("(*" + mhc_CONFIG_FILE_TYPE + ")");
+
+   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      sint32 s32_Result;
-      C_SyvUpUpdatePackageConfig c_Config;
-      C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
-      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+      const QString c_FileName = c_Dialog.selectedFiles().at(0);
 
-      this->mc_LastPath = TGL_ExtractFilePath(c_FileName.toStdString().c_str()).c_str();
-
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Update Package configuration import"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                     "Do you really want to overwrite the current Update Package configuration?"));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Import"));
-      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
-      e_ReturnMessageBox = c_MessageBox.Execute();
-
-      if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
+      if (c_FileName != "")
       {
-         // Load configuration
-         s32_Result = C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(c_FileName, c_Config);
+         sint32 s32_Result;
+         C_SyvUpUpdatePackageConfig c_Config;
+         C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
+         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
 
-         if (s32_Result == C_NO_ERR)
+         this->mc_LastPath = TGL_ExtractFilePath(c_FileName.toStdString().c_str()).c_str();
+
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Update Package configuration import"));
+         c_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                        "Do you really want to overwrite the current Update Package configuration?"));
+         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Import"));
+         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         c_MessageBox.SetCustomMinHeight(180, 180);
+         e_ReturnMessageBox = c_MessageBox.Execute();
+
+         if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
          {
-            sintn sn_Counter;
-
-            // Clear previous configuration first
-            this->RemoveAllFiles();
-
             // Load configuration
-            for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
-            {
-               // Check all paths from all nodes
-               QListWidgetItem * const pc_Item = this->item(sn_Counter);
+            s32_Result = C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(c_FileName, c_Config);
 
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-               C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
-                  dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
-               if (pc_WidgetItem != NULL)
+            if (s32_Result == C_NO_ERR)
+            {
+               sintn sn_Counter;
+
+               // Clear previous configuration first
+               this->RemoveAllFiles();
+
+               // Load configuration
+               for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
                {
-                  pc_WidgetItem->LoadImportConfig(c_Config);
+                  // Check all paths from all nodes
+                  QListWidgetItem * const pc_Item = this->item(sn_Counter);
+
+                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                  C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
+                     dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
+                  if (pc_WidgetItem != NULL)
+                  {
+                     pc_WidgetItem->LoadImportConfig(c_Config);
+                  }
                }
             }
-         }
 
-         if (s32_Result != C_NO_ERR)
-         {
-            //Error handling
-            QString c_Details;
-            C_OgeWiCustomMessage c_MessageResultSave(this, C_OgeWiCustomMessage::E_Type::eERROR);
-            c_MessageResultSave.SetHeading(C_GtGetText::h_GetText("Update Package configuration import"));
-            c_MessageResultSave.SetDescription(C_GtGetText::h_GetText("Could not load file."));
-            switch (s32_Result)
+            if (s32_Result != C_NO_ERR)
             {
-            case C_RD_WR:
-               c_Details = C_GtGetText::h_GetText("There are problems accessing the file system.\n"
-                                                  "For example, there may be no read access to the file.");
-               break;
-            case C_NOACT:
-               c_Details = C_GtGetText::h_GetText("A file is present but its structure is invalid.\n"
-                                                  "For example this can be caused by an invalid XML file.");
-               break;
-            case C_CONFIG:
-               c_Details = C_GtGetText::h_GetText("Content of file is invalid or incomplete");
-               break;
-            default:
-               c_Details = C_GtGetText::h_GetText(
-                  "Error code: \n") + QString::number(s32_Result);
-               break;
+               //Error handling
+               QString c_Details;
+               C_OgeWiCustomMessage c_MessageResultSave(this, C_OgeWiCustomMessage::E_Type::eERROR);
+               c_MessageResultSave.SetHeading(C_GtGetText::h_GetText("Update Package configuration import"));
+               c_MessageResultSave.SetDescription(C_GtGetText::h_GetText("Could not load file."));
+               switch (s32_Result)
+               {
+               case C_RD_WR:
+                  c_Details = C_GtGetText::h_GetText("There are problems accessing the file system.\n"
+                                                     "For example, there may be no read access to the file.");
+                  break;
+               case C_NOACT:
+                  c_Details = C_GtGetText::h_GetText("A file is present but its structure is invalid.\n"
+                                                     "For example this can be caused by an invalid XML file.");
+                  break;
+               case C_CONFIG:
+                  c_Details = C_GtGetText::h_GetText("Content of file is invalid or incomplete");
+                  break;
+               default:
+                  c_Details = C_GtGetText::h_GetText(
+                     "Error code: \n") + QString::number(s32_Result);
+                  break;
+               }
+               c_MessageResultSave.SetDetails(c_Details);
+               c_MessageResultSave.SetCustomMinHeight(180, 250);
+               c_MessageResultSave.Execute();
             }
-            c_MessageResultSave.SetDetails(c_Details);
-            c_MessageResultSave.Execute();
          }
       }
    }
@@ -726,6 +736,7 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
             c_MessageResult.SetHeading(C_GtGetText::h_GetText("Create Service Update Package"));
             c_MessageResult.SetDescription(C_GtGetText::h_GetText("Could not delete old Service Update Package."));
             c_MessageResult.SetDetails(C_GtGetText::h_GetText("Could not delete ") + c_FullPackagePath);
+            c_MessageResult.SetCustomMinHeight(180, 250);
             c_MessageResult.Execute();
 
             s32_Return = C_BUSY;
@@ -778,6 +789,7 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
                                 arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                                 arg(c_FullPackagePath);
             c_MessageResult.SetDetails(c_Details);
+            c_MessageResult.SetCustomMinHeight(180, 250);
             c_MessageResult.Execute();
          }
          else if (s32_Return == C_WARN)
@@ -788,6 +800,7 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
                                               "Created Service Update Package but there are warnings.") +
                                            c_FullPackagePath);
             c_MessageResult.SetDetails(C_GtGetText::h_GetText(c_Warnings.GetText().c_str()));
+            c_MessageResult.SetCustomMinHeight(250, 300);
             c_MessageResult.Execute();
          }
          else
@@ -797,6 +810,7 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
             c_MessageResult.SetDescription(C_GtGetText::h_GetText("Could not create Service Update Package!"));
             c_MessageResult.SetDetails(C_GtGetText::h_GetText("Error code: ") + QString::number(s32_Return) + "\n" +
                                        C_GtGetText::h_GetText(c_Error.c_str()));
+            c_MessageResult.SetCustomMinHeight(180, 250);
             c_MessageResult.Execute();
          }
       }
@@ -806,11 +820,11 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks all paths for existence
 
-   \param[out]    oru32_CountFiles           Number of files
-   \param[out]    opc_FlashwareWarningsApps  App names of apps with flashware warnings
-   \param[out]    opc_MissingDataBlocks      App names of apps with missing data block files
-   \param[out]    opc_MissingParamFiles      App names of apps with missing parameter set image files
-   \param[out]    opc_MissingFiles           App names of apps with missing files
+   \param[out]  oru32_CountFiles             Number of files
+   \param[out]  opc_FlashwareWarningsApps    App names of apps with flashware warnings
+   \param[out]  opc_MissingDataBlocks        App names of apps with missing data block files
+   \param[out]  opc_MissingParamFiles        App names of apps with missing parameter set image files
+   \param[out]  opc_MissingFiles             App names of apps with missing files
 
    \return
    C_NO_ERR    All files are existent
@@ -856,9 +870,9 @@ sint32 C_SyvUpUpdatePackageListWidget::CheckAllPaths(uint32 & oru32_CountFiles,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates and returns the update package with all information for the system update
 
-   \param[out]    orc_ApplicationsToWrite Vector with node update configuration
-   \param[out]    orc_NodesOrder          Vector with node update order (index is update position, value is node index)
-   \param[out]    opc_AllApplications     Optional vector with all node applications
+   \param[out]  orc_ApplicationsToWrite   Vector with node update configuration
+   \param[out]  orc_NodesOrder            Vector with node update order (index is update position, value is node index)
+   \param[out]  opc_AllApplications       Optional vector with all node applications
 
    \return
    C_NO_ERR    Update package with all information created
@@ -914,6 +928,13 @@ sint32 C_SyvUpUpdatePackageListWidget::GetUpdatePackage(
 
             // Add the applications of the node
             s32_Return = pc_WidgetItem->GetUpdatePackage(rc_Flash, pc_AllApplications);
+
+            //Append other known device names
+            tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
+            if (pc_Node->pc_DeviceDefinition != NULL)
+            {
+               rc_Flash.c_OtherAcceptedDeviceNames = pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames;
+            }
 
             if (s32_Return == C_NO_ERR)
             {
@@ -977,7 +998,7 @@ sint32 C_SyvUpUpdatePackageListWidget::GetUpdatePackage(
 
    Here: Update integrated widget size
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::resizeEvent(QResizeEvent * const opc_Event)
@@ -1009,7 +1030,7 @@ void C_SyvUpUpdatePackageListWidget::resizeEvent(QResizeEvent * const opc_Event)
 
    Draws the background element
 
-   \param[in,out] opc_Event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::paintEvent(QPaintEvent * const opc_Event)
@@ -1045,6 +1066,8 @@ void C_SyvUpUpdatePackageListWidget::paintEvent(QPaintEvent * const opc_Event)
 /*! \brief   Overwritten double click event
 
    Select file on double click
+
+   \param[in,out]  opc_Event  Event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
@@ -1160,8 +1183,8 @@ void C_SyvUpUpdatePackageListWidget::m_DelegateStopPaint(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a concrete node widget to the list
 
-   \param[in]     ou32_NodeIndex  Node index
-   \param[in]     orc_NodeName    Name of the node
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_NodeName      Name of the node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::m_AddNodeWidget(const uint32 ou32_NodeIndex, const QString & orc_NodeName)
@@ -1182,7 +1205,7 @@ void C_SyvUpUpdatePackageListWidget::m_AddNodeWidget(const uint32 ou32_NodeIndex
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
 
-   \param[in] orc_Pos Local context menu position
+   \param[in]  orc_Pos  Local context menu position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
@@ -1225,8 +1248,7 @@ void C_SyvUpUpdatePackageListWidget::m_OnCustomContextMenuRequested(const QPoint
             this->mpc_RemoveFileAction->setVisible(true);
             this->mpc_RemoveFileAction->setEnabled(
                (this->mpc_SelectedSection->Type() != mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK) ||
-               ((this->mpc_SelectedSection->Type() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK) &&
-                (this->mpc_SelectedApp->GetAppFilePath() != C_GtGetText::h_GetText("<Add File>"))));
+               (this->mpc_SelectedApp->GetAppFilePath() != C_GtGetText::h_GetText("<Add File>")));
             this->mpc_ShowFileInfoAction->setEnabled(this->mpc_SelectedApp->IsViewFileInfoPossible());
             this->mpc_ShowFileInfoAction->setVisible(true);
             this->mpc_RemoveAllNodeFilesAction->setVisible(false);
@@ -1342,8 +1364,8 @@ void C_SyvUpUpdatePackageListWidget::m_AddFileAction(void)
    Depending on the file extension (.syde_psi), it will be added as parameter set image file or
    as file for file based nodes
 
-   \param[in]     orc_DialogCaption   Caption for file dialog
-   \param[in]     orc_DialogFilter    Filter configuration for file dialog
+   \param[in]  orc_DialogCaption    Caption for file dialog
+   \param[in]  orc_DialogFilter     Filter configuration for file dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::m_AddNewFile(const QString & orc_DialogCaption, const QString & orc_DialogFilter)
@@ -1394,10 +1416,11 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
       QString c_Filter = "";
       const QString c_Folder = this->m_GetDialogPath();
       QString c_File = "";
-      bool q_HexFile = false;
 
       if ((this->mpc_SelectedApp != NULL) && (this->mpc_SelectedSection != NULL))
       {
+         bool q_HexFile = false;
+
          // Get the correct type
          switch (this->mpc_SelectedSection->Type())
          {
@@ -1477,6 +1500,7 @@ void C_SyvUpUpdatePackageListWidget::m_RemoveFile(void)
                                   C_GtGetText::h_GetText(" from the Update Package?"));
       c_MessageBox.SetOKButtonText("Remove");
       c_MessageBox.SetNOButtonText("Keep");
+      c_MessageBox.SetCustomMinHeight(180, 180);
       if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
       {
          this->mpc_SelectedNode->RemoveFile(this->mpc_SelectedApp);
@@ -1528,6 +1552,7 @@ void C_SyvUpUpdatePackageListWidget::m_RemoveAllSectionFiles(void)
                                   c_Section + C_GtGetText::h_GetText("\" from the Update Package?"));
       c_MessageBox.SetOKButtonText("Remove");
       c_MessageBox.SetNOButtonText("Keep");
+      c_MessageBox.SetCustomMinHeight(180, 180);
       if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
       {
          this->mpc_SelectedSection->RemoveAllFiles();
@@ -1556,6 +1581,7 @@ void C_SyvUpUpdatePackageListWidget::m_RemoveAllNodeFiles(void)
          this->mpc_SelectedNode->GetNodeName() + C_GtGetText::h_GetText("\" from the Update Package?"));
       c_MessageBox.SetOKButtonText("Remove");
       c_MessageBox.SetNOButtonText("Keep");
+      c_MessageBox.SetCustomMinHeight(180, 180);
       if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
       {
          this->mpc_SelectedNode->RemoveAllFiles();

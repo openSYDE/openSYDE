@@ -39,7 +39,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubIconOnly::C_OgePubIconOnly(QWidget * const opc_Parent) :
@@ -55,7 +55,7 @@ C_OgePubIconOnly::C_OgePubIconOnly(QWidget * const opc_Parent) :
 
    Here: Handle hover
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -94,7 +94,7 @@ bool C_OgePubIconOnly::event(QEvent * const opc_Event)
 
    Here: Draw icon for complete size
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubIconOnly::paintEvent(QPaintEvent * const opc_Event)
@@ -128,23 +128,25 @@ void C_OgePubIconOnly::paintEvent(QPaintEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set the Icon for Enabled and Disabled mode
+/*! \brief   Set the icon for different modes
 
-   \param[in]     oc_IconPathEnabled      String for Enabled Icon Path
-                  oc_IconPathDisabled     String for Disabled Icon Path
+   \param[in]  orc_IconPathNormal      String for enabled icon path
+   \param[in]  orc_IconPathHovered     String for hovered icon path
+   \param[in]  orc_IconPathClicked     String for clicked icon path
+   \param[in]  orc_IconPathDisabled    String for disabled icon path
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubIconOnly::SetCustomIcons(QString oc_IconPathNormal, QString oc_IconPathHovered, QString oc_IconPathClicked,
-                                      QString oc_IconPathDisabled)
+void C_OgePubIconOnly::SetCustomIcons(const QString & orc_IconPathNormal, const QString & orc_IconPathHovered,
+                                      const QString & orc_IconPathClicked, const QString & orc_IconPathDisabled)
 {
    QSize c_Size = this->size();
 
-   mc_IconNormal = QIcon(oc_IconPathNormal).pixmap(c_Size);
+   mc_IconNormal = QIcon(orc_IconPathNormal).pixmap(c_Size);
    this->setIcon(mc_IconNormal);
    // TODO icon states: because we need more time to adapt all icon-only-buttons
-   Q_UNUSED(oc_IconPathHovered)
-   Q_UNUSED(oc_IconPathClicked)
+   Q_UNUSED(orc_IconPathHovered)
+   Q_UNUSED(orc_IconPathClicked)
    //   mc_IconHovered = QIcon(oc_IconPathHovered).pixmap(c_Size);
    //   mc_IconClicked = QIcon(oc_IconPathClicked).pixmap(c_Size);
-   mc_IconDisabled = QIcon(oc_IconPathDisabled).pixmap(c_Size);
+   mc_IconDisabled = QIcon(orc_IconPathDisabled).pixmap(c_Size);
 }

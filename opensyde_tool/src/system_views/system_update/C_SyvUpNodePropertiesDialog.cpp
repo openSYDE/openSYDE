@@ -42,10 +42,10 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent                  Reference to parent
-   \param[in]     ou32_NodeIndex              Node index
-   \param[in]     oq_UpdateFailed             Flag if update somehow failed
-   \param[in]     ou32_FailedApplicationIndex Optional info about which application did fail
+   \param[in,out]  orc_Parent                   Reference to parent
+   \param[in]      ou32_NodeIndex               Node index
+   \param[in]      oq_UpdateFailed              Flag if update somehow failed
+   \param[in]      ou32_FailedApplicationIndex  Optional info about which application did fail
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
@@ -62,7 +62,7 @@ C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elemen
    mpc_STWDevice(NULL),
    mpc_OSYDevice(NULL),
    mq_UpdateFailed(oq_UpdateFailed),
-   mq_UpdateSuccessfull(false),
+   mq_UpdateSuccessful(false),
    mq_Discarded(false),
    mq_ValidStatus(false),
    mu32_FailedApplicationIndex(ou32_FailedApplicationIndex)
@@ -132,12 +132,15 @@ void C_SyvUpNodePropertiesDialog::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update status
 
-   \param[in] oe_Status          Node status
-   \param[in] opc_HexFileInfos   File information (HEX)
-   \param[in] opc_ParamFileInfos File information (Parameter set image)
-   \param[in] opc_FileInfos      File information
-   \param[in] opc_STWDevice      STW device information
-   \param[in] opc_OSYDevice      OSY device information
+   \param[in]  oe_Status                  Node status
+   \param[in]  opc_HexFileInfos           File information (HEX)
+   \param[in]  opc_HexAppInfoAmbiguous    Hex app info ambiguous
+   \param[in]  opc_ParamFileInfos         File information (Parameter set image)
+   \param[in]  opc_FileInfos              File information
+   \param[in]  opc_STWDevice              STW device information
+   \param[in]  opc_OSYDevice              OSY device information
+   \param[in]  oq_UpdateSuccessful        Flag if update was successful
+   \param[in]  oq_ValidStatus             Flag if status is valid
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::SetStatus(const C_SyvUtil::E_NodeUpdateInitialStatus oe_Status,
@@ -147,7 +150,7 @@ void C_SyvUpNodePropertiesDialog::SetStatus(const C_SyvUtil::E_NodeUpdateInitial
                                             const std::vector<QString> * const opc_FileInfos,
                                             const C_OSCSuSequences::C_XflDeviceInformation * const opc_STWDevice,
                                             const C_OSCSuSequences::C_OsyDeviceInformation * const opc_OSYDevice,
-                                            const bool oq_UpdateSuccessfull, const bool oq_ValidStatus)
+                                            const bool oq_UpdateSuccessful, const bool oq_ValidStatus)
 {
    this->me_Status = oe_Status;
    this->mpc_HexFileInfos = opc_HexFileInfos;
@@ -156,7 +159,7 @@ void C_SyvUpNodePropertiesDialog::SetStatus(const C_SyvUtil::E_NodeUpdateInitial
    this->mpc_FileInfos = opc_FileInfos;
    this->mpc_STWDevice = opc_STWDevice;
    this->mpc_OSYDevice = opc_OSYDevice;
-   this->mq_UpdateSuccessfull = oq_UpdateSuccessfull;
+   this->mq_UpdateSuccessful = oq_UpdateSuccessful;
    this->mq_ValidStatus = oq_ValidStatus;
    //Handle initial no info state
    if ((this->mpc_HexFileInfos != NULL) && (this->mpc_HexFileInfos->size() > 0UL))
@@ -212,7 +215,7 @@ const C_OSCSuSequences::C_OsyDeviceInformation * C_SyvUpNodePropertiesDialog::Ge
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -352,7 +355,7 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                      //If update successfull all applications have to be up to date
                      //If no node information is available skip this as this probably means: discarded information
                      //If error happend also skip this
-                     if ((((this->me_Status == C_SyvUtil::eI_APPLICATION_MATCH) || (this->mq_UpdateSuccessfull)) &&
+                     if ((((this->me_Status == C_SyvUtil::eI_APPLICATION_MATCH) || (this->mq_UpdateSuccessful)) &&
                           ((this->mpc_OSYDevice != NULL) || (this->mpc_STWDevice != NULL))) &&
                          (this->mq_UpdateFailed == false))
                      {
@@ -649,31 +652,12 @@ void C_SyvUpNodePropertiesDialog::m_InitFlashloaderTable(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::m_OnDiscard(void)
 {
-   //Confirm
-   C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
-
-   C_OgeWiCustomMessage::E_Outputs e_Output;
-   c_Message.SetHeading(C_GtGetText::h_GetText("Force Update"));
-   c_Message.SetDescription(C_GtGetText::h_GetText(
-                               "Do you really want to discard all read application information, "
-                               "to force flashing of this device?"));
-   c_Message.SetOKButtonText(C_GtGetText::h_GetText("Discard"));
-   c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
-   e_Output = c_Message.Execute();
-   switch (e_Output)
-   {
-   case C_OgeWiCustomMessage::eYES:
-      //Trigger changes
-      this->me_Status = C_SyvUtil::eI_TO_BE_UPDATED;
-      this->mpc_STWDevice = NULL;
-      this->mpc_OSYDevice = NULL;
-      this->mq_Discarded = true;
-      m_ReInitStatus();
-      break;
-   default:
-      //Abort
-      break;
-   }
+   //Trigger changes
+   this->me_Status = C_SyvUtil::eI_TO_BE_UPDATED;
+   this->mpc_STWDevice = NULL;
+   this->mpc_OSYDevice = NULL;
+   this->mq_Discarded = true;
+   m_ReInitStatus();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -49,7 +49,7 @@ public:
                   const std::vector<QString> * const opc_FileInfos,
                   const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * const opc_STWDevice,
                   const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * const opc_OSYDevice,
-                  const bool oq_UpdateSuccessfull, const bool oq_ValidStatus);
+                  const bool oq_UpdateSuccessful, const bool oq_ValidStatus);
    stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus GetStatus(void) const;
    const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * GetSTWDevice(void) const;
    const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * GetOSYDevice(void) const;
@@ -75,7 +75,7 @@ private:
    const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * mpc_STWDevice;
    const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * mpc_OSYDevice;
    const bool mq_UpdateFailed;
-   bool mq_UpdateSuccessfull;
+   bool mq_UpdateSuccessful;
    bool mq_Discarded;
    bool mq_ValidStatus;
    const stw_types::uint32 mu32_FailedApplicationIndex;

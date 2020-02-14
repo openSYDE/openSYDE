@@ -49,6 +49,13 @@ public:
    bool IsAtLeastOneStwFlashloaderNodeActive(void) const;
    bool IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void) const;
 
+   bool IsEthToEthRoutingNecessary(const stw_types::uint32 ou32_RouterNodeIndex) const;
+   stw_types::uint32 GetMinimumFlashloaderResetWaitTime(
+      const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type) const;
+   stw_types::sint32 GetMinimumFlashloaderResetWaitTime(
+      const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type,
+      const C_OSCProtocolDriverOsyNode & orc_ServerId, stw_types::uint32 & oru32_TimeValue) const;
+
 protected:
    C_OSCComDriverFlash * const mpc_ComDriver;
 

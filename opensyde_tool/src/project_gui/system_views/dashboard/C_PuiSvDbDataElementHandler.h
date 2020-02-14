@@ -127,7 +127,6 @@ private:
    mutable stw_tgl::C_TGLCriticalSection mc_CriticalSection;
 
    void m_SetWidgetDataPoolElementCount(const stw_types::uint32 ou32_Count);
-   const C_PuiSvDbWidgetBase * m_GetPuiSvBase(void) const;
    static QString mh_GetStringForScaledValue(const stw_types::float64 of64_Value,
                                              const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_Type);
 

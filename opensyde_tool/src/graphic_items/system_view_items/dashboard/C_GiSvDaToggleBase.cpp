@@ -215,6 +215,8 @@ void C_GiSvDaToggleBase::SendCurrentValue(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call properties for widgets
+
+   \return true (configurable properties called)
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaToggleBase::CallProperties(void)
@@ -524,6 +526,8 @@ void C_GiSvDaToggleBase::UpdateType(const C_PuiSvDbToggle::E_Type oe_Type)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for any invalid elements
+
+   \param[out]   orc_FirstInvalidElementName    Name of first invalid element
 
    \return
    true  Found

@@ -42,6 +42,7 @@ public:
    void LoadProject(const QString & orc_FilePath);
    void UpdateRecentProjects(void);
    void OnSaveProjAs(void);
+   void OpenColorPicker(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -50,7 +51,8 @@ Q_SIGNALS:
    //lint -restore
    void SigChangeMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode = 0,
                       const stw_types::uint32 ou32_Index = 0U, const QString & orc_Name = "",
-                      const QString & orc_SubSubName = "", const stw_types::uint32 ou32_Flag = 0U);
+                      const QString & orc_SubSubName = "", const stw_types::uint32 ou32_Flag = 0U,
+                      const bool oq_ChangeUseCase = false);
    void SigBeforeOtherProjectLoad(void);
    void SigOtherProjectLoaded(const bool & orq_SwitchToLastKnownMode);
    void SigNewApplicationName(const QString & orc_Name);

@@ -51,8 +51,8 @@ C_SdBueSortHelper::C_SdBueSortHelper(void)
 
    Primary sorting criteria: alphabetical
 
-   \param[in] orc_Message1 Message 1 identification indices
-   \param[in] orc_Message2 Message 2 identification indices
+   \param[in]  orc_Message1   Message 1 identification indices
+   \param[in]  orc_Message2   Message 2 identification indices
 
    \return
    true  Message 1 smaller
@@ -91,8 +91,8 @@ bool C_SdBueSortHelper::operator ()(const C_OSCCanMessageIdentificationIndices &
 
    Primary sorting criteria: alphabetical
 
-   \param[in] orc_String1 String 1
-   \param[in] orc_String2 String 2
+   \param[in]  orc_String1    String 1
+   \param[in]  orc_String2    String 2
 
    \return
    true  String 1 smaller
@@ -159,7 +159,7 @@ bool C_SdBueSortHelper::h_CompareString(const stw_scl::C_SCLString & orc_String1
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in] orc_Message Message identification indices
+   \param[in]  orc_Message    Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueSortHelperSignal::C_SdBueSortHelperSignal(const C_OSCCanMessageIdentificationIndices & orc_Message) :
@@ -172,8 +172,8 @@ C_SdBueSortHelperSignal::C_SdBueSortHelperSignal(const C_OSCCanMessageIdentifica
 
    Primary sorting criteria: alphabetical
 
-   \param[in] orc_Message1 Message 1 identification indices
-   \param[in] orc_Message2 Message 2 identification indices
+   \param[out]  oru32_Signal1    Index of signal 1
+   \param[in]   oru32_Signal2    Index of signal 2
 
    \return
    true  Message 1 smaller
@@ -203,10 +203,10 @@ bool C_SdBueSortHelperSignal::operator ()(const uint32 & oru32_Signal1, const ui
               Missing optimization: each iteration will result in the last element being at the correct position,
                so every iteration one less element should be compared
 
-   \param[in,out] orc_OSCMessages OSC Messages
-   \param[in,out] orc_UiMessages  UI Messages
-   \param[in,out] orc_OSCList     OSC data pool part
-   \param[in,out] orc_UiList      UI data pool part
+   \param[in,out]  orc_OSCMessages  OSC Messages
+   \param[in,out]  orc_UiMessages   UI Messages
+   \param[in,out]  orc_OSCList      OSC data pool part
+   \param[in,out]  orc_UiList       UI data pool part
 
    \return
    C_NO_ERR Operation success
@@ -248,7 +248,7 @@ sint32 C_SdBueSortHelper::h_SortOneMessageVector(std::vector<C_OSCCanMessage> & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if messages sorted properly by name
 
-   \param[in] orc_OSCMessages OSC Messages
+   \param[in]  orc_OSCMessages   OSC Messages
 
    \return
    True  Messages sorted by name
@@ -280,12 +280,12 @@ bool C_SdBueSortHelper::mh_CheckMessagesSorted(const std::vector<C_OSCCanMessage
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Swap two messages
 
-   \param[in]     ou32_MessageIndex1 Message 1 index (ID in OSC Messages)
-   \param[in]     ou32_MessageIndex2 Message 2 index (ID in OSC Messages)
-   \param[in,out] orc_OSCMessages    OSC Messages
-   \param[in,out] orc_UiMessages     UI Messages
-   \param[in,out] orc_OSCList        OSC data pool part
-   \param[in,out] orc_UiList         UI data pool part
+   \param[in]      ou32_MessageIndex1  Message 1 index (ID in OSC Messages)
+   \param[in]      ou32_MessageIndex2  Message 2 index (ID in OSC Messages)
+   \param[in,out]  orc_OSCMessages     OSC Messages
+   \param[in,out]  orc_UiMessages      UI Messages
+   \param[in,out]  orc_OSCList         OSC data pool part
+   \param[in,out]  orc_UiList          UI data pool part
 
    \return
    C_NO_ERR Operation success

@@ -36,6 +36,10 @@ protected:
    virtual bool filterAcceptsRow(const stw_types::sintn osn_SourceRow,
                                  const QModelIndex & orc_SourceParent) const override;
    //lint -restore
+
+private:
+   bool m_Contains(const QModelIndex & orc_Index) const;
+   bool m_CheckParents(const QModelIndex & orc_SourceParent) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

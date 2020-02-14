@@ -53,8 +53,8 @@ public:
    bool q_IsDiagnosisEnabled;      ///< Flag for diagnosis enabled using this bus
    bool q_IsBusConnected;          ///< Flag if there is a valid bus connected to this interface
    stw_types::uint32 u32_BusIndex; ///< Target bus index this interface connects to
-                                   ///< (index in system definition)
-                                   ///< Only valid if bus flag q_IsBusConnected is true
+   ///< (index in system definition)
+   ///< Only valid if bus flag q_IsBusConnected is true
 
    void AddConnection(const stw_types::uint32 & oru32_BusIndex);
    void RemoveConnection(void);

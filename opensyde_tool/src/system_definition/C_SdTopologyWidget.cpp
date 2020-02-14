@@ -53,8 +53,7 @@ const sintn C_SdTopologyWidget::mhsn_ToolboxInitPosY = 150;
 
    Set up GUI with all elements.
 
-   \param[in]     opc_UIProject     Optional pointer to project information
-   \param[in,out] opc_parent        Optional pointer to parent
+   \param[in,out] opc_Parent        Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyWidget::C_SdTopologyWidget(QWidget * const opc_Parent) :
@@ -87,7 +86,8 @@ C_SdTopologyWidget::C_SdTopologyWidget(QWidget * const opc_Parent) :
    //Interaction point scaling
    connect(this->mpc_Scene, &C_SebScene::SigTriggerUpdateTransform, this->mpc_Ui->pc_GraphicsView,
            &C_SebGraphicsView::UpdateTransform);
-   // forwaring of this signal
+   // forwarding of this signal
+   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(this->mpc_Scene, &C_SdTopologyScene::SigChangeMode, this, &C_SdTopologyWidget::SigChangeMode);
    connect(this->mpc_Scene, &C_SdTopologyScene::SigChanged, this, &C_SdTopologyWidget::SigChanged);
    connect(this->mpc_Scene, &C_SdTopologyScene::SigNodeDeleted, this, &C_SdTopologyWidget::SigNodeDeleted);
@@ -125,6 +125,8 @@ C_SdTopologyWidget::~C_SdTopologyWidget()
 /*! \brief   Function to set the parent of the widget
 
    The toolbox will be placed on the parent widget.
+
+   \param[in,out] opc_Parent   Pointer to toolbox
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
@@ -132,12 +134,17 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
    if (opc_Parent != NULL)
    {
       // create toolbox
-      C_SdTopologyToolbox * pc_Widget;
+      C_SdTopologyToolbox * pc_TopologyToolboxWidget;
 
-      pc_Widget = new C_SdTopologyToolbox();
+      pc_TopologyToolboxWidget = new C_SdTopologyToolbox();
       this->mpc_Toolbox =
-         new C_OgeWiHover(*pc_Widget, C_GtGetText::h_GetText("TOOLBOX"), false, opc_Parent, opc_Parent);
+         new C_OgeWiHover(*pc_TopologyToolboxWidget, C_GtGetText::h_GetText("TOOLBOX"), ":images/IconToolbox.svg",
+                          true, opc_Parent, opc_Parent);
 
+      // create fix minimized toolbox
+      this->mpc_FixMinimizedToolbox = new C_OgeWiFixPosition(C_GtGetText::h_GetText("TOOLBOX"),
+                                                             ":images/IconToolbox.svg",
+                                                             QRect(1449, 24, 190, 36), opc_Parent);
       // check for saved default values for toolbox
       if (C_UsHandler::h_GetInstance()->GetSdTopologyToolboxPos().x() < 0)
       {
@@ -163,13 +170,19 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
 
       if (C_UsHandler::h_GetInstance()->GetSdTopologyToolboxMaximized() == false)
       {
-         this->mpc_Toolbox->SetMinimize();
+         this->m_WiHoverMinBtnClicked();
+      }
+      else
+      {
+         this->mpc_Toolbox->show();
       }
 
-      this->mpc_Toolbox->show();
-
-      connect(this->mpc_Toolbox, &C_OgeWiHover::SigSearchChanged, pc_Widget,
+      connect(this->mpc_Toolbox, &C_OgeWiHover::SigSearchChanged, pc_TopologyToolboxWidget,
               &C_SdTopologyToolbox::SearchChanged);
+      connect(this->mpc_Toolbox, &C_OgeWiHover::SigWiHoverMinBtnClicked,
+              this, &C_SdTopologyWidget::m_WiHoverMinBtnClicked);
+      connect(this->mpc_FixMinimizedToolbox, &C_OgeWiFixPosition::SigWiFixPosMaxBtnClicked,
+              this, &C_SdTopologyWidget::m_WiFixPosMaxBtnClicked);
    }
    else
    {
@@ -183,6 +196,7 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
 
       // reset parent for memory management
       this->mpc_Toolbox->setParent(this);
+      this->mpc_FixMinimizedToolbox->setParent(this);
    }
 }
 
@@ -209,11 +223,19 @@ void C_SdTopologyWidget::HideAll(const bool oq_Hide)
    {
       this->hide();
       this->mpc_Toolbox->hide();
+      this->mpc_FixMinimizedToolbox->hide();
    }
    else
    {
       this->show();
-      this->mpc_Toolbox->show();
+      if (this->mpc_Toolbox->GetMaximized() != false)
+      {
+         this->mpc_Toolbox->show();
+      }
+      else
+      {
+         this->mpc_FixMinimizedToolbox->show();
+      }
       this->mpc_Scene->CheckAllItemsForChanges();
    }
 }
@@ -242,50 +264,58 @@ void C_SdTopologyWidget::resizeEvent(QResizeEvent * const opc_Event)
    Q_UNUSED(opc_Event)
 
    // only resize if scene is active to avoid bad toolbox geometry in case of "open tool with *.syde double click"
-   if (this->mpc_Scene->isActive() == true)
+   //   if (this->mpc_Scene->isActive() == true)
+   //   {
+   QPoint c_Point = this->mpc_Toolbox->pos();
+   QSize c_Size = this->mpc_Toolbox->size();
+
+   QPoint c_PointFixMiniToolbox = this->mpc_FixMinimizedToolbox->pos();
+
+   QWidget * pc_Widget = this->parentWidget();
+
+   if (pc_Widget == NULL)
    {
-      QPoint c_Point = this->mpc_Toolbox->pos();
-      QSize c_Size = this->mpc_Toolbox->size();
-      QWidget * pc_Widget = this->parentWidget();
-
-      if (pc_Widget == NULL)
-      {
-         // if no parent exist use this widget
-         pc_Widget = this;
-      }
-
-      // would the toolbox be outside of the widget in x direction
-      if ((this->mpc_Toolbox->x() + this->mpc_Toolbox->width() + mhsn_WidgetBorder) > pc_Widget->width())
-      {
-         // is the toolbox to big?
-         if ((this->mpc_Toolbox->width() + (2 * mhsn_WidgetBorder)) > pc_Widget->width())
-         {
-            c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WidgetBorder));
-         }
-         else
-         {
-            // adapt position of toolbox
-            c_Point.setX((pc_Widget->width() - this->mpc_Toolbox->width()) - mhsn_WidgetBorder);
-         }
-      }
-
-      // would the toolbox be outside of the widget in y direction
-      if ((this->mpc_Toolbox->y() + this->mpc_Toolbox->height() + mhsn_WidgetBorder) > pc_Widget->height())
-      {
-         // is the toolbox to big?
-         if ((this->mpc_Toolbox->height() + (2 * mhsn_WidgetBorder)) > pc_Widget->height())
-         {
-            c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WidgetBorder));
-         }
-         else
-         {
-            // adapt position of toolbox
-            c_Point.setY((pc_Widget->height() - this->mpc_Toolbox->height()) - mhsn_WidgetBorder);
-         }
-      }
-
-      this->mpc_Toolbox->setGeometry(QRect(c_Point, c_Size));
+      // if no parent exist use this widget
+      pc_Widget = this;
    }
+
+   // would the toolbox be outside of the widget in x direction
+   if ((this->mpc_Toolbox->x() + this->mpc_Toolbox->width() + mhsn_WidgetBorder) > pc_Widget->width())
+   {
+      // is the toolbox to big?
+      if ((this->mpc_Toolbox->width() + (2 * mhsn_WidgetBorder)) > pc_Widget->width())
+      {
+         c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WidgetBorder));
+      }
+      else
+      {
+         // adapt position of toolbox
+         c_Point.setX((pc_Widget->width() - this->mpc_Toolbox->width()) - mhsn_WidgetBorder);
+      }
+   }
+
+   // would the toolbox be outside of the widget in y direction
+   if ((this->mpc_Toolbox->y() + this->mpc_Toolbox->height() + mhsn_WidgetBorder) > pc_Widget->height())
+   {
+      // is the toolbox to big?
+      if ((this->mpc_Toolbox->height() + (2 * mhsn_WidgetBorder)) > pc_Widget->height())
+      {
+         c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WidgetBorder));
+      }
+      else
+      {
+         // adapt position of toolbox
+         c_Point.setY((pc_Widget->height() - this->mpc_Toolbox->height()) - mhsn_WidgetBorder);
+      }
+   }
+
+   // adapt position of fix minimized toolbox
+   c_PointFixMiniToolbox.setX((pc_Widget->width() - this->mpc_FixMinimizedToolbox->width()) -
+                              mhsn_WidgetBorder);
+
+   this->mpc_Toolbox->setGeometry(QRect(c_Point, c_Size));
+   this->mpc_FixMinimizedToolbox->setGeometry(QRect(c_PointFixMiniToolbox, this->mpc_FixMinimizedToolbox->size()));
+   //   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -302,4 +332,26 @@ void C_SdTopologyWidget::resizeEvent(QResizeEvent * const opc_Event)
 C_SdTopologyScene * C_SdTopologyWidget::GetScene(void)
 {
    return this->mpc_Scene;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function of fix minimized toolbox widget for button maximizing click
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyWidget::m_WiFixPosMaxBtnClicked(void)
+{
+   this->mpc_Toolbox->setVisible(true);
+   this->mpc_Toolbox->SetMaximized(true);
+   this->mpc_FixMinimizedToolbox->setVisible(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function of hover widget for button minimizing click
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyWidget::m_WiHoverMinBtnClicked(void)
+{
+   this->mpc_Toolbox->setVisible(false);
+   this->mpc_Toolbox->SetMaximized(false);
+   this->mpc_FixMinimizedToolbox->setVisible(true);
 }

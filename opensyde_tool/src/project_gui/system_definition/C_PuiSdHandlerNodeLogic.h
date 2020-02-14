@@ -64,6 +64,8 @@ public:
                                     stw_opensyde_core::C_OSCCanProtocol::eLAYER2,
                                  const bool & orq_AllowNameAdaptation = true,
                                  const bool & orq_AllowDataAdaptation = true);
+   stw_types::sint32 AddAutoGenCommDataPool(const stw_types::uint32 & oru32_NodeIndex, const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComProtocolType =
+                                               stw_opensyde_core::C_OSCCanProtocol::eLAYER2);
    stw_types::sint32 InsertDataPool(const stw_types::uint32 & oru32_NodeIndex,
                                     const stw_types::uint32 & oru32_DataPoolIndex,
                                     const stw_opensyde_core::C_OSCNodeDataPool & orc_OSCContent,

@@ -489,7 +489,7 @@ void C_CamGenTableView::keyPressEvent(QKeyEvent * const opc_Event)
 
    if (q_CallOrig == true)
    {
-      C_TblViewToolTipBase::keyPressEvent(opc_Event);
+      C_TblViewInteraction::keyPressEvent(opc_Event);
       //If selected: handle on column basis, otherwise always ignore
       if (this->selectedIndexes().size() > 0L)
       {
@@ -562,7 +562,7 @@ void C_CamGenTableView::keyPressEvent(QKeyEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::showEvent(QShowEvent * const opc_Event)
 {
-   C_TblViewToolTipBase::showEvent(opc_Event);
+   C_TblViewInteraction::showEvent(opc_Event);
    m_RepositionButtons();
 }
 
@@ -576,7 +576,7 @@ void C_CamGenTableView::showEvent(QShowEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::resizeEvent(QResizeEvent * const opc_Event)
 {
-   C_TblViewToolTipBase::resizeEvent(opc_Event);
+   C_TblViewInteraction::resizeEvent(opc_Event);
    m_RepositionButtons();
 }
 
@@ -593,7 +593,7 @@ void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, co
 {
    std::vector<uint32> c_Selection;
 
-   C_TblViewToolTipBase::selectionChanged(orc_Selected, orc_Deselected);
+   C_TblViewInteraction::selectionChanged(orc_Selected, orc_Deselected);
    c_Selection = this->m_GetSelectedRows();
    if (c_Selection.size() == 1UL)
    {

@@ -35,7 +35,7 @@ public:
 
    virtual stw_types::sintn type() const override;
    bool OpenStyleDialog(const bool oq_DarkMode);
-   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem);
+   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem) override;
 
    void SetBorderWidth(const stw_types::sint32 & ors32_Width);
    void SetBorderColor(const QColor & orc_Color);

@@ -54,6 +54,8 @@ const QString C_SyvDaDashboardSelectorTabWidget::mhc_AddIconLight = "://images/I
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
+
+   \param[in,out]  opc_Parent    Parent widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardSelectorTabWidget::C_SyvDaDashboardSelectorTabWidget(QWidget * const opc_Parent) :
@@ -118,8 +120,8 @@ C_SyvDaDashboardSelectorTabWidget::~C_SyvDaDashboardSelectorTabWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show tear off widget for specified tab
 
-   \param[in] os32_Index Tab index
-   \param[in] orc_Pos    Widget position
+   \param[in]  os32_Index  Tab index
+   \param[in]  orc_Pos     Widget position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::TearOffWidget(const sint32 os32_Index, const QPoint & orc_Pos)
@@ -146,7 +148,7 @@ void C_SyvDaDashboardSelectorTabWidget::TearOffWidget(const sint32 os32_Index, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the edit mode
 
-   \param[in]     oq_Active      Flag for edit mode
+   \param[in]  oq_Active   Flag for edit mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::SetEditMode(const bool oq_Active)
@@ -184,9 +186,24 @@ void C_SyvDaDashboardSelectorTabWidget::SetEditMode(const bool oq_Active)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the confirm button in tear off widget enabled or disabled
+
+   \param[in] oq_Enabled   Flag for enabled
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardSelectorTabWidget::SetEnabled(const bool oq_Enabled)
+{
+   for (QList<C_SyvDaTearOffWidget *>::const_iterator c_ItItem = this->mc_TearedOffWidgets.begin();
+        c_ItItem != this->mc_TearedOffWidgets.end(); ++c_ItItem)
+   {
+      (*c_ItItem)->SetEnabled(oq_Enabled);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set view index
 
-   \param[in] ou32_Value New view index
+   \param[in]  ou32_Value  New view index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::SetViewIndex(const uint32 ou32_Value)
@@ -316,7 +333,7 @@ void C_SyvDaDashboardSelectorTabWidget::Save(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply current dark mode setting
 
-   \param[in] oq_Active Dark mode active
+   \param[in]  oq_Active   Dark mode active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::ApplyDarkMode(const bool oq_Active)
@@ -379,7 +396,7 @@ void C_SyvDaDashboardSelectorTabWidget::ApplyDarkMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
-   \param[in]     orc_AllDataDealer    Reference to vector with all data dealer
+   \param[in,out]  orc_ComDriver    Communication driver
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) const
@@ -408,7 +425,7 @@ void C_SyvDaDashboardSelectorTabWidget::RegisterWidgets(C_SyvComDriverDiag & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active      Flag if connection is active or not active now
+   \param[in]  oq_Active   Flag if connection is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::ConnectionActiveChanged(const bool oq_Active)
@@ -512,8 +529,8 @@ void C_SyvDaDashboardSelectorTabWidget::UpdateTransmissionConfiguration()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert tab index to dashboard index
 
-   \param[in]  os32_TabIndex        Visible tab index
-   \param[out] oru32_DashboardIndex Internal dashboard data index
+   \param[in]   os32_TabIndex          Visible tab index
+   \param[out]  oru32_DashboardIndex   Internal dashboard data index
 
    \return
    C_NO_ERR Valid result found
@@ -548,8 +565,8 @@ sint32 C_SyvDaDashboardSelectorTabWidget::GetDashboardIndexForTabIndex(const sin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle manual user operation finished event
 
-   \param[in] os32_Result Operation result
-   \param[in] ou8_NRC     Negative response code, if any
+   \param[in]  os32_Result    Operation result
+   \param[in]  ou8_NRC        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
@@ -576,8 +593,8 @@ void C_SyvDaDashboardSelectorTabWidget::HandleManualOperationFinished(const sint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal all widgets which read rail element ID registrations failed
 
-   \param[in]     orc_FailedIdRegisters    Failed IDs
-   \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
+   \param[in]      orc_FailedIdRegisters     Failed IDs
+   \param[in,out]  orc_FailedIdErrorDetails  Error details for element IDs which failed registration (if any)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::SetErrorForFailedCyclicElementIdRegistrations(
@@ -609,7 +626,7 @@ void C_SyvDaDashboardSelectorTabWidget::SetErrorForFailedCyclicElementIdRegistra
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::paintEvent(QPaintEvent * const opc_Event)
@@ -624,7 +641,7 @@ void C_SyvDaDashboardSelectorTabWidget::paintEvent(QPaintEvent * const opc_Event
 
    Here: Restrict tab bar size
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::resizeEvent(QResizeEvent * const opc_Event)
@@ -642,7 +659,7 @@ void C_SyvDaDashboardSelectorTabWidget::resizeEvent(QResizeEvent * const opc_Eve
 
    Here: Store all dashboard user settings
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::hideEvent(QHideEvent * const opc_Event)
@@ -657,7 +674,7 @@ void C_SyvDaDashboardSelectorTabWidget::hideEvent(QHideEvent * const opc_Event)
 
    Here: Reshow all hidden widgets
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::showEvent(QShowEvent * const opc_Event)
@@ -727,10 +744,11 @@ void C_SyvDaDashboardSelectorTabWidget::m_MakeScreenshot(const sint32 s32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init tab styling widget
 
-   \param[in] ou32_Index Tab index
-   \param[in] orc_Name   Tab name
-   \param[in] oq_Active  Tab active
-   \param[in] oq_Dark    Dark mode active
+   \param[in]  ou32_Index     Tab index
+   \param[in]  orc_Name       Tab name
+   \param[in]  orc_Comment    Tab comment
+   \param[in]  oq_Active      Tab active
+   \param[in]  oq_Dark        Dark mode active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_InitTabStyle(const uint32 ou32_Index, const QString & orc_Name,
@@ -788,7 +806,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_InitTabStyle(const uint32 ou32_Index, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle current change event
 
-   \param[in] osn_Index Current index
+   \param[in]  osn_CurrentIndex  Current index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_CurrentChanged(const sintn osn_CurrentIndex) const
@@ -869,7 +887,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_RepositionAddButton(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle selection change request
 
-   \param[in] os32_Index Last selected item index
+   \param[in]  os32_Index  Last selected item index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_HandleChangeSelection(const sint32 os32_Index)
@@ -911,7 +929,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_HandleChangeSelection(const sint32 os3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Map data index to tab index
 
-   \param[in] ou32_DataIndex Data index
+   \param[in]  ou32_DataIndex    Data index
 
    \return
    Tab index
@@ -940,9 +958,9 @@ sint32 C_SyvDaDashboardSelectorTabWidget::m_MapDataIndexToTabIndex(const uint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add specific tab at end
 
-   \param[in]     ou32_DataIndex Dashboard data index
-   \param[in]     os32_TabIndex  Dashboard tab index
-   \param[in,out] opc_Widget     Optional dashboard widget to integrate instead of creating a new one
+   \param[in]      ou32_DataIndex   Dashboard data index
+   \param[in]      os32_TabIndex    Dashboard tab index
+   \param[in,out]  opc_Widget       Optional dashboard widget to integrate instead of creating a new one
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_AddSpecificTab(const uint32 ou32_DataIndex, const sint32 os32_TabIndex,
@@ -1004,14 +1022,12 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddSpecificTab(const uint32 ou32_DataI
          //lint -e{429}  no memory leak because of the parent of pc_Widget and the Qt memory management
       }
    }
-
-   this->m_SetDeleteButtonVisible(this->count() >  1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sync dashboard data indices
 
-   \param[in] ou32_DataIndex Dashboard data index
+   \param[in]  ou32_DataIndex    Dashboard data index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_SyncDashboardDeleteDataIndex(const uint32 ou32_DataIndex)
@@ -1049,8 +1065,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_SyncDashboardDeleteDataIndex(const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle active flag changed
 
-   \param[in] opc_Source Signal source widget
-   \param[in] oq_Active  New active flag
+   \param[in]  opc_Source  Signal source widget
+   \param[in]  oq_Active   New active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnActiveChange(const C_OgeWiDashboardTab * const opc_Source,
@@ -1079,7 +1095,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnActiveChange(const C_OgeWiDashboardT
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle copy action request
 
-   \param[in] opc_Source Signal source widget
+   \param[in]  opc_Source  Signal source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnCopyAction(const C_OgeWiDashboardTab * const opc_Source) const
@@ -1100,7 +1116,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnCopyAction(const C_OgeWiDashboardTab
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle cut action request
 
-   \param[in] opc_Source Signal source widget
+   \param[in]  opc_Source  Signal source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnCutAction(const C_OgeWiDashboardTab * const opc_Source)
@@ -1147,7 +1163,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnPasteAction(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle delete action request
 
-   \param[in] opc_Source Signal source widget
+   \param[in]  opc_Source  Signal source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnDeleteAction(const C_OgeWiDashboardTab * const opc_Source)
@@ -1167,7 +1183,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnDeleteAction(const C_OgeWiDashboardT
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle close action request
 
-   \param[in] opc_Source Signal source widget
+   \param[in]  opc_Source  Signal source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnCloseAction(const C_OgeWiDashboardTab * const opc_Source)
@@ -1178,14 +1194,12 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnCloseAction(const C_OgeWiDashboardTa
    {
       this->removeTab(sn_Match);
    }
-
-   this->m_SetDeleteButtonVisible(this->count() >  1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Search for specified tab drawing widget and return index if found
 
-   \param[in] opc_DrawingWidget Tab drawing widget to serach for
+   \param[in]  opc_DrawingWidget    Tab drawing widget to serach for
 
    \return
    -1   No matching tab found
@@ -1214,7 +1228,7 @@ sint32 C_SyvDaDashboardSelectorTabWidget::GetTabIndex(const C_OgeWiDashboardTab 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle undock action
 
-   \param[in] opc_Source Signal source widget
+   \param[in]  opc_Source  Signal source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnUndock(const C_OgeWiDashboardTab * const opc_Source)
@@ -1229,6 +1243,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnUndock(const C_OgeWiDashboardTab * c
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Open popup to edit dashboard tab properties
+
+   \param[in,out]  opc_Source    Source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_Source)
@@ -1259,13 +1275,13 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnEditProperties(C_OgeWiDashboardTab *
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show tear off widget for specified dashboard
 
-   \param[in]     ou32_DataIndex            Dashboard data index
-   \param[in]     orc_Pos                   Widget position
-   \param[in,out] opc_Widget                Optional dashboard widget to integrate instead of creating a new one
-   \param[in]     orc_Size                  Widget size
-   \param[in]     oq_TornOffWindowMinimized Window minimized flag
-   \param[in]     oq_TornOffWindowMaximized Window maximized flag
-   \param[in]     oq_Load                   Flag if tear of widget was loaded or user teared it of
+   \param[in]      ou32_DataIndex               Dashboard data index
+   \param[in]      orc_Pos                      Widget position
+   \param[in,out]  opc_Widget                   Optional dashboard widget to integrate instead of creating a new one
+   \param[in]      orc_Size                     Widget size
+   \param[in]      oq_TornOffWindowMinimized    Window minimized flag
+   \param[in]      oq_TornOffWindowMaximized    Window maximized flag
+   \param[in]      oq_Load                      Flag if tear of widget was loaded or user teared it of
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_TearOffWidget(const uint32 ou32_DataIndex, const QPoint & orc_Pos,
@@ -1315,6 +1331,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_TearOffWidget(const uint32 ou32_DataIn
          }
          pc_Widget->setGeometry(QRect(c_Pos, c_Size));
          pc_Widget->SetEditMode(this->mq_EditMode);
+         pc_Widget->SetEnabled(!this->mq_Connected);
          pc_Widget->ConnectionActiveChanged(this->mq_Connected, true);
          pc_Widget->SetDarkMode(pc_View->GetDarkModeActive());
          //Window title
@@ -1343,7 +1360,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_TearOffWidget(const uint32 ou32_DataIn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add tab and dashboard data
 
-   \param[in] orc_Data New dashboard data
+   \param[in]  orc_Data    New dashboard data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_AddTab(const C_PuiSvDashboard & orc_Data)
@@ -1362,7 +1379,6 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddTab(const C_PuiSvDashboard & orc_Da
    //Select new one
    this->setCurrentIndex(this->count() - 1);
 
-   this->m_SetDeleteButtonVisible(this->count() >  1);
    //Signal change
    Q_EMIT this->SigNumberDashboardsChanged();
 }
@@ -1370,7 +1386,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddTab(const C_PuiSvDashboard & orc_Da
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete tab and content
 
-   \param[in] os32_TabIndex Tab index
+   \param[in]  os32_TabIndex  Tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_DeleteTab(const sint32 os32_TabIndex)
@@ -1378,8 +1394,9 @@ void C_SyvDaDashboardSelectorTabWidget::m_DeleteTab(const sint32 os32_TabIndex)
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_SyvDaDashboardWidget * pc_Widget =
       dynamic_cast<C_SyvDaDashboardWidget * const>(this->widget(static_cast<sintn>(os32_TabIndex)));
+   const bool q_LastDashboard = (this->count() == 1);
 
-   if ((pc_Widget != NULL) && (this->count() > 1))
+   if (pc_Widget != NULL)
    {
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
       C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
@@ -1389,17 +1406,44 @@ void C_SyvDaDashboardSelectorTabWidget::m_DeleteTab(const sint32 os32_TabIndex)
                                      pc_Widget->GetName()));
       c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
       c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
       if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
       {
          const stw_types::uint32 u32_DataIndex = pc_Widget->GetDataIndex();
+         //Default remove action
          m_Disconnect(pc_Widget);
          if (C_PuiSvHandler::h_GetInstance()->DeleteDashboard(this->mu32_ViewIndex, u32_DataIndex) == C_NO_ERR)
          {
             this->removeTab(os32_TabIndex);
             this->m_SyncDashboardDeleteDataIndex(u32_DataIndex);
+
+            //Handle last dashboard
+            if (q_LastDashboard)
+            {
+               const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+               if (pc_View != NULL)
+               {
+                  //Use free index (there might be other dashboards!)
+                  const uint32 u32_FreeIndex = pc_View->GetDashboards().size();
+                  //Insert one after the last one (least conflict potential)
+                  C_PuiSvDashboard c_DefaultDashboard;
+                  c_DefaultDashboard.SetName(C_GtGetText::h_GetText("Dashboard"));
+                  if (C_PuiSvHandler::h_GetInstance()->InsertDashboard(this->mu32_ViewIndex, u32_FreeIndex,
+                                                                       c_DefaultDashboard,
+                                                                       true) == C_NO_ERR)
+                  {
+                     m_AddSpecificTab(u32_FreeIndex);
+                  }
+               }
+               //Select new one
+               this->setCurrentIndex(0L);
+               //Signal might not be sent
+               this->m_CurrentChanged(0);
+            }
+
             Q_EMIT this->SigChanged();
-            Q_EMIT this->SigErrorChange();
+            Q_EMIT (this->SigErrorChange());
             //Signal change
             Q_EMIT this->SigNumberDashboardsChanged();
          }
@@ -1417,14 +1461,12 @@ void C_SyvDaDashboardSelectorTabWidget::m_DeleteTab(const sint32 os32_TabIndex)
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("You can't delete the last dashboard."));
       c_MessageBox.Execute();
    }
-
-   this->m_SetDeleteButtonVisible(this->count() >  1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy tab to clip board
 
-   \param[in] ou32_DataIndex Dashboard data index
+   \param[in]  ou32_DataIndex    Dashboard data index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_CopyTab(const uint32 ou32_DataIndex) const
@@ -1446,9 +1488,13 @@ void C_SyvDaDashboardSelectorTabWidget::m_CopyTab(const uint32 ou32_DataIndex) c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Edit tab properties (name and comment)
 
-   \param[in]     oru32_DataIndex   Dashboard data index
-   \param[in,out] orc_Name          Updated name
-   \param[in,out] orc_Comment       Updated comment
+   \param[in]      oru32_DataIndex  Dashboard data index
+   \param[in,out]  orc_Name         Updated name
+   \param[in,out]  orc_Comment      Updated comment
+
+   \return
+   true  success
+   false failure/abort
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardSelectorTabWidget::m_EditTab(const uint32 & oru32_DataIndex, QString & orc_Name,
@@ -1546,7 +1592,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_StoreUserSettings(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle dashboard connections
 
-   \param[in,out] opc_Widget Dashboard widget
+   \param[in,out]  opc_Widget    Dashboard widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_Connect(C_SyvDaDashboardWidget * const opc_Widget)
@@ -1569,7 +1615,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_Connect(C_SyvDaDashboardWidget * const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle dashboard disconnections
 
-   \param[in,out] opc_Widget Dashboard widget
+   \param[in,out]  opc_Widget    Dashboard widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_Disconnect(C_SyvDaDashboardWidget * const opc_Widget)
@@ -1590,29 +1636,9 @@ void C_SyvDaDashboardSelectorTabWidget::m_Disconnect(C_SyvDaDashboardWidget * co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSelectorTabWidget::m_SetDeleteButtonVisible(const bool oq_Visible) const
-{
-   sintn sn_Counter;
-
-   for (sn_Counter = 0U; sn_Counter < this->tabBar()->count(); ++sn_Counter)
-   {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_OgeWiDashboardTab * const pc_DrawingWidget =
-         dynamic_cast<C_OgeWiDashboardTab * const>(this->tabBar()->tabButton(sn_Counter,
-                                                                             C_SyvDaDashboardSelectorTabWidget::
-                                                                             mhe_TabContentPosition));
-
-      if (pc_DrawingWidget != NULL)
-      {
-         pc_DrawingWidget->SetCloseButtonVisibility(oq_Visible);
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle tab change
 
-   \param[in] osn_Index New selected tab index
+   \param[in]  osn_Index   New selected tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabWidget::m_OnTabChanged(const sintn osn_Index) const

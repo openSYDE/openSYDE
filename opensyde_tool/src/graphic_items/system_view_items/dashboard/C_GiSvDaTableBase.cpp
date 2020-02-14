@@ -218,8 +218,8 @@ void C_GiSvDaTableBase::UpdateShowValue(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparence value configured by the actual timeout state
 
-   \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
-   \param[in] osn_Value                       Value for transparence (0..255)
+   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
+   \param[in]     osn_Value                 Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -269,6 +269,8 @@ void C_GiSvDaTableBase::EditModeActiveChanged(const bool oq_Active)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call properties for widgets
+
+   \return true (configurable properties called)
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaTableBase::CallProperties(void)
@@ -480,7 +482,7 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
    This function is thread safe.
 
    \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_Value                             Result value
+   \param[out]    orc_Values                            Vector with result value(s)
 
    \return
    C_NO_ERR    Value read

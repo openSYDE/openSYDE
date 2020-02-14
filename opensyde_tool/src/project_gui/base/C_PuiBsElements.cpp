@@ -46,7 +46,7 @@ C_PuiBsElements::C_PuiBsElements(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Assignment operator
 
-   \param[in] orc_Snapshot Instance to copy
+   \param[in]  orc_Snapshot   Instance to copy
 
    \return
    Instance with new values
@@ -89,7 +89,7 @@ void C_PuiBsElements::Clear(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Replace common items of snapshot
 
-   \param[in,out] orc_Snapshot Snapshot to replace
+   \param[in,out]  orc_Snapshot  Snapshot to replace
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::ReplaceSnapshotElements(C_PuiBsElements & orc_Snapshot) const
@@ -105,7 +105,7 @@ void C_PuiBsElements::ReplaceSnapshotElements(C_PuiBsElements & orc_Snapshot) co
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::CalcHash(uint32 & oru32_HashValue) const
@@ -133,6 +133,9 @@ void C_PuiBsElements::CalcHash(uint32 & oru32_HashValue) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Count sum of all items
+
+   \return
+   Total number of items
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_PuiBsElements::Count(void) const
@@ -149,7 +152,7 @@ stw_types::uint32 C_PuiBsElements::Count(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply position offset
 
-   \param[in] orc_NewPos Offset
+   \param[in]  orc_NewPos  Offset
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::SetDataPositionOffset(const QPointF & orc_NewPos)
@@ -183,7 +186,7 @@ void C_PuiBsElements::SetDataPositionOffset(const QPointF & orc_NewPos)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply Z value offset
 
-   \param[in] of64_HighestUsedZValue Highest used Z value
+   \param[in]  of64_HighestUsedZValue  Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::SetDataZOffset(const float64 of64_HighestUsedZValue)
@@ -217,7 +220,7 @@ void C_PuiBsElements::SetDataZOffset(const float64 of64_HighestUsedZValue)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new boundary
 
-   \param[in] orc_Data New value
+   \param[in]  orc_Data    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::AddBoundary(const C_PuiBsBoundary & orc_Data)
@@ -228,8 +231,8 @@ void C_PuiBsElements::AddBoundary(const C_PuiBsBoundary & orc_Data)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert new boundary
 
-   \param[in] oru32_Index Boundary index
-   \param[in] orc_Data    New value
+   \param[in]  oru32_Index    Boundary index
+   \param[in]  orc_Data       New value
 
    \return
    C_NO_ERR Operation success
@@ -254,7 +257,7 @@ sint32 C_PuiBsElements::InsertBoundary(const uint32 & oru32_Index, const C_PuiBs
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new image
 
-   \param[in] orc_Data New value
+   \param[in]  orc_Data    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::AddImage(const C_PuiBsImage & orc_Data)
@@ -265,8 +268,8 @@ void C_PuiBsElements::AddImage(const C_PuiBsImage & orc_Data)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert new image
 
-   \param[in] oru32_Index Image index
-   \param[in] orc_Data    New value
+   \param[in]  oru32_Index    Image index
+   \param[in]  orc_Data       New value
 
    \return
    C_NO_ERR Operation success
@@ -291,7 +294,7 @@ sint32 C_PuiBsElements::InsertImage(const uint32 & oru32_Index, const C_PuiBsIma
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new line arrow
 
-   \param[in] orc_Data New value
+   \param[in]  orc_Data    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::AddLineArrow(const C_PuiBsLineArrow & orc_Data)
@@ -302,8 +305,8 @@ void C_PuiBsElements::AddLineArrow(const C_PuiBsLineArrow & orc_Data)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert new line arrow
 
-   \param[in] oru32_Index Line arrow index
-   \param[in] orc_Data    New value
+   \param[in]  oru32_Index    Line arrow index
+   \param[in]  orc_Data       New value
 
    \return
    C_NO_ERR Operation success
@@ -328,7 +331,7 @@ sint32 C_PuiBsElements::InsertLineArrow(const uint32 & oru32_Index, const C_PuiB
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new text element
 
-   \param[in] orc_Data New value
+   \param[in]  orc_Data    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElements::AddTextElement(const C_PuiBsTextElement & orc_Data)
@@ -339,8 +342,8 @@ void C_PuiBsElements::AddTextElement(const C_PuiBsTextElement & orc_Data)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert new text element
 
-   \param[in] oru32_Index Text element index
-   \param[in] orc_Data    New value
+   \param[in]  oru32_Index    Text element index
+   \param[in]  orc_Data       New value
 
    \return
    C_NO_ERR Operation success
@@ -365,7 +368,7 @@ sint32 C_PuiBsElements::InsertTextElement(const uint32 & oru32_Index, const C_Pu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete boundary
 
-   \param[in] oru32_Index Boundary index
+   \param[in]  oru32_Index    Boundary index
 
    \return
    C_NO_ERR Operation success
@@ -390,7 +393,7 @@ sint32 C_PuiBsElements::DeleteBoundary(const uint32 & oru32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete image
 
-   \param[in] oru32_Index Image index
+   \param[in]  oru32_Index    Image index
 
    \return
    C_NO_ERR Operation success
@@ -415,7 +418,7 @@ sint32 C_PuiBsElements::DeleteImage(const uint32 & oru32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete line arrow
 
-   \param[in] oru32_Index Line arrow index
+   \param[in]  oru32_Index    Line arrow index
 
    \return
    C_NO_ERR Operation success
@@ -440,7 +443,7 @@ sint32 C_PuiBsElements::DeleteLineArrow(const uint32 & oru32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete text element
 
-   \param[in] oru32_Index Text element index
+   \param[in]  oru32_Index    Text element index
 
    \return
    C_NO_ERR Operation success
@@ -465,7 +468,7 @@ sint32 C_PuiBsElements::DeleteTextElement(const uint32 & oru32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get boundary
 
-   \param[in] oru32_Index Boundary index
+   \param[in]  oru32_Index    Boundary index
 
    \return
    NULL Boundary not found
@@ -486,8 +489,8 @@ const C_PuiBsBoundary * C_PuiBsElements::GetBoundary(const uint32 & oru32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set boundary
 
-   \param[in] oru32_Index Boundary index
-   \param[in] orc_Data    New value
+   \param[in]  oru32_Index    Boundary index
+   \param[in]  orc_Data       New value
 
    \return
    C_NO_ERR Operation success
@@ -512,7 +515,7 @@ sint32 C_PuiBsElements::SetBoundary(const uint32 & oru32_Index, const C_PuiBsBou
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get image
 
-   \param[in] oru32_Index Image index
+   \param[in]  oru32_Index    Image index
 
    \return
    NULL Image not found
@@ -533,8 +536,8 @@ const C_PuiBsImage * C_PuiBsElements::GetImage(const uint32 & oru32_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set image
 
-   \param[in] oru32_Index Image index
-   \param[in] orc_Data    New value
+   \param[in]  oru32_Index    Image index
+   \param[in]  orc_Data       New value
 
    \return
    C_NO_ERR Operation success
@@ -559,7 +562,7 @@ sint32 C_PuiBsElements::SetImage(const uint32 & oru32_Index, const C_PuiBsImage 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get line arrow
 
-   \param[in] oru32_Index Line arrow index
+   \param[in]  oru32_Index    Line arrow index
 
    \return
    NULL Line arrow not found
@@ -580,8 +583,8 @@ const C_PuiBsLineArrow * C_PuiBsElements::GetLineArrow(const uint32 & oru32_Inde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set line arrow
 
-   \param[in] oru32_Index Line arrow index
-   \param[in] orc_Data    New value
+   \param[in]  oru32_Index    Line arrow index
+   \param[in]  orc_Data       New value
 
    \return
    C_NO_ERR Operation success
@@ -606,7 +609,7 @@ sint32 C_PuiBsElements::SetLineArrow(const uint32 & oru32_Index, const C_PuiBsLi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get text element
 
-   \param[in] oru32_Index Text element index
+   \param[in]  oru32_Index    Text element index
 
    \return
    NULL Text element not found
@@ -627,8 +630,8 @@ const C_PuiBsTextElement * C_PuiBsElements::GetTextElement(const uint32 & oru32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set text element
 
-   \param[in] oru32_Index Text element index
-   \param[in] orc_Data    New value
+   \param[in]  oru32_Index    Text element index
+   \param[in]  orc_Data       New value
 
    \return
    C_NO_ERR Operation success

@@ -10,7 +10,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QColorDialog>
 #include <QGraphicsView>
 
 #include "C_GiSyLineWidget.h"
@@ -22,6 +21,7 @@
 #include "C_UtiStyleSheets.h"
 #include "C_GiLiLine.h"
 #include "C_SdTopologyScene.h"
+#include "C_GiSyColorSelectWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -48,8 +48,7 @@ const QString mc_PATH_BACKGROUND_IMG = ":/images/graphic_items/TransparentBtnBac
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_Mode   CAN-Bus / Ethernet-Bus or line
-   \param[in]     orc_Scene   Used scene for preview
+   \param[in]     oe_Mode     CAN-Bus / Ethernet-Bus or line
    \param[in,out] orc_Parent  Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -182,6 +181,8 @@ void C_GiSyLineWidget::InitStaticNames(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   On Show Event
+
+   \param[in,out]    opc_Event   Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::showEvent(QShowEvent * const opc_Event)
@@ -211,7 +212,7 @@ stw_types::sintn C_GiSyLineWidget::GetLineWidth(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set line width
 
-   \param[in]  orc_Value   New line width
+   \param[in]  osn_Value   New line width
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetLineWidth(const stw_types::sintn osn_Value)
@@ -293,7 +294,7 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiSyLineWidget::GetLineSt
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set line style
 
-   \param[in]  orc_Value   New style of line
+   \param[in]  oe_Value   New style of line
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType oe_Value)
@@ -319,7 +320,7 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set the arrow type on the start of the line
 
-   \param[in]  orc_Value   New start arrow of line
+   \param[in]  oe_Value   New start arrow of line
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetStartArrow(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_Value)
@@ -345,7 +346,7 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetE
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set the arrow type on the end of the line
 
-   \param[in]  orc_Value   New end arrow of line
+   \param[in]  oe_Value   New end arrow of line
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetEndArrow(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_Value)
@@ -469,20 +470,34 @@ void C_GiSyLineWidget::m_ColorClicked(void)
    // get the old color as initial color
    QColor c_Color = C_UtiStyleSheets::h_GetStyleSheetColor(c_Style);
 
-   c_Color = QColorDialog::getColor(c_Color, this, C_GtGetText::h_GetText("Select Color"),
-                                    QColorDialog::ShowAlphaChannel);
+   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(* c_Popup, c_Color);
 
-   if (c_Color.isValid() == true)
+   //Resize
+   c_Popup->SetSize(QSize(412, 620));
+
+   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      // save the color
-      this->mc_Color = c_Color;
+      c_Color = pc_ColorWidget->ChooseSelectedColor();
 
-      // update the button
-      C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(c_Style, c_Color);
-      this->mpc_Ui->pc_BushButtonColor->setStyleSheet(c_Style);
+      if (c_Color.isValid() == true)
+      {
+         // save the color
+         this->mc_Color = c_Color;
 
-      this->m_UpdatePreview();
+         // update the button
+         C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(c_Style, c_Color);
+         this->mpc_Ui->pc_BushButtonColor->setStyleSheet(c_Style);
+
+         this->m_UpdatePreview();
+      }
    }
+
+   if (c_Popup != NULL)
+   {
+      c_Popup->HideOverlay();
+   }
+   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -497,20 +512,34 @@ void C_GiSyLineWidget::m_ColorInnerClicked(void)
    // get the old color as initial color
    QColor c_Color = C_UtiStyleSheets::h_GetStyleSheetColor(c_Style);
 
-   c_Color = QColorDialog::getColor(c_Color, this, C_GtGetText::h_GetText("Select Color"),
-                                    QColorDialog::ShowAlphaChannel);
+   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
 
-   if (c_Color.isValid() == true)
+   //Resize
+   c_Popup->SetSize(QSize(412, 620));
+
+   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      // save the color
-      this->mc_InnerLineColor = c_Color;
+      c_Color = pc_ColorWidget->ChooseSelectedColor();
 
-      // update the button
-      C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(c_Style, c_Color);
-      this->mpc_Ui->pc_BushButtonColorInner->setStyleSheet(c_Style);
+      if (c_Color.isValid() == true)
+      {
+         // save the color
+         this->mc_InnerLineColor = c_Color;
 
-      this->m_UpdatePreview();
+         // update the button
+         C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(c_Style, c_Color);
+         this->mpc_Ui->pc_BushButtonColorInner->setStyleSheet(c_Style);
+
+         this->m_UpdatePreview();
+      }
    }
+
+   if (c_Popup != NULL)
+   {
+      c_Popup->HideOverlay();
+   }
+   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

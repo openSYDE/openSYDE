@@ -49,7 +49,7 @@ C_PuiSdSharedDatapools::C_PuiSdSharedDatapools(void)
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdSharedDatapools::CalcHash(uint32 & oru32_HashValue) const
@@ -89,8 +89,8 @@ void C_PuiSdSharedDatapools::Clear(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adding a new shared Datapool to a shared Datapool group
 
-   \param[in]     orc_NewDatapool     ID of new Datapool
-   \param[in]     orc_ShareDatapool   ID of the Datapool which shall be the share partner
+   \param[in]  orc_NewDatapool      ID of new Datapool
+   \param[in]  orc_ShareDatapool    ID of the Datapool which shall be the share partner
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc_NewDatapool,
@@ -128,8 +128,11 @@ void C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adding a new shared Datapool to a specific shared Datapool group
 
-   \param[in]     orc_NewDatapool            ID of new Datapool
-   \param[in]     ou32_SharedDatapoolGroup   Index of shared Datapool group
+   \param[in]  orc_NewDatapool            ID of new Datapool
+   \param[in]  ou32_SharedDatapoolGroup   Index of shared Datapool group
+
+   \retval C_NO_ERR   everything ok
+   \retval C_RANGE    Index of shared Datapool group out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc_NewDatapool,
@@ -154,7 +157,7 @@ sint32 C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Removing a shared Datapool from a shared Datapool group
 
-   \param[in]     orc_Datapool         ID of Datapool for remove
+   \param[in]  orc_Datapool   ID of Datapool for remove
 
    \return
    C_NO_ERR    Datapool Id removed from group
@@ -209,10 +212,10 @@ sint32 C_PuiSdSharedDatapools::RemoveSharedDatapool(const C_OSCNodeDataPoolId & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the Datapool is shared
 
-   \param[in]     ou32_SharedNodeIndex        Node index of Datapool for check
-   \param[in]     ou32_SharedDatapoolIndex    Datapool index of Datapool for check
-   \param[out]    opu32_SharedDatapoolGroup   Optional pointer to return index of shared Datapool group
-                                              Can be used with function GetSharedDatapoolGroup
+   \param[in]   ou32_SharedNodeIndex         Node index of Datapool for check
+   \param[in]   ou32_SharedDatapoolIndex     Datapool index of Datapool for check
+   \param[out]  opu32_SharedDatapoolGroup    Optional pointer to return index of shared Datapool group
+                                             Can be used with function GetSharedDatapoolGroup
 
    \return
    true     Datapool is shared
@@ -229,9 +232,9 @@ bool C_PuiSdSharedDatapools::IsSharedDatapool(const uint32 ou32_SharedNodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the Datapool is shared
 
-   \param[in]     orc_Datapool                ID of Datapool for check
-   \param[out]    opu32_SharedDatapoolGroup   Optional pointer to return index of shared Datapool group
-                                              Can be used with function GetSharedDatapoolGroup
+   \param[in]   orc_Datapool                 ID of Datapool for check
+   \param[out]  opu32_SharedDatapoolGroup    Optional pointer to return index of shared Datapool group
+                                             Can be used with function GetSharedDatapoolGroup
 
    \return
    true     Datapool is shared
@@ -277,9 +280,9 @@ bool C_PuiSdSharedDatapools::IsSharedDatapool(const C_OSCNodeDataPoolId & orc_Da
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all connected shared Datapools of one group
 
-   \param[in]     ou32_SharedDatapoolGroup         Index of shared Datapool group
-   \param[out]    orc_SharedDatapoolGroup          Result vector with all connected shared Datapool IDs of one group
-                                                   Will be cleared in any case
+   \param[in]   ou32_SharedDatapoolGroup  Index of shared Datapool group
+   \param[out]  orc_SharedDatapoolGroup   Result vector with all connected shared Datapool IDs of one group
+                                          Will be cleared in any case
 
    \return
    C_NO_ERR    Shared Datapool group found and copied
@@ -310,10 +313,10 @@ const
    The Datapool Id of the parameter orc_Datapool will not be added to orc_SharedDatapoolGroup.
    Only the shared Datapools of orc_Datapool will be added.
 
-   \param[in]     ou32_SharedNodeIndex        Node index of Datapool for check
-   \param[in]     ou32_SharedDatapoolIndex    Datapool index of Datapool for check
-   \param[out]    orc_SharedDatapoolGroup     Result vector with all connected shared Datapool IDs of one group
-                                              Will be cleared in any case
+   \param[in]   ou32_SharedNodeIndex      Node index of Datapool for check
+   \param[in]   ou32_SharedDatapoolIndex  Datapool index of Datapool for check
+   \param[out]  orc_SharedDatapoolGroup   Result vector with all connected shared Datapool IDs of one group
+                                          Will be cleared in any case
 
    \return
    true     Datapool is shared
@@ -335,9 +338,9 @@ const
    The Datapool Id of the parameter orc_Datapool will not be added to orc_SharedDatapoolGroup.
    Only the shared Datapools of orc_Datapool will be added.
 
-   \param[in]     orc_Datapool                ID of Datapool for check
-   \param[out]    orc_SharedDatapoolGroup     Result vector with all connected shared Datapool IDs of one group
-                                              Will be cleared in any case
+   \param[in]   orc_Datapool              ID of Datapool for check
+   \param[out]  orc_SharedDatapoolGroup   Result vector with all connected shared Datapool IDs of one group
+                                          Will be cleared in any case
 
    \return
    true     Datapool is shared
@@ -375,7 +378,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the existing shared Datapool configuration when a node was removed
 
-   \param[in]     ou32_NodeIndex   Index of removed node
+   \param[in]  ou32_NodeIndex    Index of removed node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdSharedDatapools::OnNodeRemoved(const uint32 ou32_NodeIndex)
@@ -425,7 +428,7 @@ void C_PuiSdSharedDatapools::OnNodeRemoved(const uint32 ou32_NodeIndex)
 
    All Datapool indexes of the same node equal or higher than the new Datapool index will be increased
 
-   \param[in]     orc_Datapool         ID of Datapool for remove
+   \param[in]  orc_Datapool   ID of Datapool for remove
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdSharedDatapools::OnDatapoolInserted(const C_OSCNodeDataPoolId & orc_Datapool)
@@ -458,7 +461,7 @@ void C_PuiSdSharedDatapools::OnDatapoolInserted(const C_OSCNodeDataPoolId & orc_
    All Datapool indexes of the same node higher than the new Datapool index will be decreased.
    If the removed Datapool was a shared Datapool, its entry will be removed too.
 
-   \param[in]     orc_Datapool         ID of Datapool for remove
+   \param[in]  orc_Datapool   ID of Datapool for remove
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdSharedDatapools::OnDatapoolRemoved(const C_OSCNodeDataPoolId & orc_Datapool)
@@ -491,8 +494,8 @@ void C_PuiSdSharedDatapools::OnDatapoolRemoved(const C_OSCNodeDataPoolId & orc_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the existing shared Datapool configuration when a Datapool was moved
 
-   \param[in]     orc_Datapool         ID of Datapool for remove
-   \param[in]     orc_Datapool         ID of Datapool for remove
+   \param[in]  orc_SourceDatapool   ID of source Datapool for move
+   \param[in]  orc_TargetDatapool   ID of target Datapool for move
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdSharedDatapools::OnDatapoolMoved(const C_OSCNodeDataPoolId & orc_SourceDatapool,

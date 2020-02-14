@@ -87,62 +87,42 @@ void C_SdNdeDbAdd::InitStaticNames(void) const
 
    this->mpc_Ui->pc_BushButtonOk->setText(C_GtGetText::h_GetText("Continue"));
    this->mpc_Ui->pc_BushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
-
    this->mpc_Ui->pc_LabelHeading->setText(C_GtGetText::h_GetText("Select Type"));
-   this->mpc_Ui->pc_RadioButtonProgramming_TSP->setText(C_GtGetText::h_GetText(
-                                                           "Programmable application(s) (extracted from openSYDE Target Support Package)"));
-   this->mpc_Ui->pc_RadioButtonProgramming_Manual->setText(C_GtGetText::h_GetText(
-                                                              "Programmable application (configure manually)"));
+
+   //Radio buttons text
+   this->mpc_Ui->pc_RadioButtonBinary->setText(C_GtGetText::h_GetText("Binary"));
+   this->mpc_Ui->pc_RadioButtonProgrammingAppl->setText(C_GtGetText::h_GetText("Programmable application"));
+   this->mpc_Ui->pc_RadioButtonTSP->setText(C_GtGetText::h_GetText(
+                                               "Add from openSYDE Target Support Package (*.syde_tsp)"));
+
+   //Radio buttons tooltips
+   this->mpc_Ui->pc_RadioButtonBinary->SetToolTipInformation(
+      C_GtGetText::h_GetText("Binary"),
+      C_GtGetText::h_GetText(
+         "Any kind of application or data created by another tool chain."));
+   this->mpc_Ui->pc_RadioButtonTSP->SetToolTipInformation(
+      C_GtGetText::h_GetText("Add from openSYDE Target Support Package (*.syde_tsp)"),
+      C_GtGetText::h_GetText("Add Data Block(s) extracted from openSYDE Target Support Package (*.syde_tsp)"));
+   this->mpc_Ui->pc_RadioButtonProgrammingAppl->SetToolTipInformation(
+      C_GtGetText::h_GetText("Programmable Application"),
+      C_GtGetText::h_GetText(
+         "A programmable application developed by using the openSYDE feature \"Generate Code\"."));
+
+   //Binary and TSP is default in every use case
+   this->mpc_Ui->pc_RadioButtonBinary->setChecked(true);
+   this->mpc_Ui->pc_RadioButtonTSP->setChecked(true);
+
    if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
    {
       if (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == true)
       {
-         this->mpc_Ui->pc_RadioButtonProgramming_TSP->setEnabled(true);
-         this->mpc_Ui->pc_RadioButtonProgramming_Manual->setEnabled(true);
-         //Always select something
-         this->mpc_Ui->pc_RadioButtonProgramming_TSP->setChecked(true);
-         //Tool tips
-         this->mpc_Ui->pc_RadioButtonProgramming_TSP->SetToolTipInformation(
-            C_GtGetText::h_GetText("Programmable application(s) (extracted from openSYDE Target Support Package)"),
-            C_GtGetText::h_GetText(
-               "A programmable application developed by using the openSYDE feature \"Generate Code\"."
-               "\nConfiguration is extracted from openSYDE Target Support Package."));
-         this->mpc_Ui->pc_RadioButtonProgramming_Manual->SetToolTipInformation(
-            C_GtGetText::h_GetText("Programmable application (configure manually)"),
-            C_GtGetText::h_GetText(
-               "A programmable application developed by using the openSYDE feature \"Generate Code\"."
-               "\nConfiguration is made manually by the user."));
+         this->mpc_Ui->pc_RadioButtonProgrammingAppl->setEnabled(true);
       }
       else
       {
-         this->mpc_Ui->pc_RadioButtonProgramming_TSP->setEnabled(false);
-         this->mpc_Ui->pc_RadioButtonProgramming_Manual->setEnabled(false);
-         //Always select something
-         this->mpc_Ui->pc_RadioButtonBinary->setChecked(true);
-         //Tool tips
-         this->mpc_Ui->pc_RadioButtonProgramming_TSP->SetToolTipInformation(
-            C_GtGetText::h_GetText("Programmable application(s) (extracted from openSYDE Target Support Package)"),
-            C_GtGetText::h_GetText(
-               "A programmable application developed by using the openSYDE feature \"Generate Code\"."
-               "\nConfiguration is extracted from openSYDE Target Support Package."));
-         this->mpc_Ui->pc_RadioButtonProgramming_Manual->SetToolTipInformation(
-            C_GtGetText::h_GetText("Programmable application (configure manually)"),
-            C_GtGetText::h_GetText(
-               "A programmable application developed by using the openSYDE feature \"Generate Code\"."
-               "\nConfiguration is made manually by the user."));
+         this->mpc_Ui->pc_RadioButtonProgrammingAppl->setEnabled(false);
       }
-      this->mpc_Ui->pc_RadioButtonBinary->setText(C_GtGetText::h_GetText("Binary"));
-      //Tool tips
-      this->mpc_Ui->pc_RadioButtonBinary->SetToolTipInformation(
-         C_GtGetText::h_GetText("Binary"),
-         C_GtGetText::h_GetText("Any kind of application or data created by another tool chain."));
    }
-
-   //Tool tips
-   //this->mpc_Ui->pc_LabelHeading->SetToolTipInformation(C_GtGetText::h_GetText("Choose Type"),
-   //                                                     C_GtGetText::h_GetText(
-   //                                                        "Select the type of Data Block you want this device
-   // to contain"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -158,7 +138,7 @@ bool C_SdNdeDbAdd::GetFromTSP(void) const
 {
    bool q_Retval = false;
 
-   if (this->mpc_Ui->pc_RadioButtonProgramming_TSP->isChecked() == true)
+   if (this->mpc_Ui->pc_RadioButtonTSP->isChecked() == true)
    {
       q_Retval = true;
    }
@@ -175,8 +155,8 @@ bool C_SdNdeDbAdd::GetFromTSP(void) const
 C_OSCNodeApplication::E_Type C_SdNdeDbAdd::GetApplicationType(void) const
 {
    C_OSCNodeApplication::E_Type e_Retval;
-   if ((this->mpc_Ui->pc_RadioButtonProgramming_TSP->isChecked() == true) ||
-       (this->mpc_Ui->pc_RadioButtonProgramming_Manual->isChecked() == true))
+   if ((this->mpc_Ui->pc_RadioButtonTSP->isChecked() == true) ||
+       (this->mpc_Ui->pc_RadioButtonProgrammingAppl->isChecked() == true))
    {
       e_Retval = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
    }
@@ -226,36 +206,7 @@ void C_SdNdeDbAdd::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAdd::m_OkClicked(void)
 {
-   if (this->mpc_Ui->pc_RadioButtonProgramming_TSP->isChecked() == true)
-   {
-      if (C_PuiSdHandler::h_GetInstance()->GetProgrammableApplications(this->mu32_NodeIndex).size() > 0UL)
-      {
-         C_OgeWiCustomMessage::E_Outputs e_Output;
-         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Delete existing data blocks"));
-         c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete and Continue"));
-         c_Message.SetDescription(C_GtGetText::h_GetText(
-                                     "Before creating new Data Block(s) from openSYDE Target Support Package, "
-                                     "all existing Data Blocks of type programming application will be deleted. "
-                                     "\n\nDo you really want to continue?"));
-         c_Message.SetCustomMinHeight(280);
-         c_Message.SetCustomMinWidth(700);
-         e_Output = c_Message.Execute();
-         if (e_Output == C_OgeWiCustomMessage::eYES)
-         {
-            this->mrc_ParentDialog.accept();
-         }
-      }
-      else
-      {
-         this->mrc_ParentDialog.accept();
-      }
-   }
-   else
-   {
-      this->mrc_ParentDialog.accept();
-   }
+   this->mrc_ParentDialog.accept();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

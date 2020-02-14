@@ -38,7 +38,7 @@ using namespace stw_opensyde_gui;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvGraphicsView::C_SdBueMlvGraphicsView(QWidget * const opc_Parent) :
@@ -50,8 +50,6 @@ C_SdBueMlvGraphicsView::C_SdBueMlvGraphicsView(QWidget * const opc_Parent) :
 /*! \brief   Default destructor
 
    Set up GUI with all elements.
-
-   \param[in,out] opc_parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvGraphicsView::~C_SdBueMlvGraphicsView()

@@ -35,7 +35,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubUseCaseNav::C_OgePubUseCaseNav(QWidget * const opc_Parent) :
@@ -47,11 +47,11 @@ C_OgePubUseCaseNav::C_OgePubUseCaseNav(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided paint event
+/*! \brief   Overridden paint event
 
    Draws the element
 
-   \param[in,out] opc_event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubUseCaseNav::paintEvent(QPaintEvent * const opc_Event)

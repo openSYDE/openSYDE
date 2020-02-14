@@ -58,7 +58,7 @@ C_PuiSvDashboard::C_PuiSvDashboard(void) :
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::CalcHash(uint32 & oru32_HashValue) const
@@ -132,7 +132,7 @@ const QString & C_PuiSvDashboard::GetName(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set name
 
-   \param[in] orc_Value New name
+   \param[in]  orc_Value   New name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetName(const QString & orc_Value)
@@ -155,7 +155,7 @@ const QString & C_PuiSvDashboard::GetComment(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set comment
 
-   \param[in] orc_Value New comment
+   \param[in]  orc_Value   New comment
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetComment(const QString & orc_Value)
@@ -178,7 +178,7 @@ bool C_PuiSvDashboard::GetActive(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set active flag
 
-   \param[in] oq_Value New active flag
+   \param[in]  oq_Value    New active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetActive(const bool oq_Value)
@@ -201,7 +201,7 @@ sint32 C_PuiSvDashboard::GetTabIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current tab index
 
-   \param[in] oq_Value New current tab index
+   \param[in]  os32_Value  New current tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetTabIndex(const sint32 os32_Value)
@@ -224,7 +224,7 @@ const std::vector<C_PuiSvDbChart> & C_PuiSvDashboard::GetCharts(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widgets
 
-   \param[in] orc_Value New widgets
+   \param[in]  orc_Value   New widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetCharts(const std::vector<C_PuiSvDbChart> & orc_Value)
@@ -235,7 +235,7 @@ void C_PuiSvDashboard::SetCharts(const std::vector<C_PuiSvDbChart> & orc_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget
 
-   \param[in] ou32_Index Widget index
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget not found
@@ -268,7 +268,7 @@ const std::vector<C_PuiSvDbLabel> & C_PuiSvDashboard::GetLabels(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widgets
 
-   \param[in] orc_Value New widgets
+   \param[in]  orc_Value   New widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetLabels(const std::vector<C_PuiSvDbLabel> & orc_Value)
@@ -279,7 +279,7 @@ void C_PuiSvDashboard::SetLabels(const std::vector<C_PuiSvDbLabel> & orc_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget
 
-   \param[in] ou32_Index Widget index
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget not found
@@ -312,7 +312,7 @@ const std::vector<C_PuiSvDbParam> & C_PuiSvDashboard::GetParams(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widgets
 
-   \param[in] orc_Value New widgets
+   \param[in]  orc_Value   New widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetParams(const std::vector<C_PuiSvDbParam> & orc_Value)
@@ -323,7 +323,7 @@ void C_PuiSvDashboard::SetParams(const std::vector<C_PuiSvDbParam> & orc_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget
 
-   \param[in] ou32_Index Widget index
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget not found
@@ -356,7 +356,7 @@ const std::vector<C_PuiSvDbPieChart> & C_PuiSvDashboard::GetPieCharts(void) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widgets
 
-   \param[in] orc_Value New widgets
+   \param[in]  orc_Value   New widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetPieCharts(const std::vector<C_PuiSvDbPieChart> & orc_Value)
@@ -367,7 +367,7 @@ void C_PuiSvDashboard::SetPieCharts(const std::vector<C_PuiSvDbPieChart> & orc_V
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget
 
-   \param[in] ou32_Index Widget index
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget not found
@@ -400,7 +400,7 @@ const std::vector<C_PuiSvDbSpinBox> & C_PuiSvDashboard::GetSpinBoxes(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widgets
 
-   \param[in] orc_Value New widgets
+   \param[in]  orc_Value   New widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetSpinBoxes(const std::vector<C_PuiSvDbSpinBox> & orc_Value)
@@ -411,7 +411,7 @@ void C_PuiSvDashboard::SetSpinBoxes(const std::vector<C_PuiSvDbSpinBox> & orc_Va
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget
 
-   \param[in] ou32_Index Widget index
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget not found
@@ -444,7 +444,7 @@ const std::vector<C_PuiSvDbSlider> & C_PuiSvDashboard::GetSliders(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widgets
 
-   \param[in] orc_Value New widgets
+   \param[in]  orc_Value   New widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetSliders(const std::vector<C_PuiSvDbSlider> & orc_Value)
@@ -455,7 +455,7 @@ void C_PuiSvDashboard::SetSliders(const std::vector<C_PuiSvDbSlider> & orc_Value
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget
 
-   \param[in] ou32_Index Widget index
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget not found
@@ -488,7 +488,7 @@ const std::vector<C_PuiSvDbProgressBar> & C_PuiSvDashboard::GetProgressBars(void
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widgets
 
-   \param[in] orc_Value New widgets
+   \param[in]  orc_Value   New widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetProgressBars(const std::vector<C_PuiSvDbProgressBar> & orc_Value)
@@ -499,7 +499,7 @@ void C_PuiSvDashboard::SetProgressBars(const std::vector<C_PuiSvDbProgressBar> &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget
 
-   \param[in] ou32_Index Widget index
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget not found
@@ -532,7 +532,7 @@ const std::vector<C_PuiSvDbTable> & C_PuiSvDashboard::GetTables(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widgets
 
-   \param[in] orc_Value New widgets
+   \param[in]  orc_Value   New widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetTables(const std::vector<C_PuiSvDbTable> & orc_Value)
@@ -543,7 +543,7 @@ void C_PuiSvDashboard::SetTables(const std::vector<C_PuiSvDbTable> & orc_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget
 
-   \param[in] ou32_Index Widget index
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget not found
@@ -576,7 +576,7 @@ const std::vector<C_PuiSvDbToggle> & C_PuiSvDashboard::GetToggles(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widgets
 
-   \param[in] orc_Value New widgets
+   \param[in]  orc_Value   New widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::SetToggles(const std::vector<C_PuiSvDbToggle> & orc_Value)
@@ -587,7 +587,7 @@ void C_PuiSvDashboard::SetToggles(const std::vector<C_PuiSvDbToggle> & orc_Value
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget
 
-   \param[in] ou32_Index Widget index
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget not found
@@ -608,8 +608,8 @@ const C_PuiSvDbToggle * C_PuiSvDashboard::GetToggle(const uint32 ou32_Index) con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget base item
 
-   \param[in] oe_Type    Widget type
-   \param[in] ou32_Index Widget index
+   \param[in]  oe_Type     Widget type
+   \param[in]  ou32_Index  Widget index
 
    \return
    NULL Widget base item not found
@@ -689,7 +689,7 @@ const C_PuiSvDbWidgetBase * C_PuiSvDashboard::GetWidgetBase(const C_PuiSvDbDataE
 
    Warning: output not cleared
 
-   \param[in,out] orc_Output Output
+   \param[in,out]  orc_Output    Output
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::GetAllWidgetItems(std::vector<const C_PuiSvDbWidgetBase *> & orc_Output) const
@@ -741,9 +741,9 @@ void C_PuiSvDashboard::GetAllWidgetItems(std::vector<const C_PuiSvDbWidgetBase *
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set widget
 
-   \param[in] ou32_Index Widget index
-   \param[in] opc_Value  New widget value
-   \param[in] oe_Type    New widget type
+   \param[in]  ou32_Index  Widget index
+   \param[in]  opc_Value   New widget value
+   \param[in]  oe_Type     New widget type
 
    \return
    C_NO_ERR Operation success
@@ -948,7 +948,7 @@ sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidge
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_Index Node index
+   \param[in]  ou32_Index  Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeAdded(const uint32 ou32_Index)
@@ -983,7 +983,7 @@ void C_PuiSvDashboard::OnSyncNodeAdded(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_Index Node index
+   \param[in]  ou32_Index  Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
@@ -1019,8 +1019,8 @@ void C_PuiSvDashboard::OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
@@ -1055,9 +1055,9 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex           Node index
-   \param[in] ou32_DataPoolSourceIndex Source data pool index
-   \param[in] ou32_DataPoolTargetIndex Target data pool index
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataPoolSourceIndex   Source data pool index
+   \param[in]  ou32_DataPoolTargetIndex   Target data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolSourceIndex,
@@ -1095,8 +1095,8 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
@@ -1132,9 +1132,9 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -1171,10 +1171,10 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex       Node index
-   \param[in] ou32_DataPoolIndex   Data pool index
-   \param[in] ou32_ListSourceIndex Source list index
-   \param[in] ou32_ListTargetIndex Target list index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_DataPoolIndex      Data pool index
+   \param[in]  ou32_ListSourceIndex    Source list index
+   \param[in]  ou32_ListTargetIndex    Target list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -1212,9 +1212,9 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_NodeIndex,
@@ -1254,10 +1254,10 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_DataSetIndex  Data set index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_DataSetIndex    Data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListDataSetAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -1297,11 +1297,11 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListDataSetAdded(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex          Node index
-   \param[in] ou32_DataPoolIndex      Data pool index
-   \param[in] ou32_ListIndex          List index
-   \param[in] ou32_DataSetSourceIndex Source data set index
-   \param[in] ou32_DataSetTargetIndex Target data set index
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataPoolIndex         Data pool index
+   \param[in]  ou32_ListIndex             List index
+   \param[in]  ou32_DataSetSourceIndex    Source data set index
+   \param[in]  ou32_DataSetTargetIndex    Target data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListDataSetMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -1366,10 +1366,10 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListDataSetMoved(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_DataSetIndex  Data set index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_DataSetIndex    Data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint32 ou32_NodeIndex,
@@ -1420,10 +1420,10 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -1461,11 +1461,11 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAdded(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex          Node index
-   \param[in] ou32_DataPoolIndex      Data pool index
-   \param[in] ou32_ListIndex          List index
-   \param[in] ou32_ElementSourceIndex Source element index
-   \param[in] ou32_ElementTargetIndex Target element index
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataPoolIndex         Data pool index
+   \param[in]  ou32_ListIndex             List index
+   \param[in]  ou32_ElementSourceIndex    Source element index
+   \param[in]  ou32_ElementTargetIndex    Target element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -1492,6 +1492,49 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_Node
       }
       if (pc_Param != NULL)
       {
+         //Param widget
+         C_PuiSvDbNodeDataElementConfig c_Config;
+         C_OSCNodeDataPoolContent c_Value;
+         sint32 s32_Dataset;
+         bool q_Found = false;
+         //Move moved item to better position
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            const C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+               pc_Param->c_DataPoolElementsConfig[u32_ItElement];
+            const C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            if ((((rc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
+                  (rc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
+                 (rc_DataElementId.u32_ListIndex == ou32_ListIndex)) &&
+                (rc_DataElementId.u32_ElementIndex == ou32_ElementTargetIndex))
+            {
+               //Copy
+               c_Config = rc_DataElementConfig;
+               c_Value = pc_Param->c_ListValues[u32_ItElement];
+               s32_Dataset = pc_Param->c_DataSetSelectionIndices[u32_ItElement];
+               //Remove
+               pc_Param->c_DataPoolElementsConfig.erase(pc_Param->c_DataPoolElementsConfig.begin() + u32_ItElement);
+               pc_Param->c_ListValues.erase(pc_Param->c_ListValues.begin() + u32_ItElement);
+               pc_Param->c_DataSetSelectionIndices.erase(pc_Param->c_DataSetSelectionIndices.begin() + u32_ItElement);
+               //Signal found
+               q_Found = true;
+               break;
+            }
+         }
+         //If this element was part of the parameter widget, insert it at a better place
+         if (q_Found)
+         {
+            const C_OSCNodeDataPoolListElementId c_Id(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                      ou32_ElementTargetIndex);
+            const uint32 u32_NewIndex = C_PuiSvDashboard::mh_GetBestIndexForNewItem(*pc_Param,
+                                                                                    c_Id, NULL);
+            pc_Param->c_DataPoolElementsConfig.insert(
+               pc_Param->c_DataPoolElementsConfig.begin() + u32_NewIndex, c_Config);
+            pc_Param->c_DataSetSelectionIndices.insert(
+               pc_Param->c_DataSetSelectionIndices.begin() + u32_NewIndex, s32_Dataset);
+            pc_Param->c_ListValues.insert(pc_Param->c_ListValues.begin() + u32_NewIndex, c_Value);
+         }
+         //Handle expanded indices
          for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
          {
             C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
@@ -1505,14 +1548,14 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
-   \param[in] oe_Type            New element type
-   \param[in] oq_IsArray         New array type
-   \param[in] ou32_ArraySize     New array size
-   \param[in] oq_IsString        Flag if new type is string
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oe_Type              New element type
+   \param[in]  oq_IsArray           New array type
+   \param[in]  ou32_ArraySize       New array size
+   \param[in]  oq_IsString          Flag if new type is string
 
    \return
    True  Some elements invalidated
@@ -1642,11 +1685,11 @@ bool C_PuiSvDashboard::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
-   \param[in] oe_Access          New access type
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oe_Access            New access type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAccessChanged(const uint32 ou32_NodeIndex,
@@ -1696,10 +1739,10 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAccessChanged(const uint32 o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32 ou32_NodeIndex,
@@ -1740,8 +1783,8 @@ void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId Data element ID
-   \param[in]     ou32_Index        Node index
+   \param[in,out]  orc_DataElementId   Data element ID
+   \param[in]      ou32_Index          Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -1759,8 +1802,8 @@ void C_PuiSvDashboard::h_OnSyncNodeAdded(C_PuiSvDbNodeDataPoolListElementId & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId Data element ID
-   \param[in]     ou32_Index        Node index
+   \param[in,out]  orc_DataElementId   Data element ID
+   \param[in]      ou32_Index          Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -1786,9 +1829,9 @@ void C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(C_PuiSvDbNodeDataPoolListEle
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId  Data element ID
-   \param[in]     ou32_NodeIndex     Node index
-   \param[in]     ou32_DataPoolIndex Data pool index
+   \param[in,out]  orc_DataElementId   Data element ID
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeDataPoolAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -1809,10 +1852,10 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolAdded(C_PuiSvDbNodeDataPoolListElemen
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId        Data element ID
-   \param[in]     ou32_NodeIndex           Node index
-   \param[in]     ou32_DataPoolSourceIndex Source data pool index
-   \param[in]     ou32_DataPoolTargetIndex Target data pool index
+   \param[in,out]  orc_DataElementId         Data element ID
+   \param[in]      ou32_NodeIndex            Node index
+   \param[in]      ou32_DataPoolSourceIndex  Source data pool index
+   \param[in]      ou32_DataPoolTargetIndex  Target data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeDataPoolMoved(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -1857,9 +1900,9 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolMoved(C_PuiSvDbNodeDataPoolListElemen
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId  Data element ID
-   \param[in]     ou32_NodeIndex     Node index
-   \param[in]     ou32_DataPoolIndex Data pool index
+   \param[in,out]  orc_DataElementId   Data element ID
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeDataPoolAboutToBeDeleted(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -1889,10 +1932,10 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolAboutToBeDeleted(C_PuiSvDbNodeDataPoo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId  Data element ID
-   \param[in]     ou32_NodeIndex     Node index
-   \param[in]     ou32_DataPoolIndex Data pool index
-   \param[in]     ou32_ListIndex     List index
+   \param[in,out]  orc_DataElementId   Data element ID
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in]      ou32_ListIndex      List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeDataPoolListAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -1915,11 +1958,11 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListAdded(C_PuiSvDbNodeDataPoolListEl
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId    Data element ID
-   \param[in]     ou32_NodeIndex       Node index
-   \param[in]     ou32_DataPoolIndex   Data pool index
-   \param[in]     ou32_ListSourceIndex Source list index
-   \param[in]     ou32_ListTargetIndex Target list index
+   \param[in,out]  orc_DataElementId      Data element ID
+   \param[in]      ou32_NodeIndex         Node index
+   \param[in]      ou32_DataPoolIndex     Data pool index
+   \param[in]      ou32_ListSourceIndex   Source list index
+   \param[in]      ou32_ListTargetIndex   Target list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeDataPoolListMoved(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -1966,10 +2009,10 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListMoved(C_PuiSvDbNodeDataPoolListEl
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId  Data element ID
-   \param[in]     ou32_NodeIndex     Node index
-   \param[in]     ou32_DataPoolIndex Data pool index
-   \param[in]     ou32_ListIndex     List index
+   \param[in,out]  orc_DataElementId   Data element ID
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in]      ou32_ListIndex      List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeDataPoolListAboutToBeDeleted(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -2001,11 +2044,11 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListAboutToBeDeleted(C_PuiSvDbNodeDat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId  Data element ID
-   \param[in]     ou32_NodeIndex     Node index
-   \param[in]     ou32_DataPoolIndex Data pool index
-   \param[in]     ou32_ListIndex     List index
-   \param[in]     ou32_ElementIndex  Element index
+   \param[in,out]  orc_DataElementId   Data element ID
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in]      ou32_ListIndex      List index
+   \param[in]      ou32_ElementIndex   Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -2030,12 +2073,12 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAdded(C_PuiSvDbNodeDataPoo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId       Data element ID
-   \param[in]     ou32_NodeIndex          Node index
-   \param[in]     ou32_DataPoolIndex      Data pool index
-   \param[in]     ou32_ListIndex          List index
-   \param[in]     ou32_ElementSourceIndex Source element index
-   \param[in]     ou32_ElementTargetIndex Target element index
+   \param[in,out]  orc_DataElementId         Data element ID
+   \param[in]      ou32_NodeIndex            Node index
+   \param[in]      ou32_DataPoolIndex        Data pool index
+   \param[in]      ou32_ListIndex            List index
+   \param[in]      ou32_ElementSourceIndex   Source element index
+   \param[in]      ou32_ElementTargetIndex   Target element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementMoved(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
@@ -2085,11 +2128,11 @@ void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementMoved(C_PuiSvDbNodeDataPoo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in,out] orc_DataElementId  Data element ID
-   \param[in]     ou32_NodeIndex     Node index
-   \param[in]     ou32_DataPoolIndex Data pool index
-   \param[in]     ou32_ListIndex     List index
-   \param[in]     ou32_ElementIndex  Element index
+   \param[in,out]  orc_DataElementId   Data element ID
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      ou32_DataPoolIndex  Data pool index
+   \param[in]      ou32_ListIndex      List index
+   \param[in]      ou32_ElementIndex   Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAboutToBeDeleted(
@@ -2157,8 +2200,8 @@ void C_PuiSvDashboard::SyncScalingInformation(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add widget to view dashboard
 
-   \param[in] opc_Box New widget value
-   \param[in] oe_Type New widget type
+   \param[in]  opc_Box  New widget value
+   \param[in]  oe_Type  New widget type
 
    \return
    C_NO_ERR Operation success
@@ -2209,9 +2252,9 @@ sint32 C_PuiSvDashboard::AddWidget(const C_PuiSvDbWidgetBase * const opc_Box,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert widget to view dashboard
 
-   \param[in] ou32_WidgetIndex Widget index
-   \param[in] opc_Box          New widget value
-   \param[in] oe_Type          New widget type
+   \param[in]  ou32_WidgetIndex  Widget index
+   \param[in]  opc_Box           New widget value
+   \param[in]  oe_Type           New widget type
 
    \return
    C_NO_ERR Operation success
@@ -2415,7 +2458,7 @@ sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_Pui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Param widget clear all data pool elements
 
-   \param[in] ou32_ParamWidgetIndex Param index
+   \param[in]  ou32_ParamWidgetIndex   Param index
 
    \return
    C_NO_ERR Operation success
@@ -2444,9 +2487,9 @@ sint32 C_PuiSvDashboard::ClearParamDataPoolElements(const uint32 ou32_ParamWidge
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Param widget add new data pool element
 
-   \param[in] ou32_ParamWidgetIndex Param index
-   \param[in] orc_NewId             New ID
-   \param[in] opc_Content           Optional init value
+   \param[in]  ou32_ParamWidgetIndex   Param index
+   \param[in]  orc_NewId               New ID
+   \param[in]  opc_Content             Optional init value
 
    \return
    C_NO_ERR Operation success
@@ -2471,18 +2514,22 @@ sint32 C_PuiSvDashboard::AddParamNewDataPoolElement(const uint32 ou32_ParamWidge
       {
          C_PuiSvDbParam & rc_ParamWidget = this->mc_ParamWidgets[ou32_ParamWidgetIndex];
          C_PuiSvDbNodeDataElementConfig c_NewConfig;
-         std::vector<sint32> c_InitalColWidth;
+         sint32 s32_SelectedDataset = -1;
+         const uint32 u32_NewIndex = C_PuiSvDashboard::mh_GetBestIndexForNewItem(
+            rc_ParamWidget, orc_NewId, &s32_SelectedDataset);
          c_NewConfig.c_ElementId = C_PuiSvDbNodeDataPoolListElementId(orc_NewId,
                                                                       C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT, false,
                                                                       0UL);
          //Add all necessary elements
-         rc_ParamWidget.c_DataPoolElementsConfig.push_back(c_NewConfig);
-         rc_ParamWidget.c_DataSetSelectionIndices.push_back(-1);
+         rc_ParamWidget.c_DataPoolElementsConfig.insert(
+            rc_ParamWidget.c_DataPoolElementsConfig.begin() + u32_NewIndex, c_NewConfig);
+         rc_ParamWidget.c_DataSetSelectionIndices.insert(
+            rc_ParamWidget.c_DataSetSelectionIndices.begin() + u32_NewIndex, s32_SelectedDataset);
          if ((((opc_Content != NULL) && (opc_Content->GetType() == pc_Element->GetType())) &&
               (opc_Content->GetArray() == pc_Element->GetArray())) &&
              (opc_Content->GetArraySize() == pc_Element->GetArraySize()))
          {
-            rc_ParamWidget.c_ListValues.push_back(*opc_Content);
+            rc_ParamWidget.c_ListValues.insert(rc_ParamWidget.c_ListValues.begin() + u32_NewIndex, *opc_Content);
          }
          else
          {
@@ -2493,9 +2540,8 @@ sint32 C_PuiSvDashboard::AddParamNewDataPoolElement(const uint32 ou32_ParamWidge
             tgl_assert(C_OSCNodeDataPoolContentUtil::h_SetValueInMinMaxRange(
                           pc_Element->c_MinValue, pc_Element->c_MaxValue, c_Content, e_Tmp,
                           C_OSCNodeDataPoolContentUtil::eTO_ZERO) == C_NO_ERR);
-            rc_ParamWidget.c_ListValues.push_back(c_Content);
+            rc_ParamWidget.c_ListValues.insert(rc_ParamWidget.c_ListValues.begin() + u32_NewIndex, c_Content);
          }
-         rc_ParamWidget.c_ColWidth.push_back(c_InitalColWidth);
          //Expand up to new item
          for (uint32 u32_ItRelevantLayer = 0UL; u32_ItRelevantLayer < 3UL; ++u32_ItRelevantLayer)
          {
@@ -2558,8 +2604,8 @@ sint32 C_PuiSvDashboard::AddParamNewDataPoolElement(const uint32 ou32_ParamWidge
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete widget from view dashboard
 
-   \param[in] ou32_WidgetIndex Widget index
-   \param[in] oe_Type          New widget type
+   \param[in]  ou32_WidgetIndex  Widget index
+   \param[in]  oe_Type           New widget type
 
    \return
    C_NO_ERR Operation success
@@ -2672,8 +2718,8 @@ sint32 C_PuiSvDashboard::DeleteWidget(const uint32 ou32_WidgetIndex, const C_Pui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check error for dashboard
 
-   \param[in,out] opq_InvalidDataElements Error result for check of invalid data elements
-   \param[in,out] opq_MissingDataElements Error result for check of missing data elements
+   \param[in,out]  opq_InvalidDataElements   Error result for check of invalid data elements
+   \param[in,out]  opq_MissingDataElements   Error result for check of missing data elements
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::CheckError(bool * const opq_InvalidDataElements, bool * const opq_MissingDataElements) const
@@ -2724,7 +2770,8 @@ void C_PuiSvDashboard::CheckError(bool * const opq_InvalidDataElements, bool * c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if list already in use by param widget
 
-   \param[in] orc_Id Node data pool list ID
+   \param[in]  orc_Id   Node data pool list ID
+
    \return
    True  Used
    False False unused
@@ -2823,7 +2870,7 @@ bool C_PuiSvDashboard::DiscardInvalidIndices(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get widget type
 
-   \param[in] opc_Box Basic widget item
+   \param[in]  opc_Box  Basic widget item
 
    \return
    Widget type, else widget type unknown
@@ -2914,6 +2961,9 @@ void C_PuiSvDashboard::Clear(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Count sum of all items
+
+   \return
+   Total number of dashboard elements
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_PuiSvDashboard::Count(void) const
@@ -2937,7 +2987,7 @@ uint32 C_PuiSvDashboard::Count(void) const
 
    Warning: output not cleared
 
-   \param[in,out] orc_Output Output
+   \param[in,out]  orc_Output    Output
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::m_GetAllWidgetItems(std::vector<C_PuiSvDbWidgetBase *> & orc_Output)
@@ -2991,7 +3041,7 @@ void C_PuiSvDashboard::m_GetAllWidgetItems(std::vector<C_PuiSvDbWidgetBase *> & 
 
    Warning: expected to be called before data element deletion
 
-   \param[in,out] orc_DataElementId Data element id
+   \param[in,out]  orc_DataElementId   Data element id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDashboard::mh_MarkInvalid(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId)
@@ -3012,6 +3062,52 @@ void C_PuiSvDashboard::mh_MarkInvalid(C_PuiSvDbNodeDataPoolListElementId & orc_D
       }
       orc_DataElementId.MarkInvalid(pc_DataPool->e_Type, c_Namespace);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get best index for new item
+
+   \param[in]   orc_ParamWidget     Param widget
+   \param[in]   orc_NewId           New id
+   \param[out]  ops32_DatasetIndex  Dataset index
+
+   \return
+   Best index for new item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_PuiSvDashboard::mh_GetBestIndexForNewItem(const C_PuiSvDbParam & orc_ParamWidget,
+                                                   const C_OSCNodeDataPoolListElementId & orc_NewId,
+                                                   stw_types::sint32 * const ops32_DatasetIndex)
+{
+   uint32 u32_NewIndex = 0UL;
+
+   //Search for best place of new item
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < orc_ParamWidget.c_DataPoolElementsConfig.size(); ++u32_ItItem)
+   {
+      const C_PuiSvDbNodeDataElementConfig & rc_CurId = orc_ParamWidget.c_DataPoolElementsConfig[u32_ItItem];
+      if (rc_CurId.c_ElementId.GetIsValid())
+      {
+         //Check if relevant list
+         if (((rc_CurId.c_ElementId.u32_NodeIndex == orc_NewId.u32_NodeIndex) &&
+              (rc_CurId.c_ElementId.u32_DataPoolIndex == orc_NewId.u32_DataPoolIndex)) &&
+             (rc_CurId.c_ElementId.u32_ListIndex == orc_NewId.u32_ListIndex))
+         {
+            if (ops32_DatasetIndex != NULL)
+            {
+               //Use the current selected dataset index
+               *ops32_DatasetIndex = orc_ParamWidget.c_DataSetSelectionIndices[u32_ItItem];
+            }
+            //If next item should be after the new item: stop and use this index instead
+            if (rc_CurId.c_ElementId.u32_ElementIndex >= orc_NewId.u32_ElementIndex)
+            {
+               break;
+            }
+         }
+      }
+      //Iterate
+      ++u32_NewIndex;
+   }
+   return u32_NewIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

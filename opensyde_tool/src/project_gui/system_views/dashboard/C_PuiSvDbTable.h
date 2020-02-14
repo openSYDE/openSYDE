@@ -28,7 +28,7 @@ public:
    C_PuiSvDbTable(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
-   virtual bool IsReadElement(void) const;
+   virtual bool IsReadElement(void) const override;
 
    std::vector<stw_types::sint32> c_ColumnWidth;
 };

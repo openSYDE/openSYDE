@@ -66,19 +66,23 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
       case C_RD_WR:
          c_Message.SetDetails(C_GtGetText::h_GetText("There are problems accessing the file system.\n"
                                                      "For example, there may be no read access to the file."));
+         c_Message.SetCustomMinHeight(200, 250);
          c_Message.Execute();
          break;
       case C_RANGE:
          c_Message.SetDetails(C_GtGetText::h_GetText("At least one project file is missing."));
+         c_Message.SetCustomMinHeight(200, 250);
          c_Message.Execute();
          break;
       case C_NOACT:
          c_Message.SetDetails(C_GtGetText::h_GetText("A project file is present but its structure is invalid.\n"
                                                      "For example this can be caused by an invalid XML file."));
+         c_Message.SetCustomMinHeight(200, 250);
          c_Message.Execute();
          break;
       case C_CONFIG:
          c_Message.SetDetails(C_GtGetText::h_GetText("The content of a project file is invalid or incomplete."));
+         c_Message.SetCustomMinHeight(230, 250);
          c_Message.Execute();
          break;
       case C_CHECKSUM:
@@ -90,6 +94,7 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
                               arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                               arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                               arg(C_GtGetText::h_GetText("log file")));
+         c_Message.SetCustomMinHeight(200, 300);
          c_Message.Execute();
          break;
       case C_COM:
@@ -101,10 +106,12 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
                               arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                               arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                               arg(C_GtGetText::h_GetText("log file")));
+         c_Message.SetCustomMinHeight(200, 300);
          c_Message.Execute();
          break;
       default:
          c_Message.SetDetails(C_GtGetText::h_GetText("Unknown cause."));
+         c_Message.SetCustomMinHeight(200, 250);
          c_Message.Execute();
          break;
       }
@@ -119,6 +126,7 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
          c_Message.SetHeading(C_GtGetText::h_GetText("Project load"));
          c_Message.SetDescription(C_GtGetText::h_GetText(
                                      "Loading an older project version. On the next save the project is updated to the new project version."));
+         c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
       }
    }
@@ -156,6 +164,7 @@ void C_PopErrorHandling::mh_ProjectSaveErr(const sint32 & ors32_Err, QWidget * c
          c_Message.SetDescription(C_GtGetText::h_GetText("Unknown cause."));
          break;
       }
+      c_Message.SetCustomMinHeight(180, 180);
       c_Message.Execute();
    }
 }

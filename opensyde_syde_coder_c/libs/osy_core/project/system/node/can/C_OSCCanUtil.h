@@ -32,7 +32,8 @@ public:
 
    static void h_GetSignalValue(const stw_types::uint8(&orau8_CanDb)[8],
                                 const stw_opensyde_core::C_OSCCanSignal & orc_Signal,
-                                std::vector<stw_types::uint8> & orc_DataPoolData);
+                                std::vector<stw_types::uint8> & orc_DataPoolData,
+                                const C_OSCNodeDataPoolContent::E_Type oe_ContentType);
 
    static void h_GetSignalValue(const stw_types::uint8(&orau8_CanDb)[8],
                                 const stw_opensyde_core::C_OSCCanSignal & orc_Signal,

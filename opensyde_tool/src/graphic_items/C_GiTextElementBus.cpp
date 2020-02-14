@@ -47,7 +47,7 @@ using namespace stw_opensyde_gui_logic;
 
    \param[in]       ors32_Index          Index of data element in system definition
    \param[in]       oru64_ID             Unique ID
-   \param[in,out]   opc_parent           Optional pointer to parent
+   \param[in,out]   opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiTextElementBus::C_GiTextElementBus(const sint32 & ors32_Index, const uint64 & oru64_ID,

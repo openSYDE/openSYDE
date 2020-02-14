@@ -55,9 +55,9 @@ C_SdNdeDpContentUtil::C_SdNdeDpContentUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert value to double
 
-   \param[in]  orc_Value    Data element value
-   \param[out] orf64_Output Value as double
-   \param[in]  ou32_Index   Index
+   \param[in]   orc_Content   Data element value
+   \param[out]  orf64_Output  Value as double
+   \param[in]   ou32_Index    Index
 
    \return
    C_NO_ERR Success
@@ -164,8 +164,8 @@ sint32 C_SdNdeDpContentUtil::h_GetValueAsFloat64(const C_OSCNodeDataPoolContent 
    If it is no array, the size of the vector is 1
    If an error ocured, the size of the vector is 0
 
-   \param[in]  orc_Content             Data element value
-   \param[in]  orc_Output              Vector with values
+   \param[in]  orc_Content    Data element value
+   \param[in]  orc_Output     Vector with values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_GetValuesAsFloat64(const C_OSCNodeDataPoolContent & orc_Content,
@@ -226,9 +226,9 @@ void C_SdNdeDpContentUtil::h_GetValuesAsFloat64(const C_OSCNodeDataPoolContent &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert value to uint64
 
-   \param[in]  orc_Content  Data element value
-   \param[in]  oru64_Output Output value
-   \param[in]  ou32_Index   Optional fallback index if array
+   \param[in]  orc_Content    Data element value
+   \param[in]  oru64_Output   Output value
+   \param[in]  ou32_Index     Optional fallback index if array
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(const C_OSCNodeDataPoolContent & orc_Content, uint64 & oru64_Output,
@@ -316,9 +316,9 @@ void C_SdNdeDpContentUtil::h_GetAnyValueAsUint64(const C_OSCNodeDataPoolContent 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert value to sint64
 
-   \param[in]  orc_Content  Data element value
-   \param[out] ors64_Output Output value
-   \param[in]  ou32_Index   Optional fallback index if array
+   \param[in]   orc_Content   Data element value
+   \param[out]  ors64_Output  Output value
+   \param[in]   ou32_Index    Optional fallback index if array
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(const C_OSCNodeDataPoolContent & orc_Content, sint64 & ors64_Output,
@@ -412,9 +412,9 @@ void C_SdNdeDpContentUtil::h_GetAnyValueAsSint64(const C_OSCNodeDataPoolContent 
    Hint: for integer datatypes an offset for rounding is added, so that the decimal place is
          not lost by casting.
 
-   \param[in]     os64_Value         Value to set and cast
-   \param[in,out] orc_Content        Content class with configured type and array configuration
-   \param[in]     ou32_ArrayIndex    Optional index for array position if content class has an array
+   \param[in]      os64_Value       Value to set and cast
+   \param[in,out]  orc_Content      Content class with configured type and array configuration
+   \param[in]      ou32_ArrayIndex  Optional index for array position if content class has an array
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSCNodeDataPoolContent & orc_Content,
@@ -717,15 +717,17 @@ void C_SdNdeDpContentUtil::h_SetValueInContentS64(const sint64 os64_Value, C_OSC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a scaled float value in the content class
 
-   The of64_Value value will be casted to the current type of the orc_Content class.
+   The value will be casted to the current type of the orc_Content class.
    If the orc_Content holds an array, the value will be set to the position ou32_ArrayIndex.
 
    Hint: for integer datatypes an offset for rounding is added, so that the decimal place is
          not lost by casting.
 
-   \param[in]     of64_Value         Value to set and cast
-   \param[in,out] orc_Content        Content class with configured type and array configuration
-   \param[in]    ou32_ArrayIndex     Optional index for array position if content class has an array
+   \param[in]      of64_ScaledValue    Scaled value to set and cast
+   \param[in,out]  orc_Content         Content class with configured type and array configuration
+   \param[in]      of64_Factor         Factor
+   \param[in]      of64_Offset         Offset
+   \param[in]      ou32_ArrayIndex     Optional index for array position if content class has an array
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_SetScaledValueInContent(const float64 of64_ScaledValue,
@@ -744,10 +746,11 @@ void C_SdNdeDpContentUtil::h_SetScaledValueInContent(const float64 of64_ScaledVa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get number of steps for the specified element ID
 
-   \param[in]  orc_Min     Unscaled minimum value
-   \param[in]  orc_Max     Unscaled maximum value
-   \param[out] oru64_Steps Number of steps, if type supported (sint8, uint8, sint16, uint16, sint32,
-                                                               uint32, sint64, uint64)
+   \param[in]   orc_Min       Unscaled minimum value
+   \param[in]   orc_Max       Unscaled maximum value
+   \param[out]  oru64_Steps   Number of steps, if type supported (sint8, uint8, sint16, uint16, sint32,
+                              uint32, sint64, uint64)
+   \param[in]   ou32_Index    Index
 
    \return
    C_NO_ERR Operation success
@@ -949,11 +952,13 @@ sint32 C_SdNdeDpContentUtil::h_GetNumberOfAvailableSteps(const C_OSCNodeDataPool
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get minimal required type after scaling to store all values
 
-   \param[in]  orc_Min     Unscaled minimum
-   \param[in]  orc_Max     Unscaled maximum
-   \param[in]  orc_Scaling Current scaling
-   \param[out] orc_NewMin  New minimum value
-   \param[out] orc_NewMax  New maximum value
+   \param[in]   orc_Min       Unscaled minimum
+   \param[in]   orc_Max       Unscaled maximum
+   \param[in]   of64_Factor   Factor
+   \param[in]   of64_Offset   Offset
+   \param[out]  orc_NewMin    New minimum value
+   \param[out]  orc_NewMax    New maximum value
+   \param[in]   ou32_Index    Index
 
    \return
    C_NO_ERR Operation success
@@ -1156,10 +1161,11 @@ sint32 C_SdNdeDpContentUtil::h_GetMinMaxAfterScaling(const C_OSCNodeDataPoolCont
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get minimal required type after scaling to store all values
 
-   \param[in]  orc_Min     Unscaled minimum
-   \param[in]  orc_Max     Unscaled maximum
-   \param[in]  orc_Scaling Current scaling
-   \param[out] orc_Types   Minimum types after scaling
+   \param[in]   orc_Min       Unscaled minimum
+   \param[in]   orc_Max       Unscaled maximum
+   \param[in]   of64_Factor   Factor
+   \param[in]   of64_Offset   Offset
+   \param[out]  orc_Types     Minimum types after scaling
 
    \return
    C_NO_ERR Operation success
@@ -1237,9 +1243,9 @@ sint32 C_SdNdeDpContentUtil::h_GetMinimalTypeAfterScaling(const C_OSCNodeDataPoo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get minimal required type after scaling to store all values
 
-   \param[in] of64_Min   Unscaled minimum
-   \param[in] of64_Max   Unscaled maximum
-   \param[in] ou64_Steps Current scaling
+   \param[in]  of64_Min    Unscaled minimum
+   \param[in]  of64_Max    Unscaled maximum
+   \param[in]  ou64_Steps  Current scaling
 
    \return
    C_NO_ERR Operation success
@@ -1342,8 +1348,8 @@ C_OSCNodeDataPoolContent::E_Type C_SdNdeDpContentUtil::h_GetMinimumTypeForRange(
 
    Simple means: array types not supported
 
-   \param[in]  orc_Content C_OSCNodeDataPoolContent input
-   \param[out] orc_Variant QVariant output
+   \param[in]   orc_Content   C_OSCNodeDataPoolContent input
+   \param[out]  orc_Variant   QVariant output
 
    \return
    C_NO_ERR Operation success
@@ -1404,8 +1410,8 @@ sint32 C_SdNdeDpContentUtil::h_SimpleConvertToVariant(const C_OSCNodeDataPoolCon
 
    Simple means: not all types supported
 
-   \param[in]  orc_Variant QVariant input
-   \param[out] orc_Content C_OSCNodeDataPoolContent output
+   \param[in]   orc_Variant   QVariant input
+   \param[out]  orc_Content   C_OSCNodeDataPoolContent output
 
    \return
    C_NO_ERR Operation success
@@ -1461,10 +1467,10 @@ sint32 C_SdNdeDpContentUtil::h_SimpleConvertFromVariant(const QVariant & orc_Var
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all values as scaled strings
 
-   \param[in]  orc_Content The source content
-   \param[in]  of64_Factor Scaling factor
-   \param[in]  of64_Offset Scaling offset
-   \param[out] orc_Output  Scaled strings
+   \param[in]   orc_Content   The source content
+   \param[in]   of64_Factor   Scaling factor
+   \param[in]   of64_Offset   Scaling offset
+   \param[out]  orc_Output    Scaled strings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_GetValuesAsScaledString(const C_OSCNodeDataPoolContent & orc_Content,
@@ -1493,10 +1499,10 @@ void C_SdNdeDpContentUtil::h_GetValuesAsScaledString(const C_OSCNodeDataPoolCont
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all values as one scaled and combined string
 
-   \param[in]  orc_Content The source content
-   \param[in]  of64_Factor Scaling factor
-   \param[in]  of64_Offset Scaling offset
-   \param[out] orc_Output  Scaled and combined string
+   \param[in]   orc_Content   The source content
+   \param[in]   of64_Factor   Scaling factor
+   \param[in]   of64_Offset   Scaling offset
+   \param[out]  orc_Output    Scaled and combined string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(const C_OSCNodeDataPoolContent & orc_Content,
@@ -1512,7 +1518,7 @@ void C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(const C_OSCNodeData
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Combine value string
 
-   \param[in] orc_Input Values
+   \param[in]  orc_Input   Values
 
    \return
    Combined value string
@@ -1536,11 +1542,11 @@ QString C_SdNdeDpContentUtil::h_CombineString(const std::vector<QString> & orc_I
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all value as scaled string
 
-   \param[in]  orc_Content The source content
-   \param[in]  of64_Factor Scaling factor
-   \param[in]  of64_Offset Scaling offset
-   \param[out] orc_Output  Scaled string
-   \param[in]  ou32_Index  Index to use in case of array
+   \param[in]   orc_Content   The source content
+   \param[in]   of64_Factor   Scaling factor
+   \param[in]   of64_Offset   Scaling offset
+   \param[out]  orc_Output    Scaled string
+   \param[in]   ou32_Index    Index to use in case of array
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_GetValueAsScaledString(const C_OSCNodeDataPoolContent & orc_Content,
@@ -1558,7 +1564,7 @@ void C_SdNdeDpContentUtil::h_GetValueAsScaledString(const C_OSCNodeDataPoolConte
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set content to maximum type value
 
-   \param[in,out] orc_Content Content
+   \param[in,out]  orc_Content   Content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_InitMax(C_OSCNodeDataPoolContent & orc_Content)
@@ -1701,7 +1707,7 @@ void C_SdNdeDpContentUtil::h_InitMax(C_OSCNodeDataPoolContent & orc_Content)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set content to minimum type value
 
-   \param[in,out] orc_Content Content
+   \param[in,out]  orc_Content   Content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
@@ -1864,8 +1870,8 @@ void C_SdNdeDpContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert node data pool content type to QVariant
 
-   \param[in] orc_Input   Node data pool content type
-   \param[in] oru32_Index Optional array index
+   \param[in]  orc_Input      Node data pool content type
+   \param[in]  oru32_Index    Optional array index
 
    \return
    QVariant content
@@ -1960,10 +1966,10 @@ QVariant C_SdNdeDpContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPool
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert node data pool content type to QVariant using scaling
 
-   \param[in] orc_Input   Node data pool content type
-   \param[in] of64_Factor Factor
-   \param[in] of64_Offset Offset
-   \param[in] oru32_Index Optional array index
+   \param[in]  orc_Input      Node data pool content type
+   \param[in]  of64_Factor    Factor
+   \param[in]  of64_Offset    Offset
+   \param[in]  oru32_Index    Optional array index
 
    \return
    QVariant content
@@ -2017,9 +2023,12 @@ QVariant C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(const C_OSCNodeDa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node data pool content according to QVariant data
 
-   \param[in]  orc_Value    Variant value
-   \param[out] orc_Output   Node data pool content to set
-   \param[in]  oru32_Index  Optional array index
+   \param[in]   orc_Value     Variant value
+   \param[out]  orc_Output    Node data pool content to set
+   \param[in]   oru32_Index   Optional array index
+
+   \retval   C_NO_ERR     Successful conversion
+   \retval   C_RANGE      Unknown conversion
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_Value,
@@ -2441,11 +2450,14 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_V
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node data pool content according to QVariant data using scaling
 
-   \param[in]  orc_Value    Variant value
-   \param[out] orc_Output   Node data pool content to set
-   \param[in]  of64_Factor  Factor
-   \param[in]  of64_Offset  Offset
-   \param[in]  oru32_Index  Optional array index
+   \param[in]   orc_Value     Variant value
+   \param[out]  orc_Output    Node data pool content to set
+   \param[in]   of64_Factor   Factor
+   \param[in]   of64_Offset   Offset
+   \param[in]   oru32_Index   Optional array index
+
+   \retval   C_NO_ERR     Success
+   \retval   C_RANGE      Unknown conversion
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(const QVariant & orc_Value,
@@ -2504,7 +2516,7 @@ sint32 C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(const QVari
 
    Use case: store to string to later use the same string to restore the same content
 
-   \param[in] orc_Source Content to store
+   \param[in]  orc_Input   Content to store
 
    \return
    Current content encoded as string
@@ -2525,8 +2537,8 @@ QString C_SdNdeDpContentUtil::h_GetAllContentAsString(const C_OSCNodeDataPoolCon
 
    Use case: store to string to later use the same string to restore the same content
 
-   \param[in]  orc_Input  String to base restoration on
-   \param[out] orc_Output Output of restoration
+   \param[in]   orc_Input     String to base restoration on
+   \param[out]  orc_Output    Output of restoration
 
    \return
    C_NO_ERR   data read

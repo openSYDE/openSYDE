@@ -288,7 +288,8 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Combine all available stylesheets
 
-   \param[out]   orc_Stylesheet   QSS file
+   \return
+   Combined string of all stylesheets
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_UtiStyleSheets::h_GetStylesheet(void)
@@ -331,9 +332,12 @@ QString C_UtiStyleSheets::h_GetStylesheet(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Apply stylesheet for html
+/*! \brief   Apply stylesheet for HTML
 
-   \param[in] orc_Html Text in html
+   \param[in]  orc_Html    Text in HTML
+
+   \return
+   Text in HTML string with style
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_UtiStyleSheets::h_ToStyledHtml(const QString & orc_Html)
@@ -350,8 +354,7 @@ QString C_UtiStyleSheets::h_ToStyledHtml(const QString & orc_Html)
 
    Necessary format: "background-color: #0070c0;"
 
-   \param[in]     orc_Style  Stylesheet string to analyse
-   \param[in]     oq_AlphaCh Flag if the alpha channel shall be read out
+   \param[in]  orc_Style   Stylesheet string to analyse
 
    \return        Background color
 */
@@ -370,8 +373,8 @@ QColor C_UtiStyleSheets::h_GetStyleSheetColor(const QString & orc_Style)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the background color of a styleshett
 
-   \param[in,out] orc_Style  Stylesheet string to adapt
-   \param[in]     orc_Color  New background color
+   \param[in,out]  orc_Style  Stylesheet string to adapt
+   \param[in]      orc_Color  New background color
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(QString & orc_Style, const QColor & orc_Color)
@@ -390,8 +393,8 @@ C_UtiStyleSheets::C_UtiStyleSheets(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append stylesheet of file
 
-   \param[in]     orc_File       QSS file
-   \param[in,out] orc_Stylesheet Stylesheet
+   \param[in]      orc_File         QSS file
+   \param[in,out]  orc_Stylesheet   Stylesheet
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendStylesheet(const QString & orc_File, QString & orc_Stylesheet)
@@ -405,7 +408,7 @@ void C_UtiStyleSheets::mh_AppendStylesheet(const QString & orc_File, QString & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append dynamic created stylesheet
 
-   \param[in,out] orc_Stylesheet Stylesheet
+   \param[in,out]  orc_Stylesheet   Stylesheet
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendDynamicStylesheet(QString & orc_Stylesheet)
@@ -420,7 +423,7 @@ void C_UtiStyleSheets::mh_AppendDynamicStylesheet(QString & orc_Stylesheet)
    The stylesheet can be used with the property Transparency with the number of the
    transparency value itself.
 
-   \param[in,out] orc_Stylesheet Stylesheet
+   \param[in,out]  orc_Stylesheet   Stylesheet
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
@@ -467,7 +470,7 @@ void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply stylesheets for scroll bars
 
-   \param[in,out] orc_Stylesheet Dynamic stylesheet document
+   \param[in,out]  orc_Stylesheet   Dynamic stylesheet document
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendScrollBarStyleSheets(QString & orc_Stylesheet)
@@ -483,9 +486,9 @@ void C_UtiStyleSheets::mh_AppendScrollBarStyleSheets(QString & orc_Stylesheet)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply stylesheets for scroll bar
 
-   \param[in]     orc_ScrollBarElements   Which elements to apply the stylesheets for
-   \param[in]     orc_ScrollBarProperties Which stylesheets should be applied for these elements
-   \param[in,out] orc_Stylesheet          Dynamic stylesheet document
+   \param[in]      orc_ScrollBarElements     Which elements to apply the stylesheets for
+   \param[in]      orc_ScrollBarProperties   Which stylesheets should be applied for these elements
+   \param[in,out]  orc_Stylesheet            Dynamic stylesheet document
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> & orc_ScrollBarElements,

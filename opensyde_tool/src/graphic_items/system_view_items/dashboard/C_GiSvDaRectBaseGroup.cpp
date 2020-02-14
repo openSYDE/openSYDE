@@ -268,7 +268,8 @@ void C_GiSvDaRectBaseGroup::LoadSvBasicData(const C_PuiSvDbWidgetBase & orc_Data
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update basic widget data
 
-   \param[in,out] orc_Data Basic widget data
+   \param[in,out] orc_Data             Basic widget data
+   \param[in]     oq_SkipDataElements  Flag for skipping data elements
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::UpdateSvBasicData(C_PuiSvDbWidgetBase & orc_Data, const bool oq_SkipDataElements) const
@@ -434,8 +435,8 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
    Base class implementation does nothing. If the dashboard element has drawing elements which
    can not be adapted by stylesheets the derived class must reimplement this function.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                           Value for transparence (0..255)
+   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
+   \param[in]     osn_Value                 Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -577,7 +578,7 @@ void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
          {
             // Update the value
             C_SdNdeDpContentUtil::h_SetScaledValueInContent(this->mf64_WriteValue, c_OscElement.c_Value,
-                                                                  c_Scaling.f64_Factor, c_Scaling.f64_Offset);
+                                                            c_Scaling.f64_Factor, c_Scaling.f64_Offset);
             //Compensate floating point precision
             if ((c_OscElement.c_Value <= c_OscElement.c_MaxValue) == false)
             {
@@ -623,6 +624,9 @@ void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
 
    Base class implementation does nothing. If there are configurable properties for the dashboard element
    the derived class must reimplement this function.
+
+   \retval false  nothing done
+   \retval true   configurable properties called
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaRectBaseGroup::CallProperties(void)
@@ -642,6 +646,8 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
 {
    if (this->mu32_NextManualActionIndex > 0)
    {
+      QGraphicsView * const pc_View = this->scene()->views().at(0);
+      C_OgeWiCustomMessage c_Message(pc_View, C_OgeWiCustomMessage::E_Type::eERROR);
       C_PuiSvDbNodeDataPoolListElementId c_ElementId;
       const sint32 s32_Return = this->GetDataPoolElementIndex(this->mu32_NextManualActionIndex - 1UL, c_ElementId);
       //Response error handling
@@ -677,27 +683,34 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
                {
                case 0x13:
                   c_Details = C_GtGetText::h_GetText("Incorrect length of request.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                case 0x31:
                   c_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                case 0x22:
                   c_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                case 0x33:
                   c_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                case 0x14:
                   c_Details = C_GtGetText::h_GetText(
                      "The total length of the response message exceeds the available buffer size.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                case 0x7F:
                   c_Details = C_GtGetText::h_GetText(
                      "The requested service is not available in the currently active session.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                default:
                   c_Details =
                      QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                }
             }
@@ -709,36 +722,45 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
                   c_Details = C_GtGetText::h_GetText("Incorrect length of request.\n"
                                                      "Specifically for this service: Size of payload data does not "
                                                      "match size of Datapool element.");
+                  c_Message.SetCustomMinHeight(180, 300);
                   break;
                case 0x31:
                   c_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                case 0x22:
                   c_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                case 0x33:
                   c_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                case 0x14:
                   c_Details = C_GtGetText::h_GetText(
                      "The total length of the response message exceeds the available buffer size.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                case 0x7F:
                   c_Details = C_GtGetText::h_GetText(
                      "The requested service is not available in the currently active session.");
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                default:
                   c_Details =
                      QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
+                  c_Message.SetCustomMinHeight(180, 250);
                   break;
                }
             }
             c_Description =
                QString(C_GtGetText::h_GetText("Operation failed with error response (%1).")).arg(c_Details);
             c_Details = "";
+            c_Message.SetCustomMinHeight(180, 230);
             break;
          default:
             c_Description = C_GtGetText::h_GetText("Operation failure, cause unknown.");
+            c_Message.SetCustomMinHeight(180, 180);
             break;
          }
          osc_write_log_info("Manual operation",
@@ -753,8 +775,6 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
          }
          else
          {
-            QGraphicsView * const pc_View = this->scene()->views().at(0);
-            C_OgeWiCustomMessage c_Message(pc_View, C_OgeWiCustomMessage::E_Type::eERROR);
             c_Message.SetHeading(C_GtGetText::h_GetText("Transmission failure"));
             c_Message.SetDescription(c_Description);
             c_Message.SetDetails(c_Details);
@@ -1127,8 +1147,7 @@ void C_GiSvDaRectBaseGroup::m_ResizeUpdateItems(const float64 of64_DiffWidth, co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle unresolved resize request
 
-   \param[in] of64_DiffWidth  Width
-   \param[in] of64_DiffHeight Height
+   \param[in] orc_NewSize  New size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_ForceWidgetResize(const QSizeF & orc_NewSize)
@@ -1528,6 +1547,8 @@ void C_GiSvDaRectBaseGroup::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for any invalid elements
+
+   \param[out]   orc_FirstInvalidElementName    Name of first invalid element
 
    \return
    true  Found

@@ -47,7 +47,7 @@ const stw_types::float64 C_SdBueMlvSignalItem::mhf64_ResizeItemClickOffset = 8.0
    \param[in]       orc_ResizeItemColor      Color of the clickable resize item
    \param[in]       orc_Name                 Name of the signal
    \param[in]       of64_Space               Space configuration between signals
-   \param[in,out]   opc_parent               Optional pointer to parent
+   \param[in,out]   opc_Parent               Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalItem::C_SdBueMlvSignalItem(const QColor & orc_BackgroundColor, const QColor & orc_FontColor,
@@ -224,6 +224,24 @@ void C_SdBueMlvSignalItem::SetSelected(const bool oq_Selected)
    {
       this->SetFont(mc_STYLE_GUIDE_FONT_REGULAR_16);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets new colors
+
+   \param[in]       orc_BackgroundColor      Background color
+   \param[in]       orc_FontColor            Font color
+   \param[in]       orc_ResizeItemColor      Color of the clickable resize item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMlvSignalItem::SetColors(const QColor & orc_BackgroundColor, const QColor & orc_FontColor,
+                                     const QColor & orc_ResizeItemColor)
+{
+   this->mc_BackgroundColorDefault = orc_BackgroundColor;
+   this->mc_DrawBackgroundColor = orc_BackgroundColor;
+   this->mc_FontColorDefault = orc_FontColor;
+   this->mc_DrawFontColor = orc_FontColor;
+   this->mc_DrawReizeItemColor = orc_ResizeItemColor;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

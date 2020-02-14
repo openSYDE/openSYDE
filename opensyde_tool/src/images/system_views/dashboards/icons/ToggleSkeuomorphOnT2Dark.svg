@@ -45,34 +45,34 @@
 	.st39{fill:url(#SVGID_28_);}
 	.st40{fill:url(#SVGID_29_);}
 	.st41{fill:url(#SVGID_30_);}
-	.st42{fill:#FBFBFB;}
-	.st43{fill:url(#SVGID_31_);}
-	.st44{fill:#5C5C5C;}
-	.st45{fill:url(#SVGID_32_);}
-	.st46{fill:#38396D;}
-	.st47{fill:url(#SVGID_33_);}
-	.st48{fill:url(#SVGID_34_);}
-	.st49{fill:url(#SVGID_35_);}
-	.st50{fill:url(#SVGID_36_);}
-	.st51{fill:#1D1D1B;}
-	.st52{fill:url(#SVGID_37_);}
-	.st53{fill:url(#SVGID_38_);}
-	.st54{fill:url(#SVGID_39_);}
-	.st55{fill:url(#SVGID_40_);}
-	.st56{fill:url(#SVGID_41_);}
-	.st57{fill:url(#SVGID_42_);}
-	.st58{fill:url(#SVGID_43_);}
-	.st59{fill:url(#SVGID_44_);}
-	.st60{fill:#201F43;}
-	.st61{fill:#585784;}
-	.st62{fill:#484763;}
-	.st63{fill:#029B88;}
-	.st64{fill:url(#SVGID_45_);}
-	.st65{fill:url(#SVGID_46_);}
-	.st66{fill:url(#SVGID_47_);}
-	.st67{fill:url(#SVGID_48_);}
-	.st68{fill:url(#SVGID_49_);}
-	.st69{fill:url(#SVGID_50_);}
+	.st42{fill:url(#SVGID_31_);}
+	.st43{fill:#5C5C5C;}
+	.st44{fill:url(#SVGID_32_);}
+	.st45{fill:#38396D;}
+	.st46{fill:url(#SVGID_33_);}
+	.st47{fill:url(#SVGID_34_);}
+	.st48{fill:url(#SVGID_35_);}
+	.st49{fill:url(#SVGID_36_);}
+	.st50{fill:#1D1D1B;}
+	.st51{fill:url(#SVGID_37_);}
+	.st52{fill:url(#SVGID_38_);}
+	.st53{fill:url(#SVGID_39_);}
+	.st54{fill:url(#SVGID_40_);}
+	.st55{fill:url(#SVGID_41_);}
+	.st56{fill:url(#SVGID_42_);}
+	.st57{fill:url(#SVGID_43_);}
+	.st58{fill:url(#SVGID_44_);}
+	.st59{fill:#201F43;}
+	.st60{fill:#585784;}
+	.st61{fill:#484763;}
+	.st62{fill:#029B88;}
+	.st63{fill:url(#SVGID_45_);}
+	.st64{fill:url(#SVGID_46_);}
+	.st65{fill:url(#SVGID_47_);}
+	.st66{fill:url(#SVGID_48_);}
+	.st67{fill:url(#SVGID_49_);}
+	.st68{fill:url(#SVGID_50_);}
+	.st69{fill:#FBFBFB;}
 </style>
 <g id="Hintergrund">
 	<g>
@@ -98,36 +98,37 @@
 </g>
 <g id="Text">
 	<g>
-		<text transform="matrix(1 0 0 1 395.2559 180.4493)" class="st7 st22 st23">Off</text>
+		<text transform="matrix(1 0 0 1 119.8149 180.4493)" class="st7 st22 st23">Off</text>
 	</g>
 </g>
 <g id="Ebene_3">
+</g>
+<g id="Ebene_4">
 	<g>
 		<g>
-			<image style="overflow:visible;opacity:0.5;" width="355" height="355" xlink:href="://images/system_views/dashboards/icons/38F6DD96.png" >
+			
+				<image style="overflow:visible;opacity:0.5;" width="355" height="355" xlink:href="://images/system_views/dashboards/icons/5CE5F052.png"  transform="matrix(1 0 0 1 280 0)">
 			</image>
 			<g>
 				
-					<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="-3413.4297" y1="273.0703" x2="-3413.4297" y2="40.0703" gradientTransform="matrix(-1 0 0 1 -3242.8594 0)">
+					<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="-5133.4297" y1="273.0703" x2="-5133.4297" y2="40.0703" gradientTransform="matrix(-1 0 0 1 -4682.8594 0)">
 					<stop  offset="0" style="stop-color:#2F3036"/>
 					<stop  offset="1" style="stop-color:#5B5B5B"/>
 				</linearGradient>
-				<circle class="st3" cx="170.6" cy="156.6" r="116.5"/>
+				<circle class="st3" cx="450.6" cy="156.6" r="116.5"/>
 			</g>
 		</g>
 		<g>
 			
-				<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="-3587.4297" y1="5997.0703" x2="-3587.4297" y2="5844.0703" gradientTransform="matrix(-1 0 0 -1 -3416.8594 6077.1406)">
+				<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="-5307.4297" y1="5997.0703" x2="-5307.4297" y2="5844.0703" gradientTransform="matrix(-1 0 0 -1 -4856.8594 6077.1406)">
 				<stop  offset="0" style="stop-color:#2F3036"/>
 				<stop  offset="1" style="stop-color:#5B5B5B"/>
 			</linearGradient>
-			<circle class="st4" cx="170.6" cy="156.6" r="76.5"/>
+			<circle class="st4" cx="450.6" cy="156.6" r="76.5"/>
 		</g>
 		<g>
-			<text transform="matrix(1 0 0 1 119.9307 180.5586)" class="st42 st22 st23">On</text>
+			<text transform="matrix(1 0 0 1 395.4419 180.6289)" class="st69 st22 st23">On</text>
 		</g>
 	</g>
-</g>
-<g id="Ebene_4">
 </g>
 </svg>

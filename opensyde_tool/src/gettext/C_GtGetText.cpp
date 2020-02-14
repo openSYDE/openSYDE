@@ -52,7 +52,7 @@ bool C_GtGetText::mhq_Initialized = false;
    <orc_BasePath>/<language>/LC_MESSAGES/<orc_MoFileName>.mo
 
    Example:
-   After calling ::h_Initialize("./translations", "application")
+   After calling C_GtGetText::h_Initialize("./translations", "application")
    The german language file will be searched at:
    ./translations/de/LC_MESSAGES/application.mo
 
@@ -110,7 +110,7 @@ sint32 C_GtGetText::h_Initialize(const C_SCLString & orc_BasePath, const C_SCLSt
    By default the system environment variable "LANG" determines the used language.
 
    As parameters use the language code as defined in ISO 639-1 (e.g. "de", "fr").
-   Make sure to place the .mo file in the corresponding folder (as configured with ::h_Initialize).
+   Make sure to place the .mo file in the corresponding folder (as configured with C_GtGetText::h_Initialize).
 
    Caution:
    This function modifies the environment variable "LANG" for the running process.

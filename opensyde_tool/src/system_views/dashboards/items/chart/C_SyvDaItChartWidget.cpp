@@ -355,9 +355,15 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             // Color for the splitter
             this->mpc_Ui->pc_Splitter->SetColor(mc_STYLE_GUIDE_COLOR_8);
 
-            // Customize the axis
+            // Customize the axis and gridline
             this->mpc_AxisTime->setLinePenColor(mc_STYLE_GUIDE_COLOR_2);
             this->mpc_AxisTime->setLabelsColor(mc_STYLE_GUIDE_COLOR_2);
+
+            if (this->mc_DataPoolElementsDataSeries.empty() == true)
+            {
+               this->mpc_AxisValue->setLinePenColor(mc_STYLE_GUIDE_COLOR_2);
+               this->mpc_AxisValue->setLabelsColor(mc_STYLE_GUIDE_COLOR_2);
+            }
 
             this->mpc_AxisTime->setGridLineColor(mc_STYLE_GUIDE_COLOR_8);
             this->mpc_AxisValue->setGridLineColor(mc_STYLE_GUIDE_COLOR_8);
@@ -378,6 +384,12 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             this->mpc_AxisTime->setLinePenColor(mc_STYLE_GUIDE_COLOR_34);
             this->mpc_AxisTime->setLabelsColor(mc_STYLE_GUIDE_COLOR_34);
 
+            if (this->mc_DataPoolElementsDataSeries.empty() == true)
+            {
+               this->mpc_AxisValue->setLinePenColor(mc_STYLE_GUIDE_COLOR_34);
+               this->mpc_AxisValue->setLabelsColor(mc_STYLE_GUIDE_COLOR_34);
+            }
+
             this->mpc_AxisTime->setGridLineColor(mc_STYLE_GUIDE_COLOR_10);
             this->mpc_AxisValue->setGridLineColor(mc_STYLE_GUIDE_COLOR_10);
 
@@ -385,6 +397,11 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             this->mpc_AxisTime->setTitleBrush(c_Brush);
          }
 
+         // Color for frame separator
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperator1_2, "HasColor8Background", oq_DarkMode);
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperator1_2, "HasColor10Background", !oq_DarkMode);
+
+         this->mpc_Ui->pc_SettingsWidget->ApplyDarkMode(C_PuiSvDbWidgetBase::eOPENSYDE, oq_DarkMode);
          break;
 
       case C_PuiSvDbWidgetBase::eFLAT:
@@ -393,9 +410,15 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             // Color for the splitter
             this->mpc_Ui->pc_Splitter->SetColor(mc_STYLE_GUIDE_COLOR_8);
 
-            // Customize the axis
+            // Customize the axis and gridline
             this->mpc_AxisTime->setLinePenColor(mc_STYLE_GUIDE_COLOR_0);
             this->mpc_AxisTime->setLabelsColor(mc_STYLE_GUIDE_COLOR_0);
+
+            if (this->mc_DataPoolElementsDataSeries.empty() == true)
+            {
+               this->mpc_AxisValue->setLinePenColor(mc_STYLE_GUIDE_COLOR_0);
+               this->mpc_AxisValue->setLabelsColor(mc_STYLE_GUIDE_COLOR_0);
+            }
 
             this->mpc_AxisTime->setGridLineColor(mc_STYLE_GUIDE_COLOR_8);
             this->mpc_AxisValue->setGridLineColor(mc_STYLE_GUIDE_COLOR_8);
@@ -412,6 +435,12 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             this->mpc_AxisTime->setLinePenColor(mc_STYLE_GUIDE_COLOR_34);
             this->mpc_AxisTime->setLabelsColor(mc_STYLE_GUIDE_COLOR_34);
 
+            if (this->mc_DataPoolElementsDataSeries.empty() == true)
+            {
+               this->mpc_AxisValue->setLinePenColor(mc_STYLE_GUIDE_COLOR_34);
+               this->mpc_AxisValue->setLabelsColor(mc_STYLE_GUIDE_COLOR_34);
+            }
+
             this->mpc_AxisTime->setGridLineColor(mc_STYLE_GUIDE_COLOR_10);
             this->mpc_AxisValue->setGridLineColor(mc_STYLE_GUIDE_COLOR_10);
 
@@ -419,6 +448,11 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             this->mpc_AxisTime->setTitleBrush(c_Brush);
          }
 
+         // Color for frame separator
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperator1_2, "HasColor8Background", oq_DarkMode);
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperator1_2, "HasColor10Background", !oq_DarkMode);
+
+         this->mpc_Ui->pc_SettingsWidget->ApplyDarkMode(C_PuiSvDbWidgetBase::eFLAT, oq_DarkMode);
          break;
 
       case C_PuiSvDbWidgetBase::eSKEUOMORPH:
@@ -427,9 +461,15 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             // Color for the splitter
             this->mpc_Ui->pc_Splitter->SetColor(mc_STYLE_GUIDE_COLOR_34);
 
-            // Customize the axis
+            // Customize the axis and gridline
             this->mpc_AxisTime->setLinePenColor(mc_STYLE_GUIDE_COLOR_0);
             this->mpc_AxisTime->setLabelsColor(mc_STYLE_GUIDE_COLOR_0);
+
+            if (this->mc_DataPoolElementsDataSeries.empty() == true)
+            {
+               this->mpc_AxisValue->setLinePenColor(mc_STYLE_GUIDE_COLOR_0);
+               this->mpc_AxisValue->setLabelsColor(mc_STYLE_GUIDE_COLOR_0);
+            }
 
             this->mpc_AxisTime->setGridLineColor(mc_STYLE_GUIDE_COLOR_34);
             this->mpc_AxisValue->setGridLineColor(mc_STYLE_GUIDE_COLOR_34);
@@ -446,6 +486,12 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             this->mpc_AxisTime->setLinePenColor(mc_STYLE_GUIDE_COLOR_33);
             this->mpc_AxisTime->setLabelsColor(mc_STYLE_GUIDE_COLOR_34);
 
+            if (this->mc_DataPoolElementsDataSeries.empty() == true)
+            {
+               this->mpc_AxisValue->setLinePenColor(mc_STYLE_GUIDE_COLOR_33);
+               this->mpc_AxisValue->setLabelsColor(mc_STYLE_GUIDE_COLOR_34);
+            }
+
             this->mpc_AxisTime->setGridLineColor(mc_STYLE_GUIDE_COLOR_10);
             this->mpc_AxisValue->setGridLineColor(mc_STYLE_GUIDE_COLOR_10);
 
@@ -453,6 +499,11 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             this->mpc_AxisTime->setTitleBrush(c_Brush);
          }
 
+         // Color for frame separator
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperator1_2, "HasColor34Background", oq_DarkMode);
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperator1_2, "HasColor10Background", !oq_DarkMode);
+
+         this->mpc_Ui->pc_SettingsWidget->ApplyDarkMode(C_PuiSvDbWidgetBase::eSKEUOMORPH, oq_DarkMode);
          break;
 
       case C_PuiSvDbWidgetBase::eOPENSYDE_2:
@@ -461,9 +512,15 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             // Color for the splitter
             this->mpc_Ui->pc_Splitter->SetColor(mc_STYLE_GUIDE_COLOR_8);
 
-            // Customize the axis
+            // Customize the axis and gridline
             this->mpc_AxisTime->setLinePenColor(mc_STYLE_GUIDE_COLOR_0);
             this->mpc_AxisTime->setLabelsColor(mc_STYLE_GUIDE_COLOR_0);
+
+            if (this->mc_DataPoolElementsDataSeries.empty() == true)
+            {
+               this->mpc_AxisValue->setLinePenColor(mc_STYLE_GUIDE_COLOR_0);
+               this->mpc_AxisValue->setLabelsColor(mc_STYLE_GUIDE_COLOR_0);
+            }
 
             this->mpc_AxisTime->setGridLineColor(mc_STYLE_GUIDE_COLOR_8);
             this->mpc_AxisValue->setGridLineColor(mc_STYLE_GUIDE_COLOR_8);
@@ -480,6 +537,12 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             this->mpc_AxisTime->setLinePenColor(mc_STYLE_GUIDE_COLOR_33);
             this->mpc_AxisTime->setLabelsColor(mc_STYLE_GUIDE_COLOR_6);
 
+            if (this->mc_DataPoolElementsDataSeries.empty() == true)
+            {
+               this->mpc_AxisValue->setLinePenColor(mc_STYLE_GUIDE_COLOR_33);
+               this->mpc_AxisValue->setLabelsColor(mc_STYLE_GUIDE_COLOR_6);
+            }
+
             this->mpc_AxisTime->setGridLineColor(mc_STYLE_GUIDE_COLOR_10);
             this->mpc_AxisValue->setGridLineColor(mc_STYLE_GUIDE_COLOR_10);
 
@@ -487,6 +550,11 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
             this->mpc_AxisTime->setTitleBrush(c_Brush);
          }
 
+         // Color for frame separator
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperator1_2, "HasColor8Background", oq_DarkMode);
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperator1_2, "HasColor10Background", !oq_DarkMode);
+
+         this->mpc_Ui->pc_SettingsWidget->ApplyDarkMode(C_PuiSvDbWidgetBase::eOPENSYDE_2, oq_DarkMode);
          break;
 
       default:
@@ -662,13 +730,12 @@ bool C_SyvDaItChartWidget::RemoveDataSerie(C_PuiSvDbNodeDataPoolListElementId & 
       {
          tgl_assert(this->mc_DataColorsUsed.size() >
                     this->mc_DataPoolElementsDataColorIndexes[u32_DataPoolElementConfigIndex]);
-         std::vector<bool>::reference c_Value =
+         //lint -e{808} C++11 usage of correct handling for bool vector element assignment
+         auto && rc_Value =
             this->mc_DataColorsUsed[this->mc_DataPoolElementsDataColorIndexes[u32_DataPoolElementConfigIndex]];
-
-         c_Value = false;
-
-         this->mc_DataPoolElementsDataColorIndexes.erase(
-            this->mc_DataPoolElementsDataColorIndexes.begin() + u32_DataPoolElementConfigIndex);
+         rc_Value = false;
+         this->mc_DataPoolElementsDataColorIndexes.erase(this->mc_DataPoolElementsDataColorIndexes.begin() +
+                                                         u32_DataPoolElementConfigIndex);
       }
 
       if (this->mc_DataPoolElementsDataSeries.size() > 0)
@@ -710,7 +777,7 @@ bool C_SyvDaItChartWidget::RemoveDataSerie(C_PuiSvDbNodeDataPoolListElementId & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Selects and shows the axix for the specific datapool element
 
-   \param[in]     orc_DataPoolElementId   Datapool element identification
+   \param[in]     ou32_DataPoolElementConfigIndex   Datapool element identification
 
    \return
    possible return value(s) and description
@@ -1011,8 +1078,8 @@ void C_SyvDaItChartWidget::UpdateError(const uint32 ou32_DataElementIndex, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparence value configured by the actual timeout state
 
-   \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
-   \param[in] osn_Value                       Value for transparence (0..255)
+   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
+   \param[in]     osn_Value                 Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value) const
@@ -1047,7 +1114,7 @@ void C_SyvDaItChartWidget::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a specific data serie
 
-   \param[in]     orc_DataPoolElementId               Datapool element identification
+   \param[in]     ou32_DataPoolElementConfigIndex     Datapool element identification
    \param[in]     oq_Warning                          Flag if a warning for this data element was detected
    \param[in]     oq_Invalid                          Flag if data elment is invalid and invalid placeholder info
                                                       shall be used
@@ -1149,8 +1216,9 @@ QColor C_SyvDaItChartWidget::m_GetColor(void)
    {
       if (this->mc_DataColorsUsed[u32_Counter] == false)
       {
-         std::vector<bool>::reference c_Value = this->mc_DataColorsUsed[u32_Counter];
-         c_Value = true;
+         //lint -e{808} C++11 usage of correct handling for bool vector element assignment
+         auto && rc_Value = this->mc_DataColorsUsed[u32_Counter];
+         rc_Value = true;
          c_Color = C_SyvDaItChartWidget::mhac_DataColors[u32_Counter];
 
          // Save the association between datapool element and the color
@@ -1173,8 +1241,9 @@ void C_SyvDaItChartWidget::m_DataItemToggled(const stw_types::uint32 ou32_DataPo
 
    if (ou32_DataPoolElementConfigIndex < this->mc_Data.c_DataPoolElementsActive.size())
    {
-      std::vector<bool>::reference c_Value = this->mc_Data.c_DataPoolElementsActive[ou32_DataPoolElementConfigIndex];
-      c_Value = oq_Checked;
+      //lint -e{808} C++11 usage of correct handling for bool vector element assignment
+      auto && rc_Value = this->mc_Data.c_DataPoolElementsActive[ou32_DataPoolElementConfigIndex];
+      rc_Value = oq_Checked;
    }
 }
 

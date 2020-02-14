@@ -18,6 +18,7 @@
 #include "C_SyvComDriverDiag.h"
 #include "C_SyvDaDashboardToolbox.h"
 #include "C_SyvComDriverDiagConnect.h"
+#include "C_OgeWiFixPosition.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -101,6 +102,9 @@ private:
    void m_HandleConnectionResult(const stw_types::sint32 os32_Result, const QString & orc_Message,
                                  const QString & orc_MessageDetails);
 
+   void m_WiFixPosMaxBtnClicked(void);
+   void m_WiHoverMinBtnClicked(void);
+
    enum E_ConnectState
    {
       eCS_DISCONNECTED,
@@ -113,6 +117,7 @@ private:
    stw_opensyde_gui_logic::C_SyvComDriverDiag * mpc_ComDriver;
    stw_opensyde_gui_logic::C_SyvComDriverDiagConnect * const mpc_ConnectionThread;
    stw_opensyde_gui_elements::C_OgeWiHover * mpc_Toolbox;
+   stw_opensyde_gui_elements::C_OgeWiFixPosition * mpc_FixMinimizedToolbox;
    QWidget * const mpc_ToolboxParent;
    C_SyvDaDashboardToolbox * mpc_ToolboxContent;
    QTimer mc_Timer;
@@ -123,6 +128,7 @@ private:
    std::set<stw_opensyde_core::C_OSCNodeDataPoolListElementId> mc_MissedReadOperations;
    std::set<stw_opensyde_core::C_OSCNodeDataPoolListElementId> mc_MissedWriteOperations;
    E_ConnectState me_ConnectState;
+   stw_types::sintn msn_InitToolboxCounter;
    static stw_types::uint32 mhu32_DisconnectTime;
    static const QString mhc_DarkModeEnabledIconPath;
    static const QString mhc_DarkModeDisabledIconPath;

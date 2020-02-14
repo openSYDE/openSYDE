@@ -25,7 +25,7 @@ class C_PuiSvDbDataElement :
    public C_PuiBsDataElement
 {
 public:
-   enum E_Type
+   enum E_Type ///< Type of dashboard data element
    {
       eCHART,        ///< Data element for chart
       eLABEL,        ///< Data element for label
@@ -40,7 +40,7 @@ public:
       eTEXT_ELEMENT, ///< Data element for text element
       eIMAGE,        ///< Data element for image element
       ePARAM,        ///< Data element for parametrization element
-      eUNKNOWN
+      eUNKNOWN       ///< Data element unknown
    };
 
    C_PuiSvDbDataElement(const stw_types::uint32 & oru32_ViewIndex, const stw_types::uint32 & oru32_DashboardIndex,

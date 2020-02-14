@@ -52,10 +52,10 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent           Reference to parent
-   \param[in]     orc_ComDriver        Reference to the com driver
-   \param[in]     orc_ChangedElements  All changed datapool elements
-   \param[in]     orc_InvalidLists     All lists to update CRC for
+   \param[in,out]  orc_Parent             Reference to parent
+   \param[in]      orc_ComDriver          Reference to the com driver
+   \param[in]      orc_ChangedElements    All changed datapool elements
+   \param[in]      orc_InvalidLists       All lists to update CRC for
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaWriteWidget::C_SyvDaItPaWriteWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
@@ -162,7 +162,7 @@ C_SyvDaItPaWriteWidget::E_Step C_SyvDaItPaWriteWidget::GetStep(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all changed elements with successful adapted CRCs
 
-   \param[out] orc_AffectedElementValues All possibly changed elements
+   \param[out]  orc_AffectedElementValues    All possibly changed elements
 
    \return
    C_NO_ERR    Process was finished successful and all changed element ids returned
@@ -190,7 +190,7 @@ sint32 C_SyvDaItPaWriteWidget::GetChangedElements(std::map<C_OSCNodeDataPoolList
 
    Here: handle escape key
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::keyPressEvent(QKeyEvent * const opc_Event)
@@ -210,8 +210,8 @@ void C_SyvDaItPaWriteWidget::keyPressEvent(QKeyEvent * const opc_Event)
 
    Prepares step 1.
 
-   \param[in]     orc_ChangedElements  All changed datapool elements (Is used to detect the affected nodes)
-   \param[in]     orc_InvalidLists     All lists to update CRC for
+   \param[in]  orc_ChangedElements  All changed datapool elements (Is used to detect the affected nodes)
+   \param[in]  orc_InvalidLists     All lists to update CRC for
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_StartWriteChangedElements(
@@ -534,6 +534,7 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
                                                  "In these cases the read values from target are different from "
                                                  "the written set values."));
                      c_Message.SetDetails(c_SuspectElementsReport);
+                     c_Message.SetCustomMinHeight(230, 300);
                      c_Message.Execute();
                   }
                }
@@ -565,7 +566,7 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
 
    Implemented steps: 3
 
-   \param[in] oq_ShowReadValues Flag if read values are to be displayed
+   \param[in]  oq_ShowReadValues    Flag if read values are to be displayed
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
@@ -936,6 +937,7 @@ void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
                c_Message.SetDescription(QString(C_GtGetText::h_GetText("At least one application did not acknowledge "
                                                                        "the application notification")));
                c_Message.SetDetails(c_Text);
+               c_Message.SetCustomMinHeight(180, 250);
                c_Message.Execute();
             }
 
@@ -947,6 +949,8 @@ void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
       }
       else
       {
+         this->mc_Timer.stop();
+         QApplication::restoreOverrideCursor();
          m_ReportErrorNvmNotifyOfChanges(s32_Result);
       }
    }
@@ -977,10 +981,11 @@ void C_SyvDaItPaWriteWidget::m_OnCancel(void)
    {
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
       c_Message.SetHeading(C_GtGetText::h_GetText("Parametrization interrupt "));
-      c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to interrupt the process? \nWithout writing "
+      c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to interrupt the process?\nWithout writing "
                                                       "CRC the lists will become invalid!"));
       c_Message.SetNOButtonText("Interrupt");
       c_Message.SetOKButtonText("Don't Interrupt");
+      c_Message.SetCustomMinHeight(180, 180);
       C_OgeWiCustomMessage::E_Outputs e_Output;
       e_Output = c_Message.Execute();
       if (e_Output == C_OgeWiCustomMessage::eNO)
@@ -1052,11 +1057,11 @@ void C_SyvDaItPaWriteWidget::m_ConfirmClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the element was changed
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
-   \param[in] oq_CheckReadValues Flag if read values should be checked
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_CheckReadValues   Flag if read values should be checked
 
    \return
    true     Element was changed
@@ -1157,12 +1162,12 @@ QString C_SyvDaItPaWriteWidget::m_GetSuspectElementReport(void) const
             QString c_Entry;
             //Mark as suspect
             C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(c_It->second.c_Expected,
-                                                                          pc_Element->f64_Factor,
-                                                                          pc_Element->f64_Offset, c_Expected);
+                                                                    pc_Element->f64_Factor,
+                                                                    pc_Element->f64_Offset, c_Expected);
             c_Expected += QString(" ") + pc_Element->c_Unit.c_str();
             C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(c_It->second.c_Actual,
-                                                                          pc_Element->f64_Factor,
-                                                                          pc_Element->f64_Offset, c_Actual);
+                                                                    pc_Element->f64_Factor,
+                                                                    pc_Element->f64_Offset, c_Actual);
             c_Actual += QString(" ") + pc_Element->c_Unit.c_str();
             c_Entry = QString(C_GtGetText::h_GetText("%1 written: %2, read: %3")).arg(c_Namespace).arg(c_Expected).arg(
                c_Actual);
@@ -1215,8 +1220,9 @@ void C_SyvDaItPaWriteWidget::m_ReportError(const QString & orc_FunctionName, con
                       c_Text.toStdString().c_str());
 
    c_Message.SetDescription(QString(C_GtGetText::h_GetText("Function %1 ended with error.")).arg(orc_FunctionName));
-   c_Message.SetDetails(QString(C_GtGetText::h_GetText("Error code:\n %1 \nError text: \n %2"))
+   c_Message.SetDetails(QString(C_GtGetText::h_GetText("Error code:\n %1\nError text: \n %2"))
                         .arg(os32_ErrorCode).arg(orc_ErrorText));
+   c_Message.SetCustomMinHeight(180, 270);
    c_Message.Execute();
 
    // Close dialog on error
@@ -1226,7 +1232,7 @@ void C_SyvDaItPaWriteWidget::m_ReportError(const QString & orc_FunctionName, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle error for function "NvmSafeWriteChangedValues"
 
-   \param[in] os32_ErrorCode Function result
+   \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32 os32_ErrorCode)
@@ -1247,82 +1253,55 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
    case C_CONFIG:
       c_Description += "No node or diagnostic protocol are known (was this class properly initialized?)\n";
       c_Description += "Protocol driver reported configuration error (was the protocol driver properly initialized?)";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_OVERFLOW:
       c_Description += "At least one value is out of the defined minimum and maximum range.";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_BUSY:
       c_Description += "Client: No changed value found and no additional lists specified";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Expected server response not received within timeout";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_NOACT:
       c_Description += "Could not send request (e.g. Tx buffer full)";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
+   // Using <br/> as new line symbol instead of \n due to problems with the h_GetLink syntax
    case C_WARN:
       switch (u8_NRC)
       {
       case 0x13:
-         c_Details = C_GtGetText::h_GetText("Incorrect length of request");
+         c_Details = C_GtGetText::h_GetText("Incorrect length of request<br/>");
          break;
       case 0x31:
-         c_Details = C_GtGetText::h_GetText("Address or length format invalid (> 4 bytes)\n"
-                                            "Requested memory range specified by address and size invalid");
+         c_Details = C_GtGetText::h_GetText("Address or length format invalid (> 4 bytes)<br/>"
+                                            "Requested memory range specified by address and size invalid<br/>");
          break;
       case 0x72:
-         c_Details = C_GtGetText::h_GetText("Server writing NVM failed");
+         c_Details = C_GtGetText::h_GetText("Server writing NVM failed<br/>");
          break;
       case 0x33:
-         c_Details = C_GtGetText::h_GetText("Required security level was not unlocked");
+         c_Details = C_GtGetText::h_GetText("Required security level was not unlocked<br/>");
          break;
       case 0x14:
          c_Details =
-            C_GtGetText::h_GetText("The total length of the response message exceeds the available buffer size");
+            C_GtGetText::h_GetText("The total length of the response message exceeds the available buffer size<br/>");
+         break;
+      case 0x7F:
+         c_Details =
+            C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NRC, 16));
+         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
          break;
       }
       c_Description += "Server sent error response";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                    mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                    c_Log);
       break;
    case C_RD_WR:
       c_Description += "Unexpected content in server response";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    default:
       //Should not happen
@@ -1330,8 +1309,13 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
       break;
    }
 
+   C_OSCLoggingHandler::h_Flush();
+   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+                C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
+
    c_Message.SetDescription(c_Description);
    c_Message.SetDetails(c_Details);
+   c_Message.SetCustomMinHeight(230, 300);
    c_Message.Execute();
 
    // Close dialog on error
@@ -1341,7 +1325,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle error for function "NvmSafeReadValues"
 
-   \param[in] os32_ErrorCode Function result
+   \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_ErrorCode)
@@ -1363,84 +1347,57 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
    case C_CONFIG:
       c_Description += "No node or diagnostic protocol are known (was this class properly initialized?)\n";
       c_Description += "Protocol driver reported configuration error (was the protocol driver properly initialized?)";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_OVERFLOW:
       c_Description += "At least one list has no elements.";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_RD_WR:
       c_Description += "No list contains Datapool elements that were";
       c_Description += "written by the preceding call to \"NvmSafeWriteChangedValues\"";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_RANGE:
       c_Description += "At least one index of a Datapool or a list of changed lists is invalid or";
       c_Description += "Datapool element size configuration does not match with count of read bytes";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Expected server response not received within timeout";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_NOACT:
       c_Description += "Could not send request (e.g. Tx buffer full)";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
+   // Using <br/> as new line symbol instead of \n due to problems with the h_GetLink syntax
    case C_WARN:
       c_Description += "Server sent error response or malformed protocol response";
       switch (u8_NRC)
       {
       case 0x13:
-         c_Details = C_GtGetText::h_GetText("Incorrect length of request");
+         c_Details = C_GtGetText::h_GetText("Incorrect length of request<br/>");
          break;
       case 0x31:
-         c_Details = C_GtGetText::h_GetText("Address or length format invalid (> 4 bytes)\n"
-                                            "Requested memory range specified by address and size invalid");
+         c_Details = C_GtGetText::h_GetText("Address or length format invalid (> 4 bytes)<br/>"
+                                            "Requested memory range specified by address and size invalid<br/>");
          break;
       case 0x72:
-         c_Details = C_GtGetText::h_GetText("Server reading NVM failed");
+         c_Details = C_GtGetText::h_GetText("Server reading NVM failed<br/>");
          break;
       case 0x33:
-         c_Details = C_GtGetText::h_GetText("Required security level was not unlocked");
+         c_Details = C_GtGetText::h_GetText("Required security level was not unlocked<br/>");
          break;
       case 0x14:
          c_Details =
-            C_GtGetText::h_GetText("The total length of the response message exceeds the available buffer size");
+            C_GtGetText::h_GetText("The total length of the response message exceeds the available buffer size<br/>");
+         break;
+      case 0x7F:
+         c_Details =
+            C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NRC, 16));
+         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
          break;
       }
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                    mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                    c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    default:
       //Should not happen
@@ -1448,8 +1405,14 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
       break;
    }
 
+   C_OSCLoggingHandler::h_Flush();
+   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+                C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
+
+   c_Message.SetType(C_OgeWiCustomMessage::eERROR);
    c_Message.SetDescription(c_Description);
    c_Message.SetDetails(c_Details);
+   c_Message.SetCustomMinHeight(230, 300);
    c_Message.Execute();
 
    // Close dialog on error
@@ -1459,7 +1422,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle error for function "NvmSafeWriteCrcs"
 
-   \param[in] os32_ErrorCode Function result
+   \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_ErrorCode)
@@ -1481,18 +1444,10 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
    case C_CONFIG:
       c_Description += "No node or diagnostic protocol are known (was this class properly initialized?)\n";
       c_Description += "protocol driver reported configuration error (was the protocol driver properly initialized?)";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_CHECKSUM:
       c_Description += "At least one Datapool of type \"NVM\" has the flag q_IsSafety set to true and";
       c_Description += "at least one of its lists has the flag q_NvMCRCActive set to false.";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_RANGE:
       c_Description +=
@@ -1500,86 +1455,59 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
       c_Description +=
          "The count of lists of NVM Datapools of the copy of C_OSCNode differs from the original instance.\n";
       c_Description += "The count of the Datapools of the copy of C_OSCNode differs from the original instance.";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_BUSY:
       c_Description += "No list contains Datapool elements that were";
       c_Description += "written by the preceding call to \"NvmSafeWriteChangedValues\"";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_OVERFLOW:
       c_Description += "At least one changed list has no elements.";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_DEFAULT:
       c_Description += "At least one element of the changed lists has the flag q_IsValid set to false.";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Expected server response not received within timeout";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_NOACT:
       c_Description += "Could not send request (e.g. Tx buffer full)";
       break;
+   // Using <br/> as new line symbol instead of \n due to problems with the h_GetLink syntax
    case C_WARN:
       c_Description += "Server sent error response";
       switch (u8_NRC)
       {
       case 0x13:
-         c_Details = C_GtGetText::h_GetText("Incorrect length of request");
+         c_Details = C_GtGetText::h_GetText("Incorrect length of request<br/>");
          break;
       case 0x31:
-         c_Details = C_GtGetText::h_GetText("Address or length format invalid (> 4 bytes)\n"
-                                            "Requested memory range specified by address and size invalid");
+         c_Details = C_GtGetText::h_GetText("Address or length format invalid (> 4 bytes)<br/>"
+                                            "Requested memory range specified by address and size invalid<br/>");
          break;
       case 0x72:
-         c_Details = C_GtGetText::h_GetText("Server writing NVM failed");
+         c_Details = C_GtGetText::h_GetText("Server writing NVM failed<br/>");
          break;
       case 0x33:
-         c_Details = C_GtGetText::h_GetText("Required security level was not unlocked");
+         c_Details = C_GtGetText::h_GetText("Required security level was not unlocked<br/>");
          break;
       case 0x14:
          c_Details =
-            C_GtGetText::h_GetText("The total length of the response message exceeds the available buffer size");
+            C_GtGetText::h_GetText("The total length of the response message exceeds the available buffer size<br/>");
+         break;
+      case 0x7F:
+         c_Details =
+            C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NRC, 16));
+         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
          break;
       }
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                    mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                    c_Log);
       break;
    case C_RD_WR:
       c_Description += "Unexpected content in server response";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    default:
       //Should not happen
@@ -1587,8 +1515,14 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
       break;
    }
 
+   C_OSCLoggingHandler::h_Flush();
+   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+                C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
+
+   c_Message.SetType(C_OgeWiCustomMessage::eERROR);
    c_Message.SetDescription(c_Description);
    c_Message.SetDetails(c_Details);
+   c_Message.SetCustomMinHeight(250, 300);
    c_Message.Execute();
 
    // Close dialog on error
@@ -1598,7 +1532,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle error for function "NvmNotifyOfChanges"
 
-   \param[in] os32_ErrorCode Function result
+   \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_ErrorCode)
@@ -1620,24 +1554,12 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
    case C_CONFIG:
       c_Description += "No node or diagnostic protocol are known (was this class properly initialized?)\n";
       c_Description += "Protocol driver reported configuration error (was the protocol driver properly initialized?)";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Expected server response not received within timeout";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_NOACT:
       c_Description += "Could not send request (e.g. Tx buffer full)";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_WARN:
       c_Description += "Server sent error response";
@@ -1652,10 +1574,6 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
       case 0x33:
          c_Details = C_GtGetText::h_GetText("Required security level was not unlocked");
          break;
-      case 0x7F:
-         c_Details = C_GtGetText::h_GetText("The requested service is not available in the currently active session.\n"
-                                            "RoutineControl identifier is not available");
-         break;
       case 0x12:
          c_Details = C_GtGetText::h_GetText(
             "RoutineControl sub-function (= routineControlType) not supported for this routine identifier "
@@ -1665,28 +1583,20 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
          c_Details =
             C_GtGetText::h_GetText("The total length of the response message exceeds the available buffer size");
          break;
+      case 0x7F:
+         c_Details =
+            C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
+         break;
       default:
          c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NRC, 16));
          break;
       }
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                    mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                    c_Log);
       break;
    case C_RD_WR:
       c_Description += "Unexpected content in server response (here: wrong Datapool index)";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
-                                                                                                  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  c_Log);
       break;
    default:
       //Should not happen
@@ -1694,8 +1604,14 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
       break;
    }
 
+   C_OSCLoggingHandler::h_Flush();
+   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+                C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
+
+   c_Message.SetType(C_OgeWiCustomMessage::eERROR);
    c_Message.SetDescription(c_Description);
    c_Message.SetDetails(c_Details);
+   c_Message.SetCustomMinHeight(250, 300);
    c_Message.Execute();
 
    // Close dialog on error
@@ -1732,7 +1648,7 @@ QString C_SyvDaItPaWriteWidget::m_ReadAndStoreUpdatedValues(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get list name (and containers) as string
 
-   \param[in] orc_Id List ID
+   \param[in]  orc_Id   List ID
 
    \return
    List name (and containers) as string
@@ -1758,10 +1674,10 @@ QString C_SyvDaItPaWriteWidget::mh_GetId(const C_OSCNodeDataPoolListId & orc_Id)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get Element for specified ID from read values
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
 
    \return
    NULL Element not found

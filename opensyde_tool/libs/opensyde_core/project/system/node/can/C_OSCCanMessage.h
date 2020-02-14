@@ -31,6 +31,8 @@ class C_OSCCanMessage
 public:
    C_OSCCanMessage(void);
 
+   bool operator !=(const C_OSCCanMessage & orc_Cmp) const;
+
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
    bool CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const stw_types::uint32 & oru32_SignalIndex,
                          const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset) const;
@@ -70,9 +72,7 @@ public:
    stw_types::uint16 u16_DelayTimeMs; ///< Minimum time between transmission in ms. (aka not earlier than)
    ///< ONLY used if tx method is eTX_METHOD_ON_CHANGE
    stw_types::uint32 u32_TimeoutMs; ///< Maximum time between reception of two messages.
-   ///< Format is in milli seconds
-   ///< ONLY used if transmission trigger is eTX_METHOD_CYCLIC
-   ///< or eTX_METHOD_ON_CHANGE.
+   ///< Format is in milli seconds. If value is set to 0, monitoring is disabled.
    std::vector<C_OSCCanSignal> c_Signals; ///< Communication signals
 
 private:

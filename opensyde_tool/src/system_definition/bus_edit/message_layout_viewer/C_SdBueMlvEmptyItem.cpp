@@ -38,7 +38,8 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out]   opc_parent           Optional pointer to parent
+   \param[in]      ou8_Index     Index number
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvEmptyItem::C_SdBueMlvEmptyItem(const uint8 ou8_Index, QGraphicsItem * const opc_Parent) :
@@ -67,7 +68,7 @@ C_SdBueMlvEmptyItem::~C_SdBueMlvEmptyItem()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the index number for the text
 
-   \param[in]     ou8_Index       Index number
+   \param[in]  ou8_Index   Index number
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::SetIndex(const uint8 ou8_Index)
@@ -78,7 +79,7 @@ void C_SdBueMlvEmptyItem::SetIndex(const uint8 ou8_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the error state
 
-   \param[in]     oq_Error        Flag if error is active
+   \param[in]  oq_Error    Flag if error is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::SetError(const bool oq_Error)
@@ -114,7 +115,7 @@ void C_SdBueMlvEmptyItem::SetError(const bool oq_Error)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the active state
 
-   \param[in]     oq_Active        Flag if active state is active
+   \param[in]  oq_Active   Flag if active state is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::SetActive(const bool oq_Active)
@@ -170,7 +171,7 @@ void C_SdBueMlvEmptyItem::RestoreFontColor(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the flag for drawing the rectangle
 
-   \param[in]     oq_DrawBackground   Flag for drawing the rectangle
+   \param[in]  oq_DrawRectangle  Flag for drawing the rectangle
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::SetDrawRectangle(const bool oq_DrawRectangle)
@@ -189,9 +190,9 @@ void C_SdBueMlvEmptyItem::SetDrawRectangle(const bool oq_DrawRectangle)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten paint event slot
 
-   \param[in,out] opc_Painter Painter
-   \param[in,out] opc_Option  Option
-   \param[in,out] opc_Widget  Widget
+   \param[in,out]  opc_Painter   Painter
+   \param[in,out]  opc_Option    Option
+   \param[in,out]  opc_Widget    Widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,

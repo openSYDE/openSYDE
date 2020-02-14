@@ -41,10 +41,10 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node file
+/*! \brief  Load node file
 
-   \param[out]    orc_Node      Data storage
-   \param[in]     orc_FilePath  File path
+   \param[out] orc_Node     Data storage
+   \param[in]  orc_FilePath File path
 
    \return
    C_NO_ERR   data read
@@ -78,7 +78,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node
+/*! \brief  Load node
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -137,7 +137,7 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node
+/*! \brief  Save node
 
    Save node to XML file
 
@@ -180,7 +180,7 @@ sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLStr
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node
+/*! \brief  Save node
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -219,7 +219,7 @@ sint32 C_OSCNodeFiler::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node com protocols
+/*! \brief  Load node com protocols
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "com-protocols"
@@ -304,7 +304,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node com protocols
+/*! \brief  Save node com protocols
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "com-protocols"
@@ -375,7 +375,7 @@ sint32 C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get automatically generated folder name
+/*! \brief  Get automatically generated folder name
 
    \param[in] orc_NodeName Node name
 
@@ -389,7 +389,7 @@ C_SCLString C_OSCNodeFiler::h_GetFolderName(const C_SCLString & orc_NodeName)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get automatically generated file name
+/*! \brief  Get automatically generated file name
 
    \return
    Automatically generated file name
@@ -401,7 +401,7 @@ C_SCLString C_OSCNodeFiler::h_GetFileName(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node properties
+/*! \brief  Load node properties
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -652,7 +652,7 @@ sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropertie
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node properties
+/*! \brief  Save node properties
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -746,7 +746,7 @@ void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePrope
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node STW flashloader settings
+/*! \brief  Load node STW flashloader settings
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "properties"
@@ -851,7 +851,7 @@ sint32 C_OSCNodeFiler::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSetti
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node STW flashloader settings
+/*! \brief  Save node STW flashloader settings
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "properties"
@@ -887,7 +887,7 @@ void C_OSCNodeFiler::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderS
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node applications
+/*! \brief  Load node applications
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -1082,7 +1082,7 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node applications
+/*! \brief  Save node applications
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -1121,7 +1121,7 @@ void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication>
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pools
+/*! \brief  Load node data pools
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -1215,7 +1215,7 @@ sint32 C_OSCNodeFiler::mh_LoadDataPools(C_OSCNode & orc_Node, C_OSCXMLParserBase
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pools
+/*! \brief  Save node data pools
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -1272,7 +1272,7 @@ sint32 C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform diagnostic server type to string
+/*! \brief  Transform diagnostic server type to string
 
    \param[in] ore_DiagnosticProtocol Diagnostic protocol type
 
@@ -1304,7 +1304,7 @@ C_SCLString C_OSCNodeFiler::mh_DiagnosticServerToString(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform string to diagnostic server type
+/*! \brief  Transform string to diagnostic server type
 
    \param[in]  orc_String String to interpret
    \param[out] ore_Type   Diagnostic server type
@@ -1342,7 +1342,7 @@ sint32 C_OSCNodeFiler::mh_StringToDiagnosticServer(const C_SCLString & orc_Strin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform flash loader type to string
+/*! \brief  Transform flash loader type to string
 
    \param[in] ore_FlashLoader Flash loader type
 
@@ -1373,7 +1373,7 @@ C_SCLString C_OSCNodeFiler::mh_FlashLoaderToString(const C_OSCNodeProperties::E_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform string to flash loader type
+/*! \brief  Transform string to flash loader type
 
    \param[in]  orc_String String to interpret
    \param[out] ore_Type   Flash loader type

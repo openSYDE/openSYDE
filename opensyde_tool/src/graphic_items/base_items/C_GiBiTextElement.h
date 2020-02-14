@@ -40,7 +40,7 @@ public:
 
    virtual stw_types::sintn type() const override;
    bool OpenStyleDialog(const bool oq_DarkMode);
-   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem);
+   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem) override;
 
    virtual void RestoreDefaultCursor(void) override;
    virtual void SetTemporaryCursor(const QCursor & orc_TemporaryCursor) override;

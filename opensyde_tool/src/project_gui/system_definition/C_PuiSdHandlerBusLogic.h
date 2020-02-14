@@ -9,7 +9,7 @@
 #define C_PUISDHANDLERBUSLOGIC_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_PuiSdHandlerNodeLogic.h"
+#include "C_PuiSdHandlerHALC.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -19,7 +19,7 @@ namespace stw_opensyde_gui_logic
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSdHandlerBusLogic :
-   public C_PuiSdHandlerNodeLogic
+   public C_PuiSdHandlerHALC
 {
 public:
    //Bus general
@@ -150,13 +150,13 @@ public:
                                    const stw_opensyde_core::C_OSCCanMessage & orc_Message, const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement>
                                    & orc_OSCSignalCommons,
                                    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                   const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
+                                   const C_PuiSdNodeCanMessage & orc_UIMessage,
                                    const bool & orq_AutomatedPropertiesAdaption);
    stw_types::sint32 InsertCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                       const stw_opensyde_core::C_OSCCanMessage & orc_Message, const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement>
                                       & orc_OSCSignalCommons,
                                       const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                      const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
+                                      const C_PuiSdNodeCanMessage & orc_UIMessage,
                                       const bool & orq_AutomatedPropertiesAdaption);
    stw_types::sint32 DeleteCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    stw_types::sint32 AddCanSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -189,9 +189,12 @@ public:
 protected:
    C_PuiSdHandlerBusLogic(QObject * const opc_Parent = NULL);
 
+   void m_GetExistingMessageNamesProtocol(const stw_types::uint32 & oru32_NodeIndex,
+                                          const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType,
+                                          const stw_types::uint32 & oru32_InterfaceIndex, std::map<stw_scl::C_SCLString, bool>
+                                          & orc_ExistingNames) const;
    std::map<stw_scl::C_SCLString, bool> m_GetExistingMessageNames(const stw_types::uint32 & oru32_NodeIndex,
-                                                                  const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType, const stw_types::uint32 & oru32_InterfaceIndex)
-   const;
+                                                                  const stw_types::uint32 & oru32_InterfaceIndex) const;
    std::map<stw_scl::C_SCLString, bool> m_GetExistingSignalNames(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    C_PuiSdNodeCanProtocol * m_GetUiCanProtocol(const stw_types::uint32 & oru32_NodeIndex,
@@ -202,7 +205,7 @@ protected:
    const;
    stw_types::sint32 m_InsertUiCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                           const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                          const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals);
+                                          const C_PuiSdNodeCanMessage & orc_UIMessage);
    stw_types::sint32 m_DeleteUiCanMessage(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
 };

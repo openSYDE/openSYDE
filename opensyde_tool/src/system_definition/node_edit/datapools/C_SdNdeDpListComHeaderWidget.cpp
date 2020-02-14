@@ -56,11 +56,10 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_Parent              Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListComHeaderWidget::C_SdNdeDpListComHeaderWidget(const uint32 ou32_NodeIndex,
-                                                                       const uint32 ou32_DataPoolIndex,
-                                                                       const uint32 ou32_ListIndex,
-                                                                       const bool & orq_UseAlternatingColor,
-                                                                       QWidget * const opc_Parent) :
+C_SdNdeDpListComHeaderWidget::C_SdNdeDpListComHeaderWidget(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                           const uint32 ou32_ListIndex,
+                                                           const bool & orq_UseAlternatingColor,
+                                                           QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListComHeaderWidget),
    mu32_NodeIndex(ou32_NodeIndex),
@@ -96,19 +95,12 @@ C_SdNdeDpListComHeaderWidget::C_SdNdeDpListComHeaderWidget(const uint32 ou32_Nod
            &C_SdNdeDpListComHeaderWidget::m_OnLinkSwitchToBus);
 
    // edit
-   this->mpc_Ui->pc_PushButtonEdit->SetCustomIcons("://images/IconEditActive.svg", "://images/IconEditHovered.svg",
+   this->mpc_Ui->pc_PushButtonEdit->SetCustomIcons("://images/IconEditActive.svg",
+                                                   "://images/IconEditHovered.svg",
                                                    "://images/IconEditClicked.svg",
                                                    "://images/IconEditDisabledBright.svg");
    connect(this->mpc_Ui->pc_PushButtonEdit, &QPushButton::clicked, this,
            &C_SdNdeDpListComHeaderWidget::m_OnLinkEdit);
-
-   // file import
-   this->mpc_Ui->pc_PushButtonImport->SetCustomIcons("://images/IconImportFile.svg",  // enabled
-                                                     "://images/IconImportFile.svg",  // TODO: hovered
-                                                     "://images/IconImportFile.svg",  // TODO: clicked
-                                                     "://images/IconImportFile.svg"); // TODO: disabled
-   connect(this->mpc_Ui->pc_PushButtonImport, &QPushButton::clicked, this,
-           &C_SdNdeDpListComHeaderWidget::m_OnLinkFileImport);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,11 +122,6 @@ void C_SdNdeDpListComHeaderWidget::InitStaticNames(void)
 {
    this->mpc_Ui->pc_LabelConnected->setText(C_GtGetText::h_GetText("Used on: "));
    this->mpc_Ui->pc_LabelNotConnected->setText(C_GtGetText::h_GetText("Not used"));
-
-   //Tool tips
-   this->mpc_Ui->pc_PushButtonImport->SetToolTipInformation(C_GtGetText::h_GetText("Import"),
-                                                            C_GtGetText::h_GetText(
-                                                               "Import messages and signals from standard file formats (*.dbc, *.eds, *.dcf)"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -279,7 +266,7 @@ void C_SdNdeDpListComHeaderWidget::UpdateMessagesAndSignals(void) const
                {
                   this->mpc_Ui->pc_LabelListError->setVisible(false);
                }
-               Q_EMIT this->SigErrorChange();
+               Q_EMIT (this->SigErrorChange());
             }
          }
       }
@@ -449,26 +436,5 @@ void C_SdNdeDpListComHeaderWidget::m_OnLinkSwitchToBus(void)
             }
          }
       }
-   }
-}
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Forward signal
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListComHeaderWidget::m_OnLinkFileImport(void)
-{
-   sint32 s32_Return = C_NOACT;
-
-   s32_Return =
-      C_CieUtil::h_ImportFile(this->mu32_NodeIndex,
-                              C_PuiSdUtil::h_GetRelatedCANProtocolType(this->mu32_NodeIndex, this->mu32_DataPoolIndex),
-                              this->mu32_DataPoolIndex,
-                              (this->mu32_ListIndex / 2), // divide by factor 2 because of Tx/Rx
-                              this->parentWidget()->parentWidget()->parentWidget()->parentWidget()->parentWidget());
-   // parent of parent of ... because of style issues
-
-   if (s32_Return == C_NO_ERR)
-   {
-      this->UpdateMessagesAndSignals();
    }
 }

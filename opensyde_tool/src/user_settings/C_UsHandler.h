@@ -20,6 +20,8 @@
 #include <QPoint>
 #include <QSize>
 #include <QMap>
+#include <QVector>
+#include <QColor>
 #include "stwtypes.h"
 #include "C_UsCommunication.h"
 #include "C_UsNode.h"
@@ -61,6 +63,8 @@ public:
    stw_types::sint32 GetSdBusEditLayoutSplitterX(void) const;
    static stw_types::uint8 GetMaxRecentProjects(void);
    QString GetCurrentSaveAsPath(void) const;
+   QVector<QColor> GetRecentColors(void) const;
+   stw_types::sintn GetNextRecentColorButtonNumber(void) const;
 
    void GetMostRecentFolder(QString & orc_Str) const;
    void GetRecentFolders(QStringList & orc_Folders) const;
@@ -107,6 +111,8 @@ public:
    void SetSdBusEditLayoutSplitterX(const stw_types::sint32 os32_Value);
    void SetSdTopologyToolboxMaximized(const bool & orq_New);
    void SetCurrentSaveAsPath(const QString & orc_Value);
+   void SetRecentColors(const QVector<QColor> & orc_RecentColorsVector);
+   void SetNextRecentColorButtonNumber(const stw_types::sintn & orc_NextRecentColorButtonNumber);
 
    void AddToRecentProjects(const QString & orc_Str);
    void RemoveOfRecentProjects(const QString & orc_Str);
@@ -205,6 +211,8 @@ private:
                                                          // are available
    QString mc_Lang;                                      ///< Current language
    QString mc_CurrentSaveAsPath;                         ///< Current save as base path
+   QVector<QColor> mc_RecentColors;                      ///< Recent colors from color picker
+   stw_types::sintn msn_NextRecentColorButtonNumber;     ///< Next recent color button for color from color picker
    QStringList mc_RecentProjects;                        ///< Unique history of recent projects
    QPoint mc_ScreenPos;                                  ///< History of last known screen position
    QSize mc_AppSize;                                     ///< History of last known openSyde window size

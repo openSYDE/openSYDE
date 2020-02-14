@@ -25,7 +25,8 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_CieImportReportWidget.h"
-#include "C_CieDBCImportNodeSelectWidget.h"
+#include "C_CieDbcImportNodeAssignmentWidget.h"
+#include "C_CieDcfEdsImportNodeSelectWidget.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_CieDataPoolListAdapter.h"
 #include "C_OSCImportEdsDcf.h"
@@ -43,6 +44,7 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const QSize C_CieUtil::mhc_SIZE_REPORT(1210, 790);
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -67,29 +69,27 @@ C_CieUtil::C_CieUtil(void)
 
    Supported are dbc, eds and dcf files.
 
-   \param[in]  ou32_NodeIndex        Index of node in system definition
-   \param[in]  oe_ProtocolType       Type of comm protocol
-   \param[in]  os32_DataPoolIndex    Index of node comm datapool (-1 if unknown)
-   \param[in]  ou32_InterfaceIndex   Index of node communication interface
-   \param[in]  opc_Parent            Parent for dialog
+   \param[in]     ou32_BusIndex           Index of bus in system definition
+   \param[in]     oe_ProtocolType         Type of comm protocol
+   \param[in]     opc_Parent              Parent for dialog
+   \param[out]    orc_NodeIndexes         Node indexes that got messages
+   \param[out]    orc_InterfaceIndexes    Interface indexes that got messages
 
    \return
    C_NO_ERR    File imported
    C_NOACT     Nothing done, aborted by user
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const C_OSCCanProtocol::E_Type oe_ProtocolType,
-                               const sint32 os32_DataPoolIndex, const uint32 ou32_InterfaceIndex,
-                               QWidget * const opc_Parent)
+sint32 C_CieUtil::h_ImportFile(const uint32 ou32_BusIndex, const C_OSCCanProtocol::E_Type oe_ProtocolType,
+                               QWidget * const opc_Parent, std::vector<uint32> & orc_NodeIndexes,
+                               std::vector<uint32> & orc_InterfaceIndexes)
 {
    //Load user settings value
    QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownImportPath();
    // open file selector with DBC filter
-   const QString c_FilterName = QString(C_GtGetText::h_GetText("openSYDE Import")) + " (*.dbc *.eds *.dcf)";
-   QString c_FullFilePath;
+   const QString c_Filter = QString(C_GtGetText::h_GetText("COMM Interface Description Files")) +
+                            " (*.dbc *.eds *.dcf)";
    sint32 s32_Return = C_NOACT;
-
-   const QSize c_SizeImportReport(1210, 790);
 
    //Replace default path if necessary
    if (c_Folder.compare("") == 0)
@@ -97,241 +97,41 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const C_OSCCanProtoc
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
 
-   c_FullFilePath =
-      C_OgeWiUtil::h_GetSaveFileName(opc_Parent, C_GtGetText::h_GetText("Select File for openSYDE Import"), c_Folder,
-                                     c_FilterName, "", QFileDialog::DontConfirmOverwrite);
+   QFileDialog c_Dialog(opc_Parent, C_GtGetText::h_GetText(
+                           "Select COMM Interface Description File"), c_Folder, c_Filter);
+   c_Dialog.setDefaultSuffix("*.dbc");
 
-   // check for user abort (empty string)
-   if (c_FullFilePath != "")
+   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      const QFileInfo c_FileInfo(c_FullFilePath);
-      //Only use lower case suffix
-      const QString c_Extension = c_FileInfo.completeSuffix().toLower();
-      //Store new user settings value
-      C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownImportPath(c_FileInfo.absoluteDir().absolutePath());
-      if (c_Extension.contains("dbc") == true)
+      const QString c_FullFilePath = c_Dialog.selectedFiles().at(0);
+
+      // check for user abort (empty string)
+      if (c_FullFilePath != "")
       {
-         sint32 s32_ImportReturn;
-         C_CieConverter::C_CIECommDefinition c_CommDef;
-         stw_scl::C_SCLStringList c_WarningMessages;
-         stw_scl::C_SCLString c_ErrorMessage;
-
-         // import network of DBC file
-         QApplication::setOverrideCursor(Qt::WaitCursor); // big DBC file can take some time to load
-         QApplication::processEvents();                   // update cursor
-         s32_ImportReturn = C_CieImportDbc::h_ImportNetwork(c_FullFilePath.toStdString().c_str(),
-                                                            c_CommDef,
-                                                            c_WarningMessages,
-                                                            c_ErrorMessage, false);
-         QApplication::restoreOverrideCursor(); // get old cursor again
-         QApplication::processEvents();         // update cursor
-
-         if ((s32_ImportReturn == stw_errors::C_NO_ERR) || (s32_ImportReturn == stw_errors::C_WARN))
+         const QFileInfo c_FileInfo(c_FullFilePath);
+         //Only use lower case suffix
+         const QString c_Extension = c_FileInfo.completeSuffix().toLower();
+         //Store new user settings value
+         C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownImportPath(c_FileInfo.absoluteDir().absolutePath());
+         if (c_Extension.contains("dbc") == true)
          {
-            if (c_CommDef.c_Nodes.size() > 0UL)
-            {
-               if ((s32_ImportReturn == stw_errors::C_WARN) && (c_WarningMessages.GetCount() > 0))
-               {
-                  // display global warning messages
-                  QString c_Warnings;
-                  for (uint32 u32_Pos = 0; u32_Pos < c_WarningMessages.GetCount(); u32_Pos++)
-                  {
-                     c_Warnings += c_WarningMessages.Strings[u32_Pos].c_str();
-                     c_Warnings += "\n";
-                  }
-                  C_OgeWiCustomMessage c_ImportWarnings(opc_Parent, C_OgeWiCustomMessage::E_Type::eWARNING);
-                  c_ImportWarnings.SetHeading(C_GtGetText::h_GetText("DBC file import"));
-                  c_ImportWarnings.SetDescription(C_GtGetText::h_GetText("Warnings occurred during DBC file import."));
-                  c_ImportWarnings.SetDetails(c_Warnings);
-                  c_ImportWarnings.SetCustomMinWidth(750);
-                  c_ImportWarnings.SetCustomMinHeight(400);
-                  c_ImportWarnings.Execute();
-               }
-
-               // create node selector
-               QPointer<C_OgePopUpDialog> const c_PopUpDialogNodeSelection =
-                  new C_OgePopUpDialog(opc_Parent, opc_Parent);
-               C_CieDBCImportNodeSelectWidget * const pc_DialogNodeSelection =
-                  new C_CieDBCImportNodeSelectWidget(*c_PopUpDialogNodeSelection, c_CommDef);
-
-               // resize node selector
-               c_PopUpDialogNodeSelection->SetSize(QSize(600, 380));
-
-               // display node selector
-               if (c_PopUpDialogNodeSelection->exec() == static_cast<sintn>(QDialog::Accepted))
-               {
-                  // get node position
-                  sint32 s32_NodePos = pc_DialogNodeSelection->GetNodeSelection();
-                  if (s32_NodePos > -1)
-                  {
-                     // assign node messages and signals
-                     C_CieConverter::C_CIENode c_CIENode = c_CommDef.c_Nodes[s32_NodePos];
-                     // get openSYDE Ui data pool list structure
-                     C_CieDataPoolListStructure c_DataPoolStructure =
-                        C_CieDataPoolListAdapter::h_GetStructureFromDBCFileImport(c_CIENode);
-
-                     // create message report for user
-                     QPointer<C_OgePopUpDialog> const c_PopUpDialogReportDialog = new C_OgePopUpDialog(opc_Parent,
-                                                                                                       opc_Parent);
-                     C_CieImportReportWidget * const pc_DialogImportReport =
-                        new C_CieImportReportWidget(*c_PopUpDialogReportDialog, ou32_NodeIndex, oe_ProtocolType,
-                                                    os32_DataPoolIndex, ou32_InterfaceIndex, c_FullFilePath);
-
-                     //Hide previous overlay before showing the next one
-                     c_PopUpDialogNodeSelection->HideOverlay();
-
-                     // init message report
-                     tgl_assert(pc_DialogImportReport->SetMessageData(c_DataPoolStructure) == C_NO_ERR);
-
-                     // resize
-                     c_PopUpDialogReportDialog->SetSize(c_SizeImportReport);
-
-                     // display message report
-                     if (c_PopUpDialogReportDialog->exec() == static_cast<sintn>(QDialog::Accepted))
-                     {
-                        s32_Return = C_NO_ERR;
-                     }
-
-                     if (c_PopUpDialogReportDialog != NULL)
-                     {
-                        c_PopUpDialogReportDialog->HideOverlay();
-                     }
-                     //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-                  }
-               }
-               if (c_PopUpDialogNodeSelection != NULL)
-               {
-                  c_PopUpDialogNodeSelection->HideOverlay();
-               }
-               //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-            }
-            else
-            {
-               C_OgeWiCustomMessage c_NodesError(opc_Parent, C_OgeWiCustomMessage::eERROR);
-               c_NodesError.SetHeading(C_GtGetText::h_GetText("DBC file import"));
-               c_NodesError.SetDescription(C_GtGetText::h_GetText("No nodes found in selected DBC file."));
-               c_NodesError.Execute();
-            }
+            s32_Return = C_CieUtil::mh_ImportDBCFile(ou32_BusIndex, oe_ProtocolType, c_FullFilePath, opc_Parent,
+                                                     orc_NodeIndexes, orc_InterfaceIndexes);
+         }
+         else if ((c_Extension.contains("eds") == true) || (c_Extension.contains("dcf") == true))
+         {
+            s32_Return = C_CieUtil::mh_ImportDCFEDSFile(ou32_BusIndex, oe_ProtocolType, c_FullFilePath, opc_Parent,
+                                                        orc_NodeIndexes, orc_InterfaceIndexes);
          }
          else
          {
-            // display error message to user
-            QString c_ErrorMsg =  c_ErrorMessage.c_str();
-            C_OgeWiCustomMessage c_MessageResult(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
-            c_MessageResult.SetHeading(C_GtGetText::h_GetText("DBC file import"));
-            c_MessageResult.SetDescription(C_GtGetText::h_GetText("DBC file import error occurred."));
-            c_MessageResult.SetDetails(C_GtGetText::h_GetText("Error code: \n") +
-                                       QString::number(s32_ImportReturn) +
-                                       C_GtGetText::h_GetText("\nError message(s):\n") +
-                                       c_ErrorMsg);
-            c_MessageResult.Execute();
+            // strange
+            C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
+            c_Message.SetHeading(C_GtGetText::h_GetText("Import from File"));
+            c_Message.SetDescription(C_GtGetText::h_GetText("File type not allowed."));
+            c_Message.SetCustomMinHeight(180, 180);
+            c_Message.Execute();
          }
-      }
-      else if ((c_Extension.contains("eds") == true) || (c_Extension.contains("dcf") == true))
-      {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-
-         tgl_assert(pc_Node != NULL);
-         if (pc_Node != NULL)
-         {
-            tgl_assert(ou32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size());
-            if (ou32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size())
-            {
-               const C_OSCNodeComInterfaceSettings & rc_CurInterface =
-                  pc_Node->c_Properties.c_ComInterfaces[ou32_InterfaceIndex];
-               stw_scl::C_SCLString c_ParsingError;
-               std::vector<C_OSCCanMessage> c_OSCRxMessageData;
-               std::vector<C_OSCNodeDataPoolListElement> c_OSCRxSignalData;
-               std::vector<C_OSCCanMessage> c_OSCTxMessageData;
-               std::vector<C_OSCNodeDataPoolListElement> c_OSCTxSignalData;
-               std::vector<std::vector<stw_scl::C_SCLString> > c_ImportMessagesPerMessage;
-               const sint32 s32_ImportResult = C_OSCImportEdsDcf::h_Import(
-                  c_FullFilePath.toStdString().c_str(), rc_CurInterface.u8_NodeID, c_OSCRxMessageData,
-                  c_OSCRxSignalData, c_OSCTxMessageData, c_OSCTxSignalData, c_ImportMessagesPerMessage,
-                  c_ParsingError);
-               if (s32_ImportResult == C_NO_ERR)
-               {
-                  const C_CieDataPoolListStructure c_DataPoolStructure =
-                     C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDSFileImport(c_OSCRxMessageData,
-                                                                                     c_OSCRxSignalData,
-                                                                                     c_OSCTxMessageData,
-                                                                                     c_OSCTxSignalData,
-                                                                                     c_ImportMessagesPerMessage);
-                  if ((c_DataPoolStructure.c_Core.c_OSCRxMessageData.size() > 0UL) ||
-                      (c_DataPoolStructure.c_Core.c_OSCTxMessageData.size() > 0UL))
-                  {
-                     QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(opc_Parent, opc_Parent);
-                     C_CieImportReportWidget * const pc_Dialog =
-                        new C_CieImportReportWidget(*c_New, ou32_NodeIndex, oe_ProtocolType, os32_DataPoolIndex,
-                                                    ou32_InterfaceIndex, c_FullFilePath);
-
-                     //Init
-                     tgl_assert(pc_Dialog->SetMessageData(c_DataPoolStructure) == C_NO_ERR);
-                     //Resize
-                     c_New->SetSize(c_SizeImportReport);
-
-                     if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
-                     {
-                        s32_Return = C_NO_ERR;
-                     }
-
-                     if (c_New != NULL)
-                     {
-                        c_New->HideOverlay();
-                     }
-                     //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-                  }
-                  else
-                  {
-                     C_OgeWiCustomMessage c_Message(opc_Parent);
-                     c_Message.SetHeading(C_GtGetText::h_GetText("Nothing found"));
-                     c_Message.SetDescription(C_GtGetText::h_GetText("No messages found in file."));
-                     c_Message.Execute();
-                  }
-               }
-               else
-               {
-                  C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
-                  c_Message.SetHeading(C_GtGetText::h_GetText("Import from file"));
-                  switch (s32_ImportResult)
-                  {
-                  case C_RANGE:
-                     c_Message.SetDescription(C_GtGetText::h_GetText("Invalid parameter."));
-                     c_Message.SetDetails(QString(c_ParsingError.c_str()));
-                     break;
-                  case C_NOACT:
-                     c_Message.SetDescription(QString(C_GtGetText::h_GetText(
-                                                         "EDS file import failed.\nNode ID %1 is invalid.")).arg(
-                                                 rc_CurInterface.u8_NodeID));
-                     c_Message.SetDetails(C_GtGetText::h_GetText("CANopen standard only supports node IDs in the range "
-                                                                 "of 1 to 127.\nThe node ID can be changed in node "
-                                                                 "properties."));
-                     break;
-                  case C_CONFIG:
-                     c_Message.SetDescription(C_GtGetText::h_GetText("An error occured while parsing."));
-                     //Update log file
-                     C_OSCLoggingHandler::h_Flush();
-                     c_Message.SetDetails(QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
-                                          arg(C_GtGetText::h_GetText("For more information see ")).
-                                          arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
-                                          arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                                          arg(C_GtGetText::h_GetText("log file")));
-                     break;
-                  default:
-                     c_Message.SetDescription(C_GtGetText::h_GetText("Unknown reason."));
-                     break;
-                  }
-                  c_Message.Execute();
-               }
-            }
-         }
-      }
-      else
-      {
-         // strange
-         C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
-         c_Message.SetDescription(C_GtGetText::h_GetText("File type not allowed."));
-         c_Message.Execute();
       }
    }
 
@@ -454,8 +254,7 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
                pc_DialogExportReport->SetMessageData(c_NodeMapping, c_ExportStatistic, c_Warnings);
 
                // resize
-               const QSize c_SizeImportReport(1210, 790);
-               c_PopUpDialogReportDialog->SetSize(c_SizeImportReport);
+               c_PopUpDialogReportDialog->SetSize(mhc_SIZE_REPORT);
 
                // display message report
                if (c_PopUpDialogReportDialog->exec() == static_cast<sintn>(QDialog::Accepted))
@@ -476,6 +275,7 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
             c_ExportError.SetHeading(C_GtGetText::h_GetText("DBC file export"));
             c_ExportError.SetDescription(C_GtGetText::h_GetText("There occurred an error on DBC file export."));
             c_ExportError.SetDetails(c_Error.c_str());
+            c_ExportError.SetCustomMinHeight(180, 250);
             c_ExportError.Execute();
          }
       }
@@ -484,7 +284,323 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
          C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
          c_Message.SetDescription(C_GtGetText::h_GetText("The specified file has the wrong extension, use: \".dbc\"."));
          c_Message.SetDetails(QString("Invalid extension: \"%1\"").arg("." + c_Extension));
+         c_Message.SetCustomMinHeight(180, 250);
          c_Message.Execute();
+      }
+   }
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Import a DBC file
+
+   File path is assumed to be absolute and non empty.
+
+   \param[in]     ou32_BusIndex           Index of bus in system definition
+   \param[in]     oe_ProtocolType         Type of comm protocol
+   \param[in]     orc_FullFilePath        Absolute file path to dbc file
+   \param[in]     opc_Parent              Parent for dialog
+   \param[out]    orc_NodeIndexes         Node indexes that got messages
+   \param[out]    orc_InterfaceIndexes    Interface indexes that got messages
+
+   \return
+   C_NO_ERR    File imported
+   C_NOACT     Nothing done, aborted by user
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_CieUtil::mh_ImportDBCFile(const uint32 ou32_BusIndex, const C_OSCCanProtocol::E_Type oe_ProtocolType,
+                                   const QString & orc_FullFilePath, QWidget * const opc_Parent,
+                                   std::vector<uint32> & orc_NodeIndexes, std::vector<uint32> & orc_InterfaceIndexes)
+{
+   sint32 s32_Return = C_NOACT;
+   sint32 s32_ImportReturn;
+
+   C_CieConverter::C_CIECommDefinition c_CommDef;
+   stw_scl::C_SCLStringList c_WarningMessages;
+   stw_scl::C_SCLString c_ErrorMessage;
+
+   // import network of DBC file
+   QApplication::setOverrideCursor(Qt::WaitCursor); // big DBC file can take some time to load
+   QApplication::processEvents();                   // update cursor
+   s32_ImportReturn = C_CieImportDbc::h_ImportNetwork(orc_FullFilePath.toStdString().c_str(),
+                                                      c_CommDef, c_WarningMessages, c_ErrorMessage, true);
+   QApplication::restoreOverrideCursor(); // get old cursor again
+   QApplication::processEvents();         // update cursor
+
+   if ((s32_ImportReturn == stw_errors::C_NO_ERR) || (s32_ImportReturn == stw_errors::C_WARN))
+   {
+      if ((c_CommDef.c_Nodes.size() == 0UL) && (c_CommDef.c_UnmappedMessages.size() == 0UL))
+
+      {
+         C_OgeWiCustomMessage c_NodesError(opc_Parent, C_OgeWiCustomMessage::eERROR);
+         c_NodesError.SetHeading(C_GtGetText::h_GetText("DBC file import"));
+         c_NodesError.SetDescription(C_GtGetText::h_GetText("No nodes or messages found in selected DBC file."));
+         c_NodesError.SetCustomMinHeight(180, 180);
+         c_NodesError.Execute();
+      }
+      else
+      {
+         if ((s32_ImportReturn == stw_errors::C_WARN) && (c_WarningMessages.GetCount() > 0))
+         {
+            // display global warning messages
+            QString c_Warnings;
+            for (uint32 u32_Pos = 0; u32_Pos < c_WarningMessages.GetCount(); u32_Pos++)
+            {
+               c_Warnings += c_WarningMessages.Strings[u32_Pos].c_str();
+               c_Warnings += "\n";
+            }
+            C_OgeWiCustomMessage c_ImportWarnings(opc_Parent, C_OgeWiCustomMessage::E_Type::eWARNING);
+            c_ImportWarnings.SetHeading(C_GtGetText::h_GetText("DBC file import"));
+            c_ImportWarnings.SetDescription(C_GtGetText::h_GetText("Warnings occurred during DBC file import."));
+            c_ImportWarnings.SetDetails(c_Warnings);
+            c_ImportWarnings.SetCustomMinWidth(750);
+            c_ImportWarnings.SetCustomMinHeight(180, 400);
+            c_ImportWarnings.Execute();
+         }
+
+         // create node assignment popup
+         QPointer<C_OgePopUpDialog> const c_PopUpDialogNodeAssignment =
+            new C_OgePopUpDialog(opc_Parent, opc_Parent);
+         C_CieDbcImportNodeAssignmentWidget * const pc_DialogNodeSelection =
+            new C_CieDbcImportNodeAssignmentWidget(*c_PopUpDialogNodeAssignment, orc_FullFilePath, ou32_BusIndex,
+                                                   c_CommDef);
+
+         c_PopUpDialogNodeAssignment->SetSize(QSize(740, 770));
+
+         // display node assignment popup
+         if (c_PopUpDialogNodeAssignment->exec() == static_cast<sintn>(QDialog::Accepted))
+         {
+            const std::vector<C_CieDbcOsyNodeAssignment> c_DbcNodeAssignment =
+               pc_DialogNodeSelection->GetNodeAssignments();
+            std::vector<C_CieDbcOsyNodeAssignment>::const_iterator c_It;
+            std::vector<C_CieImportDataAssignment> c_NodeAssignmentsConverted;
+
+            for (c_It = c_DbcNodeAssignment.begin(); c_It != c_DbcNodeAssignment.end(); ++c_It)
+            {
+               const C_CieDbcOsyNodeAssignment & rc_CurrentAssignment = *c_It;
+
+               // get openSYDE Ui data pool list structure
+               C_CieImportDataAssignment c_NodeAssignmentConverted;
+               c_NodeAssignmentConverted.c_ImportData =
+                  C_CieDataPoolListAdapter::h_GetStructureFromDBCFileImport(rc_CurrentAssignment.c_CieNode);
+               if ((rc_CurrentAssignment.s32_AssignedOsyNodeIndex >= 0) &&
+                   (rc_CurrentAssignment.s32_AssignedOsyInterfaceIndex >= 0))
+               {
+                  c_NodeAssignmentConverted.u32_OsyNodeIndex =
+                     static_cast<uint32>(rc_CurrentAssignment.s32_AssignedOsyNodeIndex);
+                  c_NodeAssignmentConverted.u32_OsyInterfaceIndex =
+                     static_cast<uint32>(rc_CurrentAssignment.s32_AssignedOsyInterfaceIndex);
+
+                  // add to output to forward information about which nodes should get active
+                  orc_NodeIndexes.push_back(c_NodeAssignmentConverted.u32_OsyNodeIndex);
+                  orc_InterfaceIndexes.push_back(c_NodeAssignmentConverted.u32_OsyInterfaceIndex);
+               }
+               else
+               {
+                  tgl_assert(false);
+               }
+
+               c_NodeAssignmentsConverted.push_back(c_NodeAssignmentConverted);
+            }
+
+            // create message report for user
+            QPointer<C_OgePopUpDialog> const c_PopUpDialogReportDialog =
+               new C_OgePopUpDialog(opc_Parent, opc_Parent);
+            C_CieImportReportWidget * const pc_DialogImportReport =
+               new C_CieImportReportWidget(*c_PopUpDialogReportDialog, orc_FullFilePath, ou32_BusIndex,
+                                           oe_ProtocolType, c_NodeAssignmentsConverted);
+
+            Q_UNUSED(pc_DialogImportReport);
+
+            //Hide previous overlay before showing the next one
+            c_PopUpDialogNodeAssignment->HideOverlay();
+
+            // resize
+            c_PopUpDialogReportDialog->SetSize(mhc_SIZE_REPORT);
+
+            // display message report
+            if (c_PopUpDialogReportDialog->exec() == static_cast<sintn>(QDialog::Accepted))
+            {
+               s32_Return = C_NO_ERR;
+            }
+
+            if (c_PopUpDialogReportDialog != NULL)
+            {
+               c_PopUpDialogReportDialog->HideOverlay();
+            }
+            //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
+         }
+         if (c_PopUpDialogNodeAssignment != NULL)
+         {
+            c_PopUpDialogNodeAssignment->HideOverlay();
+         }
+         //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
+      }
+   }
+   else
+   {
+      // display error message to user
+      QString c_ErrorMsg =  c_ErrorMessage.c_str();
+      C_OgeWiCustomMessage c_MessageResult(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
+      c_MessageResult.SetHeading(C_GtGetText::h_GetText("DBC file import"));
+      c_MessageResult.SetDescription(C_GtGetText::h_GetText("DBC file import error occurred."));
+      c_MessageResult.SetDetails(C_GtGetText::h_GetText("Error code: \n") +
+                                 QString::number(s32_ImportReturn) +
+                                 C_GtGetText::h_GetText("\nError message(s):\n") +
+                                 c_ErrorMsg);
+      c_MessageResult.SetCustomMinHeight(180, 300);
+      c_MessageResult.Execute();
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Import a DCF or EDS file
+
+   File path is assumed to be absolute and non empty.
+
+   \param[in]     ou32_BusIndex           Index of bus in system definition
+   \param[in]     oe_ProtocolType         Type of comm protocol
+   \param[in]     orc_FullFilePath        Absolute file path to dbc file
+   \param[in]     opc_Parent              Parent for dialog
+   \param[out]    orc_NodeIndexes         Node indexes that got messages
+   \param[out]    orc_InterfaceIndexes    Interface indexes that got messages
+
+   \return
+   C_NO_ERR    File imported
+   C_NOACT     Nothing done, aborted by user
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_CieUtil::mh_ImportDCFEDSFile(const uint32 ou32_BusIndex, const C_OSCCanProtocol::E_Type oe_ProtocolType,
+                                      const QString & orc_FullFilePath, QWidget * const opc_Parent,
+                                      std::vector<uint32> & orc_NodeIndexes, std::vector<uint32> & orc_InterfaceIndexes)
+{
+   sint32 s32_Return = C_NOACT;
+
+   // create node selection popup
+   QPointer<C_OgePopUpDialog> const c_PopUpDialog = new C_OgePopUpDialog(opc_Parent, opc_Parent);
+   C_CieDcfEdsImportNodeSelectWidget * const pc_DialogNodeSelection =
+      new C_CieDcfEdsImportNodeSelectWidget(*c_PopUpDialog, orc_FullFilePath, ou32_BusIndex);
+
+   Q_UNUSED(pc_DialogNodeSelection);
+
+   if (c_PopUpDialog->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      // Let user select node and interface
+      uint32 u32_NodeIndex = 0;
+      uint32 u32_InterfaceIndex = 0;
+      tgl_assert(pc_DialogNodeSelection->GetNodeSelection(u32_NodeIndex, u32_InterfaceIndex) == C_NO_ERR);
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+
+      // add to output to forward information about which nodes should get active
+      orc_NodeIndexes.push_back(u32_NodeIndex);
+      orc_InterfaceIndexes.push_back(u32_InterfaceIndex);
+
+      tgl_assert(pc_Node != NULL);
+      if (pc_Node != NULL)
+      {
+         tgl_assert(u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size());
+         if (u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size())
+         {
+            const C_OSCNodeComInterfaceSettings & rc_CurInterface =
+               pc_Node->c_Properties.c_ComInterfaces[u32_InterfaceIndex];
+            stw_scl::C_SCLString c_ParsingError;
+            std::vector<C_OSCCanMessage> c_OSCRxMessageData;
+            std::vector<C_OSCNodeDataPoolListElement> c_OSCRxSignalData;
+            std::vector<C_OSCCanMessage> c_OSCTxMessageData;
+            std::vector<C_OSCNodeDataPoolListElement> c_OSCTxSignalData;
+            std::vector<std::vector<stw_scl::C_SCLString> > c_ImportMessagesPerMessage;
+            const sint32 s32_ImportResult = C_OSCImportEdsDcf::h_Import(
+               orc_FullFilePath.toStdString().c_str(), rc_CurInterface.u8_NodeID, c_OSCRxMessageData,
+               c_OSCRxSignalData, c_OSCTxMessageData, c_OSCTxSignalData, c_ImportMessagesPerMessage,
+               c_ParsingError);
+            if (s32_ImportResult == C_NO_ERR)
+            {
+               C_CieImportDataAssignment c_NodeAssignment;
+               c_NodeAssignment.u32_OsyNodeIndex = u32_NodeIndex;
+               c_NodeAssignment.u32_OsyInterfaceIndex = u32_InterfaceIndex;
+               c_NodeAssignment.c_ImportData =
+                  C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDSFileImport(c_OSCRxMessageData,
+                                                                                  c_OSCRxSignalData,
+                                                                                  c_OSCTxMessageData,
+                                                                                  c_OSCTxSignalData,
+                                                                                  c_ImportMessagesPerMessage);
+               if ((c_NodeAssignment.c_ImportData.c_Core.c_OSCRxMessageData.size() > 0UL) ||
+                   (c_NodeAssignment.c_ImportData.c_Core.c_OSCTxMessageData.size() > 0UL))
+               {
+                  std::vector<C_CieImportDataAssignment> c_NodeAssignmentVector;
+                  c_NodeAssignmentVector.push_back(c_NodeAssignment);
+
+                  QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(opc_Parent, opc_Parent);
+                  C_CieImportReportWidget * const pc_Dialog =
+                     new C_CieImportReportWidget(*c_New, orc_FullFilePath, ou32_BusIndex, oe_ProtocolType,
+                                                 c_NodeAssignmentVector);
+
+                  Q_UNUSED(pc_Dialog);
+
+                  //Resize
+                  c_New->SetSize(mhc_SIZE_REPORT);
+
+                  if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+                  {
+                     s32_Return = C_NO_ERR;
+                  }
+
+                  if (c_New != NULL)
+                  {
+                     c_New->HideOverlay();
+                  }
+                  //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
+               }
+               else
+               {
+                  C_OgeWiCustomMessage c_Message(opc_Parent);
+                  c_Message.SetHeading(C_GtGetText::h_GetText("Nothing found"));
+                  c_Message.SetDescription(C_GtGetText::h_GetText("No messages found in file."));
+                  c_Message.SetCustomMinHeight(180, 180);
+                  c_Message.Execute();
+               }
+            }
+            else
+            {
+               C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
+               c_Message.SetHeading(C_GtGetText::h_GetText("Import from file"));
+               switch (s32_ImportResult)
+               {
+               case C_RANGE:
+                  c_Message.SetDescription(C_GtGetText::h_GetText("Invalid parameter."));
+                  c_Message.SetDetails(QString(c_ParsingError.c_str()));
+                  c_Message.SetCustomMinHeight(180, 300);
+                  break;
+               case C_NOACT:
+                  c_Message.SetDescription(QString(C_GtGetText::h_GetText(
+                                                      "EDS file import failed.\nNode ID %1 is invalid.")).arg(
+                                              rc_CurInterface.u8_NodeID));
+                  c_Message.SetDetails(C_GtGetText::h_GetText("CANopen standard only supports node IDs in the range "
+                                                              "of 1 to 127.\nThe node ID can be changed in node "
+                                                              "properties."));
+                  c_Message.SetCustomMinHeight(180, 270);
+                  break;
+               case C_CONFIG:
+                  c_Message.SetDescription(C_GtGetText::h_GetText("An error occured while parsing."));
+                  //Update log file
+                  C_OSCLoggingHandler::h_Flush();
+                  c_Message.SetDetails(QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
+                                       arg(C_GtGetText::h_GetText("For more information see ")).
+                                       arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+                                       arg(C_GtGetText::h_GetText("log file")));
+                  c_Message.SetCustomMinHeight(180, 250);
+                  break;
+               default:
+                  c_Message.SetDescription(C_GtGetText::h_GetText("Unknown reason."));
+                  c_Message.SetCustomMinHeight(180, 180);
+                  break;
+               }
+               c_Message.Execute();
+            }
+         }
       }
    }
    return s32_Return;

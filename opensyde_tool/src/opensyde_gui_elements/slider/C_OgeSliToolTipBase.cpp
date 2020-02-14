@@ -42,7 +42,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSliToolTipBase::C_OgeSliToolTipBase(QWidget * const opc_Parent) :
@@ -58,7 +58,7 @@ C_OgeSliToolTipBase::C_OgeSliToolTipBase(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value
 
-   \param[in] orc_Value New value
+   \param[in]  osn_Value   New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliToolTipBase::SetValueCustom(const sintn osn_Value)
@@ -72,9 +72,10 @@ void C_OgeSliToolTipBase::SetValueCustom(const sintn osn_Value)
 
    Formula: ((Value - of64_ToolTipRangeOffset) * of64_ToolTipFactor) + of64_ToolTipOffset
 
-   \param[in] of64_ToolTipRangeOffset See formula
-   \param[in] of64_ToolTipOffset      See formula
-   \param[in] of64_ToolTipFactor      See formula
+   \param[in]  of64_ToolTipRangeOffset    See formula
+   \param[in]  of64_ToolTipOffset         See formula
+   \param[in]  of64_ToolTipFactor         See formula
+   \param[in]  oe_RepresentationType      Representation type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliToolTipBase::SetToolTipParameters(const stw_types::float64 of64_ToolTipRangeOffset,
@@ -93,7 +94,7 @@ void C_OgeSliToolTipBase::SetToolTipParameters(const stw_types::float64 of64_Too
 
    Here: Handle tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed

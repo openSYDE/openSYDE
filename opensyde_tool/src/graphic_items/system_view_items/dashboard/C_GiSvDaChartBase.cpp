@@ -221,8 +221,8 @@ void C_GiSvDaChartBase::UpdateShowValue(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparence value configured by the actual timeout state
 
-   \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
-   \param[in] osn_Value                       Value for transparence (0..255)
+   \param[in] ou32_DataElementIndex    Index of shown datapool element in widget
+   \param[in] osn_Value                Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -252,6 +252,8 @@ void C_GiSvDaChartBase::ConnectionActiveChanged(const bool oq_Active)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call properties for widgets
+
+   \return true (configurable properties called)
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaChartBase::CallProperties(void)

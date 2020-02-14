@@ -57,7 +57,7 @@ C_OSCExportNode::C_OSCExportNode(void)
    The function will store all files in the folder specified by orc_Path.
 
    Creates:
-   * data pools
+   * Datapools
    * comm definition
    * openSYDE server initialization wrapper
 
@@ -70,11 +70,11 @@ C_OSCExportNode::C_OSCExportNode(void)
    \return
    C_NO_ERR  Operation success
    C_RD_WR   Operation failure: cannot store files
-   C_NOACT   Application is not of type ePROGRAMMABLE_APPLICATION or has unknown code structure version
+   C_NOACT   Application is not of type ePROGRAMMABLE_APPLICATION or has unknown/invalid code structure version
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
-             Data pool does not provide information about owning application or refers to an invalid application
+             Datapool does not provide information about owning application or refers to an invalid application
              ApplicationIndex references invalid application
-   C_CONFIG  Protocol or data pool not available in node for interface
+   C_CONFIG  Protocol or Datapool not available in node for interface
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw_types::uint16 ou16_ApplicationIndex,
@@ -102,7 +102,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
          //we only need to create code for programmable applications
          (rc_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION) ||
          //check if the code structure version is unknown
-         (rc_Application.u16_GenCodeVersion > 3U))
+         (rc_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION))
       {
          s32_Retval = C_NOACT;
       }
@@ -121,8 +121,8 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
 
    if (s32_Retval == C_NO_ERR)
    {
-      //index of data pool within this application (as there can be data pools owned by other applications
-      // this value is not identical to the data pool index within the whole list)
+      //index of Datapool within this application (as there can be Datapools owned by other applications
+      // this value is not identical to the Datapool index within the whole list)
       uint8 u8_DataPoolIndexWithinApplication = 0U;
       bool q_CreateDpdInit;
 
@@ -148,24 +148,33 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
       }
       else
       {
-         //Export data pools
+         //Export Datapools
          for (uint32 u32_ItDataPool = 0U;
               (u32_ItDataPool < orc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR); ++u32_ItDataPool)
          {
             bool q_Create = false;
-            bool q_IsRemote = false;
+            const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
+            C_OSCExportDataPool::E_Linkage e_Relation = C_OSCExportDataPool::eLOCAL;
 
             //owned by this application ?
-            if (orc_Node.c_DataPools[u32_ItDataPool].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
+            if (rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
             {
-               q_IsRemote = false;
+               e_Relation = C_OSCExportDataPool::eLOCAL;
                q_Create = true;
             }
-            //if the data pool is not owned by this application, but that application runs the protocol driver,
-            // then make the data pool known as remote data pool
+            //if the Datapool is not owned by this application, but has public scope,
+            // then make the Datapool known as public remote Datapool
+            else if ((orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion >= 4U) &&
+                     (rc_DataPool.q_ScopeIsPrivate == false))
+            {
+               e_Relation = C_OSCExportDataPool::eREMOTEPUBLIC;
+               q_Create = true;
+            }
+            //if the Datapool is not owned by this application and does not have public scope, but this
+            // application runs the protocol driver, then make the Datapool known as remote Datapool
             else if (ou16_ApplicationIndex == orc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex)
             {
-               q_IsRemote = true;
+               e_Relation = C_OSCExportDataPool::eREMOTE;
                q_Create = true;
             }
             else
@@ -173,16 +182,37 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                //finished here ...
             }
 
+            // check if the datapool is empty (e.g. COM datapool without any signal)
+            if (q_Create == true)
+            {
+               bool q_AtLeastOneElement = false;
+               for (uint16 u16_ListIndex = 0U; u16_ListIndex < rc_DataPool.c_Lists.size(); u16_ListIndex++)
+               {
+                  const C_OSCNodeDataPoolList & rc_List = rc_DataPool.c_Lists[u16_ListIndex];
+                  if (rc_List.c_Elements.size() != 0)
+                  {
+                     q_AtLeastOneElement = true;
+                     break;
+                  }
+               }
+
+               // do not create files for empty datapools
+               if (q_AtLeastOneElement == false)
+               {
+                  q_Create = false;
+               }
+            }
+
             if (q_Create == true)
             {
                //create source code
-               const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
+
                const uint16 u16_GenCodeVersion = orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion;
                uint8 u8_ProcessId;
                uint8 u8_DataPoolIndexRemote;
 
-               //we need the process ID of the owner process and the data pool index within the owning application
-               if (q_IsRemote == false)
+               //we need the process ID of the owner process and the Datapool index within the owning application
+               if (e_Relation == C_OSCExportDataPool::eLOCAL)
                {
                   //all your base are belong to us
                   u8_ProcessId = orc_Node.c_Applications[ou16_ApplicationIndex].u8_ProcessId;
@@ -191,7 +221,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                else
                {
                   u8_ProcessId = orc_Node.c_Applications[rc_DataPool.s32_RelatedDataBlockIndex].u8_ProcessId;
-                  //get index of data pool within the remote process:
+                  //get index of Datapool within the remote process:
                   u8_DataPoolIndexRemote = 0U;
                   for (uint8 u8_DataPool = 0U; u8_DataPool < u32_ItDataPool; u8_DataPool++)
                   {
@@ -206,13 +236,13 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
                {
                   C_OSCNodeDataPool c_DataPool;
-                  //Patch data pool to include message names
+                  //Patch Datapool to include message names
                   s32_Retval = C_OSCExportNode::mh_GetAdaptedComDataPool(orc_Node, u32_ItDataPool, c_DataPool);
                   tgl_assert(s32_Retval == C_NO_ERR);
                   //Export
                   s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, c_DataPool,
                                                                        u8_DataPoolIndexWithinApplication,
-                                                                       q_IsRemote, u8_DataPoolIndexRemote,
+                                                                       e_Relation, u8_DataPoolIndexRemote,
                                                                        u8_ProcessId, orc_ExportToolInfo);
                }
                else
@@ -220,7 +250,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                   //Export
                   s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, rc_DataPool,
                                                                        u8_DataPoolIndexWithinApplication,
-                                                                       q_IsRemote, u8_DataPoolIndexRemote,
+                                                                       e_Relation, u8_DataPoolIndexRemote,
                                                                        u8_ProcessId, orc_ExportToolInfo);
                }
                //Handle file names
@@ -235,7 +265,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                else
                {
                   osc_write_log_error("Creating source code",
-                                      "Could not write data pool file to target directory \"" + orc_Path +
+                                      "Could not write Datapool file to target directory \"" + orc_Path +
                                       "\".");
                   break;
                }
@@ -253,7 +283,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
          {
             const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
 
-            //logic: C_OSCCanProtocol refers to a data pool; if that data pool is owned by the
+            //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
             // C_OSCNodeApplication then create it
             if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
             {
@@ -310,7 +340,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
    \return
    C_NO_ERR  Node configuration is OK
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
-             Data pool does not provide information about owning application or refers to an invalid application
+             Datapool does not provide information about owning application or refers to an invalid application
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
@@ -337,7 +367,7 @@ sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
               static_cast<sint32>(orc_Node.c_Applications.size())))
          {
             osc_write_log_error("Creating source code",
-                                "Invalid definition of owner application for data pool " +
+                                "Invalid definition of owner application for Datapool " +
                                 orc_Node.c_DataPools[u8_DataPool].c_Name + ".");
             s32_Retval = C_RANGE;
             break;
@@ -348,15 +378,15 @@ sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapt com data pool elements
+/*! \brief   Adapt com Datapool elements
 
-   \param[in]     orc_Node           Current node containing data pools
-   \param[in]     ou32_DataPoolIndex Data pool index within data pools owned by node
-   \param[out]    orc_DataPool       Copy of data pool with adapted names
+   \param[in]     orc_Node           Current node containing Datapools
+   \param[in]     ou32_DataPoolIndex Datapool index within Datapools owned by node
+   \param[out]    orc_DataPool       Copy of Datapool with adapted names
 
    \return
    C_NO_ERR Operation successful
-   C_RANGE  Data pool index or type invalid
+   C_RANGE  Datapool index or type invalid
    C_CONFIG Protocol not found
 */
 //----------------------------------------------------------------------------------------------------------------------

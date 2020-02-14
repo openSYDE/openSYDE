@@ -49,8 +49,8 @@ using namespace stw_tgl;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store node data pool to clip board
 
-   \param[in] orc_OSCContent  OSC content
-   \param[in] orc_UIContent   UI content
+   \param[in]  orc_OSCContent    OSC content
+   \param[in]  orc_UIContent     UI content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPool(const C_OSCNodeDataPool & orc_OSCContent,
@@ -81,8 +81,8 @@ void C_SdClipBoardHelper::h_StoreDataPool(const C_OSCNodeDataPool & orc_OSCConte
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool from clip board
 
-   \param[out] orc_OSCContent  OSC content
-   \param[out] orc_UIContent   UI content
+   \param[out]  orc_OSCContent   OSC content
+   \param[out]  orc_UIContent    UI content
 
    \return
    C_NO_ERR Found and loaded
@@ -147,9 +147,9 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPool(C_OSCNodeDataPool & orc_OSCContent,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store node data pool lists to clip board
 
-   \param[in] orc_OSCContent OSC content
-   \param[in] orc_UIContent  UI content
-   \param[in] ore_Type       Data pool type
+   \param[in]  orc_OSCContent    OSC content
+   \param[in]  orc_UIContent     UI content
+   \param[in]  ore_Type          Data pool type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolLists(const std::vector<C_OSCNodeDataPoolList> & orc_OSCContent,
@@ -187,9 +187,9 @@ void C_SdClipBoardHelper::h_StoreDataPoolLists(const std::vector<C_OSCNodeDataPo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool lists from clip board
 
-   \param[out] orc_OSCContent OSC content
-   \param[out] orc_UIContent  UI content
-   \param[out] ore_Type       Data pool type
+   \param[out]  orc_OSCContent   OSC content
+   \param[out]  orc_UIContent    UI content
+   \param[out]  ore_Type         Data pool type
 
    \return
    C_NO_ERR Found and loaded
@@ -269,8 +269,8 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolLists(std::vector<C_OSCNodeDataPoolL
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store node data pool list elements to clip board
 
-   \param[in] orc_OSCContent OSC content
-   \param[in] orc_UIContent  UI content
+   \param[in]  orc_OSCContent    OSC content
+   \param[in]  orc_UIContent     UI content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(
@@ -286,8 +286,8 @@ void C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool list elements from clip board
 
-   \param[in] orc_OSCContent OSC content
-   \param[in] orc_UIContent  UI content
+   \param[in]  orc_OSCContent    OSC content
+   \param[in]  orc_UIContent     UI content
 
    \return
    C_NO_ERR Found and loaded
@@ -304,9 +304,9 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromClipBoard(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store node data pool list elements to string
 
-   \param[in]  orc_OSCContent OSC content
-   \param[in]  orc_UIContent  UI content
-   \param[out] orc_Output     String output
+   \param[in]   orc_OSCContent   OSC content
+   \param[in]   orc_UIContent    UI content
+   \param[out]  orc_Output       String output
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListElementsToString(
@@ -338,9 +338,9 @@ void C_SdClipBoardHelper::h_StoreDataPoolListElementsToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node data pool list elements from string
 
-   \param[in] orc_OSCContent OSC content
-   \param[in] orc_UIContent  UI content
-   \param[in] orc_Input      String input
+   \param[in]  orc_OSCContent    OSC content
+   \param[in]  orc_UIContent     UI content
+   \param[in]  orc_Input         String input
 
    \return
    C_NO_ERR Found and loaded
@@ -407,8 +407,8 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store indices to string
 
-   \param[in]  orc_Indices Indices
-   \param[out] orc_Output  String output
+   \param[in]   orc_Indices   Indices
+   \param[out]  orc_Output    String output
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreIndicesToString(const std::vector<uint32> & orc_Indices, QString & orc_Output)
@@ -432,8 +432,8 @@ void C_SdClipBoardHelper::h_StoreIndicesToString(const std::vector<uint32> & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load indices from string
 
-   \param[out] orc_Indices Indices
-   \param[in]  orc_Input   String input
+   \param[out]  orc_Indices   Indices
+   \param[in]   orc_Input     String input
 
    \return
    C_NO_ERR Found and loaded
@@ -475,8 +475,8 @@ sint32 C_SdClipBoardHelper::h_LoadIndicesFromString(std::vector<uint32> & orc_In
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store node data pool list data sets to clip board
 
-   \param[out] orc_OSCNames         Data set names
-   \param[out] orc_OSCDataSetValues Data set values
+   \param[out]  orc_OSCNames           Data set names
+   \param[out]  orc_OSCDataSetValues   Data set values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToClipBoard(
@@ -492,8 +492,12 @@ void C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToClipBoard(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data sets from clipboard
 
-   \param[out] orc_OSCNames         Data set names
-   \param[out] orc_OSCDataSetValues Data set values
+   \param[out]  orc_OSCNames           Data set names
+   \param[out]  orc_OSCDataSetValues   Data set values
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(
@@ -506,9 +510,9 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store node data pool list data sets to string
 
-   \param[out] orc_OSCNames         Data set names
-   \param[out] orc_OSCDataSetValues Data set values
-   \param[out] orc_Output           String output
+   \param[out]  orc_OSCNames           Data set names
+   \param[out]  orc_OSCDataSetValues   Data set values
+   \param[out]  orc_Output             String output
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToString(
@@ -549,9 +553,13 @@ void C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data sets from clipboard
 
-   \param[out] orc_OSCNames         Data set names
-   \param[out] orc_OSCDataSetValues Data set values
-   \param[in]  orc_Input            String input
+   \param[out]  orc_OSCNames           Data set names
+   \param[out]  orc_OSCDataSetValues   Data set values
+   \param[in]   orc_Input              String input
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromString(std::vector<C_OSCNodeDataPoolDataSet> & orc_OSCNames,
@@ -655,14 +663,14 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromString(std::vector<C
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store messages to clipboard
 
-   \param[in] orc_Messages                Message data
-   \param[in] orc_OSCSignalCommons        Signal common osc data
-   \param[in] orc_UISignalCommons         Signal common ui data
-   \param[in] orc_UISignals               Signal ui data
-   \param[in] orc_OwnerNodeName           Owner node names
-   \param[in] orc_OwnerNodeInterfaceIndex Owner node interface index
-   \param[in] orc_OwnerNodeDatapoolIndex  Owner node Datapool index
-   \param[in] orc_OwnerIsTxFlag           Owner has message as TX flags
+   \param[in]  orc_Messages                  Message data
+   \param[in]  orc_OSCSignalCommons          Signal common osc data
+   \param[in]  orc_UISignalCommons           Signal common ui data
+   \param[in]  orc_UISignals                 Signal ui data
+   \param[in]  orc_OwnerNodeName             Owner node names
+   \param[in]  orc_OwnerNodeInterfaceIndex   Owner node interface index
+   \param[in]  orc_OwnerNodeDatapoolIndex    Owner node Datapool index
+   \param[in]  orc_OwnerIsTxFlag             Owner has message as Tx flags
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & orc_Messages,
@@ -765,14 +773,14 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Restore messages from clipboard
 
-   \param[out] orc_Messages                Message data
-   \param[out] orc_OSCSignalCommons        Signal common osc data
-   \param[out] orc_UISignalCommons         Signal common ui data
-   \param[out] orc_UISignals               Signal ui data
-   \param[out] orc_OwnerNodeName           Owner node names
-   \param[out] orc_OwnerNodeInterfaceIndex Owner node interface index
-   \param[out] orc_OwnerNodeDatapoolIndex  Owner node Datapool index
-   \param[out] orc_OwnerIsTxFlag           Owner has message as TX flags
+   \param[out]  orc_Messages                 Message data
+   \param[out]  orc_OSCSignalCommons         Signal common osc data
+   \param[out]  orc_UISignalCommons          Signal common ui data
+   \param[out]  orc_UISignals                Signal ui data
+   \param[out]  orc_OwnerNodeName            Owner node names
+   \param[out]  orc_OwnerNodeInterfaceIndex  Owner node interface index
+   \param[out]  orc_OwnerNodeDatapoolIndex   Owner node Datapool index
+   \param[out]  orc_OwnerIsTxFlag            Owner has message as Tx flags
 
    \return
    C_NO_ERR Found and loaded
@@ -951,10 +959,10 @@ sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Me
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store signals to clipboard
 
-   \param[in] orc_Signals          Signals data
-   \param[in] orc_OSCSignalCommons Signal common osc data
-   \param[in] orc_UISignalCommons  Signal common ui data
-   \param[in] orc_UISignals        Signal ui data
+   \param[in]  orc_Signals             Signals data
+   \param[in]  orc_OSCSignalCommons    Signal common osc data
+   \param[in]  orc_UISignalCommons     Signal common ui data
+   \param[in]  orc_UISignals           Signal ui data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreSignalsToClipboard(const std::vector<C_OSCCanSignal> & orc_Signals,
@@ -970,10 +978,10 @@ void C_SdClipBoardHelper::h_StoreSignalsToClipboard(const std::vector<C_OSCCanSi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Restore signals from clipboard
 
-   \param[out] orc_Signals          Signals data
-   \param[out] orc_OSCSignalCommons Signal common osc data
-   \param[out] orc_UISignalCommons  Signal common ui data
-   \param[out] orc_UISignals        Signal ui data
+   \param[out]  orc_Signals            Signals data
+   \param[out]  orc_OSCSignalCommons   Signal common osc data
+   \param[out]  orc_UISignalCommons    Signal common ui data
+   \param[out]  orc_UISignals          Signal ui data
 
    \return
    C_NO_ERR Found and loaded
@@ -1000,8 +1008,8 @@ sint32 C_SdClipBoardHelper::h_LoadSignalsFromClipboard(std::vector<C_OSCCanSigna
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store message ids to string
 
-   \param[in]  orc_MessageIds Message identification indices
-   \param[out] orc_Output     String output
+   \param[in]   orc_MessageIds   Message identification indices
+   \param[out]  orc_Output       String output
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreMessageIndexToString(
@@ -1035,8 +1043,8 @@ void C_SdClipBoardHelper::h_StoreMessageIndexToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Restore message ids from string
 
-   \param[in]  orc_Input      String input
-   \param[out] orc_MessageIds Message identification indices
+   \param[in]   orc_Input        String input
+   \param[out]  orc_MessageIds   Message identification indices
 
    \return
    C_NO_ERR Found and loaded
@@ -1108,7 +1116,7 @@ sint32 C_SdClipBoardHelper::h_LoadMessageIndexFromString(const QString & orc_Inp
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store data snapshot to clipboard
 
-   \param[in] orc_Data Snapshot data
+   \param[in]  orc_Data    Snapshot data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataSnapShotToClipboard(const C_SdTopologyDataSnapshot & orc_Data)
@@ -1150,7 +1158,7 @@ void C_SdClipBoardHelper::h_StoreDataSnapShotToClipboard(const C_SdTopologyDataS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Restore data snapshot from clipboard
 
-   \param[out] orc_Data Snapshot data
+   \param[out]  orc_Data   Snapshot data
 
    \return
    C_NO_ERR Found and loaded
@@ -1249,11 +1257,11 @@ C_SdClipBoardHelper::C_SdClipBoardHelper(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store signals to string
 
-   \param[in]  orc_Signals          Signals data
-   \param[in]  orc_OSCSignalCommons Signal common osc data
-   \param[in]  orc_UISignalCommons  Signal common ui data
-   \param[in]  orc_UISignals        Signal ui data
-   \param[out] orc_Output           String output
+   \param[in]   orc_Signals            Signals data
+   \param[in]   orc_OSCSignalCommons   Signal common osc data
+   \param[in]   orc_UISignalCommons    Signal common ui data
+   \param[in]   orc_UISignals          Signal ui data
+   \param[out]  orc_Output             String output
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::mh_StoreSignalsToString(const std::vector<C_OSCCanSignal> & orc_Signals,
@@ -1292,11 +1300,11 @@ void C_SdClipBoardHelper::mh_StoreSignalsToString(const std::vector<C_OSCCanSign
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Restore signals from string
 
-   \param[in]  orc_Input            String input
-   \param[out] orc_Signals          Signals data
-   \param[out] orc_OSCSignalCommons Signal common osc data
-   \param[out] orc_UISignalCommons  Signal common ui data
-   \param[out] orc_UISignals        Signal ui data
+   \param[in]   orc_Input              String input
+   \param[out]  orc_Signals            Signals data
+   \param[out]  orc_OSCSignalCommons   Signal common osc data
+   \param[out]  orc_UISignalCommons    Signal common ui data
+   \param[out]  orc_UISignals          Signal ui data
 
    \return
    C_NO_ERR Found and loaded

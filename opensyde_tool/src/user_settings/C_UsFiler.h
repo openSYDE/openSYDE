@@ -60,6 +60,9 @@ private:
                                 const QString & orc_DashboardIdBase, const QString & orc_DashboardName,
                                 const C_UsSystemViewDashboard & orc_Dashboard);
    static void mh_SaveLanguages(const C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
+   static void mh_SaveColors(const C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
+   static void mh_SaveNextRecentColorButtonNumber(const C_UsHandler & orc_UserSettings,
+                                                  stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini,
@@ -92,6 +95,8 @@ private:
                                 const QString & orc_DashboardIdBase, const QString & orc_ViewName,
                                 C_UsHandler & orc_UserSettings);
    static void mh_LoadLanguages(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
+   static void mh_LoadColors(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
+   static void mh_LoadNextRecentColorButtonNumber(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini,

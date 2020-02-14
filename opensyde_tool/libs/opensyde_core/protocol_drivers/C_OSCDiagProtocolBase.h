@@ -130,7 +130,7 @@ public:
       C_NO_ERR   request sent, positive response with expected size received
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -161,7 +161,7 @@ public:
       C_NO_ERR   request sent, positive response with expected size received
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -191,7 +191,7 @@ public:
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -222,7 +222,7 @@ public:
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -256,7 +256,7 @@ public:
       C_NO_ERR   request sent, positive response received (or: rail value remembered)
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -288,7 +288,7 @@ public:
       C_NO_ERR   request sent
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -325,7 +325,7 @@ public:
       C_NO_ERR   request sent
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -349,7 +349,7 @@ public:
       \return
       C_NO_ERR   request sent
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -372,7 +372,7 @@ public:
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client side)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -398,7 +398,7 @@ public:
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client side); access count zero
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -426,7 +426,7 @@ public:
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client side); e.g. data record size zero
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -443,7 +443,7 @@ public:
       \return
       C_NO_ERR   request sent, positive response received
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -466,7 +466,7 @@ public:
       \return
       C_NO_ERR   request sent, positive response received
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
    */
@@ -492,7 +492,7 @@ public:
       \return
       C_NO_ERR   request sent, positive response received
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
    */
@@ -521,7 +521,7 @@ public:
       \return
       C_NO_ERR   request sent, positive response received
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -549,7 +549,7 @@ public:
       \return
       C_NO_ERR   request sent, positive response received
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response

@@ -32,7 +32,8 @@ public:
                                               const stw_types::uint32 & oru32_DataPoolListIndex,
                                               C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
                                               const std::vector<stw_types::uint32> & orc_SourceRow,
-                                              const std::vector<stw_types::uint32> & orc_TargetRow, const bool & orq_AdaptIndices,
+                                              const std::vector<stw_types::uint32> & orc_TargetRow,
+                                              const bool & orq_AdaptIndices,
                                               QUndoCommand * const opc_Parent = NULL);
    virtual void redo(void) override;
    virtual void undo(void) override;

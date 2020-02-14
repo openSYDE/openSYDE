@@ -46,8 +46,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementAddSpecificCommand::C_SdNdeUnoLeDataPoolListElementAddSpecificCommand(
    const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
-   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-   const std::vector<uint32> & orc_Indices,
+   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32> & orc_Indices,
    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCData,
    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIData, QUndoCommand * const opc_Parent) :
    C_SdNdeUnoLeDataPoolListElementAddCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,

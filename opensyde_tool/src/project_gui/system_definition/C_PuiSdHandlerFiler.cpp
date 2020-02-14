@@ -56,9 +56,9 @@ C_PuiSdHandlerFiler::C_PuiSdHandlerFiler(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pools
 
-   \param[in,out] orc_DataPools Data pool elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "node" element
-   \param[in]     opc_BasePath  Base path (Optional for save to string)
+   \param[in,out]  orc_DataPools    Data pool elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "node" element
+   \param[in]      opc_BasePath     Base path (Optional for save to string)
 
    \return
    C_NO_ERR    information loaded
@@ -136,8 +136,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPools(std::vector<C_PuiSdNodeDataPool> & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool
 
-   \param[in,out] orc_DataPool  Data pool element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "data-pool" element
+   \param[in,out]  orc_DataPool     Data pool element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "data-pool" element
 
    \return
    C_NO_ERR    information loaded
@@ -167,8 +167,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPool(C_PuiSdNodeDataPool & orc_DataPool, C
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool lists
 
-   \param[in,out] orc_DataPoolLists Data pool lists element
-   \param[in,out] orc_XMLParser     XML parser with the "current" element set to the "lists" element
+   \param[in,out]  orc_DataPoolLists   Data pool lists element
+   \param[in,out]  orc_XMLParser       XML parser with the "current" element set to the "lists" element
 
    \return
    C_NO_ERR    information loaded
@@ -229,8 +229,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPoolL
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool list
 
-   \param[in,out] orc_DataPoolList Data pool list element
-   \param[in,out] orc_XMLParser    XML parser with the "current" element set to the "list" element
+   \param[in,out]  orc_DataPoolList    Data pool list element
+   \param[in,out]  orc_XMLParser       XML parser with the "current" element set to the "list" element
 
    \return
    C_NO_ERR    information loaded
@@ -258,8 +258,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPoolList(C_PuiSdNodeDataPoolList & orc_Dat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool list elements
 
-   \param[in,out] orc_DataPoolListElements Data pool list elements
-   \param[in,out] orc_XMLParser            XML parser with the "current" element set to the "data-elements" element
+   \param[in,out]  orc_DataPoolListElements  Data pool list elements
+   \param[in,out]  orc_XMLParser             XML parser with the "current" element set to the "data-elements" element
 
    \return
    C_NO_ERR    information loaded
@@ -317,12 +317,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPoolListElements(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data pool list element
 
-   \param[in,out] orc_DataPoolListElement Data pool list element
-   \param[in,out] orc_XMLParser           XML parser with the "current" element set to the "data-element" element
-
-   \return
-   C_NO_ERR    information loaded
-   C_CONFIG    error loading information
+   \param[in,out]  orc_DataPoolListElement   Data pool list element
+   \param[in,out]  orc_XMLParser             XML parser with the "current" element set to the "data-element" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_LoadDataPoolListElement(C_PuiSdNodeDataPoolListElement & orc_DataPoolListElement,
@@ -335,10 +331,10 @@ void C_PuiSdHandlerFiler::h_LoadDataPoolListElement(C_PuiSdNodeDataPoolListEleme
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pools
 
-   \param[in]     orc_UIDataPools  UI data pool elements
-   \param[in]     opc_OSCDataPools OSC data pool elements (Optional for save to string)
-   \param[in]     opc_BasePath     Base path (Optional for save to string)
-   \param[in,out] orc_XMLParser    XML parser with the "current" element set to the "node" element
+   \param[in]      orc_UIDataPools     UI data pool elements
+   \param[in]      opc_OSCDataPools    OSC data pool elements (Optional for save to string)
+   \param[in]      opc_BasePath        Base path (Optional for save to string)
+   \param[in,out]  orc_XMLParser       XML parser with the "current" element set to the "node" element
 
    \return
    C_NO_ERR   data saved
@@ -401,8 +397,8 @@ sint32 C_PuiSdHandlerFiler::h_SaveDataPools(const std::vector<C_PuiSdNodeDataPoo
 
    Save datapool to XML file
 
-   \param[in]     orc_DataPool data storage
-   \param[in,out] orc_FilePath File path for xml
+   \param[in]      orc_DataPool  data storage
+   \param[in,out]  orc_FilePath  File path for xml
 
    \return
    C_NO_ERR   data saved
@@ -440,8 +436,8 @@ sint32 C_PuiSdHandlerFiler::h_SaveDataPoolFile(const C_PuiSdNodeDataPool & orc_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pool
 
-   \param[in]     orc_DataPool  Data pool element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "data-pool" element
+   \param[in]      orc_DataPool     Data pool element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "data-pool" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveDataPool(const C_PuiSdNodeDataPool & orc_DataPool, C_OSCXMLParserBase & orc_XMLParser)
@@ -457,8 +453,8 @@ void C_PuiSdHandlerFiler::h_SaveDataPool(const C_PuiSdNodeDataPool & orc_DataPoo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pool lists
 
-   \param[in]     orc_DataPoolLists Data pool lists
-   \param[in,out] orc_XMLParser     XML parser with the "current" element set to the "lists" element
+   \param[in]      orc_DataPoolLists   Data pool lists
+   \param[in,out]  orc_XMLParser       XML parser with the "current" element set to the "lists" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveDataPoolLists(const std::vector<C_PuiSdNodeDataPoolList> & orc_DataPoolLists,
@@ -478,8 +474,8 @@ void C_PuiSdHandlerFiler::h_SaveDataPoolLists(const std::vector<C_PuiSdNodeDataP
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pool list
 
-   \param[in]     orc_DataPoolList Data pool list element
-   \param[in,out] orc_XMLParser    XML parser with the "current" element set to the "list" element
+   \param[in]      orc_DataPoolList    Data pool list element
+   \param[in,out]  orc_XMLParser       XML parser with the "current" element set to the "list" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveDataPoolList(const C_PuiSdNodeDataPoolList & orc_DataPoolList,
@@ -494,8 +490,8 @@ void C_PuiSdHandlerFiler::h_SaveDataPoolList(const C_PuiSdNodeDataPoolList & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pool list elements
 
-   \param[in]     orc_DataPoolListElements Data pool list elements
-   \param[in,out] orc_XMLParser            XML parser with the "current" element set to the "data-elements" element
+   \param[in]      orc_DataPoolListElements  Data pool list elements
+   \param[in,out]  orc_XMLParser             XML parser with the "current" element set to the "data-elements" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveDataPoolListElements(
@@ -516,8 +512,8 @@ void C_PuiSdHandlerFiler::h_SaveDataPoolListElements(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pool list element
 
-   \param[in]     orc_DataPoolListElement Data pool list element
-   \param[in,out] orc_XMLParser           XML parser with the "current" element set to the "data-element" element
+   \param[in]      orc_DataPoolListElement   Data pool list element
+   \param[in,out]  orc_XMLParser             XML parser with the "current" element set to the "data-element" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveDataPoolListElement(const C_PuiSdNodeDataPoolListElement & orc_DataPoolListElement,
@@ -530,8 +526,8 @@ void C_PuiSdHandlerFiler::h_SaveDataPoolListElement(const C_PuiSdNodeDataPoolLis
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Loads the configuration of the shared Datapools
 
-   \param[in]     orc_FilePath              File path for xml
-   \param[out]    orc_SharedDatapools       Shared Datapool configuration
+   \param[in]   orc_FilePath           File path for xml
+   \param[out]  orc_SharedDatapools    Shared Datapool configuration
 
    \return
    C_NO_ERR   data saved
@@ -574,8 +570,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadSharedDatapoolsFile(const QString & orc_FilePa
 
    long description of function within several lines
 
-   \param[out]    orc_SharedDatapools Shared Datapool configuration
-   \param[in,out] orc_XMLParser       XML parser with the "current" element set to the "shared_datapools_groups" element
+   \param[out]     orc_SharedDatapools    Shared Datapool configuration
+   \param[in,out]  orc_XMLParser          XML parser with the "current" element set to the "shared_datapools_groups" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_LoadSharedDatapoolsGroups(C_PuiSdSharedDatapools & orc_SharedDatapools,
@@ -633,8 +629,8 @@ void C_PuiSdHandlerFiler::h_LoadSharedDatapoolsGroups(C_PuiSdSharedDatapools & o
 
    long description of function within several lines
 
-   \param[out]    orc_Group           Read shared Datapool group
-   \param[in,out] orc_XMLParser       XML parser with the "current" element set to the "shared_datapools_groups" element
+   \param[out]     orc_Group        Read shared Datapool group
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "shared_datapools_groups" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_LoadSharedDatapoolsGroup(std::vector<C_OSCNodeDataPoolId> & orc_Group,
@@ -689,8 +685,8 @@ void C_PuiSdHandlerFiler::h_LoadSharedDatapoolsGroup(std::vector<C_OSCNodeDataPo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Saves the configuration of the shared Datapools
 
-   \param[in]     orc_FilePath              File path for xml
-   \param[in]     orc_SharedDatapools       Shared Datapool configuration
+   \param[in]  orc_FilePath         File path for xml
+   \param[in]  orc_SharedDatapools  Shared Datapool configuration
 
    \return
    C_NO_ERR   data saved
@@ -732,8 +728,8 @@ sint32 C_PuiSdHandlerFiler::h_SaveSharedDatapoolsFile(const QString & orc_FilePa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Saves a shared Datapool group
 
-   \param[in]     orc_SharedDatapools Shared Datapool configuration
-   \param[in,out] orc_XMLParser       XML parser with the "current" element set to the "shared_datapools_groups" element
+   \param[in]      orc_SharedDatapools    Shared Datapool configuration
+   \param[in,out]  orc_XMLParser          XML parser with the "current" element set to the "shared_datapools_groups" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveSharedDatapoolsGroups(const C_PuiSdSharedDatapools & orc_SharedDatapools,
@@ -772,9 +768,9 @@ void C_PuiSdHandlerFiler::h_SaveSharedDatapoolsGroups(const C_PuiSdSharedDatapoo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can protocols
 
-   \param[in,out] orc_CanProtocols Can protocols (Cleared if necessary)
-   \param[in,out] orc_XMLParser    XML parser with the "current" element set to the "node" element
-   \param[in]     opc_BasePath     Base path (Optional for save to string)
+   \param[in,out]  orc_CanProtocols    Can protocols (Cleared if necessary)
+   \param[in,out]  orc_XMLParser       XML parser with the "current" element set to the "node" element
+   \param[in]      opc_BasePath        Base path (Optional for save to string)
 
    \return
    C_NO_ERR    information loaded
@@ -853,8 +849,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanProtocols(std::vector<C_PuiSdNodeCanProtoco
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can protocol
 
-   \param[in,out] orc_CanProtocol Can protocol element
-   \param[in,out] orc_XMLParser   XML parser with the "current" element set to the "com-protocol" element
+   \param[in,out]  orc_CanProtocol  Can protocol element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "com-protocol" element
 
    \return
    C_NO_ERR    information loaded
@@ -882,8 +878,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanProtocol(C_PuiSdNodeCanProtocol & orc_CanPr
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can message containers
 
-   \param[in,out] orc_CanMessageContainers Can message containers
-   \param[in,out] orc_XMLParser            XML parser with the "current" element set
+   \param[in,out]  orc_CanMessageContainers  Can message containers
+   \param[in,out]  orc_XMLParser             XML parser with the "current" element set
                                            to the "com-message-containers" element
 
    \return
@@ -948,9 +944,9 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessageContainers(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can message container
 
-   \param[in,out] orc_CanMessageContainer Can message container element
-   \param[in,out] orc_XMLParser           XML parser with the "current" element set
-                                          to the "com-message-container " element
+   \param[in,out]  orc_CanMessageContainer   Can message container element
+   \param[in,out]  orc_XMLParser             XML parser with the "current" element set
+                                             to the "com-message-container " element
 
    \return
    C_NO_ERR    information loaded
@@ -988,8 +984,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessageContainer(C_PuiSdNodeCanMessageConta
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can messages
 
-   \param[in,out] orc_CanMessages Can messages
-   \param[in,out] orc_XMLParser   XML parser with the "current" element set to unknown element
+   \param[in,out]  orc_CanMessages  Can messages
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to unknown element
 
    \return
    C_NO_ERR    information loaded
@@ -1052,8 +1048,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessages(std::vector<C_PuiSdNodeCanMessage>
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can message
 
-   \param[in,out] orc_CanMessage Can message element
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "com-message" element
+   \param[in,out]  orc_CanMessage   Can message element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "com-message" element
 
    \return
    C_NO_ERR    information loaded
@@ -1063,15 +1059,39 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessages(std::vector<C_PuiSdNodeCanMessage>
 sint32 C_PuiSdHandlerFiler::h_LoadCanMessage(C_PuiSdNodeCanMessage & orc_CanMessage, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
+   bool q_UseAutoReceiveTimeout;
+   bool q_ReceiveTimeoutDisabled;
 
    //Attributes
    if (orc_XMLParser.AttributeExists("use-auto-receive-timeout") == true)
    {
-      orc_CanMessage.q_UseAutoReceiveTimeout = orc_XMLParser.GetAttributeBool("use-auto-receive-timeout");
+      q_UseAutoReceiveTimeout = orc_XMLParser.GetAttributeBool("use-auto-receive-timeout");
    }
    else
    {
-      orc_CanMessage.q_UseAutoReceiveTimeout = true;
+      q_UseAutoReceiveTimeout = true;
+   }
+
+   if (orc_XMLParser.AttributeExists("receive-timeout-disabled") == true)
+   {
+      q_ReceiveTimeoutDisabled = orc_XMLParser.GetAttributeBool("receive-timeout-disabled");
+   }
+   else
+   {
+      q_ReceiveTimeoutDisabled = false;
+   }
+
+   if (q_ReceiveTimeoutDisabled == true)
+   {
+      orc_CanMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_DISABLED;
+   }
+   else if (q_UseAutoReceiveTimeout == true)
+   {
+      orc_CanMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
+   }
+   else
+   {
+      orc_CanMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM;
    }
 
    //Signals
@@ -1091,12 +1111,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessage(C_PuiSdNodeCanMessage & orc_CanMess
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can signals
 
-   \param[in,out] orc_CanSignals Can signals
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "com-signals" element
-
-   \return
-   C_NO_ERR    information loaded
-   C_CONFIG    error loading information
+   \param[in,out]  orc_CanSignals   Can signals
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "com-signals" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_LoadCanSignals(std::vector<C_PuiSdNodeCanSignal> & orc_CanSignals,
@@ -1146,12 +1162,8 @@ void C_PuiSdHandlerFiler::h_LoadCanSignals(std::vector<C_PuiSdNodeCanSignal> & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load can signal element
 
-   \param[in,out] orc_CanSignal Can signal element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "com-signal" element
-
-   \return
-   C_NO_ERR    information loaded
-   C_CONFIG    error loading information
+   \param[in,out]  orc_CanSignal    Can signal element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "com-signal" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_LoadCanSignal(C_PuiSdNodeCanSignal & orc_CanSignal,
@@ -1163,11 +1175,11 @@ void C_PuiSdHandlerFiler::h_LoadCanSignal(C_PuiSdNodeCanSignal & orc_CanSignal,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save can protocols
 
-   \param[in]     orc_UICanProtocols  UI can protocols
-   \param[in]     opc_OSCCanProtocols OSC can protocols (Optional for save to string)
-   \param[in]     opc_OSCDatapools    OSC datapools (Optional for save to string)
-   \param[in]     opc_BasePath        Base path (Optional for save to string)
-   \param[in,out] orc_XMLParser       XML parser with the "current" element set to the "node" element
+   \param[in]      orc_UICanProtocols     UI can protocols
+   \param[in]      opc_OSCCanProtocols    OSC can protocols (Optional for save to string)
+   \param[in]      opc_OSCDatapools       OSC datapools (Optional for save to string)
+   \param[in]      opc_BasePath           Base path (Optional for save to string)
+   \param[in,out]  orc_XMLParser          XML parser with the "current" element set to the "node" element
 
    \return
    C_NO_ERR   data saved
@@ -1241,8 +1253,8 @@ sint32 C_PuiSdHandlerFiler::h_SaveCanProtocols(const std::vector<C_PuiSdNodeCanP
 
    Save comm protocol ui to XML file
 
-   \param[in]     orc_CanProtocol data storage
-   \param[in,out] orc_FilePath    File path for xml
+   \param[in]      orc_CanProtocol  data storage
+   \param[in,out]  orc_FilePath     File path for xml
 
    \return
    C_NO_ERR   data saved
@@ -1281,8 +1293,8 @@ sint32 C_PuiSdHandlerFiler::h_SaveCanProtocolFile(const C_PuiSdNodeCanProtocol &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save can protocol
 
-   \param[in]     orc_CanProtocol Can protocol
-   \param[in,out] orc_XMLParser   XML parser with the "current" element set to the "com-protocol" element
+   \param[in]      orc_CanProtocol  Can protocol
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "com-protocol" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveCanProtocol(const C_PuiSdNodeCanProtocol & orc_CanProtocol,
@@ -1299,8 +1311,8 @@ void C_PuiSdHandlerFiler::h_SaveCanProtocol(const C_PuiSdNodeCanProtocol & orc_C
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save can message containers
 
-   \param[in]     orc_CanMessageContainers Can message containers
-   \param[in,out] orc_XMLParser            XML parser with the "current" element set
+   \param[in]      orc_CanMessageContainers  Can message containers
+   \param[in,out]  orc_XMLParser             XML parser with the "current" element set
                                            to the "com-message-containers" element
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1321,9 +1333,9 @@ void C_PuiSdHandlerFiler::h_SaveCanMessageContainers(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save can message container element
 
-   \param[in]     orc_CanMessageContainer Can message container element
-   \param[in,out] orc_XMLParser           XML parser with the "current" element set
-                                          to the "com-message-container" element
+   \param[in]      orc_CanMessageContainer   Can message container element
+   \param[in,out]  orc_XMLParser             XML parser with the "current" element set
+                                           to the "com-message-container" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveCanMessageContainer(const C_PuiSdNodeCanMessageContainer & orc_CanMessageContainer,
@@ -1341,8 +1353,8 @@ void C_PuiSdHandlerFiler::h_SaveCanMessageContainer(const C_PuiSdNodeCanMessageC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save can messages
 
-   \param[in]     orc_CanMessages Can messages
-   \param[in,out] orc_XMLParser   XML parser with the "current" element set to unknown element
+   \param[in]      orc_CanMessages  Can messages
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to unknown element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveCanMessages(const std::vector<C_PuiSdNodeCanMessage> & orc_CanMessages,
@@ -1362,15 +1374,35 @@ void C_PuiSdHandlerFiler::h_SaveCanMessages(const std::vector<C_PuiSdNodeCanMess
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save can message element
 
-   \param[in]     orc_CanMessage Can message element
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "com-message" element
+   \param[in]      orc_CanMessage   Can message element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "com-message" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveCanMessage(const C_PuiSdNodeCanMessage & orc_CanMessage,
                                            C_OSCXMLParserBase & orc_XMLParser)
 {
+   bool q_UseAutoReceiveTimeout;
+   bool q_ReceiveTimeoutDisabled;
+
+   if (orc_CanMessage.e_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_DISABLED)
+   {
+      q_ReceiveTimeoutDisabled = true;
+      q_UseAutoReceiveTimeout = true;
+   }
+   else if (orc_CanMessage.e_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM)
+   {
+      q_ReceiveTimeoutDisabled = false;
+      q_UseAutoReceiveTimeout = false;
+   }
+   else
+   {
+      q_ReceiveTimeoutDisabled = false;
+      q_UseAutoReceiveTimeout = true;
+   }
+
    //Attributes
-   orc_XMLParser.SetAttributeBool("use-auto-receive-timeout", orc_CanMessage.q_UseAutoReceiveTimeout);
+   orc_XMLParser.SetAttributeBool("use-auto-receive-timeout", q_UseAutoReceiveTimeout);
+   orc_XMLParser.SetAttributeBool("receive-timeout-disabled", q_ReceiveTimeoutDisabled);
    //Signals
    orc_XMLParser.CreateAndSelectNodeChild("com-signals");
    h_SaveCanSignals(orc_CanMessage.c_Signals, orc_XMLParser);
@@ -1381,8 +1413,8 @@ void C_PuiSdHandlerFiler::h_SaveCanMessage(const C_PuiSdNodeCanMessage & orc_Can
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save can signals
 
-   \param[in]     orc_CanSignals Can signals
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "com-signals" element
+   \param[in]      orc_CanSignals   Can signals
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "com-signals" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveCanSignals(const std::vector<C_PuiSdNodeCanSignal> & orc_CanSignals,
@@ -1403,8 +1435,8 @@ void C_PuiSdHandlerFiler::h_SaveCanSignals(const std::vector<C_PuiSdNodeCanSigna
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save can signal element
 
-   \param[in]     orc_CanSignal Can signal element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "com-signal" element
+   \param[in]      orc_CanSignal    Can signal element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "com-signal" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveCanSignal(const C_PuiSdNodeCanSignal & orc_CanSignal,
@@ -1420,8 +1452,13 @@ void C_PuiSdHandlerFiler::h_SaveCanSignal(const C_PuiSdNodeCanSignal & orc_CanSi
    Also uses base class function to load basic information.
    Postcondition: XMLParser has the node "nodes" selected.
 
-   \param[out]     orc_Nodes      UI node data containers
-   \param[in,out]  orc_XMLParser  XMLParser with the "current" element set to the "nodes" element
+   \param[out]     orc_Nodes        UI node data containers
+   \param[in,out]  orc_XMLParser    XMLParser with the "current" element set to the "nodes" element
+   \param[in]      opc_BasePath     Base path
+
+   \return
+   C_NO_ERR    everything ok
+   else        error occured while loading
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerFiler::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes, C_OSCXMLParserBase & orc_XMLParser,
@@ -1493,8 +1530,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes, C_
    Also uses base class function to save basic information.
    Postcondition: XMLParser has the node "nodes" selected.
 
-   \param[in]      orc_Nodes      UI node data containers
-   \param[in,out]  orc_XMLParser  XMLParser with the "current" element set to the "nodes" element
+   \param[in]      orc_Nodes        UI node data containers
+   \param[in,out]  orc_XMLParser    XMLParser with the "current" element set to the "nodes" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveNodes(const std::vector<C_PuiSdNode> & orc_Nodes, C_OSCXMLParserString & orc_XMLParser)
@@ -1518,8 +1555,8 @@ void C_PuiSdHandlerFiler::h_SaveNodes(const std::vector<C_PuiSdNode> & orc_Nodes
    Load GUI-specific information about bus.
    Also uses base class function to load basic information.
 
-   \param[in,out]  orc_Buses      UI bus data containers
-   \param[in,out]  orc_XMLParser  XML parser with the "current" element set to the "buses" element
+   \param[in,out]  orc_Buses        UI bus data containers
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "buses" element
 
    \return
    C_NO_ERR    information loaded
@@ -1584,12 +1621,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadBuses(std::vector<C_PuiSdBus> & orc_Buses, C_O
    Save GUI-specific information about bus.
    Also uses base class function to save basic information.
 
-   \param[in]      orc_Buses      UI bus data containers
-   \param[in,out]  orc_XMLParser  XML parser with the "current" element set to the "buses" element
-
-   \return
-   C_NO_ERR    information loaded
-   C_CONFIG    error loading information
+   \param[in]      orc_Buses        UI bus data containers
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "buses" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveBuses(const std::vector<C_PuiSdBus> & orc_Buses, C_OSCXMLParserBase & orc_XMLParser)
@@ -1610,8 +1643,8 @@ void C_PuiSdHandlerFiler::h_SaveBuses(const std::vector<C_PuiSdBus> & orc_Buses,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load text elements
 
-   \param[in,out] orc_BusTextElements Text element data elements
-   \param[in,out] orc_XMLParser       XML parser with the "current" element set to the "bus-text-elements" element
+   \param[in,out]  orc_BusTextElements    Text element data elements
+   \param[in,out]  orc_XMLParser          XML parser with the "current" element set to the "bus-text-elements" element
 
    \return
    C_NO_ERR    information loaded
@@ -1671,8 +1704,8 @@ sint32 C_PuiSdHandlerFiler::h_LoadBusTextElements(std::vector<C_PuiSdTextElement
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save text elements
 
-   \param[in]     orc_BusTextElements Text element data elements
-   \param[in,out] orc_XMLParser       XML parser with the "current" element set to the "bus-text-elements" element
+   \param[in]      orc_BusTextElements    Text element data elements
+   \param[in,out]  orc_XMLParser          XML parser with the "current" element set to the "bus-text-elements" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::h_SaveBusTextElements(const std::vector<C_PuiSdTextElementBus> & orc_BusTextElements,
@@ -1692,12 +1725,12 @@ void C_PuiSdHandlerFiler::h_SaveBusTextElements(const std::vector<C_PuiSdTextEle
 
    Save UI system definition to XML file
 
-   \param[in] orc_FilePath            File path for xml
-   \param[in] orc_OSCSystemDefinition OSC storage
-   \param[in] orc_UiNodes             UI nodes data storage
-   \param[in] orc_UiBuses             UI buses data storage
-   \param[in] orc_BusTextElements     UI bus text elements data storage
-   \param[in] orc_Elements            UI generic elements data storage
+   \param[in]  orc_FilePath               File path for xml
+   \param[in]  orc_OSCSystemDefinition    OSC storage
+   \param[in]  orc_UiNodes                UI nodes data storage
+   \param[in]  orc_UiBuses                UI buses data storage
+   \param[in]  orc_BusTextElements        UI bus text elements data storage
+   \param[in]  orc_Elements               UI generic elements data storage
 
    \return
    C_NO_ERR   data saved
@@ -1788,11 +1821,11 @@ sint32 C_PuiSdHandlerFiler::h_SaveSystemDefinitionUiFile(const QString & orc_Fil
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load system definition for UI
 
-   \param[in]     orc_FilePath        File path for xml
-   \param[in,out] orc_UiNodes         UI nodes data storage
-   \param[in,out] orc_UiBuses         UI buses data storage
-   \param[in,out] orc_BusTextElements UI bus text elements data storage
-   \param[in,out] orc_Elements        UI generic elements data storage
+   \param[in]      orc_FilePath           File path for xml
+   \param[in,out]  orc_UiNodes            UI nodes data storage
+   \param[in,out]  orc_UiBuses            UI buses data storage
+   \param[in,out]  orc_BusTextElements    UI bus text elements data storage
+   \param[in,out]  orc_Elements           UI generic elements data storage
 
    \return
    C_NO_ERR   data was read from file
@@ -1880,7 +1913,7 @@ QString C_PuiSdHandlerFiler::h_GetNodeUiFileName(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get automatically generated file name
 
-   \param[in] orc_DatapoolName Datapool name
+   \param[in]  orc_DatapoolName  Datapool name
 
    \return
    Automatically generated file name
@@ -1895,7 +1928,7 @@ QString C_PuiSdHandlerFiler::h_GetCommUiFileName(const C_SCLString & orc_Datapoo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get automatically generated file name
 
-   \param[in] orc_DatapoolName Datapool name
+   \param[in]  orc_DatapoolName  Datapool name
 
    \return
    Automatically generated file name
@@ -1910,6 +1943,8 @@ QString C_PuiSdHandlerFiler::h_GetDatapoolUiFileName(const C_SCLString & orc_Dat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get UI system definition file name
 
+   \param[in]  orc_SystemDefinitionCoreFilePath    File path to system definition core file
+
    \return
    UI system definition file name
 */
@@ -1918,11 +1953,13 @@ QString C_PuiSdHandlerFiler::h_GetSystemDefinitionUiFilePath(const QString & orc
 {
    const QFileInfo c_Info(orc_SystemDefinitionCoreFilePath);
 
-   return c_Info.dir().absoluteFilePath(c_Info.baseName() + "_ui.xml");
+   return c_Info.dir().absoluteFilePath(c_Info.completeBaseName() + "_ui.xml");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get UI shared Datapool configuration file name
+
+   \param[in]  orc_SystemDefinitionCoreFilePath    File path to system definition core file
 
    \return
    UI shared Datapool configuration file name
@@ -1938,9 +1975,9 @@ QString C_PuiSdHandlerFiler::h_GetSharedDatapoolUiFilePath(const QString & orc_S
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node UI part
 
-   \param[in,out] orc_Node     Node UI data storage
-   \param[in]     orc_FilePath File path
-   \param[in]     opc_BasePath Base path (Optional for save to string)
+   \param[in,out]  orc_Node      Node UI data storage
+   \param[in]      orc_FilePath  File path
+   \param[in]      opc_BasePath  Base path (Optional for save to string)
 
    \return
    C_NO_ERR    information loaded
@@ -1978,9 +2015,8 @@ sint32 C_PuiSdHandlerFiler::mh_LoadNodeFile(C_PuiSdNode & orc_Node, const QStrin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load datapool UI part
 
-   \param[in,out] orc_DataPool     Datapool UI data storage
-   \param[in]     orc_FilePath File path
-   \param[in]     opc_BasePath Base path (Optional for save to string)
+   \param[in,out]  orc_DataPool  Datapool UI data storage
+   \param[in]      orc_FilePath  File path
 
    \return
    C_NO_ERR    information loaded
@@ -2017,9 +2053,8 @@ sint32 C_PuiSdHandlerFiler::mh_LoadDatapoolFile(C_PuiSdNodeDataPool & orc_DataPo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load comm definition UI part
 
-   \param[in,out] orc_UICanProtocol Comm definition UI data storage
-   \param[in]     orc_FilePath      File path
-   \param[in]     opc_BasePath      Base path (Optional for save to string)
+   \param[in,out]  orc_UICanProtocol   Comm definition UI data storage
+   \param[in]      orc_FilePath        File path
 
    \return
    C_NO_ERR    information loaded
@@ -2060,9 +2095,13 @@ sint32 C_PuiSdHandlerFiler::mh_LoadCommFile(C_PuiSdNodeCanProtocol & orc_UICanPr
    Also uses base class function to load basic information.
    Postcondition: XMLParser has the node "node" selected.
 
-   \param[out]    orc_Node      UI node data container
-   \param[in,out] orc_XMLParser XMLParser with the "current" element set to the "node" element
-   \param[in]     opc_BasePath  Base path (Optional for save to string)
+   \param[out]     orc_Node         UI node data container
+   \param[in,out]  orc_XMLParser    XMLParser with the "current" element set to the "node" element
+   \param[in]      opc_BasePath     Base path (Optional for save to string)
+
+   \return
+   C_NO_ERR    everything ok
+   else        error occured while loading
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerFiler::mh_LoadNode(C_PuiSdNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
@@ -2171,10 +2210,10 @@ sint32 C_PuiSdHandlerFiler::mh_LoadNode(C_PuiSdNode & orc_Node, C_OSCXMLParserBa
 
    Save node to XML file
 
-   \param[in]     orc_UINode   UI data storage
-   \param[in]     orc_OSCNode  OSC data storage
-   \param[in,out] orc_FilePath File path for xml
-   \param[in]     opc_BasePath Base path (Optional for save to string)
+   \param[in]      orc_UINode    UI data storage
+   \param[in]      orc_OSCNode   OSC data storage
+   \param[in,out]  orc_FilePath  File path for xml
+   \param[in]      opc_BasePath  Base path (Optional for save to string)
 
    \return
    C_NO_ERR   data saved
@@ -2220,10 +2259,10 @@ sint32 C_PuiSdHandlerFiler::mh_SaveNodeFile(const C_PuiSdNode & orc_UINode, cons
    Also uses base class function to save basic information.
    Postcondition: XMLParser has the node "node" selected.
 
-   \param[in]      orc_UINode     UI node data container
-   \param[in]      orc_OSCNode    OSC node data container
-   \param[in]      opc_BasePath   Base path (Optional for save to string)
-   \param[in,out]  orc_XMLParser  XMLParser with the "current" element set to the "node" element
+   \param[in]      orc_UINode       UI node data container
+   \param[in]      opc_OSCNode      OSC node data container
+   \param[in]      opc_BasePath     Base path (Optional for save to string)
+   \param[in,out]  orc_XMLParser    XMLParser with the "current" element set to the "node" element
 
    \return
    C_NO_ERR   data saved
@@ -2308,8 +2347,8 @@ sint32 C_PuiSdHandlerFiler::mh_SaveNode(const C_PuiSdNode & orc_UINode, const C_
    Load GUI-specific information about bus.
    Also uses base class function to load basic information.
 
-   \param[in,out]  orc_Bus        UI bus data container
-   \param[in,out]  orc_XMLParser  XML parser with the "current" element set to the "bus" element
+   \param[in,out]  orc_Bus          UI bus data container
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "bus" element
 
    \return
    C_NO_ERR    information loaded
@@ -2349,12 +2388,8 @@ stw_types::sint32 C_PuiSdHandlerFiler::mh_LoadBus(C_PuiSdBus & orc_Bus, C_OSCXML
    Save GUI-specific information about bus.
    Also uses base class function to save basic information.
 
-   \param[in]      orc_Bus        UI bus data container
-   \param[in,out]  orc_XMLParser  XML parser with the "current" element set to the "bus" element
-
-   \return
-   C_NO_ERR    information loaded
-   C_CONFIG    error loading information
+   \param[in]      orc_Bus          UI bus data container
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "bus" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::mh_SaveBus(const C_PuiSdBus & orc_Bus, C_OSCXMLParserBase & orc_XMLParser)
@@ -2372,8 +2407,8 @@ void C_PuiSdHandlerFiler::mh_SaveBus(const C_PuiSdBus & orc_Bus, C_OSCXMLParserB
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load text element attributes
 
-   \param[in,out] opc_TextElement Text element data element
-   \param[in,out] orc_XMLParser   XML parser with the "current" element set to the "text-element" element
+   \param[in,out]  opc_TextElement  Text element data element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "text-element" element
 
    \return
    C_NO_ERR    information loaded
@@ -2400,8 +2435,8 @@ stw_types::sint32 C_PuiSdHandlerFiler::mh_LoadTextElement(C_PuiBsTextElement * c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save text element
 
-   \param[in]     opc_TextElement Text element data element
-   \param[in,out] orc_XMLParser   XML parser with the "current" element set to the "text-element" element
+   \param[in]      opc_TextElement  Text element data element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "text-element" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerFiler::mh_SaveTextElement(const C_PuiBsTextElement * const opc_TextElement,

@@ -58,17 +58,17 @@ const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH = 3;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent                  Reference to parent
-   \param[in]     ou32_ViewIndex              View index
-   \param[in]     ou32_DashboardIndex         Dashboard index
-   \param[in]     orc_Name                    Name of the item for the title
-   \param[in]     orc_Id                      Element id to use for default initialization (only used if not invalid)
-   \param[in]     orc_Scaling                 Scaling information for default initialization
-   \param[in]     oq_ReadElement              Optional flag if dialog for read element
-   \param[in]     oq_DarkMode                 Optional flag if dark mode active
-   \param[in]     oq_ShowWidgetSpecificPart   Optional flag if widget specific part is visible
-   \param[in]     oq_AllowChangeOfDataElement Optional flag if data element may be changed
-   \param[in]     orc_DisplayName             Optional display name (only used if element name cannot be changed)
+   \param[in,out]  orc_Parent                   Reference to parent
+   \param[in]      ou32_ViewIndex               View index
+   \param[in]      ou32_DashboardIndex          Dashboard index
+   \param[in]      orc_Name                     Name of the item for the title
+   \param[in]      orc_Id                       Element id to use for default initialization (only used if not invalid)
+   \param[in]      orc_Scaling                  Scaling information for default initialization
+   \param[in]      oq_ReadElement               Optional flag if dialog for read element
+   \param[in]      oq_DarkMode                  Optional flag if dark mode active
+   \param[in]      oq_ShowWidgetSpecificPart    Optional flag if widget specific part is visible
+   \param[in]      oq_AllowChangeOfDataElement  Optional flag if data element may be changed
+   \param[in]      orc_DisplayName              Optional display name (only used if element name cannot be changed)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_ViewIndex,
@@ -230,12 +230,47 @@ void C_SyvDaPeBase::InitStaticNames(void)
    this->mpc_Ui->pc_ComboBoxTheme->addItem(C_GtGetText::h_GetText("Material"));
    this->mpc_Ui->pc_ComboBoxTheme->addItem(C_GtGetText::h_GetText("Flat"));
    this->mpc_Ui->pc_ComboBoxTheme->addItem(C_GtGetText::h_GetText("Skeuomorphic"));
+
+   //Tool tips
+   this->mpc_Ui->pc_LabelTheme->SetToolTipInformation(C_GtGetText::h_GetText("Theme"),
+                                                      C_GtGetText::h_GetText(
+                                                         "General display style of the widget"
+                                                         " grouped into different common themes"));
+   this->mpc_Ui->pc_LabelDataElement->SetToolTipInformation(C_GtGetText::h_GetText("Data Element"),
+                                                            C_GtGetText::h_GetText(
+                                                               "The currently selected data element defined in the SYSTEM DEFINITION"));
+   this->mpc_Ui->pc_LabelUpdateModeHeading->SetToolTipInformation(C_GtGetText::h_GetText("Update Mode"),
+                                                                  C_GtGetText::h_GetText(
+                                                                     "The rate at which the data element value is requested,"
+                                                                     " once the dashboard is connected"));
+   this->mpc_Ui->pc_CheckBoxDefaultScaling->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                     "Use the default values of SYSTEM DEFINITION"),
+                                                                  C_GtGetText::h_GetText(
+                                                                     "Option to either use the scaling defined in the SYSTEM DEFINITION\n"
+                                                                     "or define a custom scaling just for this occurrence of this data element"));
+
+   //Tool tip content partly adapted from Vector CANdb++ Documentation
+   {
+      const QString c_PhysicalValueInfo = C_GtGetText::h_GetText("The raw value of a data element is the value as it is transmitted in the network."
+                                                                 "\nThe physical value of a data element is the value of the physical quantity (e.g. speed, "
+                                                                 "\nrpm, temperature, etc.) that represents the data element."
+                                                                 "\nThe following conversion formula is used to transform the raw value "
+                                                                 "\nto a physical value or in the reverse direction:"
+                                                                 "\n\n[Physical value] = ([Raw value] * [Factor]) + [Offset]");
+      QString c_InfoText =  C_GtGetText::h_GetText("Unit of the data elements physical quantity\n\n");
+      this->mpc_Ui->pc_LabelUnit->SetToolTipInformation(C_GtGetText::h_GetText("Unit"), c_InfoText.append(
+                                                           c_PhysicalValueInfo));
+      this->mpc_Ui->pc_LabelFactor->SetToolTipInformation(C_GtGetText::h_GetText("Factor"),
+                                                          c_PhysicalValueInfo);
+      this->mpc_Ui->pc_LabelOffset->SetToolTipInformation(C_GtGetText::h_GetText("Offset"),
+                                                          c_PhysicalValueInfo);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Place widget in pop up dialog
 
-   \param[in,out] opc_Widget Widget to place in pop up dialog
+   \param[in,out]  opc_Widget    Widget to place in pop up dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::SetWidget(QWidget * const opc_Widget)
@@ -251,7 +286,7 @@ void C_SyvDaPeBase::SetWidget(QWidget * const opc_Widget)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the write mode
 
-   \param[in]     oe_WriteMode      New write mode
+   \param[in]  oe_WriteMode   New write mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::SetWriteMode(const C_PuiSvDbWidgetBase::E_WriteMode oe_WriteMode) const
@@ -273,7 +308,7 @@ void C_SyvDaPeBase::SetWriteMode(const C_PuiSvDbWidgetBase::E_WriteMode oe_Write
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set theme
 
-   \param[in] oe_Style Current theme
+   \param[in]  oe_Style    Current theme
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::SetTheme(const C_PuiSvDbWidgetBase::E_Style oe_Style) const
@@ -333,9 +368,9 @@ float64 C_SyvDaPeBase::h_GetFixIconOffset(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get ideal item size according to current scene size
 
-   \param[out] orc_ItemPos  Ideal item position
-   \param[out] orc_ItemSize Ideal item size
-   \param[in]  opc_Item     Graphics item
+   \param[out]  orc_ItemPos   Ideal item position
+   \param[out]  orc_ItemSize  Ideal item size
+   \param[in]   opc_Item      Graphics item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::h_GetIdealItemRect(QPointF & orc_ItemPos, QSizeF & orc_ItemSize,
@@ -474,7 +509,7 @@ QString C_SyvDaPeBase::GetDisplayName(void) const
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -776,7 +811,7 @@ void C_SyvDaPeBase::m_Configuration(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get default display name
 
-   \param[in] orc_Id ID to use for default
+   \param[in]  orc_Id   ID to use for default
 
    \return
    Default display name
@@ -876,8 +911,8 @@ void C_SyvDaPeBase::m_InitNoDataElement(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize valid data element state
 
-   \param[in] orc_Id      Element id to use for default initialization (only used if not invalid)
-   \param[in] orc_Scaling Scaling information for default initialization
+   \param[in]  orc_Id         Element id to use for default initialization (only used if not invalid)
+   \param[in]  orc_Scaling    Scaling information for default initialization
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId & orc_Id,

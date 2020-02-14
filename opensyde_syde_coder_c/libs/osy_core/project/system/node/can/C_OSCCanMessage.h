@@ -31,6 +31,8 @@ class C_OSCCanMessage
 public:
    C_OSCCanMessage(void);
 
+   bool operator !=(const C_OSCCanMessage & orc_Cmp) const;
+
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
    bool CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const stw_types::uint32 & oru32_SignalIndex,
                          const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset) const;

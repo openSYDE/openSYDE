@@ -62,8 +62,8 @@ C_SdNdeDpListArrayEditDelegate::C_SdNdeDpListArrayEditDelegate(QObject * const o
 */
 //----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDpListArrayEditDelegate::createEditor(QWidget * const opc_Parent,
-                                                             const QStyleOptionViewItem & orc_Option,
-                                                             const QModelIndex & orc_Index) const
+                                                       const QStyleOptionViewItem & orc_Option,
+                                                       const QModelIndex & orc_Index) const
 {
    QWidget * pc_Retval = NULL;
 
@@ -84,8 +84,7 @@ QWidget * C_SdNdeDpListArrayEditDelegate::createEditor(QWidget * const opc_Paren
    \param[in]     orc_Index  Correlating index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListArrayEditDelegate::setEditorData(QWidget * const opc_Editor,
-                                                         const QModelIndex & orc_Index) const
+void C_SdNdeDpListArrayEditDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
    {
@@ -103,9 +102,8 @@ void C_SdNdeDpListArrayEditDelegate::setEditorData(QWidget * const opc_Editor,
    \param[in]     orc_Index  Correlating index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListArrayEditDelegate::setModelData(QWidget * const opc_Editor,
-                                                        QAbstractItemModel * const opc_Model,
-                                                        const QModelIndex & orc_Index) const
+void C_SdNdeDpListArrayEditDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
+                                                  const QModelIndex & orc_Index) const
 {
    if (((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true))
    {
@@ -116,7 +114,7 @@ void C_SdNdeDpListArrayEditDelegate::setModelData(QWidget * const opc_Editor,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set model for column look up
 
-   \param[in] opc_Model  Model for column look up
+   \param[in] opc_Value  Model for column look up
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListArrayEditDelegate::SetModel(const C_SdNdeDpListArrayEditModel * const opc_Value)
@@ -136,7 +134,7 @@ void C_SdNdeDpListArrayEditDelegate::SetModel(const C_SdNdeDpListArrayEditModel 
 */
 //----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDpListArrayEditDelegate::m_CreateEditor(QWidget * const opc_Parent,
-                                                               const QModelIndex & orc_Index) const
+                                                         const QModelIndex & orc_Index) const
 {
    QWidget * pc_Retval = NULL;
 
@@ -154,9 +152,9 @@ QWidget * C_SdNdeDpListArrayEditDelegate::m_CreateEditor(QWidget * const opc_Par
                C_OSCNodeDataPoolContent c_NewMin = pc_Element->c_MinValue;
                C_SdNdeDpContentUtil::h_InitMin(c_NewMin);
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, c_NewMin,
-                                                                      pc_Element->c_MaxValue, pc_Element->f64_Factor,
-                                                                      pc_Element->f64_Offset,
-                                                                      static_cast<uint32>(orc_Index.column()), false);
+                                                                pc_Element->c_MaxValue, pc_Element->f64_Factor,
+                                                                pc_Element->f64_Offset,
+                                                                static_cast<uint32>(orc_Index.column()), false);
             }
             else if (this->mpc_Model->GetArrayEditType() == C_SdNdeDpUtil::eARRAY_EDIT_MAX)
             {
@@ -164,16 +162,16 @@ QWidget * C_SdNdeDpListArrayEditDelegate::m_CreateEditor(QWidget * const opc_Par
                C_OSCNodeDataPoolContent c_NewMax = pc_Element->c_MaxValue;
                C_SdNdeDpContentUtil::h_InitMax(c_NewMax);
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
-                                                                      c_NewMax, pc_Element->f64_Factor,
-                                                                      pc_Element->f64_Offset,
-                                                                      static_cast<uint32>(orc_Index.column()), false);
+                                                                c_NewMax, pc_Element->f64_Factor,
+                                                                pc_Element->f64_Offset,
+                                                                static_cast<uint32>(orc_Index.column()), false);
             }
             else
             {
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
-                                                                      pc_Element->c_MaxValue, pc_Element->f64_Factor,
-                                                                      pc_Element->f64_Offset,
-                                                                      static_cast<uint32>(orc_Index.column()), false);
+                                                                pc_Element->c_MaxValue, pc_Element->f64_Factor,
+                                                                pc_Element->f64_Offset,
+                                                                static_cast<uint32>(orc_Index.column()), false);
             }
          }
       }

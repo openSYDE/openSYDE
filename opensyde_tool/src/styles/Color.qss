@@ -40,7 +40,6 @@ stw_opensyde_gui_elements--C_OgeChxTristate,
 QTextEdit#pc_TextEditDpName,
 stw_opensyde_gui--C_SdTopologyListWidget::item:selected,
 stw_opensyde_gui--C_SdTopologyListWidget::item:hover,
-stw_opensyde_gui--C_SdTopologyListWidget,
 stw_opensyde_gui--C_SdNdeDbListWidget,
 stw_opensyde_gui--C_SdNdeDpSelectorListWidget,
 stw_opensyde_gui_elements--C_OgeLeSearch,
@@ -62,12 +61,6 @@ stw_opensyde_gui--C_SyvDaDashboardSelectorTabBar:tab,
 stw_opensyde_gui_elements--C_OgeWiDashboardTab,
 stw_opensyde_gui--C_SyvDaDashboardSelectorTabWidget,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Background="-1"],
-stw_opensyde_gui_elements--C_OgeCbxFontProperties QListView::item:selected:!hover,
-stw_opensyde_gui_elements--C_OgeCbxText QListView::item:selected:!hover,
-stw_opensyde_gui_elements--C_OgeCbxLine QListView::item:selected:!hover,
-stw_opensyde_gui_elements--C_OgeCbxArrow QListView::item:selected:!hover,
-stw_opensyde_gui_elements--C_OgeCbxParam QListView::item:selected:!hover,
-stw_opensyde_gui_elements--C_OgeCbxTable QListView::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgePubTabClose,
 stw_opensyde_gui_elements--C_OgePubToggleBold:!checked,
 stw_opensyde_gui_elements--C_OgePubToggle:!checked,
@@ -101,8 +94,9 @@ stw_opensyde_gui--C_SyvDaDashboardWidget,
 stw_opensyde_gui--C_SdNdeDbAddNewProject,
 stw_opensyde_gui--C_SdNdeDbSelectDataPools,
 stw_opensyde_gui--C_SdNdeProgrammingOptions,
-stw_opensyde_gui--C_CieDBCImportNodeSelectWidget,
+stw_opensyde_gui--C_CieDcfEdsImportNodeSelectWidget,
 stw_opensyde_gui--C_CieImportDatapoolSelectWidget,
+stw_opensyde_gui--C_CieDbcImportNodeAssignmentWidget,
 stw_opensyde_gui--C_CieImportReportWidget,
 stw_opensyde_gui--C_CieExportReportWidget,
 stw_opensyde_gui--C_RtfExportWidget,
@@ -167,7 +161,15 @@ stw_opensyde_gui_elements--C_OgePubOptions:enabled,
 stw_opensyde_gui_elements--C_OgePubOptions:disabled,
 stw_opensyde_gui_logic--C_PopFileTableView,
 stw_opensyde_gui_logic--C_PopFileTableView::item,
-stw_opensyde_gui_elements--C_OgeContextMenu::item
+stw_opensyde_gui_elements--C_OgeContextMenu::item,
+stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView::item:hover:!selected,
+stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView::item:hover:!selected,
+stw_opensyde_gui_elements--C_OgeCbxFontProperties QListView::item:hover:!selected,
+stw_opensyde_gui_elements--C_OgeCbxText QListView::item:enabled:hover:!selected,
+stw_opensyde_gui_elements--C_OgeCbxLine QListView::item:hover:!selected,
+stw_opensyde_gui_elements--C_OgeCbxArrow QListView::item:hover:!selected,
+stw_opensyde_gui_elements--C_OgePubTextOnly,
+stw_opensyde_gui_elements::C_OgePubIconOnly
 {
 background-color: transparent;
 }
@@ -281,7 +283,8 @@ stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="O
 stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="OPENSYDE_2_DARK"][Selected="false"],
 stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="FLAT_DARK"][Selected="true"],
 stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="SKEUOMORPH_BRIGHT"][Selected="true"],
-stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="SKEUOMORPH_DARK"][Selected="true"]
+stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="SKEUOMORPH_DARK"][Selected="true"],
+stw_opensyde_gui_elements--C_OgeLabGroupItem[HasColor0="true"]
 {
 color: rgb(255, 255, 255);
 }
@@ -416,7 +419,8 @@ stw_opensyde_gui_elements--C_OgeLabTreeNode[DarkMode="true"],
 stw_opensyde_gui_elements--C_OgeLabParamHeading[DarkMode="true"],
 stw_opensyde_gui_elements--C_OgeLabTreeNodeDataPool[DarkMode="true"],
 stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="OPENSYDE_DARK"][Selected="false"],
-stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="2"]
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="2"],
+stw_opensyde_gui_elements--C_OgeLabGroupItem[HasColor2="true"]
 {
 color: rgb(27, 27, 68);
 }
@@ -465,7 +469,7 @@ background-color: rgba(141, 141, 161, 255);
 stw_opensyde_gui_elements--C_OgeLabPopUpTitle,
 stw_opensyde_gui_elements--C_OgeLabPopUpSubTitle,
 stw_opensyde_gui_elements--C_OgeLabHeadingMessage,
-stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroupBold[DarkMode="false"],
+stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroupBig[DarkMode="false"],
 stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroup[DarkMode="false"],
 stw_opensyde_gui_elements--C_OgeLabPropertiesSubHeading,
 stw_opensyde_gui_elements--C_OgeLabHeadingProperties,
@@ -475,12 +479,12 @@ stw_opensyde_gui_elements--C_OgeLabHeadingWidget,
 stw_opensyde_gui_elements--C_OgeLabHeadingWidgetDark[DarkMode="false"],
 QTextEdit#pc_TextEditDpName,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF QHeaderView::section,
-stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView::item:hover,
-stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView::item:hover,
-stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView::item:hover,
-stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item:enabled:hover,
-stw_opensyde_gui_elements--C_OgeCbxLine QAbstractItemView::item:hover,
-stw_opensyde_gui_elements--C_OgeCbxArrow QAbstractItemView::item:hover,
+stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView::item:selected,
+stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView::item:selected,
+stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView::item:selected,
+stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item:enabled:selected,
+stw_opensyde_gui_elements--C_OgeCbxLine QAbstractItemView::item:selected,
+stw_opensyde_gui_elements--C_OgeCbxArrow QAbstractItemView::item:selected,
 stw_opensyde_gui_elements--C_OgeMuSections::item:selected,
 stw_opensyde_gui_elements--C_OgeLeSearch,
 stw_opensyde_gui_elements--C_OgeLabNodeType,
@@ -500,7 +504,8 @@ stw_opensyde_gui_elements--C_OgeTedToolTipContent[Type="DEFAULT"],
 stw_opensyde_gui_elements--C_OgeLabHeadingToolTip[Type="DEFAULT"],
 stw_opensyde_gui_elements--C_OgeContextMenu::item,
 stw_opensyde_gui_elements--C_OgeContextMenu::item:enabled,
-stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="OPENSYDE_2_BRIGHT"][Selected="true"]
+stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="OPENSYDE_2_BRIGHT"][Selected="true"],
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="3"]
 {
 color: rgb(42, 42, 91);
 }
@@ -539,6 +544,7 @@ stw_opensyde_gui_elements--C_OgeLeToolBarSearch,
 stw_opensyde_gui_elements--C_OgeLePropertiesName,
 stw_opensyde_gui_elements--C_OgeLeProperties,
 stw_opensyde_gui_elements--C_OgeLeFilePath,
+stw_opensyde_gui_elements--C_OgeLePlaceholderVar,
 stw_opensyde_gui_elements--C_OgeTebMessageDetails,
 stw_opensyde_gui_elements--C_OgeTedPropertiesComment,
 stw_opensyde_gui_elements--C_OgeTebReport,
@@ -563,7 +569,17 @@ stw_opensyde_gui_elements--C_OgeTedTable,
 stw_opensyde_gui_elements--C_OgeLabListHeaderHeading,
 stw_opensyde_gui_elements--C_OgeLabDescriptionMessage,
 stw_opensyde_gui_elements--C_OgeLabGroupItemValue,
-stw_opensyde_gui_elements--C_OgeLabHeadingMessage
+stw_opensyde_gui_elements--C_OgeCbxFontProperties,
+stw_opensyde_gui_elements--C_OgeCbxFontProperties QListView,
+stw_opensyde_gui_elements--C_OgeLabHeadingMessage,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"]
 {
 selection-color: rgb(42, 42, 91);
 }
@@ -646,29 +662,24 @@ stw_opensyde_gui--C_SdNdeDpListTableView::item:enabled:selected:!focus,
 stw_opensyde_gui_elements--C_OgeLabParamInactive[DarkMode="true"],
 stw_opensyde_gui_elements--C_OgeLeProperties,
 stw_opensyde_gui_elements--C_OgeLeFilePath,
+stw_opensyde_gui_elements--C_OgeLePlaceholderVar,
 stw_opensyde_gui_elements--C_OgeLePropertiesName,
 stw_opensyde_gui_elements--C_OgeTedPropertiesComment,
 stw_opensyde_gui_elements--C_OgeTebReport,
 stw_opensyde_gui_elements--C_OgeCbxFontProperties,
 stw_opensyde_gui_elements--C_OgeCbxFontProperties QListView,
-stw_opensyde_gui_elements--C_OgeCbxFontProperties QListView::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgeCbxTextLineEdit[LineEditError="false"],
 stw_opensyde_gui_elements--C_OgeCbxText[LineEditError="false"],
 stw_opensyde_gui_elements--C_OgeCbxText QListView,
 stw_opensyde_gui_elements--C_OgeCbxText QListView::item:enabled,
-stw_opensyde_gui_elements--C_OgeCbxText QListView::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgeCbxLine,
 stw_opensyde_gui_elements--C_OgeCbxLine QListView,
-stw_opensyde_gui_elements--C_OgeCbxLine QListView::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgeCbxArrow,
 stw_opensyde_gui_elements--C_OgeCbxArrow QListView,
-stw_opensyde_gui_elements--C_OgeCbxArrow QListView::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgeCbxParam,
 stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView,
-stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgeCbxTable,
 stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView,
-stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView::item:selected:!hover,
 stw_opensyde_gui_elements--C_OgeMuSections:item,
 stw_opensyde_gui--C_SyvDaItPaArView,
 stw_opensyde_gui--C_SyvDaItPaArView::item:selected,
@@ -706,7 +717,8 @@ stw_opensyde_gui_elements--C_OgeLabDashboardDefaultNonScaling[Style="OPENSYDE_2_
 stw_opensyde_gui_elements--C_OgeLabDashboardProgressBarMaximum[Style="OPENSYDE_2_BRIGHT"],
 stw_opensyde_gui_elements--C_OgeLabNodePropComIfTable[Enabled_IP_Address_Cell="true"]:enabled,
 stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelDataSerieName[Style="OPENSYDE_2_BRIGHT"][Selected="false"],
-stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="6"]
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="6"],
+stw_opensyde_gui_elements--C_OgePubTextOnly
 {
 color: rgb(86, 86, 104);
 }
@@ -785,6 +797,7 @@ stw_opensyde_gui_elements--C_OgeTedSdListHeader,
 stw_opensyde_gui_elements--C_OgeTedSyListHeader,
 QTextEdit#pc_TextEditDpComment,
 stw_opensyde_gui_elements--C_OgeLabGroupItem,
+stw_opensyde_gui_elements--C_OgeLabGroupItem[HasColor8="true"],
 stw_opensyde_gui_elements--C_OgeChxProperties,
 stw_opensyde_gui_elements--C_OgeRabProperties,
 stw_opensyde_gui_elements--C_OgeLabGroupSubItem,
@@ -799,7 +812,8 @@ stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="8"],
 stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget::item:enabled,
 stw_opensyde_gui_elements--C_OgeLabToolBarSearchResultTitle,
 stw_opensyde_gui_elements--C_OgeLabToolBarSearchResultSubtitle,
-stw_opensyde_gui_elements--C_OgeLabToolBarNoSearchResult
+stw_opensyde_gui_elements--C_OgeLabToolBarNoSearchResult,
+stw_opensyde_gui_elements--C_OgeLabProgressLogItem
 {
 color: rgb(130, 130, 143);
 }
@@ -846,7 +860,7 @@ stw_opensyde_gui_elements--C_OgePubOptions:disabled,
 stw_opensyde_gui_elements--C_OgeLabUpdateAppPath,
 stw_opensyde_gui_elements--C_OgeContextMenu::item:disabled,
 stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item:disabled,
-stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item:disabled:hover
+stw_opensyde_gui_elements--C_OgeLabProgressLogHeading
 {
 color: rgb(155, 155, 170);
 }
@@ -866,6 +880,7 @@ stw_opensyde_gui_elements--C_OgeLabNodePropComIfTable:disabled,
 stw_opensyde_gui_elements--C_OgeLePropertiesName:!enabled,
 stw_opensyde_gui_elements--C_OgeLeProperties:!enabled,
 stw_opensyde_gui_elements--C_OgeLeFilePath:!enabled,
+stw_opensyde_gui_elements--C_OgeLePlaceholderVar:!enabled,
 stw_opensyde_gui_elements--C_OgeLabPropertiesSubHeading:!enabled,
 stw_opensyde_gui_elements--C_OgeLabGroupItem:!enabled,
 stw_opensyde_gui_elements--C_OgeLabGroupItemValue:!enabled,
@@ -915,6 +930,7 @@ stw_opensyde_gui--C_SdNdeDpListArrayEditView::item:selected:!focus,
 stw_opensyde_gui--C_SdNdeDpListDataSetView::item:selected:!focus,
 QFrame#pc_FrameSdNdeDpSelectorItem,
 stw_opensyde_gui_elements--C_OgeFrameSeparator,
+stw_opensyde_gui_elements--C_OgeFrameSeparator[HasColor10Background="true"],
 stw_opensyde_gui_elements--C_OgePubToggleBold:checked,
 stw_opensyde_gui_elements--C_OgePubToggle:checked,
 stw_opensyde_gui--C_SdBueMessageSelectorWidget QWidget#pc_MessagesPbWidget[Selected="true"],
@@ -946,6 +962,7 @@ stw_opensyde_gui--C_SyvDaItPaWidget[Style="OPENSYDE_BRIGHT"],
 stw_opensyde_gui--C_SyvDaItChartWidget[Style="OPENSYDE_BRIGHT"],
 stw_opensyde_gui_elements--C_OgeLeProperties,
 stw_opensyde_gui_elements--C_OgeLeFilePath,
+stw_opensyde_gui_elements--C_OgeLePlaceholderVar,
 stw_opensyde_gui_elements--C_OgePubOpen,
 stw_opensyde_gui_elements--C_OgePubPathVariables,
 stw_opensyde_gui_elements--C_OgeLePropertiesName,
@@ -1161,6 +1178,7 @@ stw_opensyde_gui--C_SyvDaItPaWidget[Style="OPENSYDE_BRIGHT"],
 stw_opensyde_gui--C_SyvDaItChartWidget[Style="OPENSYDE_BRIGHT"],
 stw_opensyde_gui--C_SyvDaItChartDataItemWidget[Style="OPENSYDE_BRIGHT"][Selected="false"],
 stw_opensyde_gui--C_SdTopologyToolbox,
+stw_opensyde_gui--C_SdTopologyListWidget,
 QFrame#pc_FrameApplicationWidget,
 stw_opensyde_gui--C_SyvDaItPaTreeView[DarkMode="false"]::branch:!alternate,
 stw_opensyde_gui--C_SyvDaItPaTreeView[DarkMode="false"]::item:!alternate,
@@ -1181,6 +1199,7 @@ stw_opensyde_gui_elements--C_OgeTedSdListHeader:focus,
 stw_opensyde_gui_elements--C_OgeTedSyListHeader:focus,
 stw_opensyde_gui_elements--C_OgeLeProperties,
 stw_opensyde_gui_elements--C_OgeLeFilePath,
+stw_opensyde_gui_elements--C_OgeLePlaceholderVar,
 stw_opensyde_gui_elements--C_OgePubOpen:!hover:!open:!pressed,
 stw_opensyde_gui_elements--C_OgePubPathVariables,
 stw_opensyde_gui_elements--C_OgeLePropertiesName,
@@ -1197,7 +1216,6 @@ stw_opensyde_gui_elements--C_OgeCbxFontProperties QListView,
 stw_opensyde_gui_elements--C_OgeCbxText,
 stw_opensyde_gui_elements--C_OgeCbxTextLineEdit,
 stw_opensyde_gui_elements--C_OgeCbxText QListView,
-stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item:disabled:hover,
 stw_opensyde_gui_elements--C_OgeMuSections,
 stw_opensyde_gui--C_SdBueMessageRxEntry stw_opensyde_gui_elements--C_OgeCbxText,
 stw_opensyde_gui--C_SdBueMessageRxEntry stw_opensyde_gui_elements--C_OgeSpxNumber,
@@ -1341,7 +1359,6 @@ stw_opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator:checked
 border-color: rgb(203, 235, 193);
 }
 
-
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_COLOR_23 */
 /* background-color */
@@ -1427,12 +1444,12 @@ selection-color: rgb(230, 58, 63);
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_COLOR_25 */
 /* background-color */
-stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView::item:hover,
-stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView::item:hover,
-stw_opensyde_gui_elements--C_OgeCbxFontProperties QListView::item:hover,
-stw_opensyde_gui_elements--C_OgeCbxText QListView::item:enabled:hover,
-stw_opensyde_gui_elements--C_OgeCbxLine QListView::item:hover,
-stw_opensyde_gui_elements--C_OgeCbxArrow QListView::item:hover,
+stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView::item:selected,
+stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView::item:selected,
+stw_opensyde_gui_elements--C_OgeCbxFontProperties QListView::item:selected,
+stw_opensyde_gui_elements--C_OgeCbxText QListView::item:enabled:selected,
+stw_opensyde_gui_elements--C_OgeCbxLine QListView::item:selected,
+stw_opensyde_gui_elements--C_OgeCbxArrow QListView::item:selected,
 stw_opensyde_gui_elements--C_OgeMuSections::item:selected,
 stw_opensyde_gui--C_SyvDaItChartDataItemWidget[Style="OPENSYDE_2_BRIGHT"][Selected="true"]
 {
@@ -1451,6 +1468,7 @@ stw_opensyde_gui_elements--C_OgeLeToolBarSearch,
 stw_opensyde_gui_elements--C_OgeLePropertiesName,
 stw_opensyde_gui_elements--C_OgeLeProperties,
 stw_opensyde_gui_elements--C_OgeLeFilePath,
+stw_opensyde_gui_elements--C_OgeLePlaceholderVar,
 stw_opensyde_gui_elements--C_OgeTebMessageDetails,
 stw_opensyde_gui_elements--C_OgeTedPropertiesComment,
 stw_opensyde_gui_elements--C_OgeTebReport,
@@ -1475,7 +1493,17 @@ stw_opensyde_gui_elements--C_OgeTedTable,
 stw_opensyde_gui_elements--C_OgeLabListHeaderHeading,
 stw_opensyde_gui_elements--C_OgeLabDescriptionMessage,
 stw_opensyde_gui_elements--C_OgeLabGroupItemValue,
-stw_opensyde_gui_elements--C_OgeLabHeadingMessage
+stw_opensyde_gui_elements--C_OgeCbxFontProperties,
+stw_opensyde_gui_elements--C_OgeCbxFontProperties QListView,
+stw_opensyde_gui_elements--C_OgeLabHeadingMessage,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"]
 {
 selection-background-color: rgb(195, 186, 221);
 }
@@ -1541,10 +1569,11 @@ stw_opensyde_gui_elements--C_OgeLabDashboardLabelCaption[Style="OPENSYDE_BRIGHT"
 stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style="OPENSYDE_BRIGHT"],
 stw_opensyde_gui_elements--C_OgeLabDashboardLabelCaption[Style="OPENSYDE_DARK"],
 stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style="OPENSYDE_DARK"],
-stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroupBold[DarkMode="true"],
+stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroupBig[DarkMode="true"],
 stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroup[DarkMode="true"],
 stw_opensyde_gui_elements--C_OgeTawToolBox[DarkMode="true"] QTabBar::tab,
-stw_opensyde_gui_elements--C_OgeLabHeadingWidgetDark[DarkMode="true"]
+stw_opensyde_gui_elements--C_OgeLabHeadingWidgetDark[DarkMode="true"],
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="32"]
 {
 color: rgb(30, 30, 33);
 }
@@ -1654,7 +1683,8 @@ stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="
 stw_opensyde_gui--C_SyvDaItDashboardLabelWidget[Style="SKEUOMORPH_DARK"][Type="DEFAULT"],
 stw_opensyde_gui--C_SyvDaItChartDataItemWidget[Style="SKEUOMORPH_DARK"][Selected="true"],
 stw_opensyde_gui--C_SyvDaItTaView QHeaderView[Style="SKEUOMORPH_BRIGHT"],
-stw_opensyde_gui--C_SyvDaItDashboardLabelWidget[Style="SKEUOMORPH_BRIGHT"][Type="DEFAULT"] stw_opensyde_gui_elements--C_OgeLabDashboardLabelCaption
+stw_opensyde_gui--C_SyvDaItDashboardLabelWidget[Style="SKEUOMORPH_BRIGHT"][Type="DEFAULT"] stw_opensyde_gui_elements--C_OgeLabDashboardLabelCaption,
+stw_opensyde_gui_elements--C_OgeFrameSeparator[HasColor34Background="true"]
 {
 background-color: rgb(91, 91, 91);
 }
@@ -1776,7 +1806,8 @@ border-color: rgb(217, 217, 226); /*rgb(237, 237, 242);*/
 /* STYLE_GUIDE_COLOR_39 */
 /* background-color */
 stw_opensyde_gui--C_SyvDaItDashboardLabelWidget[Style="FLAT_DARK"][Type="DEFAULT"],
-stw_opensyde_gui--C_SyvDaItChartWidget[Style="FLAT_DARK"]
+stw_opensyde_gui--C_SyvDaItChartWidget[Style="FLAT_DARK"],
+stw_opensyde_gui_elements--C_OgeFrameSeparator[HasColor39Background="true"]
 {
 background-color: rgb(116, 116, 116);
 }
@@ -1906,7 +1937,20 @@ background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgb(91, 91, 91)
 /* STYLE_GUIDE_COLOR_51 */
 /* background-color */
 stw_opensyde_gui_elements--C_OgeTawToolBox[DarkMode="true"]::pane,
-stw_opensyde_gui_elements--C_OgeTawToolBox[DarkMode="true"] QTabBar::tab:selected
+stw_opensyde_gui_elements--C_OgeTawToolBox[DarkMode="true"] QTabBar::tab:selected,
+stw_opensyde_gui--C_SdTopologyListWidget[DarkMode="true"],
+stw_opensyde_gui_elements--C_OgeCbxText[Style="OPENSYDE_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxTextLineEdit[Style="OPENSYDE_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxText QListView[Style="OPENSYDE_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxText[Style="OPENSYDE_2_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxTextLineEdit[Style="OPENSYDE_2_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxText QListView[Style="OPENSYDE_2_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxText[Style="FLAT_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxTextLineEdit[Style="FLAT_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxText QListView[Style="FLAT_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxText[Style="SKEUOMORPH_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxTextLineEdit[Style="SKEUOMORPH_DARK"],
+stw_opensyde_gui_elements--C_OgeCbxText QListView[Style="SKEUOMORPH_DARK"]
 {
 background-color: rgb(212, 212, 212);
 }

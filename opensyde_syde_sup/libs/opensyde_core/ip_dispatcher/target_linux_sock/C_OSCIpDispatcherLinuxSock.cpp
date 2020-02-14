@@ -24,7 +24,7 @@
 //#include <netdb.h>
 #include <ifaddrs.h>
 
- #include "stwtypes.h"
+#include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCIpDispatcherLinuxSock.h"
@@ -322,7 +322,7 @@ sint32 C_OSCIpDispatcherLinuxSock::m_ConnectTcp(C_TcpConnection & orc_Connection
       u32_IpAddr = (orc_Connection.au8_IpAddress[0] << 24) |
                    (orc_Connection.au8_IpAddress[1] << 16) |
                    (orc_Connection.au8_IpAddress[2] << 8)  |
-                    orc_Connection.au8_IpAddress[3];
+                   orc_Connection.au8_IpAddress[3];
       t_RemoteAddr.sin_addr.s_addr = htonl(u32_IpAddr);
       t_RemoteAddr.sin_port = htons(mhu16_UDP_TCP_PORT); //server port
 
@@ -349,7 +349,7 @@ sint32 C_OSCIpDispatcherLinuxSock::m_ConnectTcp(C_TcpConnection & orc_Connection
          FD_SET(orc_Connection.sn_Socket, &t_SocketErrorSet);
          t_TimeOut.tv_sec = mu32_ConnectionTimeoutSeconds;
          t_TimeOut.tv_usec = 0;
-         sn_Return = select(orc_Connection.sn_Socket+1, NULL, &t_SocketWriteSet, &t_SocketErrorSet, &t_TimeOut);
+         sn_Return = select(orc_Connection.sn_Socket + 1, NULL, &t_SocketWriteSet, &t_SocketErrorSet, &t_TimeOut);
          switch (sn_Return)
          {
          case -1:
@@ -418,7 +418,7 @@ sint32 C_OSCIpDispatcherLinuxSock::m_ConnectTcp(C_TcpConnection & orc_Connection
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::m_ConfigureUdpSocket(const bool oq_ServerPort, const uint32 ou32_IpToBindTo,
-                                                      sintn & orsn_Socket) const
+                                                        sintn & orsn_Socket) const
 {
    bool q_Error = false;
    sintn sn_Return;
@@ -458,6 +458,10 @@ sint32 C_OSCIpDispatcherLinuxSock::m_ConfigureUdpSocket(const bool oq_ServerPort
       t_LocalAddr.sin_addr.s_addr = htonl(ou32_IpToBindTo);
       if (oq_ServerPort == true)
       {
+         // Make port 13400 reusable to be able to run osy client and server simultaneously on same target
+         sintn sn_Enabled = 1;
+         setsockopt(orsn_Socket, SOL_SOCKET, SO_REUSEADDR, &sn_Enabled, sizeof(sn_Enabled));
+
          t_LocalAddr.sin_port = htons(mhu16_UDP_TCP_PORT); //provide port
       }
       else
@@ -599,7 +603,7 @@ sint32 C_OSCIpDispatcherLinuxSock::IsTcpConnected(const uint32 ou32_Handle)
       osc_write_log_error("openSYDE IP-TP", "ReConnectTcp called with invalid handle.");
       s32_Return = C_RANGE;
    }
-   else if(this->mc_SocketsTcp[ou32_Handle].sn_Socket == INVALID_SOCKET)
+   else if (this->mc_SocketsTcp[ou32_Handle].sn_Socket == INVALID_SOCKET)
    {
       // Socket not opened yet
       s32_Return = C_NOACT;
@@ -815,7 +819,7 @@ sint32 C_OSCIpDispatcherLinuxSock::SendTcp(const uint32 ou32_Handle, const std::
             {
                osc_write_log_error("openSYDE IP-TP",
                                    "SendTcp: Could not send all data: tried: " +
-                                   C_SCLString::IntToStr(static_cast<sintn>(orc_Data.size())) + 
+                                   C_SCLString::IntToStr(static_cast<sintn>(orc_Data.size())) +
                                    "sent: " + C_SCLString::IntToStr(sn_BytesSent));
             }
             s32_Return = C_RD_WR;
@@ -935,8 +939,8 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadTcp(const uint32 ou32_Handle, std::vector
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::ReadTcp(const uint32 ou32_Handle, const uint8 ou8_ClientBusIdentifier,
-                                         const uint8 ou8_ClientNodeIdentifier, const uint8 ou8_ServerBusIdentifier,
-                                         const uint8 ou8_ServerNodeIdentifier, std::vector<uint8> & orc_Data)
+                                           const uint8 ou8_ClientNodeIdentifier, const uint8 ou8_ServerBusIdentifier,
+                                           const uint8 ou8_ServerNodeIdentifier, std::vector<uint8> & orc_Data)
 {
    sint32 s32_Return;
 
@@ -1024,9 +1028,9 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadTcp(const uint32 ou32_Handle, const uint8
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherLinuxSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdentifier,
-                                               const uint8 ou8_ClientNodeIdentifier,
-                                               const uint8 ou8_ServerBusIdentifier,
-                                               const uint8 ou8_ServerNodeIdentifier, std::vector<uint8> & orc_Data)
+                                                 const uint8 ou8_ClientNodeIdentifier,
+                                                 const uint8 ou8_ServerBusIdentifier,
+                                                 const uint8 ou8_ServerNodeIdentifier, std::vector<uint8> & orc_Data)
 {
    sint32 s32_Return = C_NOACT;
 
@@ -1090,17 +1094,18 @@ sint32 C_OSCIpDispatcherLinuxSock::SendUdp(const std::vector<uint8> & orc_Data)
             sockaddr_in t_TargetAddress;
             t_TargetAddress.sin_family = AF_INET;
             t_TargetAddress.sin_port = htons(mhu16_UDP_TCP_PORT);      //target port [REQ DoIp-011]
-            t_TargetAddress.sin_addr.s_addr = htonl(INADDR_BROADCAST); //lint !e1960 //constant defined by API; no problem
+            t_TargetAddress.sin_addr.s_addr = htonl(INADDR_BROADCAST); //lint !e1960 //constant defined by API; no
+                                                                       // problem
             //lint -e{740,926,929}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
             const sintn sn_Return = sendto(mc_SocketsUdpClient[u32_Interface],
-                                            reinterpret_cast<const charn *>(&orc_Data[0]),
-                                            orc_Data.size(), 0, reinterpret_cast<const sockaddr *>(&t_TargetAddress),
-                                            sizeof(t_TargetAddress));
+                                           reinterpret_cast<const charn *>(&orc_Data[0]),
+                                           orc_Data.size(), 0, reinterpret_cast<const sockaddr *>(&t_TargetAddress),
+                                           sizeof(t_TargetAddress));
             if (sn_Return != static_cast<sintn>(orc_Data.size()))
             {
-                C_SCLString c_ErrnoStr = strerror(errno);
-                osc_write_log_error("openSYDE IP-TP", "SendUdp sendto error: " + c_ErrnoStr);
-                s32_Return = C_RD_WR;
+               C_SCLString c_ErrnoStr = strerror(errno);
+               osc_write_log_error("openSYDE IP-TP", "SendUdp sendto error: " + c_ErrnoStr);
+               s32_Return = C_RD_WR;
             }
          }
          else
@@ -1199,9 +1204,9 @@ sint32 C_OSCIpDispatcherLinuxSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 
                {
                   //comm error: no data read even though it was reported by ioctl
                   osc_write_log_error("openSYDE IP-TP",
-                                    "ReadUdp unexpected error: data reported as available but reading failed. Reported size: " +
-                                    C_SCLString::IntToStr(
-                                       orc_Data.size()) + " Read size: " + C_SCLString::IntToStr(sn_Return));
+                                      "ReadUdp unexpected error: data reported as available but reading failed. Reported size: " +
+                                      C_SCLString::IntToStr(
+                                         orc_Data.size()) + " Read size: " + C_SCLString::IntToStr(sn_Return));
                   s32_Return = C_RD_WR;
                }
             }

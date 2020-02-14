@@ -115,7 +115,7 @@ void C_SyvComMessageMonitor::Stop(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Starts thread to add openSYDE system definition
 
-   \param[in]     orc_PathSystemDefinition       Path of system definition file (Must be .syde_sysdef)
+   \param[in]  orc_PathSystemDefinition   Path of system definition file (Must be .syde_sysdef)
 
    \return
    C_NO_ERR   started sequence
@@ -143,8 +143,8 @@ sint32 C_SyvComMessageMonitor::StartAddOsySysDef(const C_SCLString & orc_PathSys
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Starts thread to add openSYDE system definition
 
-   \param[in]     orc_PathSystemDefinition       Path of system definition file (Must be .syde_sysdef)
-   \param[in]     ou32_BusIndex                  Bus index of CAN bus of system definition for monitoring
+   \param[in]  orc_PathSystemDefinition   Path of system definition file (Must be .syde_sysdef)
+   \param[in]  ou32_BusIndex              Bus index of CAN bus of system definition for monitoring
 
    \return
    C_NO_ERR   started sequence
@@ -176,8 +176,8 @@ sint32 C_SyvComMessageMonitor::StartAddOsySysDef(const C_SCLString & orc_PathSys
 
    This function is thread safe.
 
-   \param[in]     orc_PathSystemDefinition       Path of system definition file (Must be .syde_sysdef)
-   \param[in]     ou32_BusIndex                  Bus index of CAN bus of system definition for monitoring
+   \param[in]  orc_PathSystemDefinition   Path of system definition file (Must be .syde_sysdef)
+   \param[in]  ou32_BusIndex              Bus index of CAN bus of system definition for monitoring
 
    \return
    C_NO_ERR    Bus index for this system definition adapted
@@ -199,8 +199,8 @@ sint32 C_SyvComMessageMonitor::SetOsySysDefBus(const C_SCLString & orc_PathSyste
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the entire loaded openSYDE system definition
 
-   \param[in]     orc_PathSystemDefinition   Path and filename of openSYDE system definition file
-   \param[out]    orc_DbcDefinition          Loaded DBC definition
+   \param[in]      orc_PathSystemDefinition  Path and filename of openSYDE system definition file
+   \param[in,out]  orc_SystemDefinition      Loaded system definition
 
    \return
    C_NO_ERR    openSYDE system definition returned
@@ -249,8 +249,8 @@ sint32 C_SyvComMessageMonitor::StartAddDbcFile(const C_SCLString & orc_PathDbc)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the entire loaded DBC definition
 
-   \param[in]     orc_PathDbc          Path and filename of DBC file
-   \param[out]    orc_DbcDefinition    Loaded DBC definition
+   \param[in]   orc_PathDbc         Path and filename of DBC file
+   \param[out]  orc_DbcDefinition   Loaded DBC definition
 
    \return
    C_NO_ERR    DBC definition returned
@@ -321,6 +321,7 @@ sint32 C_SyvComMessageMonitor::RemoveDatabase(const C_SCLString & orc_Path)
 /*! \brief   Activate or deactivate a registered database
 
    \param[in]  orc_Path    Path and filename of database file
+   \param[in]  oq_Active   Active flag
 
    \return
    C_NO_ERR    Database removed
@@ -342,9 +343,9 @@ sint32 C_SyvComMessageMonitor::ActivateDatabase(const C_SCLString & orc_Path, co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds an ASC log file
 
-   \param[in]     orc_FilePath                 Path with file name. File extension must be .asc
-   \param[in]     oq_HexActive                 Mode for writing CAN Id and CAN data (hexadecimal or decimal)
-   \param[in]     oq_RelativeTimeStampActive   Mode for writing CAN timestamp (relative or absolute)
+   \param[in]  orc_FilePath                  Path with file name. File extension must be .asc
+   \param[in]  oq_HexActive                  Mode for writing CAN Id and CAN data (hexadecimal or decimal)
+   \param[in]  oq_RelativeTimeStampActive    Mode for writing CAN timestamp (relative or absolute)
 
    \return
    C_NO_ERR    File added successfully
@@ -366,7 +367,7 @@ sint32 C_SyvComMessageMonitor::AddLogFileAsc(const C_SCLString & orc_FilePath, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds an BLF log file
 
-   \param[in]     orc_FilePath                 Path with file name. File extension must be .blf
+   \param[in]  orc_FilePath   Path with file name. File extension must be .blf
 
    \return
    C_NO_ERR    File added successfully
@@ -394,7 +395,7 @@ sint32 C_SyvComMessageMonitor::AddLogFileBlf(const C_SCLString & orc_FilePath)
 
    The written file is not removed. The log file is removed from the list of active log files.
 
-   \param[in]     orc_FilePath            Path with file name. File extension must be .asc
+   \param[in]  orc_FilePath   Path with file name. File extension must be .asc
 
    \return
    C_NO_ERR    File removed
@@ -430,7 +431,7 @@ void C_SyvComMessageMonitor::RemoveAllLogFiles(void)
 
    This function is thread safe.
 
-   \param[in]  orc_Filter     Filter configuration to add
+   \param[in]  orc_Filter  Filter configuration to add
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComMessageMonitor::AddFilter(const C_OSCComMessageLoggerFilter & orc_Filter)
@@ -445,7 +446,7 @@ void C_SyvComMessageMonitor::AddFilter(const C_OSCComMessageLoggerFilter & orc_F
 
    This function is thread safe.
 
-   \param[in]  orc_Filter     Filter configuration to remove
+   \param[in]  orc_Filter  Filter configuration to remove
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComMessageMonitor::RemoveFilter(const C_OSCComMessageLoggerFilter & orc_Filter)
@@ -491,8 +492,8 @@ uint32 C_SyvComMessageMonitor::GetFilteredMessages(void) const
 
    This function is thread safe.
 
-   \param[in]     orc_Msg        Current CAN message
-   \param[in]     oq_IsTx        Message was sent of this application itself
+   \param[in]  orc_Msg  Current CAN message
+   \param[in]  oq_IsTx  Message was sent of this application itself
 
    \return
    C_NO_ERR    CAN message logged
@@ -535,7 +536,7 @@ void C_SyvComMessageMonitor::ResetCounter(void)
 
    This function is thread safe
 
-   \param[in]     ou8_BusLoad    Current CAN bus load in percentage
+   \param[in]  ou8_BusLoad    Current CAN bus load in percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComMessageMonitor::UpdateBusLoad(const uint8 ou8_BusLoad)
@@ -546,11 +547,11 @@ void C_SyvComMessageMonitor::UpdateBusLoad(const uint8 ou8_BusLoad)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for getting the current count of TX errors
+/*! \brief   Function for getting the current count of Tx errors
 
    This function is thread safe
 
-   \param[in]     ou32_TxErrors    Current detected CAN TX errors
+   \param[in]  ou32_TxErrors  Current detected CAN Tx errors
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComMessageMonitor::UpdateTxErrors(const uint32 ou32_TxErrors)
@@ -581,12 +582,12 @@ uint8 C_SyvComMessageMonitor::GetBusLoad(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the current count of TX errors
+/*! \brief   Returns the current count of Tx errors
 
    This function is thread safe
 
    \return
-   Current count of TX errors
+   Current count of Tx errors
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvComMessageMonitor::GetTxErrors(void) const
@@ -605,8 +606,8 @@ uint32 C_SyvComMessageMonitor::GetTxErrors(void) const
 
    Can be used to extract the results of one service execution after it has finished.
 
-   \param[out]  ors32_Result       result code of executed service function
-                                   for possible values see the DataDealer's function documentation
+   \param[out]  ors32_Result  result code of executed service function
+                              for possible values see the DataDealer's function documentation
 
    \return
    C_NO_ERR       result code read
@@ -634,8 +635,7 @@ sint32 C_SyvComMessageMonitor::GetResults(sint32 & ors32_Result) const
 
    Can be used to extract the results of one service execution after it has finished.
 
-   \param[out]  ors32_Result       result code of executed service function
-                                   for possible values see the DataDealer's function documentation
+   \param[in,out]  orc_Busses    Busses
 
    \return
    C_NO_ERR       result code read
@@ -661,8 +661,8 @@ sint32 C_SyvComMessageMonitor::GetResultBusses(std::vector<C_OSCSystemBus> & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the oldest message and removes it from the list
 
-   \param[out]    orc_Message       Message from list
-   This function is thread safe.
+   \param[out]  orc_Message   Message from list
+                              This function is thread safe.
 
    \return
    C_NO_ERR    Message copied
@@ -688,44 +688,11 @@ sint32 C_SyvComMessageMonitor::m_GetCanMessage(C_OSCComMessageLoggerData & orc_M
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Gets all received CAN messages and clears the messages from the list
-
-   The container orc_Messages will be cleared first.
-   This function is thread safe.
-
-   \param[out]    orc_Messages     Container for messages
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageMonitor::m_GetCanMessages(QVector<C_OSCComMessageLoggerData> & orc_Messages)
-{
-   QList<C_OSCComMessageLoggerData>::const_iterator c_ItMessage;
-   uint32 u32_Counter = 0U;
-
-   orc_Messages.clear();
-
-   this->mc_CriticalSectionMsg.Acquire();
-
-   orc_Messages.resize(this->mc_ReceivedMessages.size());
-
-   for (c_ItMessage = this->mc_ReceivedMessages.begin(); c_ItMessage != this->mc_ReceivedMessages.end(); ++c_ItMessage)
-   {
-      // Copy the message
-      orc_Messages[u32_Counter] = *c_ItMessage;
-      ++u32_Counter;
-   }
-
-   // Remove all messages
-   this->mc_ReceivedMessages.clear();
-
-   this->mc_CriticalSectionMsg.Release();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of protocol string if the protocol was changed
 
    The current protocol setting of C_SyvComMessageMonitor will be used
 
-   \param[in,out] orc_MessageData    Message data for updating
+   \param[in,out]  orc_MessageData  Message data for updating
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComMessageMonitor::m_UpdateProtocolString(C_OSCComMessageLoggerData & orc_MessageData) const
@@ -752,7 +719,7 @@ void C_SyvComMessageMonitor::m_UpdateProtocolString(C_OSCComMessageLoggerData & 
 
    This function is thread safe.
 
-   \param[in]     orc_Msg        Current CAN message
+   \param[in]  orc_Msg  Current CAN message
 
    \return
    true     CAN message is relevant
@@ -775,9 +742,9 @@ bool C_SyvComMessageMonitor::m_CheckFilter(const T_STWCAN_Msg_RX & orc_Msg)
 
    This function is thread safe.
 
-   \param[in]     orc_PathSystemDefinition   Path of system definition file (Must be .syde_sysdef)
-   \param[in]     orc_OsySysDef              Loaded openSYDE system definition
-   \param[in]     ou32_BusIndex              Used CAN bus index
+   \param[in]  orc_PathSystemDefinition   Path of system definition file (Must be .syde_sysdef)
+   \param[in]  orc_OsySysDef              Loaded openSYDE system definition
+   \param[in]  ou32_BusIndex              Used CAN bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComMessageMonitor::m_InsertOsySysDef(const C_SCLString & orc_PathSystemDefinition,
@@ -793,7 +760,7 @@ void C_SyvComMessageMonitor::m_InsertOsySysDef(const C_SCLString & orc_PathSyste
 
    This function is thread safe.
 
-   \param[in]     orc_Msg             CAN message for analyzing
+   \param[in]  orc_Msg  CAN message for analyzing
 
    \return
    true     Matching CAN message found
@@ -816,7 +783,7 @@ bool C_SyvComMessageMonitor::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
 
    This function is thread safe.
 
-   \param[in,out] orc_MessageData    Message data target for the interpretation
+   \param[in,out]  orc_MessageData  Message data target for the interpretation
 
    \return
    true     Matching CAN message exists
@@ -825,7 +792,7 @@ bool C_SyvComMessageMonitor::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvComMessageMonitor::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_MessageData) const
 {
-   bool q_Return = false;
+   bool q_Return;
 
    this->mc_CriticalSectionConfig.Acquire();
    q_Return = C_OSCComMessageLogger::m_InterpretSysDef(orc_MessageData);
@@ -839,7 +806,7 @@ bool C_SyvComMessageMonitor::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_M
 
    Using the both members c_ProtocolTextDec and c_ProtocolTextHex in orc_MessageData for the result.
 
-   \param[in,out]     orc_MessageData         CAN message data class for analyzing and for output
+   \param[in,out]  orc_MessageData  CAN message data class for analyzing and for output
 
    \return
    true     Matching CAN message found
@@ -891,7 +858,7 @@ C_SCLString C_SyvComMessageMonitor::m_GetProtocolStringDecHook(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a DBC file for interpretation
 
-   \param[in]     orc_PathDbc      File path to DBC file
+   \param[in]  orc_PathDbc    File path to DBC file
 
    \return
    C_NO_ERR    required data from file successfully stored in orc_Definition and DBC file added to interpretation
@@ -937,8 +904,7 @@ sint32 C_SyvComMessageMonitor::m_AddDbcFile(const C_SCLString & orc_PathDbc)
 
    This function is thread safe.
 
-   \param[in]     orc_Msg        Current CAN message
-   \param[in,out] orc_MessageData    Message data target for the interpretation
+   \param[in]  orc_Msg  Current CAN message
 
    \return
    Pointer     Matching CAN message found and pointer to message is returned
@@ -983,7 +949,7 @@ const C_CieConverter::C_CIECanMessage * C_SyvComMessageMonitor::m_CheckDbcFile(c
 
             if (pc_DbcMessage == NULL)
             {
-               // Not found yet, search in RX messages
+               // Not found yet, search in Rx messages
                for (u32_MsgCounter = 0U; u32_MsgCounter < rc_Node.c_RxMessages.size(); ++u32_MsgCounter)
                {
                   const C_CieConverter::C_CIECanMessage & rc_Msg = rc_Node.c_RxMessages[u32_MsgCounter].c_CanMessage;
@@ -1036,8 +1002,8 @@ const C_CieConverter::C_CIECanMessage * C_SyvComMessageMonitor::m_CheckDbcFile(c
 
    This function is thread safe.
 
-   \param[in]     opc_DbcMessage     Detected DBC message for current CAN message
-   \param[in,out] orc_MessageData    Message data target for the interpretation
+   \param[in]      opc_DbcMessage   Detected DBC message for current CAN message
+   \param[in,out]  orc_MessageData  Message data target for the interpretation
 
    \return
    true     Matching CAN message exists
@@ -1130,8 +1096,8 @@ bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMe
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Interprets the DBC message signal
 
-   \param[in,out] orc_MessageData    Message data target for the interpretation
-   \param[in]     orc_DbcSignal      CAN signal of DBC file
+   \param[in,out]  orc_MessageData  Message data target for the interpretation
+   \param[in]      orc_DbcSignal    CAN signal of DBC file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComMessageMonitor::mh_InterpretDbcFileCanSignal(C_OSCComMessageLoggerData & orc_MessageData,

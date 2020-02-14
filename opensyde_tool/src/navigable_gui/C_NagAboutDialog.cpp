@@ -42,7 +42,10 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent Reference to parent
+   \param[in,out] orc_Parent        Reference to parent
+   \param[in]     oc_ProductName    Product name
+   \param[in]     oc_LogoUrl        Product logo path
+   \param[in]     ou32_Margin       Contents margin
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagAboutDialog::C_NagAboutDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,

@@ -113,13 +113,13 @@ public:
 
    //-----------------------------------------------------------------------------
    /*!
-      \brief   Read numeric data from server's data pool
+      \brief   Read numeric data from server's Datapool
 
       Send request and wait for response.
-      This function is used for plain numeric data pool elements (i.e. non-array elements).
+      This function is used for plain numeric Datapool elements (i.e. non-array elements).
       The endianness of read data is specific to the protocol.
 
-      \param[in]  ou8_DataPoolIndex   index of data pool to read from
+      \param[in]  ou8_DataPoolIndex   index of Datapool to read from
       \param[in]  ou16_ListIndex      list index to read from
       \param[in]  ou16_ElementIndex   element index to read
       \param[in,out] orc_ReadData     in: size must match expected number of bytes
@@ -130,7 +130,7 @@ public:
       C_NO_ERR   request sent, positive response with expected size received
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -144,13 +144,13 @@ public:
 
    //-----------------------------------------------------------------------------
    /*!
-      \brief   Read array data from server's data pool
+      \brief   Read array data from server's Datapool
 
       Send request and wait for response.
       This function is used for array elements.
       The endianness of read data is specific to the protocol.
 
-      \param[in]     ou8_DataPoolIndex   index of data pool to read from
+      \param[in]     ou8_DataPoolIndex   index of Datapool to read from
       \param[in]     ou16_ListIndex      list index to read from
       \param[in]     ou16_ElementIndex   element index to read
       \param[in,out] orc_ReadData        in: size must match expected number of bytes
@@ -161,7 +161,7 @@ public:
       C_NO_ERR   request sent, positive response with expected size received
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -175,13 +175,13 @@ public:
 
    //-----------------------------------------------------------------------------
    /*!
-      \brief   Write numeric data to server's data pool
+      \brief   Write numeric data to server's Datapool
 
       Send request and wait for response.
-      This function is used for plain numeric data pool elements (i.e. non-array elements).
+      This function is used for plain numeric Datapool elements (i.e. non-array elements).
       The endianness of data to write is specific to the protocol.
 
-      \param[in]  ou8_DataPoolIndex   index of data pool to write to
+      \param[in]  ou8_DataPoolIndex   index of Datapool to write to
       \param[in]  ou16_ListIndex      list index to write to
       \param[in]  ou16_ElementIndex   element index to write
       \param[out] orc_DataToWrite     data to write
@@ -191,7 +191,7 @@ public:
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -205,14 +205,14 @@ public:
 
    //-----------------------------------------------------------------------------
    /*!
-      \brief   Write array data to server's data pool
+      \brief   Write array data to server's Datapool
 
       Send request and wait for response.
       This function is used for array elements.
       The endianness is specific to the protocol.
       The endianness of data to write is specific to the protocol.
 
-      \param[in]  ou8_DataPoolIndex   index of data pool to write to
+      \param[in]  ou8_DataPoolIndex   index of Datapool to write to
       \param[in]  ou16_ListIndex      list index to write to
       \param[in]  ou16_ElementIndex   element index to write
       \param[out] orc_DataToWrite     data to write
@@ -222,7 +222,7 @@ public:
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -256,7 +256,7 @@ public:
       C_NO_ERR   request sent, positive response received (or: rail value remembered)
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -267,15 +267,15 @@ public:
 
    //-----------------------------------------------------------------------------
    /*!
-      \brief   Request cyclic driven transmission of data pool element.
+      \brief   Request cyclic driven transmission of Datapool element.
 
-      Request cyclic transmission of data pool element.
+      Request cyclic transmission of Datapool element.
       Shall send the request and wait for the initial confirmation (or error) response.
 
       Data responses shall be handled asynchronously using the Cycle() function and
       be reported via calls to installed function pointer.
 
-      \param[in]  ou8_DataPoolIndex   index of data pool to read from
+      \param[in]  ou8_DataPoolIndex   index of Datapool to read from
       \param[in]  ou16_ListIndex      list index to read from
       \param[in]  ou16_ElementIndex   element index to read
       \param[in]  ou8_Rail            0..2   "rail" referring to time interval to use
@@ -288,7 +288,7 @@ public:
       C_NO_ERR   request sent
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -302,16 +302,16 @@ public:
 
    //-----------------------------------------------------------------------------
    /*!
-      \brief   Request change driven transmission of data pool element.
+      \brief   Request change driven transmission of Datapool element.
 
-      Request change driven transmission of data pool element.
+      Request change driven transmission of Datapool element.
 
       Shall send the request and wait for the initial confirmation (or error) response.
 
       Data responses shall be handled asynchronously using the Cycle() function and
       be reported via calls to installed function pointer.
 
-      \param[in]  ou8_DataPoolIndex   index of data pool to read from
+      \param[in]  ou8_DataPoolIndex   index of Datapool to read from
       \param[in]  ou16_ListIndex      list index to read from
       \param[in]  ou16_ElementIndex   element index to read
       \param[in]  ou8_Rail            0..2   "rail" referring to time interval to use for maximum timeout
@@ -325,7 +325,7 @@ public:
       C_NO_ERR   request sent
       C_RANGE    parameter out of range (checked by client-side function)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -349,7 +349,7 @@ public:
       \return
       C_NO_ERR   request sent
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -372,7 +372,7 @@ public:
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client side)
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -391,14 +391,14 @@ public:
       * NvmWrite()
       * NvmWriteFinalizeTransaction()
 
-      \param[in]  ou8_DataPoolIndex   Accessed data pool index
+      \param[in]  ou8_DataPoolIndex   Accessed Datapool index
       \param[in]  ou16_NVMAccessCount Expected NVM access count
 
       \return
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client side); access count zero
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -426,7 +426,7 @@ public:
       C_NO_ERR   request sent, positive response received
       C_RANGE    parameter out of range (checked by client side); e.g. data record size zero
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -443,7 +443,7 @@ public:
       \return
       C_NO_ERR   request sent, positive response received
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -453,46 +453,75 @@ public:
 
    //-----------------------------------------------------------------------------
    /*!
-      \brief   Read data pool version
+      \brief   Read Datapool version
 
       Version format: One byte for Major, Minor, Release
 
       Example: v1.23r4 in 3 Bytes   -> (0x01, 0x17, 0x04)
 
-      \param[in]  ou8_DataPoolIndex   Data pool index
+      \param[in]  ou8_DataPoolIndex   Datapool index
       \param[out] orau8_Version       Read version; format: see function description
+      \param[out] opu8_NrCode         if != NULL: negative response code in case of an error response
 
       \return
       C_NO_ERR   request sent, positive response received
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
    */
    //-----------------------------------------------------------------------------
    virtual stw_types::sint32 DataPoolReadVersion(const stw_types::uint8 ou8_DataPoolIndex,
-                                                 stw_types::uint8(&orau8_Version)[3]) = 0;
+                                                 stw_types::uint8(&orau8_Version)[3],
+                                                 stw_types::uint8 * const opu8_NrCode) = 0;
 
    //-----------------------------------------------------------------------------
    /*!
-      \brief   Verify data pool consistency
+      \brief   Read Datapool meta data
 
-      Used to check whether the referenced data pool matches with the passed criteria.
-      Depending on the protocol this can involve verification of:
-      * a checksum over data data pool definition
-      * the total number of data pool elements
-      * the version number of the data pool
+      Version format: One byte for Major, Minor, Release
 
-      \param[in]  ou8_DataPoolIndex               Data pool index
-      \param[in]  ou16_NumberOfDataPoolElements   Number of elements in data pool
-      \param[in]  ou16_DataPoolVersion            Version number of data pool
-      \param[in]  ou32_DataPoolChecksum           Data pool checksum
-      \param[out] orq_Match                       Data pool checksum match response
+      Example: v1.23r4 in 3 Bytes   -> (0x01, 0x17, 0x04)
+
+      \param[in]  ou8_DataPoolIndex   Datapool index
+      \param[out] orau8_Version       Read version; format: see function description
+      \param[out] orc_Name            Read name of Datapool
+                                      Empty string if not supported
+      \param[out] opu8_NrCode         if != NULL: negative response code in case of an error response
 
       \return
       C_NO_ERR   request sent, positive response received
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
+      C_CONFIG   pre-requisites not correct; e.g. driver not initialized
+      C_WARN     error response
+   */
+   //-----------------------------------------------------------------------------
+   virtual stw_types::sint32 DataPoolReadMetaData(const stw_types::uint8 ou8_DataPoolIndex,
+                                                  stw_types::uint8(&orau8_Version)[3],
+                                                  stw_scl::C_SCLString & orc_Name,
+                                                  stw_types::uint8 * const opu8_NrCode) = 0;
+
+   //-----------------------------------------------------------------------------
+   /*!
+      \brief   Verify Datapool consistency
+
+      Used to check whether the referenced Datapool matches with the passed criteria.
+      Depending on the protocol this can involve verification of:
+      * a checksum over data Datapool definition
+      * the total number of Datapool elements
+      * the version number of the Datapool
+
+      \param[in]  ou8_DataPoolIndex               Datapool index
+      \param[in]  ou16_NumberOfDataPoolElements   Number of elements in Datapool
+      \param[in]  ou16_DataPoolVersion            Version number of Datapool
+      \param[in]  ou32_DataPoolChecksum           Datapool checksum
+      \param[out] orq_Match                       Datapool checksum match response
+
+      \return
+      C_NO_ERR   request sent, positive response received
+      C_TIMEOUT  expected response not received within timeout
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response
@@ -511,7 +540,7 @@ public:
       The server responds with an information showing whether it acknowledges the information
        positively or negatively.
 
-      \param[in]  ou8_DataPoolIndex           Data pool index
+      \param[in]  ou8_DataPoolIndex           Datapool index
       \param[in]  ou8_ListIndex               List index
       \param[out] orq_ApplicationAcknowledge  true: positive acknowledge from server
                                               false: negative acknowledge from server
@@ -520,7 +549,7 @@ public:
       \return
       C_NO_ERR   request sent, positive response received
       C_TIMEOUT  expected response not received within timeout
-      C_NOACT    could not send request (e.g. TX buffer full)
+      C_NOACT    could not send request (e.g. Tx buffer full)
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
       C_WARN     error response
       C_RD_WR    malformed protocol response

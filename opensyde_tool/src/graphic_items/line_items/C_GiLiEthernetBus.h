@@ -34,9 +34,9 @@ public:
    virtual ~C_GiLiEthernetBus();
 
    virtual stw_types::sintn type() const override;
-   virtual bool OpenStyleDialog(void);
+   virtual bool OpenStyleDialog(void) override;
    virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem) override;
-   virtual stw_opensyde_core::C_OSCSystemBus::E_Type GetType() const;
+   virtual stw_opensyde_core::C_OSCSystemBus::E_Type GetType() const override;
 
 private:
    //Avoid call

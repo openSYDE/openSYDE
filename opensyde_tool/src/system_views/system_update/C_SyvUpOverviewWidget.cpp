@@ -29,7 +29,7 @@ using namespace stw_opensyde_gui;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpOverviewWidget::C_SyvUpOverviewWidget(QWidget * const opc_Parent) :

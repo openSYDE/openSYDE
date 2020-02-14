@@ -37,7 +37,7 @@ const stw_types::sintn C_OgeHorizontalListWidget::mhsn_DragScrollTimerInterval =
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeHorizontalListWidget::C_OgeHorizontalListWidget(QWidget * const opc_Parent) :
@@ -110,7 +110,7 @@ sintn C_OgeHorizontalListWidget::GetActualLine(void) const
 
    The native row of the list is each item.
 
-   \param[in]  osn_Row        New row count
+   \param[in]  osn_Line       New row count
    \param[in]  oq_SetActive   Set the widget of the new line active or not
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ void C_OgeHorizontalListWidget::SetActualLine(const sintn osn_Line, const bool o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the line to the position of the item
 
-   \param[in]  osn_Index       Item index
+   \param[in]  osn_Index   Item index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeHorizontalListWidget::ScrollToItem(const sintn osn_Index)
@@ -155,7 +155,7 @@ void C_OgeHorizontalListWidget::ScrollToItem(const sintn osn_Index)
 
    Here: Synchronizing datapool data with widgets
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeHorizontalListWidget::dropEvent(QDropEvent * const opc_Event)
@@ -227,7 +227,7 @@ void C_OgeHorizontalListWidget::dropEvent(QDropEvent * const opc_Event)
 
    Here: start custom paint
 
-   \param[in] oc_SupportedActions Supported actions
+   \param[in]  oc_SupportedActions  Supported actions
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeHorizontalListWidget::startDrag(const Qt::DropActions oc_SupportedActions)
@@ -248,7 +248,7 @@ void C_OgeHorizontalListWidget::startDrag(const Qt::DropActions oc_SupportedActi
 
    Here: Scrolling with auto wrap enabled from left to right instead of top to bottom
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeHorizontalListWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
@@ -295,7 +295,7 @@ void C_OgeHorizontalListWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
 
    Here: Deactivate drag move scrolling timeout
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeHorizontalListWidget::dragLeaveEvent(QDragLeaveEvent * const opc_Event)
@@ -310,7 +310,7 @@ void C_OgeHorizontalListWidget::dragLeaveEvent(QDragLeaveEvent * const opc_Event
 
    Updates the information about the count of columns and items per row
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeHorizontalListWidget::wheelEvent(QWheelEvent * const opc_Event)

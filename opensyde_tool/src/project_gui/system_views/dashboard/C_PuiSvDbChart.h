@@ -35,7 +35,7 @@ public:
    C_PuiSvDbChart();
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
-   virtual bool IsReadElement(void) const;
+   virtual bool IsReadElement(void) const override;
    virtual stw_types::sint32 RemoveElement(const stw_types::uint32 & oru32_Index) override;
 
    std::vector<bool> c_DataPoolElementsActive;

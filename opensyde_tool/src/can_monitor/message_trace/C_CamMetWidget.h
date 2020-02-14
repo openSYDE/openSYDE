@@ -57,10 +57,11 @@ public:
    void SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters) const;
 
    // Database handling
-   void AddDatabaseOsySysDef(const QString & orc_PathSystemDefinition, const stw_types::sint32 os32_BusIndex);
+   void AddDatabaseOsySysDef(const QString & orc_PathSystemDefinition, const QString & orc_OrgPath,
+                             const stw_types::sint32 os32_BusIndex);
    void AddDatabaseDbc(const QString & orc_PathDbc);
-   void RemoveDatabase(const QString & orc_PathDatabase);
-   void ActivateDatabase(const QString & orc_PathDatabase, const bool oq_Active);
+   void RemoveDatabase(const QString & orc_PathDatabase, const QString & orc_OrgPath);
+   void ActivateDatabase(const QString & orc_PathDatabase, const QString & orc_OrgPath, const bool oq_Active);
    void SetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const stw_types::uint32 ou32_BusIndex);
 
    // Logging configuration

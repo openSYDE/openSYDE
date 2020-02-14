@@ -328,7 +328,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                   c_MessageBox.SetDetails(c_Details);
                   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
                   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
-                  c_MessageBox.SetCustomMinHeight(280);
+                  c_MessageBox.SetCustomMinHeight(180, 300);
                   c_MessageBox.SetCustomMinWidth(800);
                   e_ReturnMessageBox = c_MessageBox.Execute();
 
@@ -343,8 +343,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                      else
                      {
                         //Delete automatically generated files
-                        for (uint32 u32_ItFile = 0UL; (u32_ItFile < c_ConflictedFiles.size()) && (q_Continue == true);
-                             ++u32_ItFile)
+                        for (uint32 u32_ItFile = 0UL; u32_ItFile < c_ConflictedFiles.size(); ++u32_ItFile)
                         {
                            QFile c_CurFile;
 
@@ -352,6 +351,13 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
 
                            // Delete old file
                            q_Continue = c_CurFile.remove();
+
+                           if (q_Continue == false)
+                           {
+                              c_Details = C_GtGetText::h_GetText("The following file(s) can not be overwritten: \n");
+                              c_Details += c_ConflictedFiles[u32_ItFile];
+                              break;
+                           }
                         }
                      }
                      if (q_Continue == false)
@@ -360,10 +366,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                         C_OgeWiCustomMessage c_MessageBoxErrorRemove(this, C_OgeWiCustomMessage::E_Type::eERROR);
                         c_MessageBoxErrorRemove.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File save"));
                         c_MessageBoxErrorRemove.SetDescription(C_GtGetText::h_GetText("File cannot be overwritten!"));
-                        if (this->mc_AllNodeIndexes.size() > 1UL)
-                        {
-                           c_MessageBox.SetDetails(c_Details);
-                        }
+                        c_MessageBoxErrorRemove.SetDetails(c_Details);
+                        c_MessageBoxErrorRemove.SetCustomMinHeight(180, 300);
                         c_MessageBoxErrorRemove.Execute();
                      }
                      break;
@@ -403,6 +407,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
                c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("File path contains invalid characters.")));
+               c_MessageBox.SetCustomMinHeight(180, 180);
                c_MessageBox.Execute();
             }
          }
@@ -414,6 +419,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                                                    "The specified file has the wrong extension, use: \"%1\".")).arg(
                                            C_SyvDaItPaImageRecordWidget::mhc_FILE_EXTENSION));
             c_MessageBox.SetDetails(QString("Invalid extension: \"%1\"").arg("." + c_BaseInfo.completeSuffix()));
+            c_MessageBox.SetCustomMinHeight(180, 250);
             c_MessageBox.Execute();
          }
       }
@@ -423,6 +429,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
          c_MessageBox.SetDescription(C_GtGetText::h_GetText("The specified directory does not exist."));
          c_MessageBox.SetDetails(QString("Invalid path: \"%1\"").arg(this->mc_FilePath));
+         c_MessageBox.SetCustomMinHeight(180, 250);
          c_MessageBox.Execute();
       }
    }
@@ -431,6 +438,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("The file path is empty. Please enter valid file path."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
    }
 }
@@ -990,6 +998,7 @@ void C_SyvDaItPaImageRecordWidget::m_OnCancel(void)
                                                       "The unfinished file(s) will be deleted."));
       c_Message.SetNOButtonText("Interrupt");
       c_Message.SetOKButtonText("Don't Interrupt");
+      c_Message.SetCustomMinHeight(180, 180);
       C_OgeWiCustomMessage::E_Outputs e_Output;
       e_Output = c_Message.Execute();
       if (e_Output == C_OgeWiCustomMessage::eNO)
@@ -1125,6 +1134,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportError(const QString & orc_FunctionNam
    c_Message.SetDescription(QString(C_GtGetText::h_GetText("Function %1 ended with error.")).arg(orc_FunctionName));
    c_Message.SetDetails(QString(C_GtGetText::h_GetText("Error code:\n %1 \nError text: \n %2"))
                         .arg(os32_ErrorCode).arg(orc_ErrorText));
+   c_Message.SetCustomMinHeight(180, 350);
    c_Message.Execute();
 
    // Close dialog on error
@@ -1141,7 +1151,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
 {
    const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
    uint8 u8_NRC;
-   QString c_Details;
+   QString c_Details = "";
    QString c_Description;
    C_OgeWiCustomMessage c_Message(this);
    sint32 s32_Return = this->mrc_ComDriver.GetPollResultNRC(u8_NRC);
@@ -1155,75 +1165,57 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
       break;
    case C_OVERFLOW:
       c_Description += "Wrong sequence of function calls";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
-                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_RANGE:
       c_Description += "Datapool list IDs invalid";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
-                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_CHECKSUM:
       c_Description += "CRC over the values of a parameter list read from the ECU does not match those values";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
-                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_CONFIG:
       c_Description += "No valid diagnostic protocol is set";
       c_Description += "or no valid pointer to the original instance of \"C_OSCNode\" is set in \"C_OSCDataDealer\"";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
-                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_NOACT:
       c_Description += "Server communication protocol service could not be requested";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
-                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Server communication protocol service has timed out";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
-                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_WARN:
       c_Description += "Server communication protocol service error response was received";
+
+      // Using <br/> as new line symbol instead of \n due to problems with the h_GetLink syntax
       switch (u8_NRC)
       {
       case 0x13:
-         c_Details = C_GtGetText::h_GetText("Incorrect length of request");
+         c_Details = C_GtGetText::h_GetText("Incorrect length of request<br/>");
          break;
       case 0x31:
-         c_Details = C_GtGetText::h_GetText("Address or length format invalid (> 4 bytes)\n"
-                                            "Requested memory range specified by address and size invalid");
+         c_Details = C_GtGetText::h_GetText("Address or length format invalid (> 4 bytes)<br/>"
+                                            "Requested memory range specified by address and size invalid<br/>");
          break;
       case 0x72:
-         c_Details = C_GtGetText::h_GetText("Server reading NVM failed");
+         c_Details = C_GtGetText::h_GetText("Server reading NVM failed<br/>");
          break;
       case 0x33:
-         c_Details = C_GtGetText::h_GetText("Required security level was not unlocked");
+         c_Details = C_GtGetText::h_GetText("Required security level was not unlocked<br/>");
          break;
       case 0x14:
          c_Details =
-            C_GtGetText::h_GetText("The total length of the response message exceeds the available buffer size");
+            C_GtGetText::h_GetText("The total length of the response message exceeds the available buffer size<br/>");
+         break;
+      case 0x7F:
+         c_Details =
+            C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NRC, 16));
+         c_Details = QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
          break;
       }
-      C_OSCLoggingHandler::h_Flush();
-      c_Details += QString(C_GtGetText::h_GetText("\nSee log file for details:")) +
-                   C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
-      C_OSCLoggingHandler::h_Flush();
-      c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) +
-                  C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
       break;
    default:
       //Should not happen
@@ -1231,10 +1223,14 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
       break;
    }
 
+   C_OSCLoggingHandler::h_Flush();
+   c_Details += QString(C_GtGetText::h_GetText("See log file for details: ")) +
+                C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
+
    c_Message.SetType(C_OgeWiCustomMessage::eERROR);
    c_Message.SetDescription(c_Description);
    c_Message.SetDetails(c_Details);
-
+   c_Message.SetCustomMinHeight(230, 300);
    c_Message.Execute();
    // Close dialog on error (WITHOUT user confirmation)
    this->mpc_ParentDialog->reject();
@@ -1293,7 +1289,8 @@ QString C_SyvDaItPaImageRecordWidget::m_GetPathForNode(const uint32 ou32_NodeInd
          const QDir c_Dir(c_FileInfo.absoluteDir());
          const QString c_NodeFileNameBase = C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(
             pc_Node->c_Properties.c_Name).c_str();
-         const QString c_NodeFileName = c_FileInfo.baseName() + "_" + c_NodeFileNameBase + "." + c_FileInfo.suffix();
+         const QString c_NodeFileName = c_FileInfo.completeBaseName() + "_" + c_NodeFileNameBase + "." +
+                                        c_FileInfo.suffix();
          c_Retval = c_Dir.absoluteFilePath(c_NodeFileName);
       }
    }

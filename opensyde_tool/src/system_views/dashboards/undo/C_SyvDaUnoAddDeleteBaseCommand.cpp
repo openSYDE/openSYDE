@@ -611,34 +611,27 @@ const C_PuiSvDbWidgetBase * C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(ou32_DashboardIndex);
          if (pc_Dashboard != NULL)
          {
+            //lint -save -e929 false positive in PC-Lint: allowed by MISRA 5-2-2
             const uint32 u32_Index = static_cast<uint32>(opc_DataElement->GetIndex());
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const C_GiSvDaLabelBase * const pc_Label  =
                dynamic_cast<const C_GiSvDaLabelBase * const>(opc_DataElement);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const C_GiSvDaParam * const pc_ParamWidget  =
                dynamic_cast<const C_GiSvDaParam * const>(opc_DataElement);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const C_GiSvDaSpinBoxBase * const pc_SpinBox  =
                dynamic_cast<const C_GiSvDaSpinBoxBase * const>(opc_DataElement);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const C_GiSvDaSliderBase * const pc_Slider  =
                dynamic_cast<const C_GiSvDaSliderBase * const>(opc_DataElement);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const C_GiSvDaProgressBarBase * const pc_ProgressBar  =
                dynamic_cast<const C_GiSvDaProgressBarBase * const>(opc_DataElement);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const C_GiSvDaToggleBase * const pc_Toggle  =
                dynamic_cast<const C_GiSvDaToggleBase * const>(opc_DataElement);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const C_GiSvDaChartBase * const pc_Chart  =
                dynamic_cast<const C_GiSvDaChartBase * const>(opc_DataElement);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const C_GiSvDaPieChartBase * const pc_PieChart  =
                dynamic_cast<const C_GiSvDaPieChartBase * const>(opc_DataElement);
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             const C_GiSvDaTableBase * const pc_Table  =
                dynamic_cast<const C_GiSvDaTableBase * const>(opc_DataElement);
+            //lint -restore
             if (pc_Label != NULL)
             {
                pc_Retval = pc_Dashboard->GetLabel(u32_Index);

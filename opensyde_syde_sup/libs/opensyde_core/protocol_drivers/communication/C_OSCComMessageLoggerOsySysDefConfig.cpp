@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Configuration of a openSYDE system definition for C_OSCComMessageLogger (implementation)
+   \brief       Configuration of an openSYDE system definition for C_OSCComMessageLogger (implementation)
 
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */

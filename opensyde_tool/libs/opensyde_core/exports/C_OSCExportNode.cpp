@@ -1,9 +1,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Export code of a openSYDE node. (implementation)
+   \brief       Export code of an openSYDE node. (implementation)
 
-   Export code of a openSYDE node
+   Export code of an openSYDE node
 
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -17,6 +17,7 @@
 #include "C_OSCExportNode.h"
 #include "C_OSCExportDataPool.h"
 #include "C_OSCExportCommunicationStack.h"
+#include "C_OSCExportHalc.h"
 #include "C_OSCExportOsyInit.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCUtils.h"
@@ -57,24 +58,24 @@ C_OSCExportNode::C_OSCExportNode(void)
    The function will store all files in the folder specified by orc_Path.
 
    Creates:
-   * data pools
+   * Datapools
    * comm definition
    * openSYDE server initialization wrapper
 
-   \param[in]  orc_Node                Node as information source for exported code
-   \param[in]  ou16_ApplicationIndex   Index of programmable application within orc_Node.c_Applications
-   \param[in]  orc_Path                Storage path for created files
-   \param[out] orc_Files               List of all exported file names (with absolute or relative path)
-   \param[in]  orc_ExportToolInfo      Information about calling executable (name + version)
+   \param[in]   orc_Node               Node as information source for exported code
+   \param[in]   ou16_ApplicationIndex  Index of programmable application within orc_Node.c_Applications
+   \param[in]   orc_Path               Storage path for created files
+   \param[out]  orc_Files              List of all exported file names (with absolute or relative path)
+   \param[in]   orc_ExportToolInfo     Information about calling executable (name + version)
 
    \return
    C_NO_ERR  Operation success
    C_RD_WR   Operation failure: cannot store files
-   C_NOACT   Application is not of type ePROGRAMMABLE_APPLICATION or has unknown code structure version
+   C_NOACT   Application is not of type ePROGRAMMABLE_APPLICATION or has unknown/invalid code structure version
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
-             Data pool does not provide information about owning application or refers to an invalid application
+             Datapool does not provide information about owning application or refers to an invalid application
              ApplicationIndex references invalid application
-   C_CONFIG  Protocol or data pool not available in node for interface
+   C_CONFIG  Protocol or Datapool not available in node for interface
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw_types::uint16 ou16_ApplicationIndex,
@@ -85,6 +86,7 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
 
    orc_Files.clear();
 
+   // check node prerequisites
    if (ou16_ApplicationIndex >= orc_Node.c_Applications.size())
    {
       s32_Retval = C_RANGE;
@@ -102,15 +104,15 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
          //we only need to create code for programmable applications
          (rc_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION) ||
          //check if the code structure version is unknown
-         (rc_Application.u16_GenCodeVersion > 3U))
+         (rc_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION))
       {
          s32_Retval = C_NOACT;
       }
    }
 
+   // create target folder
    if (s32_Retval == C_NO_ERR)
    {
-      //create target folder:
       s32_Retval = C_OSCUtils::h_CreateFolderRecursively(orc_Path);
       if (s32_Retval != C_NO_ERR)
       {
@@ -119,181 +121,226 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
       }
    }
 
+   // export openSYDE initialization
    if (s32_Retval == C_NO_ERR)
    {
-      //index of data pool within this application (as there can be data pools owned by other applications
-      // this value is not identical to the data pool index within the whole list)
-      uint8 u8_DataPoolIndexWithinApplication = 0U;
-      bool q_CreateDpdInit;
+      s32_Retval = mh_CreateOsyInitCode(orc_Node, ou16_ApplicationIndex, orc_Path, orc_Files, orc_ExportToolInfo);
+   }
 
-      const C_SCLString c_FileBase = TGL_FileIncludeTrailingDelimiter(orc_Path) + "osy_init";
-      orc_Files.push_back(c_FileBase + ".c");
-      orc_Files.push_back(c_FileBase + ".h");
-      if (ou16_ApplicationIndex == orc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex)
+   // export Datapool
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_CreateDatapoolCode(orc_Node, ou16_ApplicationIndex, orc_Path, orc_Files, orc_ExportToolInfo);
+   }
+
+   // export COMM definition
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_CreateCOMMStackCode(orc_Node, ou16_ApplicationIndex, orc_Path, orc_Files, orc_ExportToolInfo);
+   }
+
+   // export HAL configuration
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_CreateHALConfigCode(orc_Node, ou16_ApplicationIndex, orc_Path, orc_Files, orc_ExportToolInfo);
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create openSYDE initialization C code
+
+   \param[in]   orc_Node               Node as information source for exported code
+   \param[in]   ou16_ApplicationIndex  Index of programmable application within orc_Node.c_Applications
+   \param[in]   orc_Path               Storage path for created files
+   \param[out]  orc_Files              List of all exported file names (with absolute or relative path)
+   \param[in]   orc_ExportToolInfo     Information about calling executable (name + version)
+
+   \return
+   C_NO_ERR Operation success
+   C_RD_WR  Operation failure: cannot store files
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCExportNode::mh_CreateOsyInitCode(const C_OSCNode & orc_Node, const uint16 ou16_ApplicationIndex,
+                                             const C_SCLString & orc_Path, std::vector<C_SCLString> & orc_Files,
+                                             const C_SCLString & orc_ExportToolInfo)
+{
+   sint32 s32_Retval;
+
+   bool q_CreateDpdInit;
+
+   const C_SCLString c_FileBase = TGL_FileIncludeTrailingDelimiter(orc_Path) + "osy_init";
+
+   orc_Files.push_back(c_FileBase + ".c");
+   orc_Files.push_back(c_FileBase + ".h");
+   if (ou16_ApplicationIndex == orc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex)
+   {
+      //create DPD and DPH init functions
+      q_CreateDpdInit = true;
+   }
+   else
+   {
+      //create DPH init functions
+      q_CreateDpdInit = false;
+   }
+
+   s32_Retval = C_OSCExportOsyInit::h_CreateSourceCode(c_FileBase + ".c", orc_Node, q_CreateDpdInit,
+                                                       ou16_ApplicationIndex, orc_ExportToolInfo);
+   if (s32_Retval != C_NO_ERR)
+   {
+      osc_write_log_error("Creating source code",
+                          "Could not write osy_init file to target directory \"" + orc_Path + "\".");
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create Datapool C code
+
+   \param[in]   orc_Node               Node as information source for exported code
+   \param[in]   ou16_ApplicationIndex  Index of programmable application within orc_Node.c_Applications
+   \param[in]   orc_Path               Storage path for created files
+   \param[out]  orc_Files              List of all exported file names (with absolute or relative path)
+   \param[in]   orc_ExportToolInfo     Information about calling executable (name + version)
+
+   \return
+   C_NO_ERR Operation success
+   C_RD_WR  Operation failure: cannot store files
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCExportNode::mh_CreateDatapoolCode(const C_OSCNode & orc_Node, const uint16 ou16_ApplicationIndex,
+                                              const C_SCLString & orc_Path, std::vector<C_SCLString> & orc_Files,
+                                              const C_SCLString & orc_ExportToolInfo)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   //index of Datapool within this application (as there can be Datapools owned by other applications
+   // this value is not identical to the Datapool index within the whole list)
+   uint8 u8_DataPoolIndexWithinApplication = 0U;
+
+   //Export Datapools
+   for (uint32 u32_ItDataPool = 0U;
+        (u32_ItDataPool < orc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR); ++u32_ItDataPool)
+   {
+      bool q_Create = false;
+      const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
+      C_OSCExportDataPool::E_Linkage e_Relation = C_OSCExportDataPool::eLOCAL;
+
+      //owned by this application ?
+      if (rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
       {
-         //create DPD and DPH init functions
-         q_CreateDpdInit = true;
+         e_Relation = C_OSCExportDataPool::eLOCAL;
+         q_Create = true;
+      }
+      //if the Datapool is not owned by this application, but has public scope,
+      // then make the Datapool known as public remote Datapool
+      else if ((orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion >= 4U) &&
+               (rc_DataPool.q_ScopeIsPrivate == false))
+      {
+         e_Relation = C_OSCExportDataPool::eREMOTEPUBLIC;
+         q_Create = true;
+      }
+      //if the Datapool is not owned by this application and does not have public scope, but this
+      // application runs the protocol driver, then make the Datapool known as remote Datapool
+      else if (ou16_ApplicationIndex == orc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex)
+      {
+         e_Relation = C_OSCExportDataPool::eREMOTE;
+         q_Create = true;
       }
       else
       {
-         //create DPH init functions
-         q_CreateDpdInit = false;
+         //finished here ...
       }
-      s32_Retval = C_OSCExportOsyInit::h_CreateSourceCode(c_FileBase + ".c", orc_Node, q_CreateDpdInit,
-                                                          ou16_ApplicationIndex, orc_ExportToolInfo);
-      if (s32_Retval != C_NO_ERR)
+
+      // check if the datapool is empty (e.g. COM datapool without any signal)
+      if (q_Create == true)
       {
-         osc_write_log_error("Creating source code",
-                             "Could not write osy_init file to target directory \"" + orc_Path + "\".");
-      }
-      else
-      {
-         //Export data pools
-         for (uint32 u32_ItDataPool = 0U;
-              (u32_ItDataPool < orc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR); ++u32_ItDataPool)
+         bool q_AtLeastOneElement = false;
+         for (uint16 u16_ListIndex = 0U; u16_ListIndex < rc_DataPool.c_Lists.size(); u16_ListIndex++)
          {
-            bool q_Create = false;
-            bool q_IsRemote = false;
-
-            //owned by this application ?
-            if (orc_Node.c_DataPools[u32_ItDataPool].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
+            const C_OSCNodeDataPoolList & rc_List = rc_DataPool.c_Lists[u16_ListIndex];
+            if (rc_List.c_Elements.size() != 0)
             {
-               q_IsRemote = false;
-               q_Create = true;
-            }
-            //if the data pool is not owned by this application, but that application runs the protocol driver,
-            // then make the data pool known as remote data pool
-            else if (ou16_ApplicationIndex == orc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex)
-            {
-               q_IsRemote = true;
-               q_Create = true;
-            }
-            else
-            {
-               //finished here ...
-            }
-
-            if (q_Create == true)
-            {
-               //create source code
-               const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
-               const uint16 u16_GenCodeVersion = orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion;
-               uint8 u8_ProcessId;
-               uint8 u8_DataPoolIndexRemote;
-
-               //we need the process ID of the owner process and the data pool index within the owning application
-               if (q_IsRemote == false)
-               {
-                  //all your base are belong to us
-                  u8_ProcessId = orc_Node.c_Applications[ou16_ApplicationIndex].u8_ProcessId;
-                  u8_DataPoolIndexRemote = 0U; //does not really matter
-               }
-               else
-               {
-                  u8_ProcessId = orc_Node.c_Applications[rc_DataPool.s32_RelatedDataBlockIndex].u8_ProcessId;
-                  //get index of data pool within the remote process:
-                  u8_DataPoolIndexRemote = 0U;
-                  for (uint8 u8_DataPool = 0U; u8_DataPool < u32_ItDataPool; u8_DataPool++)
-                  {
-                     if (orc_Node.c_DataPools[u8_DataPool].s32_RelatedDataBlockIndex ==
-                         rc_DataPool.s32_RelatedDataBlockIndex)
-                     {
-                        u8_DataPoolIndexRemote++;
-                     }
-                  }
-               }
-
-               if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
-               {
-                  C_OSCNodeDataPool c_DataPool;
-                  //Patch data pool to include message names
-                  s32_Retval = C_OSCExportNode::mh_GetAdaptedComDataPool(orc_Node, u32_ItDataPool, c_DataPool);
-                  tgl_assert(s32_Retval == C_NO_ERR);
-                  //Export
-                  s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, c_DataPool,
-                                                                       u8_DataPoolIndexWithinApplication,
-                                                                       q_IsRemote, u8_DataPoolIndexRemote,
-                                                                       u8_ProcessId, orc_ExportToolInfo);
-               }
-               else
-               {
-                  //Export
-                  s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, rc_DataPool,
-                                                                       u8_DataPoolIndexWithinApplication,
-                                                                       q_IsRemote, u8_DataPoolIndexRemote,
-                                                                       u8_ProcessId, orc_ExportToolInfo);
-               }
-               //Handle file names
-               if (s32_Retval == C_NO_ERR)
-               {
-                  C_SCLString c_FileName;
-                  C_OSCExportDataPool::h_GetFileName(rc_DataPool, c_FileName);
-                  c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + c_FileName;
-                  orc_Files.push_back(c_FileName + ".c");
-                  orc_Files.push_back(c_FileName + ".h");
-               }
-               else
-               {
-                  osc_write_log_error("Creating source code",
-                                      "Could not write data pool file to target directory \"" + orc_Path +
-                                      "\".");
-                  break;
-               }
-               u8_DataPoolIndexWithinApplication++;
-            }
-         }
-      }
-      if (s32_Retval == C_NO_ERR)
-      {
-         //Export COMM definition
-         //create COMM configuration if the application owns that protocol
-         for (uint32 u32_ItProtocol = 0U;
-              (u32_ItProtocol < orc_Node.c_ComProtocols.size()) && (s32_Retval == C_NO_ERR);
-              ++u32_ItProtocol)
-         {
-            const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
-
-            //logic: C_OSCCanProtocol refers to a data pool; if that data pool is owned by the
-            // C_OSCNodeApplication then create it
-            if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
-            {
-               for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
-                    ++u32_ItInterface)
-               {
-                  const C_OSCCanMessageContainer & rc_ComMessageContainer = rc_Protocol.c_ComMessages[u32_ItInterface];
-                  if ((rc_ComMessageContainer.c_TxMessages.size() > 0) ||
-                      (rc_ComMessageContainer.c_RxMessages.size() > 0))
-                  {
-                     s32_Retval =
-                        C_OSCExportCommunicationStack::h_CreateSourceCode(orc_Path, orc_Node, ou16_ApplicationIndex,
-                                                                          static_cast<uint8>(u32_ItInterface),
-                                                                          rc_Protocol.u32_DataPoolIndex,
-                                                                          rc_Protocol.e_Type, orc_ExportToolInfo);
-                     //Handle file names
-                     if (s32_Retval == C_NO_ERR)
-                     {
-                        C_SCLString c_FileName;
-                        c_FileName = C_OSCExportCommunicationStack::h_GetFileName(static_cast<uint8>(u32_ItInterface),
-                                                                                  rc_Protocol.e_Type);
-                        c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + c_FileName;
-                        orc_Files.push_back(c_FileName + ".h");
-                        orc_Files.push_back(c_FileName + ".c");
-                     }
-                     else
-                     {
-                        osc_write_log_error("Creating source code",
-                                            "Could not write COMM definition file to target directory \"" +
-                                            orc_Path + "\".");
-                        break;
-                     }
-                  }
-               }
-            }
-            if (s32_Retval != C_NO_ERR)
-            {
+               q_AtLeastOneElement = true;
                break;
             }
          }
+
+         // do not create files for empty datapools
+         if (q_AtLeastOneElement == false)
+         {
+            q_Create = false;
+         }
+      }
+
+      if (q_Create == true)
+      {
+         //create source code
+         const uint16 u16_GenCodeVersion = orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion;
+         uint8 u8_ProcessId;
+         uint8 u8_DataPoolIndexRemote;
+
+         //we need the process ID of the owner process and the Datapool index within the owning application
+         if (e_Relation == C_OSCExportDataPool::eLOCAL)
+         {
+            //all your base are belong to us
+            u8_ProcessId = orc_Node.c_Applications[ou16_ApplicationIndex].u8_ProcessId;
+            u8_DataPoolIndexRemote = 0U; //does not really matter
+         }
+         else
+         {
+            u8_ProcessId = orc_Node.c_Applications[rc_DataPool.s32_RelatedDataBlockIndex].u8_ProcessId;
+            //get index of Datapool within the remote process:
+            u8_DataPoolIndexRemote = 0U;
+            for (uint8 u8_DataPool = 0U; u8_DataPool < u32_ItDataPool; u8_DataPool++)
+            {
+               if (orc_Node.c_DataPools[u8_DataPool].s32_RelatedDataBlockIndex ==
+                   rc_DataPool.s32_RelatedDataBlockIndex)
+               {
+                  u8_DataPoolIndexRemote++;
+               }
+            }
+         }
+
+         if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
+         {
+            C_OSCNodeDataPool c_DataPool;
+            //Patch Datapool to include message names
+            s32_Retval = C_OSCExportNode::mh_GetAdaptedComDataPool(orc_Node, u32_ItDataPool, c_DataPool);
+            tgl_assert(s32_Retval == C_NO_ERR);
+
+            //Export
+            s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, c_DataPool,
+                                                                 u8_DataPoolIndexWithinApplication,
+                                                                 e_Relation, u8_DataPoolIndexRemote,
+                                                                 u8_ProcessId, orc_ExportToolInfo);
+         }
+         else
+         {
+            //Export
+            s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, rc_DataPool,
+                                                                 u8_DataPoolIndexWithinApplication,
+                                                                 e_Relation, u8_DataPoolIndexRemote,
+                                                                 u8_ProcessId, orc_ExportToolInfo);
+         }
+         //Handle file names
+         if (s32_Retval == C_NO_ERR)
+         {
+            C_SCLString c_FileName = C_OSCExportDataPool::h_GetFileName(rc_DataPool);
+            c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + c_FileName;
+            orc_Files.push_back(c_FileName + ".c");
+            orc_Files.push_back(c_FileName + ".h");
+         }
+         else
+         {
+            osc_write_log_error("Creating source code",
+                                "Could not write Datapool file to target directory \"" + orc_Path +
+                                "\".");
+            break;
+         }
+         u8_DataPoolIndexWithinApplication++;
       }
    }
 
@@ -301,16 +348,131 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create COMM stack C code
+
+   \param[in]   orc_Node               Node as information source for exported code
+   \param[in]   ou16_ApplicationIndex  Index of programmable application within orc_Node.c_Applications
+   \param[in]   orc_Path               Storage path for created files
+   \param[out]  orc_Files              List of all exported file names (with absolute or relative path)
+   \param[in]   orc_ExportToolInfo     Information about calling executable (name + version)
+
+   \return
+   C_NO_ERR Operation success
+   C_RD_WR  Operation failure: cannot store files
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const uint16 ou16_ApplicationIndex,
+                                               const C_SCLString & orc_Path, std::vector<C_SCLString> & orc_Files,
+                                               const C_SCLString & orc_ExportToolInfo)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   for (uint32 u32_ItProtocol = 0U;
+        (u32_ItProtocol < orc_Node.c_ComProtocols.size()) && (s32_Retval == C_NO_ERR);
+        ++u32_ItProtocol)
+   {
+      const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
+
+      //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the application than create it
+      if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
+      {
+         for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
+              ++u32_ItInterface)
+         {
+            const C_OSCCanMessageContainer & rc_ComMessageContainer = rc_Protocol.c_ComMessages[u32_ItInterface];
+            if ((rc_ComMessageContainer.c_TxMessages.size() > 0) ||
+                (rc_ComMessageContainer.c_RxMessages.size() > 0))
+            {
+               s32_Retval =
+                  C_OSCExportCommunicationStack::h_CreateSourceCode(orc_Path, orc_Node, ou16_ApplicationIndex,
+                                                                    static_cast<uint8>(u32_ItInterface),
+                                                                    rc_Protocol.u32_DataPoolIndex,
+                                                                    rc_Protocol.e_Type, orc_ExportToolInfo);
+               //Handle file names
+               if (s32_Retval == C_NO_ERR)
+               {
+                  C_SCLString c_FileName;
+                  c_FileName = C_OSCExportCommunicationStack::h_GetFileName(static_cast<uint8>(u32_ItInterface),
+                                                                            rc_Protocol.e_Type);
+                  c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + c_FileName;
+                  orc_Files.push_back(c_FileName + ".h");
+                  orc_Files.push_back(c_FileName + ".c");
+               }
+               else
+               {
+                  osc_write_log_error("Creating source code",
+                                      "Could not write COMM definition file to target directory \"" +
+                                      orc_Path + "\".");
+                  break;
+               }
+            }
+         }
+      }
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create HAL configuration C code
+
+   \param[in]   orc_Node               Node as information source for exported code
+   \param[in]   ou16_ApplicationIndex  Index of programmable application within orc_Node.c_Applications
+   \param[in]   orc_Path               Storage path for created files
+   \param[out]  orc_Files              List of all exported file names (with absolute or relative path)
+   \param[in]   orc_ExportToolInfo     Information about calling executable (name + version)
+
+   \return
+   C_NO_ERR Operation success
+   C_RD_WR  Operation failure: cannot store files
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCExportNode::mh_CreateHALConfigCode(const C_OSCNode & orc_Node, const uint16 ou16_ApplicationIndex,
+                                               const C_SCLString & orc_Path, std::vector<C_SCLString> & orc_Files,
+                                               const C_SCLString & orc_ExportToolInfo)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   // Okay here we iterate over the Datapools again, but at least it is encapsulated
+   for (uint32 u32_ItDataPool = 0U;
+        (u32_ItDataPool < orc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR); ++u32_ItDataPool)
+   {
+      const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
+
+      //HALC Datapool owned by this application?
+      if ((rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex) &&
+          (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC))
+      {
+         s32_Retval = C_OSCExportHalc::h_CreateSourceCode(orc_Path, orc_Node.c_HALCConfig, rc_DataPool,
+                                                          orc_ExportToolInfo);
+         //Handle file names
+         if (s32_Retval == C_NO_ERR)
+         {
+            C_SCLString c_FileName = C_OSCExportHalc::h_GetFileName();
+            c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + c_FileName;
+            orc_Files.push_back(c_FileName + ".c");
+            orc_Files.push_back(c_FileName + ".h");
+         }
+         else
+         {
+            osc_write_log_error("Creating source code",
+                                "Could not write HALC file to target directory \"" + orc_Path +
+                                "\".");
+            break;
+         }
+      }
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for correct preconditions for creating source code
 
-   \param[in]  orc_Node   Node as information source for exported code
-   \param[in]  orc_Path   Storage path for created files
-   \param[out] orc_Files  List of all exported file names (with absolute or relative path)
+   \param[in]  orc_Node    Node as information source for exported code
 
    \return
    C_NO_ERR  Node configuration is OK
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
-             Data pool does not provide information about owning application or refers to an invalid application
+             Datapool does not provide information about owning application or refers to an invalid application
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
@@ -337,7 +499,7 @@ sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
               static_cast<sint32>(orc_Node.c_Applications.size())))
          {
             osc_write_log_error("Creating source code",
-                                "Invalid definition of owner application for data pool " +
+                                "Invalid definition of owner application for Datapool " +
                                 orc_Node.c_DataPools[u8_DataPool].c_Name + ".");
             s32_Retval = C_RANGE;
             break;
@@ -348,15 +510,15 @@ sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapt com data pool elements
+/*! \brief   Adapt com Datapool elements
 
-   \param[in]     orc_Node           Current node containing data pools
-   \param[in]     ou32_DataPoolIndex Data pool index within data pools owned by node
-   \param[out]    orc_DataPool       Copy of data pool with adapted names
+   \param[in]   orc_Node            Current node containing Datapools
+   \param[in]   ou32_DataPoolIndex  Datapool index within Datapools owned by node
+   \param[out]  orc_DataPool        Copy of Datapool with adapted names
 
    \return
    C_NO_ERR Operation successful
-   C_RANGE  Data pool index or type invalid
+   C_RANGE  Datapool index or type invalid
    C_CONFIG Protocol not found
 */
 //----------------------------------------------------------------------------------------------------------------------

@@ -41,8 +41,8 @@ class C_GiNode :
 public:
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiNode(const stw_types::sint32 & ors32_Index, const stw_types::uint64 & oru64_ID,
-            const stw_types::float64 & orf64_Width = mhf64_MinWidthNode,
-            const stw_types::float64 & orf64_Height = mhf64_MinHeightNode, QGraphicsItem * const opc_Parent = NULL);
+            const stw_types::float64 & orf64_Width = mhf64_InitialWidthNode,
+            const stw_types::float64 & orf64_Height = mhf64_InitialHeightNode, QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiNode();
    virtual void FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const;
    virtual void FindClosestPort(const QPointF &orc_ScenePoint, C_GiPort * (&orpc_Closest)) const;
@@ -113,6 +113,8 @@ protected:
 
    static const stw_types::float64 mhf64_MinWidthNode;
    static const stw_types::float64 mhf64_MinHeightNode;
+   static const stw_types::float64 mhf64_InitialWidthNode;
+   static const stw_types::float64 mhf64_InitialHeightNode;
    static const stw_types::uint32 mhu32_ScaleCategory0;
    static const stw_types::uint32 mhu32_ScaleCategory1;
    static const stw_types::uint32 mhu32_ScaleCategory2;
@@ -120,6 +122,7 @@ protected:
    static const stw_types::uint32 mhu32_ScaleCategory4;
    static const stw_types::uint32 mhu32_ScaleCategory5;
    static const stw_types::uint32 mhu32_ScaleCategory6;
+   static const stw_types::uint32 mhu32_ScaleCategory7;
 
    bool mq_ErrorIconHovered;
    QString mc_ErrorText;
@@ -145,8 +148,8 @@ private:
    void m_UpdateItems(const stw_types::float64 of64_DiffWidth, const stw_types::float64 of64_DiffHeight,
                       const bool oq_Initial);
 
-   static const stw_types::float64 mahf64_ScaleMinWidthNode[6];
-   static const stw_types::float64 mahf64_ScaleMinHeightNode[6];
+   static const stw_types::float64 mahf64_ScaleMinWidthNode[7];
+   static const stw_types::float64 mahf64_ScaleMinHeightNode[7];
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

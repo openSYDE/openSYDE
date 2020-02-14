@@ -46,7 +46,7 @@ public:
                        const QPointF & orc_PosOffset = QPointF(-1.0, -1.0));
    virtual ~C_GiBiRectBaseGroup();
 
-   virtual void RestoreDefaultCursor(void);
+   virtual void RestoreDefaultCursor(void) override;
    virtual void SetTemporaryCursor(const QCursor & orc_TemporaryCursor) override;
    virtual void SetDefaultCursor(const QCursor & orc_Value) override;
 
@@ -58,7 +58,7 @@ public:
    //lint -restore
    virtual QRectF boundingRect() const;
    QRectF GetVisibleBoundingRect() const;
-   virtual void FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const;
+   virtual void FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const override;
 
    //GI base
    virtual void SetZValueCustom(const stw_types::float64 of64_ZValue) override;

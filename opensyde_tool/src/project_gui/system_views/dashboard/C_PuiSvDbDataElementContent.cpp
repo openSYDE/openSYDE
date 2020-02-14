@@ -70,6 +70,9 @@ C_PuiSvDbDataElementContent::C_PuiSvDbDataElementContent(const stw_opensyde_core
 /*! \brief   Copy operator
 
    \param[in]     orc_Source      Reference to source
+
+   \return
+   Copied element
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbDataElementContent & C_PuiSvDbDataElementContent::operator =(const C_PuiSvDbDataElementContent & orc_Source)

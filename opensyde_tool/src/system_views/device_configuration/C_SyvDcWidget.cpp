@@ -65,6 +65,7 @@ const sint32 C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ONLY_USED_INTERFACES = 0;
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent           Reference to parent
+   \param[in,out] ou32_ViewIndex       View index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
@@ -254,13 +255,14 @@ void C_SyvDcWidget::InitText(void)
    this->mpc_Ui->pc_LabelConfigurationMode->SetToolTipInformation(
       C_GtGetText::h_GetText("Configuration Mode"),
       C_GtGetText::h_GetText(
-         "Decide which device interfaces will be configured.\n"
-         "Warning: Configuring all connected interfaces may lead to inconsistent configurations on other connected "
-         "buses.\n\n"
-         "Only directly connected interfaces: \n"
-         "   All interfaces which are connected to the bus which is used by the current device configuration.\n"
-         "All connected interfaces: \n"
-         "   All interfaces which are connected to any bus in the SYSTEM DEFINITION.\n"));
+         "Decide which device interfaces will be configured.\n \n"
+         " - Only directly connected interfaces: \n"
+         "   All interfaces which are connected to the bus are used by the current device configuration.\n\n"
+         " - All connected interfaces: \n"
+         "   All interfaces which are connected to any bus in the SYSTEM DEFINITION.\n"
+         "   Attention: This may lead to inconsistent configurations on other connected buses. \n"
+         "   (e.g.: CAN bitrate of configured interface does not match the bitrate of other nodes connected \n"
+         "   to same bus)"));
    this->mpc_Ui->pc_LabelBitRate->SetToolTipInformation(
       C_GtGetText::h_GetText("Bitrate of Connected Devices"),
       C_GtGetText::h_GetText("Specify current bitrate of connected devices. If you defined another bitrate in SYSTEM "
@@ -350,24 +352,30 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
       }
    }
 
+   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
+
    switch (s32_Retval)
    {
    case C_NO_ERR:
       break;
    case C_CONFIG:
       c_Message = QString(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_RD_WR:
       c_Message =
          QString(C_GtGetText::h_GetText("Configured communication DLL does not exist or DLL could not be opened."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_OVERFLOW:
       c_Message =
          QString(C_GtGetText::h_GetText(
                     "Unknown transport protocol or unknown diagnostic server for at least one node."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_NOACT:
       c_Message = QString(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_COM:
       // TODO BAY: Adapt text in case of Ethernet
@@ -375,27 +383,32 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
          QString(C_GtGetText::h_GetText(
                     "CAN initialization failed. Check your PC CAN interface configuration "
                     "(System View setup - double-click on PC)."));
+      c_MessageBox.SetCustomMinHeight(230, 230);
       break;
    case C_CHECKSUM:
       c_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_RANGE:
       c_Message = QString(C_GtGetText::h_GetText("Routing configuration failed."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_UNKNOWN_ERR:
       c_Message = QString(C_GtGetText::h_GetText("Wrapped error of internal function call."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_WARN:
       c_Message = QString(C_GtGetText::h_GetText("Internal error."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    default:
       c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    }
 
    if (s32_Retval != C_NO_ERR)
    {
-      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
       c_MessageBox.SetDescription(c_Message);
       m_CleanUpScan();
       c_MessageBox.Execute();
@@ -474,18 +487,20 @@ void C_SyvDcWidget::m_StartSearchProper(void)
             }
             else
             {
-               C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+               C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
                c_Message.SetHeading("Failed!");
                c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: enter Flashloader."));
                m_CleanUpScan();
+               c_Message.SetCustomMinHeight(180, 180);
                c_Message.Execute();
             }
          }
          else
          {
-            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
             c_Message.SetDescription(C_GtGetText::h_GetText("Unknown bitrate."));
             m_CleanUpScan();
+            c_Message.SetCustomMinHeight(180, 180);
             c_Message.Execute();
          }
       }
@@ -512,6 +527,10 @@ void C_SyvDcWidget::m_CleanUpScan(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ScanFinished(void)
 {
+   C_SCLString c_NotTrimmedDevices = C_GtGetText::h_GetText("Not trimmed device types: \n");
+   bool q_NotTrimmedDevicesFound = false;
+
+   //evaluate results
    if (this->mc_FoundDevices.size() == 0)
    {
       //Zero
@@ -558,6 +577,35 @@ void C_SyvDcWidget::m_ScanFinished(void)
    }
 
    m_CleanUpScan();
+
+   //check if found device types are trimmed
+   for (uint32 u32_ItDevice1 = 0; u32_ItDevice1 < this->mc_FoundDevices.size(); ++u32_ItDevice1)
+   {
+      const C_SyvDcDeviceInformation & rc_Device1 = this->mc_FoundDevices[u32_ItDevice1];
+
+      //trim & check
+      if (rc_Device1.c_DeviceName.Trim() != rc_Device1.c_DeviceName)
+      {
+         //not trimmed string found
+         q_NotTrimmedDevicesFound = true;
+
+         //add to list
+         c_NotTrimmedDevices += "- \"" + rc_Device1.c_DeviceName + "\" \n";
+      }
+   }
+
+   //evaluate status of trimmed check
+   if (q_NotTrimmedDevicesFound == true)
+   {
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eWARNING);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Device Type"));
+      c_Message.SetDescription(C_GtGetText::h_GetText(
+                                  "Device type received from target is not trimmed. "
+                                  "This could lead to visual misunderstanding while devices assignment."));
+      c_Message.SetDetails(c_NotTrimmedDevices.c_str());
+      c_Message.SetCustomMinHeight(230, 300);
+      c_Message.Execute();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -675,6 +723,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
                   {
                      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                      c_Message.SetDescription(C_GtGetText::h_GetText("Could not configure STW Flashloader devices."));
+                     c_Message.SetCustomMinHeight(180, 180);
                      c_Message.Execute();
                   }
                }
@@ -683,6 +732,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
                   C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                   c_Message.SetDescription(C_GtGetText::h_GetText(
                                               "Could not configure STW Flashloader devices over Ethernet."));
+                  c_Message.SetCustomMinHeight(180, 180);
                   c_Message.Execute();
 
                   s32_Result = C_NOACT;
@@ -708,6 +758,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
                {
                   C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                   c_Message.SetDescription(C_GtGetText::h_GetText("Could not configure openSYDE devices."));
+                  c_Message.SetCustomMinHeight(180, 180);
                   c_Message.Execute();
                }
             }
@@ -751,6 +802,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
          {
             C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
             c_Message.SetDescription(C_GtGetText::h_GetText("Could not configure openSYDE devices."));
+            c_Message.SetCustomMinHeight(180, 180);
             c_Message.Execute();
          }
       }
@@ -759,6 +811,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_Message.SetDescription(QString(C_GtGetText::h_GetText("Internal error FillDeviceConfig %1.")).
                                   arg(C_Uti::h_StwError(s32_Result)));
+         c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
       }
    }
@@ -766,6 +819,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
    {
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
       c_Message.SetDescription(QString(C_GtGetText::h_GetText("Internal error starting configuration.")));
+      c_Message.SetCustomMinHeight(180, 180);
       c_Message.Execute();
    }
 }
@@ -964,7 +1018,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const C_SyvDcDeviceConfiguation & o
    \param[in]     orc_ServerIdOnUsedBus         Server ID of the node on the for the communication used interface
    \param[in]     orc_ServerIdOnConfiguredBus   Server ID of the node on the configured interface
    \param[in]     ou32_Bitrate                  Set bitrate for the configured interface
-   \param[in]     orc_Text                      Result text for the interface
+   \param[in,out] orc_Text                      Result text for the interface
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OSCNodeComInterfaceSettings & orc_IntfSetting,
@@ -998,7 +1052,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OSCNodeComInterfaceSe
    \param[in]     orc_ServerIdOnUsedBus         Server ID of the node on the for the communication used interface
    \param[in]     orc_ServerIdOnConfiguredBus   Server ID of the node on the configured interface
    \param[in]     orc_IpAddress                 Set IP address for the configured interface
-   \param[in]     orc_Text                      Result text for the interface
+   \param[in,out] orc_Text                      Result text for the interface
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OSCNodeComInterfaceSettings & orc_IntfSetting,
@@ -1041,7 +1095,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OSCNodeComInterfaceSe
    \param[in]     orc_IntfSetting               Configuration of the current interface
    \param[in]     orc_ServerIdOnUsedBus         Server ID of the node on the for the communication used interface
    \param[in]     orc_ServerIdOnConfiguredBus   Server ID of the node on the configured interface
-   \param[in]     orc_Text                      Result text for the interface
+   \param[in,out] orc_Text                      Result text for the interface
    \param[in]     q_BusConnected                Flag if the interface is connected to a bus
    \param[in]     q_Configured                  Flag if the interface was configured by the device configuration
 */
@@ -1089,7 +1143,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSetti
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Resets the network dependent of the flashloader types
+/*! \brief   Resets the network dependent of the flashloader types after the finished configuration
 
    Procedure depends on used protocol(s):
 
@@ -1112,7 +1166,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSetti
    C_CONFIG    No com driver installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
+void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
 {
    if (this->mpc_DcSequences != NULL)
    {
@@ -1122,9 +1176,10 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
       uint32 u32_NewBitrate;
       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> c_OsyNodes;
       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> c_StwNodes;
-      QString c_Details = C_GtGetText::h_GetText("Your system uses at least one node with the STW Flashloader \n"
-                                                 "and the bitrate of the CAN bus has changed. \n"
-                                                 "In this case the reset cannot be performed automatically.");
+      const QString c_Details = C_GtGetText::h_GetText("Your system uses at least one node with the STW Flashloader \n"
+                                                       "and the bitrate of the CAN bus has changed. \n"
+                                                       "In this case the reset cannot be performed automatically.");
+      uint32 u32_WaitTime = 0U;
 
       if ((this->mc_StwFlashloaderDeviceConfigurations.size() > 0) &&
           (oq_SameBitrate == false))
@@ -1146,7 +1201,7 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
             if (q_NotAccepted == true)
             {
                osc_write_log_warning("Send openSYDE request programming flag",
-                                     "At least one node send a not accepted response.");
+                                     "At least one node sent a \"not accepted\" response.");
             }
          }
 
@@ -1169,8 +1224,13 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
             c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
             c_ConfirmationBox.SetDescription(QString(C_GtGetText::h_GetText(
                                                         "Power OFF all nodes manually and press \"Continue\".")));
+            c_ConfirmationBox.SetCustomMinHeight(180, 270);
             c_ConfirmationBox.Execute();
          }
+
+         //Before reinitializing the bus wait a little to make sure the CAN reset request broadcast(s) had the chance to
+         // really be sent out on the bus
+         stw_tgl::TGL_Sleep(50U);
 
          // Set the new bitrate for the new active configuration if the bitrate was changed
          s32_Return = this->mpc_DcSequences->InitCanAndSetCanBitrate(u32_NewBitrate);
@@ -1178,12 +1238,33 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
 
       if (s32_Return == C_NO_ERR)
       {
-         // Get the minimum wait time
-         const uint32 u32_WatiTime = this->mpc_DcSequences->GetMinimumFlashloaderResetWaitTime();
+         if (this->me_BusType == C_OSCSystemBus::eCAN)
+         {
+            // Get the minimum wait time
+            u32_WaitTime = this->mpc_DcSequences->GetMinimumFlashloaderResetWaitTime(
+               C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_CAN);
 
-         // Start sending the message for getting into flashloader for at least 500ms (default value)
-         // In case of a manual reset, this sequence must be executed till the next dialog will be closed by user
-         s32_Return = this->mpc_DcSequences->ScanCanSendFlashloaderRequest(u32_WatiTime, q_Manual);
+            // Start sending the message for getting into flashloader for at least the configured minimum time
+            // In case of a manual reset, this sequence must be executed till the next dialog will be closed by user
+            // and at least the process has last the minimum time.
+            // Inform the user how long the devices should get time.
+            s32_Return = this->mpc_DcSequences->ScanCanSendFlashloaderRequest(u32_WaitTime, q_Manual);
+         }
+         else
+         {
+            const uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+            // Get the minimum wait time
+            u32_WaitTime = this->mpc_DcSequences->GetMinimumFlashloaderResetWaitTime(
+               C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_ETHERNET);
+
+            // TODO BAY: Wait in thread?
+            do
+            {
+               //In case it takes longer do process events to handle cursor and proper show of message box
+               QApplication::processEvents(QEventLoop::AllEvents, 50);
+            }
+            while (stw_tgl::TGL_GetTickCount() < (u32_WaitTime + u32_StartTime));
+         }
       }
       else
       {
@@ -1196,11 +1277,16 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
          if (q_Manual == true)
          {
             C_OgeWiCustomMessage c_ConfirmationBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
+            const uint32 u32_WaitTimeSec = (u32_WaitTime / 1000U) + (((u32_WaitTime % 1000U) == 0U) ? 0U : 1U);
             c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
             c_ConfirmationBox.SetDetails(c_Details);
             c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
             c_ConfirmationBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                        "Turn ON all nodes manually and press \"Continue\".")));
+                                                        "Turn ON all nodes manually, wait at least %1 "
+                                                        "second(s) due to Flashloader reset wait time"
+                                                        " and then press \"Continue\".")).
+                                             arg(u32_WaitTimeSec));
+            c_ConfirmationBox.SetCustomMinHeight(200, 270);
             c_ConfirmationBox.Execute();
 
             // User has finished the reset, stop the sequence
@@ -1366,34 +1452,17 @@ void C_SyvDcWidget::m_ResetNetwork(const bool oq_ToFlashloader)
 {
    if (this->mpc_DcSequences != NULL)
    {
-      QString c_Text = "<table width=\"100%\"><tr><td width=\"40%\">";
-
-      if (this->me_BusType == C_OSCSystemBus::eCAN)
+      if (this->mc_OpenSydeDeviceConfigurations.size() > 0)
       {
-         if (this->mc_OpenSydeDeviceConfigurations.size() > 0)
-         {
-            // CAN openSYDE flashloader
-            this->mpc_DcSequences->ResetCanOpenSydeDevices(oq_ToFlashloader);
-         }
-
-         if (this->mc_StwFlashloaderDeviceConfigurations.size() > 0)
-         {
-            // STW flashloader
-            this->mpc_DcSequences->ResetCanStwFlashloaderDevices();
-         }
-      }
-      else
-      {
-         // Ethernet openSYDE flashloader
-         this->mpc_DcSequences->ResetEthOpenSydeDevices(oq_ToFlashloader);
+         // CAN openSYDE flashloader
+         this->mpc_DcSequences->ResetOpenSydeDevices(oq_ToFlashloader);
       }
 
-      c_Text += QString(C_GtGetText::h_GetText("Performing automatic reset"));
-
-      c_Text += "</td>";
-      c_Text += "<td width=\"20%\">";
-      c_Text += QString(C_GtGetText::h_GetText("DONE"));
-      c_Text += "</td></tr></table>";
+      if (this->mc_StwFlashloaderDeviceConfigurations.size() > 0)
+      {
+         // STW flashloader
+         this->mpc_DcSequences->ResetCanStwFlashloaderDevices();
+      }
    }
 }
 
@@ -2066,6 +2135,8 @@ void C_SyvDcWidget::m_Timer(void)
    {
       sint32 s32_Result;
       sint32 s32_SequenceResult;
+      bool q_ShowFinalErrorMessage = false;
+      QString c_ErrorDescription = "";
 
       std::vector<C_SyvDcDeviceInformation> c_DeviceInfo;
 
@@ -2095,6 +2166,7 @@ void C_SyvDcWidget::m_Timer(void)
                      c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: Reading information"
                                                                      " from STW Flashloader devices"));
                      m_CleanUpScan();
+                     c_Message.SetCustomMinHeight(180, 180);
                      c_Message.Execute();
                   }
                }
@@ -2111,6 +2183,7 @@ void C_SyvDcWidget::m_Timer(void)
                      c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: Reading information"
                                                                      " from openSYDE devices."));
                      m_CleanUpScan();
+                     c_Message.SetCustomMinHeight(180, 180);
                      c_Message.Execute();
                   }
                }
@@ -2128,6 +2201,7 @@ void C_SyvDcWidget::m_Timer(void)
                c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
                c_Message.SetDescription(C_GtGetText::h_GetText("Could not transfer all devices into Flashloader mode."));
                m_CleanUpScan();
+               c_Message.SetCustomMinHeight(180, 180);
                c_Message.Execute();
             }
             break;
@@ -2160,6 +2234,7 @@ void C_SyvDcWidget::m_Timer(void)
                      c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: Reading information"
                                                                      " from openSYDE Devices"));
                      m_CleanUpScan();
+                     c_Message.SetCustomMinHeight(180, 180);
                      c_Message.Execute();
                   }
                   else
@@ -2181,6 +2256,7 @@ void C_SyvDcWidget::m_Timer(void)
                c_Message.SetDescription(C_GtGetText::h_GetText("Failed while getting all information"
                                                                " from STW Flashloader Devices."));
                m_CleanUpScan();
+               c_Message.SetCustomMinHeight(180, 180);
                c_Message.Execute();
             }
             break;
@@ -2211,9 +2287,9 @@ void C_SyvDcWidget::m_Timer(void)
                c_Message.SetDescription(C_GtGetText::h_GetText("Failed while getting all information"
                                                                " from openSYDE Devices."));
                m_CleanUpScan();
+               c_Message.SetCustomMinHeight(180, 180);
                c_Message.Execute();
             }
-
             break;
          case eCONFCANSTWFLASHLOADERDEVICES:
             if ((s32_SequenceResult == C_NO_ERR) ||
@@ -2234,6 +2310,7 @@ void C_SyvDcWidget::m_Timer(void)
                      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                      c_Message.SetDescription(C_GtGetText::h_GetText(
                                                  "Error occurred during openSYDE device configuration."));
+                     c_Message.SetCustomMinHeight(180, 180);
                      c_Message.Execute();
                   }
                }
@@ -2245,15 +2322,14 @@ void C_SyvDcWidget::m_Timer(void)
                   QApplication::processEvents();
                   this->m_ShowConfigResult();
                   // Finish the process. No waiting for reset necessary.
-                  this->m_ResetFlashloader(this->mq_SameBitrates);
+                  this->m_ResetFlashloaderAfterConfig(this->mq_SameBitrates);
                }
             }
             else
             {
-               C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-               c_Message.SetDescription(C_GtGetText::h_GetText(
-                                           "Error occurred during STW Flashloader device configuration."));
-               c_Message.Execute();
+               q_ShowFinalErrorMessage = true;
+               c_ErrorDescription =
+                  C_GtGetText::h_GetText("Error occurred during STW Flashloader device configuration.");
             }
             break;
          case eCONFCANOPENSYDEDEVICES: // Same result
@@ -2266,22 +2342,14 @@ void C_SyvDcWidget::m_Timer(void)
                QApplication::processEvents();
                this->m_ShowConfigResult();
                // Finish the process. No waiting for reset necessary.
-               this->m_ResetFlashloader(this->mq_SameBitrates);
+               this->m_ResetFlashloaderAfterConfig(this->mq_SameBitrates);
             }
             else
             {
-               C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-               c_Message.SetHeading("Device Configuration");
-               c_Message.SetDescription(C_GtGetText::h_GetText(
-                                           "Error occurred during openSYDE device configuration."));
-               c_Message.Execute();
+               q_ShowFinalErrorMessage = true;
+               c_ErrorDescription = C_GtGetText::h_GetText("Error occurred during openSYDE device configuration.");
 
-               c_Text = "<br/><br/><br/>" + mhc_REPORT_HIGHLIGHT_TAG_START;
-               c_Text +=  QString(C_GtGetText::h_GetText("Configuration Error!"));
-
-               c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/>";
-
-               c_Text += QString(C_GtGetText::h_GetText("For more details see "));
+               c_Text = QString(C_GtGetText::h_GetText("For more details see "));
                //Update log file
                C_OSCLoggingHandler::h_Flush();
                c_Text += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
@@ -2289,6 +2357,12 @@ void C_SyvDcWidget::m_Timer(void)
                          arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                          arg(C_GtGetText::h_GetText("log file"));
                c_Text += "<br/>";
+
+               c_Text += "<br/><br/><br/>" + mhc_REPORT_HIGHLIGHT_TAG_START;
+               c_Text += QString(C_GtGetText::h_GetText(
+                                    "Errors occurred during device configuration. Check report for details."));
+
+               c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/>";
 
                this->m_UpdateReportText(c_Text);
             }
@@ -2311,11 +2385,59 @@ void C_SyvDcWidget::m_Timer(void)
 
             //Notify user last?
             c_Text = "<br/><br/><br/>" + mhc_REPORT_HIGHLIGHT_TAG_START;
-            c_Text +=  QString(C_GtGetText::h_GetText("Configuration finished!"));
-            c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
-            this->m_UpdateReportText(c_Text);
+
+            if ((s32_SequenceResult == C_NO_ERR) ||
+                (s32_SequenceResult == C_NOACT)) // No openSYDE devices to configure
+            {
+               C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eINFORMATION);
+
+               c_Text +=  QString(C_GtGetText::h_GetText("Device Configuration successfully finished!"));
+               c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
+               this->m_UpdateReportText(c_Text);
+
+               c_Message.SetHeading("Device Configuration");
+               c_Message.SetDescription(C_GtGetText::h_GetText("Device Configuration successfully finished."));
+               c_Message.SetCustomMinHeight(180, 180);
+               c_Message.Execute();
+            }
+            else
+            {
+               q_ShowFinalErrorMessage = true;
+               c_ErrorDescription = C_GtGetText::h_GetText("Error occurred during device configuration.");
+
+               c_Text +=
+                  QString(C_GtGetText::h_GetText(
+                             "Errors occurred during device configuration. Check report for details."));
+               c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/><br/>";
+               this->m_UpdateReportText(c_Text);
+            }
+
+            if (this->me_Step == eREADBACKCAN)
+            {
+               //Before closing the bus wait a little to make sure the CAN reset request broadcast(s) had the chance to
+               // really be sent out on the bus
+               stw_tgl::TGL_Sleep(50U);
+            }
+
             break;
          }
+      }
+
+      if (q_ShowFinalErrorMessage == true)
+      {
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+         c_Message.SetHeading("Device Configuration");
+         c_Message.SetDescription(c_ErrorDescription);
+         c_Message.SetDetails(C_GtGetText::h_GetText(
+                                 "Tips:\n"
+                                 "- Check if your PC is really connected to the device interface, which is defined in the setup view.\n"
+                                 "- Check whether the devices have performed the reset correctly.\n"
+                                 "- Check if the devices are still available.\n"
+                                 "- Check if in case of Ethernet the set IP address is in the same subnet like the PC Ethernet adapter?\n"
+                                 "\n"
+                                 "Check device configuration report for more details about warnings, errors or success."));
+         c_Message.SetCustomMinHeight(180, 350);
+         c_Message.Execute();
       }
    }
 }
@@ -2442,9 +2564,6 @@ bool C_SyvDcWidget::m_AreAllInterfacesToConfigure(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Disconnect from network if necessary
-
-   Info: currently this function is unused because it has to be called in the onclose event
-         which this class can not implement in all cases
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_DoCompleteDisconnect(void)
@@ -2454,6 +2573,7 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
       //Stop timer (don't continue process)
       this->mc_Timer.stop();
+
       if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
       {
          const C_OSCSystemBus * const pc_Bus =
@@ -2473,6 +2593,7 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
             //inform user whats happening
             c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
             c_Message.SetDescription(C_GtGetText::h_GetText("Exiting Update Mode..."));
+            c_Message.SetCustomMinHeight(180, 180);
             c_Message.show();
 
             //Wait for the current thread to finish (if any)
@@ -2535,11 +2656,16 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
 
             if (q_Osy == true)
             {
-               while (this->mpc_DcSequences->ResetCanOpenSydeDevices(false) == C_BUSY)
+               while (this->mpc_DcSequences->ResetOpenSydeDevices(false) == C_BUSY)
                {
                   //In case it takes longer do process events to handle cursor and proper show of message box
                   QApplication::processEvents(QEventLoop::AllEvents, 50);
                }
+
+               //Before closing the bus wait a little to make sure the CAN reset request broadcast(s) had the chance to
+               // really be sent out on the bus
+               stw_tgl::TGL_Sleep(50U);
+
                q_StartedAnything = true;
             }
 
@@ -2608,5 +2734,6 @@ void C_SyvDcWidget::m_InformUserAboutAbortedClose(void) const
    c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
    c_Message.SetDescription(C_GtGetText::h_GetText(
                                "While the communication is running, an abort can lead to an inconsistent status of the system."));
+   c_Message.SetCustomMinHeight(180, 180);
    c_Message.Execute();
 }

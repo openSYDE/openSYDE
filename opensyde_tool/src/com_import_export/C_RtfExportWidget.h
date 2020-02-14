@@ -89,7 +89,7 @@ private:
    void m_OkClicked(void);
    void m_CancelClicked(void);
    void m_RtfPathClicked(void);
-   void m_LogoPathClicked(void);
+   void m_LogoPathClicked(void) const;
 
    stw_types::sint32 m_CreateConfigXml(const stw_scl::C_SCLString & orc_Path,
                                        const C_ExportXmlStructure & orc_ExportXmlStructure) const;

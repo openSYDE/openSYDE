@@ -33,7 +33,7 @@ border-width: 1px;
 border-right-width: 0px;
 padding-left: 0px;
 padding-right: 0px;
-padding-top: 10px;
+padding-top: 1px;
 }
 
 stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab
@@ -81,11 +81,11 @@ min-height: 30px;
 stw_opensyde_gui_elements--C_OgeTawToolBox QTabBar::tab:selected
 {
 border-bottom-width: 0px;
-padding-bottom: 11px;
+padding-bottom: 4px;
 }
 stw_opensyde_gui_elements--C_OgeTawToolBox QTabBar::tab
 {
-padding-bottom: 10px;
+padding-bottom: 3px;
 min-height: 17px;
 }
 

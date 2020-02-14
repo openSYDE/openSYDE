@@ -52,6 +52,8 @@ C_OSCIOFileDataBase::~C_OSCIOFileDataBase()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if all IDs are unique
 
+   \param[in,out] orc_DuplicateIds Duplicate ids
+
    \retval true  All unique
    \retval false Duplicate Ids found
 */

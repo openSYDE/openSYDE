@@ -131,8 +131,8 @@ void C_SyvDaItTaView::UpdateError(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparence value configured by the actual timeout state
 
-   \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
-   \param[in] osn_Value                       Value for transparence (0..255)
+   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
+   \param[in]     osn_Value                 Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -170,6 +170,8 @@ void C_SyvDaItTaView::MoveSelected(const bool oq_Up)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove all selected items
+
+   \param[in,out]  orc_RemovedDataElements   Removed data elements
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::RemoveSelectedItems(std::vector<C_PuiSvDbNodeDataPoolListElementId> & orc_RemovedDataElements)

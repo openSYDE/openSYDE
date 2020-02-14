@@ -19,6 +19,7 @@
 #include "C_OSCCanMessageIdentificationIndices.h"
 #include "C_OSCCanProtocol.h"
 #include "C_PuiSdNodeDataPoolListElement.h"
+#include "C_PuiSdNodeCanMessage.h"
 #include "C_PuiSdNodeCanSignal.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -62,7 +63,8 @@ public:
    stw_types::sint32 SetCanMessageReceiveTimeoutAutoFlag(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
       const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-      const stw_types::uint32 ou32_DatapoolIndex, const bool oq_UseAutoReceiveTimeout) const;
+      const stw_types::uint32 ou32_DatapoolIndex,
+      const C_PuiSdNodeCanMessage::E_RxTimeoutMode & ore_ReceiveTimeoutMode) const;
    stw_types::sint32 SetCanSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                   const stw_types::uint32 & oru32_SignalIndex,
                                   const stw_opensyde_core::C_OSCCanSignal & orc_OSCSignal,
@@ -86,7 +88,7 @@ public:
                                    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals, stw_types::uint32 & oru32_MessageIndex);
    stw_types::sint32 InsertCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                       const stw_opensyde_core::C_OSCCanMessage & orc_Message,
-                                      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals);
+                                      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const C_PuiSdNodeCanMessage & orc_UIMessage);
    stw_types::sint32 DeleteCanMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    stw_types::sint32 ChangeCanMessageTx(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                         const stw_types::uint32 & oru32_NodeIndex,
@@ -145,7 +147,6 @@ public:
 private:
    stw_types::uint32 m_GetMatchingMessageVectorIndex(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
-   bool m_CheckIfAlreadyExisting(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void m_RegisterIfNecessary(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    static bool mh_CheckIfAlreadyExisting(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                          const std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > & orc_Input);
@@ -200,7 +201,7 @@ private:
    ///< Level 1: Different messages
    ///< Level 2: Matching message ids (Which IDs correlate to the same message)
    std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> mc_CriticalMessageMatches;
-   ///<Problematic messages (Match but different TX)
+   ///<Problematic messages (Match but different Tx)
    std::vector<std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > >
    mc_MessageMatchesForOtherProtocols; ///< Level 1: Different Protocols
    ///< Level 2: Different messages

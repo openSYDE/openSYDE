@@ -73,7 +73,7 @@ public:
    void ShowCancelButton(void);
 
    void SetCustomMinWidth(const stw_types::sint32 & ors32_MinWidth) const;
-   void SetCustomMinHeight(const stw_types::sint32 & ors32_MinHeight) const;
+   void SetCustomMinHeight(const stw_types::sint32 & ors32_MinHeight, const stw_types::sint32 & ors32_MaxHeight);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -95,6 +95,8 @@ private:
    QString mc_Heading;
    QString mc_Description;
    QString mc_Details;
+   stw_types::sint32 ms32_MinHeight;
+   stw_types::sint32 ms32_MaxHeight;
 
    E_Outputs me_Output;
 
@@ -105,6 +107,7 @@ private:
    void m_OKClicked(void);
    void m_NOClicked(void);
    void m_CancelClicked(void);
+   void m_Size(void) const;
 
    // Avoid call
    C_OgeWiCustomMessage(const C_OgeWiCustomMessage &);

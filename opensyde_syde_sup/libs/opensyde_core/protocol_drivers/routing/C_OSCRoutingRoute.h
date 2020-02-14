@@ -38,7 +38,7 @@ public:
    stw_types::uint8 u8_InInterfaceNumber;
    C_OSCSystemBus::E_Type e_InInterfaceType;
    // Output information for routing
-   stw_types::uint32 u32_OutBusIndex;
+   stw_types::uint32 u32_OutBusIndex; /// Equals 0xFFFFFFFFU if the point is target
    stw_types::uint8 u8_OutNodeID;
    stw_types::uint8 u8_OutInterfaceNumber;
    C_OSCSystemBus::E_Type e_OutInterfaceType;

@@ -15,6 +15,7 @@
 #include <QWidget>
 #include "stwtypes.h"
 #include "C_SdBueMessageRxEntry.h"
+#include "C_PuiSdNodeCanMessage.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -41,10 +42,9 @@ public:
                  const std::vector<stw_types::uint32> & orc_NodeIndexes,
                  const std::vector<stw_types::uint32> & orc_InterfaceIndexes,
                  const std::vector<stw_types::uint32> & orc_DatapoolIndexes,
-                 const std::vector<bool> & orc_UseAutoReceiveTimeoutFlags,
-                 const std::vector<stw_types::uint32> & orc_ReceiveTimeoutValues);
+                 const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes, const std::vector<stw_types::uint32> & orc_ReceiveTimeoutValues);
    void SetLastKnownCycleTimeValue(const stw_types::uint32 ou32_Value);
-   void SetAlwaysHideTimeout(const bool oq_Hide);
+   void SetTxMethodOnEvent(const bool oq_TxMethodOnEvent);
    void CheckNodes(const std::vector<stw_types::uint32> & orc_NodeIndexes,
                    const std::vector<stw_types::uint32> & orc_InterfaceIndexes,
                    const std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;
@@ -61,9 +61,9 @@ Q_SIGNALS:
    //lint -restore
    void SigNodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                        const stw_types::uint32 ou32_DatapoolIndex, const bool oq_Checked);
-   void SigNodeUseAutoReceiveTimeout(const stw_types::uint32 ou32_NodeIndex,
-                                     const stw_types::uint32 ou32_InterfaceIndex,
-                                     const stw_types::uint32 ou32_DatapoolIndex, const bool oq_UseReceiveTimeout);
+   void SigNodeReceiveTimeoutMode(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
+                                  const stw_types::uint32 ou32_DatapoolIndex,
+                                  const stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode);
    void SigNodeReceiveTimeout(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                               const stw_types::uint32 ou32_DatapoolIndex, const stw_types::uint32 ou32_ReceiveTimeout);
 
@@ -71,7 +71,7 @@ private:
    Ui::C_SdBueMessageRxList * mpc_Ui;
    std::vector<C_SdBueMessageRxEntry *> mc_Entries;
    stw_types::uint32 mu32_LastKnownCycleTimeValue;
-   bool mq_AlwaysHide;
+   bool mq_TxMethodOnEvent;
    bool mq_ModeSingleNode;
 
    //Avoid call

@@ -342,7 +342,8 @@ const
                }
                else
                {
-                  m_LogWarningWithHeaderAndIp("UDP response with incorrect payload size received. Ignoring.",
+                  m_LogWarningWithHeaderAndIp("UDP response with incorrect payload size (" +
+                                              C_SCLString::IntToStr(c_Response.size()) + ") received. Ignoring.",
                                               TGL_UTIL_FUNC_ID, au8_Ip);
                }
             }
@@ -504,7 +505,8 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
                }
                else
                {
-                  m_LogWarningWithHeaderAndIp("UDP response with incorrect payload size received. Ignoring.",
+                  m_LogWarningWithHeaderAndIp("UDP response with incorrect payload size (" +
+                                              C_SCLString::IntToStr(c_Response.size()) + ") received. Ignoring.",
                                               TGL_UTIL_FUNC_ID, orau8_ResponseIp);
                }
             }
@@ -608,7 +610,8 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastRequestProgramming(
                }
                else
                {
-                  m_LogWarningWithHeaderAndIp("UDP response with incorrect payload size received. Ignoring.",
+                  m_LogWarningWithHeaderAndIp("UDP response with incorrect payload size (" +
+                                              C_SCLString::IntToStr(c_Response.size()) + ") received. Ignoring.",
                                               TGL_UTIL_FUNC_ID, au8_Ip);
                }
             }
@@ -686,7 +689,7 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastNetReset(const uint8 ou8_ResetType, 
 
    Set up class
 
-   \param[in]  ou16_MaxServiceQueueSize   maximum number of entries in TX/RX queue
+   \param[in]  ou16_MaxServiceQueueSize   maximum number of entries in Tx/Rx queue
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpIp::C_OSCProtocolDriverOsyTpIp(const uint16 ou16_MaxServiceQueueSize) :
@@ -757,8 +760,8 @@ void C_OSCProtocolDriverOsyTpIp::m_ComposeRequest(const C_OSCProtocolDriverOsySe
 /*! \brief   Perform cyclic communication tasks for IP-TP
 
    Perform cyclic communication tasks for IP-TP.
-   - send services from TX queue via TCP connection
-   - read incoming TCP services and place in RX queue
+   - send services from Tx queue via TCP connection
+   - read incoming TCP services and place in Rx queue
 
    Configuration problems will be reported via the function return value.
    Ongoing communication problems will be written to the class's log text.
@@ -911,7 +914,7 @@ sint32 C_OSCProtocolDriverOsyTpIp::Cycle(void)
                      s32_Return = m_AddToRxQueue(c_Service);
                      if (s32_Return != C_NO_ERR)
                      {
-                        m_LogWarningWithHeader("RX Queue overflow. Incoming TCP response dumped.", TGL_UTIL_FUNC_ID);
+                        m_LogWarningWithHeader("Rx Queue overflow. Incoming TCP response dumped.", TGL_UTIL_FUNC_ID);
                      }
                      break;
                   default:

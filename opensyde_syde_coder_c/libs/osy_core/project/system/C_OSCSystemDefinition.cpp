@@ -1221,6 +1221,25 @@ void C_OSCSystemDefinition::GetNodeIndexesOfBus(const uint32 ou32_BusIndex, std:
 /*! \brief   Returns all node and Datapool indexes which are connected to the bus
 
    \param[in]     ou32_BusIndex        Bus index
+   \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
+   \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
+   \param[out]    orc_DatapoolIndexes  Vector with all Datapool ids which are connected to the bus and are associated
+                                       to the protocol type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCSystemDefinition::GetNodeAndComDpIndexesOfBus(const uint32 ou32_BusIndex,
+                                                        std::vector<uint32> & orc_NodeIndexes,
+                                                        std::vector<uint32> & orc_InterfaceIndexes,
+                                                        std::vector<uint32> & orc_DatapoolIndexes) const
+{
+   m_GetNodeAndComDpIndexesOfBus(ou32_BusIndex, NULL, orc_NodeIndexes, orc_InterfaceIndexes,
+                                 &orc_DatapoolIndexes);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns all node and Datapool indexes which are connected to the bus and have a specific protocol type
+
+   \param[in]     ou32_BusIndex        Bus index
    \param[in]     ore_ComProtocol      Specific protocol
    \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
    \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
@@ -1314,10 +1333,10 @@ uint32 C_OSCSystemDefinition::m_GetRelatedProtocolHash(const uint32 ou32_NodeInd
 /*! \brief   Returns all node and Datapool indexes which are connected to the bus
 
    \param[in]     ou32_BusIndex        Bus index
-   \param[in]     ore_ComProtocol      Optional: Specific protocol
+   \param[in]     ope_ComProtocol      Optional: Specific protocol
    \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
    \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
-   \param[out]    orc_DatapoolIndexes  Optional: Vector with all Datapool ids which are connected to the bus
+   \param[out]    opc_DatapoolIndexes  Optional: Vector with all Datapool ids which are connected to the bus
                                        If ore_ComProtocol is not NULL the Datapool will be checked if it is
                                        associated to the protocol type
 */

@@ -70,6 +70,10 @@ using namespace std;
 /*! \brief   Default constructor
 
    Set up GUI with all elements.
+
+   \param[in,out]  opc_Parent       Pointer to parent
+   \param[in]      ore_MessageType  Message type (information/error/warning/question)
+   \param[in]      orc_Description  Description text of message
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -77,7 +81,12 @@ C_OgeWiCustomMessage::C_OgeWiCustomMessage(QWidget * const opc_Parent, const E_T
                                            const QString & orc_Description) :
    QDialog(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiCustomMessage),
-   mq_Pressed(false)
+   mq_Pressed(false),
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   ms32_MinHeight(QWIDGETSIZE_MAX),
+   ms32_MaxHeight(QWIDGETSIZE_MAX)
+   //lint -restore
 {
    mpc_Ui->setupUi(this);
 
@@ -147,7 +156,7 @@ C_OgeWiCustomMessage::~C_OgeWiCustomMessage(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Activate move window
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -160,7 +169,7 @@ void C_OgeWiCustomMessage::HandleMousePressEvent(const QMouseEvent * const opc_E
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Deactivate move window
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::HandleMouseReleaseEvent(QMouseEvent * const opc_Event)
@@ -172,7 +181,7 @@ void C_OgeWiCustomMessage::HandleMouseReleaseEvent(QMouseEvent * const opc_Event
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move window
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::HandleMouseMoveEvent(const QMouseEvent * const opc_Event)
@@ -191,7 +200,7 @@ void C_OgeWiCustomMessage::HandleMouseMoveEvent(const QMouseEvent * const opc_Ev
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -276,7 +285,7 @@ void C_OgeWiCustomMessage::m_InitButtons(void)
    "error", "information", "question" and "warning". Furthermore show
    two or three buttons in case of question type.
 
-   \param[in]     ore_MessageType         type of the message
+   \param[in]  ore_MessageType   type of the message
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::m_SetMessageType(const E_Type & ore_MessageType)
@@ -332,17 +341,15 @@ void C_OgeWiCustomMessage::m_SetMessageType(const E_Type & ore_MessageType)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set the text of header, description and details.
 
-   \param[in]     orc_Header           Header (e.g. INFORMATION: UNKNOWN INITIALIZATION PARAMETER!)
-   \param[in]     orc_Description      Description
-   \param[in]     orc_Details          Details (only shown if expanded)
+   \param[in]  orc_Heading       Heading (e.g. UNKNOWN INITIALIZATION PARAMETER)
+   \param[in]  orc_Description   Description
+   \param[in]  orc_Details       Details (only shown if expanded)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::m_SetText(const QString & orc_Heading, const QString & orc_Description,
                                      const QString & orc_Details)
 {
    QString c_Heading = orc_Heading;
-   // for retaining size of text edit if details are provided and no retaining else
-   QSizePolicy c_SizePolicyRetain = this->mpc_Ui->pc_TebDetails->sizePolicy();
 
    // Take message type as heading if no header is provided or update heading to right type
    if ((c_Heading == "") || (c_Heading == "ERROR") || (c_Heading == "INFORMATION") ||
@@ -363,18 +370,12 @@ void C_OgeWiCustomMessage::m_SetText(const QString & orc_Heading, const QString 
    // show details and expand-button only if there are any details
    if (orc_Details == "")
    {
-      // do not retain size of text edit
-      c_SizePolicyRetain.setRetainSizeWhenHidden(false);
-      this->mpc_Ui->pc_TebDetails->setSizePolicy(c_SizePolicyRetain);
       this->mpc_Ui->pc_TebDetails->hide(); // actually not necessary
       this->mpc_Ui->pc_LabelDetails->hide();
       this->mpc_Ui->pc_ButtonDetails->hide();
    }
    else
    {
-      // do retain size of text edit
-      c_SizePolicyRetain.setRetainSizeWhenHidden(true);
-      this->mpc_Ui->pc_TebDetails->setSizePolicy(c_SizePolicyRetain);
       this->mpc_Ui->pc_TebDetails->setText(orc_Details);
       this->mpc_Ui->pc_LabelDetails->show();
       this->mpc_Ui->pc_ButtonDetails->show();
@@ -385,6 +386,8 @@ void C_OgeWiCustomMessage::m_SetText(const QString & orc_Heading, const QString 
 /*! \brief   Functionality of the arrow button (show/hide details)
 
    Show the details or hide them.
+
+   \param[in]  orq_Expand  true: expand; false: collapse
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::m_ExpandCollapseDetails(const bool & orq_Expand) const
@@ -392,6 +395,7 @@ void C_OgeWiCustomMessage::m_ExpandCollapseDetails(const bool & orq_Expand) cons
    // show or hide the details according to previous state
    this->mpc_Ui->pc_TebDetails->setVisible(orq_Expand);
    this->mpc_Ui->pc_ButtonDetails->setChecked(orq_Expand);
+   this->m_Size();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -468,9 +472,27 @@ void C_OgeWiCustomMessage::m_CancelClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new size of message box
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiCustomMessage::m_Size(void) const
+{
+   if (this->mpc_Ui->pc_ButtonDetails->isChecked() == false)
+   {
+      this->mpc_Ui->pc_GroupBoxBackground->setMinimumHeight(this->ms32_MinHeight);
+      this->mpc_Ui->pc_GroupBoxBackground->setMaximumHeight(this->ms32_MinHeight);
+   }
+   else
+   {
+      this->mpc_Ui->pc_GroupBoxBackground->setMinimumHeight(this->ms32_MaxHeight);
+      this->mpc_Ui->pc_GroupBoxBackground->setMaximumHeight(this->ms32_MaxHeight);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set a new message type (error, information, question, warning)
 
-   \param[in]     ore_MessageType       type of the message
+   \param[in]  ore_MessageType   type of the message
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::SetType(const E_Type & ore_MessageType)
@@ -485,7 +507,7 @@ void C_OgeWiCustomMessage::SetType(const E_Type & ore_MessageType)
    Analog to QMessageBox::setText, but here we have 3 different text fields
    (heading, description, details).
 
-   \param[in]     orc_Text         heading string
+   \param[in]  orc_Text    heading string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::SetHeading(const QString & orc_Text)
@@ -500,7 +522,7 @@ void C_OgeWiCustomMessage::SetHeading(const QString & orc_Text)
    Analog to QMessageBox::setText, but here we have 3 different text fields
    (heading, description, details).
 
-   \param[in]     orc_Text         description string
+   \param[in]  orc_Text    description string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::SetDescription(const QString & orc_Text)
@@ -515,7 +537,7 @@ void C_OgeWiCustomMessage::SetDescription(const QString & orc_Text)
    Analog to QMessageBox::setText, but here we have 3 different text fields
    (heading, description, details).
 
-   \param[in]     orc_Text         details string
+   \param[in]  orc_Text    details string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::SetDetails(const QString & orc_Text)
@@ -527,31 +549,23 @@ void C_OgeWiCustomMessage::SetDetails(const QString & orc_Text)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new button text of OK button.
 
-   \param[in]     orc_Text         button text string
-
-   \return
-   possible return value(s) and description
+   \param[in]  orc_Text    button text string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::SetOKButtonText(const QString & orc_Text) const
 {
    this->mpc_Ui->pc_ButtonOk->setText(orc_Text);
-   //   this->mpc_Ui->pc_ButtonOk->setStyleSheet("padding-left: 15px; padding-right: 15px");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new button text of NO-button and show button.
 
-   \param[in]     orc_Text         button text string
-
-   \return
-   possible return value(s) and description
+   \param[in]  orc_Text    button text string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::SetNOButtonText(const QString & orc_Text) const
 {
    this->mpc_Ui->pc_ButtonNo->setText(orc_Text);
-   this->mpc_Ui->pc_ButtonNo->setStyleSheet("padding-left: 15px; padding-right: 15px");
 
    // if a special button text is set, the button should be shown too
    this->mpc_Ui->pc_ButtonNo->show();
@@ -560,16 +574,12 @@ void C_OgeWiCustomMessage::SetNOButtonText(const QString & orc_Text) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new button text of Cancel-button and show button.
 
-   \param[in]     orc_Text         button text string
-
-   \return
-   possible return value(s) and description
+   \param[in]  orc_Text    button text string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::SetCancelButtonText(const QString & orc_Text)
 {
    this->mpc_Ui->pc_ButtonCancel->setText(orc_Text);
-   this->mpc_Ui->pc_ButtonCancel->setStyleSheet("padding-left: 15px; padding-right: 15px");
 
    // make the button visible
    ShowCancelButton();
@@ -595,7 +605,7 @@ void C_OgeWiCustomMessage::ShowCancelButton(void)
    that there will be much text. Please check resulting message box if
    using this method, because you may break the layout.
 
-   \param[in]     ors32_MaxWidth        new minimum width
+   \param[in]  ors32_MinWidth    new minimum width
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiCustomMessage::SetCustomMinWidth(const sint32 & ors32_MinWidth) const
@@ -606,16 +616,19 @@ void C_OgeWiCustomMessage::SetCustomMinWidth(const sint32 & ors32_MinWidth) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set custom minimum height (and so custom height) of message box.
 
-   This can be used for message boxes where the caller already knows
+   This have to be used for message boxes where the caller already knows
    that there will be much text. Please check resulting message box if
    using this method, because you may break the layout.
 
-   \param[in]     ors32_MaxHeight        new minimum height
+   \param[in]  ors32_MinHeight   new minimum height
+   \param[in]  ors32_MaxHeight   new maximum height
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiCustomMessage::SetCustomMinHeight(const sint32 & ors32_MinHeight) const
+void C_OgeWiCustomMessage::SetCustomMinHeight(const sint32 & ors32_MinHeight, const sint32 & ors32_MaxHeight)
 {
-   this->mpc_Ui->pc_GroupBoxBackground->setMinimumHeight(ors32_MinHeight);
+   this->ms32_MinHeight = ors32_MinHeight;
+   this->ms32_MaxHeight = ors32_MaxHeight;
+   this->m_Size();
 
    // reset maximum height of details field so it can use the whole space
    //lint -e1960 we can not change Qt constant but it is still better than using the hard coded magic number 16777215

@@ -72,8 +72,8 @@ void C_OgeSpxAutoFixBase::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
    this->mc_UnscaledMin = orc_Min;
    this->mc_UnscaledMax = orc_Max;
    if (C_SdNdeDpContentUtil::h_GetNumberOfAvailableSteps(this->mc_UnscaledMin, this->mc_UnscaledMax,
-                                                               this->mu64_NumberOfStepsAvailable,
-                                                               ou32_Index) != C_NO_ERR)
+                                                         this->mu64_NumberOfStepsAvailable,
+                                                         ou32_Index) != C_NO_ERR)
    {
       this->mu64_NumberOfStepsAvailable = 0;
    }

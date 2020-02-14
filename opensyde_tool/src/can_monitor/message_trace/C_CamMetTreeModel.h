@@ -70,24 +70,17 @@ public:
    std::vector<C_CamMetTreeLoggerData *> GetAllMessagesForProtocolChange(void);
    void SignalProtocolChange(void);
 
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-   // Header:
-   //lint -e{1735} Suppression, because default parameters are identical
-   virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation, const stw_types::sintn osn_Role =
-                                  static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
-   // Basic functionality:
-   //lint -e{1735} Suppression, because default parameters are identical
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions,
+   // and default parameters are identical.
+   //lint -save -e1960 -e1735
+   virtual QVariant headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation,
+                               const stw_types::sintn osn_Role = static_cast<stw_types::sintn>(Qt::DisplayRole))
+   const override;
    virtual QModelIndex index(const stw_types::sintn osn_Row, const stw_types::sintn osn_Column,
                              const QModelIndex & orc_Parent = QModelIndex()) const override;
-   //lint -e{1735} Suppression, because default parameters are identical
    virtual QModelIndex parent(const QModelIndex & orc_Index) const override;
-   //lint -e{1735} Suppression, because default parameters are identical
    virtual stw_types::sintn columnCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
-   //lint -e{1735} Suppression, because default parameters are identical
    virtual stw_types::sintn rowCount(const QModelIndex & orc_Parent = QModelIndex()) const override;
-
-   //lint -e{1735} Suppression, because default parameters are identical
    virtual QVariant data(const QModelIndex & orc_Index, const stw_types::sintn osn_Role =
                             static_cast<stw_types::sintn>(Qt::DisplayRole)) const override;
    //lint -restore
@@ -143,12 +136,11 @@ private:
    static std::vector<QStringList> mh_GetCount(const C_CamMetTreeLoggerData & orc_Message);
    static void mh_ResizeIfNecessary(QString & orc_Str, const stw_types::sint32 os32_MaxLength);
    void m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * const opc_Item, const C_CamMetTreeLoggerData & orc_Message,
-                                       const bool oq_IsContinuous, const bool oq_SignalInsert,
-                                       const stw_types::sint32 os32_Row);
+                                       const bool oq_SignalInsert, const stw_types::sint32 os32_Row);
    static C_CamMetTreeLoggerDataGreyOutInformation mh_ExtractPreviousGreyOutInformation(
       const C_CamMetTreeLoggerData & orc_MessagePrev, const C_CamMetTreeLoggerData & orc_MessageNew,
-      const stw_types::uint32 ou32_PrevMsgTimeStamp, const stw_types::sint32 os32_MultiplexerValue,
-      bool & orq_UpdateDataTimeStamp);
+      const stw_types::uint32 ou32_PrevMsgTimeStamp, const stw_types::uint32 ou32_NewMsgTimeStamp,
+      const stw_types::sint32 os32_MultiplexerValue, bool & orq_UpdateDataTimeStamp);
    static void mh_ApplyPreviousGreyOutInformation(C_CamMetTreeLoggerData & orc_Message,
                                                   const C_CamMetTreeLoggerDataGreyOutInformation & orc_StoredGrayOutInformation, const bool oq_UpdateDataTimeStamp, const stw_types::uint32 ou32_PrevMsgTimeStamp);
    static std::vector<stw_types::sintn> mh_GetMultiplexerOrder(const C_CamMetTreeLoggerData & orc_Message);

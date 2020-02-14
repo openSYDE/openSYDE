@@ -17,6 +17,7 @@
 #include <QDir>
 #include <QWidget>
 #include <QWindow>
+#include <QPointer>
 #include <QApplication>
 
 #include "C_PuiProject.h"
@@ -55,8 +56,8 @@ C_PuiProject * C_PuiProject::mhpc_Singleton = NULL;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save project
 
-   \param[in] oq_ForceSaveAll              Optional flag if all files should be saved
-   \param[in] oq_UseDeprecatedFileFormatV2 Flag to enable saving using the deprecated V2 file format
+   \param[in]  oq_ForceSaveAll               Optional flag if all files should be saved
+   \param[in]  oq_UseDeprecatedFileFormatV2  Flag to enable saving using the deprecated V2 file format
 
    \return
    C_NO_ERR   data saved
@@ -165,7 +166,7 @@ sint32 C_PuiProject::Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecate
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load project
 
-   \param[in] opu16_FileVersion Optional storage for system definition file version
+   \param[in]  opu16_FileVersion    Optional storage for system definition file version
 
    \return
    C_RD_WR  Problems accessing file system (e.g. no read access to file)
@@ -266,7 +267,7 @@ bool C_PuiProject::HasHashChanged(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set path of project (always absolute and with "/" as delimiters)
 
-   \param[in]   orc_Path   Project path
+   \param[in]  orc_Path    Project path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::SetPath(const QString & orc_Path)
@@ -283,16 +284,10 @@ void C_PuiProject::SetPath(const QString & orc_Path)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get default path
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_PuiProject::h_GetDefaultPath(void)
-{
-   return C_Uti::h_GetExePath() + "/Examples/ESX-3CM/ESX-3CM.syde";
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current path
+
+   \return
+   Project file path, i.e. path of .syde file
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiProject::GetPath(void) const
@@ -302,6 +297,9 @@ QString C_PuiProject::GetPath(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current folder path without project name
+
+   \return
+   Path to directory of project file
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiProject::GetFolderPath(void) const
@@ -325,7 +323,7 @@ QString C_PuiProject::GetName(void) const
    if (this->mc_Path != "")
    {
       QFileInfo c_File(this->mc_Path);
-      c_Return = c_File.baseName();
+      c_Return = c_File.completeBaseName();
    }
 
    return c_Return;
@@ -376,7 +374,7 @@ void C_PuiProject::h_Destroy(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get accumulated file size of all project files in byte
 
-   \param[in] orc_ProjectPath Project path
+   \param[in]  orc_ProjectPath   Project path
 
    \return
    0    File not found
@@ -405,8 +403,6 @@ uint64 C_PuiProject::h_GetProjectSize(const QString & orc_ProjectPath)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Standard constructor
-
-   \param[in]   orc_Path   Project path
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiProject::C_PuiProject(void) :
@@ -453,8 +449,8 @@ uint32 C_PuiProject::m_CalcHashProject(void) const
       2. If none: first project in recent projects list with existing .syde
       3. If failed: empty project (next recent projects are loaded afterwards)
 
-  \param[out]  opu16_FileVersion   file version
-  \param[out]  rc_LoadedProject    project that was tried to load (if load fails, this->mc_Path gets overwritten)
+   \param[out]  opu16_FileVersion   file version
+   \param[out]  rc_LoadedProject    project that was tried to load (if load fails, this->mc_Path gets overwritten)
 
   \return
    C_RD_WR  Problems accessing file system (e.g. no read access to file)
@@ -560,9 +556,9 @@ bool C_PuiProject::IsEmptyProject(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::h_HandlePendingEvents(void)
 {
-   QWidget * const pc_PreviousFocusWidget = QApplication::focusWidget();
+   QPointer<QWidget> const c_PreviousFocusWidget = QApplication::focusWidget();
 
-   if (pc_PreviousFocusWidget != NULL)
+   if (c_PreviousFocusWidget != NULL)
    {
       //At least two focus changes so we don't accidentally set the focus to the same widget
       uint32 u32_Counter = 0;
@@ -581,16 +577,19 @@ void C_PuiProject::h_HandlePendingEvents(void)
       //Process focus change and handle all pending events which may cause project changes before checking the project
       // for changes
       QApplication::processEvents();
-      //Restore original focus
-      pc_PreviousFocusWidget->setFocus();
+      if (c_PreviousFocusWidget != NULL)
+      {
+         //Restore original focus
+         c_PreviousFocusWidget->setFocus();
+      }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Automatically create sub-folder for system definition
 
-   \param[in]   orc_ProjectPath         Project path
-   \param[in]   orc_SystemDefintionPath System definition path
+   \param[in]  orc_ProjectPath            Project path
+   \param[in]  orc_SystemDefintionPath    System definition path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::h_AdaptProjectPathToSystemDefinition(const QString & orc_ProjectPath,
@@ -598,41 +597,41 @@ void C_PuiProject::h_AdaptProjectPathToSystemDefinition(const QString & orc_Proj
 {
    const QFileInfo c_File(orc_ProjectPath);
 
-   orc_SystemDefintionPath = c_File.path() + "/system_definition/" + c_File.baseName() + ".syde_sysdef";
+   orc_SystemDefintionPath = c_File.path() + "/system_definition/" + c_File.completeBaseName() + ".syde_sysdef";
 }
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Automatically create sub-folder for system views
 
-   \param[in]   orc_ProjectPath     Project path
-   \param[in]   orc_SystemViewsPath System views path
+   \param[in]  orc_ProjectPath      Project path
+   \param[in]  orc_SystemViewsPath  System views path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::mh_AdaptProjectPathToSystemViews(const QString & orc_ProjectPath, QString & orc_SystemViewsPath)
 {
    const QFileInfo c_File(orc_ProjectPath);
 
-   orc_SystemViewsPath = c_File.path() + "/system_views/" + c_File.baseName() + ".syde_sysviews";
+   orc_SystemViewsPath = c_File.path() + "/system_views/" + c_File.completeBaseName() + ".syde_sysviews";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Automatically create sub-folder for system views (V1)
 
-   \param[in]   orc_ProjectPath     Project path
-   \param[in]   orc_SystemViewsPath System views path
+   \param[in]  orc_ProjectPath      Project path
+   \param[in]  orc_SystemViewsPath  System views path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::mh_AdaptProjectPathToSystemViewsV1(const QString & orc_ProjectPath, QString & orc_SystemViewsPath)
 {
    const QFileInfo c_File(orc_ProjectPath);
 
-   orc_SystemViewsPath = c_File.path() + "/" + c_File.baseName() + ".syde_sysviews";
+   orc_SystemViewsPath = c_File.path() + "/" + c_File.completeBaseName() + ".syde_sysviews";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Automatically create sub-folder for system definition (V2)
 
-   \param[in]   orc_ProjectPath         Project path
-   \param[in]   orc_SystemDefintionPath System definition path
+   \param[in]  orc_ProjectPath            Project path
+   \param[in]  orc_SystemDefintionPath    System definition path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::mh_AdaptProjectPathToSystemDefinitionV2(const QString & orc_ProjectPath,
@@ -640,5 +639,5 @@ void C_PuiProject::mh_AdaptProjectPathToSystemDefinitionV2(const QString & orc_P
 {
    const QFileInfo c_File(orc_ProjectPath);
 
-   orc_SystemDefintionPath = c_File.path() + "/" + c_File.baseName() + ".syde_sysdef";
+   orc_SystemDefintionPath = c_File.path() + "/" + c_File.completeBaseName() + ".syde_sysdef";
 }

@@ -37,11 +37,12 @@ class C_SdNdeDpListPopUp :
 
 public:
    explicit C_SdNdeDpListPopUp(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                     const stw_types::uint32 & oru32_NodeIndex,
-                                     const stw_types::uint32 & oru32_DataPoolIndex,
-                                     const stw_types::uint32 & oru32_ListIndex,
-                                     stw_opensyde_gui_logic::C_SdNdeDpListModelViewManager * const opc_ModelViewManager, QTreeWidget * const opc_TreeWidget, stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager * const opc_UndoManager,
-                                     QWidget * const opc_Parent = NULL);
+                               const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
+                               const stw_types::uint32 & oru32_ListIndex,
+                               stw_opensyde_gui_logic::C_SdNdeDpListModelViewManager * const opc_ModelViewManager,
+                               QTreeWidget * const opc_TreeWidget,
+                               stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager * const opc_UndoManager,
+                               QWidget * const opc_Parent = NULL);
    ~C_SdNdeDpListPopUp(void);
    void InitText(void) const;
    void Clear(void) const;
@@ -81,6 +82,7 @@ private:
    void m_HandleButtonChange(const bool & orq_AddActive, const bool & orq_CutActive, const bool & orq_CopyActive,
                              const bool & orq_PasteActive, const bool & orq_DeleteActive,
                              const bool & orq_MoveDownActive, const bool & orq_MoveUpActive) const;
+   void m_OpenColorPicker(void);
    //Avoid call
    C_SdNdeDpListPopUp(const C_SdNdeDpListPopUp &);
    C_SdNdeDpListPopUp & operator =(const C_SdNdeDpListPopUp &);

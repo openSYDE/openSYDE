@@ -36,7 +36,7 @@ using namespace stw_types;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeLeIpAddress::C_OgeLeIpAddress(QWidget * const opc_Parent) :
@@ -78,7 +78,7 @@ C_OgeLeIpAddress::~C_OgeLeIpAddress()
 
    Convert uint8 to IP Address format.
 
-   \param[in]       au8_IPAddress     IP Address in uint8 format
+   \param[in]  oau8_IPAddress    IP address in uint8 format
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeIpAddress::SetIPAddress(const uint8 oau8_IPAddress[])
@@ -130,7 +130,7 @@ std::vector<sint32> C_OgeLeIpAddress::GetIPAddress(void) const
 
    Here: show empty string instead of "  0.  0.  0.  0."
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeIpAddress::focusInEvent(QFocusEvent * const opc_Event)
@@ -147,7 +147,7 @@ void C_OgeLeIpAddress::focusInEvent(QFocusEvent * const opc_Event)
 
    Here: replace empty parts with 0 and move ciphers to the right
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeIpAddress::focusOutEvent(QFocusEvent * const opc_Event)
@@ -175,7 +175,7 @@ void C_OgeLeIpAddress::focusOutEvent(QFocusEvent * const opc_Event)
    Here: Switch IP address part on arrow button click,
    With "part" is meant: one of the four parts of the IP Address, separated by '.'.
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeIpAddress::keyPressEvent(QKeyEvent * const opc_KeyEvent)

@@ -52,10 +52,11 @@ public:
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void SigAddDatabaseDbc(const QString & orc_Path);
-   void SigAddDatabaseOsySysDef(const QString & orc_Path, const stw_types::uint32 ou32_BusIndex);
-   void SigRemoveDatabase(const QString & orc_Path, const bool oq_IsUpdate);
-   void SigActivateDatabase(const QString & orc_Path, const bool oq_Active);
+   void SigAddDatabaseDbc(const QString & orc_Path, const QString & orc_OrgPath);
+   void SigAddDatabaseOsySysDef(const QString & orc_Path, const QString & orc_OrgPath,
+                                const stw_types::uint32 ou32_BusIndex);
+   void SigRemoveDatabase(const QString & orc_Path, const QString & orc_OrgPath, const bool oq_IsUpdate);
+   void SigActivateDatabase(const QString & orc_Path, const QString & orc_OrgPath, const bool oq_Active);
    void SigSetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const stw_types::uint32 ou32_BusIndex);
    void SigHide(void);
 

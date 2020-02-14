@@ -47,6 +47,8 @@ using namespace stw_opensyde_gui_elements;
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
+
+   \param[in,out]    opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaTreeDelegate::C_SyvDaItPaTreeDelegate(QObject * const opc_Parent) :
@@ -420,8 +422,8 @@ QWidget * C_SyvDaItPaTreeDelegate::m_CreateEditor(QWidget * const opc_Parent, co
          if (pc_Element != NULL)
          {
             pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
-                                                                   pc_Element->c_MaxValue, pc_Element->f64_Factor,
-                                                                   pc_Element->f64_Offset, 0, true);
+                                                             pc_Element->c_MaxValue, pc_Element->f64_Factor,
+                                                             pc_Element->f64_Offset, 0, true);
             if (pc_Retval == NULL)
             {
                //Send link click

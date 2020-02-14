@@ -237,6 +237,8 @@ void C_GiSvDaProgressBarBase::ConnectionActiveChanged(const bool oq_Active)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call properties for widgets
+
+   \return true (configurable properties called)
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaProgressBarBase::CallProperties(void)
@@ -401,8 +403,8 @@ void C_GiSvDaProgressBarBase::SetValuePe(const sintn osn_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparence value configured by the actual timeout state
 
-   \param[in]     ou32_WidgetDataPoolElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                           Value for transparence (0..255)
+   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
+   \param[in]     osn_Value                 Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -438,10 +440,10 @@ void C_GiSvDaProgressBarBase::m_UpdateStaticValues(void)
             C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, this->mf64_UnscaledMax, u32_Index);
             this->mpc_ProgressBarWidget->SetUnit(c_Scaling.c_Unit);
             C_SdNdeDpContentUtil::h_GetValueAsScaledString(pc_Element->c_MinValue, c_Scaling.f64_Factor,
-                                                                 c_Scaling.f64_Offset, c_Text, u32_Index);
+                                                           c_Scaling.f64_Offset, c_Text, u32_Index);
             this->mpc_ProgressBarWidget->SetMin(0, c_Text);
             C_SdNdeDpContentUtil::h_GetValueAsScaledString(pc_Element->c_MaxValue, c_Scaling.f64_Factor,
-                                                                 c_Scaling.f64_Offset, c_Text, u32_Index);
+                                                           c_Scaling.f64_Offset, c_Text, u32_Index);
             this->mpc_ProgressBarWidget->SetMax(2000000, c_Text);
             //Update value
             this->mpc_ProgressBarWidget->SetValue(static_cast<sintn>(f64_Value * 2000000.0), c_Value);

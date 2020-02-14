@@ -79,7 +79,8 @@ C_SyvUpPieChart::~C_SyvUpPieChart(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update progress value
 
-   \param[in] ou16_Progress100 Progress in percent
+   \param[in]  ou16_Progress100  Progress in percent
+   \param[in]  oq_Finished       Flag if finished
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPieChart::SetProgress100(const uint16 ou16_Progress100, const bool oq_Finished)

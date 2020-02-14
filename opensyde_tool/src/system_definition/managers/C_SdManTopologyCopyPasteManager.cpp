@@ -71,6 +71,8 @@ C_SdManTopologyCopyPasteManager::~C_SdManTopologyCopyPasteManager(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data snapshot
 
+   \param[in,out]  opc_Parent    Optional pointer to parent (unused here)
+
    Warning: calling function has to delete the created object
 
    \return

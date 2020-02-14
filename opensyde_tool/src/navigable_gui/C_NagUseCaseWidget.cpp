@@ -13,9 +13,11 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "constants.h"
 #include "C_NagUseCaseWidget.h"
 #include "C_OgePopUpDialog.h"
 #include "C_PopSaveAsDialogWidget.h"
+#include "C_GiSyColorSelectWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -38,7 +40,7 @@ using namespace stw_opensyde_gui;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagUseCaseWidget::C_NagUseCaseWidget(QWidget * const opc_Parent) :
@@ -62,7 +64,7 @@ C_NagUseCaseWidget::~C_NagUseCaseWidget()
    The function is virtual to offer specific widgets the possibility to react
    if the parent was changed
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::SetParentHook(QWidget * const opc_Parent)
@@ -72,6 +74,9 @@ void C_NagUseCaseWidget::SetParentHook(QWidget * const opc_Parent)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the vector with the function names
+
+   \return
+   Vector with function names
 */
 //----------------------------------------------------------------------------------------------------------------------
 QVector<C_NagToolBarButtonProperties> C_NagUseCaseWidget::GetVecToolBarFuncNames(void) const
@@ -109,11 +114,11 @@ void C_NagUseCaseWidget::Save(void)
 
    The concrete implementation is widget specific
 
-   \param[in] os32_Index            First index
-   \param[in] os32_SubIndex         Second index
-   \param[in] os32_SubSubIndex      Third index
-   \param[in] os32_SubSubSubIndex   Fourth index
-   \param[in] os32_Flag             Optional flag for further information
+   \param[in]  os32_Index           First index
+   \param[in]  os32_SubIndex        Second index
+   \param[in]  os32_SubSubIndex     Third index
+   \param[in]  os32_SubSubSubIndex  Fourth index
+   \param[in]  os32_Flag            Optional flag for further information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_SubIndex, const sint32 os32_SubSubIndex,
@@ -151,9 +156,9 @@ bool C_NagUseCaseWidget::PrepareToClose(void)
    Do not call this function internally. Use the signal SigChangeMode to
    inform the entire application about the change.
 
-   \param[in]     os32_SubMode     Actual sub mode
-   \param[in]     ou32_Index       Index for node or bus
-   \param[in]     ou32_Flag        Flag for special functionality
+   \param[in]  os32_SubMode   Actual sub mode
+   \param[in]  ou32_Index     Index for node or bus
+   \param[in]  ou32_Flag      Flag for special functionality
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_Index, const uint32 ou32_Flag)
@@ -168,7 +173,7 @@ void C_NagUseCaseWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle for global key press event
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Handled
@@ -214,4 +219,30 @@ void C_NagUseCaseWidget::SaveAs(void)
       c_New->HideOverlay();
    }
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle open color picker action
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagUseCaseWidget::OpenColorPicker(void)
+{
+   QPointer<stw_opensyde_gui_elements::C_OgePopUpDialog> const c_Popup =
+      new stw_opensyde_gui_elements::C_OgePopUpDialog(this, this);
+   C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
+
+   //Resize
+   c_Popup->SetSize(QSize(412, 620));
+
+   // open color picker dialog
+   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      pc_ColorWidget->ChooseSelectedColor();
+   }
+
+   if (c_Popup != NULL)
+   {
+      c_Popup->HideOverlay();
+   }
+   //lint -e{429}  no memory leak because of the parent of pc_ColorWidget and the Qt memory management
 }

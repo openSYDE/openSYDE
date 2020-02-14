@@ -111,7 +111,7 @@ void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingCha
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -148,7 +148,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -166,7 +166,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Exit(void)
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -196,7 +196,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
    C_RANGE    CAN message invalid (RTR bit set; ID out of range; DLC out of range)
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)

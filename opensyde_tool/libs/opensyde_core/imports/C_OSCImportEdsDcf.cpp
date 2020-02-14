@@ -51,10 +51,10 @@ using namespace stw_opensyde_core;
 
    \param[in]  orc_FilePath         File to import, file type is based on file ending
    \param[in]  ou8_NodeId           Node ID
-   \param[out] orc_OSCRxMessageData Imported core RX message data
-   \param[out] orc_OSCRxSignalData  Imported core RX signal data
-   \param[out] orc_OSCTxMessageData Imported core TX message data
-   \param[out] orc_OSCTxSignalData  Imported core TX signal data
+   \param[out] orc_OSCRxMessageData Imported core Rx message data
+   \param[out] orc_OSCRxSignalData  Imported core Rx signal data
+   \param[out] orc_OSCTxMessageData Imported core Tx message data
+   \param[out] orc_OSCTxSignalData  Imported core Tx signal data
    \param[out] orc_ImportMessagesPerMessage   Import result messages
    \param[out] orc_ParsingError     Optional parsing error message
 
@@ -112,13 +112,13 @@ sint32 C_OSCImportEdsDcf::h_Import(const C_SCLString & orc_FilePath, const uint8
             mh_LoadDummies(orc_FilePath, c_Dummies);
             s32_Retval = mh_ParseMessages(0x1400, ou8_NodeId, c_Dictionary.c_Objects, c_Dummies, orc_OSCRxMessageData,
                                           orc_OSCRxSignalData,
-                                          q_Eds, orc_ImportMessagesPerMessage);
+                                          q_Eds, orc_ImportMessagesPerMessage, false);
             if (s32_Retval == C_NO_ERR)
             {
                s32_Retval = mh_ParseMessages(0x1800, ou8_NodeId, c_Dictionary.c_Objects, c_Dummies,
                                              orc_OSCTxMessageData,
                                              orc_OSCTxSignalData,
-                                             q_Eds, orc_ImportMessagesPerMessage);
+                                             q_Eds, orc_ImportMessagesPerMessage, true);
             }
          }
          else
@@ -185,6 +185,7 @@ const C_OSCCanOpenObject * C_OSCImportEdsDcf::mh_GetCOObject(
    \param[out] orc_OSCRxSignalData  Imported core signal data
    \param[in]  oq_IsEds             Flag if current file is an EDS file
    \param[out] orc_ImportMessages   Import result messages
+   \param[in]  oq_IsTx              Flag if message is a Tx message
 
    \return
    C_NO_ERR Operation success
@@ -197,7 +198,8 @@ sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const u
                                            std::vector<C_OSCCanMessage> & orc_OSCMessageData,
                                            std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalData,
                                            const bool oq_IsEds,
-                                           std::vector<std::vector<C_SCLString> > & orc_ImportMessages)
+                                           std::vector<std::vector<C_SCLString> > & orc_ImportMessages,
+                                           const bool oq_IsTx)
 {
    sint32 s32_Retval = C_NO_ERR;
    bool q_Found = true;
@@ -253,7 +255,8 @@ sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const u
                            c_Message.e_TxMethod = C_OSCCanMessage::eTX_METHOD_CYCLIC;
                            mh_AddUserMessage(ou32_StartingId + u32_ItMessage, "Transmission type",
                                              "the message type \"synchronous\" was converted to \"cyclic\".\n"
-                                             "Cycle time set default to 100ms.",
+                                             "Cycle time set default to " +
+                                             C_SCLString::IntToStr(c_Message.u32_CycleTimeMs) + "ms.",
                                              2L, false, &c_CurMessages);
                         }
                         else if ((u32_TransmissionType == 0xFCUL) || (u32_TransmissionType == 0xFDUL))
@@ -284,24 +287,66 @@ sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const u
                   //Optional
                   //Event-timer section
                   //-------------------
-                  const C_OSCCanOpenObject * const pc_COMessageETObject =
-                     mh_GetCOObject(orc_COObjects, ou32_StartingId + u32_ItMessage, 5);
-                  if (pc_COMessageETObject != NULL)
+                  if (oq_IsTx == false)
                   {
-                     uint32 u32_EventTimer;
-                     if (mh_GetIntegerValue(mh_GetCOObjectValue(*pc_COMessageETObject, oq_IsEds),
-                                            ou8_NodeId,
-                                            u32_EventTimer) == C_NO_ERR)
+                     bool q_UseDefault = false;
+                     C_SCLString c_Reason;
+
+                     // Event-timer only relevant for Rx because it equals the timeout time
+                     const C_OSCCanOpenObject * const pc_COMessageETObject =
+                        mh_GetCOObject(orc_COObjects, ou32_StartingId + u32_ItMessage, 5);
+                     if (pc_COMessageETObject != NULL)
                      {
-                        c_Message.u32_TimeoutMs = u32_EventTimer;
+                        uint32 u32_EventTimer;
+                        if (mh_GetIntegerValue(mh_GetCOObjectValue(*pc_COMessageETObject, oq_IsEds),
+                                               ou8_NodeId,
+                                               u32_EventTimer) == C_NO_ERR)
+                        {
+                           if ((c_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT) ||
+                               (u32_EventTimer > 0U))
+                           {
+                              c_Message.u32_TimeoutMs = u32_EventTimer;
+                           }
+                           else
+                           {
+                              // In case of cyclic or change, 0ms is not supported.
+                              // In case of on event, timeout is disabled
+                              q_UseDefault = true;
+                              c_Reason = "was 0ms";
+                           }
+                        }
+                        else
+                        {
+                           q_UseDefault = true;
+                           c_Reason = "empty or not a number";
+                        }
                      }
                      else
                      {
-                        mh_AddUserMessage(ou32_StartingId + u32_ItMessage, "Event-timer",
-                                          "empty or not a number", 5L, true);
-                        s32_Retval = C_CONFIG;
+                        q_UseDefault = true;
+                        c_Reason = "does not exist";
+                     }
+
+                     if (q_UseDefault == true)
+                     {
+                        // In case of cyclic or change, set to default.
+                        // In case of on event, timeout is disabled
+                        if (c_Message.e_TxMethod != C_OSCCanMessage::eTX_METHOD_ON_EVENT)
+                        {
+                           mh_AddUserMessage(ou32_StartingId + u32_ItMessage, "Event-timer",
+                                             c_Reason + ", default set to: " +
+                                             C_SCLString::IntToStr(
+                                                c_Message.u32_TimeoutMs) + "ms", 5L, false, &c_CurMessages);
+                        }
+                        else
+                        {
+                           mh_AddUserMessage(ou32_StartingId + u32_ItMessage, "Event-timer",
+                                             c_Reason + ", default set to: disabled (0)", 5L, false, &c_CurMessages);
+                           c_Message.u32_TimeoutMs = 0U;
+                        }
                      }
                   }
+
                   if (s32_Retval == C_NO_ERR)
                   {
                      //Signals

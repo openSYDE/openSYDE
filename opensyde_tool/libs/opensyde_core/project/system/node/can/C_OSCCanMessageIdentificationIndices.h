@@ -30,8 +30,7 @@ public:
    C_OSCCanMessageIdentificationIndices(const stw_types::uint32 ou32_NodeIndex,
                                         const C_OSCCanProtocol::E_Type oe_ComProtocol,
                                         const stw_types::uint32 ou32_InterfaceIndex,
-                                        const stw_types::uint32 ou32_DatapoolIndex,
-                                        const bool oq_MessageIsTx,
+                                        const stw_types::uint32 ou32_DatapoolIndex, const bool oq_MessageIsTx,
                                         const stw_types::uint32 ou32_MessageIndex = 0U);
    bool operator ==(const C_OSCCanMessageIdentificationIndices & orc_Cmp) const;
 

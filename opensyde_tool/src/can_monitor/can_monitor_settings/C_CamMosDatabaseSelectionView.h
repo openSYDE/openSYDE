@@ -54,7 +54,6 @@ protected:
    //lint -save -e1960
    virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected) override;
-
    //lint -restore
 
 private:

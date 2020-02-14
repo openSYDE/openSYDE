@@ -85,7 +85,7 @@ sint32 C_OSCIOConfigDataFiler::h_LoadIODataFile(C_OSCIOConfigData & orc_IOData, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save IO description
+/*! \brief  Save IO description
 
    Save IO description
    Will overwrite the file if it already exists.
@@ -628,7 +628,6 @@ sint32 C_OSCIOConfigDataFiler::mh_GetDbConfigForString(const stw_scl::C_SCLStrin
    \param[in,out] orc_XMLParser XML with default state
    \param[in]     orc_BasePath  Base path
 
-
    \return
    C_NO_ERR    data read
    C_CONFIG    IO definition content is invalid or incomplete
@@ -823,9 +822,8 @@ sint32 C_OSCIOConfigDataFiler::mh_LoadIODomains(C_OSCIOConfigData & orc_IOData, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load IO domain
 
-   \param[in,out] orc_IODomain       IO domain
-   \param[in]     orc_ParametersFile Current parameters spec
-   \param[in,out] orc_XMLParser      XML parser
+   \param[in,out] orc_IODomain  IO domain
+   \param[in,out] orc_XMLParser XML parser
 
    \return
    C_NO_ERR    data read
@@ -897,9 +895,8 @@ sint32 C_OSCIOConfigDataFiler::mh_LoadIODomain(C_OSCIOConfigDataDomain & orc_IOD
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load IO channel
 
-   \param[in,out] orc_IOChannel      IO channel
-   \param[in]     orc_ParametersFile Current parameters spec
-   \param[in,out] orc_XMLParser      XML parser
+   \param[in,out] orc_IOChannel IO channel
+   \param[in,out] orc_XMLParser XML parser
 
    \return
    C_NO_ERR    data read

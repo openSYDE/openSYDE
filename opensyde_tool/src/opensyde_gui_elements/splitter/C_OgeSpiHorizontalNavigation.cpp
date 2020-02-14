@@ -39,7 +39,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpiHorizontalNavigation::C_OgeSpiHorizontalNavigation(QWidget * const opc_Parent) :
@@ -64,7 +64,8 @@ QSplitterHandle * C_OgeSpiHorizontalNavigation::createHandle(void)
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in]      oe_Orientation   Orientation of handle (horizontal/vertical)
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpiHorizontalNavigationHandle::C_OgeSpiHorizontalNavigationHandle(const Qt::Orientation oe_Orientation,
@@ -78,7 +79,7 @@ C_OgeSpiHorizontalNavigationHandle::C_OgeSpiHorizontalNavigationHandle(const Qt:
 
    Draws the background element
 
-   \param[in,out] opc_Event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiHorizontalNavigationHandle::paintEvent(QPaintEvent * const opc_Event)

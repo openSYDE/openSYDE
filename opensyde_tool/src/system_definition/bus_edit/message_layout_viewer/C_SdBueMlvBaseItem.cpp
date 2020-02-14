@@ -40,11 +40,12 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]        orc_BackgroundColor  Background color
-   \param[in]        orc_FontColor        Font color
-   \param[in]        orc_Font             Font configuration
-   \param[in]        orc_Text             Text
-   \param[in,out]    opc_parent           Optional pointer to parent
+   \param[in]      orc_BackgroundColor    Background color
+   \param[in]      orc_FontColor          Font color
+   \param[in]      orc_Font               Font configuration
+   \param[in]      orc_Text               Text
+   \param[in]      oq_DrawText            Flag if text is visible
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvBaseItem::C_SdBueMlvBaseItem(const QColor & orc_BackgroundColor, const QColor & orc_FontColor,
@@ -80,7 +81,7 @@ C_SdBueMlvBaseItem::~C_SdBueMlvBaseItem()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the shown text
 
-   \param[in]     orc_Text      New text
+   \param[in]  orc_Text    New text
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBaseItem::SetText(const QString & orc_Text)
@@ -91,7 +92,7 @@ void C_SdBueMlvBaseItem::SetText(const QString & orc_Text)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the size of the rectangle
 
-   \param[in]     orc_Size      New size
+   \param[in]  orc_Size    New size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBaseItem::SetSize(const QSizeF & orc_Size)
@@ -102,7 +103,7 @@ void C_SdBueMlvBaseItem::SetSize(const QSizeF & orc_Size)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets new font for the text
 
-   \param[in]     orc_Font       New font
+   \param[in]  orc_Font    New font
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBaseItem::SetFont(const QFont & orc_Font)
@@ -116,9 +117,9 @@ void C_SdBueMlvBaseItem::SetFont(const QFont & orc_Font)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten paint event slot
 
-   \param[in,out] opc_Painter Painter
-   \param[in,out] opc_Option  Option
-   \param[in,out] opc_Widget  Widget
+   \param[in,out]  opc_Painter   Painter
+   \param[in,out]  opc_Option    Option
+   \param[in,out]  opc_Widget    Widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBaseItem::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,

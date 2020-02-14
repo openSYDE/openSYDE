@@ -53,7 +53,7 @@ C_PopListItem::C_PopListItem(QObject * const opc_Parent) :
 
    \param[in,out] opc_Painter Painter (default interface)
    \param[in]     orc_Option  Option (default interface)
-   \param[in]     orc_index   Index (default interface)
+   \param[in]     orc_Index   Index (default interface)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopListItem::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,

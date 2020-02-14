@@ -125,7 +125,8 @@ void C_SdNdeDbAddNewProject::InitStaticNames(void) const
 
    this->mpc_Ui->pc_LabelCreateIn->SetToolTipInformation(
       C_GtGetText::h_GetText("Create In Directory"),
-      C_GtGetText::h_GetText("Location where the openSYDE Target Support Package should be extracted at."));
+      C_GtGetText::h_GetText(
+         "Location where the openSYDE Target Support Package content (e.g.: Target project, Flashware, ...) should be extracted at."));
 
    this->mpc_Ui->pc_PushButtonTSP->SetToolTipInformation(
       C_GtGetText::h_GetText("Browse"),
@@ -315,6 +316,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
       c_Message.SetDescription(QString(C_GtGetText::h_GetText(
                                           "Could not load specified openSYDE Target Support Package.")));
       c_Message.SetDetails(c_Details);
+      c_Message.SetCustomMinHeight(180, 250);
       c_Message.Execute();
    }
    else
@@ -329,6 +331,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
          c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
          c_Message.SetDescription(QString(C_GtGetText::h_GetText(
                                              "No openSYDE Target Support Package specified")));
+         c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
       }
       else if ((pc_Node != NULL) && (this->mc_Package.c_DeviceName != pc_Node->c_DeviceType))
@@ -340,6 +343,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
                                            "device \"%2\" of this node")).
             arg(this->mc_Package.c_DeviceName.c_str()).
             arg(pc_Node->c_DeviceType.c_str()));
+         c_Message.SetCustomMinHeight(230, 180);
          c_Message.Execute();
       }
       else if (this->mpc_Ui->pc_LineEditCreateIn->GetPath().isEmpty() == true)
@@ -347,6 +351,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
          c_Message.SetDescription(QString(C_GtGetText::h_GetText("Define a directory for the project here.")));
+         c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
       }
       else if ((c_CreateInFolder.exists() == true) &&
@@ -360,7 +365,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
          c_Message.SetDescription(
             QString(C_GtGetText::h_GetText("Directory \"%1\" is not empty. \n\nShould this directory be cleared? "
                                            "Attention: Your data will be lost!")).arg(c_CreateInFolder.absolutePath()));
-         c_Message.SetCustomMinHeight(280);
+         c_Message.SetCustomMinHeight(230, 230);
          c_Message.SetCustomMinWidth(800);
 
          switch (c_Message.Execute())
@@ -380,6 +385,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
                   QString(C_GtGetText::h_GetText("Could not clear directory \"%1\".")).
                   arg(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath())));
                QApplication::restoreOverrideCursor();
+               c_Message2.SetCustomMinHeight(180, 180);
                c_Message2.Execute();
             }
             break;
@@ -421,6 +427,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
                                                                               GetPath())));
          c_Message.SetCustomMinWidth(800);
          c_Message.SetDetails(c_ErrorText.c_str());
+         c_Message.SetCustomMinHeight(230, 300);
          QApplication::restoreOverrideCursor();
          c_Message.Execute();
       }
@@ -554,7 +561,7 @@ void C_SdNdeDbAddNewProject::m_AddTopSection(QString & orc_Content) const
    orc_Content += "</tr>";
    orc_Content += "<tr>";
    orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;
-   orc_Content += C_GtGetText::h_GetText("Number of applications:");
+   orc_Content += C_GtGetText::h_GetText("Number of Data Blocks:");
    orc_Content += "</td>";
    orc_Content += C_SdNdeDbAddNewProject::mhc_ContinueTD;
    orc_Content += QString::number(this->mc_Package.c_Applications.size());
@@ -574,7 +581,7 @@ void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
    for (uint32 u32_ItTemplate = 0UL; u32_ItTemplate < this->mc_Package.c_Applications.size(); ++u32_ItTemplate)
    {
       const C_OSCTSPApplication & rc_Template = this->mc_Package.c_Applications[u32_ItTemplate];
-      orc_Content += "<h4>" + QString(C_GtGetText::h_GetText("Application %1")).arg(u32_ItTemplate + 1UL) + "</h4>";
+      orc_Content += "<h4>" + QString(C_GtGetText::h_GetText("Data Block %1")).arg(u32_ItTemplate + 1UL) + "</h4>";
       orc_Content += "<table>";
       orc_Content += "<tr>";
       orc_Content += C_SdNdeDbAddNewProject::mhc_StartTD;

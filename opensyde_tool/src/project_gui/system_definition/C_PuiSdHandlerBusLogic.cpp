@@ -47,9 +47,10 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add bus
 
-   \param[in,out] opc_OSCBus   New OSC bus (name might be modified by this function if not unique)
-   \param[in,out] opc_UIBus    New UI bus
-   \param[in]     opc_Name     New bus name
+   \param[in,out]  orc_OSCBus             New OSC bus (name might be modified by this function if not unique)
+   \param[in]      orc_UIBus              UI bus
+   \param[in]      opc_Name               New bus name
+   \param[in]      oq_AllowBusIdAdaption  Flag if bus ID adaption is allowed
 
    \return
    Index of bus
@@ -106,8 +107,8 @@ std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::GetExistingBusNames(void) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set UI bus from array
 
-   \param[in] ou32_Index Index
-   \param[in] orc_Item    New value
+   \param[in]  ou32_Index  Index
+   \param[in]  orc_Item    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::SetUIBus(const uint32 ou32_Index, const C_PuiSdBus & orc_Item)
@@ -121,8 +122,8 @@ void C_PuiSdHandlerBusLogic::SetUIBus(const uint32 ou32_Index, const C_PuiSdBus 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set OSC bus from array
 
-   \param[in] ou32_Index Index
-   \param[in] orc_Item    New value
+   \param[in]  ou32_Index  Index
+   \param[in]  orc_Item    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::SetOSCBus(const uint32 ou32_Index, const C_OSCSystemBus & orc_Item)
@@ -141,7 +142,7 @@ void C_PuiSdHandlerBusLogic::SetOSCBus(const uint32 ou32_Index, const C_OSCSyste
 
    Get UI bus from array
 
-   \param[in] ors32_Index Index
+   \param[in]  oru32_Index    Index
 
    \return
    NULL Data not found
@@ -168,7 +169,7 @@ const C_PuiSdBus * C_PuiSdHandlerBusLogic::GetUIBus(const uint32 & oru32_Index) 
 
    Get OSC bus from array
 
-   \param[in] ors32_Index Index
+   \param[in]  oru32_Index    Index
 
    \return
    NULL Data not found
@@ -193,10 +194,10 @@ const C_OSCSystemBus * C_PuiSdHandlerBusLogic::GetOSCBus(const uint32 & oru32_In
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any bus uses the provided name
 
-   \param[in]     orc_Name                  Bus name to check for
-   \param[in]     opu32_BusIndexToSkip      Optional parameter to skip one index
-                                            (Use-case: skip current bus to avoid conflict with itself)
-   \param[in,out] opc_ExistingNames         Optional parameter to list all OTHER existing bus names
+   \param[in]      orc_Name               Bus name to check for
+   \param[in]      opu32_BusIndexToSkip   Optional parameter to skip one index
+                                          (Use-case: skip current bus to avoid conflict with itself)
+   \param[in,out]  opc_ExistingNames      Optional parameter to list all OTHER existing bus names
 
    \return
    true  Available
@@ -243,7 +244,7 @@ bool C_PuiSdHandlerBusLogic::CheckBusNameAvailable(const C_SCLString & orc_Name,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove bus
 
-   \param[in]   ou32_BusIndex   Connector bus index (0 -> first bus)
+   \param[in]  ou32_BusIndex  Connector bus index (0 -> first bus)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::RemoveBus(const uint32 ou32_BusIndex)
@@ -270,7 +271,7 @@ void C_PuiSdHandlerBusLogic::RemoveBus(const uint32 ou32_BusIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if there is a bus conflict
 
-   \param[in]     ou32_BusIndex              Bus index
+   \param[in]  ou32_BusIndex  Bus index
 
    \return
    true  Conflict
@@ -379,13 +380,12 @@ bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for bus conflict details
 
-   \param[in]     ou32_BusIndex              Bus index
-   \param[in,out] opc_NameMap                Optional map to use for name conflict check
-   \param[out]    opq_NameConflict           Name conflict
-   \param[out]    opq_NameEmpty              Name empty
-   \param[out]    opq_IdInvalid              Id out of range
-   \param[out]    opc_InvalidNodesForBitRate Additional info for bit rate error
-   \param[out]    opc_InvalidProtocols       Additional info for protocol error
+   \param[in]   ou32_BusIndex                Bus index
+   \param[out]  opq_NameConflict             Name conflict
+   \param[out]  opq_NameEmpty                Name empty
+   \param[out]  opq_IdInvalid                Id out of range
+   \param[out]  opc_InvalidNodesForBitRate   Additional info for bit rate error
+   \param[out]  opc_InvalidProtocols         Additional info for protocol error
 
    \return
    true  Conflict
@@ -508,6 +508,9 @@ const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get OSC Buses size
+
+   \return
+   Number of OSC buses
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_PuiSdHandlerBusLogic::GetOSCBusesSize(void) const
@@ -523,10 +526,10 @@ stw_types::uint32 C_PuiSdHandlerBusLogic::GetOSCBusesSize(void) const
    - add a new connection to the node structure
    - add a corresponding new UI connection to the UI node structure
 
-   \param[in]   ou32_NodeIndex      Connected node index
-   \param[in]   ou8_InterfaceNumber Interface number of node
-   \param[in]   oru8_NodeId         New node id
-   \param[in]   ou32_BusIndex       Connected bus index
+   \param[in]  ou32_NodeIndex       Connected node index
+   \param[in]  ou8_InterfaceNumber  Interface number of node
+   \param[in]  oru8_NodeId          New node id
+   \param[in]  ou32_BusIndex        Connected bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::AddConnection(const uint32 ou32_NodeIndex, const uint8 ou8_InterfaceNumber,
@@ -568,8 +571,8 @@ void C_PuiSdHandlerBusLogic::AddConnection(const uint32 ou32_NodeIndex, const ui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove connection
 
-   \param[in]   ou32_NodeIndex          Connector node index (0 -> first node)
-   \param[in]   ou32_ConnectionIndex    Connector connection index (0 -> first connection)
+   \param[in]  ou32_NodeIndex    Connector node index (0 -> first node)
+   \param[in]  orc_ID            Connector ID encoding interface type and index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::RemoveConnection(const uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ID)
@@ -589,10 +592,10 @@ void C_PuiSdHandlerBusLogic::RemoveConnection(const uint32 ou32_NodeIndex, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change connection
 
-   \param[in] ou32_NodeIndex   Index of node this interface is part of
-   \param[in] orc_ID           Previous interface ID
-   \param[in] ou8_NewInterface New interface number
-   \param[in] oru8_NodeId      New node id
+   \param[in]  ou32_NodeIndex    Index of node this interface is part of
+   \param[in]  orc_ID            Previous interface ID
+   \param[in]  ou8_NewInterface  New interface number
+   \param[in]  oru8_NodeId       New node id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ID,
@@ -608,11 +611,11 @@ void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32 ou32_NodeIndex, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change complete connection
 
-   \param[in] ou32_NodeIndex Index of node this interface is part of
-   \param[in] orc_PrevID     Previous interface ID
-   \param[in] orc_NewID      New interface ID
-   \param[in] oru8_NodeId    Node id
-   \param[in] oru32_BusIndex Bus index to use instead of last used one
+   \param[in]  ou32_NodeIndex    Index of node this interface is part of
+   \param[in]  orc_PrevID        Previous interface ID
+   \param[in]  orc_NewID         New interface ID
+   \param[in]  oru8_NodeId       Node id
+   \param[in]  oru32_BusIndex    Bus index to use instead of last used one
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32 ou32_NodeIndex,
@@ -676,8 +679,8 @@ void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32 ou32_NodeInde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set UI node connections
 
-   \param[in] ou32_NodeIndex  Node index
-   \param[in] orc_Connections Connection information
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_Connections   Connection information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::SetUINodeConnections(const uint32 ou32_NodeIndex,
@@ -693,9 +696,9 @@ void C_PuiSdHandlerBusLogic::SetUINodeConnections(const uint32 ou32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set UI node connection ID
 
-   \param[in] ou32_NodeIndex       Node index
-   \param[in] ou32_ConnectionIndex Connection index
-   \param[in] orc_Id               New ID
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ConnectionIndex    Connection index
+   \param[in]  orc_Id                  New ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::SetUINodeConnectionId(const uint32 ou32_NodeIndex, const uint32 ou32_ConnectionIndex,
@@ -714,9 +717,9 @@ void C_PuiSdHandlerBusLogic::SetUINodeConnectionId(const uint32 ou32_NodeIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get com protocol data
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] ore_ComType           Can protocol type
-   \param[in] ou32_DatapoolIndex    Datapool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  ore_ComType          Can protocol type
+   \param[in]  ou32_DatapoolIndex   Datapool index
 
    \return
    NULL No matching data found
@@ -740,9 +743,9 @@ const C_OSCCanProtocol * C_PuiSdHandlerBusLogic::GetCanProtocol(const uint32 & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get com data pool (common)
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] ore_ComType           Can protocol type
-   \param[in] oru32_DatapoolIndex   Datapool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  ore_ComType          Can protocol type
+   \param[in]  oru32_DatapoolIndex  Datapool index
 
    \return
    NULL No matching data found
@@ -766,8 +769,8 @@ const C_OSCNodeDataPool * C_PuiSdHandlerBusLogic::GetOSCCanDataPool(const uint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all com data pools of specific protocol type (common)
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] ore_ComType           Can protocol type
+   \param[in]  oru32_NodeIndex   Node index
+   \param[in]  ore_ComType       Can protocol type
 
    \return
    Empty vector            No matching data found for communication protocol
@@ -791,9 +794,9 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get com data pool (ui)
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] ore_ComType           Can protocol type
-   \param[in] oru32_DatapoolIndex   Datapool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  ore_ComType          Can protocol type
+   \param[in]  oru32_DatapoolIndex  Datapool index
 
    \return
    NULL No matching data found
@@ -826,9 +829,9 @@ const C_PuiSdNodeDataPool * C_PuiSdHandlerBusLogic::GetUiCanDataPool(const uint3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get com protocol (ui)
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] ore_ComType           Can protocol type
-   \param[in] ou32_DatapoolIndex    Datapool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  ore_ComType          Can protocol type
+   \param[in]  ou32_DatapoolIndex   Datapool index
 
    \return
    NULL No matching data found
@@ -865,10 +868,10 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get message container of one protocol type, interface and Datapool
 
-   \param[in] oru32_NodeIndex      Node index
-   \param[in] ore_ComType          Can protocol type
-   \param[in] oru32_InterfaceIndex Node interface index
-   \param[in] ou32_DatapoolIndex    Datapool index
+   \param[in]  oru32_NodeIndex         Node index
+   \param[in]  ore_ComType             Can protocol type
+   \param[in]  oru32_InterfaceIndex    Node interface index
+   \param[in]  ou32_DatapoolIndex      Datapool index
 
    \return
    NULL No matching data found
@@ -897,9 +900,9 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all message containers of one protocol type and interface
 
-   \param[in] oru32_NodeIndex      Node index
-   \param[in] ore_ComType          Can protocol type
-   \param[in] oru32_InterfaceIndex Node interface index
+   \param[in]  oru32_NodeIndex         Node index
+   \param[in]  ore_ComType             Can protocol type
+   \param[in]  oru32_InterfaceIndex    Node interface index
 
    \return
    Empty vector            No matching data found for message container
@@ -933,16 +936,15 @@ std::vector<const C_OSCCanMessageContainer *> C_PuiSdHandlerBusLogic::GetCanProt
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get protocol type of specific Datapool
 
-   \param[in] oru32_NodeIndex       Node index
-   \param[in] ou32_DatapoolIndex    Datapool index
-   \param[out] ore_ComType          Detected CAN protocol type
+   \param[in]   ou32_NodeIndex      Node index
+   \param[in]   ou32_DatapoolIndex  Datapool index
+   \param[out]  ore_ComType         Detected CAN protocol type
 
    \retval C_NO_ERR     Com type read
    \retval C_RANGE      ou32_NodeIndex or ou32_DatapoolIndex invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::GetCanProtocolType(const uint32 ou32_NodeIndex,
-                                                  const uint32 ou32_DatapoolIndex,
+sint32 C_PuiSdHandlerBusLogic::GetCanProtocolType(const uint32 ou32_NodeIndex, const uint32 ou32_DatapoolIndex,
                                                   C_OSCCanProtocol::E_Type & ore_ComType) const
 {
    sint32 s32_Return = C_RANGE;
@@ -965,7 +967,7 @@ sint32 C_PuiSdHandlerBusLogic::GetCanProtocolType(const uint32 ou32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get message data
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 
    \return
    NULL No matching data found
@@ -998,11 +1000,11 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy can message with all related data structures
 
-   \param[in]  orc_MessageId        Message identification indices
-   \param[out] orc_Message          Message data
-   \param[out] orc_OSCSignalCommons Signals data (osc common)
-   \param[out] orc_UISignalCommons  Signals data (ui common)
-   \param[out] orc_UISignals        Signals data (ui)
+   \param[in]   orc_MessageId          Message identification indices
+   \param[out]  orc_Message            Message data
+   \param[out]  orc_OSCSignalCommons   Signals data (osc common)
+   \param[out]  orc_UISignalCommons    Signals data (ui common)
+   \param[out]  orc_UISignals          Signals data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -1062,11 +1064,11 @@ sint32 C_PuiSdHandlerBusLogic::GetCanMessageComplete(const C_OSCCanMessageIdenti
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get signal list (common)
 
-   \param[in] oru32_NodeIndex      Node index
-   \param[in] ore_ComType          Can protocol type
-   \param[in] oru32_InterfaceIndex Node interface index
-   \param[in] ou32_DatapoolIndex   Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx type (else rx type assumed)
+   \param[in]  oru32_NodeIndex         Node index
+   \param[in]  ore_ComType             Can protocol type
+   \param[in]  oru32_InterfaceIndex    Node interface index
+   \param[in]  ou32_DatapoolIndex      Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx type (else rx type assumed)
 
    \return
    NULL No matching data found
@@ -1091,8 +1093,8 @@ const C_OSCNodeDataPoolList * C_PuiSdHandlerBusLogic::GetOSCCanDataPoolList(cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get can signal data (position)
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 
    \return
    NULL No matching data found
@@ -1119,7 +1121,7 @@ const C_OSCCanSignal * C_PuiSdHandlerBusLogic::GetCanSignal(const C_OSCCanMessag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get can message data (ui)
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 
    \return
    NULL No matching data found
@@ -1155,8 +1157,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get can signal data (ui)
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 
    \return
    NULL No matching data found
@@ -1183,8 +1185,8 @@ const C_PuiSdNodeCanSignal * C_PuiSdHandlerBusLogic::GetUiCanSignal(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get can signal data (osc common)
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 
    \return
    NULL No matching data found
@@ -1221,8 +1223,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get can signal data (ui common)
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 
    \return
    NULL No matching data found
@@ -1259,9 +1261,9 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get connection data
 
-   \param[in] ou32_NodeIndex      Node index
-   \param[in] ou32_InterfaceIndex Interface index
-   \param[in] oe_Type             Interface type
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  oe_Type              Interface type
 
    \return
    NULL Connection not found
@@ -1295,12 +1297,12 @@ const C_PuiSdNodeConnection * C_PuiSdHandlerBusLogic::GetUiConnection(const uint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy can signal with all related data structures
 
-   \param[in]  orc_MessageId       Message identification indices
-   \param[in]  oru32_SignalIndex   Signal index
-   \param[out] orc_Signal          Signal data (osc)
-   \param[out] orc_OSCSignalCommon Signal data (osc common)
-   \param[out] orc_UISignalCommon  Signal data (ui common)
-   \param[out] orc_UISignal        Signal data (ui)
+   \param[in]   orc_MessageId          Message identification indices
+   \param[in]   oru32_SignalIndex      Signal index
+   \param[out]  orc_Signal             Signal data (osc)
+   \param[out]  orc_OSCSignalCommon    Signal data (osc common)
+   \param[out]  orc_UISignalCommon     Signal data (ui common)
+   \param[out]  orc_UISignal           Signal data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -1339,10 +1341,10 @@ sint32 C_PuiSdHandlerBusLogic::GetCanSignalComplete(const C_OSCCanMessageIdentif
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set CAN protocol message container connected flag
 
-   \param[in] ou32_NodeIndex      Node index
-   \param[in] oe_ComType          Can protocol type
-   \param[in] ou32_InterfaceIndex Node interface index
-   \param[in] oq_Value             New value to apply
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  oe_ComType           Can protocol type
+   \param[in]  ou32_InterfaceIndex  Node interface index
+   \param[in]  oq_Value             New value to apply
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::SetCanProtocolMessageContainerConnected(const uint32 ou32_NodeIndex,
@@ -1375,9 +1377,9 @@ void C_PuiSdHandlerBusLogic::SetCanProtocolMessageContainerConnected(const uint3
 
    Do not change any signal using this function.
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
-   \param[in] orc_Message       Message data
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  orq_NewMessageIsTx   Flag if new message is Tx
+   \param[in]  orc_Message          Message data
 
    \return
    C_NO_ERR Operation success
@@ -1440,7 +1442,7 @@ sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIden
                {
                   const std::vector<C_OSCCanMessage> & rc_Messages = pc_UpdatedMessageContainer->GetMessagesConst(
                      orq_NewMessageIsTx);
-                  const std::vector<C_PuiSdNodeCanSignal> c_UiSignalsCopy = pc_UiMessage->c_Signals;
+                  const C_PuiSdNodeCanMessage c_UiMessageCopy = *pc_UiMessage;
                   std::vector<C_PuiSdNodeDataPoolListElement> c_UISignalCommons;
                   const C_OSCCanMessageIdentificationIndices c_NewId(orc_MessageId.u32_NodeIndex,
                                                                      orc_MessageId.e_ComProtocol,
@@ -1452,7 +1454,7 @@ sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIden
                   u32_SignalStartIndex = pc_UpdatedMessageContainer->GetMessageSignalDataStartIndex(
                      orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex);
 
-                  for (uint32 u32_ItSignal = 0; u32_ItSignal < c_UiSignalsCopy.size(); ++u32_ItSignal)
+                  for (uint32 u32_ItSignal = 0; u32_ItSignal < c_UiMessageCopy.c_Signals.size(); ++u32_ItSignal)
                   {
                      const uint32 u32_TargetIndex = u32_SignalStartIndex + u32_ItSignal;
                      tgl_assert(u32_TargetIndex < pc_UiDataPoolList->c_DataPoolListElements.size());
@@ -1466,7 +1468,7 @@ sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIden
                   if (s32_Retval == C_NO_ERR)
                   {
                      //Add
-                     s32_Retval = this->m_InsertUiCanMessage(c_NewId, c_UISignalCommons, c_UiSignalsCopy);
+                     s32_Retval = this->m_InsertUiCanMessage(c_NewId, c_UISignalCommons, c_UiMessageCopy);
                   }
                }
             }
@@ -1493,8 +1495,8 @@ sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIden
 
    Do not change any signals using this function.
 
-   \param[in] orc_MessageId Message identification indices
-   \param[in] orc_Message   Message data
+   \param[in]  orc_MessageId  Message identification indices
+   \param[in]  orc_Message    Message data
 
    \return
    C_NO_ERR Operation success
@@ -1543,12 +1545,12 @@ sint32 C_PuiSdHandlerBusLogic::SetUiCanMessage(const C_OSCCanMessageIdentificati
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set can signal
 
-   \param[in] orc_MessageId       Message identification indices
-   \param[in] oru32_SignalIndex   Signal index
-   \param[in] orc_OSCSignal       Signal data (osc)
-   \param[in] orc_OSCSignalCommon Signal data (osc common)
-   \param[in] orc_UISignalCommon  Signal data (ui common)
-   \param[in] orc_UISignal        Signal data (ui)
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  orc_OSCSignal        Signal data (osc)
+   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
+   \param[in]  orc_UISignalCommon   Signal data (ui common)
+   \param[in]  orc_UISignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -1662,9 +1664,9 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignal(const C_OSCCanMessageIdentificationI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set can signal common part
 
-   \param[in] orc_MessageId       Message identification indices
-   \param[in] oru32_SignalIndex   Signal index
-   \param[in] ou16_MultiplexValue New multiplex value
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  ou16_MultiplexValue  New multiplex value
 
    \return
    C_NO_ERR Operation success
@@ -1697,10 +1699,10 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignalMUXValue(const C_OSCCanMessageIdentif
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set can signal position part
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
-   \param[in] orc_OSCSignal     Signal data (osc)
-   \param[in] orc_UISignal      Signal data (ui)
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  orc_OSCSignal        Signal data (osc)
+   \param[in]  orc_UISignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -1756,16 +1758,16 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignalPosition(const C_OSCCanMessageIdentif
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add can message
 
-   \param[in] oru32_NodeIndex                 Node index
-   \param[in] ore_ComType                     Can protocol type
-   \param[in] oru32_InterfaceIndex            Node interface index
-   \param[in] oru32_DatapoolIndex             Datapool index
-   \param[in] orq_MessageIsTx                 Flag if message is tx type (else rx type assumed)
-   \param[in] orc_Message                     Message data
-   \param[in] orc_OSCSignalCommons            Signals data (osc common)
-   \param[in] orc_UISignalCommons             Signals data (ui common)
-   \param[in] orc_UISignals                   Signals data (ui)
-   \param[in] orq_AutomatedPropertiesAdaption Optional parameter to allow or disable automated properties adaption
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  ore_ComType                      Can protocol type
+   \param[in]  oru32_InterfaceIndex             Node interface index
+   \param[in]  ou32_DatapoolIndex               Datapool index
+   \param[in]  orq_MessageIsTx                  Flag if message is tx type (else rx type assumed)
+   \param[in]  orc_Message                      Message data
+   \param[in]  orc_OSCSignalCommons             Signals data (osc common)
+   \param[in]  orc_UISignalCommons              Signals data (ui common)
+   \param[in]  orc_UIMessage                    Message data (ui)
+   \param[in]  orq_AutomatedPropertiesAdaption  Optional parameter to allow or disable automated properties adaption
 
    \return
    C_NO_ERR Operation success
@@ -1778,7 +1780,7 @@ sint32 C_PuiSdHandlerBusLogic::AddCanMessage(const uint32 & oru32_NodeIndex,
                                              const bool & orq_MessageIsTx, const C_OSCCanMessage & orc_Message,
                                              const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
                                              const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                             const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
+                                             const C_PuiSdNodeCanMessage & orc_UIMessage,
                                              const bool & orq_AutomatedPropertiesAdaption)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1796,7 +1798,7 @@ sint32 C_PuiSdHandlerBusLogic::AddCanMessage(const uint32 & oru32_NodeIndex,
                                                              orq_MessageIsTx,
                                                              u32_MessageIndex);
       s32_Retval = this->InsertCanMessage(c_MessageId, orc_Message, orc_OSCSignalCommons, orc_UISignalCommons,
-                                          orc_UISignals, orq_AutomatedPropertiesAdaption);
+                                          orc_UIMessage, orq_AutomatedPropertiesAdaption);
    }
    else
    {
@@ -1808,12 +1810,12 @@ sint32 C_PuiSdHandlerBusLogic::AddCanMessage(const uint32 & oru32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert can message
 
-   \param[in] orc_MessageId                   Message identification indices
-   \param[in] orc_Message                     Message data
-   \param[in] orc_OSCSignalCommons            Signals data (osc common)
-   \param[in] orc_UISignalCommons             Signals data (ui common)
-   \param[in] orc_UISignals                   Signals data (ui)
-   \param[in] orq_AutomatedPropertiesAdaption Optional parameter to allow or disable automated properties adaption
+   \param[in]  orc_MessageId                    Message identification indices
+   \param[in]  orc_Message                      Message data
+   \param[in]  orc_OSCSignalCommons             Signals data (osc common)
+   \param[in]  orc_UISignalCommons              Signals data (ui common)
+   \param[in]  orc_UIMessage                    Message data (ui)
+   \param[in]  orq_AutomatedPropertiesAdaption  Optional parameter to allow or disable automated properties adaption
 
    \return
    C_NO_ERR Operation success
@@ -1824,7 +1826,7 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OSCCanMessageIdentificat
                                                 const C_OSCCanMessage & orc_Message,
                                                 const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
                                                 const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                                const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
+                                                const C_PuiSdNodeCanMessage & orc_UIMessage,
                                                 const bool & orq_AutomatedPropertiesAdaption)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1838,8 +1840,8 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OSCCanMessageIdentificat
       {
          //Get unique name
          c_AdaptedMessage.c_Name = C_Uti::h_GetUniqueName(
-            this->m_GetExistingMessageNames(orc_MessageId.u32_NodeIndex, orc_MessageId.e_ComProtocol,
-                                            orc_MessageId.u32_InterfaceIndex), orc_Message.c_Name);
+            this->m_GetExistingMessageNames(orc_MessageId.u32_NodeIndex, orc_MessageId.u32_InterfaceIndex),
+            orc_Message.c_Name);
       }
       s32_Retval = rc_OSCNode.InsertMessage(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                                             orc_MessageId.u32_DatapoolIndex,
@@ -1859,7 +1861,7 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OSCCanMessageIdentificat
       if (s32_Retval == C_NO_ERR)
       {
          //Ui part
-         s32_Retval = m_InsertUiCanMessage(orc_MessageId, orc_UISignalCommons, orc_UISignals);
+         s32_Retval = m_InsertUiCanMessage(orc_MessageId, orc_UISignalCommons, orc_UIMessage);
       }
    }
    return s32_Retval;
@@ -1868,7 +1870,7 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OSCCanMessageIdentificat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete can message
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 
    \return
    C_NO_ERR Operation success
@@ -1912,11 +1914,11 @@ sint32 C_PuiSdHandlerBusLogic::DeleteCanMessage(const C_OSCCanMessageIdentificat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add can signal
 
-   \param[in] orc_MessageId       Message identification indices
-   \param[in] orc_Signal          Signal data (osc)
-   \param[in] orc_OSCSignalCommon Signal data (osc common)
-   \param[in] orc_UISignalCommon  Signal data (ui common)
-   \param[in] orc_UISignal        Signal data (ui)
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  orc_Signal           Signal data (osc)
+   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
+   \param[in]  orc_UISignalCommon   Signal data (ui common)
+   \param[in]  orc_UISignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -1948,12 +1950,12 @@ sint32 C_PuiSdHandlerBusLogic::AddCanSignal(const C_OSCCanMessageIdentificationI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert can signal
 
-   \param[in] orc_MessageId       Message identification indices
-   \param[in] oru32_SignalIndex   Signal index
-   \param[in] orc_Signal          Signal data (osc)
-   \param[in] orc_OSCSignalCommon Signal data (osc common)
-   \param[in] orc_UISignalCommon  Signal data (ui common)
-   \param[in] orc_UISignal        Signal data (ui)
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  orc_Signal           Signal data (osc)
+   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
+   \param[in]  orc_UISignalCommon   Signal data (ui common)
+   \param[in]  orc_UISignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -2061,8 +2063,8 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete can signal
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 
    \return
    C_NO_ERR Operation success
@@ -2162,9 +2164,9 @@ sint32 C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OSCCanMessageIdentificati
 
    Take node, datapool, list, element index and return message id and signal index.
 
-   \param[in]        orc_NodeDatapoolListElementId    node, datapool, list, element index packed together
-   \param[in,out]    orc_MessageId                    message id
-   \param[in,out]    oru32_SignalIndex                signal index
+   \param[in]      orc_NodeDatapoolListElementId   node, datapool, list, element index packed together
+   \param[in,out]  orc_MessageId                   message id
+   \param[in,out]  oru32_SignalIndex               signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::ConvertElementIndexToSignalIndex(
@@ -2241,12 +2243,12 @@ void C_PuiSdHandlerBusLogic::ConvertElementIndexToSignalIndex(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if specified messages match
 
-   \param[in]  orc_MessageId1            First message identification indices
-   \param[in]  orc_MessageId2            Second message identification indices
-   \param[out] orq_IsMatch               Flag if messages match
-   \param[in]  oq_IgnoreMessageDirection Flag to compare messages without message direction check
-                                         True: compare the message content no matter what the message directions are
-                                         False: if both messages are TX this function will always say: no match
+   \param[in]   orc_MessageId1               First message identification indices
+   \param[in]   orc_MessageId2               Second message identification indices
+   \param[out]  orq_IsMatch                  Flag if messages match
+   \param[in]   oq_IgnoreMessageDirection    Flag to compare messages without message direction check
+                                             True: compare the message content no matter what the message directions are
+                                             False: if both messages are Tx this function will always say: no match
 
    \return
    C_NO_ERR Done
@@ -2356,8 +2358,8 @@ sint32 C_PuiSdHandlerBusLogic::CheckMessageMatch(const C_OSCCanMessageIdentifica
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get signal display name
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 
    \return
    Signal display name
@@ -2388,7 +2390,7 @@ QString C_PuiSdHandlerBusLogic::GetCanSignalDisplayName(const C_OSCCanMessageIde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get namespace for ID
 
-   \param[in] orc_Id ID
+   \param[in]  orc_Id   ID
 
    \return
    Namespace
@@ -2440,7 +2442,7 @@ QString C_PuiSdHandlerBusLogic::GetNamespace(const C_OSCNodeDataPoolListElementI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get namespace for signal ID
 
-   \param[in] orc_Id Signal ID
+   \param[in]  orc_Id   Signal ID
 
    \return
    Namespace
@@ -2483,30 +2485,30 @@ QString C_PuiSdHandlerBusLogic::GetSignalNamespace(const C_OSCNodeDataPoolListEl
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdHandlerBusLogic::C_PuiSdHandlerBusLogic(QObject * const opc_Parent) :
-   C_PuiSdHandlerNodeLogic(opc_Parent)
+   C_PuiSdHandlerHALC(opc_Parent)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get pointers to all currently registered message names contained in the specified node interface & protocol
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] ore_ComType             Protocol type
-   \param[in] oru32_InterfaceIndex    Index of interface of node
-
-   \return
-   Vector of pointers to all currently registered message names contained in the specified node interface & protocol
+   \param[in]      oru32_NodeIndex        Node index
+   \param[in]      ore_ComType            Protocol type
+   \param[in]      oru32_InterfaceIndex   Index of interface of node
+   \param[out]     orc_ExistingNames      Vector of pointers to all currently registered message names contained in the
+                                          specified node interface & protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingMessageNames(const uint32 & oru32_NodeIndex,
-                                                                              const C_OSCCanProtocol::E_Type & ore_ComType,
-                                                                              const uint32 & oru32_InterfaceIndex) const
+void C_PuiSdHandlerBusLogic::m_GetExistingMessageNamesProtocol(const uint32 & oru32_NodeIndex,
+                                                               const C_OSCCanProtocol::E_Type & ore_ComType,
+                                                               const uint32 & oru32_InterfaceIndex,
+                                                               std::map<C_SCLString, bool> & orc_ExistingNames)
+const
 {
-   std::map<C_SCLString, bool> c_Retval;
    const std::vector<const C_OSCCanMessageContainer *> c_Container = this->GetCanProtocolMessageContainers(
       oru32_NodeIndex, ore_ComType, oru32_InterfaceIndex);
    uint32 u32_Counter;
@@ -2521,16 +2523,39 @@ std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingMessageNames(co
       for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_TxMessages.size(); ++u32_ItMessage)
       {
          const C_OSCCanMessage & rc_Message = rc_TxMessages[u32_ItMessage];
-         c_Retval[rc_Message.c_Name] = true;
+         orc_ExistingNames[rc_Message.c_Name] = true;
       }
       //Rx
       for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_RxMessages.size(); ++u32_ItMessage)
       {
          const C_OSCCanMessage & rc_Message = rc_RxMessages[u32_ItMessage];
-         c_Retval[rc_Message.c_Name] = true;
+         orc_ExistingNames[rc_Message.c_Name] = true;
       }
    }
-   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get pointers to all currently registered message names contained in the specified node interface
+
+   \param[in]  oru32_NodeIndex         Node index
+   \param[in]  oru32_InterfaceIndex    Index of interface of node
+
+   \return
+   Vector of pointers to all currently registered message names contained in the specified node interface
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingMessageNames(const uint32 & oru32_NodeIndex,
+                                                                              const uint32 & oru32_InterfaceIndex) const
+{
+   std::map<C_SCLString, bool> c_ExistingNames;
+
+   // get existing message names of all three protocols
+   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eLAYER2, oru32_InterfaceIndex, c_ExistingNames);
+   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eCAN_OPEN_SAFETY, oru32_InterfaceIndex,
+                                     c_ExistingNames);
+   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eECES, oru32_InterfaceIndex, c_ExistingNames);
+
+   return c_ExistingNames;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2538,7 +2563,7 @@ std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingMessageNames(co
 
    Extract names of data pool.
 
-   \param[in]  orc_MessageId   Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 
    \return
    Vector of pointers to all currently registered signal names contained in the specified message
@@ -2580,9 +2605,9 @@ std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingSignalNames(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get com protocol (ui)
 
-   \param[in] oru32_NodeIndex    Node index
-   \param[in] ore_ComType        Can protocol type
-   \param[in] ou32_DatapoolIndex Datapool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  ore_ComType          Can protocol type
+   \param[in]  ou32_DatapoolIndex   Datapool index
 
    \return
    NULL No matching data found
@@ -2618,11 +2643,11 @@ C_PuiSdNodeCanProtocol * C_PuiSdHandlerBusLogic::m_GetUiCanProtocol(const uint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get signal list (ui)
 
-   \param[in] oru32_NodeIndex      Node index
-   \param[in] ore_ComType          Can protocol type
-   \param[in] oru32_InterfaceIndex Node interface index
-   \param[in] ou32_DatapoolIndex   Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx type (else rx type assumed)
+   \param[in]  oru32_NodeIndex         Node index
+   \param[in]  ore_ComType             Can protocol type
+   \param[in]  oru32_InterfaceIndex    Node interface index
+   \param[in]  ou32_DatapoolIndex      Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx type (else rx type assumed)
 
    \return
    NULL No matching data found
@@ -2662,9 +2687,9 @@ const C_PuiSdNodeDataPoolList * C_PuiSdHandlerBusLogic::m_GetUiCanDataPoolList(c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert ui part for can message
 
-   \param[in] orc_MessageId                   Message identification indices
-   \param[in] orc_UISignalCommons             Signals data (ui common)
-   \param[in] orc_UISignals                   Signals data (ui)
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  orc_UISignalCommons  Signals data (ui common)
+   \param[in]  orc_UIMessage        Message data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -2673,7 +2698,7 @@ const C_PuiSdNodeDataPoolList * C_PuiSdHandlerBusLogic::m_GetUiCanDataPoolList(c
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerBusLogic::m_InsertUiCanMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                     const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                                    const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals)
+                                                    const C_PuiSdNodeCanMessage & orc_UIMessage)
 {
    sint32 s32_Retval = C_NO_ERR;
    const C_OSCNode * const pc_Node = this->GetOSCNodeConst(orc_MessageId.u32_NodeIndex);
@@ -2766,9 +2791,7 @@ sint32 C_PuiSdHandlerBusLogic::m_InsertUiCanMessage(const C_OSCCanMessageIdentif
                orc_MessageId.q_MessageIsTx);
             if (orc_MessageId.u32_MessageIndex <= rc_Messages.size())
             {
-               C_PuiSdNodeCanMessage c_Message;
-               c_Message.c_Signals = orc_UISignals;
-               rc_Messages.insert(rc_Messages.begin() + orc_MessageId.u32_MessageIndex, c_Message);
+               rc_Messages.insert(rc_Messages.begin() + orc_MessageId.u32_MessageIndex, orc_UIMessage);
             }
             else
             {
@@ -2795,7 +2818,7 @@ sint32 C_PuiSdHandlerBusLogic::m_InsertUiCanMessage(const C_OSCCanMessageIdentif
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete ui part of can message
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 
    \return
    C_NO_ERR Operation success

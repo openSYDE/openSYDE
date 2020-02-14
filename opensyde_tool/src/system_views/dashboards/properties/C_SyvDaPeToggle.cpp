@@ -45,8 +45,8 @@ const sintn C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE3 = 2;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent  Optional pointer to parent
-   \param[in]     oq_DarkMode Flag for dark mode
+   \param[in,out]  orc_Parent    Parent widget
+   \param[in]      oq_DarkMode   Flag for dark mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeToggle::C_SyvDaPeToggle(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
@@ -89,9 +89,15 @@ C_SyvDaPeToggle::~C_SyvDaPeToggle(void)
 void C_SyvDaPeToggle::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelStyle->setText(C_GtGetText::h_GetText("Style"));
+
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 1"));
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 2"));
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 3"));
+
+   //Tool tips
+   this->mpc_Ui->pc_LabelStyle->SetToolTipInformation(C_GtGetText::h_GetText("Style"),
+                                                      C_GtGetText::h_GetText(
+                                                         "Different options for styles specific to this widget"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -124,7 +130,7 @@ C_PuiSvDbToggle::E_Type C_SyvDaPeToggle::GetType(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set type
 
-   \param[in] oe_Type New type
+   \param[in]  oe_Type  New type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeToggle::SetType(const C_PuiSvDbToggle::E_Type oe_Type) const

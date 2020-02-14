@@ -168,7 +168,7 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
    {
       c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Init Value: "));
       if (C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_DpListElement.c_DataSetValues[0UL],
-                                                          f64_Value, 0UL) == C_NO_ERR)
+                                                    f64_Value, 0UL) == C_NO_ERR)
       {
          c_ToolTipContent.append(QString::number(f64_Value));
       }

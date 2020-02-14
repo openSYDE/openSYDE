@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiNavigationTab::C_OgeWiNavigationTab(QWidget * const opc_Parent) :
@@ -76,7 +76,7 @@ C_OgeWiNavigationTab::~C_OgeWiNavigationTab(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set include left border flag
 
-   \param[in] oq_Include Include left border flag
+   \param[in]  oq_Include  Include left border flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::SetIncludeLeftBorder(const bool oq_Include)
@@ -87,7 +87,7 @@ void C_OgeWiNavigationTab::SetIncludeLeftBorder(const bool oq_Include)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new active state
 
-   \param[in] oq_Active New active state
+   \param[in]  oq_Active   New active state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::SetActive(const bool oq_Active)
@@ -108,7 +108,7 @@ void C_OgeWiNavigationTab::SetActive(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new SVG icon
 
-   \param[in] orc_IconSvg New icon
+   \param[in]  orc_IconSvg    New icon
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::SetIconSvg(const QString & orc_IconSvg) const
@@ -119,7 +119,7 @@ void C_OgeWiNavigationTab::SetIconSvg(const QString & orc_IconSvg) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new text
 
-   \param[in] orc_NewText New text
+   \param[in]  orc_NewText    New text
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::SetText(const QString & orc_NewText) const
@@ -133,7 +133,7 @@ void C_OgeWiNavigationTab::SetText(const QString & orc_NewText) const
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::paintEvent(QPaintEvent * const opc_Event)
@@ -148,7 +148,10 @@ void C_OgeWiNavigationTab::paintEvent(QPaintEvent * const opc_Event)
 
    Here: Check for hover event
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
+
+   \retval true      Event was recognized and processed
+   \retval false     Event ignored
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeWiNavigationTab::event(QEvent * const opc_Event)

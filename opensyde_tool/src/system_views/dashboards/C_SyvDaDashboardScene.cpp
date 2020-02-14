@@ -85,10 +85,10 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_ViewIndex      View index
-   \param[in]     ou32_DashboardIndex Dashboard index
-   \param[in]     oq_LoadDashboard    Optional flag to avoid loading any items initially
-   \param[in,out] opc_Parent          Optional pointer to parent
+   \param[in]      ou32_ViewIndex         View index
+   \param[in]      ou32_DashboardIndex    Dashboard index
+   \param[in]      oq_LoadDashboard       Optional flag to avoid loading any items initially
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardScene::C_SyvDaDashboardScene(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
@@ -135,7 +135,7 @@ C_SyvDaDashboardScene::~C_SyvDaDashboardScene(void)
 
    Checks all widgets of base type C_GiSvDaRectBaseGroup.
 
-   \param[in]     orc_ScenePos     Scene position of cursor
+   \param[in]  orc_ScenePos   Scene position of cursor
 
    \return
    true     Cursor is on a relevant position
@@ -173,7 +173,7 @@ bool C_SyvDaDashboardScene::IsMousePosRelevantForProxyWidgetInteraction(const QP
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the state of the edit mode
 
-   \param[in]     oq_Active      Flag for setting the edit mode
+   \param[in]  oq_Active   Flag for setting the edit mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetEditMode(const bool oq_Active)
@@ -214,7 +214,7 @@ void C_SyvDaDashboardScene::SetEditMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Function to activate or deactivate drawing of performance heavy widgets
 
-   \param[in] oq_Active Flag if widgets should currently be drawn
+   \param[in]  oq_Active   Flag if widgets should currently be drawn
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetDrawingActive(const bool oq_Active) const
@@ -238,7 +238,7 @@ void C_SyvDaDashboardScene::SetDrawingActive(const bool oq_Active) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard index
 
-   \param[in] ou32_DashboardIndex New dashboard index
+   \param[in]  ou32_DashboardIndex  New dashboard index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetDashboardIndex(const uint32 ou32_DashboardIndex)
@@ -304,8 +304,8 @@ void C_SyvDaDashboardScene::Save(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy snapshot to scene
 
-   \param[in] orc_Snapshot Object snapshot
-   \param[in] opc_IDMap    Optional map for IDs to use
+   \param[in]  orc_Snapshot   Object snapshot
+   \param[in]  opc_IDMap      Optional map for IDs to use
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc_Snapshot,
@@ -469,7 +469,7 @@ void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc
 
    Hint: leaves all items which are not included in the system view dashboard
 
-   \param[in,out] opc_Item Pointer to item which may be deleted
+   \param[in,out]  opc_Item   Pointer to item which may be deleted
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
@@ -557,7 +557,7 @@ void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dark mode active
 
-   \param[in] oq_Value Dark mode active
+   \param[in]  oq_Value    Dark mode active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetDarkModeActive(const bool oq_Value)
@@ -621,7 +621,7 @@ void C_SyvDaDashboardScene::SetDarkModeInitialized(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy items to scene from copy paste manager
 
-   \param[in] opc_Pos Optional position offset
+   \param[in]  opc_Pos  Optional position offset
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
@@ -668,7 +668,7 @@ void C_SyvDaDashboardScene::CopyFromManagerToScene(const QPointF * const opc_Pos
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal for update of current scaling
 
-   \param[in] orc_Transform Current scaling
+   \param[in]  orc_Transform  Current scaling
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::UpdateTransform(const QTransform & orc_Transform)
@@ -691,6 +691,8 @@ bool C_SyvDaDashboardScene::IsAnyItemAddable(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is movable on the scene
+
+   \param[in]  opc_Item    Item to check
 
    \return
    true     Item is movable
@@ -732,6 +734,8 @@ bool C_SyvDaDashboardScene::IsItemMovable(const QGraphicsItem * const opc_Item) 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is selectable on the scene
 
+   \param[in]  opc_Item    Item to check
+
    \return
    true     Item is selectable
    false    Item is not selectable
@@ -771,6 +775,8 @@ bool C_SyvDaDashboardScene::IsItemSelectable(const QGraphicsItem * const opc_Ite
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is deletable on the scene
+
+   \param[in]  opc_Item    Item to check
 
    \return
    true     Item is deletable
@@ -812,6 +818,9 @@ bool C_SyvDaDashboardScene::IsItemDeletable(const QGraphicsItem * const opc_Item
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is changeable in the zorder
 
+   \param[in]  opc_Item    Item to check
+
+   \return
    true     Z order is changeable
    false    Z order is not changeable
 */
@@ -850,6 +859,8 @@ bool C_SyvDaDashboardScene::IsZOrderChangeable(const QGraphicsItem * const opc_I
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item can be aligned
+
+   \param[in]  opc_Item    Item to check
 
    \return
    true     Item can be aligned
@@ -916,7 +927,7 @@ stw_types::uint32 C_SyvDaDashboardScene::GetDashboardIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
-   \param[in]     orc_AllDataDealer    Reference to vector with all data dealer
+   \param[in,out]  orc_ComDriver    Com driver containing information about all data dealer
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) const
@@ -959,7 +970,7 @@ void C_SyvDaDashboardScene::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active      Flag if connection is active or not active now
+   \param[in]  oq_Active   Flag if connection is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::ConnectionActiveChanged(const bool oq_Active) const
@@ -1032,14 +1043,14 @@ void C_SyvDaDashboardScene::UpdateTransmissionConfiguration(void) const
       }
    }
    //Add possible error change
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle manual user operation finished event
 
-   \param[in] os32_Result Operation result
-   \param[in] ou8_NRC     Negative response code, if any
+   \param[in]  os32_Result    Operation result
+   \param[in]  ou8_NRC        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
@@ -1062,8 +1073,8 @@ void C_SyvDaDashboardScene::HandleManualOperationFinished(const sint32 os32_Resu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal all widgets which read rail element ID registrations failed
 
-   \param[in]     orc_FailedIdRegisters    Failed IDs
-   \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
+   \param[in]      orc_FailedIdRegisters     Failed IDs
+   \param[in,out]  orc_FailedIdErrorDetails  Error details for element IDs which failed registration (if any)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetErrorForFailedCyclicElementIdRegistrations(
@@ -1091,7 +1102,7 @@ void C_SyvDaDashboardScene::SetErrorForFailedCyclicElementIdRegistrations(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::TriggerErrorCheck(void) const
 {
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1147,8 +1158,8 @@ const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvDaDashboardScene:
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add image to scene
 
-   \param[in] orc_Path     Image path
-   \param[in] orc_Position Image scene position
+   \param[in]  orc_Path       Image path
+   \param[in]  orc_Position   Image scene position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_AddImage(const QString & orc_Path, const QPointF & orc_Position)
@@ -1166,8 +1177,8 @@ void C_SyvDaDashboardScene::m_AddImage(const QString & orc_Path, const QPointF &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add data from mime data
 
-   \param[in] opc_MimeData Mime data to add to scene
-   \param[in] orc_Position Position to add data at
+   \param[in]  opc_MimeData   Mime data to add to scene
+   \param[in]  orc_Position   Position to add data at
 
    \return
    true: Item was added
@@ -1324,7 +1335,7 @@ bool C_SyvDaDashboardScene::m_AddOfMime(const QMimeData * const opc_MimeData, co
 void C_SyvDaDashboardScene::m_Copy(void)
 {
    this->m_CopyItemsToCopyPasteManager(this->selectedItems());
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1373,7 +1384,7 @@ bool C_SyvDaDashboardScene::m_IsUndoAvailable(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Optional check for user confirmation on delete action
 
-   \param[in] orc_SelectedItems Selected items
+   \param[in]  orc_SelectedItems    Selected items
 
    \return
    true  Continue
@@ -1397,6 +1408,7 @@ bool C_SyvDaDashboardScene::m_HandleDeleteUserConfirmation(const QList<QGraphics
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Items delete"));
          c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
          c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         c_MessageBox.SetCustomMinHeight(180, 180);
          e_ReturnMessageBox = c_MessageBox.Execute();
 
          switch (e_ReturnMessageBox)
@@ -1416,7 +1428,7 @@ bool C_SyvDaDashboardScene::m_HandleDeleteUserConfirmation(const QList<QGraphics
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten context menu event
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event)
@@ -1464,7 +1476,7 @@ void C_SyvDaDashboardScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse double click event slot
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
@@ -1496,6 +1508,8 @@ void C_SyvDaDashboardScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * con
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle edit properties
+
+   \param[in,out]  opc_Item   Item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_OnWidgetEditProperties(QGraphicsItem * const opc_Item) const
@@ -1506,14 +1520,14 @@ void C_SyvDaDashboardScene::m_OnWidgetEditProperties(QGraphicsItem * const opc_I
    if (pc_RectBase != NULL)
    {
       pc_RectBase->CallProperties();
-      Q_EMIT this->SigErrorChange();
+      Q_EMIT (this->SigErrorChange());
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add param widget to scene and connnect signals
 
-   \param[in,out] opc_Item Param widget item
+   \param[in,out]  opc_Item   Param widget item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_AddParamWidgetToScene(C_GiSvDaParam * const opc_Item)
@@ -1525,7 +1539,7 @@ void C_SyvDaDashboardScene::m_AddParamWidgetToScene(C_GiSvDaParam * const opc_It
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add widget to scene and connnect signals
 
-   \param[in,out] opc_Item Widget item
+   \param[in,out]  opc_Item   Widget item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_AddWidgetToScene(C_GiSvDaRectBaseGroup * const opc_Item)
@@ -1548,13 +1562,13 @@ void C_SyvDaDashboardScene::m_AddWidgetToScene(C_GiSvDaRectBaseGroup * const opc
 
    m_AddRectBaseGroupToScene(opc_Item);
    m_AddAnyItemToScene(opc_Item);
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete widget of scene and disconnect signals
 
-   \param[in,out] opc_Item Widget item
+   \param[in,out]  opc_Item   Widget item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveWidgetOfScene(C_GiSvDaRectBaseGroup * const opc_Item)
@@ -1580,14 +1594,14 @@ void C_SyvDaDashboardScene::m_RemoveWidgetOfScene(C_GiSvDaRectBaseGroup * const 
       m_RemoveRectBaseGroupOfScene(opc_Item);
       //Update indices
       this->m_SyncIndex(opc_Item->GetWidgetType(), opc_Item->GetIndex(), C_PuiSvDbDataElement::eDELETE);
-      Q_EMIT this->SigErrorChange();
+      Q_EMIT (this->SigErrorChange());
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete boundary of scene and disconnect signals
 
-   \param[in,out] opc_Item Boundary item
+   \param[in,out]  opc_Item   Boundary item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveBoundaryOfScene(C_GiSvDaBoundary * const opc_Item)
@@ -1604,7 +1618,7 @@ void C_SyvDaDashboardScene::m_RemoveBoundaryOfScene(C_GiSvDaBoundary * const opc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete text element of scene and disconnect signals
 
-   \param[in,out] opc_Item Text element item
+   \param[in,out]  opc_Item   Text element item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveTextElementOfScene(C_GiSvDaTextElement * const opc_Item)
@@ -1623,7 +1637,7 @@ void C_SyvDaDashboardScene::m_RemoveTextElementOfScene(C_GiSvDaTextElement * con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete image group of scene and disconnect signals
 
-   \param[in,out] opc_Item Image group item
+   \param[in,out]  opc_Item   Image group item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveImageGroupOfScene(C_GiSvDaImageGroup * const opc_Item)
@@ -1640,7 +1654,7 @@ void C_SyvDaDashboardScene::m_RemoveImageGroupOfScene(C_GiSvDaImageGroup * const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete line arrow of scene and disconnect signals
 
-   \param[in,out] opc_Item Line arrow item
+   \param[in,out]  opc_Item   Line arrow item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveLineArrowOfScene(C_GiSvDaArrow * const opc_Item)
@@ -1657,9 +1671,9 @@ void C_SyvDaDashboardScene::m_RemoveLineArrowOfScene(C_GiSvDaArrow * const opc_I
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt index if item in array was deleted
 
-   \param[in] ore_Type    Type of vector which changed
-   \param[in] ors32_Index Index of vector which changed
-   \param[in] ore_Action  Type of action
+   \param[in]  ore_Type       Type of vector which changed
+   \param[in]  ors32_Index    Index of vector which changed
+   \param[in]  ore_Action     Type of action
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_SyncIndex(const C_PuiSvDbDataElement::E_Type & ore_Type, const sint32 & ors32_Index,
@@ -1685,22 +1699,22 @@ void C_SyvDaDashboardScene::m_SyncIndex(const C_PuiSvDbDataElement::E_Type & ore
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load subset of system definition entries
 
-   \param[in] orc_OtherStartIndices Start indices
-                                    0: Boundary
-                                    1: Text element
-                                    2: Line arrow
-                                    3: Image
-                                    4: Label
-                                    5: Spin box
-                                    6: Slider
-                                    7: Progress bar
-                                    8: Chart
-                                    9: Toggle
-                                    10: Pie chart
-                                    11: Table
-                                    12: Param
-   \param[in] orq_Selection         False: Ignore selection
-   \param[in] opc_IDMap             Optional map for IDs to use
+   \param[in]  orc_OtherStartIndices   Start indices
+                                       0: Boundary
+                                       1: Text element
+                                       2: Line arrow
+                                       3: Image
+                                       4: Label
+                                       5: Spin box
+                                       6: Slider
+                                       7: Progress bar
+                                       8: Chart
+                                       9: Toggle
+                                       10: Pie chart
+                                       11: Table
+                                       12: Param
+   \param[in]  orq_Selection           False: Ignore selection
+   \param[in]  opc_IDMap               Optional map for IDs to use
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartIndices, const bool & orq_Selection,

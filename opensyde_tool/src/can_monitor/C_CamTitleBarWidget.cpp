@@ -58,11 +58,11 @@ const QString C_CamTitleBarWidget::mhc_NORECENTPROJECT = "No recent project foun
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamTitleBarWidget::C_CamTitleBarWidget(QWidget * const opc_Parent) :
@@ -88,19 +88,18 @@ C_CamTitleBarWidget::C_CamTitleBarWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LogoLabel->setPixmap(c_ImgLogo);
 
    // button icons
-   this->mpc_Ui->pc_PushButtonHelp->setText("");
-   this->mpc_Ui->pc_PushButtonHelp->setIconSize(QSize(24, 24));
-   this->mpc_Ui->pc_PushButtonHelp->SetSvg("://images/IconHelp.svg");
-   this->mpc_Ui->pc_PushButtonHelp->SetIconOnly(true);
-
    this->mpc_Ui->pc_PushButtonNew->setIconSize(QSize(22, 22));
    this->mpc_Ui->pc_PushButtonSave->setIconSize(QSize(24, 24));
    this->mpc_Ui->pc_PushButtonSaveAs->setIconSize(QSize(24, 24));
    this->mpc_Ui->pc_ToolButtonLoad->setIconSize(QSize(24, 24));
+   this->mpc_Ui->pc_PushButtonHelp->setIconSize(QSize(24, 24));
    this->mpc_Ui->pc_PushButtonNew->SetSvg("://images/IconAddNewProj.svg");
    this->mpc_Ui->pc_PushButtonSave->SetSvg("://images/IconSave.svg");
    this->mpc_Ui->pc_PushButtonSaveAs->SetSvg("://images/IconProjSaveAs.svg");
    this->mpc_Ui->pc_ToolButtonLoad->SetSvg("://images/IconProjOpen.svg");
+   this->mpc_Ui->pc_PushButtonHelp->SetSvg("://images/IconHelp.svg");
+   this->mpc_Ui->pc_PushButtonHelp->setText("");
+   this->mpc_Ui->pc_PushButtonHelp->SetIconOnly(true);
 
    // button style
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ToolButtonLoad, "MenuOpen", false);
@@ -112,8 +111,8 @@ C_CamTitleBarWidget::C_CamTitleBarWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_ToolButtonLoad->setMenu(this->mpc_Menu);
    this->mpc_Ui->pc_ToolButtonLoad->setPopupMode(QToolButton::MenuButtonPopup); // for two-button-style
 
-   connect(this->mpc_Menu, &QMenu::aboutToShow, this, &C_CamTitleBarWidget::m_OnAboutToShow);
-   connect(this->mpc_Menu, &QMenu::aboutToHide, this, &C_CamTitleBarWidget::m_OnAboutToHide);
+   connect(this->mpc_Menu, &QMenu::aboutToShow, this, &C_CamTitleBarWidget::m_OnAboutToShowMenu);
+   connect(this->mpc_Menu, &QMenu::aboutToHide, this, &C_CamTitleBarWidget::m_OnAboutToHideMenu);
 
    connect(this->mpc_Menu, &QMenu::triggered, this, &C_CamTitleBarWidget::m_OnRecentProjectSelected);
    connect(this->mpc_Ui->pc_PushButtonNew, &QPushButton::clicked, this, &C_CamTitleBarWidget::m_NewConfig);
@@ -125,7 +124,7 @@ C_CamTitleBarWidget::C_CamTitleBarWidget(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamTitleBarWidget::~C_CamTitleBarWidget()
@@ -135,16 +134,14 @@ C_CamTitleBarWidget::~C_CamTitleBarWidget()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize all displayed static names
+/*! \brief  Initialize all displayed static names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_PushButtonAbout->setText(C_GtGetText::h_GetText("About"));
-   this->mpc_Ui->pc_PushButtonNew->setText(C_GtGetText::h_GetText("New Project"));
-   this->mpc_Ui->pc_ToolButtonLoad->setText(C_GtGetText::h_GetText("Open Project"));
-   this->mpc_Ui->pc_PushButtonSaveAs->setText(C_GtGetText::h_GetText("Save Project As"));
-   this->mpc_Ui->pc_PushButtonSave->setText(C_GtGetText::h_GetText("Save Project"));
+   // initialize button texts
+   this->mpc_Ui->pc_PushButtonAbout->setText(C_GtGetText::h_GetText("About")); // no icon therefore no icon-only mode
+   this->m_SetButtonsText(false);
 
    //tooltips
    this->mpc_Ui->pc_PushButtonHelp->SetToolTipInformation(C_GtGetText::h_GetText("Help"),
@@ -165,7 +162,7 @@ void C_CamTitleBarWidget::InitStaticNames(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update recent projects menu and window title.
+/*! \brief  Update recent projects menu and window title.
 
    Clear recent projects menu and add all known recent projects again.
    Furthermore set window title to new opened project
@@ -192,13 +189,13 @@ void C_CamTitleBarWidget::UpdateRecentProjectsAndWindowTitle(void)
    }
 
    // update window title (window title of this widget is connected to main window)
-   if (c_ActualProject.baseName() == "")
+   if (c_ActualProject.completeBaseName() == "")
    {
       c_NewTitle = QString("openSYDE CAN Monitor - New project");
    }
    else
    {
-      c_NewTitle = QString("openSYDE CAN Monitor - %1 (%2)").arg(c_ActualProject.baseName()).arg(
+      c_NewTitle = QString("openSYDE CAN Monitor - %1 (%2)").arg(c_ActualProject.completeBaseName()).arg(
          c_ActualProject.absoluteFilePath());
    }
    //Send title changed signal to update main window title (this would only set child window title)
@@ -206,7 +203,7 @@ void C_CamTitleBarWidget::UpdateRecentProjectsAndWindowTitle(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle project comparison
+/*! \brief  Handle project comparison
 
    \return
    True  Continue
@@ -247,7 +244,7 @@ bool C_CamTitleBarWidget::HandleProjectComparison(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle save configuration action
+/*! \brief  Handle save configuration action
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::SaveConfig(void)
@@ -266,7 +263,7 @@ void C_CamTitleBarWidget::SaveConfig(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle save configuration as action
+/*! \brief  Handle save configuration as action
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::SaveAsConfig(void)
@@ -278,7 +275,7 @@ void C_CamTitleBarWidget::SaveAsConfig(void)
    {
       c_PreviousDir = C_Uti::h_GetExePath();
    }
-   c_FileName = C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Save can monitor configuration"),
+   c_FileName = C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Save CAN Monitor Configuration"),
                                                c_PreviousDir, C_CamTitleBarWidget::mhc_FILTER, "");
    if (c_FileName.isEmpty() == false)
    {
@@ -294,7 +291,7 @@ void C_CamTitleBarWidget::SaveAsConfig(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle load configuration action
+/*! \brief  Handle load configuration action
 
    \param[in]  orc_FilePath   path of project file to load
 
@@ -333,7 +330,21 @@ sint32 C_CamTitleBarWidget::LoadConfig(const QString & orc_FilePath)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show about screen
+/*! \brief  Overwritten resize event slot
+
+   Here: remove or add button text depending on size
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamTitleBarWidget::resizeEvent(QResizeEvent * const opc_Event)
+{
+   C_OgeWiOnlyBackground::resizeEvent(opc_Event);
+   this->m_SetButtonsText(this->width() < 1100);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Show about screen
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_ShowAbout(void)
@@ -354,7 +365,7 @@ void C_CamTitleBarWidget::m_ShowAbout(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Trigger help
+/*! \brief  Trigger help
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_TriggerHelp(void)
@@ -364,7 +375,7 @@ void C_CamTitleBarWidget::m_TriggerHelp(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle new configuration action
+/*! \brief  Handle new configuration action
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_NewConfig(void)
@@ -385,9 +396,9 @@ void C_CamTitleBarWidget::m_NewConfig(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle save to file action with valid file path
+/*! \brief  Handle save to file action with valid file path
 
-   \param[in] orc_File Selected file path
+   \param[in]  orc_File    Selected file path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
@@ -419,7 +430,7 @@ void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of open project button.
+/*! \brief  Slot of open project button.
 
    Do unsaved changes check, open file dialog and trigger load.
 */
@@ -446,9 +457,9 @@ void C_CamTitleBarWidget::m_OnOpenProjectClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of action triggered in recent-projects-menu.
+/*! \brief  Slot of action triggered in recent-projects-menu.
 
-   \param[in]     opc_Action         selected action in menu
+   \param[in]  opc_Action  selected action in menu
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_OnRecentProjectSelected(const QAction * const opc_Action)
@@ -476,7 +487,7 @@ void C_CamTitleBarWidget::m_OnRecentProjectSelected(const QAction * const opc_Ac
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Remap database paths to new location.
+/*! \brief  Remap database paths to new location.
 
    Following convention is used:
    prior path was        relative                               absolute
@@ -497,6 +508,7 @@ void C_CamTitleBarWidget::m_RemapOnSaveAs(const QString & orc_NewFileName) const
    for (uint32 u32_Pos = 0; u32_Pos < c_Databases.size(); u32_Pos++)
    {
       C_CamProDatabaseData & rc_Database = c_Databases[u32_Pos];
+      const QString c_PrevName = rc_Database.c_Name;
       const QFileInfo c_Info(rc_Database.c_Name);
       QString c_NewName = C_CamUti::h_GetAbsPathFromProj(rc_Database.c_Name);
 
@@ -509,26 +521,66 @@ void C_CamTitleBarWidget::m_RemapOnSaveAs(const QString & orc_NewFileName) const
 
       // set new path
       C_CamProHandler::h_GetInstance()->SetDatabaseName(u32_Pos, c_NewName);
+      C_CamProHandler::h_GetInstance()->ReplaceDatabaseName(c_PrevName, c_NewName);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Change color of left side of tool button on menu show.
+/*! \brief  Set buttons text or remove them if only icon should be visible (in small width mode)
+
+   \param[in]  oq_IconOnly    Flag to indicate icon only vs icon with text
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamTitleBarWidget::m_SetButtonsText(const bool oq_IconOnly) const
+{
+   this->mpc_Ui->pc_PushButtonNew->SetIconOnly(oq_IconOnly);
+   this->mpc_Ui->pc_PushButtonSaveAs->SetIconOnly(oq_IconOnly);
+   this->mpc_Ui->pc_PushButtonSave->SetIconOnly(oq_IconOnly);
+
+   if (oq_IconOnly == true)
+   {
+      uint32 u32_SmallMaximumSize = 34;
+      this->mpc_Ui->pc_PushButtonNew->setText(C_GtGetText::h_GetText(""));
+      this->mpc_Ui->pc_ToolButtonLoad->setText(C_GtGetText::h_GetText(""));
+      this->mpc_Ui->pc_PushButtonSaveAs->setText(C_GtGetText::h_GetText(""));
+      this->mpc_Ui->pc_PushButtonSave->setText(C_GtGetText::h_GetText(""));
+
+      this->mpc_Ui->pc_PushButtonNew->setMaximumWidth(u32_SmallMaximumSize);
+      this->mpc_Ui->pc_ToolButtonLoad->setMaximumWidth(2 * u32_SmallMaximumSize + 6);
+      this->mpc_Ui->pc_PushButtonSaveAs->setMaximumWidth(u32_SmallMaximumSize);
+      this->mpc_Ui->pc_PushButtonSave->setMaximumWidth(u32_SmallMaximumSize);
+   }
+   else
+   {
+      this->mpc_Ui->pc_PushButtonNew->setText(C_GtGetText::h_GetText("New Project"));
+      this->mpc_Ui->pc_ToolButtonLoad->setText(C_GtGetText::h_GetText("Open Project"));
+      this->mpc_Ui->pc_PushButtonSaveAs->setText(C_GtGetText::h_GetText("Save Project As"));
+      this->mpc_Ui->pc_PushButtonSave->setText(C_GtGetText::h_GetText("Save Project"));
+
+      this->mpc_Ui->pc_PushButtonNew->setMaximumWidth(QWIDGETSIZE_MAX);
+      this->mpc_Ui->pc_ToolButtonLoad->setMaximumWidth(QWIDGETSIZE_MAX);
+      this->mpc_Ui->pc_PushButtonSaveAs->setMaximumWidth(QWIDGETSIZE_MAX);
+      this->mpc_Ui->pc_PushButtonSave->setMaximumWidth(QWIDGETSIZE_MAX);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Change color of left side of tool button on menu show.
 
    We need a style sheet property here, because only the menu button can have an own ":open" style;
    the rest of the button ignores this flag and uses pressed color.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamTitleBarWidget::m_OnAboutToShow(void) const
+void C_CamTitleBarWidget::m_OnAboutToShowMenu(void) const
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ToolButtonLoad, "MenuOpen", true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Change color of left side of tool button on menu hide.
+/*! \brief  Change color of left side of tool button on menu hide.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamTitleBarWidget::m_OnAboutToHide(void) const
+void C_CamTitleBarWidget::m_OnAboutToHideMenu(void) const
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ToolButtonLoad, "MenuOpen", false);
 }

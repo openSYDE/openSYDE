@@ -86,7 +86,7 @@ void C_OgeCbxIconDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
    //lint -e{730, 746, 1013, 1055} Use clean Qt interface
    c_Option.state.setFlag(QStyle::State_MouseOver,
                           ((C_Uti::h_CheckStyleState(orc_Option.state, QStyle::State_MouseOver)) &&
-                          orc_Index.flags().testFlag(Qt::ItemIsEnabled)));
+                           orc_Index.flags().testFlag(Qt::ItemIsEnabled)));
 
    //Draw original item & icon
    QStyledItemDelegate::paint(opc_Painter, c_Option, orc_Index);
@@ -94,7 +94,7 @@ void C_OgeCbxIconDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
    //Draw selection rectangle
 
    if (orc_Index.flags().testFlag(Qt::ItemIsEnabled) &&
-       (C_Uti::h_CheckStyleState(orc_Option.state, QStyle::State_MouseOver) == true))
+       (C_Uti::h_CheckStyleState(orc_Option.state, QStyle::State_Selected) == true))
    {
       opc_Painter->save();
       opc_Painter->setBrush(stw_opensyde_gui::mc_STYLE_GUIDE_COLOR_25); //selection color

@@ -251,13 +251,48 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the tester present message to a specific node
+
+   \param[in]     orc_ServerId     Node to send the tester present
+
+   \return
+   C_NO_ERR    All nodes set to session successfully
+   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
+   C_COM       Error of service
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::SendTesterPresent(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId)
+const
+{
+   sint32 s32_Return = C_CONFIG;
+
+   if (this->mq_Initialized == true)
+   {
+      C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->m_GetOsyProtocol(orc_ServerId);
+      if (pc_ProtocolOsy != NULL)
+      {
+         // Send tester present message without expecting a response
+         s32_Return = pc_ProtocolOsy->OsyTesterPresent(1U);
+
+         if (s32_Return != C_NO_ERR)
+         {
+            // No response expected. All errors caused by client. We can break here.
+            s32_Return = C_COM;
+         }
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize the necessary routing configuration to start the routing for one specific server
 
    Prepares all active nodes with its routing configurations if necessary
    Three different types of routing:
-   - openSYDE routing for a openSYDE server
+   - openSYDE routing for an openSYDE server
    - legacy routing for a non openSYDE server
-   - legacy routing for a non openSYDE after openSYDE routing to a openSYDE server
+   - legacy routing for a non openSYDE after openSYDE routing to an openSYDE server
 
    \param[in]   ou32_NodeIndex         node index to read from
    \param[out]  opu32_ErrorNodeIndex   optional pointer for node index which caused the error on starting routing if
@@ -267,12 +302,13 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const 
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
    C_RANGE    node index out of range
    C_COM      communication driver reported error
+   C_NOACT    At least one node does not support Ethernet to Ethernet routing
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::StartRouting(const uint32 ou32_NodeIndex, uint32 * const opu32_ErrorNodeIndex)
@@ -373,6 +409,52 @@ sint32 C_OSCComDriverProtocol::IsRoutingNecessary(const uint32 ou32_NodeIndex)
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if a specific node must be capable of Ethernet to Ethernet routing
+
+   \param[in]       ou32_RouterNodeIndex     Node to check if node must be capable of Ethernet to Ethernet routing
+                                             for at least one route
+
+   \retval   true     Ethernet to Ethernet Routing must be supported by router node
+   \retval   false    Ethernet to Ethernet Routing must not be supported by router node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCComDriverProtocol::IsEthToEthRoutingNecessary(const uint32 ou32_RouterNodeIndex) const
+{
+   bool q_Return = false;
+   uint32 u32_RouteCounter;
+
+   // Check all routes
+   for (u32_RouteCounter = 0U; u32_RouteCounter < this->mc_Routes.size(); ++u32_RouteCounter)
+   {
+      const C_OSCRoutingRoute & rc_Route = this->mc_Routes[u32_RouteCounter];
+      uint32 u32_RoutePointCounter;
+
+      // Check all points
+      for (u32_RoutePointCounter = 0U; u32_RoutePointCounter < rc_Route.c_VecRoutePoints.size();
+           ++u32_RoutePointCounter)
+      {
+         const C_OSCRoutingRoutePoint & rc_Point = rc_Route.c_VecRoutePoints[u32_RoutePointCounter];
+
+         if ((rc_Point.u32_NodeIndex == ou32_RouterNodeIndex) &&
+             (rc_Point.e_InInterfaceType == C_OSCSystemBus::eETHERNET) &&
+             (rc_Point.e_OutInterfaceType == C_OSCSystemBus::eETHERNET))
+         {
+            // Ethernet routing is necessary for this node for at least one route
+            q_Return = true;
+            break;
+         }
+      }
+
+      if (q_Return == true)
+      {
+         break;
+      }
+   }
+
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -493,6 +575,92 @@ void C_OSCComDriverProtocol::GetRouteOfNode(const uint32 ou32_NodeIndex, C_OSCRo
          orc_Route = this->mc_Routes[u32_ActiveIndex];
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the used interface type of the node on its route
+
+   \param[in]   ou32_NodeIndex         Node index to get info from
+   \param[out]  ore_InterfaceType      Used interface type of target node on its route
+
+   \retval   C_NO_ERR   Detailed description of 1st return value
+   \retval   C_RANGE    Node index out of range
+   \retval   C_CONFIG   Route of node is not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::GetRoutingTargetInterfaceType(const uint32 ou32_NodeIndex,
+                                                             C_OSCSystemBus::E_Type & ore_InterfaceType) const
+{
+   sint32 s32_Return;
+   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+
+   if (u32_ActiveIndex >= this->mc_ActiveNodesIndexes.size())
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveIndex];
+
+      if (rc_ActRoute.c_VecRoutePoints.size() > 0)
+      {
+         // Check the last routing point. The out interface type is connected to the bus which is
+         // connected to the target
+         ore_InterfaceType = rc_ActRoute.c_VecRoutePoints[rc_ActRoute.c_VecRoutePoints.size() - 1].e_OutInterfaceType;
+
+         s32_Return = C_NO_ERR;
+      }
+      else
+      {
+         s32_Return = C_CONFIG;
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the last route point on route before target
+
+   \param[in]   ou32_NodeIndex         Node index of target of route
+   \param[out]  orc_RouterServerId     Router server Id of last router on route to target ou32_NodeIndex
+
+   \retval   C_NO_ERR   Detailed description of 1st return value
+   \retval   C_RANGE    Node index out of range
+   \retval   C_CONFIG   Route of node is not valid or has no route points
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::GetServerIdOfLastRouter(const uint32 ou32_NodeIndex,
+                                                       C_OSCProtocolDriverOsyNode & orc_RouterServerId) const
+{
+   sint32 s32_Return;
+   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+
+   if (u32_ActiveIndex >= this->mc_ActiveNodesIndexes.size())
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveIndex];
+
+      if (rc_ActRoute.c_VecRoutePoints.size() > 0)
+      {
+         // Get the next to last routing point. That is the last router.
+         const uint32 u32_RouterNodeIndex =
+            rc_ActRoute.c_VecRoutePoints[rc_ActRoute.c_VecRoutePoints.size() - 1].u32_NodeIndex;
+
+         orc_RouterServerId = this->mc_ServerIDs[this->m_GetActiveIndex(u32_RouterNodeIndex)];
+
+         s32_Return = C_NO_ERR;
+      }
+      else
+      {
+         s32_Return = C_CONFIG;
+      }
+   }
+
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1168,6 +1336,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(const uint32 ou32_ActiveN
 /*! \brief   Sets all nodes into a specific security level
 
    \param[in]     ou8_SecurityLevel     level of requested security
+   \param[out] orc_ErrorActiveNodes    All active node indexes of nodes which can not be reached
 
    \return
    C_NO_ERR    All nodes set to session successfully
@@ -1176,7 +1345,8 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(const uint32 ou32_ActiveN
    C_TIMEOUT   Expected response not received within timeout
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_SecurityLevel) const
+sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_SecurityLevel,
+                                                        std::set<uint32> & orc_ErrorActiveNodes) const
 {
    sint32 s32_Return = C_CONFIG;
 
@@ -1193,6 +1363,11 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_Security
          if ((s32_Return != C_NO_ERR) &&
              (s32_Return != C_NOACT))
          {
+            //Store invalid node
+            if (u32_Counter < this->mc_ActiveNodesIndexes.size())
+            {
+               orc_ErrorActiveNodes.insert(this->mc_ActiveNodesIndexes[u32_Counter]);
+            }
             // Do not change the C_TIMEOUT error
             if (s32_Return != C_TIMEOUT)
             {
@@ -1234,6 +1409,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_Security
    C_COM       Communication problem
    C_TIMEOUT   Expected response not received within timeout
    C_RD_WR     Unexpected content in response
+   C_NOACT     At least one node does not support Ethernet to Ethernet routing
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
@@ -1309,6 +1485,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                   const uint32 u32_RouterActiveIndex =
                      this->m_GetActiveIndex(rc_RoutePoint.u32_NodeIndex, &q_Found);
                   uint32 u32_NextEthernetNode = 0U;
+                  bool q_NextOneError = false;
 
                   if (q_Found == true)
                   {
@@ -1349,6 +1526,22 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                   {
                      // Do not disconnect after. The connection is necessary to hold the routing alive.
                      s32_Return = pc_ProtocolOsy->ReConnect();
+                  }
+
+                  // Check if node supports IP to IP routing
+                  if (s32_Return == C_NO_ERR)
+                  {
+                     C_OSCProtocolDriverOsy::C_ListOfFeatures c_Features;
+                     s32_Return = pc_ProtocolOsy->OsyReadListOfFeatures(c_Features);
+
+                     if (s32_Return == C_NO_ERR)
+                     {
+                        if (c_Features.q_EthernetToEthernetRoutingSupported == false)
+                        {
+                           // Node is not capable for Ethernet to Ethernet routing
+                           s32_Return = C_NOACT;
+                        }
+                     }
                   }
 
                   if (s32_Return == C_NO_ERR)
@@ -1392,6 +1585,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                   if (s32_Return == C_NO_ERR)
                   {
                      const uint32 u32_StartTime = TGL_GetTickCount();
+
                      do
                      {
                         uint8 u8_Status;
@@ -1408,6 +1602,13 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                            {
                               // Error of service
                               s32_Return = C_WARN;
+                              // If this service will not be finished without error, the router node is available
+                              // and the target of the next point is not reachable
+                              q_NextOneError = true;
+                           }
+                           else
+                           {
+                              q_NextOneError = false;
                            }
                            break;
                         }
@@ -1415,6 +1616,9 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                         {
                            // No error and not finished yet, set timeout in case of loop abort condition
                            s32_Return = C_TIMEOUT;
+                           // If this service will not be finished in its time, the router node is available and
+                           // the target of the next point is not reachable
+                           q_NextOneError = true;
                            // Let the node do its work
                            TGL_Sleep(20);
                         }
@@ -1425,7 +1629,16 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
 
                   if ((s32_Return != C_NO_ERR) && (opu32_ErrorActiveNodeIndex != NULL))
                   {
-                     *opu32_ErrorActiveNodeIndex = u32_RouterActiveIndex;
+                     if (q_NextOneError == false)
+                     {
+                        // Current router node caused the error
+                        *opu32_ErrorActiveNodeIndex = u32_RouterActiveIndex;
+                     }
+                     else
+                     {
+                        // The next one is to blame
+                        *opu32_ErrorActiveNodeIndex = u32_NextEthernetNode;
+                     }
                   }
 
                   // Clear all queues. In case of CAN tp the change causes that more than one queue receives
@@ -1472,9 +1685,9 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
 
    Prepares the active nodes on the route with its routing configurations if necessary
    Three different types of routing:
-   - openSYDE routing for a openSYDE server
+   - openSYDE routing for an openSYDE server
    - legacy routing for a non openSYDE server
-   - legacy routing for a non openSYDE after openSYDE routing to a openSYDE server
+   - legacy routing for a non openSYDE after openSYDE routing to an openSYDE server
 
    The routing must be activated to all nodes after each node
    For example:
@@ -1492,9 +1705,9 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                                               routing if an error occurred
 
    \return
-   C_NO_ERR   request sent, positive response received
+   C_NO_ERR   request sent, positive response received or no routing necessary
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -1748,6 +1961,9 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                      s32_Return = C_CONFIG;
                   }
                }
+
+               // Routing started. Save the active node index of the last router node on the route
+               this->mc_ActiveNodesLastCanRouters.push_back(u32_ActiveLastNode);
             }
 
             //lint -e{429}  pc_RoutingDispatcher will be saved in mc_LegacyRouterDispatchers and deleted by destructor
@@ -1833,6 +2049,8 @@ void C_OSCComDriverProtocol::m_StopRouting(const uint32 ou32_ActiveNode)
                          "Routing to node " + C_SCLString::IntToStr(this->mc_ActiveNodesIndexes[ou32_ActiveNode]) +
                          " stopped.");
    }
+
+   this->mc_ActiveNodesLastCanRouters.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1937,6 +2155,8 @@ void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
          }
       }
    }
+
+   this->mc_ActiveNodesLastCanRouters.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2379,7 +2599,7 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
                   c_Text += "\" - SetDispatcher - error: ";
                   c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
                   c_Text += "\nC_CONFIG   could not register with dispatcher\n"
-                            "C_NOACT    could not configure RX filter\n";
+                            "C_NOACT    could not configure Rx filter\n";
                   osc_write_log_warning("Asynchronous communication", c_Text.c_str());
                   s32_Retval = C_OVERFLOW;
                }
@@ -2391,7 +2611,7 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
                c_Text += "\" - SetNodeIdentifiers - error: ";
                c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
                c_Text += "\nC_RANGE    client and/or server identifier out of range\n"
-                         "C_NOACT    could not reconfigure RX filters\n";
+                         "C_NOACT    could not reconfigure Rx filters\n";
                osc_write_log_warning("Asynchronous communication", c_Text.c_str());
                s32_Retval = C_OVERFLOW;
             }
@@ -2410,7 +2630,7 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
                   C_SCLString c_Text = "Broadcast - SetDispatcher - error: ";
                   c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
                   c_Text += "\nC_CONFIG   could not register with dispatcher\n"
-                            "C_NOACT    could not configure RX filter\n";
+                            "C_NOACT    could not configure Rx filter\n";
                   osc_write_log_warning("Asynchronous communication", c_Text.c_str());
                   s32_Retval = C_OVERFLOW;
                }
@@ -2420,7 +2640,7 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
                C_SCLString c_Text = "Broadcast - SetNodeIdentifiers - error: ";
                c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
                c_Text += "\nC_RANGE    client and/or server identifier out of range\n"
-                         "C_NOACT    could not reconfigure RX filters\n";
+                         "C_NOACT    could not reconfigure Rx filters\n";
                osc_write_log_warning("Asynchronous communication", c_Text.c_str());
                s32_Retval = C_OVERFLOW;
             }
@@ -2483,79 +2703,14 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
 
          tgl_assert(this->mc_Routes.size() == this->mu32_ActiveNodeCount);
 
-         // Initialize all Ethernet connections with IP to IP routing
+         // Initialize all Ethernet connections without routing
          for (u32_ItActiveNode = 0; u32_ItActiveNode < this->mu32_ActiveNodeCount; ++u32_ItActiveNode)
          {
-            if (this->mc_Routes[u32_ItActiveNode].c_VecRoutePoints.size() != 0)
+            // These connections will be used by Ethernet to CAN routing too
+            if (this->mc_Routes[u32_ItActiveNode].c_VecRoutePoints.size() == 0)
             {
-               uint32 u32_Ip2IpRouterActiveNodeClientSide;
-               uint32 u32_Ip2IpRouterActiveNodeTargetSide;
-
-               s32_Retval = m_GetActiveIndexOfIp2IpRouter(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeClientSide,
-                                                          u32_Ip2IpRouterActiveNodeTargetSide);
-
-               if (s32_Retval == C_NO_ERR)
-               {
-                  // Exist a dispatcher handle for this router server
-                  std::map<uint32, uint32>::const_iterator c_IterUniqueIp2IpRouters = c_ActiveNodeIp2IpRouters.find(
-                     u32_Ip2IpRouterActiveNodeTargetSide);
-
-                  if (c_IterUniqueIp2IpRouters == c_ActiveNodeIp2IpRouters.end())
-                  {
-                     // New dispatcher handle necessary
-                     s32_Retval = this->m_InitTcp(
-                        mc_ServerIpAddresses[u32_Ip2IpRouterActiveNodeClientSide].au8_IpAddress,
-                        c_IpDispatcherHandles[u32_ItActiveNode]);
-
-                     // Save the associated position of the dispatcher handle for this specific router
-                     c_ActiveNodeIp2IpRouters.insert(
-                        std::pair<uint32, uint32>(u32_Ip2IpRouterActiveNodeTargetSide, u32_ItActiveNode));
-                  }
-                  else
-                  {
-                     // Reuse the dispatcher handle of the same router
-                     c_IpDispatcherHandles[u32_ItActiveNode] = c_IterUniqueIp2IpRouters->second;
-                  }
-
-                  // Save the associated IP to IP router of the active node for later stopping the route
-                  this->mc_ActiveNodeIp2IpDispatcher.insert(
-                     std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeTargetSide));
-               }
-               else if (s32_Retval == C_NOACT)
-               {
-                  uint32 u32_Ip2CanRouterActiveNode;
-
-                  // No error, no IP to IP routing, check for IP to CAN routing
-                  s32_Retval = this->m_GetActiveIndexOfIp2CanRouter(u32_ItActiveNode, u32_Ip2CanRouterActiveNode);
-
-                  if (s32_Retval == C_NO_ERR)
-                  {
-                     // IP to CAN routing has only one dispatcher and must be reused
-                     c_IpDispatcherHandles[u32_ItActiveNode] = u32_Ip2CanRouterActiveNode;
-
-                     // Save the associated IP to CAN router of the active node for later stopping the route
-                     this->mc_ActiveNodeIp2CanDispatcher.insert(
-                        std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2CanRouterActiveNode));
-                  }
-                  else if (s32_Retval == C_NOACT)
-                  {
-                     // No error, but no initialization here too
-                     s32_Retval = C_NO_ERR;
-                  }
-                  else
-                  {
-                     osc_write_log_error("Ethernet initialization",
-                                         "Could not get index of IP to CAN router. Error Code: " +
-                                         C_SCLString::IntToStr(s32_Retval));
-                  }
-               }
-               else
-               {
-                  osc_write_log_error("Ethernet initialization",
-                                      "Could not get index of IP to IP router. Error Code: " +
-                                      C_SCLString::IntToStr(s32_Retval));
-               }
-
+               s32_Retval = this->m_InitTcp(mc_ServerIpAddresses[u32_ItActiveNode].au8_IpAddress,
+                                            c_IpDispatcherHandles[u32_ItActiveNode]);
                if (s32_Retval != C_NO_ERR)
                {
                   break;
@@ -2565,14 +2720,90 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
 
          if (s32_Retval == C_NO_ERR)
          {
-            // Initialize all Ethernet connections without routing
+            // Initialize all Ethernet connections with IP to IP routing
             for (u32_ItActiveNode = 0; u32_ItActiveNode < this->mu32_ActiveNodeCount; ++u32_ItActiveNode)
             {
-               // These connections will be used by Ethernet to CAN routing too
-               if (this->mc_Routes[u32_ItActiveNode].c_VecRoutePoints.size() == 0)
+               if (this->mc_Routes[u32_ItActiveNode].c_VecRoutePoints.size() != 0)
                {
-                  s32_Retval = this->m_InitTcp(mc_ServerIpAddresses[u32_ItActiveNode].au8_IpAddress,
-                                               c_IpDispatcherHandles[u32_ItActiveNode]);
+                  uint32 u32_Ip2IpRouterActiveNodeClientSide;
+                  uint32 u32_Ip2IpRouterActiveNodeTargetSide;
+
+                  s32_Retval = m_GetActiveIndexOfIp2IpRouter(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeClientSide,
+                                                             u32_Ip2IpRouterActiveNodeTargetSide);
+
+                  if (s32_Retval == C_NO_ERR)
+                  {
+                     // Exist a dispatcher handle for this router server
+                     std::map<uint32, uint32>::const_iterator c_IterUniqueIp2IpRouters = c_ActiveNodeIp2IpRouters.find(
+                        u32_Ip2IpRouterActiveNodeTargetSide);
+
+                     if (c_IterUniqueIp2IpRouters == c_ActiveNodeIp2IpRouters.end())
+                     {
+                        // New dispatcher handle necessary
+                        s32_Retval = this->m_InitTcp(
+                           mc_ServerIpAddresses[u32_Ip2IpRouterActiveNodeClientSide].au8_IpAddress,
+                           c_IpDispatcherHandles[u32_ItActiveNode]);
+
+                        // Save the associated position of the dispatcher handle for this specific router
+                        c_ActiveNodeIp2IpRouters.insert(
+                           std::pair<uint32, uint32>(u32_Ip2IpRouterActiveNodeTargetSide, u32_ItActiveNode));
+                     }
+                     else
+                     {
+                        uint32 u32_Handle;
+
+                        // Reuse the dispatcher handle of the same router
+                        tgl_assert(c_IterUniqueIp2IpRouters->second < c_IpDispatcherHandles.size());
+
+                        u32_Handle = c_IpDispatcherHandles[c_IterUniqueIp2IpRouters->second];
+                        c_IpDispatcherHandles[u32_ItActiveNode] = u32_Handle;
+                     }
+
+                     // Save the associated IP to IP router of the active node for later stopping the route
+                     this->mc_ActiveNodeIp2IpDispatcher.insert(
+                        std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeTargetSide));
+                  }
+                  else if (s32_Retval == C_NOACT)
+                  {
+                     uint32 u32_Ip2CanRouterActiveNode;
+
+                     // No error, no IP to IP routing, check for IP to CAN routing
+                     s32_Retval = this->m_GetActiveIndexOfIp2CanRouter(u32_ItActiveNode, u32_Ip2CanRouterActiveNode);
+
+                     if (s32_Retval == C_NO_ERR)
+                     {
+                        uint32 u32_Handle;
+
+                        // Reuse the dispatcher handle of the same router
+                        tgl_assert(u32_Ip2CanRouterActiveNode < c_IpDispatcherHandles.size());
+
+                        // IP to CAN routing has only one dispatcher and must be reused
+                        u32_Handle = c_IpDispatcherHandles[u32_Ip2CanRouterActiveNode];
+                        c_IpDispatcherHandles[u32_ItActiveNode] = u32_Handle;
+
+                        // Save the associated IP to CAN router of the active node for later stopping the route
+                        this->mc_ActiveNodeIp2CanDispatcher.insert(
+                           std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2CanRouterActiveNode));
+                     }
+                     else if (s32_Retval == C_NOACT)
+                     {
+                        // No error, but no initialization here too
+                        s32_Retval = C_NO_ERR;
+                     }
+                     else
+                     {
+                        osc_write_log_error("Ethernet initialization",
+                                            "Could not get index of IP to CAN router. Error Code: " +
+                                            C_SCLString::IntToStr(s32_Retval));
+                     }
+                  }
+                  else
+                  {
+                     osc_write_log_error("Ethernet initialization",
+                                         "Could not get index of IP to IP router. Error Code: " +
+                                         C_SCLString::IntToStr(s32_Retval));
+                  }
+
                   if (s32_Retval != C_NO_ERR)
                   {
                      break;

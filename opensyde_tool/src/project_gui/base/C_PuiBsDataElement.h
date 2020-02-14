@@ -33,7 +33,7 @@ public:
    virtual void UpdateData(void) = 0;
    virtual void DeleteData(void) = 0;
 
-   enum E_Action
+   enum E_Action ///< Action type
    {
       eDELETE, ///< Change type: delete
       eADD     ///< Change type: add

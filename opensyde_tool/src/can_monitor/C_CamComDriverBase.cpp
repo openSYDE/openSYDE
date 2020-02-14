@@ -138,6 +138,8 @@ void C_CamComDriverBase::DistributeMessages(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sending a CAN message by putting it into the queue
 
+   \param[in]  orc_Msg  Tx CAN message
+
    This function is thread safe
 */
 //----------------------------------------------------------------------------------------------------------------------

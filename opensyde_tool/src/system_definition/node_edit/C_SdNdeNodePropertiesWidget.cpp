@@ -72,8 +72,7 @@ const stw_types::sint32 C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_ENABLED = 1;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent  Reference to parent
-   \param[in]     orc_Name    Name of the bus for the title
+   \param[in,out]  opc_Parent    Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Parent) :
@@ -235,6 +234,10 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelProgramming->setText(C_GtGetText::h_GetText("Programming Support"));
    this->mpc_Ui->pc_LabelComIfSettings->setText(C_GtGetText::h_GetText("Communication Interfaces Settings"));
 
+   this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_GtGetText::h_GetText("openSYDE"));
+   this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_GtGetText::h_GetText("KEFEX"));
+   this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_GtGetText::h_GetText("None"));
+
    this->mpc_Ui->pc_ComboBoxProgramming->addItem(C_GtGetText::h_GetText("Disabled"));
    this->mpc_Ui->pc_ComboBoxProgramming->addItem(C_GtGetText::h_GetText("Enabled"));
 
@@ -368,7 +371,7 @@ void C_SdNdeNodePropertiesWidget::SelectName(void) const
 
    Sets the private node id of widget
 
-   \param[in]     ou32_NodeIndex         new node id
+   \param[in]  ou32_NodeIndex    new node id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::SetNodeId(const uint32 ou32_NodeIndex)
@@ -845,8 +848,6 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
    Is called from outside
       - on system definition save
       - on page change
-
-   \return   false:
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::SaveToData(void) const
@@ -1064,6 +1065,7 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check node name
+
    - check input
    - show/hide invalid icon
 */
@@ -1158,6 +1160,7 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
             c_Details.append(QString("\"%1\"\n").arg(rc_Name.c_str()));
          }
          c_Message.SetDetails(c_Details);
+         c_Message.SetCustomMinHeight(180, 350);
          c_Message.Execute();
          //Restore previous name
          {
@@ -1181,11 +1184,12 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check com interface id
+
    - check input
    - valid/invalid text
 
-   \param[in]     ou32_Row         Row
-   \param[in]     ou32_Column      Column
+   \param[in]  ou32_Row       Row
+   \param[in]  ou32_Column    Column
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const uint32 ou32_Column) const
@@ -1306,11 +1310,12 @@ void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const ui
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   m_IpAddressClick
+
    - check if ip cell is clicked
    - ...
 
-   \param[in]     ou32_Row         Row
-   \param[in]     ou32_Column      Column
+   \param[in]  ou32_Row       Row
+   \param[in]  ou32_Column    Column
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row, const uint32 ou32_Column)

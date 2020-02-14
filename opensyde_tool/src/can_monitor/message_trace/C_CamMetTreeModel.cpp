@@ -56,7 +56,7 @@ const QString C_CamMetTreeModel::mhc_IconSignalSelected = "://images/IconSignalS
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeModel::C_CamMetTreeModel(QObject * const opc_Parent) :
@@ -230,7 +230,7 @@ void C_CamMetTreeModel::ActionClearData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add specified strings as rows
 
-   \param[in] orc_Data New row content
+   \param[in]  orc_Data    New row content
 
    \return
    Indices of added rows (only valid if not in unique message mode)
@@ -248,8 +248,8 @@ std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLogge
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set current selection
 
-   \param[in] os32_SelectedParentRow  Current selected parent index
-   \param[in] os32_SelectedChildIndex Current selected child index
+   \param[in]  os32_SelectedParentRow     Current selected parent index
+   \param[in]  os32_SelectedChildIndex    Current selected child index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetSelection(const sint32 os32_SelectedParentRow, const sint32 os32_SelectedChildIndex)
@@ -290,7 +290,7 @@ void C_CamMetTreeModel::SetSelection(const sint32 os32_SelectedParentRow, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set display mode: display tree
 
-   \param[in] oq_Value New value
+   \param[in]  oq_Value    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayTree(const bool oq_Value)
@@ -309,7 +309,7 @@ void C_CamMetTreeModel::SetDisplayTree(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set display mode: display unique messages
 
-   \param[in] oq_Value New value
+   \param[in]  oq_Value    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayUniqueMessages(const bool oq_Value)
@@ -333,7 +333,7 @@ void C_CamMetTreeModel::SetDisplayUniqueMessages(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set display style for CAN ID and CAN data
 
-   \param[in] oq_Value New value
+   \param[in]  oq_Value    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayAsHex(const bool oq_Value)
@@ -352,7 +352,7 @@ void C_CamMetTreeModel::SetDisplayAsHex(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set display style for timestamp
 
-   \param[in] oq_Value New value
+   \param[in]  oq_Value    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayTimestampRelative(const bool oq_Value)
@@ -435,9 +435,9 @@ void C_CamMetTreeModel::SignalProtocolChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
@@ -451,7 +451,8 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
       const E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING))
+      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+
       {
          switch (e_Col)
          {
@@ -480,36 +481,64 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
             break;
          }
       }
+      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      {
+         switch (e_Col)
+         {
+         case eTIME_STAMP:
+            c_Retval = C_GtGetText::h_GetText("Time");
+            break;
+         case eCAN_ID:
+            c_Retval = C_GtGetText::h_GetText("Identifier");
+            break;
+         case eCAN_NAME:
+            c_Retval = C_GtGetText::h_GetText("Name");
+            break;
+         case eCAN_DIR:
+            c_Retval = C_GtGetText::h_GetText("Direction");
+            break;
+         case eCAN_DLC:
+            c_Retval = C_GtGetText::h_GetText("Data Length Code");
+            break;
+         case eCAN_DATA:
+            c_Retval = C_GtGetText::h_GetText("Data");
+            break;
+         case eCAN_COUNTER:
+            c_Retval = C_GtGetText::h_GetText("Counter");
+            break;
+         default:
+            break;
+         }
+      }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
       {
          switch (e_Col)
          {
          case eTIME_STAMP:
-            c_Retval = C_GtGetText::h_GetText(
-               "Absolute time (hh:mm:ss.ms.us) from the measurement start, or relative to the previous event.");
+            c_Retval = C_GtGetText::h_GetText("Absolute time (hh:mm:ss.ms.us) from the measurement start, or relative "
+                                              "to the previous event.");
             break;
          case eCAN_ID:
             c_Retval = C_GtGetText::h_GetText("CAN identifier of the message.");
             break;
          case eCAN_NAME:
-            c_Retval = C_GtGetText::h_GetText(
-               "Symbolic name of the CAN message. Empty if not defined in on of the active database(s).");
+            c_Retval = C_GtGetText::h_GetText("Symbolic name of the CAN message. Empty if not defined in one of the "
+                                              "active database(s).");
             break;
          case eCAN_DIR:
-            c_Retval = C_GtGetText::h_GetText(
-               "Direction of the CAN message.\n"
-               "   - Rx: Received message\n"
-               "   - Tx: Sent by this instance of openSYDE CAN Monitor");
+            c_Retval = C_GtGetText::h_GetText("Direction of the CAN message.\n"
+                                              "   - Rx: Received message\n"
+                                              "   - Tx: Sent by this instance of openSYDE CAN Monitor");
             break;
          case eCAN_DLC:
-            c_Retval = C_GtGetText::h_GetText("Data length code. Number of data bytes in decimal representation.");
+            c_Retval = C_GtGetText::h_GetText("Number of data bytes in decimal representation.");
             break;
          case eCAN_DATA:
             c_Retval = C_GtGetText::h_GetText("CAN message data in bytes.");
             break;
          case eCAN_COUNTER:
-            c_Retval = C_GtGetText::h_GetText(
-               "Indicates the number of times the event has appeared since measurement start.");
+            c_Retval = C_GtGetText::h_GetText("Indicates the number of times the event has appeared since "
+                                              "measurement start.");
             break;
          default:
             break;
@@ -526,9 +555,9 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data index
 
-   \param[in] osn_Row    Row
-   \param[in] osn_Column Column
-   \param[in] orc_Parent Parent
+   \param[in]  osn_Row     Row
+   \param[in]  osn_Column  Column
+   \param[in]  orc_Parent  Parent
 
    \return
    Data index (may be invalid = invalid parameters)
@@ -552,7 +581,7 @@ QModelIndex C_CamMetTreeModel::index(const sintn osn_Row, const sintn osn_Column
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get parent index
 
-   \param[in] orc_Index Index
+   \param[in]  orc_Index   Index
 
    \return
    Parent index (may be invalid = root level)
@@ -572,7 +601,7 @@ QModelIndex C_CamMetTreeModel::parent(const QModelIndex & orc_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get tree column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -606,7 +635,7 @@ sintn C_CamMetTreeModel::columnCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get tree row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -643,8 +672,8 @@ sintn C_CamMetTreeModel::rowCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -1040,7 +1069,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Column to enum conversion
 
-   \param[in] os32_Column Column
+   \param[in]  os32_Column    Column
 
    \return
    Enum value
@@ -1081,7 +1110,7 @@ C_CamMetTreeModel::E_Columns C_CamMetTreeModel::h_ColumnToEnum(const sint32 os32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Enum to column conversion
 
-   \param[in] oe_Value Enum value
+   \param[in]  oe_Value    Enum value
 
    \return
    Column
@@ -1126,7 +1155,7 @@ sint32 C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_V
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get message at row
 
-   \param[in] osn_Row Current row
+   \param[in]  osn_Row  Current row
 
    \return
    NULL Message not found
@@ -1159,7 +1188,7 @@ const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const sintn osn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Translate message tree indices to signal index
 
-   \param[in] orc_CurrentIndex Current child index to get signal index for
+   \param[in]  orc_CurrentIndex  Current child index to get signal index for
 
    \return
    Translated signal index
@@ -1193,9 +1222,9 @@ uint32 C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const QModelIndex & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Translate message tree indices to signal index
 
-   \param[in] os32_MessageIndex  Top level row
-   \param[in] os32_SignalIndex   Signal index
-   \param[in] os32_SignalIndexL2 Second level row (optional)
+   \param[in]  os32_MessageIndex    Top level row
+   \param[in]  os32_SignalIndex     Signal index
+   \param[in]  os32_SignalIndexL2   Second level row (optional)
 
    \return
    Translated signal index
@@ -1282,7 +1311,7 @@ uint32 C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const sint32 os32_Messa
 
    Only handle continuous mode storage
 
-   \param[in] orc_Data New row content
+   \param[in]  orc_Data    New row content
 
    \return
    Indices of added rows (only valid if not in unique message mode)
@@ -1291,7 +1320,7 @@ uint32 C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const sint32 os32_Messa
 std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C_CamMetTreeLoggerData> & orc_Data)
 {
    std::vector<sint32> c_Retval;
-   if (orc_Data.size() > 0)
+   if (orc_Data.empty() == false)
    {
       //Columns which need to get updated on change of static message
       const uint32 u32_CompleteSize = static_cast<uint32>(this->mc_DataBase.size()) +
@@ -1313,7 +1342,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
             C_TblTreSimpleItem * const pc_Item = new C_TblTreSimpleItem();
             this->mc_DataBase.push_back(*c_ItData);
             //Add tree item
-            m_UpdateTreeItemBasedOnMessage(pc_Item, *c_ItData, true, false, -1);
+            m_UpdateTreeItemBasedOnMessage(pc_Item, *c_ItData, false, -1);
             this->mpc_RootItemContinuous->AddChild(pc_Item);
          }
          //Appending so notify model of insert action
@@ -1335,7 +1364,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
               c_ItData != orc_Data.end(); ++c_ItData)
          {
             C_TblTreSimpleItem * const pc_Item = new C_TblTreSimpleItem();
-            m_UpdateTreeItemBasedOnMessage(pc_Item, *c_ItData, true, false, -1);
+            m_UpdateTreeItemBasedOnMessage(pc_Item, *c_ItData, false, -1);
             //1. insert until space is no longer available
             if (this->mc_DataBase.size() < C_CamMetTreeModel::mhu32_MAX_STORAGE)
             {
@@ -1383,7 +1412,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
             C_TblTreSimpleItem * const pc_Item = new C_TblTreSimpleItem();
             this->mc_DataBase[this->mu32_OldestItemIndex] = *c_ItData;
             //Replace tree item
-            m_UpdateTreeItemBasedOnMessage(pc_Item, *c_ItData, true, false, -1);
+            m_UpdateTreeItemBasedOnMessage(pc_Item, *c_ItData, false, -1);
             delete (this->mpc_RootItemContinuous->c_Children[0UL]);
             this->mpc_RootItemContinuous->c_Children.erase(this->mpc_RootItemContinuous->c_Children.begin());
             this->mpc_RootItemContinuous->AddChild(pc_Item);
@@ -1423,12 +1452,12 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
 
    Only handle unique mode storage
 
-   \param[in] orc_Data New row content
+   \param[in]  orc_Data    New row content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_AddRowsUnique(const std::list<C_CamMetTreeLoggerData> & orc_Data)
 {
-   if (orc_Data.size() > 0)
+   if (orc_Data.empty() == false)
    {
       //Every time
       for (std::list<C_CamMetTreeLoggerData>::const_iterator c_ItData = orc_Data.begin();
@@ -1455,9 +1484,9 @@ void C_CamMetTreeModel::m_AddRowsUnique(const std::list<C_CamMetTreeLoggerData> 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle new unique message for existing unique message entry
 
-   \param[in] orc_Message            New message
-   \param[in] orc_ExistingMessageKey Key to use to find the existing message position
-   \param[in] os32_MultiplexerValue  Current multiplexer value
+   \param[in]  orc_Message             New message
+   \param[in]  orc_ExistingMessageKey  Key to use to find the existing message position
+   \param[in]  os32_MultiplexerValue   Current multiplexer value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C_CamMetTreeLoggerData & orc_Message,
@@ -1471,11 +1500,13 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
    const uint64 u64_NewAbsoluteTimestampValue = orc_Message.u64_TimeStampAbsolute;
    uint64 u64_RelativeTimestamp;
 
-   const uint32 u32_MsgTimeStamp = static_cast<uint32>(rc_Message.c_CanMsg.u64_TimeStamp / 1000ULL);
+   const uint32 u32_PrevMsgTimeStamp = static_cast<uint32>(rc_Message.c_CanMsg.u64_TimeStamp / 1000ULL);
+   const uint32 u32_NewMsgTimeStamp = static_cast<uint32>(orc_Message.c_CanMsg.u64_TimeStamp / 1000ULL);
 
    // Save previous values which are not filled by C_SyvComMessageMonitor
    const C_CamMetTreeLoggerDataGreyOutInformation c_PreviousInfo =
-      C_CamMetTreeModel::mh_ExtractPreviousGreyOutInformation(rc_Message, orc_Message, u32_MsgTimeStamp,
+      C_CamMetTreeModel::mh_ExtractPreviousGreyOutInformation(rc_Message, orc_Message, u32_PrevMsgTimeStamp,
+                                                              u32_NewMsgTimeStamp,
                                                               os32_MultiplexerValue,
                                                               q_UpdateDataTimeStamp);
 
@@ -1483,7 +1514,7 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
    C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(rc_Message, orc_Message, os32_MultiplexerValue);
 
    C_CamMetTreeModel::mh_ApplyPreviousGreyOutInformation(rc_Message, c_PreviousInfo, q_UpdateDataTimeStamp,
-                                                         u32_MsgTimeStamp);
+                                                         u32_PrevMsgTimeStamp);
 
    //Handle relative timestamp value
    if (u64_NewAbsoluteTimestampValue > u64_PreviousAbsoluteTimestampValue)
@@ -1512,7 +1543,7 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
    }
    //Update existing tree item
    m_UpdateTreeItemBasedOnMessage(this->mpc_RootItemStatic->c_Children[static_cast<uint32>(s32_Counter)], rc_Message,
-                                  false, true, s32_Counter);
+                                  true, s32_Counter);
    //Notify the model of data changes for all replaced items (current: all items)
    if (this->mq_UniqueMessageMode == true)
    {
@@ -1534,8 +1565,8 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle new unique message entry
 
-   \param[in] orc_Message           New message
-   \param[in] os32_MultiplexerValue Current multiplexer value
+   \param[in]  orc_Message             New message
+   \param[in]  os32_MultiplexerValue   Current multiplexer value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_HandleNewUniqueMessage(const C_CamMetTreeLoggerData & orc_Message,
@@ -1550,7 +1581,7 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessage(const C_CamMetTreeLoggerData & 
    C_TblTreSimpleItem * const pc_NewItem = new C_TblTreSimpleItem();
    const sintn sn_EstimatedPosIndex = this->m_GetPosIndexForUniqueMessage(orc_Message.c_TimeStampAbsolute);
    //Update tree with known index
-   m_UpdateTreeItemBasedOnMessage(pc_NewItem, orc_Message, false, false, sn_EstimatedPosIndex);
+   m_UpdateTreeItemBasedOnMessage(pc_NewItem, orc_Message, false, sn_EstimatedPosIndex);
    this->mpc_RootItemStatic->InsertChild(sn_EstimatedPosIndex, pc_NewItem);
 
    if (this->mq_UniqueMessageMode == true)
@@ -1590,7 +1621,7 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessage(const C_CamMetTreeLoggerData & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get message row index for the current timestamp (may be estimated)
 
-   \param[in] orc_AbsoluteTimeStamp Time stamp to work with
+   \param[in]  orc_AbsoluteTimeStamp   Time stamp to work with
 
    \return
    Index of new message (may be estimated)
@@ -1726,7 +1757,7 @@ void C_CamMetTreeModel::m_GrayOutTimer(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Detects the necessary transparency step dependent of the difference time
 
-   \param[in] ou32_DiffTime Difference time
+   \param[in]  ou32_DiffTime  Difference time
 
    \return
    Detected transparency step
@@ -1763,7 +1794,7 @@ sintn C_CamMetTreeModel::mh_GetTransparencyStep(const uint32 ou32_DiffTime)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get list of strings
 
-   \param[in] orc_Message Message to evaluate
+   \param[in]  orc_Message    Message to evaluate
 
    \return
    List of strings
@@ -1793,8 +1824,8 @@ std::vector<QStringList> C_CamMetTreeModel::mh_GetCount(const C_CamMetTreeLogger
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Resize string to the specified maximum length if the string exceeds this limit
 
-   \param[in,out] orc_Str        String that will get resized if necessary
-   \param[in]     os32_MaxLength Maximum length the string may not exceed after calling this function
+   \param[in,out]  orc_Str          String that will get resized if necessary
+   \param[in]      os32_MaxLength   Maximum length the string may not exceed after calling this function
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::mh_ResizeIfNecessary(QString & orc_Str, const sint32 os32_MaxLength)
@@ -1805,21 +1836,22 @@ void C_CamMetTreeModel::mh_ResizeIfNecessary(QString & orc_Str, const sint32 os3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update tree item based on message
 
-   \param[in,out] opc_Item        Item to update
-   \param[in]     orc_Message     Message to update from
-   \param[in]     oq_IsContinuous Flag if tree item is for continuos mode (simplified handling)
-   \param[in]     oq_SignalInsert Flag if begin and end insert should be called
-   \param[in]     os32_Row        Message row index
+   \param[in,out]  opc_Item         Item to update
+   \param[in]      orc_Message      Message to update from
+   \param[in]      oq_IsContinuous  Flag if tree item is for continuous mode (simplified handling)
+   \param[in]      oq_SignalInsert  Flag if begin and end insert should be called
+   \param[in]      os32_Row         Message row index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * const opc_Item,
                                                        const C_CamMetTreeLoggerData & orc_Message,
-                                                       const bool oq_IsContinuous, const bool oq_SignalInsert,
-                                                       const sint32 os32_Row)
+                                                       const bool oq_SignalInsert, const sint32 os32_Row)
 {
-   if (oq_IsContinuous)
+   const std::vector<sintn> c_Order = C_CamMetTreeModel::mh_GetMultiplexerOrder(orc_Message);
+
+   if (c_Order.size() == 0UL)
    {
-      //Each signal gets one child element
+      //Normal message
       if (opc_Item->c_Children.size() < orc_Message.c_Signals.size())
       {
          if ((oq_SignalInsert) && (os32_Row >= 0))
@@ -1861,120 +1893,91 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
    }
    else
    {
-      const std::vector<sintn> c_Order = C_CamMetTreeModel::mh_GetMultiplexerOrder(orc_Message);
-      if (c_Order.size() == 0UL)
+      std::vector<uint32> c_Expected;
+      std::vector<uint32> c_Current;
+      //Multiplexer
+      for (uint32 u32_ItOr = 0UL; u32_ItOr < c_Order.size(); ++u32_ItOr)
       {
-         //Normal message
-         if (opc_Item->c_Children.size() < orc_Message.c_Signals.size())
+         uint32 u32_Counter = 0UL;
+         for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
          {
-            //Insert
-            for (uint32 u32_ItSig = opc_Item->c_Children.size(); u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+            const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
+            if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
             {
-               opc_Item->AddChild(new C_TblTreSimpleItem());
+               if (rc_SignalData.c_OscSignal.u16_MultiplexValue == c_Order[u32_ItOr])
+               {
+                  ++u32_Counter;
+               }
             }
          }
-         else if (opc_Item->c_Children.size() > orc_Message.c_Signals.size())
+         c_Expected.push_back(u32_Counter);
+      }
+      //Others
+      for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+      {
+         const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
+         if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
          {
-            //Reset
-            opc_Item->ClearChildren();
-            for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+            c_Expected.push_back(0UL);
+         }
+      }
+      //Current state
+      c_Current.reserve(opc_Item->c_Children.size());
+      for (uint32 u32_ItChild = 0UL; u32_ItChild < opc_Item->c_Children.size(); ++u32_ItChild)
+      {
+         const C_TblTreSimpleItem * const pc_Child = opc_Item->c_Children[u32_ItChild];
+         if (pc_Child != NULL)
+         {
+            c_Current.push_back(pc_Child->c_Children.size());
+         }
+      }
+      //Compare
+      if (c_Expected != c_Current)
+      {
+         uint32 u32_InsertAt = 0UL;
+         uint32 u32_InsertNum = 0UL;
+         const bool q_FixByInsertingNewChild = C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(c_Expected,
+                                                                                                    c_Current,
+                                                                                                    u32_InsertAt,
+                                                                                                    u32_InsertNum);
+         if (q_FixByInsertingNewChild)
+         {
+            if ((oq_SignalInsert) && (os32_Row >= 0))
             {
-               opc_Item->AddChild(new C_TblTreSimpleItem());
+               this->beginInsertRows(this->index(os32_Row, 0), u32_InsertAt, u32_InsertAt);
+            }
+            C_TblTreSimpleItem * const pc_Parent = new C_TblTreSimpleItem();
+            for (uint32 u32_ItChild = 0UL; u32_ItChild < u32_InsertNum; ++u32_ItChild)
+            {
+               pc_Parent->AddChild(new C_TblTreSimpleItem());
+            }
+            opc_Item->InsertChild(u32_InsertAt, pc_Parent);
+            if ((oq_SignalInsert) && (os32_Row >= 0))
+            {
+               this->endInsertRows();
             }
          }
          else
          {
-            //Nothing to do
-         }
-      }
-      else
-      {
-         std::vector<uint32> c_Expected;
-         std::vector<uint32> c_Current;
-         //Multiplexer
-         for (uint32 u32_ItOr = 0UL; u32_ItOr < c_Order.size(); ++u32_ItOr)
-         {
-            uint32 u32_Counter = 0UL;
-            for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+            if ((oq_SignalInsert) && (os32_Row >= 0))
             {
-               const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
-               if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
-               {
-                  if (rc_SignalData.c_OscSignal.u16_MultiplexValue == c_Order[u32_ItOr])
-                  {
-                     ++u32_Counter;
-                  }
-               }
+               this->beginResetModel();
             }
-            c_Expected.push_back(u32_Counter);
-         }
-         //Others
-         for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
-         {
-            const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
-            if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
+            //Clear
+            opc_Item->ClearChildren();
+            //Rebuild as expected
+            for (uint32 u32_ItExpected = 0UL; u32_ItExpected < c_Expected.size(); ++u32_ItExpected)
             {
-               c_Expected.push_back(0UL);
-            }
-         }
-         //Current state
-         c_Current.reserve(opc_Item->c_Children.size());
-         for (uint32 u32_ItChild = 0UL; u32_ItChild < opc_Item->c_Children.size(); ++u32_ItChild)
-         {
-            const C_TblTreSimpleItem * const pc_Child = opc_Item->c_Children[u32_ItChild];
-            if (pc_Child != NULL)
-            {
-               c_Current.push_back(pc_Child->c_Children.size());
-            }
-         }
-         //Compare
-         if (c_Expected != c_Current)
-         {
-            uint32 u32_InsertAt = 0UL;
-            uint32 u32_InsertNum = 0UL;
-            const bool q_FixByInsertingNewChild = C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(c_Expected,
-                                                                                                       c_Current,
-                                                                                                       u32_InsertAt,
-                                                                                                       u32_InsertNum);
-            if (q_FixByInsertingNewChild)
-            {
-               if ((oq_SignalInsert) && (os32_Row >= 0))
-               {
-                  this->beginInsertRows(this->index(os32_Row, 0), u32_InsertAt, u32_InsertAt);
-               }
                C_TblTreSimpleItem * const pc_Parent = new C_TblTreSimpleItem();
-               for (uint32 u32_ItChild = 0UL; u32_ItChild < u32_InsertNum; ++u32_ItChild)
+               for (uint32 u32_ItChild = 0UL; u32_ItChild < c_Expected[u32_ItExpected]; ++u32_ItChild)
                {
                   pc_Parent->AddChild(new C_TblTreSimpleItem());
                }
-               opc_Item->InsertChild(u32_InsertAt, pc_Parent);
-               if ((oq_SignalInsert) && (os32_Row >= 0))
-               {
-                  this->endInsertRows();
-               }
+               opc_Item->AddChild(pc_Parent);
             }
-            else
+            if ((oq_SignalInsert) && (os32_Row >= 0))
             {
-               if ((oq_SignalInsert) && (os32_Row >= 0))
-               {
-                  this->beginResetModel();
-               }
-               //Clear
-               opc_Item->ClearChildren();
-               //Rebuild as expected
-               for (uint32 u32_ItExpected = 0UL; u32_ItExpected < c_Expected.size(); ++u32_ItExpected)
-               {
-                  C_TblTreSimpleItem * const pc_Parent = new C_TblTreSimpleItem();
-                  for (uint32 u32_ItChild = 0UL; u32_ItChild < c_Expected[u32_ItExpected]; ++u32_ItChild)
-                  {
-                     pc_Parent->AddChild(new C_TblTreSimpleItem());
-                  }
-                  opc_Item->AddChild(pc_Parent);
-               }
-               if ((oq_SignalInsert) && (os32_Row >= 0))
-               {
-                  this->endResetModel();
-               }
+               this->endResetModel();
             }
          }
       }
@@ -1985,11 +1988,12 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Extract previous gray out value information to handle new message
 
-   \param[in]  orc_MessagePrev         Previous message information
-   \param[in]  orc_MessageNew          New message information
-   \param[in]  ou32_PrevMsgTimeStamp   Previous message timestamp
-   \param[in]  os32_MultiplexerValue   New multiplexer value
-   \param[out] orq_UpdateDataTimeStamp Flag if data timestamp should be updated
+   \param[in]   orc_MessagePrev           Previous message information
+   \param[in]   orc_MessageNew            New message information
+   \param[in]   ou32_PrevMsgTimeStamp     Previous message timestamp
+   \param[in]   ou32_NewMsgTimeStamp      New message time stamp
+   \param[in]   os32_MultiplexerValue     New multiplexer value
+   \param[out]  orq_UpdateDataTimeStamp   Flag if data timestamp should be updated
 
    \return
    Current gray out value information
@@ -1997,7 +2001,8 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeLoggerDataGreyOutInformation C_CamMetTreeModel::mh_ExtractPreviousGreyOutInformation(
    const C_CamMetTreeLoggerData & orc_MessagePrev, const C_CamMetTreeLoggerData & orc_MessageNew,
-   const uint32 ou32_PrevMsgTimeStamp, const sint32 os32_MultiplexerValue, bool & orq_UpdateDataTimeStamp)
+   const uint32 ou32_PrevMsgTimeStamp, const uint32 ou32_NewMsgTimeStamp, const sint32 os32_MultiplexerValue,
+   bool & orq_UpdateDataTimeStamp)
 {
    C_CamMetTreeLoggerDataGreyOutInformation c_Retval;
 
@@ -2059,7 +2064,7 @@ C_CamMetTreeLoggerDataGreyOutInformation C_CamMetTreeModel::mh_ExtractPreviousGr
    //Update specific timestamp of multiplexer map
    if (os32_MultiplexerValue >= 0)
    {
-      c_Retval.c_MapMultiplexerValueToChangedTimeStamps[os32_MultiplexerValue] = ou32_PrevMsgTimeStamp;
+      c_Retval.c_MapMultiplexerValueToChangedTimeStamps[os32_MultiplexerValue] = ou32_NewMsgTimeStamp;
    }
    return c_Retval;
 }
@@ -2067,10 +2072,10 @@ C_CamMetTreeLoggerDataGreyOutInformation C_CamMetTreeModel::mh_ExtractPreviousGr
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply previous gray out value to new message
 
-   \param[in,out] orc_Message                  Message to overwrite
-   \param[in]     orc_StoredGrayOutInformation Stored gray out information
-   \param[in]     oq_UpdateDataTimeStamp       Flag to update the data timestamps
-   \param[in]     ou32_PrevMsgTimeStamp        Previous message timestamp
+   \param[in,out]  orc_Message                     Message to overwrite
+   \param[in]      orc_StoredGrayOutInformation    Stored gray out information
+   \param[in]      oq_UpdateDataTimeStamp          Flag to update the data timestamps
+   \param[in]      ou32_PrevMsgTimeStamp           Previous message timestamp
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::mh_ApplyPreviousGreyOutInformation(C_CamMetTreeLoggerData & orc_Message,
@@ -2107,7 +2112,7 @@ void C_CamMetTreeModel::mh_ApplyPreviousGreyOutInformation(C_CamMetTreeLoggerDat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get multiplexer value ordering
 
-   \param[in] orc_Message Message to look for multiplexer
+   \param[in]  orc_Message    Message to look for multiplexer
 
    \return
    Multiplexer value ordering
@@ -2133,10 +2138,10 @@ std::vector<sintn> C_CamMetTreeModel::mh_GetMultiplexerOrder(const C_CamMetTreeL
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if the difference between the two vectors can be fixed by inserting a new item
 
-   \param[in]  orc_ExpectedVec Expected vector
-   \param[in]  orc_CurrentVec  Current vector
-   \param[out] oru32_InsertAt  Position to insert new item at
-   \param[out] oru32_InsertNum New value to insert at this position
+   \param[in]   orc_ExpectedVec  Expected vector
+   \param[in]   orc_CurrentVec   Current vector
+   \param[out]  oru32_InsertAt   Position to insert new item at
+   \param[out]  oru32_InsertNum  New value to insert at this position
 
    \retval true  A valid solution was found
    \retval false No valid solution could be found
@@ -2206,9 +2211,9 @@ bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Copy the new message content while keeping relevant signals from the previous message content
 
-   \param[in,out] orc_PreviousMessage Previous message content
-   \param[in]     orc_NewMessage      New message content
-   \param[in]     os32_MuxValue       Mux value
+   \param[in,out]  orc_PreviousMessage    Previous message content
+   \param[in]      orc_NewMessage         New message content
+   \param[in]      os32_MuxValue          Mux value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(C_CamMetTreeLoggerData & orc_PreviousMessage,
@@ -2277,7 +2282,7 @@ void C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(C_CamMetTreeLogg
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get multiplexer value for this instance of a message
 
-   \param[in] orc_Message Message to search the multiplexer value in
+   \param[in]  orc_Message    Message to search the multiplexer value in
 
    \return
    -1:   invalid
@@ -2303,8 +2308,8 @@ sint32 C_CamMetTreeModel::mh_GetMultiplexerValue(const C_CamMetTreeLoggerData & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get row in message for multiplexer value
 
-   \param[in] orc_Message           Message to search in
-   \param[in] os32_MultiplexerValue Multiplexer value to search for
+   \param[in]  orc_Message             Message to search in
+   \param[in]  os32_MultiplexerValue   Multiplexer value to search for
 
    \return
    -1:   invalid

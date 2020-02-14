@@ -50,7 +50,7 @@ public:
 
    C_PuiBsLineArrow();
 
-   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
 
    QColor c_UIColorDark;
    E_ArrowHeadType e_StartArrowHeadType;

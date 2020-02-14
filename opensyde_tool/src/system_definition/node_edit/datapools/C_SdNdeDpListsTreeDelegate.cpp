@@ -57,7 +57,7 @@ C_SdNdeDpListsTreeDelegate::C_SdNdeDpListsTreeDelegate(QObject * const opc_Paren
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeDelegate::SetDataPool(const stw_types::uint32 ou32_NodeIndex,
-                                                   const stw_types::uint32 ou32_DataPoolIndex)
+                                             const stw_types::uint32 ou32_DataPoolIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mu32_DataPoolIndex = ou32_DataPoolIndex;
@@ -73,8 +73,7 @@ void C_SdNdeDpListsTreeDelegate::SetDataPool(const stw_types::uint32 ou32_NodeIn
    Item size
 */
 //----------------------------------------------------------------------------------------------------------------------
-QSize C_SdNdeDpListsTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option,
-                                                 const QModelIndex & orc_Index) const
+QSize C_SdNdeDpListsTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const
 {
    QSize c_Retval = QStyledItemDelegate::sizeHint(orc_Option, orc_Index);
 
@@ -84,10 +83,10 @@ QSize C_SdNdeDpListsTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Opti
       {
          //dynamic
          const stw_types::sint32 s32_Height = C_SdNdeDpUtil::h_GetTableSize(this->mu32_NodeIndex,
-                                                                                  this->mu32_DataPoolIndex,
-                                                                                  static_cast<uint32>(orc_Index.parent()
-                                                                                                      .row()),
-                                                                                  this->msn_MaximumHeight);
+                                                                            this->mu32_DataPoolIndex,
+                                                                            static_cast<uint32>(orc_Index.parent()
+                                                                                                .row()),
+                                                                            this->msn_MaximumHeight);
          c_Retval.setHeight(s32_Height);
       }
       else

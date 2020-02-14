@@ -130,7 +130,7 @@
     <number>0</number>
    </property>
    <item row="0" column="0">
-    <widget class="QLabel" name="pc_LabelSearchNotFound">
+    <widget class="stw_opensyde_gui_elements::C_OgeLabToolBarNoSearchResult" name="pc_LabelSearchNotFound">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -142,12 +142,6 @@
        <width>0</width>
        <height>40</height>
       </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>Calibri</family>
-       <pointsize>14</pointsize>
-      </font>
      </property>
      <property name="text">
       <string>No results</string>
@@ -210,11 +204,7 @@
             <number>14</number>
            </property>
            <item row="0" column="0">
-            <layout class="QVBoxLayout" name="pc_VerticalLayout1">
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-            </layout>
+            <layout class="QVBoxLayout" name="pc_VerticalLayout1"/>
            </item>
           </layout>
          </widget>
@@ -369,7 +359,7 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QWidget" name="pc_BlankTopWidgetSearch" native="true">
+    <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_BlankTopWidgetSearch" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -390,7 +380,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QWidget" name="pc_BlankWidgetSearch" native="true">
+      <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_BlankWidgetSearch" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -459,6 +449,11 @@
    <extends>QWidget</extends>
    <header>C_OgeWiOnlyBackground.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabToolBarNoSearchResult</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabToolBarNoSearchResult.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

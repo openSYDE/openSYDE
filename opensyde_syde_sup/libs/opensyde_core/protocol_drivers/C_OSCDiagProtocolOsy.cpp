@@ -158,7 +158,7 @@ sint32 C_OSCDiagProtocolOsy::Cycle(void)
    \return
    C_NO_ERR   request sent, positive response with expected size received
    C_RANGE    data pool, list, element index out of range (checked by client-side function)
-   C_NOACT    could not send request (TX buffer full)
+   C_NOACT    could not send request (Tx buffer full)
    C_CONFIG   transport protocol not installed
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -188,7 +188,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
    \return
    C_NO_ERR   request sent, positive response with expected size received
    C_RANGE    data pool, list, element index out of range (checked by client-side function)
-   C_NOACT    could not send request (TX buffer full)
+   C_NOACT    could not send request (Tx buffer full)
    C_CONFIG   transport protocol not installed
    C_WARN     error response
    C_RD_WR    malformed protocol response (e.g. reported size does not match expected size)
@@ -227,7 +227,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
    \return
    C_NO_ERR   request sent, positive response received
    C_RANGE    data pool, list, element index out of range (checked by client-side function)
-   C_NOACT    could not send request (TX buffer full)
+   C_NOACT    could not send request (Tx buffer full)
    C_CONFIG   transport protocol not installed
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -257,7 +257,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
    \return
    C_NO_ERR   request sent, positive response received
    C_RANGE    data pool, list, element index out of range (checked by client-side function)
-   C_NOACT    could not send request (TX buffer full)
+   C_NOACT    could not send request (Tx buffer full)
    C_CONFIG   transport protocol not installed
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -289,7 +289,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, c
    \return
    C_NO_ERR   request sent, positive response received (or: rail value remembered)
    C_RANGE    parameter out of range (checked by client-side function)
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -319,7 +319,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolSetEventDataRate(const uint8 ou8_Rail, cons
    \return
    C_NO_ERR   request sent
    C_RANGE    parameter out of range (checked by client-side function)
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -353,7 +353,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, c
    \return
    C_NO_ERR   request sent
    C_RANGE    parameter out of range (checked by client-side function)
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -378,7 +378,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
    \return
    C_NO_ERR   request sent
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -401,7 +401,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolStopEventDriven(void)
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_COM      expected server response not received because of communication error
@@ -451,7 +451,7 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteStartTransaction(const uint8 ou8_DataPoolIn
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response
@@ -492,28 +492,71 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteFinalizeTransaction(void)
 
    \param[in]  ou8_DataPoolIndex   Data pool index
    \param[out] orau8_Version       Read version; format: see function description
+   \param[out] opu8_NrCode         if != NULL: negative response code in case of an error response
 
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3])
+sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3],
+                                                 stw_types::uint8 * const opu8_NrCode)
 {
    sint32 s32_Retval;
    C_DataPoolMetaData c_MetaData;
 
-   s32_Retval = this->OsyReadDataPoolMetaData(ou8_DataPoolIndex, c_MetaData);
+   s32_Retval = this->OsyReadDataPoolMetaData(ou8_DataPoolIndex, c_MetaData, opu8_NrCode);
 
    if (s32_Retval == C_NO_ERR)
    {
       orau8_Version[0] = c_MetaData.au8_Version[0];
       orau8_Version[1] = c_MetaData.au8_Version[1];
       orau8_Version[2] = c_MetaData.au8_Version[2];
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read Datapool meta data
+
+   Version format: One byte for Major, Minor, Release
+
+   Example: v1.23r4 in 3 Bytes   -> (0x01, 0x17, 0x04)
+
+   \param[in]  ou8_DataPoolIndex   Datapool index
+   \param[out] orau8_Version       Read version; format: see function description
+   \param[out] orc_Name            Read name of Datapool
+   \param[out] opu8_NrCode         if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received; or: no action required
+   C_RANGE    data pool index is zero
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not send protocol request
+   C_CONFIG   CAN dispatcher not installed
+   C_WARN     error response
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCDiagProtocolOsy::DataPoolReadMetaData(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3],
+                                                  stw_scl::C_SCLString & orc_Name, stw_types::uint8 * const opu8_NrCode)
+{
+   sint32 s32_Retval;
+   C_DataPoolMetaData c_MetaData;
+
+   s32_Retval = this->OsyReadDataPoolMetaData(ou8_DataPoolIndex, c_MetaData, opu8_NrCode);
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      orau8_Version[0] = c_MetaData.au8_Version[0];
+      orau8_Version[1] = c_MetaData.au8_Version[1];
+      orau8_Version[2] = c_MetaData.au8_Version[2];
+
+      orc_Name = c_MetaData.c_Name;
    }
 
    return s32_Retval;
@@ -535,7 +578,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, 
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data pool index)
@@ -568,7 +611,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolVerify(const uint8 ou8_DataPoolIndex, const
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data pool or list index)

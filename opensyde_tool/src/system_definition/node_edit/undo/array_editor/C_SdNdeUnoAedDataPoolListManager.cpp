@@ -51,22 +51,27 @@ C_SdNdeUnoAedDataPoolListManager::C_SdNdeUnoAedDataPoolListManager(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do data change
 
-   \param[in]     oru32_NodeIndex         Node index
-   \param[in]     oru32_DataPoolIndex     Node data pool index
-   \param[in]     oru32_ListIndex         Node data pool list index
-   \param[in]     oru32_ElementIndex      Node data pool list element index
-   \param[in]     ore_ArrayEditType       Enum for node data pool list element variable
-   \param[in]     oru32_DataSetIndex      If min or max use 0
-                                          Else use data set index
-   \param[in]     oru32_ArrayElementIndex Array index
-   \param[in]     orc_NewData             New data
+   \param[in]        oru32_NodeIndex                     Node index
+   \param[in]        oru32_DataPoolIndex                 Node data pool index
+   \param[in]        oru32_ListIndex                     Node data pool list index
+   \param[in]        oru32_ElementIndex                  Node data pool list element index
+   \param[in]        ore_ArrayEditType                   Enum for node data pool list element variable
+   \param[in]        oru32_DataSetIndex                  If min or max use 0
+                                                         Else use data set index
+   \param[in]        oru32_ArrayElementIndex             Array index
+   \param[in]        orc_NewData                         New data
+   \param[in,out]    opc_DataPoolListModelViewManager    Data pool lists model view manager to get objects to perform
+                                                         actions on
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoAedDataPoolListManager::DoDataChangeElements(const uint32 & oru32_NodeIndex,
                                                             const uint32 & oru32_DataPoolIndex,
                                                             const uint32 & oru32_ListIndex,
                                                             const uint32 & oru32_ElementIndex,
-                                                            const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType, const uint32 & oru32_DataSetIndex, const uint32 & oru32_ArrayElementIndex, const QVariant & orc_NewData,
+                                                            const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                                            const uint32 & oru32_DataSetIndex,
+                                                            const uint32 & oru32_ArrayElementIndex,
+                                                            const QVariant & orc_NewData,
                                                             C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager)
 {
    QUndoCommand * pc_Command;

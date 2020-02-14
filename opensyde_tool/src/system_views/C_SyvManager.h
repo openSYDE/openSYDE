@@ -48,7 +48,8 @@ Q_SIGNALS:
    void SigReloadNaviBarSystemViewNames(void) const;
    void SigChangeMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode = 0,
                       const stw_types::uint32 ou32_Index = 0U, const QString & orc_Name = "",
-                      const QString & orc_SubSubMode = "", const stw_types::uint32 ou32_Flag = 0U);
+                      const QString & orc_SubSubMode = "", const stw_types::uint32 ou32_Flag = 0U,
+                      const bool oq_ChangeUseCase = false);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

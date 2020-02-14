@@ -30,6 +30,9 @@ public:
 
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
+   static const stw_types::uint16 hu16_HIGHEST_KNOWN_CODE_VERSION = 4U;
+   ///< highest known code format version in openSYDE core library
+
    enum E_Type ///< possible application types
    {
       eBINARY = 0,              ///< Type for address based flash access devices. E.g.: Intel Hex file.

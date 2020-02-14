@@ -38,7 +38,7 @@ public:
    //lint -restore
 
 protected:
-   virtual void m_Init(void);
+   virtual void m_Init(void) override;
 
 private:
    static stw_types::sint32 mh_GetUValue(const QString & orc_Input, stw_types::uint64 & oru64_Output);

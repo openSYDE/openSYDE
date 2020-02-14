@@ -251,13 +251,48 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the tester present message to a specific node
+
+   \param[in]     orc_ServerId     Node to send the tester present
+
+   \return
+   C_NO_ERR    All nodes set to session successfully
+   C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
+   C_COM       Error of service
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::SendTesterPresent(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId)
+const
+{
+   sint32 s32_Return = C_CONFIG;
+
+   if (this->mq_Initialized == true)
+   {
+      C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->m_GetOsyProtocol(orc_ServerId);
+      if (pc_ProtocolOsy != NULL)
+      {
+         // Send tester present message without expecting a response
+         s32_Return = pc_ProtocolOsy->OsyTesterPresent(1U);
+
+         if (s32_Return != C_NO_ERR)
+         {
+            // No response expected. All errors caused by client. We can break here.
+            s32_Return = C_COM;
+         }
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize the necessary routing configuration to start the routing for one specific server
 
    Prepares all active nodes with its routing configurations if necessary
    Three different types of routing:
-   - openSYDE routing for a openSYDE server
+   - openSYDE routing for an openSYDE server
    - legacy routing for a non openSYDE server
-   - legacy routing for a non openSYDE after openSYDE routing to a openSYDE server
+   - legacy routing for a non openSYDE after openSYDE routing to an openSYDE server
 
    \param[in]   ou32_NodeIndex         node index to read from
    \param[out]  opu32_ErrorNodeIndex   optional pointer for node index which caused the error on starting routing if
@@ -267,7 +302,7 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const 
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -540,6 +575,92 @@ void C_OSCComDriverProtocol::GetRouteOfNode(const uint32 ou32_NodeIndex, C_OSCRo
          orc_Route = this->mc_Routes[u32_ActiveIndex];
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the used interface type of the node on its route
+
+   \param[in]   ou32_NodeIndex         Node index to get info from
+   \param[out]  ore_InterfaceType      Used interface type of target node on its route
+
+   \retval   C_NO_ERR   Detailed description of 1st return value
+   \retval   C_RANGE    Node index out of range
+   \retval   C_CONFIG   Route of node is not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::GetRoutingTargetInterfaceType(const uint32 ou32_NodeIndex,
+                                                             C_OSCSystemBus::E_Type & ore_InterfaceType) const
+{
+   sint32 s32_Return;
+   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+
+   if (u32_ActiveIndex >= this->mc_ActiveNodesIndexes.size())
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveIndex];
+
+      if (rc_ActRoute.c_VecRoutePoints.size() > 0)
+      {
+         // Check the last routing point. The out interface type is connected to the bus which is
+         // connected to the target
+         ore_InterfaceType = rc_ActRoute.c_VecRoutePoints[rc_ActRoute.c_VecRoutePoints.size() - 1].e_OutInterfaceType;
+
+         s32_Return = C_NO_ERR;
+      }
+      else
+      {
+         s32_Return = C_CONFIG;
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the last route point on route before target
+
+   \param[in]   ou32_NodeIndex         Node index of target of route
+   \param[out]  orc_RouterServerId     Router server Id of last router on route to target ou32_NodeIndex
+
+   \retval   C_NO_ERR   Detailed description of 1st return value
+   \retval   C_RANGE    Node index out of range
+   \retval   C_CONFIG   Route of node is not valid or has no route points
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverProtocol::GetServerIdOfLastRouter(const uint32 ou32_NodeIndex,
+                                                       C_OSCProtocolDriverOsyNode & orc_RouterServerId) const
+{
+   sint32 s32_Return;
+   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+
+   if (u32_ActiveIndex >= this->mc_ActiveNodesIndexes.size())
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveIndex];
+
+      if (rc_ActRoute.c_VecRoutePoints.size() > 0)
+      {
+         // Get the next to last routing point. That is the last router.
+         const uint32 u32_RouterNodeIndex =
+            rc_ActRoute.c_VecRoutePoints[rc_ActRoute.c_VecRoutePoints.size() - 1].u32_NodeIndex;
+
+         orc_RouterServerId = this->mc_ServerIDs[this->m_GetActiveIndex(u32_RouterNodeIndex)];
+
+         s32_Return = C_NO_ERR;
+      }
+      else
+      {
+         s32_Return = C_CONFIG;
+      }
+   }
+
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1564,9 +1685,9 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
 
    Prepares the active nodes on the route with its routing configurations if necessary
    Three different types of routing:
-   - openSYDE routing for a openSYDE server
+   - openSYDE routing for an openSYDE server
    - legacy routing for a non openSYDE server
-   - legacy routing for a non openSYDE after openSYDE routing to a openSYDE server
+   - legacy routing for a non openSYDE after openSYDE routing to an openSYDE server
 
    The routing must be activated to all nodes after each node
    For example:
@@ -1586,7 +1707,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
    \return
    C_NO_ERR   request sent, positive response received or no routing necessary
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
@@ -2478,7 +2599,7 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
                   c_Text += "\" - SetDispatcher - error: ";
                   c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
                   c_Text += "\nC_CONFIG   could not register with dispatcher\n"
-                            "C_NOACT    could not configure RX filter\n";
+                            "C_NOACT    could not configure Rx filter\n";
                   osc_write_log_warning("Asynchronous communication", c_Text.c_str());
                   s32_Retval = C_OVERFLOW;
                }
@@ -2490,7 +2611,7 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
                c_Text += "\" - SetNodeIdentifiers - error: ";
                c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
                c_Text += "\nC_RANGE    client and/or server identifier out of range\n"
-                         "C_NOACT    could not reconfigure RX filters\n";
+                         "C_NOACT    could not reconfigure Rx filters\n";
                osc_write_log_warning("Asynchronous communication", c_Text.c_str());
                s32_Retval = C_OVERFLOW;
             }
@@ -2509,7 +2630,7 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
                   C_SCLString c_Text = "Broadcast - SetDispatcher - error: ";
                   c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
                   c_Text += "\nC_CONFIG   could not register with dispatcher\n"
-                            "C_NOACT    could not configure RX filter\n";
+                            "C_NOACT    could not configure Rx filter\n";
                   osc_write_log_warning("Asynchronous communication", c_Text.c_str());
                   s32_Retval = C_OVERFLOW;
                }
@@ -2519,7 +2640,7 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
                C_SCLString c_Text = "Broadcast - SetNodeIdentifiers - error: ";
                c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
                c_Text += "\nC_RANGE    client and/or server identifier out of range\n"
-                         "C_NOACT    could not reconfigure RX filters\n";
+                         "C_NOACT    could not reconfigure Rx filters\n";
                osc_write_log_warning("Asynchronous communication", c_Text.c_str());
                s32_Retval = C_OVERFLOW;
             }

@@ -38,7 +38,7 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListModelViewManager::C_SdNdeDpListModelViewManager(QObject * const opc_Parent) :
@@ -89,9 +89,9 @@ void C_SdNdeDpListModelViewManager::Clear(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data set view
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 
    \return
    NULL Not registered
@@ -99,8 +99,8 @@ void C_SdNdeDpListModelViewManager::Clear(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListDataSetView * C_SdNdeDpListModelViewManager::GetDataSetView(const uint32 & oru32_NodeIndex,
-                                                                                     const uint32 & oru32_DataPoolIndex,
-                                                                                     const uint32 & oru32_ListIndex)
+                                                                         const uint32 & oru32_DataPoolIndex,
+                                                                         const uint32 & oru32_ListIndex)
 {
    C_SdNdeDpListDataSetView * pc_Retval = NULL;
 
@@ -121,17 +121,17 @@ C_SdNdeDpListDataSetView * C_SdNdeDpListModelViewManager::GetDataSetView(const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data set model
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 
    \return
    Data set model (garanteed)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListDataSetModel * C_SdNdeDpListModelViewManager::GetDataSetModel(const uint32 & oru32_NodeIndex,
-                                                                                       const uint32 & oru32_DataPoolIndex,
-                                                                                       const uint32 & oru32_ListIndex)
+                                                                           const uint32 & oru32_DataPoolIndex,
+                                                                           const uint32 & oru32_ListIndex)
 {
    C_SdNdeDpListDataSetModel * pc_Retval = NULL;
 
@@ -167,13 +167,13 @@ C_SdNdeDpListDataSetModel * C_SdNdeDpListModelViewManager::GetDataSetModel(const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get array edit view
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
-   \param[in] oru32_ElementIndex  Node data pool list element index
-   \param[in] ore_ArrayEditType   Enum for node data pool list element variable
-   \param[in] oru32_DataSetIndex  If min or max use 0
-                                  Else use data set index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
+   \param[in]  oru32_ElementIndex   Node data pool list element index
+   \param[in]  ore_ArrayEditType    Enum for node data pool list element variable
+   \param[in]  oru32_DataSetIndex   If min or max use 0
+                                    Else use data set index
 
    \return
    NULL Not registered
@@ -181,8 +181,11 @@ C_SdNdeDpListDataSetModel * C_SdNdeDpListModelViewManager::GetDataSetModel(const
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListArrayEditView * C_SdNdeDpListModelViewManager::GetArrayEditView(const uint32 & oru32_NodeIndex,
-                                                                                         const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex, const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                                                                         const uint32 & oru32_DataSetIndex)
+                                                                             const uint32 & oru32_DataPoolIndex,
+                                                                             const uint32 & oru32_ListIndex,
+                                                                             const uint32 & oru32_ElementIndex,
+                                                                             const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                                                             const uint32 & oru32_DataSetIndex)
 {
    C_SdNdeDpListArrayEditView * pc_Retval = NULL;
 
@@ -204,22 +207,24 @@ C_SdNdeDpListArrayEditView * C_SdNdeDpListModelViewManager::GetArrayEditView(con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get array edit model
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
-   \param[in] oru32_ElementIndex  Node data pool list element index
-   \param[in] ore_ArrayEditType   Enum for node data pool list element variable
-   \param[in] oru32_DataSetIndex  If min or max use 0
-                                  Else use data set index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
+   \param[in]  oru32_ElementIndex   Node data pool list element index
+   \param[in]  ore_ArrayEditType    Enum for node data pool list element variable
+   \param[in]  oru32_DataSetIndex   If min or max use 0
+                                    Else use data set index
 
    \return
    Array edit model (garanteed)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListArrayEditModel * C_SdNdeDpListModelViewManager::GetArrayEditModel(
-   const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex,
-   const uint32 & oru32_ElementIndex, const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-   const uint32 & oru32_DataSetIndex)
+C_SdNdeDpListArrayEditModel * C_SdNdeDpListModelViewManager::GetArrayEditModel(const uint32 & oru32_NodeIndex,
+                                                                               const uint32 & oru32_DataPoolIndex,
+                                                                               const uint32 & oru32_ListIndex,
+                                                                               const uint32 & oru32_ElementIndex,
+                                                                               const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                                                               const uint32 & oru32_DataSetIndex)
 {
    C_SdNdeDpListArrayEditModel * pc_Retval = NULL;
 
@@ -256,9 +261,9 @@ C_SdNdeDpListArrayEditModel * C_SdNdeDpListModelViewManager::GetArrayEditModel(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get element view
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 
    \return
    NULL Not registered
@@ -266,8 +271,8 @@ C_SdNdeDpListArrayEditModel * C_SdNdeDpListModelViewManager::GetArrayEditModel(
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListTableView * C_SdNdeDpListModelViewManager::GetElementView(const uint32 & oru32_NodeIndex,
-                                                                                   const uint32 & oru32_DataPoolIndex,
-                                                                                   const uint32 & oru32_ListIndex)
+                                                                       const uint32 & oru32_DataPoolIndex,
+                                                                       const uint32 & oru32_ListIndex)
 {
    C_SdNdeDpListTableView * pc_Retval = NULL;
 
@@ -288,17 +293,17 @@ C_SdNdeDpListTableView * C_SdNdeDpListModelViewManager::GetElementView(const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get element model
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 
    \return
    Element model (garanteed)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListTableModel * C_SdNdeDpListModelViewManager::GetElementModel(const uint32 & oru32_NodeIndex,
-                                                                                     const uint32 & oru32_DataPoolIndex,
-                                                                                     const uint32 & oru32_ListIndex)
+                                                                         const uint32 & oru32_DataPoolIndex,
+                                                                         const uint32 & oru32_ListIndex)
 {
    C_SdNdeDpListTableModel * pc_Retval = NULL;
 
@@ -335,16 +340,16 @@ C_SdNdeDpListTableModel * C_SdNdeDpListModelViewManager::GetElementModel(const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register data set view
 
-   \param[in]     oru32_NodeIndex     Node index
-   \param[in]     oru32_DataPoolIndex Node data pool index
-   \param[in]     oru32_ListIndex     Node data pool list index
-   \param[in,out] opc_View            Data set view
+   \param[in]      oru32_NodeIndex        Node index
+   \param[in]      oru32_DataPoolIndex    Node data pool index
+   \param[in]      oru32_ListIndex        Node data pool list index
+   \param[in,out]  opc_View               Data set view
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::RegisterDataSetView(const uint32 & oru32_NodeIndex,
-                                                              const uint32 & oru32_DataPoolIndex,
-                                                              const uint32 & oru32_ListIndex,
-                                                              C_SdNdeDpListDataSetView * const opc_View)
+                                                        const uint32 & oru32_DataPoolIndex,
+                                                        const uint32 & oru32_ListIndex,
+                                                        C_SdNdeDpListDataSetView * const opc_View)
 {
    C_SdNdeDpListDataSetView * pc_Found = NULL;
 
@@ -369,16 +374,16 @@ void C_SdNdeDpListModelViewManager::RegisterDataSetView(const uint32 & oru32_Nod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Unregister data set view
 
-   \param[in]     oru32_NodeIndex     Node index
-   \param[in]     oru32_DataPoolIndex Node data pool index
-   \param[in]     oru32_ListIndex     Node data pool list index
-   \param[in,out] opc_View            Data set view
+   \param[in]      oru32_NodeIndex        Node index
+   \param[in]      oru32_DataPoolIndex    Node data pool index
+   \param[in]      oru32_ListIndex        Node data pool list index
+   \param[in,out]  opc_View               Data set view
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::UnRegisterDataSetView(const uint32 & oru32_NodeIndex,
-                                                                const uint32 & oru32_DataPoolIndex,
-                                                                const uint32 & oru32_ListIndex,
-                                                                const C_SdNdeDpListDataSetView * const opc_View)
+                                                          const uint32 & oru32_DataPoolIndex,
+                                                          const uint32 & oru32_ListIndex,
+                                                          const C_SdNdeDpListDataSetView * const opc_View)
 {
    for (uint32 u32_ItView = 0; u32_ItView < this->mc_DataSetViews.size(); ++u32_ItView)
    {
@@ -399,22 +404,23 @@ void C_SdNdeDpListModelViewManager::UnRegisterDataSetView(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register array edit view
 
-   \param[in]     oru32_NodeIndex     Node index
-   \param[in]     oru32_DataPoolIndex Node data pool index
-   \param[in]     oru32_ListIndex     Node data pool list index
-   \param[in]     oru32_ElementIndex  Node data pool list element index
-   \param[in]     ore_ArrayEditType   Enum for node data pool list element variable
-   \param[in]     oru32_DataSetIndex  If min or max use 0
-                                      Else use data set index
-   \param[in,out] opc_View            Array edit view
+   \param[in]      oru32_NodeIndex        Node index
+   \param[in]      oru32_DataPoolIndex    Node data pool index
+   \param[in]      oru32_ListIndex        Node data pool list index
+   \param[in]      oru32_ElementIndex     Node data pool list element index
+   \param[in]      ore_ArrayEditType      Enum for node data pool list element variable
+   \param[in]      oru32_DataSetIndex     If min or max use 0
+                                          Else use data set index
+   \param[in,out]  opc_View               Array edit view
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::RegisterArrayEditView(const uint32 & oru32_NodeIndex,
-                                                                const uint32 & oru32_DataPoolIndex,
-                                                                const uint32 & oru32_ListIndex,
-                                                                const uint32 & oru32_ElementIndex,
-                                                                const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType, const uint32 & oru32_DataSetIndex,
-                                                                C_SdNdeDpListArrayEditView * const opc_View)
+                                                          const uint32 & oru32_DataPoolIndex,
+                                                          const uint32 & oru32_ListIndex,
+                                                          const uint32 & oru32_ElementIndex,
+                                                          const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                                          const uint32 & oru32_DataSetIndex,
+                                                          C_SdNdeDpListArrayEditView * const opc_View)
 {
    C_SdNdeDpListArrayEditView * pc_Found = NULL;
 
@@ -440,22 +446,23 @@ void C_SdNdeDpListModelViewManager::RegisterArrayEditView(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Unregister array edit view
 
-   \param[in]     oru32_NodeIndex     Node index
-   \param[in]     oru32_DataPoolIndex Node data pool index
-   \param[in]     oru32_ListIndex     Node data pool list index
-   \param[in]     oru32_ElementIndex  Node data pool list element index
-   \param[in]     ore_ArrayEditType   Enum for node data pool list element variable
-   \param[in]     oru32_DataSetIndex  If min or max use 0
-                                      Else use data set index
-   \param[in,out] opc_View            Array edit view
+   \param[in]      oru32_NodeIndex        Node index
+   \param[in]      oru32_DataPoolIndex    Node data pool index
+   \param[in]      oru32_ListIndex        Node data pool list index
+   \param[in]      oru32_ElementIndex     Node data pool list element index
+   \param[in]      ore_ArrayEditType      Enum for node data pool list element variable
+   \param[in]      oru32_DataSetIndex     If min or max use 0
+                                          Else use data set index
+   \param[in,out]  opc_View               Array edit view
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::UnRegisterArrayEditView(const uint32 & oru32_NodeIndex,
-                                                                  const uint32 & oru32_DataPoolIndex,
-                                                                  const uint32 & oru32_ListIndex,
-                                                                  const uint32 & oru32_ElementIndex,
-                                                                  const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType, const uint32 & oru32_DataSetIndex,
-                                                                  const C_SdNdeDpListArrayEditView * const opc_View)
+                                                            const uint32 & oru32_DataPoolIndex,
+                                                            const uint32 & oru32_ListIndex,
+                                                            const uint32 & oru32_ElementIndex,
+                                                            const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                                            const uint32 & oru32_DataSetIndex,
+                                                            const C_SdNdeDpListArrayEditView * const opc_View)
 {
    for (uint32 u32_ItView = 0; u32_ItView < this->mc_ArrayEditViews.size(); ++u32_ItView)
    {
@@ -477,16 +484,16 @@ void C_SdNdeDpListModelViewManager::UnRegisterArrayEditView(const uint32 & oru32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register element view
 
-   \param[in]     oru32_NodeIndex     Node index
-   \param[in]     oru32_DataPoolIndex Node data pool index
-   \param[in]     oru32_ListIndex     Node data pool list index
-   \param[in,out] opc_View            Element view
+   \param[in]      oru32_NodeIndex        Node index
+   \param[in]      oru32_DataPoolIndex    Node data pool index
+   \param[in]      oru32_ListIndex        Node data pool list index
+   \param[in,out]  opc_View               Element view
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::RegisterElementView(const uint32 & oru32_NodeIndex,
-                                                              const uint32 & oru32_DataPoolIndex,
-                                                              const uint32 & oru32_ListIndex,
-                                                              C_SdNdeDpListTableView * const opc_View)
+                                                        const uint32 & oru32_DataPoolIndex,
+                                                        const uint32 & oru32_ListIndex,
+                                                        C_SdNdeDpListTableView * const opc_View)
 {
    C_SdNdeDpListTableView  * pc_Found = NULL;
 
@@ -511,16 +518,16 @@ void C_SdNdeDpListModelViewManager::RegisterElementView(const uint32 & oru32_Nod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Unregister element view
 
-   \param[in]     oru32_NodeIndex     Node index
-   \param[in]     oru32_DataPoolIndex Node data pool index
-   \param[in]     oru32_ListIndex     Node data pool list index
-   \param[in,out] opc_View            Element view
+   \param[in]      oru32_NodeIndex        Node index
+   \param[in]      oru32_DataPoolIndex    Node data pool index
+   \param[in]      oru32_ListIndex        Node data pool list index
+   \param[in,out]  opc_View               Element view
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::UnRegisterElementView(const uint32 & oru32_NodeIndex,
-                                                                const uint32 & oru32_DataPoolIndex,
-                                                                const uint32 & oru32_ListIndex,
-                                                                const C_SdNdeDpListTableView * const opc_View)
+                                                          const uint32 & oru32_DataPoolIndex,
+                                                          const uint32 & oru32_ListIndex,
+                                                          const C_SdNdeDpListTableView * const opc_View)
 {
    for (uint32 u32_ItView = 0; u32_ItView < this->mc_ElementViews.size(); ++u32_ItView)
    {
@@ -541,14 +548,14 @@ void C_SdNdeDpListModelViewManager::UnRegisterElementView(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward signal
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Data pool index
-   \param[in] oru32_DataPoolListIndex List index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
+   \param[in]  oru32_ListIndex      List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::RegisterDataSetCountChange(const uint32 & oru32_NodeIndex,
-                                                                     const uint32 & oru32_DataPoolIndex,
-                                                                     const uint32 & oru32_ListIndex)
+                                                               const uint32 & oru32_DataPoolIndex,
+                                                               const uint32 & oru32_ListIndex)
 {
    Q_EMIT this->SigDataSetCountChange(oru32_NodeIndex, oru32_DataPoolIndex, oru32_ListIndex);
 }
@@ -579,14 +586,14 @@ void C_SdNdeDpListModelViewManager::UpdateModels(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward signal
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Data pool index
-   \param[in] oru32_DataPoolListIndex List index
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::m_OnDataSetErrorChangePossible(const uint32 & oru32_NodeIndex,
-                                                                         const uint32 & oru32_DataPoolIndex,
-                                                                         const uint32 & oru32_DataPoolListIndex)
+                                                                   const uint32 & oru32_DataPoolIndex,
+                                                                   const uint32 & oru32_DataPoolListIndex)
 {
    Q_EMIT this->SigDataSetErrorChange(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex);
 }
@@ -594,20 +601,23 @@ void C_SdNdeDpListModelViewManager::m_OnDataSetErrorChangePossible(const uint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do data change
 
-   \param[in]     oru32_DataPoolListDataSetIndex Node data pool list data set index
-   \param[in]     orc_NewData                    New data
-   \param[in]     ore_DataChangeType             Data change type
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          List index
+   \param[in]  oru32_DataPoolListDataSetIndex   Node data pool list data set index
+   \param[in]  orc_NewData                      New data
+   \param[in]  ore_DataChangeType               Data change type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::m_OnDataSetDataChange(const uint32 & oru32_NodeIndex,
-                                                                const uint32 & oru32_DataPoolIndex,
-                                                                const uint32 & oru32_DataPoolListIndex,
-                                                                const uint32 & oru32_DataPoolListDataSetIndex,
-                                                                const QVariant & orc_NewData,
-                                                                const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType)
+                                                          const uint32 & oru32_DataPoolIndex,
+                                                          const uint32 & oru32_DataPoolListIndex,
+                                                          const uint32 & oru32_DataPoolListDataSetIndex,
+                                                          const QVariant & orc_NewData,
+                                                          const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType)
 {
    C_SdNdeDpListDataSetView  * const pc_View = this->GetDataSetView(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                          oru32_DataPoolListIndex);
+                                                                    oru32_DataPoolListIndex);
 
    if (pc_View != NULL)
    {
@@ -618,19 +628,19 @@ void C_SdNdeDpListModelViewManager::m_OnDataSetDataChange(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle data set count change
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Node data pool index
-   \param[in] oru32_DataPoolListIndex Node data pool list index
-   \param[in] ors32_NewColumnCount    New column count
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Node data pool index
+   \param[in]  oru32_DataPoolListIndex    Node data pool list index
+   \param[in]  ors32_NewColumnCount       New column count
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::m_OnDataSetColumnCountChange(const uint32 & oru32_NodeIndex,
-                                                                       const uint32 & oru32_DataPoolIndex,
-                                                                       const uint32 & oru32_DataPoolListIndex,
-                                                                       const sint32 & ors32_NewColumnCount)
+                                                                 const uint32 & oru32_DataPoolIndex,
+                                                                 const uint32 & oru32_DataPoolListIndex,
+                                                                 const sint32 & ors32_NewColumnCount)
 {
    C_SdNdeDpListDataSetView  * const pc_View = this->GetDataSetView(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                          oru32_DataPoolListIndex);
+                                                                    oru32_DataPoolListIndex);
 
    if (pc_View != NULL)
    {
@@ -641,17 +651,17 @@ void C_SdNdeDpListModelViewManager::m_OnDataSetColumnCountChange(const uint32 & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward signal
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Node data pool index
-   \param[in] oru32_DataPoolListIndex Node data pool list index
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Node data pool index
+   \param[in]  oru32_DataPoolListIndex    Node data pool list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::m_OnElementErrorChangePossible(const uint32 & oru32_NodeIndex,
-                                                                         const uint32 & oru32_DataPoolIndex,
-                                                                         const uint32 & oru32_DataPoolListIndex)
+                                                                   const uint32 & oru32_DataPoolIndex,
+                                                                   const uint32 & oru32_DataPoolListIndex)
 {
    C_SdNdeDpListTableView  * const pc_View = this->GetElementView(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                        oru32_DataPoolListIndex);
+                                                                  oru32_DataPoolListIndex);
 
    if (pc_View != NULL)
    {
@@ -662,17 +672,17 @@ void C_SdNdeDpListModelViewManager::m_OnElementErrorChangePossible(const uint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward signal
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Node data pool index
-   \param[in] oru32_DataPoolListIndex Node data pool list index
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Node data pool index
+   \param[in]  oru32_DataPoolListIndex    Node data pool list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::m_OnElementSizeChangePossible(const uint32 & oru32_NodeIndex,
-                                                                        const uint32 & oru32_DataPoolIndex,
-                                                                        const uint32 & oru32_DataPoolListIndex)
+                                                                  const uint32 & oru32_DataPoolIndex,
+                                                                  const uint32 & oru32_DataPoolListIndex)
 {
    C_SdNdeDpListTableView  * const pc_View = this->GetElementView(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                        oru32_DataPoolListIndex);
+                                                                  oru32_DataPoolListIndex);
 
    if (pc_View != NULL)
    {
@@ -683,26 +693,26 @@ void C_SdNdeDpListModelViewManager::m_OnElementSizeChangePossible(const uint32 &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do data change
 
-   \param[in]     oru32_NodeIndex                Node index
-   \param[in]     oru32_DataPoolIndex            Node data pool index
-   \param[in]     oru32_DataPoolListIndex        Node data pool list index
-   \param[in]     oru32_DataPoolListElementIndex Node data pool list element index
-   \param[in]     orc_NewData                    New data
-   \param[in]     ore_DataChangeType             Data change type
-   \param[in]     oru32_ArrayIndex               Optional array index
-   \param[in]     ors32_DataSetIndex             Optional data set index
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Node data pool index
+   \param[in]  oru32_DataPoolListIndex          Node data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Node data pool list element index
+   \param[in]  orc_NewData                      New data
+   \param[in]  ore_DataChangeType               Data change type
+   \param[in]  oru32_ArrayIndex                 Optional array index
+   \param[in]  ors32_DataSetIndex               Optional data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::m_OnElementDataChange(const uint32 & oru32_NodeIndex,
-                                                                const uint32 & oru32_DataPoolIndex,
-                                                                const uint32 & oru32_DataPoolListIndex,
-                                                                const uint32 & oru32_DataPoolListElementIndex,
-                                                                const QVariant & orc_NewData,
-                                                                const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType, const uint32 & oru32_ArrayIndex,
-                                                                const sint32 & ors32_DataSetIndex)
+                                                          const uint32 & oru32_DataPoolIndex,
+                                                          const uint32 & oru32_DataPoolListIndex,
+                                                          const uint32 & oru32_DataPoolListElementIndex,
+                                                          const QVariant & orc_NewData,
+                                                          const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType, const uint32 & oru32_ArrayIndex,
+                                                          const sint32 & ors32_DataSetIndex)
 {
    C_SdNdeDpListTableView  * const pc_View = this->GetElementView(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                        oru32_DataPoolListIndex);
+                                                                  oru32_DataPoolListIndex);
 
    if (pc_View != NULL)
    {
@@ -714,25 +724,25 @@ void C_SdNdeDpListModelViewManager::m_OnElementDataChange(const uint32 & oru32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward signal
 
-   \param[in]     oru32_NodeIndex     Node index
-   \param[in]     oru32_DataPoolIndex Node data pool index
-   \param[in]     oru32_ListIndex     Node data pool list index
-   \param[in]     oru32_ElementIndex  Node data pool list element index
-   \param[in]     ore_ArrayEditType   Enum for node data pool list element variable
-   \param[in]     oru32_DataSetIndex  If min or max use 0
-                                      Else use data set index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
+   \param[in]  oru32_ElementIndex   Node data pool list element index
+   \param[in]  ore_ArrayEditType    Enum for node data pool list element variable
+   \param[in]  oru32_DataSetIndex   If min or max use 0
+                                    Else use data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::m_OnArrayEditErrorChangePossible(const uint32 & oru32_NodeIndex,
-                                                                           const uint32 & oru32_DataPoolIndex,
-                                                                           const uint32 & oru32_ListIndex,
-                                                                           const uint32 & oru32_ElementIndex,
-                                                                           const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                                                           const uint32 & oru32_DataSetIndex)
+                                                                     const uint32 & oru32_DataPoolIndex,
+                                                                     const uint32 & oru32_ListIndex,
+                                                                     const uint32 & oru32_ElementIndex,
+                                                                     const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                                                     const uint32 & oru32_DataSetIndex)
 {
    C_SdNdeDpListArrayEditView  * const pc_View = this->GetArrayEditView(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                              oru32_ListIndex, oru32_ElementIndex,
-                                                                              ore_ArrayEditType, oru32_DataSetIndex);
+                                                                        oru32_ListIndex, oru32_ElementIndex,
+                                                                        ore_ArrayEditType, oru32_DataSetIndex);
 
    if (pc_View != NULL)
    {
@@ -743,27 +753,29 @@ void C_SdNdeDpListModelViewManager::m_OnArrayEditErrorChangePossible(const uint3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do data change
 
-   \param[in]     oru32_NodeIndex         Node index
-   \param[in]     oru32_DataPoolIndex     Node data pool index
-   \param[in]     oru32_ListIndex         Node data pool list index
-   \param[in]     oru32_ElementIndex      Node data pool list element index
-   \param[in]     ore_ArrayEditType       Enum for node data pool list element variable
-   \param[in]     oru32_DataSetIndex      If min or max use 0
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Node data pool index
+   \param[in]  oru32_ListIndex            Node data pool list index
+   \param[in]  oru32_ElementIndex         Node data pool list element index
+   \param[in]  ore_ArrayEditType          Enum for node data pool list element variable
+   \param[in]  oru32_DataSetIndex         If min or max use 0
                                           Else use data set index
-   \param[in]     oru32_ArrayElementIndex Array index
-   \param[in]     orc_NewData             New data
+   \param[in]  oru32_ArrayElementIndex    Array index
+   \param[in]  orc_NewData                New data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListModelViewManager::m_OnArrayEditDataChange(const uint32 & oru32_NodeIndex,
-                                                                  const uint32 & oru32_DataPoolIndex,
-                                                                  const uint32 & oru32_ListIndex,
-                                                                  const uint32 & oru32_ElementIndex,
-                                                                  const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType, const uint32 & oru32_DataSetIndex, const uint32 & oru32_ArrayElementIndex,
-                                                                  const QVariant & orc_NewData)
+                                                            const uint32 & oru32_DataPoolIndex,
+                                                            const uint32 & oru32_ListIndex,
+                                                            const uint32 & oru32_ElementIndex,
+                                                            const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                                            const uint32 & oru32_DataSetIndex,
+                                                            const uint32 & oru32_ArrayElementIndex,
+                                                            const QVariant & orc_NewData)
 {
    C_SdNdeDpListArrayEditView  * const pc_View = this->GetArrayEditView(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                              oru32_ListIndex, oru32_ElementIndex,
-                                                                              ore_ArrayEditType, oru32_DataSetIndex);
+                                                                        oru32_ListIndex, oru32_ElementIndex,
+                                                                        ore_ArrayEditType, oru32_DataSetIndex);
 
    if (pc_View != NULL)
    {

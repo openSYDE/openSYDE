@@ -32,8 +32,19 @@ public:
    explicit C_ImpCodeGenerationReportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent);
    ~C_ImpCodeGenerationReportWidget(void);
 
+   class C_ReportData ///< Class to put together all report-relevant information of one Data Block
+   {
+   public:
+      QString c_NodeName;                ///< Node name where the Data Block belongs to
+      QString c_AppName;                 ///< Data Block name
+      QString c_CodeGeneratorPath;       ///< Path of used code generator
+      stw_types::uint16 u16_CodeVersion; ///< Path of used code generator
+      QString c_Directory;               ///< Directory where generated files were saved at
+      QStringList c_GeneratedFiles;      ///< List absolute file paths of all generated files
+   };
+
    void InitStaticNames(void) const;
-   void CreateReport(const std::list<QString> & orc_ExportedFiles) const;
+   void CreateReport(const std::vector<C_ReportData> & orc_ExportInfo) const;
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -46,8 +57,6 @@ private:
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
 
-   const QString mc_FilePath;
-   static const QString mhc_HTML_TABLE_HEADER_START;
    static const QString mhc_HTML_TABLE_DATA_START;
 
    void m_OkClicked(void);

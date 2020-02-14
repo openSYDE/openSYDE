@@ -116,7 +116,7 @@ C_SyvDaItPaArView::~C_SyvDaItPaArView(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Specify associated list
 
-   \param[in] oru32_ElementIndex Element index
+   \param[in] ou32_ElementIndex  Element index
    \param[in] opc_DataWidget     Data widget
    \param[in] oq_ECUValues       Optional flag if the shown values are ECU values
 */

@@ -40,9 +40,9 @@ class C_SdNdeDpListDataSetWidget :
 
 public:
    explicit C_SdNdeDpListDataSetWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                             const stw_types::uint32 & oru32_NodeIndex,
-                                             const stw_types::uint32 & oru32_DataPoolIndex,
-                                             const stw_types::uint32 & oru32_ListIndex);
+                                       const stw_types::uint32 & oru32_NodeIndex,
+                                       const stw_types::uint32 & oru32_DataPoolIndex,
+                                       const stw_types::uint32 & oru32_ListIndex);
    ~C_SdNdeDpListDataSetWidget(void);
    void InitStaticNames(void) const;
    QUndoCommand * TakeUndoCommand(void) const;

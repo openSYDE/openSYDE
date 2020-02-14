@@ -48,12 +48,12 @@ using namespace stw_opensyde_gui_logic;
 
    long description of function within several lines
 
-   \param[in] oru32_ViewIndex            Index of system view
-   \param[in] oru32_DashboardIndex       Index of dashboard in system view
-   \param[in] ors32_DataIndex            Index of connected data item
-   \param[in] ore_Type                   Type of data
-   \param[in] ou32_MaximumDataElements   Maximum number of shown data elements of the widget
-   \param[in] oq_ReadItem                Flag if item is a read only item and has an rail assignment
+   \param[in]  oru32_ViewIndex            Index of system view
+   \param[in]  oru32_DashboardIndex       Index of dashboard in system view
+   \param[in]  ors32_DataIndex            Index of connected data item
+   \param[in]  ore_Type                   Type of data
+   \param[in]  ou32_MaximumDataElements   Maximum number of shown data elements of the widget
+   \param[in]  oq_ReadItem                Flag if item is a read only item and has an rail assignment
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbDataElementHandler::C_PuiSvDbDataElementHandler(const uint32 & oru32_ViewIndex,
@@ -76,8 +76,8 @@ C_PuiSvDbDataElementHandler::C_PuiSvDbDataElementHandler(const uint32 & oru32_Vi
 
    This function is thread safe.
 
-   \param[in]     orc_WidgetDataPoolElementId         Datapool element identificator
-   \param[in]     orc_DataPoolElementScaling          Datapool element scaling configuration
+   \param[in]  orc_WidgetDataPoolElementId   Datapool element identificator
+   \param[in]  orc_DataPoolElementScaling    Datapool element scaling configuration
 
    \return
    C_NO_ERR    Datapool element added
@@ -130,8 +130,8 @@ sint32 C_PuiSvDbDataElementHandler::RegisterDataPoolElement(
 
    Info: no default handling
 
-   \param[in] orc_WidgetDataPoolElementId Affected data element
-   \param[in] ou8_ErrorCode               Registered error code
+   \param[in]  orc_WidgetDataPoolElementId   Affected data element
+   \param[in]  ou8_ErrorCode                 Registered error code
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::RegisterDataPoolElementCyclicError(
@@ -146,7 +146,7 @@ void C_PuiSvDbDataElementHandler::RegisterDataPoolElementCyclicError(
 
    This function is thread safe.
 
-   \param[in]     orc_WidgetDataPoolElementId         Datapool element identificator
+   \param[in]  orc_WidgetDataPoolElementId   Datapool element identificator
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::RemoveDataPoolElement(
@@ -258,8 +258,8 @@ uint32 C_PuiSvDbDataElementHandler::GetWidgetDataPoolElementCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets all identification informations about the registered datapool element
 
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_DataPoolId                        Datapool element identificator
+   \param[in]   ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[out]  orc_DataPoolId                     Datapool element identificator
 
    \return
    C_NO_ERR    Datapool element index valid and index id was filled
@@ -293,8 +293,8 @@ sint32 C_PuiSvDbDataElementHandler::GetDataPoolElementIndex(const uint32 ou32_Wi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets index of datapool element in widget with identification informations
 
-   \param[in]      orc_DataPoolId                        Datapool element identificator
-   \param[out]     oru32_WidgetDataPoolElementIndex      Index of shown datapool element in widget
+   \param[in]   orc_DataPoolId                     Datapool element identificator
+   \param[out]  oru32_WidgetDataPoolElementIndex   Index of shown datapool element in widget
 
    \return
    C_NO_ERR    Datapool element index valid and index id was filled
@@ -322,8 +322,8 @@ sint32 C_PuiSvDbDataElementHandler::GetWidgetDataPoolElementIndex(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets all scaling informations about the registered datapool element
 
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_DataPoolScaling                   Datapool element scaling configuration
+   \param[in]   ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[out]  orc_DataPoolScaling                Datapool element scaling configuration
 
    \return
    C_NO_ERR    Datapool element index valid and index id was filled
@@ -358,7 +358,7 @@ sint32 C_PuiSvDbDataElementHandler::GetDataPoolElementScaling(const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   short description of function
 
-   \param[in]     orc_WidgetDataPoolElementId         Datapool element identificator
+   \param[in]  orc_WidgetDataPoolElementId   Datapool element identificator
 
    \return
    true     Data element is already registered
@@ -388,8 +388,8 @@ bool C_PuiSvDbDataElementHandler::IsDataElementRegistered(
 
    This function is thread safe.
 
-   \param[in]     orc_WidgetDataPoolElementId         Datapool element identificator
-   \param[in]     orc_NewValue                        New received value
+   \param[in]  orc_WidgetDataPoolElementId   Datapool element identificator
+   \param[in]  orc_NewValue                  New received value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::InsertNewValueIntoQueue(
@@ -423,8 +423,8 @@ void C_PuiSvDbDataElementHandler::InsertNewValueIntoQueue(
 
    This function is thread safe.
 
-   \param[in]     orc_WidgetDataPoolElementId         Datapool element identificator
-   \param[in]     orc_NewValue                        New received value
+   \param[in]  orc_WidgetDataPoolElementId   Datapool element identificator
+   \param[in]  orc_NewValue                  New received value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::AddNewNvmValueIntoQueue(
@@ -456,8 +456,8 @@ void C_PuiSvDbDataElementHandler::AddNewNvmValueIntoQueue(
 
    Warning: expected to be in range of min & max
 
-   \param[in] f64_Value         Unscaled value
-   \param[in] ou32_IndexElement Optional index of element (if more than one)
+   \param[in]  f64_Value            Unscaled value
+   \param[in]  ou32_IndexElement    Optional index of element (if more than one)
 
    \return
    Value as scaled string
@@ -494,9 +494,9 @@ QString C_PuiSvDbDataElementHandler::GetUnscaledValueAsScaledString(const float6
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get unscaled value (does not need to be in range of min & max) as scaled string
 
-   \param[in]     of64_Value        Unscaled value (does not need to be in range of min & max)
-   \param[in]     ou32_IndexElement Optional index of element (if more than one)
-   \param[in,out] opf64_Progress    Optional parameter to store the progress of the new applied value in range of min and max [0,1]
+   \param[in]      of64_Value          Unscaled value (does not need to be in range of min & max)
+   \param[in]      ou32_IndexElement   Optional index of element (if more than one)
+   \param[in,out]  opf64_Progress      Optional parameter to store the progress of the new applied value in range of min and max [0,1]
 
    \return
    Value as scaled string
@@ -559,10 +559,10 @@ const
 
    This function is thread safe.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
-   \param[out]    orc_Values                      Vector with result value(s)
-   \param[out]    opc_StringifiedValues           Optional vector with result strings
-   \param[in]     oq_UseScaling                   Optional flag if return value should include internally stored scaling
+   \param[in]   ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[out]  orc_Values                         Vector with result value(s)
+   \param[out]  opc_StringifiedValues              Optional vector with result strings
+   \param[in]   oq_UseScaling                      Optional flag if return value should include internally stored scaling
 
    \return
    C_NO_ERR    Value read
@@ -617,9 +617,9 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
          //Set timestamp valid
          if (ou32_WidgetDataPoolElementIndex < this->mc_LastDataPoolElementTimeStampsValid.size())
          {
-            std::vector<bool>::reference c_Value =
-               this->mc_LastDataPoolElementTimeStampsValid[ou32_WidgetDataPoolElementIndex];
-            c_Value = true;
+            //lint -e{808} C++11 usage of correct handling for bool vector element assignment
+            auto && rc_Value = this->mc_LastDataPoolElementTimeStampsValid[ou32_WidgetDataPoolElementIndex];
+            rc_Value = true;
          }
 
          // Remove all values for the next call
@@ -655,9 +655,9 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
 
    This function is thread safe.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
-   \param[out]    of64_Value                      Result value
-   \param[in]     oq_UseScaling                   Optional flag if return value should include internally stored scaling
+   \param[in]   ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[out]  orf64_Value                        Result value
+   \param[in]   oq_UseScaling                      Optional flag if return value should include internally stored scaling
 
    \return
    C_NO_ERR    Value read
@@ -706,9 +706,9 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
          //Set timestamp valid
          if (ou32_WidgetDataPoolElementIndex < this->mc_LastDataPoolElementTimeStampsValid.size())
          {
-            std::vector<bool>::reference c_Value =
-               this->mc_LastDataPoolElementTimeStampsValid[ou32_WidgetDataPoolElementIndex];
-            c_Value = true;
+            //lint -e{808} C++11 usage of correct handling for bool vector element assignment
+            auto && rc_Value = this->mc_LastDataPoolElementTimeStampsValid[ou32_WidgetDataPoolElementIndex];
+            rc_Value = true;
          }
 
          // Remove all values for the next call
@@ -730,8 +730,10 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
 
    This function is thread safe.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_Value                             List with all values
+   \param[in]   ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[out]  orc_Values                         List with all values
+   \param[out]  orc_Timestamps                     List with all timestamps
+   \param[in]   oq_UseScaling                      Use scaling
 
    \return
    C_NO_ERR    Value read
@@ -798,9 +800,9 @@ sint32 C_PuiSvDbDataElementHandler::m_GetAllValues(const uint32 ou32_WidgetDataP
          //Set timestamp valid
          if (ou32_WidgetDataPoolElementIndex < this->mc_LastDataPoolElementTimeStampsValid.size())
          {
-            std::vector<bool>::reference c_Value =
-               this->mc_LastDataPoolElementTimeStampsValid[ou32_WidgetDataPoolElementIndex];
-            c_Value = true;
+            //lint -e{808} C++11 usage of correct handling for bool vector element assignment
+            auto && rc_Value = this->mc_LastDataPoolElementTimeStampsValid[ou32_WidgetDataPoolElementIndex];
+            rc_Value = true;
          }
       }
       else
@@ -823,8 +825,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetAllValues(const uint32 ou32_WidgetDataP
 
    This function is thread safe.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_Value                             Raw result value
+   \param[in]   ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[out]  orc_Value                          Raw result value
 
    \return
    C_NO_ERR    Value read
@@ -865,11 +867,11 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastNvmValue(const uint32 ou32_WidgetDa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get percentage of timeout progress for specified element
 
-   \param[in]  ou32_DataElementIndex              Index of time stamp of last received data package
-   \param[out] oru8_TimoutPercentage100           0-100 Progression of timeout
-                                                      -> 0: Current value has been received right now
-                                                      -> 100: Last known value has reached the exact specified timeout
-   Else  Should not happen
+   \param[in]   ou32_DataElementIndex     Index of time stamp of last received data package
+   \param[out]  oru8_TimoutPercentage100  0-100 Progression of timeout
+                                          -> 0: Current value has been received right now
+                                          -> 100: Last known value has reached the exact specified timeout
+                                          Else  Should not happen
 
    \return
    C_NO_ERR Valid value
@@ -924,9 +926,9 @@ sint32 C_PuiSvDbDataElementHandler::m_GetTimoutPercentage100(const uint32 ou32_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Scales a minimum and maximum value with the active scaling configuration
 
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[in,out] orf64_Min                             Minimum value
-   \param[in,out] orf64_Max                             Maximum value
+   \param[in]      ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[in,out]  orf64_Min                          Minimum value
+   \param[in,out]  orf64_Max                          Maximum value
 
    \return
    C_NO_ERR Valid value
@@ -974,10 +976,11 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(voi
            ++c_ItItem)
       {
          const C_PuiSvDbNodeDataPoolListElementId & rc_ElementId = c_ItItem.key();
-         std::vector<bool>::reference c_Value = this->mc_DataPoolElementValid[c_ItItem.value()];
+         //lint -e{808} C++11 usage of correct handling for bool vector element assignment
+         auto && rc_Value = this->mc_DataPoolElementValid[c_ItItem.value()];
          uint16 u16_UpdateRate = 0U;
          // Update the valid flag
-         c_Value = rc_ElementId.GetIsValid();
+         rc_Value = rc_ElementId.GetIsValid();
 
          if (rc_ElementId.GetIsValid() == true)
          {
@@ -1127,75 +1130,10 @@ void C_PuiSvDbDataElementHandler::m_SetWidgetDataPoolElementCount(const uint32 o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvDbWidgetBase * C_PuiSvDbDataElementHandler::m_GetPuiSvBase(void) const
-{
-   const C_PuiSvDbWidgetBase * pc_Base = NULL;
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-   if (pc_View != NULL)
-   {
-      const C_PuiSvDashboard * const pc_DashBoard = pc_View->GetDashboard(this->mu32_DashboardIndex);
-
-      if (pc_DashBoard != NULL)
-      {
-         switch (this->me_Type)
-         {
-         case eCHART:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_Base = pc_DashBoard->GetChart(static_cast<uint32>(this->ms32_Index));
-            break;
-         case eLABEL:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_Base = pc_DashBoard->GetLabel(static_cast<uint32>(this->ms32_Index));
-            break;
-         case ePARAM:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_Base = pc_DashBoard->GetParam(static_cast<uint32>(this->ms32_Index));
-            break;
-         case ePIE_CHART:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_Base = pc_DashBoard->GetPieChart(static_cast<uint32>(this->ms32_Index));
-            break;
-         case eSPIN_BOX:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_Base = pc_DashBoard->GetSpinBox(static_cast<uint32>(this->ms32_Index));
-            break;
-         case eSLIDER:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_Base = pc_DashBoard->GetSlider(static_cast<uint32>(this->ms32_Index));
-            break;
-         case eTABLE:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_Base = pc_DashBoard->GetTable(static_cast<uint32>(this->ms32_Index));
-            break;
-         case ePROGRESS_BAR:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_Base = pc_DashBoard->GetProgressBar(static_cast<uint32>(this->ms32_Index));
-            break;
-         case eTOGGLE:
-            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-            pc_Base = pc_DashBoard->GetToggle(static_cast<uint32>(this->ms32_Index));
-            break;
-         case eLINE_ARROW:   // Is no C_GiSvDaRectBaseGroup
-         case eTEXT_ELEMENT: // Is no C_GiSvDaRectBaseGroup
-         case eIMAGE:        // Is no C_GiSvDaRectBaseGroup
-         case eUNKNOWN:      // Is no C_GiSvDaRectBaseGroup
-         default:
-            // Shall not happen
-            tgl_assert(false);
-            break;
-         }
-      }
-   }
-
-   return pc_Base;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string for scaled value
 
-   \param[in] of64_Value Scaled value
-   \param[in] oe_Type    Target type after scaling
+   \param[in]  of64_Value  Scaled value
+   \param[in]  oe_Type     Target type after scaling
 
    \return
    String for value

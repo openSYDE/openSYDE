@@ -483,7 +483,7 @@ QString C_CamMosDatabaseItemWidget::h_AdaptPathToSystemDefinitionIfNecessary(con
    {
       // first try file version V3, i.e. system definition file is in sub directory
       QString c_SysdefFile =
-         orc_SydeFile.absolutePath() + "/system_definition/" + orc_SydeFile.baseName() + ".syde_sysdef";
+         orc_SydeFile.absolutePath() + "/system_definition/" + orc_SydeFile.completeBaseName() + ".syde_sysdef";
 
       if (QFileInfo(c_SysdefFile).exists() == true)
       {
@@ -492,7 +492,7 @@ QString C_CamMosDatabaseItemWidget::h_AdaptPathToSystemDefinitionIfNecessary(con
       else
       {
          // now try file version V2, i.e. system definition file is beneath .syde file
-         c_SysdefFile = orc_SydeFile.absolutePath() + "/" + orc_SydeFile.baseName() + ".syde_sysdef";
+         c_SysdefFile = orc_SydeFile.absolutePath() + "/" + orc_SydeFile.completeBaseName() + ".syde_sysdef";
 
          if (QFileInfo(c_SysdefFile).exists() == true)
          {

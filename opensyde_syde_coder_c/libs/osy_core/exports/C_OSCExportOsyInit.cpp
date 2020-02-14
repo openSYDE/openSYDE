@@ -72,8 +72,8 @@ C_OSCExportOsyInit::~C_OSCExportOsyInit(void)
 
    \param[in] orc_FilePath             path to file to create
    \param[in] orc_Node                 node definition
-   \param[in] oq_RunsDpd               true: create DPD init code and init code for all local and remote DPs
-                                       false: only create init code for local DPs
+   \param[in] oq_RunsDpd               true: create DPD init code and init code for all local, public and remote DPs
+                                       false: only create init code for local and public DPs
    \param[in] ou16_ApplicationIndex    index of application we create code for (to identify local DPs)
    \param[in] orc_ExportToolInfo       information about calling executable (name + version)
 
@@ -116,19 +116,16 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       c_Lines.Add("#include \"osy_dpd_driver.h\"");
    }
    c_Lines.Add("#include \"osy_dpa_data_pool.h\"");
-   //includes for the data pool definitions
+   //includes for the Datapool definitions
    //adding them to this central header allows the application to just include one central file and access all data
    // pools
-   c_Lines.Add("//Header files exporting application specific data pools:");
+   c_Lines.Add("//Header files exporting application specific Datapools:");
    for (uint8 u8_DataPool = 0U; u8_DataPool < orc_Node.c_DataPools.size(); u8_DataPool++)
    {
-      const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u8_DataPool];
-
-      //add data pool if application runs DPD or application owns this data pool
-      if ((oq_RunsDpd == true) || (rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex))
+      if (mh_IsDpKnownToApp(u8_DataPool, ou16_ApplicationIndex, orc_Node, oq_RunsDpd) == true)
       {
          C_SCLString c_HeaderName;
-         C_OSCExportDataPool::h_GetFileName(rc_DataPool, c_HeaderName);
+         C_OSCExportDataPool::h_GetFileName(orc_Node.c_DataPools[u8_DataPool], c_HeaderName);
          c_Lines.Add("#include \"" + c_HeaderName + ".h\"");
          u8_DataPoolsKnownInThisApplication++;
       }
@@ -141,7 +138,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       for (uint32 u32_ItProtocol = 0U; u32_ItProtocol < orc_Node.c_ComProtocols.size(); u32_ItProtocol++)
       {
          const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
-         //logic: C_OSCCanProtocol refers to a data pool; if that data pool is owned by the
+         //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
          // C_OSCNodeApplication then create it
          if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
          {
@@ -481,22 +478,22 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       c_Lines.Add("");
       c_Lines.Add(
          "//----------------------------------------------------------------------------------------------------------------------");
-      c_Lines.Add("/*! \\brief   Set up and provide openSYDE data pool handler configuration");
+      c_Lines.Add("/*! \\brief   Set up and provide openSYDE Datapool handler configuration");
       c_Lines.Add("");
       c_Lines.Add("   Sets up:");
-      c_Lines.Add("   * initialization structure listing all data pools in correct sequence");
+      c_Lines.Add("   * initialization structure listing all Datapools in correct sequence");
       c_Lines.Add("");
       c_Lines.Add("   \\return");
       c_Lines.Add(
          "   pointer to initialization structure (statically available; can be used for the DPH initialization function)");
-      c_Lines.Add("   NULL: no data pools defined");
+      c_Lines.Add("   NULL: no Datapools defined");
       c_Lines.Add("*/");
       c_Lines.Add(
          "//----------------------------------------------------------------------------------------------------------------------");
       c_Lines.Add("const T_osy_dpa_data_pool * const * osy_dph_get_init_config(void)");
       c_Lines.Add("{");
 
-      //add table of data pools
+      //add table of Datapools
       if (u8_DataPoolsKnownInThisApplication == 0U)
       {
          c_Lines.Add("   return NULL;");
@@ -507,9 +504,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          c_Lines.Add("   {");
          for (uint8 u8_DataPool = 0U; u8_DataPool < orc_Node.c_DataPools.size(); u8_DataPool++)
          {
-            //add data pool if application runs DPD or application owns this data pool
-            if ((oq_RunsDpd == true) ||
-                (orc_Node.c_DataPools[u8_DataPool].s32_RelatedDataBlockIndex == ou16_ApplicationIndex))
+            if (mh_IsDpKnownToApp(u8_DataPool, ou16_ApplicationIndex, orc_Node, oq_RunsDpd) == true)
             {
                const C_SCLString c_Text = "      &gt_" + orc_Node.c_DataPools[u8_DataPool].c_Name + "_DataPool,";
                c_Lines.Add(c_Text);
@@ -527,10 +522,10 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       c_Lines.Add("");
       c_Lines.Add(
          "//----------------------------------------------------------------------------------------------------------------------");
-      c_Lines.Add("/*! \\brief   Get number of defined openSYDE data pools");
+      c_Lines.Add("/*! \\brief   Get number of defined openSYDE Datapools");
       c_Lines.Add("");
       c_Lines.Add("   \\return");
-      c_Lines.Add("   number of openSYDE data pools");
+      c_Lines.Add("   number of openSYDE Datapools");
       c_Lines.Add("*/");
       c_Lines.Add(
          "//----------------------------------------------------------------------------------------------------------------------");
@@ -562,7 +557,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          for (uint32 u32_Protocol = 0U; u32_Protocol < orc_Node.c_ComProtocols.size(); u32_Protocol++)
          {
             const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_Protocol];
-            //logic: C_OSCCanProtocol refers to a data pool; if that data pool is owned by the
+            //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
             // C_OSCNodeApplication then this node knows about the protocol
             if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
             {
@@ -596,7 +591,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
             "   The returned value matches the number of elements in the table returned by osy_com_get_protocol_configs.");
          c_Lines.Add("");
          c_Lines.Add("   \\return");
-         c_Lines.Add("   number of openSYDE data pools");
+         c_Lines.Add("   number of openSYDE Datapools");
          c_Lines.Add("*/");
          c_Lines.Add(
             "//----------------------------------------------------------------------------------------------------------------------");
@@ -646,20 +641,20 @@ bool C_OSCExportOsyInit::mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSetting
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility: get size of greatest data pool element or list
+/*! \brief   Utility: get size of greatest Datapool element or list
 
-   For NVM data pools:
-   *  Go through vector of data pools and check which is the greatest list
-   For other data pools:
-   *  Go through vector of data pools and check which is the greatest element
+   For NVM Datapools:
+   *  Go through vector of Datapools and check which is the greatest list
+   For other Datapools:
+   *  Go through vector of Datapools and check which is the greatest element
 
    This is used for defining the buffer size for the protocol driver. So the function considers local and remote
-    data pools.
+    Datapools.
 
-   \param[in] orc_DataPools            data pools to scan
+   \param[in] orc_DataPools            Datapools to scan
 
    \return
-   size of the greatest data pool element/list in bytes
+   size of the greatest Datapool element/list in bytes
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCExportOsyInit::mh_GetSizeOfLargestDataPoolElement(const std::vector<C_OSCNodeDataPool> & orc_DataPools)
@@ -696,4 +691,57 @@ uint32 C_OSCExportOsyInit::mh_GetSizeOfLargestDataPoolElement(const std::vector<
       }
    }
    return u32_GreatestSize;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Utility: Check if a Datapool is known by a specific application.
+
+   A Datapool is "known" by a specific application if it is
+      - not empty i.e. has at least one list containing at least one element and
+      - Datapool is owned by Application ("local Datapool") or Datapool runs DPD ("remote Datapool") or
+        Datapool is public ("public remote Datapool")
+
+   \param[in]       ou8_DataPoolIndex        datapool index
+   \param[in]       ou16_ApplicationIndex    application index
+   \param[in]       orc_Node                 system definition node
+   \param[in]       oq_RunsDpd               application runs DPD
+
+   \retval  true     Datapool is known to the specified app
+   \retval  false    Datapool is not known to the specified app (e.g. owned by another application)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCExportOsyInit::mh_IsDpKnownToApp(const uint8 ou8_DataPoolIndex, const uint16 ou16_ApplicationIndex,
+                                           const C_OSCNode & orc_Node, bool oq_RunsDpd)
+{
+   bool q_Return = false;
+
+   if (ou8_DataPoolIndex < orc_Node.c_DataPools.size())
+   {
+      const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[ou8_DataPoolIndex];
+      bool q_AtLeastOneElement = false;
+
+      // check if datapool is non-empty (files only get generated in this case)
+      for (uint16 u16_ListIndex = 0U; u16_ListIndex < rc_DataPool.c_Lists.size(); u16_ListIndex++)
+      {
+         const C_OSCNodeDataPoolList & rc_List = rc_DataPool.c_Lists[u16_ListIndex];
+         if (rc_List.c_Elements.size() != 0)
+         {
+            q_AtLeastOneElement = true;
+            break;
+         }
+      }
+
+      if (q_AtLeastOneElement == true)
+      {
+         // check if application runs DPD or application owns this Datapool or Datapool is public
+         if ((oq_RunsDpd == true) || (rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex) ||
+             ((orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion >= 4U) &&
+              (rc_DataPool.q_ScopeIsPrivate == false)))
+         {
+            q_Return = true;
+         }
+      }
+   }
+
+   return q_Return;
 }

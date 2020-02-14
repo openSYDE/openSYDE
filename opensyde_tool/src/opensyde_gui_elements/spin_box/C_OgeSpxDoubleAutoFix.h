@@ -40,7 +40,7 @@ public:
    //lint -restore
 
 protected:
-   virtual void m_Init(void);
+   virtual void m_Init(void) override;
 
 private:
    stw_types::float64 mf64_ScaledMin;

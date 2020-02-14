@@ -38,13 +38,12 @@ class C_SdNdeDpProperties :
 
 public:
    explicit C_SdNdeDpProperties(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                      stw_opensyde_core::C_OSCNodeDataPool * const opc_OSCDataPool,
-                                      stw_opensyde_gui_logic::C_PuiSdNodeDataPool * const pc_UiDataPool,
-                                      stw_opensyde_core::C_OSCCanProtocol::E_Type * const ope_ComProtocolType,
-                                      const stw_types::sint32 os32_DataPoolIndex,
-                                      const stw_types::uint32 & oru32_NodeIndex, const bool oq_SelectName,
-                                      const bool oq_ShowApplicationSection,
-                                      const stw_opensyde_core::C_OSCNodeDataPoolId * const opc_SharedDatapoolId);
+                                stw_opensyde_core::C_OSCNodeDataPool * const opc_OSCDataPool,
+                                stw_opensyde_gui_logic::C_PuiSdNodeDataPool * const pc_UiDataPool,
+                                stw_opensyde_core::C_OSCCanProtocol::E_Type * const ope_ComProtocolType,
+                                const stw_types::sint32 os32_DataPoolIndex, const stw_types::uint32 & oru32_NodeIndex,
+                                const bool oq_SelectName, const bool oq_ShowApplicationSection,
+                                const stw_opensyde_core::C_OSCNodeDataPoolId * const opc_SharedDatapoolId);
    virtual ~C_SdNdeDpProperties(void);
 
    void InitStaticNames(void);
@@ -59,6 +58,9 @@ private:
    //Avoid call
    C_SdNdeDpProperties(const C_SdNdeDpProperties &);
    C_SdNdeDpProperties & operator =(const C_SdNdeDpProperties &);
+
+   static const stw_types::sintn mhsn_INDEX_PRIVATE;
+   static const stw_types::sintn mhsn_INDEX_PUBLIC;
 
    Ui::C_SdNdeDpProperties * mpc_Ui;
    stw_opensyde_gui_elements::C_OgePopUpDialog * mpc_ParentDialog;

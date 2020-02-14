@@ -141,7 +141,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_DeleteSave(void)
 {
    m_SaveToData();
    m_Delete();
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_Restore(void)
    if (pc_Scene != NULL)
    {
       pc_Scene->CopyFromSnapshotToScene(this->mc_DataBackup, &(this->mc_MapTypeAndIndexToID));
-      Q_EMIT this->SigErrorChange();
+      Q_EMIT (this->SigErrorChange());
    }
 }
 

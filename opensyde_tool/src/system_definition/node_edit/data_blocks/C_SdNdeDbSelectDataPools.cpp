@@ -342,6 +342,7 @@ bool C_SdNdeDbSelectDataPools::m_IsCommDatapoolSelectionValid(void)
       c_Message.SetDescription(C_GtGetText::h_GetText("Select only one COMM Datapool for each of Layer 2, "
                                                       "ECeS and ECoS."));
       c_Message.SetDetails(c_Details);
+      c_Message.SetCustomMinHeight(230, 270);
       c_Message.Execute();
    }
 

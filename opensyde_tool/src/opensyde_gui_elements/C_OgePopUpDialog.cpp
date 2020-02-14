@@ -47,9 +47,9 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent            Optional pointer to parent
-   \param[in]     opc_EffectTargetChild Optional pointer to child widget of dialog to apply shadow effect to
-   \param[in]     oq_AddShadow          Optional flag to add shadow effect (warning: costs performance on redraw)
+   \param[in,out]  opc_Parent             Optional pointer to parent
+   \param[in]      opc_EffectTargetChild  Optional pointer to child widget of dialog to apply shadow effect to
+   \param[in]      oq_AddShadow           Optional flag to add shadow effect (warning: costs performance on redraw)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const opc_EffectTargetChild,
@@ -133,7 +133,7 @@ C_OgePopUpDialog::~C_OgePopUpDialog()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Place widget in pop up dialog
 
-   \param[in,out] opc_Widget Widget to place in pop up dialog
+   \param[in,out]  opc_Widget    Widget to place in pop up dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -159,7 +159,7 @@ void C_OgePopUpDialog::SetWidget(QWidget * const opc_Widget)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set title
 
-   \param[in,out] orc_Str New title (rich text supported)
+   \param[in,out]  orc_Str    New title (rich text supported)
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -173,7 +173,7 @@ void C_OgePopUpDialog::SetTitle(const QString & orc_Str)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set sub title
 
-   \param[in,out] orc_Str New sub title (rich text supported)
+   \param[in,out]  orc_Str    New sub title (rich text supported)
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -199,7 +199,7 @@ void C_OgePopUpDialog::m_SetWindowTitle()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Activate move window
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -212,7 +212,7 @@ void C_OgePopUpDialog::HandleMousePressEvent(const QMouseEvent * const opc_Event
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Deactivate move window
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -225,7 +225,7 @@ void C_OgePopUpDialog::HandleMouseReleaseEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move window
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::HandleMouseMoveEvent(const QMouseEvent * const opc_Event)
@@ -242,7 +242,7 @@ void C_OgePopUpDialog::HandleMouseMoveEvent(const QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Resize new size
 
-   \param[in] orc_Size New size
+   \param[in]  orc_Size    New size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::SetSize(const QSize & orc_Size)
@@ -255,7 +255,7 @@ void C_OgePopUpDialog::SetSize(const QSize & orc_Size)
 
    If opc_Widget is NULL, the top widget will be used as orientation.
 
-   \param[in]  opc_Widget   Optional widget for orientation for maximum size
+   \param[in]  opc_Widget  Optional widget for orientation for maximum size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::ApplyMaximumSize(const QWidget * const opc_Widget)
@@ -303,7 +303,7 @@ void C_OgePopUpDialog::HideOverlay(void) const
 
    Warning: proper handling of SigCloseIgnored required
 
-   \param[in] oq_NotifyClose Flag to notify on close
+   \param[in]  oq_NotifyAndBlockClose  Flag to notify and block close
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::SetNotifyAndBlockClose(const bool oq_NotifyAndBlockClose)
@@ -316,7 +316,7 @@ void C_OgePopUpDialog::SetNotifyAndBlockClose(const bool oq_NotifyAndBlockClose)
 
    Here: Trigger help key press handling
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -333,7 +333,7 @@ void C_OgePopUpDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 
    Here: Reposition to main window center
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::showEvent(QShowEvent * const opc_Event)
@@ -364,7 +364,7 @@ void C_OgePopUpDialog::showEvent(QShowEvent * const opc_Event)
 
    Here: Ignore and forward close requests
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::closeEvent(QCloseEvent * const opc_Event)

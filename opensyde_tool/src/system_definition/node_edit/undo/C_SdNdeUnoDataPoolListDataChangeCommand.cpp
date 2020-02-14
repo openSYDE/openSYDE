@@ -47,7 +47,7 @@ using namespace stw_errors;
    \param[in]     oru32_NodeIndex                Node index
    \param[in]     oru32_DataPoolIndex            Node data pool index
    \param[in,out] opc_DataPoolListsTreeWidget    Data pool lists tree widget to perform actions on
-   \param[in]     oru32_DataPoolListElementIndex Node data pool list index
+   \param[in]     oru32_DataPoolListIndex        Data pool list index
    \param[in]     orc_NewData                    New data
    \param[in]     ore_DataChangeType             Data change type
    \param[in,out] opc_Parent                     Optional pointer to parent

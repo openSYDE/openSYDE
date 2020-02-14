@@ -229,6 +229,8 @@ private:
 
    void m_GetAllWidgetItems(std::vector<C_PuiSvDbWidgetBase *> & orc_Output);
    static void mh_MarkInvalid(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId);
+   static stw_types::uint32 mh_GetBestIndexForNewItem(const C_PuiSvDbParam & orc_ParamWidget,
+                                                      const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_NewId, stw_types::sint32 * const ops32_DatasetIndex);
    void m_SyncCleanUpParams(void);
 };
 

@@ -50,7 +50,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaArModel::C_SyvDaItPaArModel(QObject * const opc_Parent) :
@@ -64,9 +64,9 @@ C_SyvDaItPaArModel::C_SyvDaItPaArModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Specify associated list
 
-   \param[in] oru32_ElementIndex Element index
-   \param[in] opc_DataWidget     Data widget
-   \param[in] oq_ECUValues       Optional flag if the shown values are ECU values
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  opc_DataWidget       Data widget
+   \param[in]  oq_ECUValues         Optional flag if the shown values are ECU values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArModel::SetElement(const uint32 ou32_ElementIndex, C_PuiSvDbDataElementHandler * const opc_DataWidget,
@@ -82,9 +82,9 @@ void C_SyvDaItPaArModel::SetElement(const uint32 ou32_ElementIndex, C_PuiSvDbDat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
@@ -139,7 +139,7 @@ QVariant C_SyvDaItPaArModel::headerData(const sintn osn_Section, const Qt::Orien
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -160,7 +160,7 @@ sintn C_SyvDaItPaArModel::rowCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -184,8 +184,8 @@ sintn C_SyvDaItPaArModel::columnCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -207,10 +207,10 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
                if (this->mq_ECUValues == true)
                {
                   c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_Element->c_NvmValue,
-                                                                                         pc_Element->f64_Factor,
-                                                                                         pc_Element->f64_Offset,
-                                                                                         static_cast<uint32>(orc_Index.
-                                                                                                             column()));
+                                                                                   pc_Element->f64_Factor,
+                                                                                   pc_Element->f64_Offset,
+                                                                                   static_cast<uint32>(orc_Index.
+                                                                                                       column()));
                }
                else
                {
@@ -218,11 +218,11 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
                   if (pc_Data != NULL)
                   {
                      c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(*pc_Data,
-                                                                                            pc_Element->f64_Factor,
-                                                                                            pc_Element->f64_Offset,
-                                                                                            static_cast<uint32>(
-                                                                                               orc_Index.
-                                                                                               column()));
+                                                                                      pc_Element->f64_Factor,
+                                                                                      pc_Element->f64_Offset,
+                                                                                      static_cast<uint32>(
+                                                                                         orc_Index.
+                                                                                         column()));
                   }
                }
             }
@@ -257,9 +257,9 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data at index
 
-   \param[in] orc_Index Index
-   \param[in] orc_Value New data
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  orc_Value   New data
+   \param[in]  osn_Role    Data role
 
    \return
    true  success
@@ -292,9 +292,9 @@ bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant &
                      const uint32 u32_Index = static_cast<uint32>(orc_Index.column());
                      C_OSCNodeDataPoolContent & rc_Content = c_Copy.c_ListValues[this->mu32_ElementIndex];
                      C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_Value, rc_Content,
-                                                                                         pc_OSCElement->f64_Factor,
-                                                                                         pc_OSCElement->f64_Offset,
-                                                                                         u32_Index);
+                                                                                   pc_OSCElement->f64_Factor,
+                                                                                   pc_OSCElement->f64_Offset,
+                                                                                   u32_Index);
                      tgl_assert(pc_ParamWidget->SetParamItem(c_Copy) == C_NO_ERR);
                   }
                }
@@ -312,7 +312,7 @@ bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get flags for item
 
-   \param[in] orc_Index Item
+   \param[in]  orc_Index   Item
 
    \return
    Flags for item
@@ -340,8 +340,7 @@ Qt::ItemFlags C_SyvDaItPaArModel::flags(const QModelIndex & orc_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal model update
 
-   \param[in] oru32_Row      Changed row
-   \param[in] ore_ChangeType Change type
+   \param[in]  oru32_Column   Changed column
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArModel::HandleDataChange(const uint32 & oru32_Column)
@@ -498,7 +497,7 @@ sint32 C_SyvDaItPaArModel::m_GetDataSetIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check error for current cell
 
-   \param[in] orc_Index Index to check the error for
+   \param[in]  orc_Index   Index to check the error for
 
    \return
    True  Error detected

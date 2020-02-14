@@ -36,9 +36,9 @@ class C_SdNdeDpListComHeaderWidget :
 
 public:
    explicit C_SdNdeDpListComHeaderWidget(const stw_types::uint32 ou32_NodeIndex,
-                                               const stw_types::uint32 ou32_DataPoolIndex,
-                                               const stw_types::uint32 ou32_ListIndex,
-                                               const bool & orq_UseAlternatingColor, QWidget * const opc_Parent = NULL);
+                                         const stw_types::uint32 ou32_DataPoolIndex,
+                                         const stw_types::uint32 ou32_ListIndex, const bool & orq_UseAlternatingColor,
+                                         QWidget * const opc_Parent = NULL);
    ~C_SdNdeDpListComHeaderWidget(void);
    void InitStaticNames(void);
    bool GetErrorActive(void) const;
@@ -73,7 +73,6 @@ private:
    void m_UpdateBusLink(void);
    void m_OnLinkEdit(void);
    void m_OnLinkSwitchToBus(void);
-   void m_OnLinkFileImport(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

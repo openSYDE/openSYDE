@@ -194,6 +194,9 @@ void C_NagToolTip::DoMove(const QPoint & orc_GlobalPos)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Hide all existing tool tips
+
+   \retval true   hided at least one tooltip
+   \retval false  no existing visible tooltip found
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_NagToolTip::h_HideAll(void)

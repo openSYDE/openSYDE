@@ -26,7 +26,7 @@ class C_SdManUnoTopologyAddCommand :
    public C_SdManUnoTopologyAddBaseCommand
 {
 public:
-   enum E_ElementType
+   enum E_ElementType ///< Data element type
    {
       eNODE,          ///< Data element for node
       eCAN_BUS,       ///< Data element for can bus
@@ -52,7 +52,7 @@ public:
    virtual ~C_SdManUnoTopologyAddCommand(void);
 
 protected:
-   virtual void m_AddNew(void);
+   virtual void m_AddNew(void) override;
 
 private:
    const E_ElementType me_Type;

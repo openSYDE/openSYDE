@@ -134,6 +134,8 @@ void C_UsHandler::SetDefault(void)
 
    this->msn_SysDefNodeEditTabIndex = 0;
    this->msn_SysDefBusEditTabIndex = 0;
+
+   this->mc_RecentColors.fill(QColor(255, 255, 255, 255), 6);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -326,6 +328,30 @@ stw_types::uint8 C_UsHandler::GetMaxRecentProjects(void)
 QString C_UsHandler::GetCurrentSaveAsPath(void) const
 {
    return this->mc_CurrentSaveAsPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get recent colors as vector to color picker
+
+   \return
+   Recent colors as vector to color picker
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QVector<QColor> C_UsHandler::GetRecentColors(void) const
+{
+   return this->mc_RecentColors;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get next recent color button number to color picker
+
+   \return
+   Next recent color button number to color picker
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sintn C_UsHandler::GetNextRecentColorButtonNumber(void) const
+{
+   return this->msn_NextRecentColorButtonNumber;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -632,6 +658,9 @@ const QList<QString> C_UsHandler::GetProjSvSetupViewKeysInternal(void) const
 
    \param[in] orc_ViewName      Project system view name (identifier)
    \param[in] orc_DashboardName Dashboard name (identifier)
+
+   \return
+   dashboard user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_UsSystemViewDashboard C_UsHandler::GetProjSvDashboardSettings(const QString & orc_ViewName,
@@ -735,7 +764,7 @@ void C_UsHandler::SetAppSize(const QSize & orc_New)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set application maximizing flag
 
-   \param[in] orq_New Updated application maximizing flag
+   \param[in] oq_New Updated application maximizing flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetAppMaximized(const bool oq_New)
@@ -851,6 +880,28 @@ void C_UsHandler::SetSdTopologyToolboxMaximized(const bool & orq_New)
 void C_UsHandler::SetCurrentSaveAsPath(const QString & orc_Value)
 {
    this->mc_CurrentSaveAsPath = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set recent colors as vector from color picker
+
+   \param[in] orc_RecentColorsVector Recent colors as vector from color picker
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetRecentColors(const QVector<QColor> & orc_RecentColorsVector)
+{
+   this->mc_RecentColors = orc_RecentColorsVector;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set next recent color button number from color picker
+
+   \param[in] orc_NextRecentColorButtonNumber Next recent color button number from color picker
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetNextRecentColorButtonNumber(const sintn & orc_NextRecentColorButtonNumber)
+{
+   this->msn_NextRecentColorButtonNumber = orc_NextRecentColorButtonNumber;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1111,6 +1162,7 @@ void C_UsHandler::SetProjSdNodeDatapoolSelectedVariableNames(const QString & orc
    \param[in] orc_NodeName            Project system definition node name (identifier)
    \param[in] orc_DatapoolName        Project system definition node datapool name (identifier)
    \param[in] orc_ListName            Project system definition node datapool list name (identifier)
+   \param[in] oe_SelectedProtocol     Type of selected protocol
    \param[in] oq_MessageSelected      Set flag if there is a selected message
    \param[in] orc_SelectedMessageName Selected message name if any
    \param[in] oq_SignalSelected       Flag if signal selected
@@ -1119,8 +1171,10 @@ void C_UsHandler::SetProjSdNodeDatapoolSelectedVariableNames(const QString & orc
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeDatapoolListSelectedMessage(const QString & orc_NodeName,
                                                            const QString & orc_DatapoolName,
-                                                           const QString & orc_ListName,
-                                                           const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_SelectedProtocol, const bool oq_MessageSelected, const QString & orc_SelectedMessageName, const bool oq_SignalSelected,
+                                                           const QString & orc_ListName, const stw_opensyde_core::C_OSCCanProtocol::E_Type
+                                                           oe_SelectedProtocol, const bool oq_MessageSelected,
+                                                           const QString & orc_SelectedMessageName,
+                                                           const bool oq_SignalSelected,
                                                            const QString & orc_SelectedSignalName)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
@@ -1536,7 +1590,7 @@ void C_UsHandler::SetProjSvUpdateSummaryBig(const QString & orc_ViewName, const 
 /*! \brief   Set visibility of empty optional sections
 
    \param[in] orc_ViewName    Project system view name (identifier)
-   \param[in] oq_BigVisible   true: visible; false: invisible
+   \param[in] oq_Visible   true: visible; false: invisible
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvUpdateEmptyOptionalSectionsVisible(const QString & orc_ViewName, const bool oq_Visible)
@@ -1821,7 +1875,7 @@ sint32 C_UsHandler::h_CheckLanguageExists(const QString & orc_Str)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get parent folder of path with or without file
 
-   \param[in]  orc_CompletePathWithFile     Complete path
+   \param[in]  orc_CompletePath             Complete path
    \param[out] orc_Parent                   Parent folder
    \param[in]  orq_CompletePathContainsFile Indicator if complete path contains a file (filenames can't be handled automatically
                                                as there is no difference to a folder name,

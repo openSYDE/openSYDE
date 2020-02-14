@@ -40,7 +40,7 @@ stw_types::uint16 C_OSCParamSetFilerBase::mhu16_FileVersion = 1;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add CRC to specified file
+/*! \brief  Add CRC to specified file
 
    \param[in] orc_Path File path
 
@@ -86,7 +86,7 @@ sint32 C_OSCParamSetFilerBase::h_AddCRC(const C_SCLString & orc_Path)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check parameter set file version
+/*! \brief  Check parameter set file version
 
    Check parameter set file version from XML file
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
@@ -111,13 +111,14 @@ sint32 C_OSCParamSetFilerBase::h_CheckFileVersion(C_OSCXMLParserBase & orc_XMLPa
    }
    else
    {
+      osc_write_log_error("Loading Dataset data", "Could not find \"file-version\" node.");
       s32_Retval = C_CONFIG;
    }
    return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save parameter set file version
+/*! \brief  Save parameter set file version
 
    Save parameter set file version to XML file
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
@@ -138,13 +139,14 @@ void C_OSCParamSetFilerBase::h_SaveFileVersion(C_OSCXMLParserBase & orc_XMLParse
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save parameter set file info
+/*! \brief  Save parameter set file info
 
    Save parameter set file info to XML file
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
    post-condition: the passed XML parser has the active node set to the same "opensyde-parameter-sets"
 
    \param[in,out] orc_XMLParser XML with specified node active
+   \param[in]     orc_FileInfo  File info
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetFilerBase::h_SaveFileInfo(C_OSCXMLParserBase & orc_XMLParser,
@@ -163,7 +165,7 @@ void C_OSCParamSetFilerBase::h_SaveFileInfo(C_OSCXMLParserBase & orc_XMLParser,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load parameter set file info
+/*! \brief  Load parameter set file info
 
    Load parameter set file info from XML file
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
@@ -264,7 +266,7 @@ void C_OSCParamSetFilerBase::h_LoadFileInfo(C_OSCXMLParserBase & orc_XMLParser,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCParamSetFilerBase::C_OSCParamSetFilerBase(void)
@@ -272,7 +274,7 @@ C_OSCParamSetFilerBase::C_OSCParamSetFilerBase(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load parameter set node name
+/*! \brief  Load parameter set node name
 
    Load parameter set node name data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -298,13 +300,14 @@ sint32 C_OSCParamSetFilerBase::h_LoadNodeName(stw_scl::C_SCLString & orc_Name, C
    }
    else
    {
+      osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"name\" node.");
       s32_Retval = C_CONFIG;
    }
    return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save parameter set node name
+/*! \brief  Save parameter set node name
 
    Save parameter set node name to XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -329,7 +332,7 @@ void C_OSCParamSetFilerBase::h_SaveNodeName(const stw_scl::C_SCLString & orc_Nam
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load parameter set data pool infos
+/*! \brief  Load parameter set data pool infos
 
    Load parameter set data pool infos data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -391,14 +394,14 @@ sint32 C_OSCParamSetFilerBase::h_LoadDataPoolInfos(std::vector<C_OSCParamSetData
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save parameter set data pool information
+/*! \brief  Save parameter set data pool information
 
    Save parameter set data pool information to XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[in]     orc_DataPoolInfos   data pool information to store
-   \param[in,out] orc_XMLParser       XML with specified node active
+   \param[in]     orc_DataPoolInfos data pool information to store
+   \param[in,out] orc_XMLParser     XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetFilerBase::h_SaveDataPoolInfos(const std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
@@ -426,10 +429,10 @@ void C_OSCParamSetFilerBase::h_SaveDataPoolInfos(const std::vector<C_OSCParamSet
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load parameter set data pool info
+/*! \brief  Load parameter set data pool info
 
    Load parameter set data pool info data from XML file
-   pre-condition: the passed XML parser has the active node set to "datapools"
+   pre-condition: the passed XML parser has the active node set to "datapool"
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
    \param[out]    orc_DataPoolInfo           data storage
@@ -453,7 +456,8 @@ sint32 C_OSCParamSetFilerBase::h_LoadDataPoolInfo(C_OSCParamSetDataPoolInfo & or
    }
    else
    {
-      s32_Retval = C_RANGE;
+      osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"datapool\".\"crc\" attribute.");
+      s32_Retval = C_CONFIG;
    }
    if (orc_XMLParser.AttributeExists("nvm-size") == true)
    {
@@ -471,61 +475,75 @@ sint32 C_OSCParamSetFilerBase::h_LoadDataPoolInfo(C_OSCParamSetDataPoolInfo & or
    {
       orq_MissingOptionalContent = true;
    }
-   if ((orc_XMLParser.SelectNodeChild("name") == "name") && (s32_Retval == C_NO_ERR))
+   if (s32_Retval == C_NO_ERR)
    {
-      orc_DataPoolInfo.c_Name = orc_XMLParser.GetNodeContent();
-      //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "datapool");
-   }
-   else
-   {
-      s32_Retval = C_RANGE;
-   }
-   if ((orc_XMLParser.SelectNodeChild("version") == "version") && (s32_Retval == C_NO_ERR))
-   {
-      if (orc_XMLParser.AttributeExists("major") == true)
+      if (orc_XMLParser.SelectNodeChild("name") == "name")
       {
-         orc_DataPoolInfo.au8_Version[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("major"));
+         orc_DataPoolInfo.c_Name = orc_XMLParser.GetNodeContent();
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "datapool");
       }
       else
       {
-         s32_Retval = C_RANGE;
+         osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"datapool\".\"name\" node.");
+         s32_Retval = C_CONFIG;
       }
-      if ((orc_XMLParser.AttributeExists("minor") == true) && (s32_Retval == C_NO_ERR))
-      {
-         orc_DataPoolInfo.au8_Version[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("minor"));
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
-      }
-      if ((orc_XMLParser.AttributeExists("release") == true) && (s32_Retval == C_NO_ERR))
-      {
-         orc_DataPoolInfo.au8_Version[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("release"));
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
-      }
-      //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "datapool");
    }
-   else
+   if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = C_RANGE;
+      if (orc_XMLParser.SelectNodeChild("version") == "version")
+      {
+         if (orc_XMLParser.AttributeExists("major") == true)
+         {
+            orc_DataPoolInfo.au8_Version[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("major"));
+         }
+         else
+         {
+            osc_write_log_error("Loading Dataset data",
+                                "Could not find \"node\".\"datapool\".\"version\".\"major\" attribute.");
+            s32_Retval = C_CONFIG;
+         }
+         if ((orc_XMLParser.AttributeExists("minor") == true) && (s32_Retval == C_NO_ERR))
+         {
+            orc_DataPoolInfo.au8_Version[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("minor"));
+         }
+         else
+         {
+            osc_write_log_error("Loading Dataset data",
+                                "Could not find \"node\".\"datapool\".\"version\".\"minor\" attribute.");
+            s32_Retval = C_CONFIG;
+         }
+         if ((orc_XMLParser.AttributeExists("release") == true) && (s32_Retval == C_NO_ERR))
+         {
+            orc_DataPoolInfo.au8_Version[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("release"));
+         }
+         else
+         {
+            osc_write_log_error("Loading Dataset data",
+                                "Could not find \"node\".\"datapool\".\"version\".\"release\" attribute.");
+            s32_Retval = C_CONFIG;
+         }
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "datapool");
+      }
+      else
+      {
+         osc_write_log_error("Loading Dataset data", "Could not find \"node\".\"datapool\".\"version\" node.");
+         s32_Retval = C_CONFIG;
+      }
    }
    return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save parameter set data pool info
+/*! \brief  Save parameter set data pool info
 
    Save parameter set data pool info to XML file
    pre-condition: the passed XML parser has the active node set to "datapool"
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
-   \param[in]     orc_DataPoolInfo  information to store
-   \param[in,out] orc_XMLParser     XML with specified node active
+   \param[in]     orc_DataPoolInfo information to store
+   \param[in,out] orc_XMLParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetFilerBase::h_SaveDataPoolInfo(const C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,

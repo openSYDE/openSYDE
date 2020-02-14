@@ -40,8 +40,8 @@ const sintn C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_TRANSPARENT = 1;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent  Optional pointer to parent
-   \param[in]     oq_DarkMode Flag for dark mode
+   \param[in,out]  orc_Parent    Parent widget
+   \param[in]      oq_DarkMode   Flag for dark mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeLabel::C_SyvDaPeLabel(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
@@ -99,6 +99,20 @@ void C_SyvDaPeLabel::InitStaticNames(void) const
 
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Default"));
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Transparent"));
+
+   //Tool tips
+   this->mpc_Ui->pc_LabelCaption->SetToolTipInformation(C_GtGetText::h_GetText("Caption"),
+                                                        C_GtGetText::h_GetText(
+                                                           "Caption, displayed above the value"));
+   this->mpc_Ui->pc_LabelStyle->SetToolTipInformation(C_GtGetText::h_GetText("Style"),
+                                                      C_GtGetText::h_GetText(
+                                                         "Different options for styles specific to this widget"));
+   this->mpc_Ui->pc_LabelShowUnit->SetToolTipInformation(C_GtGetText::h_GetText("Show Unit"),
+                                                         C_GtGetText::h_GetText(
+                                                            "Option to display the unit after the value or hide the unit entirely"));
+   this->mpc_Ui->pc_LabelShowCaption->SetToolTipInformation(C_GtGetText::h_GetText("Show Caption"),
+                                                            C_GtGetText::h_GetText(
+                                                               "Option to display the caption above the value or hide the caption entirely"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -163,7 +177,7 @@ QString C_SyvDaPeLabel::GetCaption(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set type
 
-   \param[in] oe_Type New type
+   \param[in]  oe_Type  New type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::SetType(const C_PuiSvDbLabel::E_Type oe_Type) const
@@ -184,7 +198,7 @@ void C_SyvDaPeLabel::SetType(const C_PuiSvDbLabel::E_Type oe_Type) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set show unit flag
 
-   \param[in] oq_Value New show unit flag
+   \param[in]  oq_Value    New show unit flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::SetShowUnit(const bool oq_Value) const
@@ -195,7 +209,7 @@ void C_SyvDaPeLabel::SetShowUnit(const bool oq_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set show caption flag
 
-   \param[in] oq_Value New show caption flag
+   \param[in]  oq_Value    New show caption flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::SetShowCaption(const bool oq_Value) const
@@ -206,7 +220,7 @@ void C_SyvDaPeLabel::SetShowCaption(const bool oq_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set caption
 
-   \param[in] oq_Value New caption
+   \param[in]  orc_Value   New caption
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::SetCaption(const QString & orc_Value) const

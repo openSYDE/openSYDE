@@ -94,7 +94,6 @@ private:
    void m_LoadFromData(void);
    void m_OnExtendedChange(const bool & orq_Extended) const;
    void m_OnTxMethodChange(const stw_types::sint32 & ors32_State) const;
-   void m_OnDlcChange(const stw_types::sintn & orsn_NewValue) const;
    static stw_types::sint32 h_TxMethodToIndex(const stw_opensyde_core::C_OSCCanMessage::E_TxMethodType & ore_TxMethod);
    static stw_opensyde_core::C_OSCCanMessage::E_TxMethodType h_IndexToTxMethod(const stw_types::sint32 & ors32_Index);
    void m_OnNameChanged(void);
@@ -110,7 +109,8 @@ private:
    void m_OnRxChanged(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                       const stw_types::uint32 ou32_DatapoolIndex, const bool oq_Checked);
    void m_OnRxTimeoutFlagChanged(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-                                 const stw_types::uint32 ou32_DatapoolIndex, const bool oq_UseAuto);
+                                 const stw_types::uint32 ou32_DatapoolIndex,
+                                 const stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_TimeoutMode);
    void m_OnRxTimeoutValueChanged(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                                   const stw_types::uint32 ou32_DatapoolIndex,
                                   const stw_types::uint32 ou32_TimeoutValue);

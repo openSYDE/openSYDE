@@ -483,21 +483,6 @@ p, li { white-space: pre-wrap; }
                     <height>30</height>
                    </size>
                   </property>
-                  <item>
-                   <property name="text">
-                    <string>openSYDE</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>KEFEX</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>None</string>
-                   </property>
-                  </item>
                  </widget>
                 </item>
                 <item>

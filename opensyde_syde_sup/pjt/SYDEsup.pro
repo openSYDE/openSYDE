@@ -45,6 +45,23 @@ SOURCES += ../src/C_SUPSuSequences.cpp \
            ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetRawEntry.cpp \
            ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetRawNode.cpp \
            ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetRawNodeFiler.cpp \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfig.cpp \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigChannel.cpp \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigDomain.cpp \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigFiler.cpp \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameter.cpp \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameterStruct.cpp \
+           ../libs/opensyde_core/halc/definition/base/C_OSCHalcDefBase.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDef.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelAvailability.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelUseCase.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefContent.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefContentBitmaskItem.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefDomain.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefElement.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefFiler.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefStruct.cpp \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefStructFiler.cpp \
            ../libs/opensyde_core/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.cpp \
            ../libs/opensyde_core/kefex_diaglib/CDLReportEvents.cpp \
            ../libs/opensyde_core/kefex_diaglib/CHexFile.cpp \
@@ -82,6 +99,7 @@ SOURCES += ../src/C_SUPSuSequences.cpp \
            ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.cpp \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPool.cpp \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContent.cpp \
+           ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.cpp \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolDataset.cpp \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolFiler.cpp \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolId.cpp \
@@ -147,6 +165,23 @@ HEADERS += ../src/C_SUPSuSequences.h \
            ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetRawEntry.h \
            ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetRawNode.h \
            ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetRawNodeFiler.h \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfig.h \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigChannel.h \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigDomain.h \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigFiler.h \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameter.h \
+           ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameterStruct.h \
+           ../libs/opensyde_core/halc/definition/base/C_OSCHalcDefBase.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDef.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelAvailability.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelUseCase.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefContent.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefContentBitmaskItem.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefDomain.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefElement.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefFiler.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefStruct.h \
+           ../libs/opensyde_core/halc/definition/C_OSCHalcDefStructFiler.h \
            ../libs/opensyde_core/ip_dispatcher/dispatcher/C_OSCIpDispatcher.h \
            ../libs/opensyde_core/ip_dispatcher/target_windows_win_sock/C_OSCIpDispatcherWinSock.h \
            ../libs/opensyde_core/kefex_diaglib/CDLReportEvents.h \
@@ -185,6 +220,7 @@ HEADERS += ../src/C_SUPSuSequences.h \
            ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.h \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPool.h \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContent.h \
+           ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.h \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolDataset.h \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolExportSettings.h \
            ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolFiler.h \
@@ -241,10 +277,11 @@ INCLUDEPATH += ../src \
                ../libs/opensyde_core/ip_dispatcher/dispatcher \
                ../libs/opensyde_core/data_dealer \
                ../libs/opensyde_core/data_dealer/paramset \
-               ../libs/opensyde_core/exports \
-               ../libs/opensyde_core/imports \
+               ../libs/opensyde_core/halc \
+               ../libs/opensyde_core/halc/configuration \
+               ../libs/opensyde_core/halc/definition \
+               ../libs/opensyde_core/halc/definition/base \
                ../libs/opensyde_core/logging \
-               ../libs/opensyde_core/md5 \
                ../libs/opensyde_core/project \
                ../libs/opensyde_core/project/system \
                ../libs/opensyde_core/project/system/node \

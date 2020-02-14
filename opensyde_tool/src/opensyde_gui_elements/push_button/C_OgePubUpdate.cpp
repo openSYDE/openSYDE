@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubUpdate::C_OgePubUpdate(QWidget * const opc_Parent) :
@@ -54,7 +54,7 @@ C_OgePubUpdate::C_OgePubUpdate(QWidget * const opc_Parent) :
 
    Here: Draw icon
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubUpdate::paintEvent(QPaintEvent * const opc_Event)
@@ -81,12 +81,12 @@ void C_OgePubUpdate::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Setting the Icon for Enabled and Disabled mode
 
-   \param[in,out] oc_IconPathEnabled      String for Enabled Icon Path
-                  oc_IconPathDisabled     String for Disabled Icon Path
+   \param[in]  orc_IconPathEnabled   String for Enabled Icon Path
+   \param[in]  orc_IconPathDisabled  String for Disabled Icon Path
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubUpdate::InitCustomIcon(QString oc_IconPathEnabled, QString oc_IconPathDisabled)
+void C_OgePubUpdate::InitCustomIcon(const QString & orc_IconPathEnabled, const QString & orc_IconPathDisabled)
 {
-   mc_IconEnabled.addPixmap(QPixmap(oc_IconPathEnabled));
-   mc_IconDisabled.addPixmap(QPixmap(oc_IconPathDisabled));
+   mc_IconEnabled.addPixmap(QPixmap(orc_IconPathEnabled));
+   mc_IconDisabled.addPixmap(QPixmap(orc_IconPathDisabled));
 }

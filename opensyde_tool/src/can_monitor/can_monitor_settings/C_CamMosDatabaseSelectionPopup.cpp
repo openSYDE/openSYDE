@@ -128,7 +128,13 @@ void C_CamMosDatabaseSelectionPopup::InitStaticNames(void) const
    this->mpc_Ui->pc_LineEditSearch->setPlaceholderText(C_GtGetText::h_GetText("Filter"));
    this->mpc_Ui->pc_LabelSearchNoElementsFound->setText(C_GtGetText::h_GetText("No messages found."));
    this->mpc_Ui->pc_LabelInitialSignalNoElements->setText(C_GtGetText::h_GetText(
-                                                             "No messages defined. No active database."));
+                                                             "No messages found. \n\n"
+                                                             "Possible reasons:\n"
+                                                             "   - Database deactivated\n"
+                                                             "   - Database not loaded yet\n"
+                                                             "   - Database loading failed\n"
+                                                             "   - Database doesn't contain messages"));
+
    this->mpc_Ui->pc_GroupBoxSearchNoElementsFound->setTitle("");
    this->mpc_Ui->pc_GroupBoxInitialSignalNoElements->setTitle("");
 

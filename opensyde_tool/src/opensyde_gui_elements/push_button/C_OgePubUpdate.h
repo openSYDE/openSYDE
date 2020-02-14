@@ -28,7 +28,7 @@ class C_OgePubUpdate :
 
 public:
    C_OgePubUpdate(QWidget * const opc_Parent = NULL);
-   void InitCustomIcon(QString oc_IconPathEnabled, QString oc_IconPathDisabled);
+   void InitCustomIcon(const QString & orc_IconPathEnabled, const QString & orc_IconPathDisabled);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions

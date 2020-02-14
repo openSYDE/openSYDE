@@ -47,10 +47,13 @@ using namespace stw_opensyde_core;
                                   Else use data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListArrayEditWidget::C_SdNdeDpListArrayEditWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 & oru32_NodeIndex,
-   const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
-   const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType, const uint32 & oru32_DataSetIndex) :
+C_SdNdeDpListArrayEditWidget::C_SdNdeDpListArrayEditWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                           const uint32 & oru32_NodeIndex,
+                                                           const uint32 & oru32_DataPoolIndex,
+                                                           const uint32 & oru32_ListIndex,
+                                                           const uint32 & oru32_ElementIndex,
+                                                           const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                                           const uint32 & oru32_DataSetIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListArrayEditWidget),
    mrc_Parent(orc_Parent),

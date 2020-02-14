@@ -36,7 +36,6 @@
 #include "C_PopUtil.h"
 #include "C_OSCUtils.h"
 #include "C_PuiUtil.h"
-#include "C_ImpCodeGenerationReportWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
@@ -73,7 +72,7 @@ C_ImpUtil::C_ImpUtil(void)
 
    Errors are handled internally.
 
-   \param[in]   opc_Parent    parent widget
+   \param[in]  opc_Parent  parent widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_ImpUtil::h_ExportCodeAll(QWidget * const opc_Parent)
@@ -101,7 +100,6 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
                              const std::vector< std::vector<uint32> > & orc_AppIndicesPerNode,
                              QWidget * const opc_Parent)
 {
-   std::list<QString> c_ExportedFiles;
    sint32 s32_Result = C_NO_ERR;
    bool q_Continue = true;
    C_OgeWiCustomMessage c_Message(opc_Parent);
@@ -152,6 +150,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          c_Message.SetDetails(QString(C_GtGetText::h_GetText(
                                          "The following Datapools have no assigned application:\n%1")).arg(
                                  c_DataPoolErrorMessage));
+         c_Message.SetCustomMinHeight(180, 250);
          c_Message.Execute();
       }
    }
@@ -188,6 +187,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
                                                           "Do you really want to generate code?"));
          c_Question.SetOKButtonText(C_GtGetText::h_GetText("Generate"));
          c_Question.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+         c_Question.SetCustomMinHeight(180, 180);
          if (c_Question.Execute() == C_OgeWiCustomMessage::eYES)
          {
             q_Continue = true;
@@ -269,8 +269,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          c_Message.SetOKButtonText(C_GtGetText::h_GetText("Generate"));
          c_Message.SetNOButtonText(C_GtGetText::h_GetText("Don't Generate"));
          c_Message.SetDetails("<a/>" + c_EraseInfoMessage + c_DataBlockInfoMessage);
-         c_Message.SetCustomMinWidth(750);
-         c_Message.SetCustomMinHeight(400);
+         c_Message.SetCustomMinHeight(200, 400);
          if (c_Message.Execute() != C_OgeWiCustomMessage::eYES)
          {
             q_Continue = false;
@@ -285,6 +284,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
                                                          "Set a code generator for every Data Block."));
          c_Message.SetDetails(QString(C_GtGetText::h_GetText("<a/>The following Data Blocks "
                                                              "have no code generator:<br>%1")).arg(c_ErrorMessage));
+         c_Message.SetCustomMinHeight(180, 300);
          c_Message.Execute();
          q_Continue = false;
       }
@@ -293,13 +293,15 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
    // finally we are ready to generate code
    if (q_Continue == true)
    {
+      std::vector<C_ImpCodeGenerationReportWidget::C_ReportData> c_ExportInfo;
+
       // export code for each node
       QApplication::setOverrideCursor(Qt::WaitCursor);
       for (uint32 u32_ItNode = 0; (u32_ItNode < orc_NodeIndices.size()) && (s32_Result == C_NO_ERR); ++u32_ItNode)
       {
          // Maybe once replace "true" flag with user-confirmed value
          s32_Result = C_ImpUtil::mh_ExportCodeNode(orc_NodeIndices[u32_ItNode], orc_AppIndicesPerNode[u32_ItNode],
-                                                   c_ExportedFiles, true);
+                                                   c_ExportInfo, true);
       }
       QApplication::restoreOverrideCursor();
 
@@ -310,8 +312,8 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          C_ImpCodeGenerationReportWidget * const pc_DialogExportReport =  new C_ImpCodeGenerationReportWidget(
             *c_PopUpDialogReportDialog);
 
-         c_PopUpDialogReportDialog->SetSize(QSize(1000, 700));
-         pc_DialogExportReport->CreateReport(c_ExportedFiles);
+         c_PopUpDialogReportDialog->SetSize(QSize(1100, 700));
+         pc_DialogExportReport->CreateReport(c_ExportInfo);
 
          // display message report
          c_PopUpDialogReportDialog->exec();
@@ -334,6 +336,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
                                                     C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
                                    C_GtGetText::h_GetText(" or log file(s) of code generator(s).");
          c_MessageResult.SetDetails(c_Details);
+         c_MessageResult.SetCustomMinHeight(180, 250);
          c_MessageResult.Execute();
       }
    }
@@ -345,8 +348,8 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
    Check given nodes for valid ones (i.e. ones with programmable applications)
    and export code for them.
 
-   \param[in]     orc_NodeIndices  node indices (can be a single node too - wrapped in a 1-length-vector)
-   \param[in]     opc_Parent       parent widget
+   \param[in]  orc_NodeIndices   node indices (can be a single node too - wrapped in a 1-length-vector)
+   \param[in]  opc_Parent        parent widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, QWidget * const opc_Parent)
@@ -395,6 +398,7 @@ void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, Q
       c_Message.SetType(C_OgeWiCustomMessage::E_Type::eINFORMATION);
       c_Message.SetHeading(C_GtGetText::h_GetText("Code generation"));
       c_Message.SetDescription(c_Text);
+      c_Message.SetCustomMinHeight(180, 180);
       c_Message.Execute();
    }
    // generate code
@@ -407,10 +411,10 @@ void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, Q
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Export code for specified node
 
-   \param[in]   ou32_NodeIndex      Node index
-   \param[in ]  orc_ExportFolder    folder the files shall be written to
-   \param[in]   orq_Erase           flag for code generator: true -> erase target folder and all sub-folders
-   \param[out]  orc_ExportedFiles   list of created files (with full paths)
+   \param[in]   ou32_NodeIndex   Node index
+   \param[in]   orc_AppIndices   Application indices
+   \param[out]  orc_ExportInfo   data structure containing information for report
+   \param[in]   orq_Erase        flag for code generator: true -> erase target folder and all sub-folders
 
    \return
    C_NO_ERR       Operation success
@@ -419,7 +423,8 @@ void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, Q
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vector<stw_types::uint32> & orc_AppIndices,
-                                    std::list<QString> & orc_ExportedFiles, const bool & orq_Erase)
+                                    std::vector<C_ImpCodeGenerationReportWidget::C_ReportData> & orc_ExportInfo,
+                                    const bool & orq_Erase)
 {
    sint32 s32_Retval = C_NO_ERR;
    C_OSCNode c_Node;
@@ -444,21 +449,22 @@ sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vect
                      pc_Application->c_CodeGeneratorPath.c_str(),
                      C_PuiUtil::h_GetResolvedAbsPathFromProject(pc_Application->c_ProjectPath.c_str()));
 
-               std::vector<QString> c_Files;
-               s32_Retval = mh_ExecuteCodeGenerator(c_Node.c_Properties.c_Name.c_str(), pc_Application->c_Name.c_str(),
-                                                    c_CompleteExportFolderName, c_Files, c_CompleteCodeGenerator,
+               C_ImpCodeGenerationReportWidget::C_ReportData c_ReportInfo;
+               c_ReportInfo.c_NodeName = c_Node.c_Properties.c_Name.c_str();
+               c_ReportInfo.c_AppName = pc_Application->c_Name.c_str();
+               c_ReportInfo.c_CodeGeneratorPath = c_CompleteCodeGenerator;
+               c_ReportInfo.u16_CodeVersion = pc_Application->u16_GenCodeVersion;
+               c_ReportInfo.c_Directory = c_CompleteExportFolderName;
+
+               s32_Retval = mh_ExecuteCodeGenerator(c_ReportInfo.c_NodeName, c_ReportInfo.c_AppName,
+                                                    c_ReportInfo.c_Directory, c_ReportInfo.c_GeneratedFiles,
+                                                    c_ReportInfo.c_CodeGeneratorPath,
                                                     orq_Erase);
+
                if (s32_Retval == C_NO_ERR)
                {
-                  // Insert headings for node and Data Block name and path
-                  orc_ExportedFiles.push_back(
-                     QString(C_GtGetText::h_GetText("\n%1, Data Block \"%2\"")).arg(
-                        c_Node.c_Properties.c_Name.c_str()).arg(pc_Application->c_Name.c_str()));
-                  orc_ExportedFiles.push_back(c_CompleteExportFolderName);
-                  for (uint32 u32_It = 0; u32_It < c_Files.size(); ++u32_It)
-                  {
-                     orc_ExportedFiles.push_back(c_Files[u32_It]);
-                  }
+                  // Add report information for this application
+                  orc_ExportInfo.push_back(c_ReportInfo);
                }
             }
          }
@@ -478,6 +484,8 @@ sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vect
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Open IDE
+
+   \param[in]  orc_IdeExeCall    Command line command for executable call (eventually including flags)
 
    \return
    C_NO_ERR Operation success
@@ -591,7 +599,8 @@ QString C_ImpUtil::h_GetSydeCoderCPath()
    Combine paths for given application to get absolute path of directory
    at which code should get generated.
 
-   \param[in]     orc_Application    Data block for which path is requested
+   \param[in]  opc_Application   Data block for which path is requested
+   \param[in]  orc_NodeName      Node name of node where application belongs to
 
    \return
    Absolute path to location of generated code.
@@ -625,6 +634,8 @@ QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication * const 
    Show error message if user wants to generate code without
    saving an empty project.
 
+   \param[in]  opc_Parent  Parent widget (for message box)
+
    \return
       true     project was saved -> can continue with code generation
       false    project was not saved -> do not continue
@@ -645,6 +656,7 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
          c_Message.SetDetails(C_GtGetText::h_GetText(
                                  "The path where the generated code is saved must be set. "
                                  "Save the project to set a default path."));
+         c_Message.SetCustomMinHeight(180, 250);
          c_Message.Execute();
          q_Return = false;
       }
@@ -672,9 +684,9 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
    If the reference path is not absolute, behavior is undefined
    (Qt then defaults to calling path, which is often but not always the path of the executable).
 
-   \param[in]     opc_Parent                 parent widget (for parent of message box)
-   \param[in]     orc_Path                   relative or absolute path of file or directory
-   \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
+   \param[in]  opc_Parent                 parent widget (for parent of message box)
+   \param[in]  orc_Path                   relative or absolute path of file or directory
+   \param[in]  orc_AbsoluteReferenceDir   absolute path of reference directory
 
    \retval   String with path    Path the user wants to save or input path if relativeness is not possible
    \retval   Empty string        orc_Path has at least one invalid character
@@ -703,6 +715,7 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
                            arg(c_PathRelative).arg(c_PathAbsolute));
       c_Message.SetOKButtonText(C_GtGetText::h_GetText("Relative"));
       c_Message.SetNOButtonText(C_GtGetText::h_GetText("Absolute"));
+      c_Message.SetCustomMinHeight(230, 250);
 
       if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
       {
@@ -727,9 +740,9 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
 
    See original for more details.
 
-   \param[in]     opc_Parent                 parent widget (for parent of message box)
-   \param[in]     orc_Paths                  relative or absolute paths of files or directories
-   \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
+   \param[in]  opc_Parent                 parent widget (for parent of message box)
+   \param[in]  orc_Paths                  relative or absolute paths of files or directories
+   \param[in]  orc_AbsoluteReferenceDir   absolute path of reference directory
 
    \retval   Strings with paths  Paths the user wants to save or input paths if relativeness is not possible at all
    \retval   Empty list          At least one string in orc_Paths has at least one invalid character
@@ -806,6 +819,7 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
          c_Message.SetDetails(c_Details);
          c_Message.SetOKButtonText(C_GtGetText::h_GetText("Relative"));
          c_Message.SetNOButtonText(C_GtGetText::h_GetText("Absolute"));
+         c_Message.SetCustomMinHeight(230, 400);
 
          if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
          {
@@ -828,8 +842,8 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get active window handle if already existing
 
-   \param[in]     orc_ExeName Name of executable without path (e.g. LogiCAD3.exe)
-   \param[in,out] orc_Windows All found windows
+   \param[in]      orc_ExeName   Name of executable without path (e.g. LogiCAD3.exe)
+   \param[in,out]  orc_Windows   All found windows
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName, std::vector<HWND> & orc_Windows)
@@ -882,8 +896,8 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
 
    Adopted from here: https://stackoverflow.com/questions/221730/bat-file-to-run-a-exe-at-the-command-prompt
 
-   \param[in]     opc_Handle
-   \param[in]     os32_LParam
+   \param[in]  opc_Handle     Handle
+   \param[in]  os32_LParam    Parameter
 
    \return
    TRUE, FALSE
@@ -927,12 +941,12 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
    The paths provided as arguments must be absolute.
    Path checks are done by QProcess or by executable.
 
-   \param[in]     orc_NodeName         name of node to generate code for
-   \param[in]     orc_AppName          name of application to generate code for
-   \param[in]     orc_ExportFolder     path where exported code files get saved at
-   \param[out]    orc_Files            files that got generated
-   \param[in]     orc_CodeGenerator    code generator executable or batch file
-   \param[in]     orq_Erase            flag for code generator: true -> erase target folder and all sub-folders
+   \param[in]      orc_NodeName        name of node to generate code for
+   \param[in]      orc_AppName         name of application to generate code for
+   \param[in]      orc_ExportFolder    path where exported code files get saved at
+   \param[out]     orc_ExportedFiles   Exported files
+   \param[in]      orc_CodeGenerator   code generator executable or batch file
+   \param[in]      orq_Erase           flag for code generator: true -> erase target folder and all sub-folders
 
    \return
    C_NO_ERR       everything worked
@@ -940,12 +954,12 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
    C_RD_WR        problems accessing file system
                   (could not read or write code generation .exe or system definition or file list)
    C_NOACT        Could not generate code for at least one application.
-   C_CONFIG       Application or device for given node have wrong configuration
+   C_CONFIG       Application or device for given node has wrong configuration
    C_TIMEOUT      Timeout for code generator call.
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QString & orc_AppName,
-                                          const QString & orc_ExportFolder, std::vector<QString> & orc_ExportedFiles,
+                                          const QString & orc_ExportFolder, QStringList & orc_ExportedFiles,
                                           const QString & orc_CodeGenerator, const bool & orq_Erase)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1060,6 +1074,10 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
             break;
          case 44: // eRESULT_APPLICATION_NOT_PROGRAMMABLE
             c_ErrorText = "Application is not defined as programmable.";
+            s32_Return = C_CONFIG;
+            break;
+         case 45: // eRESULT_APPLICATION_UNKNOWN_CODE_VERSION
+            c_ErrorText = "Application has unknown code structure version.";
             s32_Return = C_CONFIG;
             break;
          case 9009: // error code if a batch script includes unrecognized commands (e.g. missing executable)

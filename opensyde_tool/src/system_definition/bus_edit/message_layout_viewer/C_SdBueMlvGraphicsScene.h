@@ -54,6 +54,7 @@ public:
    void SetSignal(const stw_types::uint32 ou32_SignalIndex);
    void Clear(void);
    void DisplayToolTip(const QPointF & orc_ScenePos);
+   void RefreshColors(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

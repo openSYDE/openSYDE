@@ -680,10 +680,6 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
 
    if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
    {
-      bool q_BusValid;
-      bool q_ProtocolValid;
-      bool q_MessageValid;
-
       //Expected to be already clean
       this->mc_MessageSyncManagers.clear();
       this->mc_MessageSyncManagers.reserve(3U);
@@ -695,8 +691,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
          C_TblTreItem * const pc_BusItem = new C_TblTreItem();
          const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
             pc_View->GetPcData().GetBusIndex());
-         //Flag
-         q_BusValid = false;
+         bool q_BusValid = false;
          //Node
          if (pc_Bus != NULL)
          {
@@ -719,6 +714,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
             pc_BusItem->ReserveChildrenSpace(3UL);
             for (uint8 u8_ItProtocol = 0U; u8_ItProtocol < 3U; ++u8_ItProtocol)
             {
+               bool q_ProtocolValid;
                C_PuiSdNodeCanMessageSyncManager * const pc_SyncManager = new C_PuiSdNodeCanMessageSyncManager();
                C_OSCCanProtocol::E_Type e_Type;
                std::vector<C_OSCCanMessageIdentificationIndices> c_UniqueMessages;
@@ -762,7 +758,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
                   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(
                      c_UniqueMessages[u32_ItMessage]);
                   //Flag
-                  q_MessageValid = false;
+                  bool q_MessageValid = false;
                   if (pc_Message != NULL)
                   {
                      //Init current node

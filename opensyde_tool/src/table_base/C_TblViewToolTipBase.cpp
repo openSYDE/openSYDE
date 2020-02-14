@@ -3,7 +3,8 @@
    \file
    \brief       Table view with tool tip (implementation)
 
-   Table view with tool tip
+   Table view with tool tip.
+   This base class also handles entering edit on enter or return key press.
 
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -80,6 +81,66 @@ void C_TblViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden key press event slot
+
+   Here: handle enter or return click: enter edit mode or toggle checkbox
+
+   \param[in,out] opc_Event Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblViewToolTipBase::keyPressEvent(QKeyEvent * const opc_Event)
+{
+   bool q_CallOrig = true;
+
+   switch (opc_Event->key())
+   {
+   case Qt::Key_Return:
+   case Qt::Key_Enter:
+      // enter edit mode if not already in this mode and if item is editable
+      if ((this->state() != QAbstractItemView::EditingState) &&
+          (this->model()->flags(this->currentIndex()).testFlag(Qt::ItemIsEditable) == true))
+      {
+         q_CallOrig = false;
+         this->edit(this->currentIndex());
+         opc_Event->accept();
+      }
+      // toggle checkbox in checkbox case
+      if (this->model()->flags(this->currentIndex()).testFlag(Qt::ItemIsUserCheckable) == true)
+      {
+         if (this->model()->data(this->currentIndex(), static_cast<sintn>(Qt::CheckStateRole)) ==
+             static_cast<sintn>(Qt::Checked))
+         {
+            q_CallOrig = false;
+            this->model()->setData(this->currentIndex(), static_cast<sintn>(Qt::Unchecked),
+                                   static_cast<sintn>(Qt::CheckStateRole));
+            opc_Event->accept();
+         }
+         else if (this->model()->data(this->currentIndex(), static_cast<sintn>(Qt::CheckStateRole)) ==
+                  static_cast<sintn>(Qt::Unchecked))
+         {
+            q_CallOrig = false;
+            this->model()->setData(this->currentIndex(), static_cast<sintn>(Qt::Checked),
+                                   static_cast<sintn>(Qt::CheckStateRole));
+            opc_Event->accept();
+         }
+         else
+         {
+            // Do nothing
+         }
+      }
+      break;
+   default:
+      // No special handling
+      break;
+   }
+
+   if (q_CallOrig == true)
+   {
+      QTableView::keyPressEvent(opc_Event);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Overwritten default event slot
 
    Here: Handle tool tip
@@ -131,7 +192,7 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
                   {
                      this->ms32_HoveredVertHeader = s32_VisualIndex;
                      //Update text
-                     this->setMouseTracking(true);
+                     // Do not set mouse tracking here as it could disturb focus handling of persistent editor widgets
                      this->mpc_ToolTip->SetHeading(c_Heading);
                      this->mpc_ToolTip->SetContent(c_Content);
                      this->mpc_ToolTip->SetType(C_NagToolTip::eDEFAULT);
@@ -160,7 +221,7 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
                   {
                      this->ms32_HoveredHorzHeader = s32_VisualIndex;
                      //Update text
-                     this->setMouseTracking(true);
+                     // Do not set mouse tracking here as it could disturb focus handling of persistent editor widgets
                      this->mpc_ToolTip->SetHeading(c_Heading);
                      this->mpc_ToolTip->SetContent(c_Content);
                      this->mpc_ToolTip->SetType(C_NagToolTip::eDEFAULT);
@@ -189,7 +250,8 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
                         this->ms32_HoveredRow = s32_ToolTipRow;
                         this->ms32_HoveredCol = s32_ToolTipCol;
                         //Update text
-                        this->setMouseTracking(true);
+                        // Do not set mouse tracking here as it could disturb focus handling of persistent editor
+                        // widgets
                         this->mpc_ToolTip->SetHeading(c_Heading);
                         this->mpc_ToolTip->SetContent(c_Content);
                         this->mpc_ToolTip->SetType(e_Type);

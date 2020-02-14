@@ -48,8 +48,9 @@ using namespace stw_opensyde_gui_elements;
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_APPLY = 0U;
 const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_GENERATE_CODE = 1U;
-const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_EXPORT = 2U;
-const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_RTF_EXPORT = 3U;
+const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_IMPORT = 2U;
+const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_EXPORT = 3U;
+const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_RTF_EXPORT = 4U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -66,7 +67,7 @@ const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_RTF_EXPORT = 3U;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
@@ -134,14 +135,21 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    c_ButtonProperties.c_ToolTipContent = mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF;
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 
-   // Function index 2: mhu32_USER_INPUT_FUNC_EXPORT
+   // Function index 2: mhu32_USER_INPUT_FUNC_IMPORT
+   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Import Messages");
+   c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Import Messages");
+   c_ButtonProperties.c_ToolTipContent =
+      C_GtGetText::h_GetText("Import messages and signals from DBC, EDS or DCF file.");
+   this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
+
+   // Function index 3: mhu32_USER_INPUT_FUNC_EXPORT
    c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("DBC File Export");
    c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("DBC File Export");
    c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText(
       "Export messages and signals of current bus in standard DBC file format.");
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 
-   // Function index 3: mhu32_USER_INPUT_FUNC_RTF_EXPORT
+   // Function index 4: mhu32_USER_INPUT_FUNC_RTF_EXPORT
    c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Report");
    c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Report");
    c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Export the SYSTEM DEFINITION as RTF document file.");
@@ -164,6 +172,8 @@ C_SdHandlerWidget::~C_SdHandlerWidget()
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to set the parent of the widget
+
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::SetParentHook(QWidget * const opc_Parent)
@@ -198,6 +208,9 @@ void C_SdHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
          this->mpc_Topology->SaveToData();
       }
       this->GenerateCode();
+      break;
+   case mhu32_USER_INPUT_FUNC_IMPORT:
+      this->Import();
       break;
    case mhu32_USER_INPUT_FUNC_EXPORT:
       this->Export();
@@ -262,11 +275,11 @@ void C_SdHandlerWidget::Save(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to open a concrete datapool, datapool list or dataelement
 
-   \param[in] os32_Index            First index
-   \param[in] os32_SubIndex         Second index
-   \param[in] os32_SubSubIndex      Third index
-   \param[in] os32_SubSubSubIndex   Fourth index
-   \param[in] os32_Flag             Optional flag for further information
+   \param[in]  os32_Index           First index
+   \param[in]  os32_SubIndex        Second index
+   \param[in]  os32_SubSubIndex     Third index
+   \param[in]  os32_SubSubSubIndex  Fourth index
+   \param[in]  os32_Flag            Optional flag for further information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_SubIndex, const sint32 os32_SubSubIndex,
@@ -327,9 +340,9 @@ bool C_SdHandlerWidget::PrepareToClose(void)
    Do not call this function internally. Use the signal SigChangeMode to
    inform the entire application about the change.
 
-   \param[in]     os32_SubMode     Actual sub mode
-   \param[in]     ou32_Index       Index for node or bus
-   \param[in]     ou32_Flag        Flag for special functionality
+   \param[in]  os32_SubMode   Actual sub mode
+   \param[in]  ou32_Index     Index for node or bus
+   \param[in]  ou32_Flag      Flag for special functionality
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_Index, const uint32 ou32_Flag)
@@ -337,11 +350,13 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
    const QIcon c_IconSave(":images/IconSave.svg");
    const QIcon c_IconCompile("://images/system_definition/IconGenerateCode.svg");
    const QIcon c_IconExport("://images/IconExportDbc.svg");
+   const QIcon c_IconImport("://images/IconImportFile.svg");
    const QIcon c_IconRtfExport("://images/IconExportRtf.svg");
 
    // set the icons. this can not be done in constructor
    Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, c_IconSave));
    Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, c_IconCompile));
+   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_IMPORT, c_IconImport));
    Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, c_IconExport));
    Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, c_IconRtfExport));
 
@@ -395,10 +410,11 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
          // save the tab index
          this->msn_BusEditTabIndex = this->mpc_ActBusEdit->GetTabIndex();
 
-         // show button for DBC file export, Ethernet is not supported yet!
-         if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN)
+         // show button for DBC file export and messages import
+         if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN) // Ethernet is not supported yet
          {
-            Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, true);
+            Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_IMPORT, true));
+            Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, true));
          }
 
          // remove widget
@@ -415,6 +431,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
 
       //Clean up buttons
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, false));
+      Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_IMPORT, false));
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, false));
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, false));
 
@@ -487,9 +504,10 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigErrorChange, this, &C_SdHandlerWidget::m_ErrorChange);
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigNameChanged, this, &C_SdHandlerWidget::SigNameChanged);
 
-         // show button for DBC file export, Ethernet is not supported yet!
-         if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN)
+         // show button for DBC file export and messages import
+         if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN) // Ethernet is not supported yet
          {
+            Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_IMPORT, true));
             Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, true));
          }
 
@@ -511,7 +529,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle for global key press event
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Handled
@@ -534,6 +552,11 @@ bool C_SdHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
    {
       // open project save
       this->SaveAs();
+   }
+   else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F8))
+   {
+      // open color picker
+      this->OpenColorPicker();
    }
    else
    {
@@ -570,8 +593,8 @@ void C_SdHandlerWidget::m_BusChanged(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Switch to bus edit widget
 
-   \param[in] ou32_Index   Bus index
-   \param[in] orc_BusName  Bus name
+   \param[in]  ou32_Index     Bus index
+   \param[in]  orc_BusName    Bus name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::m_SwitchToBus(const uint32 ou32_Index, const QString & orc_BusName)
@@ -666,6 +689,7 @@ void C_SdHandlerWidget::Export(void)
          C_OgeWiCustomMessage c_ExportWarnings(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_ExportWarnings.SetHeading(C_GtGetText::h_GetText("DBC file export"));
          c_ExportWarnings.SetDescription(C_GtGetText::h_GetText(c_Message.c_str()));
+         c_ExportWarnings.SetCustomMinHeight(180, 180);
          c_ExportWarnings.Execute();
       }
       else
@@ -678,7 +702,7 @@ void C_SdHandlerWidget::Export(void)
             std::vector<uint32> c_InterfaceIndexes;
             std::vector<uint32> c_DatapoolIndexes;
             std::set<uint32> c_UniqueNodeIndexes;
-            uint32 u32_NumOfInputMessages;
+            uint32 u32_NumOfInputMessages = 0;
 
             C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeAndComDpIndexesOfBus(
                this->mu32_Index,
@@ -725,7 +749,7 @@ void C_SdHandlerWidget::Export(void)
                   c_CurrentCIENode.c_Properties.c_Name = pc_Node->c_Properties.c_Name;
                   c_CurrentCIENode.c_Properties.c_Comment = pc_Node->c_Properties.c_Comment;
 
-                  // get TX can messages
+                  // get Tx can messages
                   const std::vector<C_OSCCanMessage> c_TxMsgs = pc_CanMessageContainer->GetMessagesConst(true);
                   std::vector<C_OSCCanMessage>::const_iterator c_TxIter;
                   for (c_TxIter = c_TxMsgs.begin(); c_TxIter != c_TxMsgs.end(); ++c_TxIter)
@@ -745,7 +769,7 @@ void C_SdHandlerWidget::Export(void)
                      }
                   }
 
-                  // get RX can messages
+                  // get Rx can messages
                   const std::vector<C_OSCCanMessage> & c_RxMsgs = pc_CanMessageContainer->GetMessagesConst(false);
                   std::vector<C_OSCCanMessage>::const_iterator c_RxIter;
                   for (c_RxIter = c_RxMsgs.begin(); c_RxIter != c_RxMsgs.end(); ++c_RxIter)
@@ -777,6 +801,7 @@ void C_SdHandlerWidget::Export(void)
                      c_ExportWarnings.SetDescription(C_GtGetText::h_GetText(
                                                         "Warnings occurred during DBC file export."));
                      c_ExportWarnings.SetDetails(c_Warnings.GetText().c_str());
+                     c_ExportWarnings.SetCustomMinHeight(180, 300);
                      c_ExportWarnings.Execute();
                   }
                }
@@ -787,6 +812,20 @@ void C_SdHandlerWidget::Export(void)
                                     u32_NumOfInputSignals);
          }
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Call for DBC/EDS/DCF import functionality.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::Import(void)
+{
+   // only available on bus edit
+   tgl_assert(this->mpc_ActBusEdit != NULL);
+   if (this->mpc_ActBusEdit != NULL)
+   {
+      this->mpc_ActBusEdit->ImportMessages();
    }
 }
 
@@ -808,6 +847,7 @@ void C_SdHandlerWidget::RtfExport(void)
                                                          "Save project to continue."));
          c_Message.SetDetails(C_GtGetText::h_GetText(
                                  "For RTF file export the SYSTEM DEFINITION must be saved to disk."));
+         c_Message.SetCustomMinHeight(230, 250);
          c_Message.Execute();
       }
       else
@@ -879,6 +919,7 @@ void C_SdHandlerWidget::RtfExport(void)
                c_MessageResult.SetHeading(C_GtGetText::h_GetText("RTF File Export"));
                c_MessageResult.SetDescription(C_GtGetText::h_GetText("RTF document successfully created."));
                c_MessageResult.SetDetails(c_Details);
+               c_MessageResult.SetCustomMinHeight(180, 250);
                c_MessageResult.Execute();
             }
             else if (s32_Return == C_WARN)
@@ -889,6 +930,7 @@ void C_SdHandlerWidget::RtfExport(void)
                c_MessageResult.SetHeading(C_GtGetText::h_GetText("RTF File Export"));
                c_MessageResult.SetDescription(C_GtGetText::h_GetText("Warnings occurred on RTF File Export."));
                c_MessageResult.SetDetails(C_GtGetText::h_GetText(c_Details.c_str()));
+               c_MessageResult.SetCustomMinHeight(180, 250);
                c_MessageResult.Execute();
             }
             else
@@ -897,6 +939,7 @@ void C_SdHandlerWidget::RtfExport(void)
                c_MessageResult.SetHeading(C_GtGetText::h_GetText("RTF File Export"));
                c_MessageResult.SetDescription(C_GtGetText::h_GetText("RTF file export error occurred."));
                c_MessageResult.SetDetails(C_GtGetText::h_GetText(c_Error.c_str()));
+               c_MessageResult.SetCustomMinHeight(180, 250);
                c_MessageResult.Execute();
             }
          }

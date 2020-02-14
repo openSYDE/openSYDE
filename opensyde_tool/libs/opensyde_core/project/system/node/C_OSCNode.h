@@ -19,6 +19,7 @@
 #include "C_OSCNodeDataPool.h"
 #include "C_OSCNodeApplication.h"
 #include "C_OSCCanProtocol.h"
+#include "C_OSCHalcConfig.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -149,6 +150,7 @@ public:
    ///< for related communication protocol.
    ///< Created if necessary.
    ///< Maximum size equal to number of com protocols.
+   C_OSCHalcConfig c_HALCConfig; ///< Optional HALC configuration for this node
 
 private:
    void m_GetAllMessages(const stw_types::uint32 & oru32_InterfaceIndex,

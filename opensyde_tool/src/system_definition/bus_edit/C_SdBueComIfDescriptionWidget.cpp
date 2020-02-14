@@ -25,6 +25,7 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiSdUtil.h"
 #include "C_GtGetText.h"
+#include "C_CieUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -90,13 +91,6 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
            this, &C_SdBueComIfDescriptionWidget::m_ConnectNodeToProtAndAddDataPool);
    connect(this->mpc_Ui->pc_NodeSelectorWidget, &C_SdBueNodeSelectorWidget::SigDisconnectNodeFromProt,
            this, &C_SdBueComIfDescriptionWidget::m_DisconnectNodeFromProt);
-   connect(this->mpc_Ui->pc_NodeSelectorWidget, &C_SdBueNodeSelectorWidget::SigAddDataPool,
-           this, &C_SdBueComIfDescriptionWidget::m_AddDataPool);
-   connect(this->mpc_Ui->pc_NodeSelectorWidget, &C_SdBueNodeSelectorWidget::SigReload,
-           this, &C_SdBueComIfDescriptionWidget::Reload);
-   connect(this->mpc_Ui->pc_NodeSelectorWidget, &C_SdBueNodeSelectorWidget::SigErrorChange,
-           this, &C_SdBueComIfDescriptionWidget::SigErrorChange);
-
    connect(this->mpc_Ui->pc_ProtocolTabWidget, &stw_opensyde_gui_elements::C_OgeTawSelector::currentChanged,
            this, &C_SdBueComIfDescriptionWidget::m_ProtocolChanged);
 
@@ -340,7 +334,7 @@ void C_SdBueComIfDescriptionWidget::PartialReload(void)
    this->mpc_Ui->pc_NodeSelectorWidget->SetProtocol(this->GetActProtocol());
    m_ReloadMessages();
    //Update error
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -523,6 +517,41 @@ void C_SdBueComIfDescriptionWidget::DeleteSignal(const C_OSCCanMessageIdentifica
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Import messages from DBC, EDS or DCF file to this bus.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueComIfDescriptionWidget::ImportMessages(void)
+{
+   std::vector<uint32> c_NodeIndexes;
+   std::vector<uint32> c_InterfaceIndexes;
+
+   sint32 s32_Return = C_CieUtil::h_ImportFile(this->mu32_BusIndex,
+                                               this->GetActProtocol(), this, c_NodeIndexes, c_InterfaceIndexes);
+
+   if (s32_Return == C_NO_ERR)
+   {
+      // connect all nodes that were part of message import
+      tgl_assert(c_NodeIndexes.size() == c_InterfaceIndexes.size());
+      if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+      {
+         for (uint32 u32_ItIndex = 0; u32_ItIndex < c_NodeIndexes.size(); u32_ItIndex++)
+         {
+            // on import a Datapool was created if necessary - just to make sure
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPools(c_NodeIndexes[u32_ItIndex],
+                                                                           this->GetActProtocol()).size() > 0);
+            C_PuiSdHandler::h_GetInstance()->
+            SetCanProtocolMessageContainerConnected(c_NodeIndexes[u32_ItIndex], this->GetActProtocol(),
+                                                    c_InterfaceIndexes[u32_ItIndex], true);
+         }
+      }
+
+      // reload and update errors
+      this->Reload();
+      Q_EMIT (this->SigErrorChange());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten key press release event slot
 
    \param[in,out] opc_KeyEvent Key event identification and information
@@ -592,6 +621,11 @@ void C_SdBueComIfDescriptionWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent
       }
    }
 
+   if (opc_KeyEvent->key() == Qt::Key_F5)
+   {
+      this->mpc_Ui->pc_MsgSigEditWidget->RefreshColors();
+   }
+
    QWidget::keyPressEvent(opc_KeyEvent);
 }
 
@@ -655,16 +689,6 @@ void C_SdBueComIfDescriptionWidget::m_DisconnectNodeFromProt(const uint32 ou32_N
 
    this->mc_UndoManager.DoDisconnectNodeFromProt(ou32_NodeIndex, ou32_InterfaceIndex,
                                                  this->GetActProtocol(), this);
-   m_OnConnectionChange();
-   Q_EMIT (this->SigChanged());
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueComIfDescriptionWidget::m_AddDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
-{
-   this->mc_UndoManager.DoAddDataPool(ou32_NodeIndex, ou32_InterfaceIndex,
-                                      this->GetActProtocol(),
-                                      this);
    m_OnConnectionChange();
    Q_EMIT (this->SigChanged());
 }
@@ -924,7 +948,7 @@ void C_SdBueComIfDescriptionWidget::m_OnSignalCountOfMessageChanged(
 void C_SdBueComIfDescriptionWidget::m_RecheckErrorGlobal(void) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->RecheckErrorGlobal();
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -966,7 +990,7 @@ void C_SdBueComIfDescriptionWidget::m_OnMessageCountChanged(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Change of RX configuration of message
+/*! \brief   Change of Rx configuration of message
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnMessageRxChanged(void) const

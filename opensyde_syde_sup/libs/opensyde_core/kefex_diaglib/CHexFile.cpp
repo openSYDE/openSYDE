@@ -24,8 +24,8 @@
 //                          additionally it returns the data address offset
 //                          and binary data size in byte
 //************************************************************************
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
@@ -44,15 +44,14 @@ using namespace stw_hex_file;
 //------------------------------------------------------------------------
 
 // hex file type
-static const sint32 ms32_HEXFILE_ERR   =  -1;          // GetFileType: file unknown
-static const sint32 ms32_HEXFILE_IHEX  =   0;           // GetFileType: file is intel-hex
-static const sint32 ms32_HEXFILE_SREC  =   1;           // GetFileType: file is s-record
+static const sint32 ms32_HEXFILE_ERR   =  -1; // GetFileType: file unknown
+static const sint32 ms32_HEXFILE_IHEX  =   0; // GetFileType: file is intel-hex
+static const sint32 ms32_HEXFILE_SREC  =   1; // GetFileType: file is s-record
 
-static const uint32 mu32_HEXBUFFER_SIZE  = 530U;        // buffer size for hex line data
-static const sint32 ms32_INTELHEX_MAX    = (522 + 2);   // max size of intel-hex line + \r\n
+static const uint32 mu32_HEXBUFFER_SIZE  = 530U;      // buffer size for hex line data
+static const sint32 ms32_INTELHEX_MAX    = (522 + 2); // max size of intel-hex line + \r\n
 
-
-static const sint32 ms32_SRECORD_MAX  = 517;    // max size of s-record line
+static const sint32 ms32_SRECORD_MAX  = 517; // max size of s-record line
 
 static const uint8 mu8_MIN_RECSIZE          =   8U;
 static const uint8 mu8_MAX_RECSIZE          =   255U;
@@ -110,7 +109,7 @@ C_HexFile::~C_HexFile(void)
 
 uint32 C_HexFile::ByteCount(void) const
 {
-   return (mu32_NumRawBytes);
+   return mu32_NumRawBytes;
 }
 
 //************************************************************************
@@ -140,8 +139,8 @@ uint32 C_HexFile::LoadFromFile(const charn * const opcn_FileName)
 {
    uint32 u32_Error;
    sint32 s32_FileType;
-   std::FILE * pt_File;
 
+   std::FILE * pt_File;
 
    this->Clear();
    pt_File = std::fopen(opcn_FileName, "rt");
@@ -152,11 +151,11 @@ uint32 C_HexFile::LoadFromFile(const charn * const opcn_FileName)
    }
    else
    {
-      u32_Error = this->GetFileType(pt_File, s32_FileType);      // get hex file type
-                                                             // intel-hex, s-record, ...
+      u32_Error = this->GetFileType(pt_File, s32_FileType); // get hex file type
+      // intel-hex, s-record, ...
       if (u32_Error == NO_ERR)
       {
-         u32_Error = AddHexLine(":020000040000FA\n");   // init data with zero offset
+         u32_Error = AddHexLine(":020000040000FA\n"); // init data with zero offset
 
          if (u32_Error == NO_ERR)
          {
@@ -175,11 +174,21 @@ uint32 C_HexFile::LoadFromFile(const charn * const opcn_FileName)
 
             (void)fclose(pt_File);
 
-            if ((u32_Error & ERR_HEXLINE_SYNTAX) == 0U)        // no error?
+            if ((u32_Error & ERR_HEXLINE_SYNTAX) == 0U) // no error?
             {
-               RemoveFirst();                            // remove first element (zero offset)
+               RemoveFirst(); // remove first element (zero offset)
             }
          }
+         else
+         {
+            //Release created file pointer
+            (void)fclose(pt_File);
+         }
+      }
+      else
+      {
+         //Release created file pointer
+         (void)fclose(pt_File);
       }
    }
 
@@ -216,7 +225,7 @@ uint32 C_HexFile::LoadFromFile(const charn * const opcn_FileName)
 uint32 C_HexFile::LoadIntelHex(std::FILE * const opt_File)
 {
    uint32 u32_Error = NO_ERR;
-   charn  acn_HexBuffer[mu32_HEXBUFFER_SIZE];
+   charn acn_HexBuffer[mu32_HEXBUFFER_SIZE];
    uint32 u32_AdrNew;
    uint8 u8_Command = mu8_CMD_DATA;
    uint8 u8_Len = 0U;
@@ -249,7 +258,8 @@ uint32 C_HexFile::LoadIntelHex(std::FILE * const opt_File)
          if (u32_Error == NO_ERR)
          {
             if ((mu32_AdrOffs & ~mu32_XADR32_MASK) != 0)
-            {  // change XADR16 into XADR32 records
+            {
+               // change XADR16 into XADR32 records
                u32_Error = ConvRec16ToRec32(acn_HexBuffer);
             }
             else
@@ -298,13 +308,13 @@ uint32 C_HexFile::LoadIntelHex(std::FILE * const opt_File)
       }
    }
 
-   if ((u8_Command != mu8_CMD_EOF) && (u32_Error == NO_ERR))    // no EOF record?
+   if ((u8_Command != mu8_CMD_EOF) && (u32_Error == NO_ERR)) // no EOF record?
    {
-      SetEOFPtr();                            // add EOF record
+      SetEOFPtr(); // add EOF record
       u32_Error = AddHexLine(":00000001FF\n");
       if (u32_Error == 0U)
       {
-         u32_Error = WRN_NO_EOF_RECORD;          // set warning
+         u32_Error = WRN_NO_EOF_RECORD; // set warning
       }
    }
 
@@ -335,8 +345,8 @@ uint32 C_HexFile::LoadIntelHex(std::FILE * const opt_File)
 uint32 C_HexFile::LoadSRecord(std::FILE * const opt_File)
 {
    uint32 u32_Error = NO_ERR;
-   charn  acn_HexBuffer[mu32_HEXBUFFER_SIZE];
-   charn  acn_IntelBuffer[mu32_HEXBUFFER_SIZE];
+   charn acn_HexBuffer[mu32_HEXBUFFER_SIZE];
+   charn acn_IntelBuffer[mu32_HEXBUFFER_SIZE];
    uint32 u32_AdrNew;
    uint8 u8_RecordType;
    uint8 u8_Length = 0U;
@@ -363,20 +373,22 @@ uint32 C_HexFile::LoadSRecord(std::FILE * const opt_File)
             mu8_MaxRecordLength = u8_Length;
          }
 
-         if ((u8_RecordType == mu8_SREC_DATA16) || (u8_RecordType == mu8_SREC_DATA24) || (u8_RecordType == mu8_SREC_DATA32))
+         if ((u8_RecordType == mu8_SREC_DATA16) || (u8_RecordType == mu8_SREC_DATA24) ||
+             (u8_RecordType == mu8_SREC_DATA32))
          {
-                                                          // get record address
+            // get record address
             u32_Error = GetSRecordAddress(acn_HexBuffer, u8_RecordType, u32_AdrNew);
 
-            if (mu32_AdrOffs != (u32_AdrNew & mu32_XADR32_MASK))    // 32bit address offset changed?
+            if (mu32_AdrOffs != (u32_AdrNew & mu32_XADR32_MASK)) // 32bit address offset changed?
             {
-               mu32_AdrOffs = (u32_AdrNew & mu32_XADR32_MASK);       // yes -> set new address offset
-               u32_Error = SetOffset(mu32_AdrOffs);             // set new offset record
+               mu32_AdrOffs = (u32_AdrNew & mu32_XADR32_MASK); // yes -> set new address offset
+               u32_Error = SetOffset(mu32_AdrOffs);            // set new offset record
             }
 
-            if (u32_Error == NO_ERR)                                 // no error?
-            {                                             // create intel hex record
-               u8_Length -= static_cast<uint8>(u8_RecordType + 2U);    // calc. intel-hex length
+            if (u32_Error == NO_ERR) // no error?
+            {
+               // create intel hex record
+               u8_Length -= static_cast<uint8>(u8_RecordType + 2U); // calc. intel-hex length
                acn_IntelBuffer[0] = ':';
 
                mu32_NumRawBytes += u8_Length;
@@ -400,15 +412,14 @@ uint32 C_HexFile::LoadSRecord(std::FILE * const opt_File)
       }
    }
 
-   if (u32_Error == NO_ERR)                             // no error?
+   if (u32_Error == NO_ERR) // no error?
    {
-      SetEOFPtr();                            // add EOF record
+      SetEOFPtr(); // add EOF record to end of file
       u32_Error = AddHexLine(":00000001FF\n");
    }
 
    return u32_Error;
 }
-
 
 //************************************************************************
 // .FUNCTION    GetFileType
@@ -433,17 +444,17 @@ uint32 C_HexFile::GetFileType(std::FILE * const opt_File, sint32 & ors32_FileTyp
    charn acn_HexBuffer[mu32_HEXBUFFER_SIZE];
    uint8 u8_Dummy;
 
-   ors32_FileType = ms32_HEXFILE_ERR;                  // init type flag
-   (void)std::memset(acn_HexBuffer, 0, mu32_HEXBUFFER_SIZE);     // clear hex buffer
+   ors32_FileType = ms32_HEXFILE_ERR;                           // init type flag
+   (void)std::memset(acn_HexBuffer, 0, mu32_HEXBUFFER_SIZE);    // clear hex buffer
    pcn_Ret = fgets(acn_HexBuffer, ms32_INTELHEX_MAX, opt_File); // read first line of file
-   rewind(opt_File);                           // set file pointer to start of file
+   rewind(opt_File);                                            // set file pointer to start of file
 
    if (pcn_Ret != acn_HexBuffer)
    {
       // fgets failed
       u32_Error = ERR_HEXLINE_SYNTAX;
    }
-   else if (acn_HexBuffer[0] == ':')                  // line might be intel-hex?
+   else if (acn_HexBuffer[0] == ':') // line might be intel-hex?
    {
       u32_Error = GetIHexCommand(acn_HexBuffer, u8_Dummy);
       if (u32_Error == NO_ERR) // check hexline
@@ -451,7 +462,7 @@ uint32 C_HexFile::GetFileType(std::FILE * const opt_File, sint32 & ors32_FileTyp
          ors32_FileType = ms32_HEXFILE_IHEX;
       }
    }
-   else if (acn_HexBuffer[0] == 'S')           // line might be s-record?
+   else if (acn_HexBuffer[0] == 'S') // line might be s-record?
    {
       u32_Error = GetSRecordType(acn_HexBuffer, u8_Dummy);
       if (u32_Error == NO_ERR) // check hexline
@@ -461,12 +472,11 @@ uint32 C_HexFile::GetFileType(std::FILE * const opt_File, sint32 & ors32_FileTyp
    }
    else
    {
-      u32_Error = ERR_HEXLINE_SYNTAX;               // init error flag
+      u32_Error = ERR_HEXLINE_SYNTAX; // init error flag
    }
 
    return u32_Error;
 }
-
 
 //************************************************************************
 // .FUNCTION    Optimize
@@ -494,46 +504,46 @@ uint32 C_HexFile::OptimizeLinear(const uint32 ou32_RecSize, const sint32 os32_Fi
 {
    uint32 u32_Error = NO_ERR;
 
-   if (LineInit() != NULL)            // HEX Data loaded?
+   if (LineInit() != NULL) // HEX Data loaded?
    {
       uint32 u32_Offset = mu32_MinAdr;
       uint32 u32_Size = (mu32_MaxAdr - mu32_MinAdr) + 1U;
       uint16 * pu16_BinImage;
 
-      try                              // try to allocate memory
+      try // try to allocate memory
       {
-         pu16_BinImage = new uint16[static_cast<uintn>(u32_Size)];  // allocate space for memory image
+         pu16_BinImage = new uint16[static_cast<uintn>(u32_Size)]; // allocate space for memory image
       }
-      catch (...)                // not enough memory?
+      catch (...) // not enough memory?
       {
          u32_Error = ERR_NOT_ENOUGH_MEMORY;
       }
 
-      if (u32_Error == NO_ERR)                          // memory OK?
+      if (u32_Error == NO_ERR) // memory OK?
       {
          (void)std::memset(pu16_BinImage, 0, static_cast<uintn>(u32_Size * sizeof(uint16))); // clear memory
-                                                    // store memory image
+         // store memory image
          uint32 u32_Warning = CopyHex2Mem(pu16_BinImage, u32_Offset);
 
-         if (os32_FillFlag != 0)                                // fill gaps?
+         if (os32_FillFlag != 0) // fill gaps?
          {
-            for (uint32 i = 0U; i < u32_Size; i++)      // yes, fill unused data
+            for (uint32 u32_ByteIndex = 0U; u32_ByteIndex < u32_Size; u32_ByteIndex++) // yes, fill unused data
             {
-               if ((pu16_BinImage[i] & 0xFF00U) == 0U)
+               if ((pu16_BinImage[u32_ByteIndex] & 0xFF00U) == 0U)
                {
-                  pu16_BinImage[i] = static_cast<uint16>(static_cast<uint16>(0x0100U) + ou8_FillPattern);
+                  pu16_BinImage[u32_ByteIndex] = static_cast<uint16>(static_cast<uint16>(0x0100U) + ou8_FillPattern);
                }
             }
          }
 
-         u32_Error = CreateHexFile(pu16_BinImage, u32_Offset, u32_Size, ou32_RecSize);  // create new HEX file from image
+         u32_Error = CreateHexFile(pu16_BinImage, u32_Offset, u32_Size, ou32_RecSize); // create new HEX file from image
 
-         if (u32_Error == 0U)                        // if no error
+         if (u32_Error == 0U) // if no error
          {
-            u32_Error = u32_Warning;               // return warning
+            u32_Error = u32_Warning; // return warning
          }
 
-         delete[] pu16_BinImage;                 // delete memory image
+         delete[] pu16_BinImage; // delete memory image
       }
    }
 
@@ -565,18 +575,17 @@ uint32 C_HexFile::Optimize(const uint32 ou32_RecSize)
    uint32 u32_Error = ERR_NO_DATA;
    const C_HexDataDump * pc_Dump;
 
-   if (this->LineInit() != NULL)            // HEX Data loaded?
+   if (this->LineInit() != NULL) // HEX Data loaded?
    {
       pc_Dump = this->GetDataDump(u32_Error);
       if (u32_Error == NO_ERR)
       {
-         u32_Error = this->CreateHexFile(*pc_Dump, ou32_RecSize);  // create new HEX file from image
+         u32_Error = this->CreateHexFile(*pc_Dump, ou32_RecSize); // create new HEX file from image
       }
    }
 
    return u32_Error;
 }
-
 
 //************************************************************************
 // .FUNCTION    SaveToFile
@@ -595,21 +604,23 @@ uint32 C_HexFile::SaveToFile(const charn * const opcn_FileName)
 {
    uint32 u32_Error = NO_ERR;
    const uint8  * pu8_HexLine;
+
    std::FILE * pt_File;
 
-   if (LineInit() != NULL)            // HEX Data loaded?
+   if (LineInit() != NULL) // HEX Data loaded?
    {
-      pt_File = std::fopen(opcn_FileName, "wt");  // yes, now open acFileName
+      pt_File = std::fopen(opcn_FileName, "wt"); // yes, now open acFileName
 
       if (pt_File == NULL)
       {
-         u32_Error = ERR_CANT_OPEN_FILE;  // something is wrong with acFileName!
+         u32_Error = ERR_CANT_OPEN_FILE; // something is wrong with acFileName!
       }
       else
-      {                                // are there any lines left?
+      {
+         // are there any lines left?
          while ((pu8_HexLine = NextLine()) != NULL)
          {
-            fputs(HexLineString(pu8_HexLine), pt_File);  // write string into file
+            fputs(HexLineString(pu8_HexLine), pt_File); // write string into file
             fputs("\n", pt_File);
          }
 
@@ -634,15 +645,15 @@ uint32 C_HexFile::SaveToFile(const charn * const opcn_FileName)
 //************************************************************************
 const charn * C_HexFile::NextLineString(void)
 {
-  const charn * pcn_String = NULL;
-  const uint8 * pu8_HexLine = NextLine();
+   const charn * pcn_String = NULL;
+   const uint8 * pu8_HexLine = NextLine();
 
-  if (pu8_HexLine != NULL)
-  {
-     pcn_String = HexLineString(pu8_HexLine);
-  }
+   if (pu8_HexLine != NULL)
+   {
+      pcn_String = HexLineString(pu8_HexLine);
+   }
 
-  return pcn_String;
+   return pcn_String;
 }
 
 //************************************************************************
@@ -666,24 +677,23 @@ const uint8 * C_HexFile::NextBinData(uint32 & oru32_Address, uint8 & oru8_Size)
    const uint8 * pu8_Line;
    T_HexLine * pt_Line;
 
-   oru32_Address = 0;                          // clear return values
+   oru32_Address = 0; // clear return values
    oru8_Size = 0;
 
-   while ((pu8_Line = NextLine()) != NULL)     // search for next data line
+   while ((pu8_Line = NextLine()) != NULL) // search for next data line
    {
       if (pu8_Line[mu8_INTEL_CMD] == mu8_CMD_DATA)
       {
          pt_Line = mpt_HexData->pt_Prev;
-         oru32_Address = pt_Line->u32_XAdr;         // get 32bit line address
-         oru8_Size = pu8_Line[mu8_INTEL_LEN];          // get data len
-         pu8_Line = &pu8_Line[mu8_INTEL_DAT];         // get data pointer
+         oru32_Address = pt_Line->u32_XAdr;   // get 32bit line address
+         oru8_Size = pu8_Line[mu8_INTEL_LEN]; // get data len
+         pu8_Line = &pu8_Line[mu8_INTEL_DAT]; // get data pointer
          break;
       }
    }
 
    return pu8_Line;
 }
-
 
 //************************************************************************
 // .FUNCTION    InitHexFile
@@ -777,38 +787,40 @@ uint32 C_HexFile::CopyHex2Mem(uint16 * const opu16_BinImage, const uint32 ou32_O
    uint32 u32_AdrOffset = 0U;
    const uint8 * pu8_HexLine;
 
-   if (LineInit() != NULL)            // HEX Data loaded?
+   if (LineInit() != NULL) // HEX Data loaded?
    {
       while ((pu8_HexLine = NextLine()) != NULL)
       {
          uint8 u8_Command = pu8_HexLine[mu8_INTEL_CMD];
 
-         if (u8_Command == mu8_CMD_EOF)       // EOF record?
+         if (u8_Command == mu8_CMD_EOF) // EOF record?
          {
             break;
          }
 
-         if (u8_Command == mu8_CMD_XADR32)    // address offset?
+         if (u8_Command == mu8_CMD_XADR32) // address offset?
          {
-            u32_AdrOffset =  (static_cast<uint32>(pu8_HexLine[mu8_INTEL_DAT])     << 24);
+            u32_AdrOffset =  (static_cast<uint32>(pu8_HexLine[mu8_INTEL_DAT]) << 24);
             u32_AdrOffset |= (static_cast<uint32>(pu8_HexLine[mu8_INTEL_DAT + 1]) << 16);
          }
-         else if (u8_Command == mu8_CMD_DATA)      // data record?
+         else if (u8_Command == mu8_CMD_DATA) // data record?
          {
-            uint32 n = pu8_HexLine[mu8_INTEL_LEN];
+            uint32 u32_NumBytes = pu8_HexLine[mu8_INTEL_LEN];
             uint32 u32_Adr = (static_cast<uint32>(pu8_HexLine[mu8_INTEL_ADRH]) << 8);
             u32_Adr |= pu8_HexLine[mu8_INTEL_ADRL];
             u32_Adr = (u32_Adr + u32_AdrOffset) - ou32_Offset;
 
-            for (uint32 i = 0; i < n; i++)             // copy data into memory
-            {                                   // check for data overlay
-               if (((opu16_BinImage[u32_Adr + i] & 0xFF00U) != 0) && (u32_Error == NO_ERR))
+            for (uint32 u32_ByteIndex = 0; u32_ByteIndex < u32_NumBytes; u32_ByteIndex++) // copy data into memory
+            {
+               // check for data overlay
+               if (((opu16_BinImage[u32_Adr + u32_ByteIndex] & 0xFF00U) != 0) && (u32_Error == NO_ERR))
                {
-                  u32_Error = (WRN_RECORD_OVERLAY | ((u32_Adr + ou32_Offset + i) & ~ERR_MASK)); // -> set warning
-                  mu32_LastOverlayErrorAddress = u32_Adr + ou32_Offset + i;
+                  // -> set warning
+                  u32_Error = (WRN_RECORD_OVERLAY | ((u32_Adr + ou32_Offset + u32_ByteIndex) & ~ERR_MASK));
+                  mu32_LastOverlayErrorAddress = u32_Adr + ou32_Offset + u32_ByteIndex;
                }
-               opu16_BinImage[u32_Adr + i] = static_cast<uint16>(static_cast<uint16>(0x0100U) +
-                                                                 pu8_HexLine[mu8_INTEL_DAT + i]);
+               opu16_BinImage[u32_Adr + u32_ByteIndex] = static_cast<uint16>(static_cast<uint16>(0x0100U) +
+                                                                 pu8_HexLine[mu8_INTEL_DAT + u32_ByteIndex]);
             }
          }
          else
@@ -861,19 +873,19 @@ uint32 C_HexFile::CreateHexFile(const uint16 * const opu16_BinImage, const uint3
       u32_RecSize = mu8_MAX_RECSIZE;
    }
 
-   this->Clear();  // clear existing hex file data
+   this->Clear(); // clear existing hex file data
 
    mu32_NumRawBytes = ou32_Size;
 
-   u32_Error = AddHexLine(":020000040000FA\n");   // init data with zero offset
+   u32_Error = AddHexLine(":020000040000FA\n"); // init data with zero offset
 
    if (u32_Error == NO_ERR)
    {
-      for (uint32 i = 0; i < ou32_Size; i++)
+      for (uint32 u32_ByteIndex = 0; u32_ByteIndex < ou32_Size; u32_ByteIndex++)
       {
-         while ((opu16_BinImage[i] & 0xFF00U) != 0U)  // do while data valid...
+         while ((opu16_BinImage[u32_ByteIndex] & 0xFF00U) != 0U) // do while data valid...
          {
-            u32_Adr = ou32_Offset +i;          // create full address
+            u32_Adr = ou32_Offset + u32_ByteIndex; // create full address
 
             if ((u32_Adr & mu32_XADR32_MASK) != mu32_AdrOffs)
             {
@@ -888,7 +900,7 @@ uint32 C_HexFile::CreateHexFile(const uint16 * const opu16_BinImage, const uint3
 
             if (u32_Error == NO_ERR)
             {
-               if (((u32_Adr - mu32_AdrOffs) % u32_RecSize) == 0U)        // record size boundary?
+               if (((u32_Adr - mu32_AdrOffs) % u32_RecSize) == 0U) // record size boundary?
                {
                   u32_Error = CloseRecord(acn_Record, q_RecordOpen);
                }
@@ -898,8 +910,9 @@ uint32 C_HexFile::CreateHexFile(const uint16 * const opu16_BinImage, const uint3
                break;
             }
 
-            if (q_RecordOpen == false)            // no record open?
-            {                                // -> open data record...
+            if (q_RecordOpen == false) // no record open?
+            {
+               // -> open data record...
                s32_Length = 0;
                SetWord(acn_Record, mu8_INTEL_ADRH, (u32_Adr & ~mu32_XADR32_MASK));
                SetByte(acn_Record, mu8_INTEL_CMD, mu8_CMD_DATA);
@@ -907,17 +920,17 @@ uint32 C_HexFile::CreateHexFile(const uint16 * const opu16_BinImage, const uint3
             }
 
             // store data
-            SetByte(acn_Record, static_cast<uint32>(mu8_INTEL_DAT + s32_Length), static_cast<uint8>(opu16_BinImage[i]));
-            s32_Length++;                        // inc. data length
+            SetByte(acn_Record, static_cast<uint32>(mu8_INTEL_DAT + s32_Length), static_cast<uint8>(opu16_BinImage[u32_ByteIndex]));
+            s32_Length++;                                                       // inc. data length
             SetByte(acn_Record, mu8_INTEL_LEN, static_cast<uint8>(s32_Length)); // set data length
 
-            i++;                             // increment address index
-            if (i >= ou32_Size)                   // end of BinImage?
+            u32_ByteIndex++;                // increment address index
+            if (u32_ByteIndex >= ou32_Size) // end of BinImage?
             {
                break;
             }
          }
-         if ((i < ou32_Size) && ((opu16_BinImage[i] & 0xFF00U) == 0))
+         if ((u32_ByteIndex < ou32_Size) && ((opu16_BinImage[u32_ByteIndex] & 0xFF00U) == 0))
          {
             mu32_NumRawBytes--; //no valid data: one byte less in hexfile ...
          }
@@ -935,10 +948,11 @@ uint32 C_HexFile::CreateHexFile(const uint16 * const opu16_BinImage, const uint3
 
    if (u32_Error == NO_ERR)
    {
+      SetEOFPtr(); // add EOF record to end of file
       u32_Error = AddHexLine(":00000001FF\n");
-      if (u32_Error == NO_ERR)  // add EOF record
+      if (u32_Error == NO_ERR) // add EOF record
       {
-         RemoveFirst();                    // remove first element (zero offset)
+         RemoveFirst(); // remove first element (zero offset)
       }
    }
 
@@ -983,9 +997,9 @@ uint32 C_HexFile::CreateHexFile(const C_HexDataDump & orc_Dump, const uint32 ou3
       u32_RecSize = mu8_MAX_RECSIZE;
    }
 
-   this->Clear();  // clear existing hex file data
+   this->Clear(); // clear existing hex file data
 
-   u32_Error = AddHexLine(":020000040000FA\n");   // init data with zero offset
+   u32_Error = AddHexLine(":020000040000FA\n"); // init data with zero offset
 
    if (u32_Error == NO_ERR)
    {
@@ -1027,8 +1041,9 @@ uint32 C_HexFile::CreateHexFile(const C_HexDataDump & orc_Dump, const uint32 ou3
                break;
             }
 
-            if (q_RecordOpen == false)            // no record open?
-            {                                // -> open data record...
+            if (q_RecordOpen == false) // no record open?
+            {
+               // -> open data record...
                s32_Length = 0;
                SetWord(acn_Record, mu8_INTEL_ADRH, (u32_AbsoluteAddress & ~mu32_XADR32_MASK));
                SetByte(acn_Record, mu8_INTEL_CMD, mu8_CMD_DATA);
@@ -1038,7 +1053,7 @@ uint32 C_HexFile::CreateHexFile(const C_HexDataDump & orc_Dump, const uint32 ou3
             // store data
             SetByte(acn_Record, static_cast<uint32>(mu8_INTEL_DAT + s32_Length),
                     static_cast<uint8>(pc_Block->au8_Data[u32_OffsetInBlock]));
-            s32_Length++;                        // inc. data length
+            s32_Length++;                                                       // inc. data length
             SetByte(acn_Record, mu8_INTEL_LEN, static_cast<uint8>(s32_Length)); // set data length
          }
 
@@ -1056,16 +1071,16 @@ uint32 C_HexFile::CreateHexFile(const C_HexDataDump & orc_Dump, const uint32 ou3
 
    if (u32_Error == 0U)
    {
+      SetEOFPtr(); // add EOF record to end of file
       u32_Error = AddHexLine(":00000001FF\n");
-      if (u32_Error == NO_ERR)  // add EOF record
+      if (u32_Error == NO_ERR) // add EOF record
       {
-         RemoveFirst();                    // remove first element (zero offset)
+         RemoveFirst(); // remove first element (zero offset)
       }
    }
 
    return u32_Error;
 }
-
 
 //************************************************************************
 // .FUNCTION    CloseRecord
@@ -1087,7 +1102,7 @@ uint32 C_HexFile::CloseRecord(charn * const opcn_Record, bool & orq_RecordOpen)
 {
    uint32 u32_Error = NO_ERR;
 
-   if (orq_RecordOpen == true)                   // create valid data record
+   if (orq_RecordOpen == true) // create valid data record
    {
       CalcCheck(opcn_Record);
       u32_Error = AddHexLine(opcn_Record);
@@ -1096,7 +1111,6 @@ uint32 C_HexFile::CloseRecord(charn * const opcn_Record, bool & orq_RecordOpen)
 
    return u32_Error;
 }
-
 
 //************************************************************************
 // .FUNCTION    HexLineString
@@ -1115,16 +1129,16 @@ const charn * C_HexFile::HexLineString(const uint8 * const opu8_HexLine) //const
    static charn hacn_Buffer[mu32_HEXBUFFER_SIZE];
    uint32 u32_Length;
 
-   hacn_Buffer[0] = ':';           // begin a new Intel HEX line
+   hacn_Buffer[0] = ':'; // begin a new Intel HEX line
    u32_Length = static_cast<uint32>(opu8_HexLine[mu8_INTEL_LEN]) + 5U;
 
-   for (uint32 i = 0U; i < u32_Length; i++)  // store ASCII HEX data
+   for (uint32 u32_ByteIndex = 0U; u32_ByteIndex < u32_Length; u32_ByteIndex++) // store ASCII HEX data
    {
-      SetByte(hacn_Buffer, i, opu8_HexLine[i]);
+      SetByte(hacn_Buffer, u32_ByteIndex, opu8_HexLine[u32_ByteIndex]);
    }
 
-   u32_Length = (u32_Length * 2U) + 1U;    // create line end:
-   hacn_Buffer[u32_Length] = '\0';   // terminate string
+   u32_Length = (u32_Length * 2U) + 1U; // create line end:
+   hacn_Buffer[u32_Length] = '\0';      // terminate string
 
    return hacn_Buffer;
 }
@@ -1160,21 +1174,21 @@ uint32 C_HexFile::GetIHexCommand(const charn * const opcn_String, uint8 & oru8_C
    {
       if (GetByte(opcn_String, mu8_INTEL_LEN, u8_Data) == NO_ERR) // read record data length
       {
-         u32_Length = static_cast<uint32>(u8_Data) + mu8_INTEL_DAT + 1;           // calculate complete record length
+         u32_Length = static_cast<uint32>(u8_Data) + mu8_INTEL_DAT + 1; // calculate complete record length
 
-         for (u32_Loop = 0U; u32_Loop < u32_Length; u32_Loop++)                     // calculate checksum...
+         for (u32_Loop = 0U; u32_Loop < u32_Length; u32_Loop++) // calculate checksum...
          {
             u32_Error = GetByte(opcn_String, u32_Loop, u8_Data);
             if (u32_Error != NO_ERR)
             {
-               break;                                        // on error break!
+               break; // on error break!
             }
             u8_Checksum += u8_Data;
          }
 
-         if ((u32_Error == NO_ERR) && (u8_Checksum != 0x00U))              // checksum error?
+         if ((u32_Error == NO_ERR) && (u8_Checksum != 0x00U)) // checksum error?
          {
-            u32_Error = ERR_HEXLINE_CHECKSUM;                 // yes -> set checksum error
+            u32_Error = ERR_HEXLINE_CHECKSUM; // yes -> set checksum error
          }
       }
 
@@ -1225,13 +1239,13 @@ uint32 C_HexFile::GetSRecordType(const charn * const opcn_String, uint8 & oru8_R
 
    if (opcn_String[0] == 'S')
    {
-      if (GetByte(opcn_String + 1, mu8_SREC_LEN, u8_Data) == NO_ERR)    // read record data length
+      if (GetByte(opcn_String + 1, mu8_SREC_LEN, u8_Data) == NO_ERR) // read record data length
       {
-         sint32 s32_Length = static_cast<sint32>(u8_Data) + 1;           // calculate complete record length
+         sint32 s32_Length = static_cast<sint32>(u8_Data) + 1; // calculate complete record length
 
-         for (sint32 i = 0; i < s32_Length; i++)                         // calculate checksum...
+         for (sint32 u32_ByteIndex = 0; u32_ByteIndex < s32_Length; u32_ByteIndex++) // calculate checksum...
          {
-            u32_Error = GetByte(opcn_String + 1, i, u8_Data);
+            u32_Error = GetByte(opcn_String + 1, u32_ByteIndex, u8_Data);
             if (u32_Error != NO_ERR)
             {
                break;
@@ -1239,17 +1253,17 @@ uint32 C_HexFile::GetSRecordType(const charn * const opcn_String, uint8 & oru8_R
             u8_Checksum += u8_Data;
          }
 
-         if ((u32_Error == 0U) && (u8_Checksum != 0xFFU))                  // checksum error?
+         if ((u32_Error == 0U) && (u8_Checksum != 0xFFU)) // checksum error?
          {
-            u32_Error = ERR_HEXLINE_CHECKSUM;                     // yes -> set checksum error
+            u32_Error = ERR_HEXLINE_CHECKSUM; // yes -> set checksum error
          }
       }
 
       if (u32_Error == 0U)
       {
-         oru8_RecordType = static_cast<uint8>(opcn_String[1]) - 0x30U;     // read record type
+         oru8_RecordType = static_cast<uint8>(opcn_String[1]) - 0x30U; // read record type
 
-         if (oru8_RecordType > mu8_SREC_END16)                        // check record type
+         if (oru8_RecordType > mu8_SREC_END16) // check record type
          {
             u32_Error = ERR_HEXLINE_COMMAND;
          }
@@ -1291,7 +1305,7 @@ uint32 C_HexFile::GetIntelAddress(const charn * const opcn_String, const uint8 o
 
    switch (ou8_Command)
    {
-   case mu8_CMD_DATA:      // calculate 32bit address for data record
+   case mu8_CMD_DATA: // calculate 32bit address for data record
       if (GetWord(opcn_String, mu8_INTEL_ADRH, u32_Address) == NO_ERR)
       {
          oru32_Adr = mu32_AdrOffs + u32_Address;
@@ -1299,8 +1313,8 @@ uint32 C_HexFile::GetIntelAddress(const charn * const opcn_String, const uint8 o
       }
       break;
 
-   case mu8_CMD_XADR16:   // calculate 32bit offset address
-                         // from Intel16 20bit offset command
+   case mu8_CMD_XADR16: // calculate 32bit offset address
+                        // from Intel16 20bit offset command
       if (GetWord(opcn_String, mu8_INTEL_DAT, u32_Address) == NO_ERR)
       {
          oru32_Adr = (u32_Address << 4);
@@ -1308,8 +1322,8 @@ uint32 C_HexFile::GetIntelAddress(const charn * const opcn_String, const uint8 o
       }
       break;
 
-   case mu8_CMD_XADR32:        // calculate 32bit offset address
-                          // from Intel32 32bit offset command
+   case mu8_CMD_XADR32: // calculate 32bit offset address
+      // from Intel32 32bit offset command
       if (GetWord(opcn_String, mu8_INTEL_DAT, u32_Address) == NO_ERR)
       {
          oru32_Adr = (u32_Address << 16);
@@ -1411,12 +1425,13 @@ uint32 C_HexFile::GetSRecordAddress(const charn * const opcn_String, const uint8
 void C_HexFile::SetDataPtr(const uint32 ou32_Adr)
 {
    T_HexLine * pt_Next;
+
    if (mpt_Prev == NULL)
    {
       return;
    }
 
-   while (ou32_Adr < mpt_Prev->u32_XAdr)    // search for next data entry point
+   while (ou32_Adr < mpt_Prev->u32_XAdr) // search for next data entry point
    {
       mpt_Prev = mpt_Prev->pt_Prev;
    }
@@ -1452,13 +1467,15 @@ uint32 C_HexFile::SetXAdrPtr(const uint32 ou32_Adr)
    uint32 u32_Ret = true;
    uint32 u32_Offs;
    T_HexLine * pt_Next;
+
    if (mpt_Prev == NULL)
    {
       return false;
    }
 
-   if (ou32_Adr != 0U)    // address offset > 0x00000000 ?
-   {             // search entry point for new offset command
+   if (ou32_Adr != 0U) // address offset > 0x00000000 ?
+   {
+      // search entry point for new offset command
       while ((ou32_Adr <= mpt_Prev->u32_XAdr) && (mpt_Prev != mpt_DataEntry))
       {
          mpt_Prev = mpt_Prev->pt_Prev;
@@ -1470,10 +1487,10 @@ uint32 C_HexFile::SetXAdrPtr(const uint32 ou32_Adr)
          mpt_Prev = pt_Next;
          pt_Next = mpt_Prev->pt_Next;
       }
-                // check if offset command already exists
+      // check if offset command already exists
       if (pt_Next->pu8_HexLine[mu8_INTEL_CMD] == mu8_CMD_XADR32)
       {
-         u32_Offs = (static_cast<uint32>(pt_Next->pu8_HexLine[mu8_INTEL_DAT])      << 24) +
+         u32_Offs = (static_cast<uint32>(pt_Next->pu8_HexLine[mu8_INTEL_DAT]) << 24) +
                     (static_cast<uint32>(pt_Next->pu8_HexLine[mu8_INTEL_DAT + 1U]) << 16);
          if (u32_Offs == ou32_Adr)
          {
@@ -1504,7 +1521,7 @@ uint32 C_HexFile::SetXAdrPtr(const uint32 ou32_Adr)
 //************************************************************************
 void C_HexFile::SetEOFPtr(void)
 {
-   mpt_Prev = mpt_DataEntry->pt_Prev;  // set ptPrev to last element
+   mpt_Prev = mpt_DataEntry->pt_Prev; // set ptPrev to last element
 }
 
 //************************************************************************
@@ -1528,9 +1545,9 @@ void C_HexFile::SetEOFPtr(void)
 uint32 C_HexFile::AddHexLine(const charn * const opcn_String)
 {
    uint32 u32_Error;
-   T_HexLine *pt_New;
-   T_HexLine *pt_Next;
-   uint8  u8_Len;
+   T_HexLine * pt_New;
+   T_HexLine * pt_Next;
+   uint8 u8_Len;
    uint32 u32_Length;
 
    u32_Error = GetByte(opcn_String, mu8_INTEL_LEN, u8_Len);
@@ -1538,29 +1555,29 @@ uint32 C_HexFile::AddHexLine(const charn * const opcn_String)
 
    if (u32_Error == NO_ERR)
    {
-      try                         // be aware of the bad bad_alloc exception...
+      try // be aware of the bad bad_alloc exception...
       {
-         pt_New = new T_HexLine();     // create new element
-         pt_New->pu8_HexLine = NULL;  // sorry, no data!
+         pt_New = new T_HexLine();   // create new element
+         pt_New->pu8_HexLine = NULL; // sorry, no data!
 
-         if (mpt_Prev == NULL)       // first entry?
+         if (mpt_Prev == NULL) // first entry?
          {
-            pt_New->pt_Prev = pt_New;  // 1st element points to himself
-            pt_New->pt_Next = pt_New;  // 1st element points to himself
+            pt_New->pt_Prev = pt_New; // 1st element points to himself
+            pt_New->pt_Next = pt_New; // 1st element points to himself
             mpt_Prev      = pt_New;   // new element is also previous element!
             mpt_DataEntry = pt_New;   // remember the entry pointer!
          }
 
          pt_Next = mpt_Prev->pt_Next; // remember next element!
-         mpt_Prev->pt_Next = pt_New;   // previous points to new element
-         pt_New->pt_Prev = mpt_Prev;   // new points to previous element
-         pt_New->pt_Next = pt_Next;    // new points also to next element
-         pt_Next->pt_Prev = pt_New;    // next points to new element
+         mpt_Prev->pt_Next = pt_New;  // previous points to new element
+         pt_New->pt_Prev = mpt_Prev;  // new points to previous element
+         pt_New->pt_Next = pt_Next;   // new points also to next element
+         pt_Next->pt_Prev = pt_New;   // next points to new element
          mpt_Prev = pt_New;           // next time new is previous...
 
-         pt_New->pu8_HexLine = new uint8[static_cast<uintn>(u32_Length)];  // allocate space for data
+         pt_New->pu8_HexLine = new uint8[static_cast<uintn>(u32_Length)]; // allocate space for data
       }
-      catch (...)           // UWE! need some RAM
+      catch (...) // UWE! need some RAM
       {
          u32_Error = ERR_NOT_ENOUGH_MEMORY;
       }
@@ -1606,38 +1623,39 @@ uint32 C_HexFile::CopyData(const charn * const opcn_String, T_HexLine * const op
    uint32 u32_EndAdr;
    uint8 u8_Data;
 
-   for (uint32 i = 0U; i < ou32_Length; i++)        // copy HEX data into buffer
+   for (uint32 u32_ByteIndex = 0U; u32_ByteIndex < ou32_Length; u32_ByteIndex++) // copy HEX data into buffer
    {
-      u32_Error = GetByte(opcn_String, i, u8_Data);
+      u32_Error = GetByte(opcn_String, u32_ByteIndex, u8_Data);
       if (u32_Error != 0U)
       {
          break;
       }
 
-      opt_HexLine->pu8_HexLine[i] = u8_Data;
+      opt_HexLine->pu8_HexLine[u32_ByteIndex] = u8_Data;
    }
 
-   if (u32_Error == 0U)             // no error in HEX data ?
+   if (u32_Error == 0U) // no error in HEX data ?
    {
-                            // 32bit address offset command ?
-                            // calculate and store 32bit start address
+      // 32bit address offset command ?
+      // calculate and store 32bit start address
       if (opt_HexLine->pu8_HexLine[mu8_INTEL_CMD] == mu8_CMD_XADR32)
       {
-         opt_HexLine->u32_XAdr = ((static_cast<uint32>(opt_HexLine->pu8_HexLine[mu8_INTEL_DAT])     << 24) +
+         opt_HexLine->u32_XAdr = ((static_cast<uint32>(opt_HexLine->pu8_HexLine[mu8_INTEL_DAT]) << 24) +
                                   (static_cast<uint32>(opt_HexLine->pu8_HexLine[mu8_INTEL_DAT + 1]) << 16));
       }
 
-                            // data record ?
+      // data record ?
       if (opt_HexLine->pu8_HexLine[mu8_INTEL_CMD] == mu8_CMD_DATA)
-      {                       // calculate start address
+      {
+         // calculate start address
          u32_StartAdr = ((static_cast<uint32>(opt_HexLine->pu8_HexLine[mu8_INTEL_ADRH]) << 8) +
-                                             opt_HexLine->pu8_HexLine[mu8_INTEL_ADRL]) + mu32_AdrOffs;
+                         opt_HexLine->pu8_HexLine[mu8_INTEL_ADRL]) + mu32_AdrOffs;
          u32_EndAdr = (u32_StartAdr + ou32_Length) - 6;
-         if (u32_StartAdr < mu32_MinAdr)  // check and store min address
+         if (u32_StartAdr < mu32_MinAdr) // check and store min address
          {
             mu32_MinAdr = u32_StartAdr;
          }
-         if (u32_EndAdr > mu32_MaxAdr)    // check and store max address
+         if (u32_EndAdr > mu32_MaxAdr) // check and store max address
          {
             mu32_MaxAdr = u32_EndAdr;
          }
@@ -1652,10 +1670,10 @@ uint32 C_HexFile::CopyData(const charn * const opcn_String, T_HexLine * const op
    }
    else
    {
-      mu32_LineCountNew++;       // count new line numbers
+      mu32_LineCountNew++; // count new line numbers
    }
 
-   return (u32_Error);
+   return u32_Error;
 }
 
 //************************************************************************
@@ -1677,13 +1695,13 @@ void C_HexFile::RemoveFirst(void)
 
    if (mpt_DataEntry != NULL)
    {
-      pt_Next = mpt_DataEntry->pt_Next;   // pointer to next element
-      pt_Last = mpt_DataEntry->pt_Prev;   // pointer to last element
+      pt_Next = mpt_DataEntry->pt_Next; // pointer to next element
+      pt_Last = mpt_DataEntry->pt_Prev; // pointer to last element
 
-      pt_Next->pt_Prev = pt_Last;        // previous from next is last element
-      pt_Last->pt_Next = pt_Next;        // next from previos is next (now 1st element)
+      pt_Next->pt_Prev = pt_Last; // previous from next is last element
+      pt_Last->pt_Next = pt_Next; // next from previos is next (now 1st element)
 
-      if (mpt_Prev == mpt_DataEntry)      // check and change global pointers
+      if (mpt_Prev == mpt_DataEntry) // check and change global pointers
       {
          mpt_Prev = pt_Next;
       }
@@ -1691,17 +1709,17 @@ void C_HexFile::RemoveFirst(void)
       {
          mpt_HexData = pt_Next;
       }
-                                    // remove data buffer
+      // remove data buffer
       if (mpt_DataEntry->pu8_HexLine != NULL)
       {
          delete[] mpt_DataEntry->pu8_HexLine;
       }
 
-      delete mpt_DataEntry;             // remove element
+      delete mpt_DataEntry; // remove element
 
-      mpt_DataEntry = pt_Next;           // next is 1st element
+      mpt_DataEntry = pt_Next; // next is 1st element
 
-      mu32_LineCountNew--;               // dec line counter
+      mu32_LineCountNew--; // dec line counter
    }
 }
 
@@ -1766,10 +1784,10 @@ uint32 C_HexFile::ConvOffs16To32(charn * const opcn_String) const
 uint32 C_HexFile::ConvRec16ToRec32(charn * const opcn_String)
 {
    uint32 u32_Error;
-   charn  acn_HexLine[mu32_HEXBUFFER_SIZE];
+   charn acn_HexLine[mu32_HEXBUFFER_SIZE];
    uint32 u32_Adr;
-   uint8  u8_Len;
-   uint8  u8_Len1;
+   uint8 u8_Len;
+   uint8 u8_Len1;
    uint32 u32_StartAdr;
    uint32 u32_EndAdr;
    uint32 u32_SaveOffs;
@@ -1784,11 +1802,12 @@ uint32 C_HexFile::ConvRec16ToRec32(charn * const opcn_String)
          u32_EndAdr   = (u32_StartAdr + u8_Len) - 1;
 
          if (u32_StartAdr >= 0x00010000U)
-         { // write 32bit offset command
+         {
+            // write 32bit offset command
             u32_Error = SetOffset((mu32_AdrOffs & mu32_XADR32_MASK) + 0x10000U);
          }
 
-         SetDataPtr(mu32_AdrOffs + u32_Adr);      // calc new list pointer
+         SetDataPtr(mu32_AdrOffs + u32_Adr); // calc new list pointer
 
          if (u32_Error == NO_ERR)
          {
@@ -1798,10 +1817,10 @@ uint32 C_HexFile::ConvRec16ToRec32(charn * const opcn_String)
                SetWord(opcn_String, mu8_INTEL_ADRH, u32_StartAdr);
                CalcCheck(opcn_String);
 
-               u32_SaveOffs = mu32_AdrOffs;                       // save address offset
-               mu32_AdrOffs = (mu32_AdrOffs + u32_Adr) & mu32_XADR32_MASK;  // create 32bit Offset
-               u32_Error = AddHexLine(opcn_String);               // add 32bit HEX record
-               mu32_AdrOffs = u32_SaveOffs;                       // restore address offset
+               u32_SaveOffs = mu32_AdrOffs;                                // save address offset
+               mu32_AdrOffs = (mu32_AdrOffs + u32_Adr) & mu32_XADR32_MASK; // create 32bit Offset
+               u32_Error = AddHexLine(opcn_String);                        // add 32bit HEX record
+               mu32_AdrOffs = u32_SaveOffs;                                // restore address offset
             }
             else
             {
@@ -1812,20 +1831,21 @@ uint32 C_HexFile::ConvRec16ToRec32(charn * const opcn_String)
                SetByte(acn_HexLine, mu8_INTEL_LEN, u8_Len1);
                SetWord(acn_HexLine, mu8_INTEL_ADRH, u32_StartAdr);
                SetByte(acn_HexLine, mu8_INTEL_CMD, mu8_CMD_DATA);
-               for (uint8 i = 0U; i < u8_Len1; i++)
+               for (uint8 u32_ByteIndex = 0U; u32_ByteIndex < u8_Len1; u32_ByteIndex++)
                {
-                  strncpy(&acn_HexLine[(i * 2U) + 9U], &opcn_String[(i * 2U) + 9U], 2U);
+                  strncpy(&acn_HexLine[(u32_ByteIndex * 2U) + 9U], &opcn_String[(u32_ByteIndex * 2U) + 9U], 2U);
                }
                CalcCheck(acn_HexLine);
                strncpy(&acn_HexLine[(static_cast<uint32>(u8_Len1) * 2U) + 11U], "\n\0", 2U);
 
-               u32_SaveOffs = mu32_AdrOffs;                       // save address offset
-               mu32_AdrOffs = (mu32_AdrOffs + u32_Adr) & mu32_XADR32_MASK;  // create 32bit Offset
-               u32_Error = AddHexLine(acn_HexLine);              // add 32bit HEX record
-               mu32_AdrOffs = u32_SaveOffs;                       // restore address offset
+               u32_SaveOffs = mu32_AdrOffs;                                // save address offset
+               mu32_AdrOffs = (mu32_AdrOffs + u32_Adr) & mu32_XADR32_MASK; // create 32bit Offset
+               u32_Error = AddHexLine(acn_HexLine);                        // add 32bit HEX record
+               mu32_AdrOffs = u32_SaveOffs;                                // restore address offset
 
                if (u32_Error == NO_ERR)
-               { // write 32bit offset command
+               {
+                  // write 32bit offset command
                   u32_StartAdr = (((mu32_AdrOffs + u32_Adr) & mu32_XADR32_MASK) + 0x10000U);
                   u32_Error = SetOffset(u32_StartAdr);
                   if (u32_Error == NO_ERR)
@@ -1840,11 +1860,11 @@ uint32 C_HexFile::ConvRec16ToRec32(charn * const opcn_String)
                      CalcCheck(acn_HexLine);
                      strncpy(&acn_HexLine[(static_cast<uint32>(u8_Len) * 2U) + 11U], "\n\0", 2U);
 
-                     SetDataPtr(u32_StartAdr);           // calc new list pointer
-                     u32_SaveOffs = mu32_AdrOffs;           // save address offset
-                     mu32_AdrOffs = u32_StartAdr;           // create 32bit Offset
-                     u32_Error = AddHexLine(acn_HexLine);  // add 32bit HEX record
-                     mu32_AdrOffs = u32_SaveOffs;           // restore address offset
+                     SetDataPtr(u32_StartAdr);            // calc new list pointer
+                     u32_SaveOffs = mu32_AdrOffs;         // save address offset
+                     mu32_AdrOffs = u32_StartAdr;         // create 32bit Offset
+                     u32_Error = AddHexLine(acn_HexLine); // add 32bit HEX record
+                     mu32_AdrOffs = u32_SaveOffs;         // restore address offset
                   }
                }
             }
@@ -1909,8 +1929,8 @@ uint32 C_HexFile::CalcCheck(charn * const opcn_String)
 {
    uint32 u32_Error;
    uint32 u32_Length;
-   uint8  u8_Data;
-   uint8  u8_Checksum = 0U;
+   uint8 u8_Data;
+   uint8 u8_Checksum = 0U;
 
    u32_Error = GetByte(opcn_String, mu8_INTEL_LEN, u8_Data);
    if (u32_Error == NO_ERR)
@@ -1956,8 +1976,8 @@ uint32 C_HexFile::GetByte(const charn * const opcn_String, const uint32 ou32_Ind
 {
    uint32 u32_Error = ERR_HEXLINE_SYNTAX;
    uint32 u32_Index = ou32_Index;
-   uint8  u8_HiNib;
-   uint8  u8_LoNib;
+   uint8 u8_HiNib;
+   uint8 u8_LoNib;
 
    u32_Index = (u32_Index * 2U) + 1U;
    u8_HiNib = static_cast<uint8>(opcn_String[u32_Index]);
@@ -2020,14 +2040,14 @@ void C_HexFile::SetByte(charn * const opcn_String, const uint32 ou32_Index, cons
    uint32 u32_Index;
 
    au8_HexByte[0] = static_cast<uint8>(ou8_Byte >> 4);
-   au8_HexByte[0] = static_cast<uint8>(au8_HexByte[0] + 0x30U);  // create HEX ASCII char...
+   au8_HexByte[0] = static_cast<uint8>(au8_HexByte[0] + 0x30U); // create HEX ASCII char...
    if (au8_HexByte[0] > 0x39U)
    {
       au8_HexByte[0] = static_cast<uint8>(au8_HexByte[0] + 7U);
    }
 
    au8_HexByte[1] = static_cast<uint8>(ou8_Byte & 0x0FU);
-   au8_HexByte[1] = static_cast<uint8>(au8_HexByte[1] + 0x30U);  // create HEX ASCII char...
+   au8_HexByte[1] = static_cast<uint8>(au8_HexByte[1] + 0x30U); // create HEX ASCII char...
    if (au8_HexByte[1] > 0x39U)
    {
       au8_HexByte[1] = static_cast<uint8>(au8_HexByte[1] + 7U);
@@ -2056,8 +2076,8 @@ void C_HexFile::SetByte(charn * const opcn_String, const uint32 ou32_Index, cons
 uint32 C_HexFile::GetWord(const charn * const opcn_String, const uint32 ou32_Index, uint32 & oru32_Word)
 {
    uint32 u32_Error;
-   uint8  u8_Hi;
-   uint8  u8_Lo;
+   uint8 u8_Hi;
+   uint8 u8_Lo;
 
    u32_Error = GetByte(opcn_String, ou32_Index, u8_Hi);
    if (u32_Error == NO_ERR)
@@ -2098,6 +2118,7 @@ void C_HexFile::SetWord(charn * const opcn_String, const uint32 ou32_Index, cons
 uint32 C_HexFile::Validate(void)
 {
    uint32 u32_Error;
+
    (void)this->GetDataDump(u32_Error);
    return u32_Error;
 }
@@ -2107,6 +2128,7 @@ uint32 C_HexFile::Validate(void)
 uint32 C_HexFile::GetXAdrActLine(uint32 & oru32_XAdr) const
 {
    uint32 u32_Return = ERR_NO_DATA;
+
    if (mpt_HexData != NULL)
    {
       oru32_XAdr = mpt_HexData->u32_XAdr;
@@ -2300,8 +2322,7 @@ sint32 C_HexFile::prv_FindPattern(const uint8 * const opu8_Buffer, const uint8 *
    -1       error (pattern not found)
 */
 //-----------------------------------------------------------------------------
-sint32 C_HexFile::FindPattern(uint32 & oru32_Address, const uint8 ou8_PatternLength,
-                              const uint8 * const opu8_Pattern)
+sint32 C_HexFile::FindPattern(uint32 & oru32_Address, const uint8 ou8_PatternLength, const uint8 * const opu8_Pattern)
 {
    sint32 s32_Return;
    sint32 s32_Block;
@@ -2532,4 +2553,3 @@ uint32 C_HexFile::GetLastOverlayErrorAddress(void) const
 {
    return mu32_LastOverlayErrorAddress;
 }
-

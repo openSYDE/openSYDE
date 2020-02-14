@@ -57,6 +57,8 @@ C_UtiUndoStack::~C_UtiUndoStack(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do command push
+
+   \param[in,out]  opc_UndoCommand  New undo command to add to the stack
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UtiUndoStack::DoPush(QUndoCommand * const opc_UndoCommand)

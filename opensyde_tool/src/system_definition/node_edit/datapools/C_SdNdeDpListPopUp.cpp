@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include "constants.h"
 #include "C_SdNdeDpListPopUp.h"
 #include "ui_C_SdNdeDpListPopUp.h"
 #include "C_GtGetText.h"
@@ -17,6 +18,7 @@
 #include "C_PuiSdHandler.h"
 #include "TGLUtils.h"
 #include "C_OgeWiUtil.h"
+#include "C_GiSyColorSelectWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -52,11 +54,10 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListPopUp::C_SdNdeDpListPopUp(C_OgePopUpDialog & orc_Parent, const uint32 & oru32_NodeIndex,
-                                                   const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex,
-                                                   C_SdNdeDpListModelViewManager * const opc_ModelViewManager,
-                                                   QTreeWidget * const opc_TreeWidget,
-                                                   C_SdNdeUnoDataPoolManager * const opc_UndoManager,
-                                                   QWidget * const opc_Parent) :
+                                       const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex,
+                                       C_SdNdeDpListModelViewManager * const opc_ModelViewManager,
+                                       QTreeWidget * const opc_TreeWidget,
+                                       C_SdNdeUnoDataPoolManager * const opc_UndoManager, QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListPopUp),
    mrc_Parent(orc_Parent),
@@ -297,6 +298,10 @@ void C_SdNdeDpListPopUp::keyPressEvent(QKeyEvent * const opc_Event)
          this->mq_SaveAsAfterClose = true;
          this->mrc_Parent.accept();
          break;
+      case Qt::Key_F8:
+         this->m_OpenColorPicker();
+         this->mrc_Parent.accept();
+         break;
       default:
          //Nothing to do
          break;
@@ -402,9 +407,9 @@ void C_SdNdeDpListPopUp::m_HandleSelection(const uint32 & oru32_ListIndex, const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListPopUp::m_HandleButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
-                                                    const bool & orq_CopyActive, const bool & orq_PasteActive,
-                                                    const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
-                                                    const bool & orq_MoveUpActive) const
+                                              const bool & orq_CopyActive, const bool & orq_PasteActive,
+                                              const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
+                                              const bool & orq_MoveUpActive) const
 {
    this->mpc_Ui->pc_PushButtonAdd->setEnabled(orq_AddActive);
    this->mpc_Ui->pc_PushButtonCut->setEnabled(orq_CutActive);
@@ -413,4 +418,29 @@ void C_SdNdeDpListPopUp::m_HandleButtonChange(const bool & orq_AddActive, const 
    this->mpc_Ui->pc_PushButtonDelete->setEnabled(orq_DeleteActive);
    this->mpc_Ui->pc_PushButtonMoveDown->setEnabled(orq_MoveDownActive);
    this->mpc_Ui->pc_PushButtonMoveUp->setEnabled(orq_MoveUpActive);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open color picker
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpListPopUp::m_OpenColorPicker(void)
+{
+   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
+
+   //Resize
+   c_Popup->SetSize(QSize(412, 620));
+
+   // open color picker dialog
+   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      pc_ColorWidget->ChooseSelectedColor();
+   }
+
+   if (c_Popup != NULL)
+   {
+      c_Popup->HideOverlay();
+   }
+   //lint -e{429}  no memory leak because of the parent of pc_ColorWidget and the Qt memory management
 }

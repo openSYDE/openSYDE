@@ -39,8 +39,6 @@ protected:
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
 
-   QFontMetrics m_GetFontMetrics(void) const;
-
    bool mq_AllowAutomatedAdaptation;
    QFont mc_LastFont;
 };

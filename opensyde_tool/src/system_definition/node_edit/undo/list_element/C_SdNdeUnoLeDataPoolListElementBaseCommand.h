@@ -31,8 +31,8 @@ public:
    C_SdNdeUnoLeDataPoolListElementBaseCommand(const stw_types::uint32 & oru32_NodeIndex,
                                               const stw_types::uint32 & oru32_DataPoolIndex,
                                               const stw_types::uint32 & oru32_DataPoolListIndex,
-                                              C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const QString & orc_Text = "",
-                                              QUndoCommand * const opc_Parent = NULL);
+                                              C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
+                                              const QString & orc_Text = "", QUndoCommand * const opc_Parent = NULL);
 
 protected:
    const stw_types::uint32 mu32_NodeIndex;

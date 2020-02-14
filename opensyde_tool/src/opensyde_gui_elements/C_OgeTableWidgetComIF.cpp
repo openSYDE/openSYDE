@@ -43,7 +43,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTableWidgetComIF::C_OgeTableWidgetComIF(QWidget * const opc_Parent) :
@@ -95,11 +95,11 @@ C_OgeTableWidgetComIF::~C_OgeTableWidgetComIF(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set tool tip at position
 
-   \param[in] ou32_Row     Row (ID)
-   \param[in] ou32_Col     Column (ID)
-   \param[in] orc_Heading  Tool tip heading
-   \param[in] orc_Content  Tool tip content
-   \param[in] oq_ErrorType Tool tip error type
+   \param[in]  ou32_Row       Row (ID)
+   \param[in]  ou32_Col       Column (ID)
+   \param[in]  orc_Heading    Tool tip heading
+   \param[in]  orc_Content    Tool tip content
+   \param[in]  oe_Type        Tool tip error type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTableWidgetComIF::SetToolTipAt(const uint32 ou32_Row, const uint32 ou32_Col, const QString & orc_Heading,
@@ -131,10 +131,10 @@ void C_OgeTableWidgetComIF::SetToolTipAt(const uint32 ou32_Row, const uint32 ou3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set header tool tip at position
 
-   \param[in] ou32_Section   Header section (ID)
-   \param[in] oe_Orientation Header orientation (ID)
-   \param[in] orc_Heading    Tool tip heading
-   \param[in] orc_Content    Tool tip content
+   \param[in]  ou32_Section      Header section (ID)
+   \param[in]  oe_Orientation    Header orientation (ID)
+   \param[in]  orc_Heading       Tool tip heading
+   \param[in]  orc_Content       Tool tip content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTableWidgetComIF::SetToolTipHeadingAt(const uint32 ou32_Section, const Qt::Orientation oe_Orientation,
@@ -151,7 +151,7 @@ void C_OgeTableWidgetComIF::SetToolTipHeadingAt(const uint32 ou32_Section, const
 
    Here: Handle tooltip if necessary
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTableWidgetComIF::mouseMoveEvent(QMouseEvent * const opc_Event)
@@ -165,7 +165,7 @@ void C_OgeTableWidgetComIF::mouseMoveEvent(QMouseEvent * const opc_Event)
 
    Here: Handle tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -338,7 +338,7 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Compare this smaller than other item
 
-   \param[in] orc_Item Other item
+   \param[in]  orc_Item    Other item
 
    \return
    True  This is smaller
@@ -372,7 +372,7 @@ void C_OgeTableWidgetComIF::m_HideToolTip(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle mouse move (tool tip related)
 
-   \param[in] orc_GlobalPos Global mouse position
+   \param[in]  orc_GlobalPos  Global mouse position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)

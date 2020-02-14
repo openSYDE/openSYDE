@@ -46,7 +46,7 @@ public:
                           const C_GiLiBus * const opc_BusItem, const bool oq_MiddleLine = false,
                           QGraphicsItem * const opc_Parent = NULL);
    ~C_GiLiBusConnectorBase(void);
-   virtual QPointF GetPos(void) const;
+   virtual QPointF GetPos(void) const override;
    std::vector<QPointF> GetPointsScenePos(void) const;
    virtual void SetPoints(const std::vector<QPointF> & orc_ScenePos);
    const C_GiLiBus * GetBusItem(void) const;
@@ -111,7 +111,6 @@ protected:
    static stw_types::sint32 mh_GetGenericInteractionIndex(void);
    void m_CalcInitialLocalPos(const QPointF & orc_InPos);
    void m_UpdateGenericItem(C_GiBiConnectableItem * const opc_NewItem);
-   void m_RestoreLastValidBus(void);
    virtual void m_Reconnect(void);
    virtual void m_OnInteractionPointMove(void);
    virtual void m_OnIterationBusInteractionPointMoveCleanUp(QGraphicsItem * const opc_HighestParentItem,

@@ -44,8 +44,8 @@ const sintn C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE2 = 1;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent  Optional pointer to parent
-   \param[in]     oq_DarkMode Flag for dark mode
+   \param[in,out]  orc_Parent    Parent widget
+   \param[in]      oq_DarkMode   Flag for dark mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeSpinBox::C_SyvDaPeSpinBox(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
@@ -93,8 +93,17 @@ void C_SyvDaPeSpinBox::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelShowUnit->setText(C_GtGetText::h_GetText("Show Unit"));
    this->mpc_Ui->pc_LabelStyle->setText(C_GtGetText::h_GetText("Style"));
+
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 1"));
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 2"));
+
+   //Tool tips
+   this->mpc_Ui->pc_LabelStyle->SetToolTipInformation(C_GtGetText::h_GetText("Style"),
+                                                      C_GtGetText::h_GetText(
+                                                         "Different options for styles specific to this widget"));
+   this->mpc_Ui->pc_LabelShowUnit->SetToolTipInformation(C_GtGetText::h_GetText("Show Unit"),
+                                                         C_GtGetText::h_GetText(
+                                                            "Option to display the unit after the value or hide the unit entirely"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,7 +121,7 @@ bool C_SyvDaPeSpinBox::GetShowUnit(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set show unit flag
 
-   \param[in] oq_Value New show unit flag
+   \param[in]  oq_Value    New show unit flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSpinBox::SetShowUnit(const bool oq_Value) const
@@ -147,7 +156,7 @@ C_PuiSvDbSpinBox::E_Type C_SyvDaPeSpinBox::GetType(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set type
 
-   \param[in] oe_Type New type
+   \param[in]  oe_Type  New type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSpinBox::SetType(const C_PuiSvDbSpinBox::E_Type oe_Type) const

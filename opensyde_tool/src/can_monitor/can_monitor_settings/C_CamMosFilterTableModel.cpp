@@ -522,7 +522,7 @@ QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32 u32_Ca
    {
       QFileInfo c_FileInfo(c_Database);
 
-      c_Return = c_FileInfo.baseName() + "::" + c_Message;
+      c_Return = c_FileInfo.completeBaseName() + "::" + c_Message;
    }
 
    return c_Return;

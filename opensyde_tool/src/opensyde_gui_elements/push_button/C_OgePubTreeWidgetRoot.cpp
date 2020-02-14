@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubTreeWidgetRoot::C_OgePubTreeWidgetRoot(QWidget * const opc_Parent) :
@@ -48,7 +48,7 @@ C_OgePubTreeWidgetRoot::C_OgePubTreeWidgetRoot(QWidget * const opc_Parent) :
 
    Draws the element
 
-   \param[in,out] opc_event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubTreeWidgetRoot::paintEvent(QPaintEvent * const opc_Event)

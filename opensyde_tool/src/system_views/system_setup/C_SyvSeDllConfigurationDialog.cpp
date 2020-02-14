@@ -53,7 +53,7 @@ using namespace stw_can;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] orc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
@@ -305,6 +305,7 @@ void C_SyvSeDllConfigurationDialog::m_ConfigureDllClicked(void) const
             C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
             c_MessageBox.SetHeading(C_GtGetText::h_GetText("PC CAN Interface configuration"));
             c_MessageBox.SetDescription(C_GtGetText::h_GetText("CAN DLL initialization not successful."));
+            c_MessageBox.SetCustomMinHeight(180, 180);
             c_MessageBox.Execute();
          }
          (void)c_Can.DLL_Close();
@@ -314,6 +315,7 @@ void C_SyvSeDllConfigurationDialog::m_ConfigureDllClicked(void) const
          C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("PC CAN Interface configuration"));
          c_MessageBox.SetDescription(C_GtGetText::h_GetText("CAN DLL not found."));
+         c_MessageBox.SetCustomMinHeight(180, 180);
          c_MessageBox.Execute();
       }
    }
@@ -374,6 +376,7 @@ void C_SyvSeDllConfigurationDialog::m_TestConnectionClicked(void) const
       // Show the result
       c_MessageBox.SetHeading(c_Heading);
       c_MessageBox.SetDescription(c_Description);
+      c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
    }
 }
@@ -444,6 +447,7 @@ bool C_SyvSeDllConfigurationDialog::m_CheckCustomDllPath(void) const
          C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eERROR);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("PC CAN Interface configuration"));
          c_MessageBox.SetDescription(C_GtGetText::h_GetText("CAN DLL path is empty. Please choose a valid path."));
+         c_MessageBox.SetCustomMinHeight(180, 180);
          c_MessageBox.Execute();
          q_Return = false;
       }

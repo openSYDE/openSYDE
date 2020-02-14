@@ -21,6 +21,7 @@
 #include "C_OSCSystemFilerUtil.h"
 #include "C_OSCNodeDataPoolFiler.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_OSCHalcConfigFiler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -41,10 +42,10 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node file
+/*! \brief  Load node file
 
-   \param[out]    orc_Node      Data storage
-   \param[in]     orc_FilePath  File path
+   \param[out]  orc_Node      Data storage
+   \param[in]   orc_FilePath  File path
 
    \return
    C_NO_ERR   data read
@@ -78,15 +79,15 @@ sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node
+/*! \brief  Load node
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with node active
-   \param[in]     orc_BasePath  Base path
+   \param[out]     orc_Node         data storage
+   \param[in,out]  orc_XMLParser    XML with node active
+   \param[in]      orc_BasePath     Base path
 
    \return
    C_NO_ERR   data read
@@ -115,21 +116,25 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
       {
          s32_Retval = mh_LoadDataPools(orc_Node, orc_XMLParser, orc_BasePath);
 
-         //AFTER loading the datapools
-         if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("com-protocols") == "com-protocols"))
+         if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadNodeComProtocols(orc_Node.c_ComProtocols, orc_Node.c_DataPools, orc_XMLParser,
-                                                orc_BasePath);
-            if (s32_Retval == C_NO_ERR)
+            s32_Retval = mh_LoadHALC(orc_Node.c_HALCConfig, orc_XMLParser, orc_BasePath);
+            //AFTER loading the datapools
+            if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("com-protocols") == "com-protocols"))
             {
-               //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "node"); //back up to node
+               s32_Retval = h_LoadNodeComProtocols(orc_Node.c_ComProtocols, orc_Node.c_DataPools, orc_XMLParser,
+                                                   orc_BasePath);
+               if (s32_Retval == C_NO_ERR)
+               {
+                  //Return
+                  tgl_assert(orc_XMLParser.SelectNodeParent() == "node"); //back up to node
+               }
             }
-         }
-         else
-         {
-            osc_write_log_error("Loading node definition", "Could not find \"com-protocols\" node.");
-            s32_Retval = C_CONFIG;
+            else
+            {
+               osc_write_log_error("Loading node definition", "Could not find \"com-protocols\" node.");
+               s32_Retval = C_CONFIG;
+            }
          }
       }
    }
@@ -137,13 +142,13 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node
+/*! \brief  Save node
 
    Save node to XML file
 
-   \param[in]     orc_Node         data storage
-   \param[in,out] orc_FilePath     File path for xml
-   \param[in,out] opc_CreatedFiles Optional storage for history of all created files
+   \param[in]      orc_Node            data storage
+   \param[in,out]  orc_FilePath        File path for xml
+   \param[in,out]  opc_CreatedFiles    Optional storage for history of all created files
 
    \return
    C_NO_ERR   data saved
@@ -180,16 +185,16 @@ sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLStr
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node
+/*! \brief  Save node
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[in]     orc_Node         data storage
-   \param[in,out] orc_XMLParser    XML with node active
-   \param[in]     orc_BasePath     Base path
-   \param[in,out] opc_CreatedFiles Optional storage for history of all created files
+   \param[in]      orc_Node            data storage
+   \param[in,out]  orc_XMLParser       XML with node active
+   \param[in]      orc_BasePath        Base path
+   \param[in,out]  opc_CreatedFiles    Optional storage for history of all created files
 
    \return
    C_NO_ERR   data saved
@@ -215,20 +220,24 @@ sint32 C_OSCNodeFiler::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase
       tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
       s32_Retval = mh_SaveDataPools(orc_Node.c_DataPools, orc_XMLParser, orc_BasePath, opc_CreatedFiles);
    }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_SaveHALC(orc_Node.c_HALCConfig, orc_XMLParser, orc_BasePath, opc_CreatedFiles);
+   }
    return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node com protocols
+/*! \brief  Load node com protocols
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "com-protocols"
    post-condition: the passed XML parser has the active node set to the same "com-protocols"
 
-   \param[out]    orc_NodeComProtocols data storage
-   \param[in]     orc_NodeDataPools    Loaded datapools
-   \param[in,out] orc_XMLParser        XML with list active
-   \param[in]     orc_BasePath         Base path
+   \param[out]     orc_NodeComProtocols   data storage
+   \param[in]      orc_NodeDataPools      Loaded datapools
+   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in]      orc_BasePath           Base path
 
    \return
    C_NO_ERR   data read
@@ -304,17 +313,17 @@ sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node com protocols
+/*! \brief  Save node com protocols
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "com-protocols"
    post-condition: the passed XML parser has the active node set to the same "com-protocols"
 
-   \param[in]     orc_NodeComProtocols data storage
-   \param[in]     orc_NodeDataPools    data pools for file name generation
-   \param[in,out] orc_XMLParser        XML with list active
-   \param[in]     orc_BasePath         Base path
-   \param[in,out] opc_CreatedFiles     Optional storage for history of all created files
+   \param[in]      orc_NodeComProtocols   data storage
+   \param[in]      orc_NodeDataPools      data pools for file name generation
+   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in]      orc_BasePath           Base path
+   \param[in,out]  opc_CreatedFiles       Optional storage for history of all created files
 
    \return
    C_NO_ERR   data saved
@@ -375,9 +384,9 @@ sint32 C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get automatically generated folder name
+/*! \brief  Get automatically generated folder name
 
-   \param[in] orc_NodeName Node name
+   \param[in]  orc_NodeName   Node name
 
    \return
    Automatically generated folder name
@@ -389,7 +398,7 @@ C_SCLString C_OSCNodeFiler::h_GetFolderName(const C_SCLString & orc_NodeName)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get automatically generated file name
+/*! \brief  Get automatically generated file name
 
    \return
    Automatically generated file name
@@ -401,14 +410,14 @@ C_SCLString C_OSCNodeFiler::h_GetFileName(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node properties
+/*! \brief  Load node properties
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[out]    orc_NodeProperties data storage
-   \param[in,out] orc_XMLParser      XML with core active
+   \param[out]     orc_NodeProperties  data storage
+   \param[in,out]  orc_XMLParser       XML with core active
 
    \return
    C_NO_ERR   data read
@@ -652,14 +661,14 @@ sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropertie
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node properties
+/*! \brief  Save node properties
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[in]     orc_NodeProperties data storage
-   \param[in,out] orc_XMLParser      XML with core active
+   \param[in]      orc_NodeProperties  data storage
+   \param[in,out]  orc_XMLParser       XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodeProperties,
@@ -746,14 +755,14 @@ void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePrope
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node STW flashloader settings
+/*! \brief  Load node STW flashloader settings
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "properties"
    post-condition: the passed XML parser has the active node set to the same "properties"
 
-   \param[out]    orc_StwFlashloaderSettings data storage
-   \param[in,out] orc_XMLParser              XML with core active
+   \param[out]     orc_StwFlashloaderSettings   data storage
+   \param[in,out]  orc_XMLParser                XML with core active
 
    \return
    C_NO_ERR   data read
@@ -851,14 +860,14 @@ sint32 C_OSCNodeFiler::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSetti
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node STW flashloader settings
+/*! \brief  Save node STW flashloader settings
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "properties"
    post-condition: the passed XML parser has the active node set to the same "properties"
 
-   \param[in]     orc_StwFlashloaderSettings data storage
-   \param[in,out] orc_XMLParser              XML with core active
+   \param[in]      orc_StwFlashloaderSettings   data storage
+   \param[in,out]  orc_XMLParser                XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFiler::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderSettings & orc_StwFlashloaderSettings,
@@ -887,14 +896,14 @@ void C_OSCNodeFiler::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderS
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node applications
+/*! \brief  Load node applications
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[out]    orc_NodeApplications data storage
-   \param[in,out] orc_XMLParser        XML with core active
+   \param[out]     orc_NodeApplications   data storage
+   \param[in,out]  orc_XMLParser          XML with core active
 
    \return
    C_NO_ERR   data read
@@ -1082,14 +1091,14 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node applications
+/*! \brief  Save node applications
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[in]     orc_NodeApplications data storage
-   \param[in,out] orc_XMLParser        XML with core active
+   \param[in]      orc_NodeApplications   data storage
+   \param[in,out]  orc_XMLParser          XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication> & orc_NodeApplications,
@@ -1121,15 +1130,15 @@ void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication>
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pools
+/*! \brief  Load node data pools
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with core active
-   \param[in]     orc_BasePath  Base path
+   \param[out]     orc_Node         data storage
+   \param[in,out]  orc_XMLParser    XML with core active
+   \param[in]      orc_BasePath     Base path
 
    \return
    C_NO_ERR   data read
@@ -1215,16 +1224,16 @@ sint32 C_OSCNodeFiler::mh_LoadDataPools(C_OSCNode & orc_Node, C_OSCXMLParserBase
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pools
+/*! \brief  Save node data pools
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[in]     orc_NodeDataPools data storage
-   \param[in,out] orc_XMLParser     XML with core active
-   \param[in]     orc_BasePath      Base path
-   \param[in,out] opc_CreatedFiles  Optional storage for history of all created files
+   \param[in]      orc_NodeDataPools   data storage
+   \param[in,out]  orc_XMLParser       XML with core active
+   \param[in]      orc_BasePath        Base path
+   \param[in,out]  opc_CreatedFiles    Optional storage for history of all created files
 
    \return
    C_NO_ERR   data saved
@@ -1272,9 +1281,102 @@ sint32 C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform diagnostic server type to string
+/*! \brief  Load HALC
 
-   \param[in] ore_DiagnosticProtocol Diagnostic protocol type
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XMLParser    XML parser
+   \param[in]      orc_BasePath     Base path
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeFiler::mh_LoadHALC(C_OSCHalcConfig & orc_Config, C_OSCXMLParserBase & orc_XMLParser,
+                                   const C_SCLString & orc_BasePath)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   //Clear
+   orc_Config.Clear();
+   if (orc_XMLParser.SelectNodeChild("halc-file") == "halc-file")
+   {
+      if (orc_BasePath.IsEmpty())
+      {
+         //From string
+         s32_Retval = C_OSCHalcConfigFiler::h_LoadData(orc_Config, orc_XMLParser, orc_BasePath);
+      }
+      else
+      {
+         s32_Retval =
+            C_OSCHalcConfigFiler::h_LoadFile(orc_Config,
+                                             C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath,
+                                                                                   orc_XMLParser.
+                                                                                   GetNodeContent()), orc_BasePath);
+      }
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+   }
+   else
+   {
+      //Ignore
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save HALC
+
+   \param[in]      orc_Config          Config
+   \param[in,out]  orc_XMLParser       XML parser
+   \param[in]      orc_BasePath        Base path
+   \param[in,out]  opc_CreatedFiles    Created files
+
+   \return
+   C_NO_ERR   data saved
+   C_CONFIG   file could not be created
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeFiler::mh_SaveHALC(const C_OSCHalcConfig & orc_Config, C_OSCXMLParserBase & orc_XMLParser,
+                                   const C_SCLString & orc_BasePath, std::vector<C_SCLString> * const opc_CreatedFiles)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (!orc_Config.c_FileString.IsEmpty())
+   {
+      orc_XMLParser.CreateAndSelectNodeChild("halc-file");
+      if (orc_BasePath.IsEmpty())
+      {
+         //To string
+         s32_Retval = C_OSCHalcConfigFiler::h_SaveData(orc_Config, orc_XMLParser, orc_BasePath, opc_CreatedFiles);
+      }
+      else
+      {
+         // const C_SCLString c_FileName = C_OSCNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
+         //Fix
+         const C_SCLString c_FileName = "halc.xml";
+         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath, c_FileName);
+         //Save datapool file
+         s32_Retval = C_OSCHalcConfigFiler::h_SaveFile(orc_Config, c_CombinedFileName, orc_BasePath, opc_CreatedFiles);
+         //Set file reference
+         orc_XMLParser.SetNodeContent(c_FileName);
+         //Store if necessary
+         if (opc_CreatedFiles != NULL)
+         {
+            opc_CreatedFiles->push_back(c_FileName);
+         }
+      }
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Transform diagnostic server type to string
+
+   \param[in]  ore_DiagnosticProtocol  Diagnostic protocol type
 
    \return
    Stringified diagnostic server type
@@ -1304,10 +1406,10 @@ C_SCLString C_OSCNodeFiler::mh_DiagnosticServerToString(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform string to diagnostic server type
+/*! \brief  Transform string to diagnostic server type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Diagnostic server type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Diagnostic server type
 
    \return
    C_NO_ERR   no error
@@ -1342,9 +1444,9 @@ sint32 C_OSCNodeFiler::mh_StringToDiagnosticServer(const C_SCLString & orc_Strin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform flash loader type to string
+/*! \brief  Transform flash loader type to string
 
-   \param[in] ore_FlashLoader Flash loader type
+   \param[in]  ore_FlashLoader   Flash loader type
 
    \return
    Stringified flash loader type
@@ -1373,10 +1475,10 @@ C_SCLString C_OSCNodeFiler::mh_FlashLoaderToString(const C_OSCNodeProperties::E_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform string to flash loader type
+/*! \brief  Transform string to flash loader type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Flash loader type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Flash loader type
 
    \return
    C_NO_ERR   no error

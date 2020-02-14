@@ -46,8 +46,8 @@ C_OgeSpxAllBase::C_OgeSpxAllBase() :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set additional tooltip info
 
-   \param[in] orc_Text     Additional text
-   \param[in] oq_ErrorType New error type
+   \param[in]  orc_Text    Additional text
+   \param[in]  oe_Type     New error type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxAllBase::SetToolTipAdditionalInfo(const QString & orc_Text,
@@ -68,7 +68,8 @@ void C_OgeSpxAllBase::ActivateDefaultToolTip(void)
 
    //Translation: 1=Minimum value, 2=Maximum value
    const QString c_Content =
-      QString(C_GtGetText::h_GetText("Minimum: %1\nMaximum: %2")).arg(this->m_GetMinimumString()).arg(this->m_GetMaximumString());
+      QString(C_GtGetText::h_GetText("Minimum: %1\nMaximum: %2")).arg(this->m_GetMinimumString()).arg(
+         this->m_GetMaximumString());
 
    this->SetToolTipInformation(c_Heading, c_Content);
 }
@@ -122,7 +123,7 @@ QString C_OgeSpxAllBase::m_GetMaximumString() const
 
    Here: Handle tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed

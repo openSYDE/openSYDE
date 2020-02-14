@@ -10,7 +10,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QColorDialog>
 #include <QFontDialog>
 
 #include "C_GiSyTextElementWidget.h"
@@ -24,6 +23,7 @@
 #include "C_UtiStyleSheets.h"
 #include "C_GiCustomFunctions.h"
 #include "C_Uti.h"
+#include "C_GiSyColorSelectWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -50,8 +50,6 @@ const QString mc_PATH_BACKGROUND_IMG = ":/images/graphic_items/TransparentBtnBac
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_Mode   CAN-Bus / Ethernet-Bus or line
-   \param[in]     orc_Scene   Used scene for preview
    \param[in,out] orc_Parent  Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -113,6 +111,8 @@ void C_GiSyTextElementWidget::InitStaticNames(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   On Show Event
+
+   \param[in,out]    opc_Event   Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyTextElementWidget::showEvent(QShowEvent * const opc_Event)
@@ -246,20 +246,34 @@ void C_GiSyTextElementWidget::m_FontColorClicked(void)
    // get the old color as initial color
    QColor c_Color = C_UtiStyleSheets::h_GetStyleSheetColor(c_Style);
 
-   c_Color = QColorDialog::getColor(c_Color, this, C_GtGetText::h_GetText("Select Color (QT Default Dialog)"),
-                                    QColorDialog::ShowAlphaChannel);
+   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
 
-   if (c_Color.isValid() == true)
+   //Resize
+   c_Popup->SetSize(QSize(412, 620));
+
+   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      // save the color
-      this->mc_FontColor = c_Color;
+      c_Color = pc_ColorWidget->ChooseSelectedColor();
 
-      // update the button
-      C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(c_Style, c_Color);
-      this->mpc_Ui->pc_BushButtonFontColor->setStyleSheet(c_Style);
+      if (c_Color.isValid() == true)
+      {
+         // save the color
+         this->mc_FontColor = c_Color;
 
-      this->m_UpdatePreview();
+         // update the button
+         C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(c_Style, c_Color);
+         this->mpc_Ui->pc_BushButtonFontColor->setStyleSheet(c_Style);
+
+         this->m_UpdatePreview();
+      }
    }
+
+   if (c_Popup != NULL)
+   {
+      c_Popup->HideOverlay();
+   }
+   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -72,11 +72,13 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    mpc_ComDriver(NULL),
    mpc_ConnectionThread(new C_SyvComDriverDiagConnect(this)),
    mpc_Toolbox(NULL),
+   mpc_FixMinimizedToolbox(NULL),
    mpc_ToolboxParent(opc_ToolboxParent),
    mu32_ViewIndex(ou32_ViewIndex),
    mq_EditModeActive(false),
    mq_ConnectActive(false),
-   me_ConnectState(eCS_DISCONNECTED)
+   me_ConnectState(eCS_DISCONNECTED),
+   msn_InitToolboxCounter(0)
 {
    mpc_Ui->setupUi(this);
 
@@ -127,6 +129,22 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
            &C_SyvDaDashboardsWidget::m_ConnectStepFinished);
 
    this->SetEditMode(false);
+
+   // create toolbox
+   if (this->mpc_Toolbox == NULL)
+   {
+      mpc_ToolboxContent = new C_SyvDaDashboardToolbox();
+      mpc_Toolbox = new C_OgeWiHover(*mpc_ToolboxContent, C_GtGetText::h_GetText("TOOLBOX"), ":images/IconToolbox.svg",
+                                     false, this->mpc_ToolboxParent, this->mpc_ToolboxParent);
+   }
+
+   // create fix minimized toolbox
+   if (this->mpc_FixMinimizedToolbox == NULL)
+   {
+      this->mpc_FixMinimizedToolbox = new C_OgeWiFixPosition(C_GtGetText::h_GetText("TOOLBOX"),
+                                                             ":images/IconToolbox.svg",
+                                                             QRect(1277, 24, 190, 36), this->mpc_ToolboxParent);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -142,6 +160,11 @@ C_SyvDaDashboardsWidget::~C_SyvDaDashboardsWidget(void)
    if (this->mpc_Toolbox != NULL)
    {
       this->mpc_Toolbox->hide();
+   }
+
+   if (this->mpc_FixMinimizedToolbox != NULL)
+   {
+      this->mpc_FixMinimizedToolbox->hide();
    }
 
    delete mpc_Ui;
@@ -266,14 +289,19 @@ void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
       this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
 
       //Initially create toolbox
-      if (this->mpc_Toolbox == NULL)
-      {
-         this->m_InitToolBox();
-      }
+      this->m_InitToolBox();
+
       //Show toolbox
-      if (this->mpc_Toolbox != NULL)
+      if ((this->mpc_Toolbox != NULL) &&
+          (C_UsHandler::h_GetInstance()->GetProjSvSetupView(
+              C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex)->GetName())
+           .GetDashboardToolboxMaximized() != false))
       {
          this->mpc_Toolbox->show();
+      }
+      else
+      {
+         this->mpc_FixMinimizedToolbox->show();
       }
 
       // create copy of dashboard in case of clicking cancel
@@ -291,6 +319,12 @@ void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
       if (this->mpc_Toolbox != NULL)
       {
          this->mpc_Toolbox->hide();
+      }
+
+      // Hide minimized toolbox
+      if (this->mpc_FixMinimizedToolbox != NULL)
+      {
+         this->mpc_FixMinimizedToolbox->hide();
       }
 
       //Also should remember the toolbox settings
@@ -327,7 +361,7 @@ bool C_SyvDaDashboardsWidget::GetConnectActive(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connected flag
 
-   \param[in] orc_Value New connected flag
+   \param[in] oq_Value New connected flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
@@ -418,6 +452,7 @@ void C_SyvDaDashboardsWidget::OnPushButtonConnectPress(void)
          this->SetEditMode(false);
       }
       //Deactivate edit & config
+      this->mpc_Ui->pc_TabWidget->SetEnabled(false);
       this->mpc_Ui->pc_PbConfirm->setEnabled(false);
       Q_EMIT this->SigSetConfigurationAvailable(false);
       //While connecting display updated tool bar
@@ -432,6 +467,7 @@ void C_SyvDaDashboardsWidget::OnPushButtonConnectPress(void)
       this->me_ConnectState = eCS_DISCONNECTED;
       Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnected.svg", false);
       //Reactivate edit & config
+      this->mpc_Ui->pc_TabWidget->SetEnabled(true);
       this->mpc_Ui->pc_PbConfirm->setEnabled(true);
       Q_EMIT this->SigSetConfigurationAvailable(true);
       break;
@@ -457,6 +493,11 @@ void C_SyvDaDashboardsWidget::hideEvent(QHideEvent * const opc_Event)
    {
       this->mpc_Toolbox->hide();
    }
+
+   if (this->mpc_FixMinimizedToolbox != NULL)
+   {
+      this->mpc_FixMinimizedToolbox->hide();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -469,10 +510,13 @@ void C_SyvDaDashboardsWidget::hideEvent(QHideEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
-   if (this->mpc_Toolbox != NULL)
+   if ((this->mpc_Toolbox != NULL) && (this->mpc_FixMinimizedToolbox != NULL))
    {
       QPoint c_Point = this->mpc_Toolbox->pos();
       QSize c_Size = this->mpc_Toolbox->size();
+
+      QPoint c_PointFixMiniToolbox = this->mpc_FixMinimizedToolbox->pos();
+
       QWidget * pc_Widget = this->mpc_ToolboxParent;
 
       Q_UNUSED(opc_Event)
@@ -513,7 +557,15 @@ void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
          }
       }
 
+      // adapt position of fix minimized toolbox
+      // The operator '-' have to follow by the same operator, otherwise the geometry is wrong
+      //lint -save -e834 -e1963
+      c_PointFixMiniToolbox.setX((pc_Widget->width() - this->mpc_FixMinimizedToolbox->width()) -
+                                 170 - mhsn_WidgetBorder);
+      //lint -restore
+
       this->mpc_Toolbox->setGeometry(QRect(c_Point, c_Size));
+      this->mpc_FixMinimizedToolbox->setGeometry(QRect(c_PointFixMiniToolbox, this->mpc_FixMinimizedToolbox->size()));
    }
 }
 
@@ -569,65 +621,78 @@ void C_SyvDaDashboardsWidget::m_InitToolBox(void)
    }
    c_ViewSettings = C_UsHandler::h_GetInstance()->GetProjSvSetupView(c_ViewName);
 
-   // create toolbox
-   if (this->mpc_Toolbox == NULL)
+   if (this->mpc_Toolbox != NULL)
    {
-      mpc_ToolboxContent = new C_SyvDaDashboardToolbox();
-      mpc_Toolbox = new C_OgeWiHover(*mpc_ToolboxContent, C_GtGetText::h_GetText(
-                                        "TOOLBOX"), false, this->mpc_ToolboxParent, this->mpc_ToolboxParent);
-   }
-
-   //Dark mode
-   if (pc_View != NULL)
-   {
-      this->mpc_Toolbox->ApplyDarkMode(pc_View->GetDarkModeActive());
-      if (this->mpc_ToolboxContent != NULL)
+      //Dark mode
+      if (pc_View != NULL)
       {
-         this->mpc_ToolboxContent->ApplyDarkMode(pc_View->GetDarkModeActive());
-      }
-   }
-   else
-   {
-      this->mpc_Toolbox->ApplyDarkMode(false);
-      if (this->mpc_ToolboxContent != NULL)
-      {
-         this->mpc_ToolboxContent->ApplyDarkMode(false);
-      }
-   }
-
-   // check for saved default values for toolbox
-   if (c_ViewSettings.GetDashboardToolboxPos().x() < 0)
-   {
-      if (this->mpc_ToolboxParent == NULL)
-      {
-         // default value in this error case
-         this->mpc_Toolbox->move(mhsn_WidgetBorder, mhsn_ToolboxInitPosY);
+         this->mpc_Toolbox->ApplyDarkMode(pc_View->GetDarkModeActive());
+         if (this->mpc_ToolboxContent != NULL)
+         {
+            this->mpc_ToolboxContent->ApplyDarkMode(pc_View->GetDarkModeActive());
+         }
       }
       else
       {
-         // default value
-         this->mpc_Toolbox->setGeometry(QRect(QPoint((((this->mpc_ToolboxParent->width() - this->mpc_Toolbox->width()) -
-                                                       mhsn_WidgetBorder) - static_cast<sintn> (150)),
-                                                     mhsn_ToolboxInitPosY + static_cast<sintn> (50)),
-                                              QSize(449, 429)));
-
-         this->mpc_Toolbox->SetMaximizedHeight(429);
+         this->mpc_Toolbox->ApplyDarkMode(false);
+         if (this->mpc_ToolboxContent != NULL)
+         {
+            this->mpc_ToolboxContent->ApplyDarkMode(false);
+         }
       }
-   }
-   else
-   {
-      // restore last position and size
-      this->mpc_Toolbox->setGeometry(QRect(c_ViewSettings.GetDashboardToolboxPos(),
-                                           c_ViewSettings.GetDashboardToolboxSize()));
-      this->mpc_Toolbox->SetMaximizedHeight(c_ViewSettings.GetDashboardToolboxSize().height());
+
+      // check for saved default values for toolbox
+      if (c_ViewSettings.GetDashboardToolboxPos().x() < 0)
+      {
+         if (this->mpc_ToolboxParent == NULL)
+         {
+            // default value in this error case
+            this->mpc_Toolbox->move(mhsn_WidgetBorder, mhsn_ToolboxInitPosY);
+         }
+         else
+         {
+            // default value
+            this->mpc_Toolbox->setGeometry(QRect(QPoint((((this->mpc_ToolboxParent->width() -
+                                                           this->mpc_Toolbox->width()) -
+                                                          mhsn_WidgetBorder) - static_cast<sintn> (150)),
+                                                        mhsn_ToolboxInitPosY + static_cast<sintn> (50)),
+                                                 QSize(449, 429)));
+
+            this->mpc_Toolbox->SetMaximizedHeight(429);
+         }
+      }
+      else
+      {
+         // restore last position and size
+         this->mpc_Toolbox->setGeometry(QRect(c_ViewSettings.GetDashboardToolboxPos(),
+                                              c_ViewSettings.GetDashboardToolboxSize()));
+         this->mpc_Toolbox->SetMaximizedHeight(c_ViewSettings.GetDashboardToolboxSize().height());
+      }
    }
 
    if (c_ViewSettings.GetDashboardToolboxMaximized() == false)
    {
-      this->mpc_Toolbox->SetMinimize();
+      this->m_WiHoverMinBtnClicked();
    }
 
-   this->mpc_Toolbox->hide();
+   // Hide toolbox
+   if (this->mpc_Toolbox != NULL)
+   {
+      this->mpc_Toolbox->hide();
+   }
+
+   // Hide minimizied toolbox
+   if (this->mpc_FixMinimizedToolbox != NULL)
+   {
+      this->mpc_FixMinimizedToolbox->hide();
+   }
+
+   connect(this->mpc_Toolbox, &C_OgeWiHover::SigWiHoverMinBtnClicked,
+           this, &C_SyvDaDashboardsWidget::m_WiHoverMinBtnClicked);
+   connect(this->mpc_FixMinimizedToolbox, &C_OgeWiFixPosition::SigWiFixPosMaxBtnClicked,
+           this, &C_SyvDaDashboardsWidget::m_WiFixPosMaxBtnClicked);
+
+   this->msn_InitToolboxCounter = this->msn_InitToolboxCounter + 1;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -636,7 +701,7 @@ void C_SyvDaDashboardsWidget::m_InitToolBox(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_CleanUpToolBox(void) const
 {
-   if (this->mpc_Toolbox != NULL)
+   if ((this->mpc_Toolbox != NULL) && (this->msn_InitToolboxCounter > 0))
    {
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
       if (pc_View != NULL)
@@ -1041,10 +1106,50 @@ void C_SyvDaDashboardsWidget::m_HandleConnectionResult(const sint32 os32_Result,
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard connect"));
       c_MessageBox.SetDescription(orc_Message);
       c_MessageBox.SetDetails(orc_MessageDetails);
-      c_MessageBox.SetCustomMinHeight(450);
-      c_MessageBox.SetCustomMinWidth(850);
+      c_MessageBox.SetCustomMinHeight(200, 400);
+      c_MessageBox.SetCustomMinWidth(650);
       c_MessageBox.Execute();
       //Reset internal state AFTER user confirmation to block any screen switches until this point
       this->me_ConnectState = eCS_DISCONNECTED;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function of fix minimized toolbox widget for button maximizing click
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardsWidget::m_WiFixPosMaxBtnClicked(void)
+{
+   // Show toolbox and set maximized true
+   if (this->mpc_Toolbox != NULL)
+   {
+      this->mpc_Toolbox->setVisible(true);
+      this->mpc_Toolbox->SetMaximized(true);
+   }
+
+   // Don't show minimized toolbox
+   if (this->mpc_FixMinimizedToolbox != NULL)
+   {
+      this->mpc_FixMinimizedToolbox->setVisible(false);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function of hover widget for button minimizing click
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardsWidget::m_WiHoverMinBtnClicked(void)
+{
+   // Don't show toolbox and set maximized false
+   if (this->mpc_Toolbox != NULL)
+   {
+      this->mpc_Toolbox->setVisible(false);
+      this->mpc_Toolbox->SetMaximized(false);
+   }
+
+   // Show minimized toolbox
+   if (this->mpc_FixMinimizedToolbox != NULL)
+   {
+      this->mpc_FixMinimizedToolbox->setVisible(true);
    }
 }

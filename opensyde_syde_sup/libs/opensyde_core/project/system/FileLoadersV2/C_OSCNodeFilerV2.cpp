@@ -470,12 +470,12 @@ void C_OSCNodeFilerV2::h_SaveNodeComMessageContainer(const C_OSCCanMessageContai
 {
    orc_XMLParser.SetAttributeBool("com-protocol-usage-flag",
                                   orc_NodeComMessageContainer.q_IsComProtocolUsedByInterface);
-   //TX messages
+   //Tx messages
    orc_XMLParser.CreateAndSelectNodeChild("tx-messages");
    h_SaveNodeComMessages(orc_NodeComMessageContainer.c_TxMessages, orc_XMLParser);
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-container");
-   //RX messages
+   //Rx messages
    orc_XMLParser.CreateAndSelectNodeChild("rx-messages");
    h_SaveNodeComMessages(orc_NodeComMessageContainer.c_RxMessages, orc_XMLParser);
    //Return
@@ -1450,6 +1450,9 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
             {
                c_CurApplication.u8_ProcessId = 0U;
             }
+
+            // Set generated code version to 1 (new feature not supported by V2; but default would be 0)
+            c_CurApplication.u16_GenCodeVersion = 1U;
 
             //Type
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("type") == "type"))

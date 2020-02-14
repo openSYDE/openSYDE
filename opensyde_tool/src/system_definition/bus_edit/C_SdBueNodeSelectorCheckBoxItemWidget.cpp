@@ -41,10 +41,10 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_NodeIndex      Index of node
-   \param[in]     ou32_InterfaceIndex Index of node interface
-   \param[in]     orc_Name            Name of node
-   \param[in,out] opc_Parent          Optional pointer to parent
+   \param[in]      ou32_NodeIndex         Index of node
+   \param[in]      ou32_InterfaceIndex    Index of node interface
+   \param[in]      orc_Name               Name of node
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueNodeSelectorCheckBoxItemWidget::C_SdBueNodeSelectorCheckBoxItemWidget(const stw_types::uint32 ou32_NodeIndex,
@@ -58,22 +58,13 @@ C_SdBueNodeSelectorCheckBoxItemWidget::C_SdBueNodeSelectorCheckBoxItemWidget(con
 {
    mpc_Ui->setupUi(this);
 
-   InitStaticNames();
-
    mpc_CheckBox = new C_OgeChxDefaultSmall(ou32_NodeIndex, ou32_InterfaceIndex, this);
    this->mpc_CheckBox->setText(orc_Name);
    this->mpc_CheckBox->setIcon(this->mc_IconInactive);
 
-   this->mpc_Ui->pc_PushButtonImport->SetCustomIcons("://images/IconImportFile.svg",  // enabled
-                                                     "://images/IconImportFile.svg",  // TODO: hovered
-                                                     "://images/IconImportFile.svg",  // TODO: clicked
-                                                     "://images/IconImportFile.svg"); // TODO: disabled
-
    //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(this->mpc_CheckBox, &C_OgeChxDefaultSmall::SigCheckBoxToggled,
            this, &C_SdBueNodeSelectorCheckBoxItemWidget::m_NodeToggled);
-   connect(this->mpc_Ui->pc_PushButtonImport, &C_OgePubIconOnly::clicked, this,
-           &C_SdBueNodeSelectorCheckBoxItemWidget::m_ImportClicked);
 
    this->mpc_Ui->pc_HorizontalLayout->insertWidget(0, this->mpc_CheckBox);
 
@@ -93,22 +84,10 @@ C_SdBueNodeSelectorCheckBoxItemWidget::~C_SdBueNodeSelectorCheckBoxItemWidget()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize all displayed static names
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxItemWidget::InitStaticNames(void) const
-{
-   //Tool tips
-   this->mpc_Ui->pc_PushButtonImport->SetToolTipInformation(C_GtGetText::h_GetText("Import"),
-                                                            C_GtGetText::h_GetText(
-                                                               "Import messages and signals from standard file formats (*.dbc, *.eds, *.dcf)"));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the configured indexes
 
-   \param[out]    ou32_Index       First index
-   \param[out]    ou32_SubIndex    Second index
+   \param[out]  oru32_Index      First index
+   \param[out]  oru32_SubIndex   Second index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::GetIndexes(stw_types::uint32 & oru32_Index,
@@ -120,7 +99,7 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::GetIndexes(stw_types::uint32 & oru32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Setting checked state of check box
 
-   \param[in]     oq_Checked       Check flag
+   \param[in]  oq_Checked  Check flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::SetChecked(const bool oq_Checked)
@@ -145,7 +124,7 @@ bool C_SdBueNodeSelectorCheckBoxItemWidget::IsChecked(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the actual protocol to mark the protocol using nodes
 
-   \param[in]     oe_Protocol     Protocol id
+   \param[in]  oe_Protocol    Protocol id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol)
@@ -267,20 +246,9 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::m_NodeToggled(const uint32 ou32_Node
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxItemWidget::m_ImportClicked(void)
-{
-   uint32 u32_NodeIndex;
-   uint32 u32_InterfaceIndex;
-
-   this->mpc_CheckBox->GetIndexes(u32_NodeIndex, u32_InterfaceIndex);
-
-   Q_EMIT this->SigComImport(u32_NodeIndex, u32_InterfaceIndex);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the icon of the check box
 
-   \param[in]     oq_Checked      Flag if check box is checked
+   \param[in]  oq_Checked  Flag if check box is checked
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::m_AdaptIcon(const bool oq_Checked)

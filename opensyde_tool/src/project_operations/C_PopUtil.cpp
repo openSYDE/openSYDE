@@ -81,12 +81,11 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
       //Don't set details. User expects in details something like a list of what was changed in project
       if (C_PuiProject::h_GetInstance()->IsEmptyProject() == false)
       {
-         //c_MessageBox.SetDetails(C_GtGetText::h_GetText("Project path: ") +
-         //                        C_PuiProject::h_GetInstance()->GetPath());
          c_Description += " \"" + C_PuiProject::h_GetInstance()->GetName() + "\"";
       }
       c_Description += "?";
       c_MessageBox.SetDescription(c_Description);
+      c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
       switch (e_ReturnMessageBox)
@@ -203,6 +202,7 @@ bool C_PopUtil::h_CheckCriticalNamingConflict(QWidget * const opc_Parent, const 
       {
          QApplication::restoreOverrideCursor();
       }
+      c_Message.SetCustomMinHeight(230, 300);
       c_Message.Execute();
       if (oq_DisableActiveWaitCursor)
       {

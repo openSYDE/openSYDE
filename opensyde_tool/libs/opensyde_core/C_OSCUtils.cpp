@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <cctype>
+#include <fstream>
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
@@ -40,7 +41,7 @@ const stw_types::float64 C_OSCUtils::mhf64_Epsilon = 1e-5;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   CheckValidCName
+/*! \brief  CheckValidCName
 
    Function adapted from KEFEX to openSYDE (KFXCheckValidCName)
    Check if tName follows C naming conventions:
@@ -48,8 +49,8 @@ const stw_types::float64 C_OSCUtils::mhf64_Epsilon = 1e-5;
    -> only alphanumeric characters + "_"
    -> should not be longer than "ou16_MaxLength" characters
 
-   \param[in]     orc_Name         symbol name to check
-   \param[in]     ou16_MaxLength   permitted maximum identifier length
+   \param[in]  orc_Name          symbol name to check
+   \param[in]  ou16_MaxLength    permitted maximum identifier length
 
    \return
    true  -> OK
@@ -86,10 +87,10 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Compare to float64s for near equality
+/*! \brief  Compare to float64s for near equality
 
-   \param[in] orf64_Float1 Float 1 to compare
-   \param[in] orf64_Float2 Float 2 to compare
+   \param[in]  orf64_Float1   Float 1 to compare
+   \param[in]  orf64_Float2   Float 2 to compare
 
    \return
    true  Equal
@@ -103,10 +104,10 @@ bool C_OSCUtils::h_IsFloat64NearlyEqual(const float64 & orf64_Float1, const floa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Compare to float32s for near equality
+/*! \brief  Compare to float32s for near equality
 
-   \param[in] orf32_Float1 Float 1 to compare
-   \param[in] orf32_Float2 Float 2 to compare
+   \param[in]  orf32_Float1   Float 1 to compare
+   \param[in]  orf32_Float2   Float 2 to compare
 
    \return
    true  Equal
@@ -121,12 +122,12 @@ bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const floa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   create target folder (from bottom-up if required)
+/*! \brief  create target folder (from bottom-up if required)
 
    Nice and simple logic grabbed from
     https://stackoverflow.com/questions/1530760/how-do-i-recursively-create-a-folder-in-win32
 
-   \param[in]     orc_Folder         Path to create
+   \param[in]  orc_Folder  Path to create
 
    \return
    C_NO_ERR  folder created
@@ -156,7 +157,7 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Replace special characters in string
+/*! \brief  Replace special characters in string
 
    Aims:
    * convert into strings that can be used for file system folder names or file names
@@ -176,18 +177,32 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
    * {
    * }
    * $
+   * %
+   * &
+   * !
+   * #
+   * +
+   * ,
+   * ;
+   * =
+   * @
+   * [
+   * ]
+   * ^
+   * '
+   * ~
    * . (unusual but permitted)
    * <space> (unusual but permitted)
 
    See https://en.wikipedia.org/wiki/Filename for a list of limitations.
 
-   Special handling will also be applied to strings only containing "." or "..".
+   Special handling will also be applied to the strings "." and "..":
    These will be replaced by "dot" resp. "doubledot".
    Furthermore empty or blank strings (e.g. "", " ", "  ") will be replaced by "blank".
 
    As a result the length of the string might change.
 
-   \param[in]     orc_String         Original string
+   \param[in]  orc_String  Original string
 
    \return
    Niceified string
@@ -215,7 +230,10 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
          if ((std::isalnum(cn_Character) == 0) &&
              (cn_Character != '_') && (cn_Character != '-') && (cn_Character != '(') && (cn_Character != ')') &&
              (cn_Character != '{') && (cn_Character != '}') && (cn_Character != '$') && (cn_Character != '.') &&
-             (cn_Character != ' '))
+             (cn_Character != ' ') && (cn_Character != '%') && (cn_Character != '&') && (cn_Character != '!') &&
+             (cn_Character != '#') && (cn_Character != '+') && (cn_Character != ',') && (cn_Character != ';') &&
+             (cn_Character != '=') && (cn_Character != '@') && (cn_Character != '[') && (cn_Character != ']') &&
+             (cn_Character != '^') && (cn_Character != '\'') && (cn_Character != '~'))
          {
             c_Result += C_SCLString::IntToStr(cn_Character);
          }
@@ -240,7 +258,7 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Replace non-C characters in string
+/*! \brief  Replace non-C characters in string
 
    Aims:
    * convert a text string so that it can be used as a comment in C code
@@ -251,7 +269,7 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
    * "*" is replaced by "_" if immediately followed by "/"
    * "\" is replaced by "_" if at the end of the string
 
-   \param[in]     orc_String         Original string
+   \param[in]  orc_String  Original string
 
    \return
    Niceified string
@@ -297,7 +315,7 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
 
    For checking whole paths use h_CheckValidFileName, because here slashes and colons are not allowed.
 
-   \param[in]     orc_String         File path name
+   \param[in]  orc_String  File path name
 
    \retval   true    The string is valid
    \retval   false   The string is not valid
@@ -317,52 +335,76 @@ bool C_OSCUtils::h_CheckValidFileName(const C_SCLString & orc_String)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check if string is niceified for file or directory paths.
+/*! \brief  Check if string is valid for file or directory paths.
 
-   Replaces drive name ("C:") and path seperators ("/" or "\") and uses file name check for remaining strings.
-   Empty paths are handled invalid because an empty file path is not valid.
+   Splits the provided string at '/' and '\'and uses h_CheckValidFileName for these sub-strings.
+   If the sub-string is a double dot ".." it is skipped because of its special meaning (directory up) in path context
+   If the provided string starts with a drive name (C:) or with a single dot "."
+   these sub-strings are skipped from file name check as they are valid in their special context.
 
-   \param[in]     orc_String         File path string
+   Empty paths are handled invalid because an empty file path is not valid for file saving.
+   Same rule applies if the path only contains (back-)slashes.
+   Multiple slashes in direct sequence are handled as valid if there exists at least one further character.
 
-   \retval   true    The string is niceified and is valid
-   \retval   false   The string is not nice and is not valid
+   \param[in]  orc_String  File path string
+
+   \retval   true    The string is valid for file or directory path
+   \retval   false   The string invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCUtils::h_CheckValidFilePath(const C_SCLString & orc_String)
 {
-   C_SCLString c_StringWithoutSpecialChars = "";
+   bool q_Return = true;
 
-   if (orc_String != "")
+   if (orc_String.IsEmpty() == true)
    {
-      for (uint32 u32_Index = 0U; u32_Index < orc_String.Length(); u32_Index++)
+      q_Return = false;
+   }
+   else
+   {
+      bool q_AtLeastOneOtherChar = false;
+      SCLDynamicArray<C_SCLString> c_SplitStrings;
+      orc_String.Tokenize("\\/", c_SplitStrings);
+
+      for (sint32 s32_Index = 0U; (s32_Index < c_SplitStrings.GetLength()) && (q_Return == true); s32_Index++)
       {
-         const charn cn_Character = orc_String.c_str()[u32_Index];
-         // skip the following characters:
-         //    ':' on second place (after drive name)
-         //    '/' resp. '\'
-         //    . and because it is valid in paths (but sometimes invalid in names)
-         if (((u32_Index != 1U) || (cn_Character != ':')) &&
-             ((cn_Character != '\\') && (cn_Character != '/') && (cn_Character != '.')))
+         const C_SCLString & rc_Substring = c_SplitStrings[s32_Index];
+
+         // empty sub-strings are okay here, because they result from two consecutive (back-)slashes or from
+         // trailing/leading(back-)slash
+         if (rc_Substring.IsEmpty() == false)
          {
-            c_StringWithoutSpecialChars += cn_Character;
+            q_AtLeastOneOtherChar = true;
+
+            // skip ".." as it has special meaning in paths but is not allowed for names
+            if (rc_Substring != "..")
+            {
+               // skip if complete string starts with drive name or "."
+               if ((s32_Index > 0) ||
+                   ((rc_Substring != ".") /* . at beginning is allowed */ &&
+                    ((rc_Substring.Length() != 2U) || (rc_Substring.SubString(2, 1) != ':')) /* drive names e.g. C: */))
+               {
+                  q_Return = h_CheckValidFileName(rc_Substring);
+               }
+            }
          }
       }
 
-      // was not empty before but is empty now -> artificially add a character again
-      if (c_StringWithoutSpecialChars == "")
+      // only (back-)slashes found
+      if (q_AtLeastOneOtherChar == false)
       {
-         c_StringWithoutSpecialChars = "_";
+         q_Return = false;
       }
    }
 
-   return (c_StringWithoutSpecialChars == h_NiceifyStringForFileName(c_StringWithoutSpecialChars));
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if scaling active
+/*! \brief  Check if scaling active
 
-   \param[in] of64_Factor Factor
-   \param[in] of64_Offset Offset
+   \param[in]  of64_Factor    Factor
+   \param[in]  of64_Offset    Offset
 
    \return
    True  Scaling active
@@ -376,13 +418,13 @@ bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Scales a value
+/*! \brief  Scales a value
 
    returns ((value * factor) + offset)
 
-   \param[in]     of64_Value      Original unscaled value
-   \param[in]     of64_Factor     Scaling factor
-   \param[in]     of64_Offset     Scaling offset
+   \param[in]  of64_Value     Original unscaled value
+   \param[in]  of64_Factor    Scaling factor
+   \param[in]  of64_Offset    Scaling offset
 
    \return
    Scaled value
@@ -399,13 +441,13 @@ float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of6
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates a scaled value back to the unscaled value
+/*! \brief  Calculates a scaled value back to the unscaled value
 
    returns ((value - of64_Offset) - offset)
 
-   \param[in]     of64_Value      Scaled value
-   \param[in]     of64_Factor     Scaling factor
-   \param[in]     of64_Offset     Scaling offset
+   \param[in]  of64_Value     Scaled value
+   \param[in]  of64_Factor    Scaling factor
+   \param[in]  of64_Offset    Scaling offset
 
    \return
    Origin value
@@ -428,7 +470,7 @@ float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 o
       1: format up to and including 2019. E.g: 05.123456.1001
       2: format from 2020. E.g: 200012345678
 
-   \param[in]       opu8_SerialNumber     Pointer to first of six serial number array elements
+   \param[in]  opu8_SerialNumber    Pointer to first of six serial number array elements
 
    \return
    serial number string
@@ -457,4 +499,34 @@ C_SCLString C_OSCUtils::h_SerialNumberToString(const uint8 * const opu8_SerialNu
    }
 
    return c_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy file to string
+
+   \param[in]   orc_FilePath        File to copy
+   \param[out]  orc_OutputString    File content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCUtils::h_FileToString(const C_SCLString & orc_FilePath, C_SCLString & orc_OutputString)
+{
+   std::string c_Input;
+   {
+      //Read
+      std::ifstream c_File;
+
+      c_File.open(orc_FilePath.c_str(), std::ifstream::in);
+      if (c_File.is_open())
+      {
+         c_File.seekg(0LL, std::ios::end);
+         c_Input.reserve(static_cast<stw_types::uint32>(c_File.tellg()));
+         c_File.seekg(0LL, std::ios::beg);
+
+         c_Input.assign((std::istreambuf_iterator<stw_types::charn>(c_File)),
+                        std::istreambuf_iterator<stw_types::charn>());
+         c_File.close();
+      }
+   }
+   //Copy to output
+   orc_OutputString = C_SCLString(c_Input.c_str());
 }

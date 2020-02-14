@@ -37,7 +37,7 @@ public:
 
    virtual stw_types::sintn type(void) const override;
    virtual void SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style,
-                                const bool oq_DarkMode);
+                                const bool oq_DarkMode) override;
    virtual void ReInitializeSize(void) override;
 
    virtual void LoadData(void) override;
@@ -45,7 +45,7 @@ public:
    virtual void DeleteData(void) override;
    virtual bool CallProperties(void) override;
 
-   virtual void UpdateShowValue(void);
+   virtual void UpdateShowValue(void) override;
    virtual void ConnectionActiveChanged(const bool oq_Active) override;
    virtual void EditModeActiveChanged(const bool oq_Active) override;
    virtual void HandleManualOperationFinished(const stw_types::sint32 os32_Result,

@@ -56,9 +56,6 @@ Q_SIGNALS:
                                            const stw_types::uint32 ou32_InterfaceIndex) const;
    void SigDisconnectNodeFromProt(const stw_types::uint32 ou32_NodeIndex,
                                   const stw_types::uint32 ou32_InterfaceIndex) const;
-   void SigAddDataPool(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex) const;
-   void SigReload(void);
-   void SigErrorChange(void);
 
 private:
    //Avoid call
@@ -67,7 +64,6 @@ private:
 
    void m_NodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                       const bool oq_Checked) const;
-   void m_NodeComImport(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
 
    Ui::C_SdBueNodeSelectorWidget * mpc_Ui;
    stw_types::uint32 mu32_BusIndex;

@@ -220,8 +220,8 @@ void C_GiSvDaLabelBase::UpdateShowValue(void)
    Base class implementation does nothing. If the dashboard element has drawing elements which
    can not be adapted by stylesheets the derived class must reimplement this function.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                           Value for transparence (0..255)
+   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
+   \param[in]     osn_Value                 Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaLabelBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -259,6 +259,8 @@ void C_GiSvDaLabelBase::ConnectionActiveChanged(const bool oq_Active)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call properties for widgets
+
+   \return true (configurable properties called)
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaLabelBase::CallProperties(void)

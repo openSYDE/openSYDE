@@ -132,6 +132,7 @@ bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::
                }
                c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Only %1 %2 allowed per list.")).arg(
                                               mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX).arg(c_Text));
+               c_MessageBox.SetCustomMinHeight(180, 180);
                c_MessageBox.Execute();
             }
          }

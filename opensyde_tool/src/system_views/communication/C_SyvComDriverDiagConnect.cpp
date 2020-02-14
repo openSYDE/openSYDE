@@ -219,7 +219,8 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
          this->mc_ErrorMessage =
             QString(C_GtGetText::h_GetText(
                        "The Datapool definition differs between client and node.\n"
-                       "Generate the code for all listed nodes in the details again."));
+                       "Generate the code for all listed nodes in the details again.\n"
+                       "Tip: Also make sure the Datapools are initialized in the application."));
          this->mc_ErrorMessageDetails =
             QString(C_GtGetText::h_GetText("Affected node(s) and Datapool(s):\n%1")).arg(
                c_ErrorDetails);

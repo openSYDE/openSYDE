@@ -75,7 +75,7 @@ C_SdNdeDpSelectorUsageWidget::~C_SdNdeDpSelectorUsageWidget(void)
 /*! \brief   Calculates the actual percentage of the usage
 
    \param[in] ou32_Size       Maximum size
-   \param[in] orc32_Used      List of used space of all relevant datapools
+   \param[in] orc32_VecUsed   List of used space of all relevant datapools
    \param[in] orc_VecNames    List of names of all relevant datapools
 
    \return
@@ -83,7 +83,7 @@ C_SdNdeDpSelectorUsageWidget::~C_SdNdeDpSelectorUsageWidget(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDpSelectorUsageWidget::SetUsage(const uint32 ou32_Size, const std::vector<uint32> & orc32_VecUsed,
-                                                    std::vector<QString> & orc_VecNames)
+                                              std::vector<QString> & orc_VecNames)
 {
    uint32 u32_SumUsed = 0U;
 

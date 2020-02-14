@@ -47,7 +47,7 @@ using namespace stw_cmon_protocol;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLoggerFilter::C_OSCComMessageLoggerFilter(void) :
@@ -59,7 +59,7 @@ C_OSCComMessageLoggerFilter::C_OSCComMessageLoggerFilter(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if current equal to orc_Cmp
+/*! \brief  Check if current equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
@@ -84,7 +84,7 @@ bool C_OSCComMessageLoggerFilter::operator ==(const C_OSCComMessageLoggerFilter 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLogger::C_OSCComMessageLogger(void) :
@@ -104,7 +104,7 @@ C_OSCComMessageLogger::C_OSCComMessageLogger(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLogger::~C_OSCComMessageLogger(void)
@@ -115,7 +115,7 @@ C_OSCComMessageLogger::~C_OSCComMessageLogger(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Continues the paused the logging
+/*! \brief  Continues the paused the logging
 
    Continues the logging of this logger.
    The delivering instance of C_OSCComDriverBase must be running logging too.
@@ -127,7 +127,7 @@ void C_OSCComMessageLogger::Continue(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Pauses the logging.
+/*! \brief  Pauses the logging.
 
    Pauses the logging of this logger.
    The delivering instance of C_OSCComDriverBase will not be changed by this pause.
@@ -140,7 +140,7 @@ void C_OSCComMessageLogger::Pause(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function to react on the stop of the communication
+/*! \brief  Function to react on the stop of the communication
 
    Reset all CAN message counter
 */
@@ -151,7 +151,7 @@ void C_OSCComMessageLogger::Stop(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function to react on the stop of the communication
+/*! \brief  Function to react on the stop of the communication
 
    Reset filtered message counter and set the first timestamp for calculation of absolute timestamp relative to start
 */
@@ -168,9 +168,9 @@ void C_OSCComMessageLogger::Start(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the protocol for interpreting
+/*! \brief  Sets the protocol for interpreting
 
-   \param[in]     oe_Protocol     Set protocol type
+   \param[in] oe_Protocol Set protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::SetProtocol(const e_CMONL7Protocols oe_Protocol)
@@ -192,10 +192,10 @@ void C_OSCComMessageLogger::SetProtocol(const e_CMONL7Protocols oe_Protocol)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds an openSYDE system definition for analyzing
+/*! \brief  Adds an openSYDE system definition for analyzing
 
-   \param[in]     orc_PathSystemDefinition       Path of system definition file (Must be .syde_sysdef)
-   \param[out]    orc_Busses                     All CAN buses of system definition
+   \param[in]  orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
+   \param[out] orc_Busses               All CAN buses of system definition
 
    \return
    C_NO_ERR    data read
@@ -214,11 +214,11 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds an openSYDE system definition for analyzing
+/*! \brief  Adds an openSYDE system definition for analyzing
 
-   \param[in]     orc_PathSystemDefinition       Path of system definition file (Must be .syde_sysdef)
-   \param[out]    orc_Busses                     All CAN buses of system definition
-   \param[in]     ou32_BusIndex                  Bus index of CAN bus of system definition for monitoring
+   \param[in]  orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
+   \param[in]  ou32_BusIndex            Bus index of CAN bus of system definition for monitoring
+   \param[out] orc_Busses               All CAN buses of system definition
 
    \return
    C_NO_ERR    data read
@@ -314,10 +314,10 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Updates the set bus index of the specific system definition
+/*! \brief  Updates the set bus index of the specific system definition
 
-   \param[in]     orc_PathSystemDefinition       Path of system definition file (Must be .syde_sysdef)
-   \param[in]     ou32_BusIndex                  Bus index of CAN bus of system definition for monitoring
+   \param[in] orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
+   \param[in] ou32_BusIndex            Bus index of CAN bus of system definition for monitoring
 
    \return
    C_NO_ERR    Bus index for this system definition adapted
@@ -351,10 +351,10 @@ sint32 C_OSCComMessageLogger::SetOsySysDefBus(const C_SCLString & orc_PathSystem
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the entire loaded openSYDE system definition
+/*! \brief  Returns the entire loaded openSYDE system definition
 
-   \param[in]     orc_PathSystemDefinition   Path and filename of openSYDE system definition file
-   \param[out]    orc_SystemDefinition       Loaded system definition
+   \param[in]  orc_PathSystemDefinition Path and filename of openSYDE system definition file
+   \param[out] orc_SystemDefinition     Loaded system definition
 
    \return
    C_NO_ERR    openSYDE system definition returned
@@ -380,9 +380,9 @@ sint32 C_OSCComMessageLogger::GetOsySysDef(const C_SCLString & orc_PathSystemDef
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Removes a database file
+/*! \brief  Removes a database file
 
-   \param[in]  orc_Path    Path and filename of database file
+   \param[in] orc_Path Path and filename of database file
 
    \return
    C_NO_ERR    Database removed
@@ -411,9 +411,10 @@ sint32 C_OSCComMessageLogger::RemoveDatabase(const C_SCLString & orc_Path)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Activate or deactivate a registered database
+/*! \brief  Activate or deactivate a registered database
 
-   \param[in]  orc_Path    Path and filename of database file
+   \param[in] orc_Path  Path and filename of database file
+   \param[in] oq_Active Flag if database is active
 
    \return
    C_NO_ERR    Database removed
@@ -428,19 +429,38 @@ sint32 C_OSCComMessageLogger::ActivateDatabase(const C_SCLString & orc_Path, con
 
    if (c_ItFlag != this->mc_DatabaseActiveFlags.end())
    {
+      std::map<stw_scl::C_SCLString, C_OSCComMessageLoggerOsySysDefConfig>::iterator c_ItSysDef =
+         this->mc_OsySysDefs.find(orc_Path);
+
       c_ItFlag->second = oq_Active;
       s32_Return = C_NO_ERR;
+
+      // Check if it is a openSYDE System Definition
+      if (c_ItSysDef != this->mc_OsySysDefs.end())
+      {
+         // The configuration of the layer 7 interpretation must be adapted too
+         if (oq_Active == true)
+         {
+            this->mc_ProtocolDec.AddOsySysDef(&(c_ItSysDef->second));
+            this->mc_ProtocolHex.AddOsySysDef(&(c_ItSysDef->second));
+         }
+         else
+         {
+            this->mc_ProtocolDec.RemoveOsySysDef(&(c_ItSysDef->second));
+            this->mc_ProtocolHex.RemoveOsySysDef(&(c_ItSysDef->second));
+         }
+      }
    }
 
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds an ASC log file
+/*! \brief  Adds an ASC log file
 
-   \param[in]     orc_FilePath                 Path with file name. File extension must be .asc
-   \param[in]     oq_HexActive                 Mode for writing CAN Id and CAN data (hexadecimal or decimal)
-   \param[in]     oq_RelativeTimeStampActive   Mode for writing CAN timestamp (relative or absolute)
+   \param[in] orc_FilePath               Path with file name. File extension must be .asc
+   \param[in] oq_HexActive               Mode for writing CAN Id and CAN data (hexadecimal or decimal)
+   \param[in] oq_RelativeTimeStampActive Mode for writing CAN timestamp (relative or absolute)
 
    \return
    C_NO_ERR    File added successfully
@@ -465,11 +485,11 @@ sint32 C_OSCComMessageLogger::AddLogFileAsc(const C_SCLString & orc_FilePath, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Remove an specific log file
+/*! \brief  Remove an specific log file
 
    The written file is not removed. The log file is removed from the list of active log files.
 
-   \param[in]     orc_FilePath            Path with file name. File extension must be .asc
+   \param[in] orc_FilePath Path with file name. File extension must be .asc
 
    \return
    C_NO_ERR    File removed
@@ -496,7 +516,7 @@ sint32 C_OSCComMessageLogger::RemoveLogFile(const C_SCLString & orc_FilePath)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Remove all log files
+/*! \brief  Remove all log files
 
    The written files are not removed. The log files are removed from the list of active log files.
 */
@@ -513,9 +533,9 @@ void C_OSCComMessageLogger::RemoveAllLogFiles(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adds a new filter configuration
+/*! \brief  Adds a new filter configuration
 
-   \param[in]  orc_Filter     Filter configuration to add
+   \param[in] orc_Filter Filter configuration to add
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::AddFilter(const C_OSCComMessageLoggerFilter & orc_Filter)
@@ -524,9 +544,9 @@ void C_OSCComMessageLogger::AddFilter(const C_OSCComMessageLoggerFilter & orc_Fi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Removes a filter configuration
+/*! \brief  Removes a filter configuration
 
-   \param[in]  orc_Filter     Filter configuration to remove
+   \param[in] orc_Filter Filter configuration to remove
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::RemoveFilter(const C_OSCComMessageLoggerFilter & orc_Filter)
@@ -545,7 +565,7 @@ void C_OSCComMessageLogger::RemoveFilter(const C_OSCComMessageLoggerFilter & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Removes the entire filter configuration
+/*! \brief  Removes the entire filter configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::RemoveAllFilter(void)
@@ -554,7 +574,7 @@ void C_OSCComMessageLogger::RemoveAllFilter(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the current count of filtered CAN messages
+/*! \brief  Returns the current count of filtered CAN messages
 
    This function is thread safe
 
@@ -568,15 +588,15 @@ uint32 C_OSCComMessageLogger::GetFilteredMessages(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   If necessary handle and log the CAN message
+/*! \brief  If necessary handle and log the CAN message
 
    Check if CAN message must be logged.
    Check CAN message for configured protocols.
    Fills an instance of C_OSCComMessageLoggerData which can get by calling GetHandledCanMessage.
    This base class implementation must be called first.
 
-   \param[in]     orc_Msg        Current CAN message
-   \param[in]     oq_IsTx        Message was sent of this application itself
+   \param[in] orc_Msg Current CAN message
+   \param[in] oq_IsTx Message was sent of this application itself
 
    \return
    C_NO_ERR    CAN message logged
@@ -640,7 +660,7 @@ sint32 C_OSCComMessageLogger::HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Resets all CAN message counter
+/*! \brief  Resets all CAN message counter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::ResetCounter(void)
@@ -649,11 +669,11 @@ void C_OSCComMessageLogger::ResetCounter(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Optional function for getting the current bus load
+/*! \brief  Optional function for getting the current bus load
 
    This implementation does nothing with the value. This function must be overridden to use the bus load value
 
-   \param[in]     ou8_BusLoad    Current CAN bus load in percentage
+   \param[in] ou8_BusLoad Current CAN bus load in percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::UpdateBusLoad(const uint8 ou8_BusLoad)
@@ -663,11 +683,11 @@ void C_OSCComMessageLogger::UpdateBusLoad(const uint8 ou8_BusLoad)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Optional function for getting the current detected CAN TX errors
+/*! \brief  Optional function for getting the current detected CAN TX errors
 
    This implementation does nothing with the value. This function must be overridden to use the detected CAN TX errors
 
-   \param[in]     ou32_TxErrors    Current detected CAN TX errors
+   \param[in] ou32_TxErrors Current detected CAN TX errors
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::UpdateTxErrors(const uint32 ou32_TxErrors)
@@ -677,7 +697,7 @@ void C_OSCComMessageLogger::UpdateTxErrors(const uint32 ou32_TxErrors)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the current handled CAN message after call of HandleCanMessage
+/*! \brief  Returns the current handled CAN message after call of HandleCanMessage
 
    \return
    Current interpreted CAN message
@@ -689,9 +709,9 @@ const C_OSCComMessageLoggerData & C_OSCComMessageLogger::m_GetHandledCanMessage(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checks a specific CAN message for matching the filter configuration
+/*! \brief  Checks a specific CAN message for matching the filter configuration
 
-   \param[in]     orc_Msg        Current CAN message
+   \param[in] orc_Msg Current CAN message
 
    \return
    true     CAN message is relevant
@@ -773,9 +793,9 @@ bool C_OSCComMessageLogger::m_CheckFilter(const T_STWCAN_Msg_RX & orc_Msg)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the CAN message as protocol specific interpreted string with values as hex
+/*! \brief  Returns the CAN message as protocol specific interpreted string with values as hex
 
-   \param[in]     orc_Msg        Current CAN message
+   \param[in] orc_Msg Current CAN message
 
    \return
    CAN message converted to protocol string
@@ -795,9 +815,9 @@ C_SCLString C_OSCComMessageLogger::m_GetProtocolStringHex(const T_STWCAN_Msg_RX 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the CAN message as protocol specific interpreted string with values as decimal
+/*! \brief  Returns the CAN message as protocol specific interpreted string with values as decimal
 
-   \param[in]     orc_Msg        Current CAN message
+   \param[in] orc_Msg Current CAN message
 
    \return
    CAN message converted to protocol string
@@ -817,15 +837,15 @@ C_SCLString C_OSCComMessageLogger::m_GetProtocolStringDec(const T_STWCAN_Msg_RX 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Inserts openSYDE system definition to parsing configuration
+/*! \brief  Inserts openSYDE system definition to parsing configuration
 
    Splitting of parts of function AddOsySysDef into this one because of performance.
    Loading of file needs a lot more time and shall not be part of the synchronized parts.
    Deriving classes can override this function to use synchronization.
 
-   \param[in]     orc_PathSystemDefinition   Path of system definition file (Must be .syde_sysdef)
-   \param[in]     orc_OsySysDef              Loaded openSYDE system definition
-   \param[in]     ou32_BusIndex              Used CAN bus index
+   \param[in] orc_PathSystemDefinition Path of system definition file (Must be .syde_sysdef)
+   \param[in] orc_OsySysDef            Loaded openSYDE system definition
+   \param[in] ou32_BusIndex            Used CAN bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::m_InsertOsySysDef(const C_SCLString & orc_PathSystemDefinition,
@@ -846,12 +866,12 @@ void C_OSCComMessageLogger::m_InsertOsySysDef(const C_SCLString & orc_PathSystem
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checks if a matching CAN message is defined in at least one registered openSYDE system definition
+/*! \brief  Checks if a matching CAN message is defined in at least one registered openSYDE system definition
 
    The result will be saved to mpc_OsySysDefMessage and mpc_OsySysDefDataPoolList.
    If mpc_OsySysDefMessage and mpc_OsySysDefDataPoolList is NULL, no CAN message found in any system definition.
 
-   \param[in]     orc_Msg             CAN message for analyzing
+   \param[in] orc_Msg CAN message for analyzing
 
    \return
    true     Matching CAN message found
@@ -963,9 +983,9 @@ bool C_OSCComMessageLogger::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Interprets the system definition message
+/*! \brief  Interprets the system definition message
 
-   \param[in,out] orc_MessageData    Message data target for the interpretation
+   \param[in,out] orc_MessageData Message data target for the interpretation
 
    \return
    true     Matching CAN message exists
@@ -997,7 +1017,7 @@ bool C_OSCComMessageLogger::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_Me
 
             if (orc_MessageData.c_Signals.size() > 0)
             {
-               const C_OSCComMessageLoggerDataSignal & rc_Signal =
+               C_OSCComMessageLoggerDataSignal & rc_Signal =
                   orc_MessageData.c_Signals[orc_MessageData.c_Signals.size() - 1];
 
                if (rc_Signal.q_DlcError == false)
@@ -1005,6 +1025,7 @@ bool C_OSCComMessageLogger::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_Me
                   try
                   {
                      u16_MultiplexValue = static_cast<uint16>(rc_Signal.c_RawValueDec.ToInt());
+                     rc_Signal.c_Name += " (Multiplexer)";
                      q_MultiplexerFound = true;
                      u32_MultiplexerIndex = u32_Counter;
                   }
@@ -1051,7 +1072,7 @@ bool C_OSCComMessageLogger::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_Me
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the interpreted string of the found CAN message interpretation of a openSYDE system definition
+/*! \brief  Returns the interpreted string of the found CAN message interpretation of a openSYDE system definition
 
    The result in mpc_OsySysDefMessage and mpc_OsySysDefDataPoolList will be used.
    All values are shown as hexadecimal value.
@@ -1076,7 +1097,7 @@ C_SCLString C_OSCComMessageLogger::m_GetOsySysDefStringHex(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the interpreted string of the found CAN message interpretation of a openSYDE system definition
+/*! \brief  Returns the interpreted string of the found CAN message interpretation of a openSYDE system definition
 
    The result in mpc_OsySysDefMessage and mpc_OsySysDefDataPoolList will be used.
    All values are shown as decimal value.
@@ -1101,11 +1122,11 @@ C_SCLString C_OSCComMessageLogger::m_GetOsySysDefStringDec(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checks and interprets if a matching CAN message is defined in a description / specification
+/*! \brief  Checks and interprets if a matching CAN message is defined in a description / specification
 
    Using the both members c_ProtocolTextDec and c_ProtocolTextHex in orc_MessageData for the result.
 
-   \param[in,out]     orc_MessageData         CAN message data class for analyzing and for output
+   \param[in,out] orc_MessageData CAN message data class for analyzing and for output
 
    \return
    true     Matching CAN message found
@@ -1122,7 +1143,7 @@ bool C_OSCComMessageLogger::m_CheckInterpretation(stw_opensyde_core::C_OSCComMes
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Interprets the received CAN signal value
+/*! \brief  Interprets the received CAN signal value
 
    \param[in,out]     orc_Signal        Signal interpretation
    \param[in]         orau8_CanDb       RAW CAN message data
@@ -1151,7 +1172,7 @@ void C_OSCComMessageLogger::mh_InterpretCanSignalValue(C_OSCComMessageLoggerData
 
       // Get the signal as raw value in the first step
       c_SignalRawData.resize(c_OscValue.GetSizeByte());
-      C_OSCCanUtil::h_GetSignalValue(orau8_CanDb, orc_OscSignal, c_SignalRawData);
+      C_OSCCanUtil::h_GetSignalValue(orau8_CanDb, orc_OscSignal, c_SignalRawData, orc_OscValue.GetType());
       // And the interpreted value
       c_OscValue.SetValueFromLittleEndianBlob(c_SignalRawData);
 
@@ -1196,7 +1217,7 @@ void C_OSCComMessageLogger::mh_InterpretCanSignalValue(C_OSCComMessageLoggerData
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns an interpreted string of a protocol
+/*! \brief  Returns an interpreted string of a protocol
 
    This is the default implementation and returns an empty string
 
@@ -1211,7 +1232,7 @@ C_SCLString C_OSCComMessageLogger::m_GetProtocolStringHexHook(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns an interpreted string of a protocol
+/*! \brief  Returns an interpreted string of a protocol
 
    This is the default implementation and returns an empty string
 
@@ -1226,10 +1247,10 @@ C_SCLString C_OSCComMessageLogger::m_GetProtocolStringDecHook(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Fills instance mc_HandledCanMessage of C_OSCComMessageLoggerData dependent of the current message
+/*! \brief  Fills instance mc_HandledCanMessage of C_OSCComMessageLoggerData dependent of the current message
 
-   \param[in]     orc_Msg        Current CAN message
-   \param[in]     oq_IsTx        Message was sent of this application itself
+   \param[in] orc_Msg Current CAN message
+   \param[in] oq_IsTx Message was sent of this application itself
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx)
@@ -1350,10 +1371,10 @@ void C_OSCComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Interprets the system definition message signal
+/*! \brief  Interprets the system definition message signal
 
-   \param[in,out] orc_MessageData    Message data target for the interpretation
-   \param[in]     orc_OscSignal      CAN signal of system definition
+   \param[in,out] orc_MessageData Message data target for the interpretation
+   \param[in]     orc_OscSignal   CAN signal of system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::m_InterpretSysDefCanSignal(C_OSCComMessageLoggerData & orc_MessageData,
@@ -1380,7 +1401,7 @@ void C_OSCComMessageLogger::m_InterpretSysDefCanSignal(C_OSCComMessageLoggerData
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Resets all CAN message counter
+/*! \brief  Resets all CAN message counter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::m_ResetCounter(void)

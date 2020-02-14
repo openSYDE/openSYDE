@@ -60,7 +60,7 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdNodeCanMessageSyncManager::C_PuiSdNodeCanMessageSyncManager(QObject * const opc_Parent) :
@@ -73,8 +73,8 @@ C_PuiSdNodeCanMessageSyncManager::C_PuiSdNodeCanMessageSyncManager(QObject * con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init message matches
 
-   \param[in] oru32_BusIndex  Bus index
-   \param[in] ore_ComProtocol Protocol type
+   \param[in]  oru32_BusIndex    Bus index
+   \param[in]  ore_ComProtocol   Protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::Init(const uint32 & oru32_BusIndex,
@@ -126,9 +126,9 @@ void C_PuiSdNodeCanMessageSyncManager::Init(const uint32 & oru32_BusIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init message matches
 
-   \param[in] oru32_NodeIndex      Node index
-   \param[in] oru32_InterfaceIndex Interface index
-   \param[in] ore_ComProtocol      Protocol type
+   \param[in]  oru32_NodeIndex         Node index
+   \param[in]  oru32_InterfaceIndex    Interface index
+   \param[in]  ore_ComProtocol         Protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::Init(const uint32 & oru32_NodeIndex, const uint32 & oru32_InterfaceIndex,
@@ -197,11 +197,11 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all node indexes which are connected to the bus and use the active protocol
 
-   \param[in]     ou32_BusIndex        Bus index
-   \param[in]     ore_ComProtocol      Active protocol
-   \param[out]    orc_NodeIndexes      Vector with all node ids which are connected to the bus
-   \param[out]    orc_InterfaceIndexes Vector with all node interface ids which are connected to the bus
-   \param[out]    orc_DatapoolIndexes  Vector with all Datapool indexes which are connected to the bus and associated
+   \param[in]   ou32_BusIndex          Bus index
+   \param[in]   ore_ComProtocol        Active protocol
+   \param[out]  orc_NodeIndexes        Vector with all node ids which are connected to the bus
+   \param[out]  orc_InterfaceIndexes   Vector with all node interface ids which are connected to the bus
+   \param[out]  orc_DatapoolIndexes    Vector with all Datapool indexes which are connected to the bus and associated
                                        to the protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -261,8 +261,8 @@ void C_PuiSdNodeCanMessageSyncManager::h_GetConnectedAndActiveInterfaces(const u
 
    * Do only change message direction using this function.
 
-   \param[in] orc_MessageId      Message identification indices
-   \param[in] orq_NewMessageIsTx Flag if message direction is now transmit
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  orq_NewMessageIsTx   Flag if message direction is now transmit
 
    \return
    C_NO_ERR Operation success
@@ -330,8 +330,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageDirection(
    * Do not change message direction using this function.
    * Do not change message receive timeout using this function.
 
-   \param[in] orc_MessageId Message identification indices
-   \param[in] orc_Message   Message data
+   \param[in]  orc_MessageId  Message identification indices
+   \param[in]  orc_Message    Message data
 
    \return
    C_NO_ERR Operation success
@@ -375,11 +375,11 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessagePropertiesWithoutDirection
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set can message receive timeout
 
-   \param[in] orc_MessageId       Message identification indices -> message
-   \param[in] ou32_NodeIndex      Node index -> which receiver
-   \param[in] ou32_InterfaceIndex Interface index -> which receiver
-   \param[in] ou32_DatapoolIndex  Datapool index -> which receiver
-   \param[in] ou32_ReceiveTimeout Receive timeout
+   \param[in]  orc_MessageId        Message identification indices -> message
+   \param[in]  ou32_NodeIndex       Node index -> which receiver
+   \param[in]  ou32_InterfaceIndex  Interface index -> which receiver
+   \param[in]  ou32_DatapoolIndex   Datapool index -> which receiver
+   \param[in]  ou32_ReceiveTimeout  Receive timeout
 
    \return
    C_NO_ERR Operation success
@@ -432,11 +432,11 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeout(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set can message auto receive timeout flag
 
-   \param[in] orc_MessageId            Message identification indices -> message
-   \param[in] ou32_NodeIndex           Node index -> which receiver
-   \param[in] ou32_InterfaceIndex      Interface index -> which receiver
-   \param[in] ou32_DatapoolIndex       Datapool index -> which receiver
-   \param[in] oq_UseAutoReceiveTimeout Auto receive timeout flag
+   \param[in]  orc_MessageId           Message identification indices -> message
+   \param[in]  ou32_NodeIndex          Node index -> which receiver
+   \param[in]  ou32_InterfaceIndex     Interface index -> which receiver
+   \param[in]  ou32_DatapoolIndex      Datapool index -> which receiver
+   \param[in]  ore_ReceiveTimeoutMode  Receive timeout mode
 
    \return
    C_NO_ERR Operation success
@@ -445,7 +445,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeout(
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeoutAutoFlag(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 ou32_NodeIndex,
-   const uint32 ou32_InterfaceIndex, const uint32 ou32_DatapoolIndex, const bool oq_UseAutoReceiveTimeout) const
+   const uint32 ou32_InterfaceIndex, const uint32 ou32_DatapoolIndex,
+   const C_PuiSdNodeCanMessage::E_RxTimeoutMode & ore_ReceiveTimeoutMode) const
 {
    sint32 s32_Retval = C_RANGE;
    //Get all matching Ids
@@ -468,7 +469,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeoutAutoFlag(
          {
             C_PuiSdNodeCanMessage c_Copy = *pc_Message;
             //Only set timeout flag
-            c_Copy.q_UseAutoReceiveTimeout = oq_UseAutoReceiveTimeout;
+            c_Copy.e_ReceiveTimeoutMode = ore_ReceiveTimeoutMode;
             s32_Retval = C_PuiSdHandler::h_GetInstance()->SetUiCanMessage(rc_CurMessageId,
                                                                           c_Copy);
          }
@@ -489,12 +490,12 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeoutAutoFlag(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set can signal
 
-   \param[in] orc_MessageId       Message identification indices
-   \param[in] oru32_SignalIndex   Signal index
-   \param[in] orc_OSCSignal       Signal data (osc)
-   \param[in] orc_OSCSignalCommon Signal data (osc common)
-   \param[in] orc_UISignalCommon  Signal data (ui common)
-   \param[in] orc_UISignal        Signal data (ui)
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  orc_OSCSignal        Signal data (osc)
+   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
+   \param[in]  orc_UISignalCommon   Signal data (ui common)
+   \param[in]  orc_UISignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -530,9 +531,9 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignal(const C_OSCCanMessageIdent
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set can signal common part
 
-   \param[in] orc_MessageId       Message identification indices
-   \param[in] oru32_SignalIndex   Signal index
-   \param[in] ou16_MultiplexValue New multiplex value
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  ou16_MultiplexValue  New multiplex value
 
    \return
    C_NO_ERR Operation success
@@ -565,10 +566,10 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set can signal position part
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
-   \param[in] orc_OSCSignal     Signal data (osc)
-   \param[in] orc_UISignal      Signal data (ui)
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  orc_OSCSignal        Signal data (osc)
+   \param[in]  orc_UISignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -601,16 +602,16 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignalPosition(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add can message
 
-   \param[in]  oru32_NodeIndex      Node index
-   \param[in]  ore_ComType          Can protocol type
-   \param[in]  oru32_InterfaceIndex Node interface index
-   \param[in]  oru32_DatapoolIndex  Datapool index
-   \param[in]  orq_MessageIsTx      Flag if message is tx type (else rx type assumed)
-   \param[in]  orc_Message          Message data
-   \param[in]  orc_OSCSignalCommons Signals data (osc common)
-   \param[in]  orc_UISignalCommons  Signals data (ui common)
-   \param[in]  orc_UISignals        Signals data (ui)
-   \param[out] oru32_MessageIndex   New message index, only valid if C_NO_ERR
+   \param[in]   oru32_NodeIndex        Node index
+   \param[in]   ore_ComType            Can protocol type
+   \param[in]   oru32_InterfaceIndex   Node interface index
+   \param[in]   oru32_DatapoolIndex    Datapool index
+   \param[in]   orq_MessageIsTx        Flag if message is tx type (else rx type assumed)
+   \param[in]   orc_Message            Message data
+   \param[in]   orc_OSCSignalCommons   Signals data (osc common)
+   \param[in]   orc_UISignalCommons    Signals data (ui common)
+   \param[in]   orc_UISignals          Signals data (ui)
+   \param[out]  oru32_MessageIndex     New message index, only valid if C_NO_ERR
 
    \return
    C_NO_ERR Operation success
@@ -635,9 +636,12 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessage(const uint32 & oru32_Node
       const std::vector<C_OSCCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(orq_MessageIsTx);
       const C_OSCCanMessageIdentificationIndices c_MessageId(oru32_NodeIndex, ore_ComType, oru32_InterfaceIndex,
                                                              oru32_DatapoolIndex, orq_MessageIsTx, rc_Messages.size());
+      C_PuiSdNodeCanMessage c_UIMessage;
+
+      c_UIMessage.c_Signals = orc_UISignals;
       s32_Retval = this->InsertCanMessage(c_MessageId, orc_Message,
                                           orc_OSCSignalCommons,
-                                          orc_UISignalCommons, orc_UISignals);
+                                          orc_UISignalCommons, c_UIMessage);
       if (s32_Retval == C_NO_ERR)
       {
          oru32_MessageIndex = rc_Messages.size() - 1UL;
@@ -649,11 +653,11 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessage(const uint32 & oru32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert can message
 
-   \param[in] orc_MessageId        Message identification indices
-   \param[in] orc_Message          Message data
-   \param[in] orc_OSCSignalCommons Signals data (osc common)
-   \param[in] orc_UISignalCommons  Signals data (ui common)
-   \param[in] orc_UISignals        Signals data (ui)
+   \param[in]  orc_MessageId           Message identification indices
+   \param[in]  orc_Message             Message data
+   \param[in]  orc_OSCSignalCommons    Signals data (osc common)
+   \param[in]  orc_UISignalCommons     Signals data (ui common)
+   \param[in]  orc_UIMessage           Message data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -663,11 +667,11 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessage(const uint32 & oru32_Node
 sint32 C_PuiSdNodeCanMessageSyncManager::InsertCanMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                           const C_OSCCanMessage & orc_Message,
                                                           const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                                          const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals)
+                                                          const C_PuiSdNodeCanMessage & orc_UIMessage)
 {
    const sint32 s32_Retval = C_PuiSdHandler::h_GetInstance()->InsertCanMessage(orc_MessageId, orc_Message,
                                                                                orc_OSCSignalCommons,
-                                                                               orc_UISignalCommons, orc_UISignals,
+                                                                               orc_UISignalCommons, orc_UIMessage,
                                                                                true);
 
    m_UpdateIndicesToNewCanMessage(orc_MessageId);
@@ -678,7 +682,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::InsertCanMessage(const C_OSCCanMessageI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete can message
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 
    \return
    C_NO_ERR Operation success
@@ -707,10 +711,10 @@ sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanMessage(const C_OSCCanMessageI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change can message transmitter
 
-   \param[in] orc_MessageId        Message identification indices
-   \param[in] oru32_NodeIndex      New transmitter node index
-   \param[in] oru32_InterfaceIndex New transmitter node interface index
-   \param[in] ou32_DatapoolIndex   New transmitter node Datapool index
+   \param[in]  orc_MessageId           Message identification indices
+   \param[in]  oru32_NodeIndex         New transmitter node index
+   \param[in]  oru32_InterfaceIndex    New transmitter node interface index
+   \param[in]  ou32_DatapoolIndex      New transmitter node Datapool index
 
    \return
    C_NO_ERR Operation success
@@ -741,7 +745,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::ChangeCanMessageTx(const C_OSCCanMessag
 
       std::vector<C_OSCNodeDataPoolListElement> c_OSCSignalCommons;
       std::vector<C_PuiSdNodeDataPoolListElement> c_UISignalCommons;
-      std::vector<C_PuiSdNodeCanSignal> c_UISignals;
+      C_PuiSdNodeCanMessage c_UIMessage;
       std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds;
 
       //Get matching message ids
@@ -756,11 +760,12 @@ sint32 C_PuiSdNodeCanMessageSyncManager::ChangeCanMessageTx(const C_OSCCanMessag
 
       //Get complete message
       tgl_assert(C_PuiSdHandler::h_GetInstance()->GetCanMessageComplete(orc_MessageId, c_Message, c_OSCSignalCommons,
-                                                                        c_UISignalCommons, c_UISignals) == C_NO_ERR);
+                                                                        c_UISignalCommons,
+                                                                        c_UIMessage.c_Signals) == C_NO_ERR);
       //Add without register
       tgl_assert(C_PuiSdHandler::h_GetInstance()->InsertCanMessage(c_NewId, c_Message, c_OSCSignalCommons,
                                                                    c_UISignalCommons,
-                                                                   c_UISignals, false) == C_NO_ERR);
+                                                                   c_UIMessage, false) == C_NO_ERR);
       //Delete existing Tx and matching Rx
       //lint -e{850} Index modified for erase index step
       for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
@@ -819,10 +824,10 @@ sint32 C_PuiSdNodeCanMessageSyncManager::ChangeCanMessageTx(const C_OSCCanMessag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add can message receiver
 
-   \param[in] orc_MessageId        Message identification indices
-   \param[in] ou32_NodeIndex       New receiver node index
-   \param[in] ou32_InterfaceIndex  New receiver node interface index
-   \param[in] ou32_DatapoolIndex   Node Datapool index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  ou32_NodeIndex       New receiver node index
+   \param[in]  ou32_InterfaceIndex  New receiver node interface index
+   \param[in]  ou32_DatapoolIndex   Node Datapool index
 
    \return
    C_NO_ERR Operation success
@@ -852,15 +857,16 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessageRx(const C_OSCCanMessageId
 
       std::vector<C_OSCNodeDataPoolListElement> c_OSCSignalCommons;
       std::vector<C_PuiSdNodeDataPoolListElement> c_UISignalCommons;
-      std::vector<C_PuiSdNodeCanSignal> c_UISignals;
+      C_PuiSdNodeCanMessage c_UIMessage;
 
       //Get complete message
       tgl_assert(C_PuiSdHandler::h_GetInstance()->GetCanMessageComplete(orc_MessageId, c_Message, c_OSCSignalCommons,
-                                                                        c_UISignalCommons, c_UISignals) == C_NO_ERR);
+                                                                        c_UISignalCommons,
+                                                                        c_UIMessage.c_Signals) == C_NO_ERR);
       //Add without register
       tgl_assert(C_PuiSdHandler::h_GetInstance()->InsertCanMessage(c_NewId, c_Message, c_OSCSignalCommons,
                                                                    c_UISignalCommons,
-                                                                   c_UISignals, false) == C_NO_ERR);
+                                                                   c_UIMessage, false) == C_NO_ERR);
       //Append to matching messages
       if (u32_MatchingMessageIdsIndex < this->mc_MessageMatches.size())
       {
@@ -884,10 +890,10 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessageRx(const C_OSCCanMessageId
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete can message receiver
 
-   \param[in] orc_MessageId        Message identification indices
-   \param[in] ou32_NodeIndex       Previous receiver node index
-   \param[in] ou32_InterfaceIndex  Previous receiver node interface index
-   \param[in] ou32_DatapoolIndex   Node Datapool index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  ou32_NodeIndex       Previous receiver node index
+   \param[in]  ou32_InterfaceIndex  Previous receiver node interface index
+   \param[in]  ou32_DatapoolIndex   Node Datapool index
 
    \return
    C_NO_ERR Operation success
@@ -927,11 +933,11 @@ sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanMessageRx(const C_OSCCanMessag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add can signal
 
-   \param[in] orc_MessageId       Message identification indices
-   \param[in] orc_Signal          Signal data (osc)
-   \param[in] orc_OSCSignalCommon Signal data (osc common)
-   \param[in] orc_UISignalCommon  Signal data (ui common)
-   \param[in] orc_UISignal        Signal data (ui)
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  orc_Signal           Signal data (osc)
+   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
+   \param[in]  orc_UISignalCommon   Signal data (ui common)
+   \param[in]  orc_UISignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -966,12 +972,12 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanSignal(const C_OSCCanMessageIdent
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert can signal
 
-   \param[in] orc_MessageId       Message identification indices
-   \param[in] oru32_SignalIndex   Signal index
-   \param[in] orc_Signal          Signal data (osc)
-   \param[in] orc_OSCSignalCommon Signal data (osc common)
-   \param[in] orc_UISignalCommon  Signal data (ui common)
-   \param[in] orc_UISignal        Signal data (ui)
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  orc_Signal           Signal data (osc)
+   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
+   \param[in]  orc_UISignalCommon   Signal data (ui common)
+   \param[in]  orc_UISignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
@@ -1008,8 +1014,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::InsertCanSignal(const C_OSCCanMessageId
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete can signal
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 
    \return
    C_NO_ERR Operation success
@@ -1040,7 +1046,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanSignal(const C_OSCCanMessageId
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get vector of matching message ids
 
-   \param[in] orc_MessageId Message identification indices to search for
+   \param[in]  orc_MessageId  Message identification indices to search for
 
    \return
    All matching message ids (including the searched message id)
@@ -1071,8 +1077,7 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
    orc_MessageId will not be changed.
    If an other message id was found, orc_MessageId will be set to the found matching message id
 
-   \param[in,out]     orc_MessageId              Message id for searching and the result
-
+   \param[in,out]  orc_MessageId    Message id for searching and the result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::ReplaceMessageIdWithMatchingId(
@@ -1101,7 +1106,7 @@ void C_PuiSdNodeCanMessageSyncManager::ReplaceMessageIdWithMatchingId(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message ID matches a critical message ID (Message with two transmitters)
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 
    \return
    True  Critical message (Message with two transmitters)
@@ -1137,16 +1142,12 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check error for bus & connected node data pools
 
-   \param[out] opq_MessageNameInvalid               An error type, found for a bus
-   \param[out] opq_MessageIdInvalid                 An error type, found for a bus
-   \param[out] opq_MessagesHaveNoTx                 An error type, found for a bus
-   \param[out] opq_DelayTimeInvalid                 An error type, found for a bus
-   \param[out] opq_MessageSignalInvalid             An error type, found for a bus
-   \param[in]  ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
-
-   \return
-   C_NO_ERR Done
-   C_RANGE  Bus does not exist
+   \param[out]  opq_MessageNameInvalid                An error type, found for a bus
+   \param[out]  opq_MessageIdInvalid                  An error type, found for a bus
+   \param[out]  opq_MessagesHaveNoTx                  An error type, found for a bus
+   \param[out]  opq_DelayTimeInvalid                  An error type, found for a bus
+   \param[out]  opq_MessageSignalInvalid              An error type, found for a bus
+   \param[in]   ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNameInvalid,
@@ -1276,13 +1277,13 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message id valid
 
-   \param[in]     oru32_MessageId       Message id
-   \param[out]    orq_Valid             Flag if valid
-   \param[in]     opc_SkipMessage       Optional parameter to skip one message
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in,out] opq_EcosRangeError    Optional output for ECOS range check result
-   \param[in,out] opq_EcosEvenError     Optional output for ECOS even check result
-   \param[in,out] opq_DuplicateDetected Optional output for duplicate check result
+   \param[in]      oru32_MessageId        Message id
+   \param[out]     orq_Valid              Flag if valid
+   \param[in]      opc_SkipMessage        Optional parameter to skip one message
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in,out]  opq_EcosRangeError     Optional output for ECOS range check result
+   \param[in,out]  opq_EcosEvenError      Optional output for ECOS even check result
+   \param[in,out]  opq_DuplicateDetected  Optional output for duplicate check result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::CheckMessageIdBus(const uint32 & oru32_MessageId, bool & orq_Valid,
@@ -1371,12 +1372,12 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message name valid
 
-   \param[in]  orc_MessageName      Message name
-   \param[out] orq_Valid            Flag if valid
-   \param[in]  opc_SkipMessage      Optional parameter to skip one message
-                                    (Use-case: skip current message to avoid conflict with itself)
-   \param[in,out] opq_InvalidName   Optional output for invalid name check result
-   \param[in,out] opq_DuplicateName Optional output for duplicate name check result
+   \param[in]      orc_MessageName     Message name
+   \param[out]     orq_Valid           Flag if valid
+   \param[in]      opc_SkipMessage     Optional parameter to skip one message
+                                       (Use-case: skip current message to avoid conflict with itself)
+   \param[in,out]  opq_InvalidName     Optional output for invalid name check result
+   \param[in,out]  opq_DuplicateName   Optional output for duplicate name check result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::CheckMessageNameBus(const C_SCLString & orc_MessageName, bool & orq_Valid,
@@ -1443,8 +1444,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message has transmitter
 
-   \param[out] orq_Valid   Flag if valid
-   \param[in]  orc_Message Message to check
+   \param[out]  orq_Valid     Flag if valid
+   \param[in]   orc_Message   Message to check
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::CheckMessageHasTx(bool & orq_Valid,
@@ -1473,6 +1474,8 @@ void C_PuiSdNodeCanMessageSyncManager::CheckMessageHasTx(bool & orq_Valid,
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get next usable message id (if any)
+
+   \param[in]  orq_Extended   Extended flag
 
    \return
    Next valid id if available (otherwise may be invalid)
@@ -1550,8 +1553,8 @@ uint32 C_PuiSdNodeCanMessageSyncManager::GetNextValidMessageId(const bool & orq_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message is still critical
 
-   \param[in]  orc_MessageId    Message identification indices
-   \param[out] orc_NewMessageId New message identification indices to use instead of the old ones if necessary
+   \param[in]   orc_MessageId       Message identification indices
+   \param[out]  orc_NewMessageId    New message identification indices to use instead of the old ones if necessary
 
    \return
    True  The input message identification index is no longer valid (use the output parameter instead)
@@ -1626,8 +1629,8 @@ bool C_PuiSdNodeCanMessageSyncManager::RecheckCriticalMessage(
                      C_OSCCanMessageIdentificationIndices c_Alternative;
                      std::vector<C_OSCCanMessageIdentificationIndices> c_ToBeDeleted;
 
-                     //Clean up all RX for this message
-                     //-> critical message matches can not have RX items as the assignment which transmitter
+                     //Clean up all Rx for this message
+                     //-> critical message matches can not have Rx items as the assignment which transmitter
                      //   cannot be performed
                      for (std::vector<C_OSCCanMessageIdentificationIndices>::const_iterator c_ItMatchingMessage =
                              c_ItUniqueMessage->begin(); c_ItMatchingMessage != c_ItUniqueMessage->end();
@@ -1656,12 +1659,14 @@ bool C_PuiSdNodeCanMessageSyncManager::RecheckCriticalMessage(
                                                          c_ItDelteMessage->u32_InterfaceIndex,
                                                          c_ItDelteMessage->u32_DatapoolIndex) == C_NO_ERR);
                            //Check if message matches current message ID and set alternative as new
-                           //The currently known message id for the caller might be a RX message which just might have
+                           //The currently known message id for the caller might be a Rx message which just might have
                            //been deleted therefore its better to return the first found transmitter (still the same
                            //message)
                            if (*c_ItDelteMessage == orc_MessageId)
                            {
                               orc_NewMessageId = c_Alternative;
+                              //We have found an alternative
+                              q_Retval = true;
                            }
                         }
                      }
@@ -1684,7 +1689,7 @@ bool C_PuiSdNodeCanMessageSyncManager::RecheckCriticalMessage(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current unique ID for specified message
 
-   \param[in] orc_MessageId Message ID to search for
+   \param[in]  orc_MessageId  Message ID to search for
 
    \return
    Current unique ID for specified message
@@ -1711,7 +1716,7 @@ uint64 C_PuiSdNodeCanMessageSyncManager::GetUniqueId(const C_OSCCanMessageIdenti
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get message ID for specified unique ID
 
-   \param[in] ou64_UniqueId unique ID to search for
+   \param[in]  ou64_UniqueId  unique ID to search for
 
    \return
    Message ID for specified unique ID
@@ -1744,8 +1749,8 @@ C_OSCCanMessageIdentificationIndices C_PuiSdNodeCanMessageSyncManager::GetMessag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Search for message ID by message name
 
-   \param[in]  orc_MessageName Message name (ID)
-   \param[out] orc_MessageId   Found message ID
+   \param[in]   orc_MessageName  Message name (ID)
+   \param[out]  orc_MessageId    Found message ID
 
    \return
    C_NO_ERR Operation success
@@ -1784,7 +1789,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::GetMessageIdForMessageName(const QStrin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get index of vector of matching message ids
 
-   \param[in] orc_MessageId Message identification indices to search for
+   \param[in]  orc_MessageId  Message identification indices to search for
 
    \return
    Index of vector of matching message ids (otherwise out of range -> size of mc_MessageMatches)
@@ -1824,26 +1829,9 @@ uint32 C_PuiSdNodeCanMessageSyncManager::m_GetMatchingMessageVectorIndex(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility function to check if message id alread stored
-
-   \param[in] orc_MessageId Message identification indices to search for
-
-   \return
-   true: exist
-   false: does not exist
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdNodeCanMessageSyncManager::m_CheckIfAlreadyExisting(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId)
-const
-{
-   return mh_CheckIfAlreadyExisting(orc_MessageId, this->mc_MessageMatches);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add this message id to the internal matching message vector
 
-   \param[in] orc_MessageId Message identification indices to register
+   \param[in]  orc_MessageId  Message identification indices to register
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::m_RegisterIfNecessary(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
@@ -1855,8 +1843,8 @@ void C_PuiSdNodeCanMessageSyncManager::m_RegisterIfNecessary(const C_OSCCanMessa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility function to check if message id already stored
 
-   \param[in] orc_MessageId Message identification indices to search for
-   \param[in] orc_Input     Message vector to check
+   \param[in]  orc_MessageId  Message identification indices to search for
+   \param[in]  orc_Input      Message vector to check
 
    \return
    true: exist
@@ -1894,10 +1882,10 @@ bool C_PuiSdNodeCanMessageSyncManager::mh_CheckIfAlreadyExisting(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add this message id to the internal matching message vector
 
-   \param[in]     orc_MessageId              Message identification indices to register
-   \param[in,out] orc_Output                 Message vector to update
-   \param[in,out] opc_OutputUniqueIds        Optional vector to store the new unique IDs in
-   \param[in,out] opc_CriticalMessageMatches Optional vector for critical messages with two transmitter
+   \param[in]      orc_MessageId                Message identification indices to register
+   \param[in,out]  orc_Output                   Message vector to update
+   \param[in,out]  opc_OutputUniqueIds          Optional vector to store the new unique IDs in
+   \param[in,out]  opc_CriticalMessageMatches   Optional vector for critical messages with two transmitter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::mh_RegisterIfNecessary(
@@ -1926,8 +1914,8 @@ void C_PuiSdNodeCanMessageSyncManager::mh_RegisterIfNecessary(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove this message id from the internal matching message vector
 
-   \param[in] orc_MessageId  Message identification indices to remove
-   \param[in] oq_AllowDelete Optional allow delete of matching messages vector flag
+   \param[in]  orc_MessageId     Message identification indices to remove
+   \param[in]  oq_AllowDelete    Optional allow delete of matching messages vector flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::m_RemoveAndUpdateIndices(
@@ -1956,8 +1944,8 @@ void C_PuiSdNodeCanMessageSyncManager::m_RemoveAndUpdateIndices(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove this message id from the internal matching message vector
 
-   \param[in]     orc_MessageId  Message identification indices to remove
-   \param[in,out] orc_MessageIds Message ID vector to adapt
+   \param[in]      orc_MessageId    Message identification indices to remove
+   \param[in,out]  orc_MessageIds   Message ID vector to adapt
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::mh_RemoveAndUpdateIndices(
@@ -1995,9 +1983,9 @@ void C_PuiSdNodeCanMessageSyncManager::mh_RemoveAndUpdateIndices(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all nodes matching the specified message (including the source node)
 
-   \param[in]     orc_MessageId              Message identification indices
-   \param[out]    orc_MatchingMessageIds     Matching message identification indices
-   \param[in,out] opc_CriticalMessageMatches Optional vector for critical messages with two transmitter
+   \param[in]      orc_MessageId                Message identification indices
+   \param[out]     orc_MatchingMessageIds       Matching message identification indices
+   \param[in,out]  opc_CriticalMessageMatches   Optional vector for critical messages with two transmitter
 
    \return
    C_NO_ERR Operation success
@@ -2152,8 +2140,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::mh_GetNodeIndexesMatchingForMessage(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete can message
 
-   \param[in] orc_MessageId  Message identification indices
-   \param[in] oq_AllowDelete Optional allow delete of matching messages vector flag
+   \param[in]  orc_MessageId     Message identification indices
+   \param[in]  oq_AllowDelete    Optional allow delete of matching messages vector flag
 
    \return
    C_NO_ERR Operation success
@@ -2174,7 +2162,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::m_DeleteCanMessage(const C_OSCCanMessag
 
    REQUIRES: Call before adding new id to vector
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::m_UpdateIndicesToNewCanMessage(
@@ -2196,8 +2184,8 @@ void C_PuiSdNodeCanMessageSyncManager::m_UpdateIndicesToNewCanMessage(
 
    REQUIRES: Call before adding new id to vector
 
-   \param[in]     orc_MessageId  Message identification indices
-   \param[in,out] orc_MessageIds Message ID vector to adapt
+   \param[in]      orc_MessageId    Message identification indices
+   \param[in,out]  orc_MessageIds   Message ID vector to adapt
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::mh_UpdateIndicesToNewCanMessage(
@@ -2228,7 +2216,7 @@ void C_PuiSdNodeCanMessageSyncManager::mh_UpdateIndicesToNewCanMessage(
 
    REQUIRES: Call with previous message id
 
-   \param[in] orc_MessageId Message identification indices (previous direction)
+   \param[in]  orc_MessageId  Message identification indices (previous direction)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::m_UpdateIndicesToCanMessageDirectionChange(
@@ -2251,8 +2239,8 @@ void C_PuiSdNodeCanMessageSyncManager::m_UpdateIndicesToCanMessageDirectionChang
 
    REQUIRES: Call with previous message id
 
-   \param[in]     orc_MessageId  Message identification indices (previous direction)
-   \param[in,out] orc_MessageIds Message ID vector to adapt
+   \param[in]      orc_MessageId    Message identification indices (previous direction)
+   \param[in,out]  orc_MessageIds   Message ID vector to adapt
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::mh_UpdateIndicesToCanMessageDirectionChange(
@@ -2282,13 +2270,13 @@ void C_PuiSdNodeCanMessageSyncManager::mh_UpdateIndicesToCanMessageDirectionChan
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init message matches
 
-   \param[in]     oru32_BusIndex             Bus index
-   \param[in]     ore_ComProtocol            Protocol type
-   \param[out]    orc_Output                 Created message vector
-                                             1./Outer layer: all non unique messages
-                                             2./Inner layer: all matching IDs for one unique message
-   \param[in,out] opc_OutputUniqueIds        Optional vector to store the new unique IDs in
-   \param[in,out] opc_CriticalMessageMatches Optional vector for critical messages with two transmitter
+   \param[in]      oru32_BusIndex               Bus index
+   \param[in]      ore_ComProtocol              Protocol type
+   \param[out]     orc_Output                   Created message vector
+                                                1./Outer layer: all non unique messages
+                                                2./Inner layer: all matching IDs for one unique message
+   \param[in,out]  opc_OutputUniqueIds          Optional vector to store the new unique IDs in
+   \param[in,out]  opc_CriticalMessageMatches   Optional vector for critical messages with two transmitter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::mh_Init(const uint32 & oru32_BusIndex,
@@ -2357,11 +2345,12 @@ void C_PuiSdNodeCanMessageSyncManager::mh_Init(const uint32 & oru32_BusIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init message matches
 
-   \param[in]  oru32_NodeIndex               Node index
-   \param[in]  oru32_InterfaceIndex          Interface index
-   \param[in]  ore_ComProtocol               Protocol type
-   \param[out] orc_Output                    Created message vector
-   \param[in,out] opc_CriticalMessageMatches Optional vector for critical messages with two transmitter
+   \param[in]      oru32_NodeIndex              Node index
+   \param[in]      oru32_InterfaceIndex         Interface index
+   \param[in]      ore_ComProtocol              Protocol type
+   \param[out]     orc_Output                   Created message vector
+   \param[in,out]  opc_OutputUniqueIds          Output unique ids
+   \param[in,out]  opc_CriticalMessageMatches   Optional vector for critical messages with two transmitter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::mh_Init(const uint32 & oru32_NodeIndex, const uint32 & oru32_InterfaceIndex,
@@ -2440,7 +2429,7 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get vector of different, unique message ids
 
-   \param[in] orc_Input Message vector to check
+   \param[in]  orc_Input   Message vector to check
 
    \return
    Different, unique message ids
@@ -2467,8 +2456,8 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append vector elemnts to output
 
-   \param[in]     orc_Input  Input vector
-   \param[in,out] orc_Output Output vector
+   \param[in]      orc_Input     Input vector
+   \param[in,out]  orc_Output    Output vector
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::mh_Append(const std::vector<C_OSCCanMessageIdentificationIndices> & orc_Input,
@@ -2487,12 +2476,12 @@ void C_PuiSdNodeCanMessageSyncManager::mh_Append(const std::vector<C_OSCCanMessa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle message comparison with all cases
 
-   \param[in]     orc_MessageIdReference            Message identification indices (Current check)
-   \param[in]     orc_MessageIdNew                  Message identification indices (Current iteration)
-   \param[in,out] opc_MatchingMessageIds            Vector for matching message IDs
-   \param[in,out] opc_CriticalMessageMatches        Vector for critical message matches
-   \param[in,out] opq_CriticalMatchFoundASecondTime Flag if current critical match is second occurrence
-   \param[in,out] opq_CriticalMatchFound            Flag if current comparison was a critical match
+   \param[in]      orc_MessageIdReference             Message identification indices (Current check)
+   \param[in]      orc_MessageIdNew                   Message identification indices (Current iteration)
+   \param[in,out]  opc_MatchingMessageIds             Vector for matching message IDs
+   \param[in,out]  opc_CriticalMessageMatches         Vector for critical message matches
+   \param[in,out]  opq_CriticalMatchFoundASecondTime  Flag if current critical match is second occurrence
+   \param[in,out]  opq_CriticalMatchFound             Flag if current comparison was a critical match
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::mh_HandleMessageComparison(
@@ -2508,7 +2497,7 @@ void C_PuiSdNodeCanMessageSyncManager::mh_HandleMessageComparison(
    {
       *opq_CriticalMatchFound = false;
    }
-   //Compare members with TX check active
+   //Compare members with Tx check active
    tgl_assert(C_PuiSdHandler::h_GetInstance()->CheckMessageMatch(orc_MessageIdReference,
                                                                  orc_MessageIdNew,
                                                                  q_Match) == C_NO_ERR);
@@ -2534,7 +2523,7 @@ void C_PuiSdNodeCanMessageSyncManager::mh_HandleMessageComparison(
    }
    else
    {
-      //Check for matching TX conflict
+      //Check for matching Tx conflict
       if (((orc_MessageIdReference.q_MessageIsTx == true) &&
            (orc_MessageIdNew.q_MessageIsTx == true)) &&
           ((orc_MessageIdNew == orc_MessageIdReference) == false))
@@ -2578,7 +2567,7 @@ void C_PuiSdNodeCanMessageSyncManager::mh_HandleMessageComparison(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if message ID is critical
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 
    \return
    True  Critical
@@ -2625,7 +2614,7 @@ uint64 C_PuiSdNodeCanMessageSyncManager::m_GetNewUniqueId(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get next free unique ID
 
-   \param[in] orc_ExistingUniqueIds Current existing unique Ids
+   \param[in]  orc_ExistingUniqueIds   Current existing unique Ids
 
    \return
    Next free unique ID

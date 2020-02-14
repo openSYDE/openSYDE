@@ -39,7 +39,7 @@ public:
                        const stw_types::float64 & orf64_Height, QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiSvNodeSyvUpdate();
 
-   virtual void SetViewConnected(const bool oq_Connected);
+   virtual void SetViewConnected(const bool oq_Connected) override;
    void SetConnected(const bool oq_Active);
    void SetUpdating(const bool oq_Active);
    void SetNodeUpdateInProgress(const bool oq_Active, const bool oq_Aborted,

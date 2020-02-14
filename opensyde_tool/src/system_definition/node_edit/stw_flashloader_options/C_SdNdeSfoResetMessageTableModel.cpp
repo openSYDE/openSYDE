@@ -220,7 +220,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   c_Retval =
                      QString("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.
                                                          u32_ResetMessageId,
-                                                         16));
+                                                         16).toUpper());
                }
                else
                {
@@ -262,7 +262,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   {
                      c_Retval =
                         QString("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[
-                                                               u32_ByteIndex], 16));
+                                                               u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
@@ -290,7 +290,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   {
                      c_Retval =
                         QString("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[
-                                                               u32_ByteIndex], 16));
+                                                               u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
@@ -318,7 +318,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   {
                      c_Retval =
                         QString("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[
-                                                               u32_ByteIndex], 16));
+                                                               u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
@@ -346,7 +346,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   {
                      c_Retval =
                         QString("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[
-                                                               u32_ByteIndex], 16));
+                                                               u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
@@ -374,7 +374,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   {
                      c_Retval =
                         QString("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[
-                                                               u32_ByteIndex], 16));
+                                                               u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
@@ -402,7 +402,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   {
                      c_Retval =
                         QString("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[
-                                                               u32_ByteIndex], 16));
+                                                               u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
@@ -430,7 +430,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   {
                      c_Retval =
                         QString("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[
-                                                               u32_ByteIndex], 16));
+                                                               u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
@@ -458,7 +458,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   {
                      c_Retval =
                         QString("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[
-                                                               u32_ByteIndex], 16));
+                                                               u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {

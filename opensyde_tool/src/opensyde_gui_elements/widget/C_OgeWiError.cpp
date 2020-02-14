@@ -39,7 +39,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiError::C_OgeWiError(QWidget * const opc_Parent) :
@@ -77,6 +77,8 @@ void C_OgeWiError::InitStaticNames() const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set error description
+
+   \param[in]  orc_Description   Error description string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiError::SetErrorDescription(const QString & orc_Description) const
@@ -87,7 +89,7 @@ void C_OgeWiError::SetErrorDescription(const QString & orc_Description) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remember dialog as parent
 
-   \param[in] opc_ParentDialog Parent dialog
+   \param[in]  opc_ParentDialog  Parent dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiError::SaveParentDialog(QDialog * const opc_ParentDialog)

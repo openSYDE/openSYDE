@@ -359,9 +359,9 @@ void C_SyvDaItTaModel::UpdateError(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparence value configured by the actual timeout state
-
-   \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
-   \param[in] osn_Value                       Value for transparence (0..255)
+ *
+   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
+   \param[in]     osn_Value                 Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -746,12 +746,12 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                   }
                   else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
                   {
-                     bool q_IsTransmissionError;
                      QString c_Error;
 
                      switch (e_Col)
                      {
                      case C_SyvDaItTaModel::eICON:
+                        bool q_IsTransmissionError;
                         if (pc_TableWidget->GetViewActive(*pc_DataElementId) == false)
                         {
                            c_Retval = C_GtGetText::h_GetText("Configuration warning");
@@ -788,11 +788,11 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                   }
                   else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
                   {
-                     bool q_IsTransmissionError;
                      QString c_Error;
                      switch (e_Col)
                      {
                      case C_SyvDaItTaModel::eICON:
+                        bool q_IsTransmissionError;
                         if (pc_TableWidget->GetViewActive(*pc_DataElementId) == false)
                         {
                            if (pc_DataElementId->GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
@@ -838,11 +838,11 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                   }
                   else if (osn_Role == msn_USER_ROLE_TOOL_TIP_TYPE)
                   {
-                     bool q_IsTransmissionError;
                      QString c_Error;
                      switch (e_Col)
                      {
                      case C_SyvDaItTaModel::eICON:
+                        bool q_IsTransmissionError;
                         if (pc_TableWidget->GetViewActive(*pc_DataElementId) == false)
                         {
                            c_Retval = static_cast<sintn>(C_NagToolTip::eWARNING);
@@ -1006,8 +1006,8 @@ void C_SyvDaItTaModel::CopySelectedItems(const std::vector<uint32> & orc_Selecte
 
    Warning 1: This function currently can only handle shifts by ONE up or down
 
-   \param[in] orc_SelectedIndices Selected indices
-   \param[in] oq_Up               Flag to switch to move one step up or down
+   \param[in]  orc_Indices    Selected indices
+   \param[in]  oq_Up          Flag to switch to move one step up or down
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::MoveItems(const QModelIndexList & orc_Indices, const bool oq_Up)
@@ -1055,8 +1055,6 @@ void C_SyvDaItTaModel::RemoveItems(const QModelIndexList & orc_Indices,
 /*! \brief   Column to enum conversion
 
    \param[in]  ors32_Column     Column
-   \param[out] opc_DataSetIndex Optional: If column is a data set, this contains the data set index
-                                          Else -1
 
    \return
    Enum value

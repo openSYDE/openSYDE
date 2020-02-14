@@ -36,7 +36,7 @@ public:
 
 protected:
    virtual void m_Reconnect(const stw_types::uint64 & oru64_StartingID, const stw_types::uint64 & oru64_LastID,
-                            const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId);
+                            const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -60,7 +60,6 @@ Q_SIGNALS:
    //lint -restore
    void SigNodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                        const bool oq_Checked);
-   void SigComImport(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
 
 private:
    //Avoid call

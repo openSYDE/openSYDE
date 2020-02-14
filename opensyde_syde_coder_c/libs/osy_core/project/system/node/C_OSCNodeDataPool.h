@@ -45,7 +45,7 @@ public:
                        std::vector<stw_types::uint32> * const opc_InvalidDataSetIndices,
                        std::vector<stw_types::uint32> * const opc_InvalidElementIndices) const;
 
-   enum E_Type ///< type of data pool
+   enum E_Type ///< Type of data pool
    {
       eDIAG, ///< Data pool type: diagnostic (contains/handles variables)
       eNVM,  ///< Data pool type: non-volatile memory (contains/handles parameters)
@@ -60,6 +60,7 @@ public:
    ///< -1, No application selected
    ///< Else valid application assumed
    bool q_IsSafety;                            ///< Flag if data pool contains safety relevant content
+   bool q_ScopeIsPrivate;                      ///< Flag if data pools scope of content is private (vs. public)
    stw_types::uint32 u32_NvMStartAddress;      ///< NvM start address of data pool
    stw_types::uint32 u32_NvMSize;              ///< NvM size of data pool
    std::vector<C_OSCNodeDataPoolList> c_Lists; ///< Data pool lists

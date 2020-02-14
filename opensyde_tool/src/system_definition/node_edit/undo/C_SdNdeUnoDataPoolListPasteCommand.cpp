@@ -108,6 +108,7 @@ bool C_SdNdeUnoDataPoolListPasteCommand::InitialSetup(const uint32 & oru32_First
                   C_OgeWiCustomMessage c_MessageBox(this->mpc_DataPoolListsTreeWidget);
                   c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Only %1 lists allowed per Datapool.")).
                                               arg(mu32_NODE_DATA_POOL_LIST_MAX));
+                  c_MessageBox.SetCustomMinHeight(180, 180);
                   c_MessageBox.Execute();
                }
             }
@@ -116,6 +117,7 @@ bool C_SdNdeUnoDataPoolListPasteCommand::InitialSetup(const uint32 & oru32_First
          {
             C_OgeWiCustomMessage c_MessageBox(this->mpc_DataPoolListsTreeWidget);
             c_MessageBox.SetDescription(C_GtGetText::h_GetText("Cannot paste list. List type is not compatible."));
+            c_MessageBox.SetCustomMinHeight(180, 180);
             c_MessageBox.Execute();
             q_Retval = false;
          }

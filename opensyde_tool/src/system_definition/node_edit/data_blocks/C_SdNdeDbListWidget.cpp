@@ -299,5 +299,5 @@ void C_SdNdeDbListWidget::m_CheckNodeId(void) const
          pc_WidgetItem->CheckProcessIdError();
       }
    }
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }

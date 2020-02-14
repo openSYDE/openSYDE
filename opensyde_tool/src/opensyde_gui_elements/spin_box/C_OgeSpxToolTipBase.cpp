@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxToolTipBase::C_OgeSpxToolTipBase(QWidget * const opc_Parent) :
@@ -62,7 +62,7 @@ C_OgeSpxToolTipBase::C_OgeSpxToolTipBase(QWidget * const opc_Parent) :
 
    Here: Handle tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -113,7 +113,7 @@ QString C_OgeSpxToolTipBase::m_GetMaximumRawString(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set mouse tracking status
 
-   \param[in] oq_Active New mouse tracking status
+   \param[in]  oq_Active   New mouse tracking status
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxToolTipBase::m_SetMouseTracking(const bool oq_Active)
@@ -124,7 +124,7 @@ void C_OgeSpxToolTipBase::m_SetMouseTracking(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call base event slot
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -137,11 +137,42 @@ bool C_OgeSpxToolTipBase::m_CallBaseEvent(QEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten text from value slot
+
+             Here: Convert hex number to string without "0x"
+
+   Here: Handle specific text from value of spin box
+         Use that method when a prefix e. g. "0x" is already set
+         and you only need the hex number in string format
+
+   \param[in,out]  osn_Value  Value identification and information
+
+   \return
+   A string of numbers and letters
+   Here: Converted hex number as string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxToolTipBase::textFromValue(const sintn osn_Value) const
+{
+   QString c_Retval;
+
+   if (this->displayIntegerBase() == 16)
+   {
+      c_Retval = QString::number(osn_Value, 16).toUpper();
+   }
+   else
+   {
+      c_Retval = QSpinBox::textFromValue(osn_Value);
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set minimum value (simple wrapper with tool tip update)
 
-   \param[in] osn_Value        New minimum value
-   \param[in] oq_ShowSpecial   Show special
-   \param[in] osn_SpecialValue Special value
+   \param[in]  osn_Value         New minimum value
+   \param[in]  oq_ShowSpecial    Show special
+   \param[in]  osn_SpecialValue  Special value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxToolTipBase::SetMinimumCustom(const stw_types::sintn osn_Value, const bool oq_ShowSpecial,
@@ -156,9 +187,9 @@ void C_OgeSpxToolTipBase::SetMinimumCustom(const stw_types::sintn osn_Value, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set maximum value (simple wrapper with tool tip update)
 
-   \param[in] osn_Value        New maximum value
-   \param[in] oq_ShowSpecial   Show special
-   \param[in] osn_SpecialValue Special value
+   \param[in]  osn_Value         New maximum value
+   \param[in]  oq_ShowSpecial    Show special
+   \param[in]  osn_SpecialValue  Special value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxToolTipBase::SetMaximumCustom(const stw_types::sintn osn_Value, const bool oq_ShowSpecial,
@@ -251,7 +282,7 @@ void C_OgeSpxToolTipBase::m_SetupContextMenu(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
 
-   \param[in] orc_Pos Local context menu position
+   \param[in]  orc_Pos  Local context menu position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxToolTipBase::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
@@ -336,7 +367,7 @@ void C_OgeSpxToolTipBase::m_Delete() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Convert num to string
 
-   \param[in] osn_Value Value
+   \param[in]  osn_Value   Value
 
    \return
    Converted num as string
@@ -348,7 +379,7 @@ QString C_OgeSpxToolTipBase::m_ConvertNumToString(const sintn osn_Value) const
 
    if (this->displayIntegerBase() == 16)
    {
-      c_Retval = "0x" + QString::number(osn_Value, 16);
+      c_Retval = "0x" + QString::number(osn_Value, 16).toUpper();
    }
    else
    {

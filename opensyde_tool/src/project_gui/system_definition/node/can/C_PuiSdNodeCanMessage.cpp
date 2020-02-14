@@ -35,7 +35,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdNodeCanMessage::C_PuiSdNodeCanMessage(void) :
-   q_UseAutoReceiveTimeout(true)
+   e_ReceiveTimeoutMode(eRX_TIMEOUT_MODE_AUTO)
 {
 }
 
@@ -49,5 +49,11 @@ C_PuiSdNodeCanMessage::C_PuiSdNodeCanMessage(void) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessage::CalcHash(stw_types::uint32 & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&q_UseAutoReceiveTimeout, sizeof(q_UseAutoReceiveTimeout), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_ReceiveTimeoutMode, sizeof(this->e_ReceiveTimeoutMode), oru32_HashValue);
+
+   for (stw_types::uint32 u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
+   {
+      const C_PuiSdNodeCanSignal & rc_Signal = this->c_Signals[u32_ItSignal];
+      rc_Signal.CalcHash(oru32_HashValue);
+   }
 }

@@ -495,5 +495,14 @@
         <file>images/main_page_and_navi_bar/Icon_save_as_disabled.svg</file>
         <file>images/system_definition/IconDataPoolSmallInactive.svg</file>
         <file>images/CheckBoxIndeterminate.svg</file>
+        <file>images/graphic_items/TransparentRoundBackground.png</file>
+        <file>images/graphic_items/TransparentRoundSmallBackground.png</file>
+        <file>images/graphic_items/ColorPickerIcon.png</file>
+        <file>images/IconToolbox.svg</file>
+        <file>images/system_views/IconProgressLog.svg</file>
+        <file>images/IconDoubleArrowLeft.svg</file>
+        <file>images/IconDoubleArrowRight.svg</file>
+        <file>images/IconDoubleArrowRightDark.svg</file>
+        <file>images/IconToolboxDark.svg</file>
     </qresource>
 </RCC>

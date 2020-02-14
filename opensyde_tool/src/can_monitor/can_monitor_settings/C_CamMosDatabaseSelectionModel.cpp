@@ -313,7 +313,7 @@ C_TblTreItem * C_CamMosDatabaseSelectionModel::m_CreateAndFillDatabaseNode(const
 
    //Static
    pc_Retval->c_Icon = QIcon(C_CamMosDatabaseSelectionModel::mhc_IconDatabase);
-   pc_Retval->c_Name = c_FileInfo.baseName();
+   pc_Retval->c_Name = c_FileInfo.completeBaseName();
    pc_Retval->c_ToolTipHeading = C_GtGetText::h_GetText("Database");
    pc_Retval->c_ToolTipContent = orc_File;
    //Remember the original name (required by getter)

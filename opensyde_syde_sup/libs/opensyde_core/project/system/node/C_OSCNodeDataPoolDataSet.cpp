@@ -37,7 +37,7 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolDataSet::C_OSCNodeDataPoolDataSet(void) :
-   c_Name("DefaultDataSetName"),
+   c_Name("Dataset"),
    c_Comment("")
 {
 }

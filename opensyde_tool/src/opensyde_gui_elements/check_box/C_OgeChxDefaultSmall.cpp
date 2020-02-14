@@ -35,7 +35,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeChxDefaultSmall::C_OgeChxDefaultSmall(QWidget * const opc_Parent) :
@@ -50,8 +50,9 @@ C_OgeChxDefaultSmall::C_OgeChxDefaultSmall(QWidget * const opc_Parent) :
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_Index   Optional index for easy identification of the object
-   \param[in,out] opc_Parent   Optional pointer to parent
+   \param[in]      ou32_Index       Index for easy identification of the object
+   \param[in]      ou32_SubIndex    Sub index for easy identification of the object
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeChxDefaultSmall::C_OgeChxDefaultSmall(const stw_types::uint32 ou32_Index, const stw_types::uint32 ou32_SubIndex,
@@ -66,8 +67,8 @@ C_OgeChxDefaultSmall::C_OgeChxDefaultSmall(const stw_types::uint32 ou32_Index, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the configured indexes
 
-   \param[out]    ou32_Index       First index
-   \param[out]    ou32_SubIndex    Second index
+   \param[out]  oru32_Index      First Index
+   \param[out]  oru32_SubIndex   Second index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChxDefaultSmall::GetIndexes(stw_types::uint32 & oru32_Index, stw_types::uint32 & oru32_SubIndex) const

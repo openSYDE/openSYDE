@@ -49,8 +49,8 @@ const sintn C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_BOTTOM = 1;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent  Optional pointer to parent
-   \param[in]     oq_DarkMode Flag for dark mode
+   \param[in,out]  orc_Parent    Parent widget
+   \param[in]      oq_DarkMode   Flag for dark mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeProgressBar::C_SyvDaPeProgressBar(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
@@ -103,9 +103,21 @@ void C_SyvDaPeProgressBar::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelShowMinMax->setText(C_GtGetText::h_GetText("Show Min / Max"));
    this->mpc_Ui->pc_LabelStyle->setText(C_GtGetText::h_GetText("Style"));
    this->mpc_Ui->pc_LabelAlignment->setText(C_GtGetText::h_GetText("Alignment"));
+
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 1"));
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 2"));
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 3"));
+
+   //Tool tips
+   this->mpc_Ui->pc_LabelStyle->SetToolTipInformation(C_GtGetText::h_GetText("Style"),
+                                                      C_GtGetText::h_GetText(
+                                                         "Different options for styles specific to this widget"));
+   this->mpc_Ui->pc_LabelAlignment->SetToolTipInformation(C_GtGetText::h_GetText("Alignment"),
+                                                          C_GtGetText::h_GetText(
+                                                             "Option for different alignments of the value label"));
+   this->mpc_Ui->pc_LabelShowMinMax->SetToolTipInformation(C_GtGetText::h_GetText("Show Min / Max"),
+                                                           C_GtGetText::h_GetText(
+                                                              "Option to display the minimum and maximum value next to the progress bar or hide them entirely"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -190,7 +202,7 @@ C_PuiSvDbProgressBar::E_Alignment C_SyvDaPeProgressBar::GetAlignment(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set show minimum and maximum flag
 
-   \param[in] oq_Value New show minimum and maximum flag
+   \param[in]  oq_Value    New show minimum and maximum flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::SetShowMinMax(const bool oq_Value) const
@@ -201,7 +213,7 @@ void C_SyvDaPeProgressBar::SetShowMinMax(const bool oq_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set type
 
-   \param[in] oe_Type New type
+   \param[in]  oe_Type  New type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::SetType(const C_PuiSvDbProgressBar::E_Type oe_Type)
@@ -225,7 +237,7 @@ void C_SyvDaPeProgressBar::SetType(const C_PuiSvDbProgressBar::E_Type oe_Type)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set alignment
 
-   \param[in] oe_Type New alignment
+   \param[in]  oe_Alignment   New alignment
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::SetAlignment(const C_PuiSvDbProgressBar::E_Alignment oe_Alignment) const

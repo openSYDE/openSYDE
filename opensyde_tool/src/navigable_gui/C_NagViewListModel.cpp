@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_NagViewListModel::C_NagViewListModel(QObject * const opc_Parent) :
@@ -48,7 +48,7 @@ C_NagViewListModel::C_NagViewListModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new number of rows
 
-   \param[in] osn_Rows Set new number of rows
+   \param[in]  osn_Rows    Set new number of rows
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewListModel::SetNumRows(const sintn osn_Rows)
@@ -92,7 +92,7 @@ void C_NagViewListModel::SetNumRows(const sintn osn_Rows)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -111,8 +111,8 @@ sintn C_NagViewListModel::rowCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -131,7 +131,7 @@ QVariant C_NagViewListModel::data(const QModelIndex & orc_Index, const sintn osn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get flags for item
 
-   \param[in] orc_Index Item
+   \param[in]  orc_Index   Item
 
    \return
    Flags for item
@@ -168,7 +168,7 @@ QStringList C_NagViewListModel::mimeTypes(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overloaded function for stored mime data
 
-   \param[in] orc_Items Current selected items
+   \param[in]  orc_Indices    Currently selected indices
 
    \return
    Mime data for drag event

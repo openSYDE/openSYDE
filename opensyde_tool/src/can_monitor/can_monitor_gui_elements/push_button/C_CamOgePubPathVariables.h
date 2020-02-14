@@ -20,7 +20,7 @@ namespace stw_opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamOgePubPathVariables :
-      public C_OgePubToolTipBase
+   public C_OgePubToolTipBase
 {
    Q_OBJECT
 
@@ -35,7 +35,7 @@ Q_SIGNALS:
    void SigVariableSelected(const QString & orc_Name);
 
 private:
-    stw_opensyde_gui_elements::C_OgeMuSections * mpc_Menu;
+   stw_opensyde_gui_elements::C_OgeMuSections * mpc_Menu;
 
    void m_CanMonitorExeTriggered(void);
    void m_CanMonitorProjTriggered(void);

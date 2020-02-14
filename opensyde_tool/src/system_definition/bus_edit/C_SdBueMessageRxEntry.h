@@ -16,6 +16,8 @@
 #include <QWidget>
 #include "stwtypes.h"
 
+#include "C_PuiSdNodeCanMessage.h"
+
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
@@ -38,12 +40,10 @@ public:
 
    void InitStaticNames(void) const;
    void Init(const QString & orc_EntryName, const stw_types::uint32 ou32_NodeIndex,
-             const stw_types::uint32 ou32_InterfaceIndex, const std::vector<bool> & orc_UseAutoReceiveTimeoutFlags,
-             const std::vector<stw_types::uint32> & orc_ReceiveTimeoutValues,
-             const std::vector<stw_types::uint32> & orc_DatapoolIndexes, const std::vector<QString> & orc_DatapoolNames,
-             const bool oq_NodeLayer);
+             const stw_types::uint32 ou32_InterfaceIndex,
+             const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes, const std::vector<stw_types::uint32> & orc_ReceiveTimeoutValues, const std::vector<stw_types::uint32> & orc_DatapoolIndexes, const std::vector<QString> & orc_DatapoolNames, const bool oq_NodeLayer);
    void SetLastKnownCycleTimeValue(const stw_types::uint32 ou32_Value);
-   void SetAlwaysHideTimeout(const bool oq_Hide);
+   void SetTxMethodOnEvent(const bool oq_TxMethodOnEvent);
    void SetChecked(const stw_types::uint32 ou32_DatapoolIndex, const bool oq_Checked) const;
    void SetEnabled(const bool oq_Enabled) const;
 
@@ -64,9 +64,9 @@ Q_SIGNALS:
    //lint -restore
    void SigNodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                        const stw_types::uint32 ou32_DatapoolIndex, const bool oq_Checked);
-   void SigNodeUseAutoReceiveTimeout(const stw_types::uint32 ou32_NodeIndex,
-                                     const stw_types::uint32 ou32_InterfaceIndex,
-                                     const stw_types::uint32 ou32_DatapoolIndex, const bool oq_UseAutoReceiveTimeout);
+   void SigNodeReceiveTimeoutMode(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
+                                  const stw_types::uint32 ou32_DatapoolIndex,
+                                  const stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode);
    void SigNodeReceiveTimeout(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                               const stw_types::uint32 ou32_DatapoolIndex, const stw_types::uint32 ou32_ReceiveTimeout);
 
@@ -91,13 +91,13 @@ private:
    stw_types::uint32 mu32_DatapoolIndex;
    stw_types::uint32 mu32_LastKnownCycleTimeValue;
    stw_types::uint32 mu32_AutoReceiveTimeoutValue;
-   bool mq_UseAutoReceiveTimeoutFlag;
+   stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode me_ReceiveTimeoutMode;
    stw_types::uint32 mu32_ReceiveTimeoutValue;
 
    // If entry has sub items (mq_HasChildren == true)
    std::vector<C_SdBueMessageRxEntry *> mc_Entries;
 
-   bool mq_AlwaysHide;
+   bool mq_TxMethodOnEvent;
 
    void m_OnCheckBoxStateChanged(const stw_types::sintn osn_CheckState);
    void m_ToggleSubItems(const bool oq_Checked);

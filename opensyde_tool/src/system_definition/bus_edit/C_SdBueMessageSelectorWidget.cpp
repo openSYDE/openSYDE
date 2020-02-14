@@ -44,7 +44,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_Parent) :
@@ -499,6 +499,7 @@ void C_SdBueMessageSelectorWidget::m_AddMessageButtonClicked(void) const
       C_OgeWiCustomMessage c_MessageBox(this->parentWidget());
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Message add"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("Cannot add new message. Select an active node."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
    }
 }

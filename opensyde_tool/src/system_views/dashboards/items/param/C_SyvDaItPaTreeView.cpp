@@ -46,7 +46,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaTreeView::C_SyvDaItPaTreeView(QWidget * const opc_Parent) :
@@ -201,8 +201,8 @@ void C_SyvDaItPaTreeView::ApplySelectedEcuValues()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check all Set values in range
 
-   \param[in] orc_ListIds  Subset of lists to check range for
-   \param[in] orc_ListIds2 Additional subset of lists to check range for
+   \param[in]  orc_ListIds    Subset of lists to check range for
+   \param[in]  orc_ListIds2   Additional subset of lists to check range for
 
    \return
    True  In range
@@ -231,9 +231,7 @@ bool C_SyvDaItPaTreeView::CheckAllListsRead(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle value preparation
 
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
+   \param[in]  orc_ListIds    List IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::PrepareChangedValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
@@ -244,9 +242,7 @@ void C_SyvDaItPaTreeView::PrepareChangedValues(const std::vector<C_OSCNodeDataPo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Resets the NVM changed flag for all relevant elements
 
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
+   \param[in]  orc_ListIds    List IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::RemoveValuesChangedFlag(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
@@ -257,7 +253,7 @@ void C_SyvDaItPaTreeView::RemoveValuesChangedFlag(const std::vector<C_OSCNodeDat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dark flag value
 
-   \param[in] oq_Value New dark flag value
+   \param[in]  oq_Value    New dark flag value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetDark(const bool oq_Value)
@@ -268,7 +264,7 @@ void C_SyvDaItPaTreeView::SetDark(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set edit mode status
 
-   \param[in] oq_EditMode Edit mode active
+   \param[in]  oq_EditMode    Edit mode active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetEditMode(const bool oq_EditMode)
@@ -279,7 +275,7 @@ void C_SyvDaItPaTreeView::SetEditMode(const bool oq_EditMode)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connection status
 
-   \param[in] oq_Connected Connection active
+   \param[in]  oq_Connected   Connection active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetConnected(const bool oq_Connected)
@@ -290,7 +286,7 @@ void C_SyvDaItPaTreeView::SetConnected(const bool oq_Connected)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set action status
 
-   \param[in] oq_Active Action active
+   \param[in]  oq_Active   Action active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetActionActive(const bool oq_Active)
@@ -333,8 +329,7 @@ uint32 C_SyvDaItPaTreeView::GetSelectedItemCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize
 
-   \param[in] opc_DataWidget Data storage
-   \param[in] ou32_ViewIndex View index
+   \param[in]  opc_DataWidget    Data storage
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::Init(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DataWidget)
@@ -370,8 +365,6 @@ void C_SyvDaItPaTreeView::Init(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandl
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update ECU values for specified ID
-
-   \param[in] orc_ListId List ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::UpdateECUValues(void)
@@ -419,7 +412,7 @@ std::vector<sint32> C_SyvDaItPaTreeView::GetCurrentColumnPositionIndices(void) c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete the specified list IDs
 
-   \param[in] orc_ListIds List IDs to delete
+   \param[in]  orc_ListIds    List IDs to delete
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::DeleteSpecified(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
@@ -432,7 +425,7 @@ void C_SyvDaItPaTreeView::DeleteSpecified(const std::vector<C_OSCNodeDataPoolLis
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set column position indices
 
-   \param[in] orc_NewColPositionIndices New column position indices
+   \param[in]  orc_NewColPositionIndices  New column position indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetColumnPositionIndices(const std::vector<sint32> & orc_NewColPositionIndices)
@@ -478,7 +471,7 @@ void C_SyvDaItPaTreeView::SetColumnPositionIndices(const std::vector<sint32> & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply new column widths
 
-   \param[in] orc_NewColWidths New column widths
+   \param[in]  orc_NewColWidths  New column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetColumnWidth(const std::vector<sint32> & orc_NewColWidths)
@@ -528,7 +521,7 @@ void C_SyvDaItPaTreeView::SetColumnWidth(const std::vector<sint32> & orc_NewColW
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if all specified lists are read
 
-   \param[in] orc_ListIds List IDs to check
+   \param[in]  orc_ListIds    List IDs to check
 
    \return
    True  Read
@@ -566,7 +559,7 @@ std::vector<C_PuiSvDbExpandedTreeIndex> C_SyvDaItPaTreeView::GetAllExpandedTreeI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set all items as expanded
 
-   \param[in] orc_Items Items to expand
+   \param[in]  orc_Items   Items to expand
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetAllExpandedTreeItems(const std::vector<C_PuiSvDbExpandedTreeIndex> & orc_Items)
@@ -648,8 +641,8 @@ std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeView::GetInvalidListIds() co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update CRC status
 
-   \param[in] orc_ListId LIST ID
-   \param[in] oq_Status  New CRC status
+   \param[in]  orc_ListId  LIST ID
+   \param[in]  oq_Status   New CRC status
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_ListId, const bool oq_Status)
@@ -660,8 +653,8 @@ void C_SyvDaItPaTreeView::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_ListI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get set values for specified list
 
-   \param[in]  orc_ListId     List ID
-   \param[out] orc_ListValues Set values
+   \param[in]   orc_ListId       List ID
+   \param[out]  orc_ListValues   Set values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::GetListSetValues(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ListId,
@@ -676,7 +669,7 @@ const
 
    Here: Handle escape manually
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::keyPressEvent(QKeyEvent * const opc_Event)
@@ -702,7 +695,7 @@ void C_SyvDaItPaTreeView::keyPressEvent(QKeyEvent * const opc_Event)
 
    Here: Handle hover for cursor adaption on links
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -760,7 +753,7 @@ void C_SyvDaItPaTreeView::m_HandleChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if columns in expected sorting order
 
-   \param[in] orc_NewColPositionIndices Expected sorting order
+   \param[in]  orc_NewColPositionIndices  Expected sorting order
 
    \return
    True  Sorted or error
@@ -787,7 +780,7 @@ bool C_SyvDaItPaTreeView::m_ColumnsSortedAsExpected(const std::vector<sint32> & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle link clicked signal
 
-   \param[in] orc_Index Index to edit
+   \param[in]  orc_Index   Index to edit
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
@@ -846,8 +839,8 @@ void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare read action
 
-   \param[in] orc_Id           Current ID
-   \param[in] ou32_ValidLayers Number of valid Layers of ID
+   \param[in]  orc_Id            Current ID
+   \param[in]  ou32_ValidLayers  Number of valid Layers of ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionRead(const C_OSCNodeDataPoolListElementId & orc_Id,
@@ -865,8 +858,8 @@ void C_SyvDaItPaTreeView::m_HandleActionRead(const C_OSCNodeDataPoolListElementI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare write action
 
-   \param[in] orc_Id           Current ID
-   \param[in] ou32_ValidLayers Number of valid Layers of ID
+   \param[in]  orc_Id            Current ID
+   \param[in]  ou32_ValidLayers  Number of valid Layers of ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionWrite(const C_OSCNodeDataPoolListElementId & orc_Id,
@@ -884,8 +877,8 @@ void C_SyvDaItPaTreeView::m_HandleActionWrite(const C_OSCNodeDataPoolListElement
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare apply action
 
-   \param[in] orc_Id           Current ID
-   \param[in] ou32_ValidLayers Number of valid Layers of ID
+   \param[in]  orc_Id            Current ID
+   \param[in]  ou32_ValidLayers  Number of valid Layers of ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionApply(const C_OSCNodeDataPoolListElementId & orc_Id,
@@ -903,8 +896,8 @@ void C_SyvDaItPaTreeView::m_HandleActionApply(const C_OSCNodeDataPoolListElement
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare load action
 
-   \param[in] orc_Id           Current ID
-   \param[in] ou32_ValidLayers Number of valid Layers of ID
+   \param[in]  orc_Id            Current ID
+   \param[in]  ou32_ValidLayers  Number of valid Layers of ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionLoad(const C_OSCNodeDataPoolListElementId & orc_Id,
@@ -923,8 +916,8 @@ void C_SyvDaItPaTreeView::m_HandleActionLoad(const C_OSCNodeDataPoolListElementI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare save action
 
-   \param[in] orc_Id           Current ID
-   \param[in] ou32_ValidLayers Number of valid Layers of ID
+   \param[in]  orc_Id            Current ID
+   \param[in]  ou32_ValidLayers  Number of valid Layers of ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionSave(const C_OSCNodeDataPoolListElementId & orc_Id,
@@ -943,8 +936,8 @@ void C_SyvDaItPaTreeView::m_HandleActionSave(const C_OSCNodeDataPoolListElementI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare record action
 
-   \param[in] orc_Id           Current ID
-   \param[in] ou32_ValidLayers Number of valid Layers of ID
+   \param[in]  orc_Id            Current ID
+   \param[in]  ou32_ValidLayers  Number of valid Layers of ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionRecord(const C_OSCNodeDataPoolListElementId & orc_Id,
@@ -962,8 +955,8 @@ void C_SyvDaItPaTreeView::m_HandleActionRecord(const C_OSCNodeDataPoolListElemen
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare remove action
 
-   \param[in] orc_Id           Current ID
-   \param[in] ou32_ValidLayers Number of valid Layers of ID
+   \param[in]  orc_Id            Current ID
+   \param[in]  ou32_ValidLayers  Number of valid Layers of ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionRemove(const C_OSCNodeDataPoolListElementId & orc_Id,

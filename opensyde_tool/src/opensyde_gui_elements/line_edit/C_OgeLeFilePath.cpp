@@ -38,13 +38,13 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeLeFilePath::C_OgeLeFilePath(QWidget * const opc_Parent) :
-   C_OgeLeFilePathBase(opc_Parent)
+   C_OgeLeFilePathBase(opc_Parent),
+   mc_DbProjectPath("")
 {
-   this->mc_DbProjectPath = "";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ C_OgeLeFilePath::C_OgeLeFilePath(QWidget * const opc_Parent) :
 
    To update tool tip make sure to call SetPath after this!
 
-   \param[in]   orc_DbProjectPath   path to replace special variable (Data Block project)
+   \param[in]  orc_DbPath  path to replace special variable (Data Block project)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePath::SetDbProjectPath(const QString & orc_DbPath)
@@ -65,7 +65,7 @@ void C_OgeLeFilePath::SetDbProjectPath(const QString & orc_DbPath)
 
    Needs to be wrapped because of different path variables in different projects.
 
-   \param[in]       orc_Path           path that probably contains variables
+   \param[in]  orc_Path    path that probably contains variables
 
    \return
    Resolved path

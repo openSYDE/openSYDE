@@ -52,7 +52,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent           Optional pointer to parent
+   \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPackageListNodeFilesWidget::C_SyvUpPackageListNodeFilesWidget(QWidget * const opc_Parent) :

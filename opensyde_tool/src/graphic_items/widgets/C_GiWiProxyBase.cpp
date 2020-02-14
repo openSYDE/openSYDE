@@ -32,7 +32,9 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in]     of64_InitWidth    Initial width
+   \param[in]     of64_InitHeight   Initial height
+   \param[in,out] opc_Parent        Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiWiProxyBase::C_GiWiProxyBase(const stw_types::float64 of64_InitWidth, const stw_types::float64 of64_InitHeight,

@@ -62,12 +62,31 @@ bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
    if ((this->u32_ComDataElementIndex != orc_Cmp.u32_ComDataElementIndex) ||
        (this->e_ComByteOrder != orc_Cmp.e_ComByteOrder) ||
        (this->u16_ComBitStart != orc_Cmp.u16_ComBitStart) ||
-       (this->u16_ComBitLength != orc_Cmp.u16_ComBitLength))
+       (this->u16_ComBitLength != orc_Cmp.u16_ComBitLength) ||
+       (this->e_MultiplexerType != orc_Cmp.e_MultiplexerType) ||
+       (this->u16_MultiplexValue != orc_Cmp.u16_MultiplexValue))
    {
       q_Return = true;
    }
 
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current is equal to orc_Cmp
+
+   Returns negotiation of != operator.
+
+   \param[in] orc_Cmp Compared instance
+
+   \return
+   Current is equal to orc_Cmp
+   Else false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanSignal::operator ==(const C_OSCCanSignal & orc_Cmp) const
+{
+   return !(*this != orc_Cmp);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

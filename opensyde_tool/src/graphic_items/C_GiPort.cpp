@@ -44,7 +44,7 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 C_GiPort::C_GiPort(QGraphicsItem * const opc_Parent) :
    QGraphicsItem(opc_Parent),
-   mc_BoundingRect(QRectF(0.0, 0.0, 80.0, 15.0)),
+   mc_BoundingRect(QRectF(0.0, 0.0, 40.0, 15.0)),
    ms32_RegisteredConnectors(0),
    mq_DrawBoder(false),
    mq_DrawWhiteFilter(false)
@@ -54,8 +54,8 @@ C_GiPort::C_GiPort(QGraphicsItem * const opc_Parent) :
 
    // fill the vector
    this->mc_Points.append(QPointF(0.0, 15.0));
-   this->mc_Points.append(QPointF(80.0, 15.0));
-   this->mc_Points.append(QPointF(70.0, 2.0));
+   this->mc_Points.append(QPointF(40.0, 15.0));
+   this->mc_Points.append(QPointF(30.0, 2.0));
    this->mc_Points.append(QPointF(10.0, 2.0));
 
    //shadow
@@ -283,11 +283,11 @@ void C_GiPort::ResizePortToDefault()
    if (this->mc_Points.size() == 4)
    {
       this->mc_Points[0] = QPointF(0.0, 15.0);
-      this->mc_Points[1] = QPointF(80.0, 15.0);
-      this->mc_Points[2] = QPointF(70.0, 2.0);
+      this->mc_Points[1] = QPointF(40.0, 15.0);
+      this->mc_Points[2] = QPointF(30.0, 2.0);
       this->mc_Points[3] = QPointF(10.0, 2.0);
 
-      this->mc_BoundingRect = QRectF(0.0, 0.0, 80.0, 15.0);
+      this->mc_BoundingRect = QRectF(0.0, 0.0, 40.0, 15.0);
    }
 }
 

@@ -49,24 +49,27 @@ const float64 mf64_PointStartY = 9.0;
 
 const float64 mf64_ActionPointOffsetNode = 15.0;
 
-const float64 C_GiNode::mhf64_MinWidthNode = 165.0;
-const float64 C_GiNode::mhf64_MinHeightNode = 110.0;
+const float64 C_GiNode::mhf64_MinWidthNode = 107.0;
+const float64 C_GiNode::mhf64_MinHeightNode = 71.0;
+const float64 C_GiNode::mhf64_InitialWidthNode = 165.0;
+const float64 C_GiNode::mhf64_InitialHeightNode = 110.0;
 
-const uint32 C_GiNode::mhu32_ScaleCategory0 = 6U; // no scaling -> default
-const uint32 C_GiNode::mhu32_ScaleCategory1 = 0U;
+const uint32 C_GiNode::mhu32_ScaleCategory0 = 7U;
+const uint32 C_GiNode::mhu32_ScaleCategory1 = 0U; // no scaling -> default
 const uint32 C_GiNode::mhu32_ScaleCategory2 = 1U;
 const uint32 C_GiNode::mhu32_ScaleCategory3 = 2U;
 const uint32 C_GiNode::mhu32_ScaleCategory4 = 3U;
 const uint32 C_GiNode::mhu32_ScaleCategory5 = 4U;
 const uint32 C_GiNode::mhu32_ScaleCategory6 = 5U;
+const uint32 C_GiNode::mhu32_ScaleCategory7 = 6U;
 
-const float64 C_GiNode::mahf64_ScaleMinWidthNode[6] =
+const float64 C_GiNode::mahf64_ScaleMinWidthNode[7] =
 {
-   200.0, 250.0, 300.0, 350.0, 400.0, 450.0
+   150.0, 200.0, 250.0, 300.0, 350.0, 400.0, 450.0
 };
-const float64 C_GiNode::mahf64_ScaleMinHeightNode[6] =
+const float64 C_GiNode::mahf64_ScaleMinHeightNode[7] =
 {
-   130.0, 165.0, 200.0, 230.0, 265.0, 300.0
+   100.0, 130.0, 165.0, 200.0, 230.0, 265.0, 300.0
 };
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -230,36 +233,40 @@ void C_GiNode::m_DetectIconSize(void)
 
    if (u32_ScaleCategory == mhu32_ScaleCategory0)
    {
-      this->ms32_IconSize = 24;
+      this->ms32_IconSize = 16;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory1)
    {
-      this->ms32_IconSize = 32;
+      this->ms32_IconSize = 24;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory2)
    {
-      this->ms32_IconSize = 40;
+      this->ms32_IconSize = 32;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory3)
    {
-      this->ms32_IconSize = 48;
+      this->ms32_IconSize = 40;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory4)
    {
-      this->ms32_IconSize = 56;
+      this->ms32_IconSize = 48;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory5)
    {
-      this->ms32_IconSize = 64;
+      this->ms32_IconSize = 56;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory6)
+   {
+      this->ms32_IconSize = 64;
+   }
+   else if (u32_ScaleCategory == mhu32_ScaleCategory7)
    {
       this->ms32_IconSize = 72;
    }
    else
    {
       // fallback
-      this->ms32_IconSize = 24;
+      this->ms32_IconSize = 16;
    }
 }
 
@@ -326,36 +333,40 @@ void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
 
    if (u32_ScaleCategory == mhu32_ScaleCategory0)
    {
-      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_18;
+      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_13;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory1)
    {
-      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_23;
+      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_18;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory2)
    {
-      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_28;
+      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_23;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory3)
    {
-      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_33;
+      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_28;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory4)
    {
-      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_38;
+      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_33;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory5)
    {
-      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_43;
+      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_38;
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory6)
+   {
+      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_43;
+   }
+   else if (u32_ScaleCategory == mhu32_ScaleCategory7)
    {
       c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_48;
    }
    else
    {
       // fallback
-      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_18;
+      c_BoundaryFont = mc_STYLE_GUIDE_FONT_REGULAR_13;
    }
    this->mpc_Boundary->SetFont(c_BoundaryFont);
 }
@@ -1028,7 +1039,16 @@ uint32 C_GiNode::m_GetScaleCategory(void) const
                   if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory6]) &&
                       (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory6]))
                   {
-                     u32_ScaleCategory = mhu32_ScaleCategory6;
+                     // check seventh scaling
+                     if ((c_ActSize.width() >= mahf64_ScaleMinWidthNode[mhu32_ScaleCategory7]) &&
+                         (c_ActSize.height() >= mahf64_ScaleMinHeightNode[mhu32_ScaleCategory7]))
+                     {
+                        u32_ScaleCategory = mhu32_ScaleCategory7;
+                     }
+                     else
+                     {
+                        u32_ScaleCategory = mhu32_ScaleCategory6;
+                     }
                   }
                   else
                   {

@@ -65,9 +65,12 @@ C_SdTopologyToolbox::C_SdTopologyToolbox(QWidget * const opc_Parent) :
    mpc_Ui->setupUi(this);
    this->mpc_Ui->pc_ListWidgetSearch->setVisible(false);
    this->mpc_Ui->pc_BlankWidgetSearch->setVisible(false);
+   this->mpc_Ui->pc_BlankWidgetSearch->SetBackgroundColor(12);
    this->mpc_Ui->pc_BlankTopWidgetSearch->setVisible(false);
+   this->mpc_Ui->pc_BlankTopWidgetSearch->SetBackgroundColor(12);
    this->mpc_Ui->pc_LabelSearchNotFound->setVisible(false);
    this->mpc_Ui->pc_LabelSearchNotFound->setText(C_GtGetText::h_GetText("No results found"));
+   this->mpc_Ui->pc_LabelSearchNotFound->setStyleSheet("background-color: rgb(250, 250, 250);");
 
    this->mpc_Ui->pc_ScrollAreaNodesWidget->SetBackgroundColor(-1);
    this->mpc_Ui->pc_ScrollAreaBusesWidget->SetBackgroundColor(-1);
@@ -104,7 +107,7 @@ C_SdTopologyToolbox::~C_SdTopologyToolbox()
    If the search text is empty, the search was finished.
    If the search text is not empty, the search result has to be updated.
 
-   \param[in] opc_Text   Updated search text
+   \param[in] orc_Text   Updated search text
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyToolbox::SearchChanged(const QString & orc_Text)
@@ -222,6 +225,8 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
          {
             const C_OSCDeviceDefinition & rc_Device = c_Devices[u32_ItDevice];
             const QString c_DeviceName = rc_Device.c_DeviceName.c_str();
+            QStringList c_Test;
+            c_Test = c_DeviceName.split(" ");
             //Tooltip
             const QString c_DeviceDescription = QString(rc_Device.c_DeviceDescription.c_str());
             pc_List->addItem(rc_Device.GetDisplayName().c_str());
@@ -234,10 +239,9 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
             pc_Item->setData(msn_USER_ROLE_TOOL_TIP_CONTENT, c_DeviceDescription);
          }
       }
+      // add a final spacer
+      C_SebToolboxUtil::h_AddFinalSpacer(this->mpc_Ui->pc_VerticalLayout1, pc_List);
    }
-
-   // add a final spacer
-   C_SebToolboxUtil::h_AddFinalSpacer(this->mpc_Ui->pc_VerticalLayout1, pc_List);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -132,6 +132,28 @@ void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a specific color configuration
+
+   \param[in]     orc_ColorConfiguration  Color configuration
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMlvSignalManager::SetColorConfiguration(
+   const C_SdBueMlvSignalManager::C_SignalItemColors & orc_ColorConfiguration)
+{
+   sint32 s32_Counter;
+
+   this->mc_ColorConfiguration = orc_ColorConfiguration;
+   this->mc_UiSignal.u8_ColorIndex = orc_ColorConfiguration.u8_Index;
+
+   for (s32_Counter = 0U; s32_Counter < this->mc_VecSignalItems.size(); ++s32_Counter)
+   {
+      this->mc_VecSignalItems[s32_Counter]->SetColors(this->mc_ColorConfiguration.c_BackgroundColor,
+                                                      this->mc_ColorConfiguration.c_FontColor,
+                                                      this->mc_ColorConfiguration.c_ResizeItemColor);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the name of the signal
 
    \param[in]     orc_Name          Name of the signal
@@ -147,7 +169,7 @@ void C_SdBueMlvSignalManager::SetName(const QString & orc_Name)
 
    The last bit must be set already.
 
-   \param[in]     ou32_BitPosition      Position of the first bit
+   \param[in]     ou16_Position      Position of the first bit
 
    \return
    true  Signal was changed
@@ -205,7 +227,7 @@ bool C_SdBueMlvSignalManager::SetStartBit(const uint16 ou16_Position)
 
    The start bit must be set already.
 
-   \param[in]     ou32_BitPosition      Position of the last bit
+   \param[in]     ou16_Position      Position of the last bit
 
    \return
    true  Signal was changed
@@ -434,6 +456,8 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvSignalManager::GetColorCon
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the interaction mode dependent of the mouse position
+
+   \param[in]  orc_MousePos   Mouse position
 
    \return
    eIAM_NONE

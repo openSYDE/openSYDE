@@ -39,10 +39,10 @@ class C_SdNdeDpListHeaderWidget :
    Q_OBJECT
 
 public:
-   explicit C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent = NULL,
-                                            QTreeWidget * const opc_ListWidget = NULL,
-                                            stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager * const opc_UndoManager = NULL, stw_opensyde_gui_logic::C_SdNdeDpListModelViewManager * const opc_ModelViewManager = NULL, const stw_types::uint32 ou32_NodeIndex = 0, const stw_types::uint32 ou32_DataPoolIndex = 0,
-                                            const stw_types::uint32 ou32_ListIndex = 0);
+   explicit C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent = NULL, QTreeWidget * const opc_ListWidget = NULL,
+                                      stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager * const opc_UndoManager = NULL,
+                                      stw_opensyde_gui_logic::C_SdNdeDpListModelViewManager * const opc_ModelViewManager = NULL, const stw_types::uint32 ou32_NodeIndex = 0, const stw_types::uint32 ou32_DataPoolIndex = 0,
+                                      const stw_types::uint32 ou32_ListIndex = 0);
    ~C_SdNdeDpListHeaderWidget(void);
 
    void SetInitParameters(QTreeWidget * const opc_TreeWidget,

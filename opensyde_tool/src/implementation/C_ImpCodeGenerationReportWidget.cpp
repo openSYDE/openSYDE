@@ -11,8 +11,10 @@
 #include "precomp_headers.h"
 
 #include <QFileInfo>
+#include <QDir>
 #include "constants.h"
 #include "C_GtGetText.h"
+#include "C_Uti.h"
 #include "C_ImpCodeGenerationReportWidget.h"
 #include "ui_C_ImpCodeGenerationReportWidget.h"
 
@@ -22,10 +24,9 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_ImpCodeGenerationReportWidget::mhc_HTML_TABLE_HEADER_START =
-   "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 5px 0px;white-space:pre;font-weight:bold;\">";
 const QString C_ImpCodeGenerationReportWidget::mhc_HTML_TABLE_DATA_START =
-   "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 5px 0px;white-space:pre;\">";
+   "<td align=\"left\" valign=\"top\" style=\"padding: 2px 18px 2px 2px;white-space:pre;\">";
+// the padding order is: top right bottom left
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -42,11 +43,7 @@ const QString C_ImpCodeGenerationReportWidget::mhc_HTML_TABLE_DATA_START =
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent          Reference to parent
-   \param[in]     ou32_NodeIndex      Node index
-   \param[in]     ou32_DataPoolIndex  Data pool index
-   \param[in]     ou32_InterfaceIndex Interface index
-   \param[in]     orc_FilePath        Loaded file path
+   \param[in,out]  orc_Parent    Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_ImpCodeGenerationReportWidget::C_ImpCodeGenerationReportWidget(
@@ -94,61 +91,89 @@ void C_ImpCodeGenerationReportWidget::InitStaticNames(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create report for code generation in HTML.
+
+   \param[in]  orc_ExportInfo    Information containing exported file paths for each Data Block
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_ImpCodeGenerationReportWidget::CreateReport(const std::list<QString> & orc_ExportedFiles) const
+void C_ImpCodeGenerationReportWidget::CreateReport(const std::vector<C_ReportData> & orc_ExportInfo)
+const
 {
    QString c_MessageResultText;
 
-   for (std::list<QString>::const_iterator c_It = orc_ExportedFiles.begin();
-        c_It != orc_ExportedFiles.end();
-        ++c_It)
+   for (std::vector<C_ReportData>::const_iterator c_ItDatablocks = orc_ExportInfo.begin();
+        c_ItDatablocks != orc_ExportInfo.end(); ++c_ItDatablocks)
    {
-      QString c_Line = (*c_It);
-      c_Line.replace('\\', '/');
-      QFileInfo c_FileInfo(c_Line);
-      // line is directory -> show full path and add link to file system
-      if (c_FileInfo.isDir())
-      {
-         // first table row:  | Location:| C:\path\to\files |
-         c_MessageResultText += mhc_HTML_TABLE_DATA_START;
-         c_MessageResultText += C_GtGetText::h_GetText("Location:");
-         c_MessageResultText += "</td>";
-         c_MessageResultText += mhc_HTML_TABLE_DATA_START;
-         c_MessageResultText += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>").
-                                arg(c_Line).
-                                arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                                arg(c_Line);
-         c_MessageResultText += "</td>";
-         c_MessageResultText += "</tr>";
+      const C_ReportData & rc_ReportData = *c_ItDatablocks;
+      QFileInfo c_DirFileInfo(rc_ReportData.c_CodeGeneratorPath);
 
-         // second table row:  | Generated Files:| something.c + more lines |
-         c_MessageResultText += "<tr>";
-         c_MessageResultText += mhc_HTML_TABLE_DATA_START;
-         c_MessageResultText += C_GtGetText::h_GetText("Generated files:");
-         c_MessageResultText += "</td>";
-         c_MessageResultText += mhc_HTML_TABLE_DATA_START;
-      }
-      // line is path to file -> show only file name and add link to file system
-      else if (c_FileInfo.exists())
+      // section title
+      c_MessageResultText += "<h4>";
+      c_MessageResultText += QString(C_GtGetText::h_GetText("\n%1, Data Block \"%2\"")).
+                             arg(rc_ReportData.c_NodeName).arg(rc_ReportData.c_AppName);
+      c_MessageResultText += "</h4>";
+
+      // open new table
+      c_MessageResultText += "<table><tr>";
+
+      // first table row:  | Code Generator: | C:/path/to/syde_coder.exe |
+      c_MessageResultText += mhc_HTML_TABLE_DATA_START;
+      c_MessageResultText += C_GtGetText::h_GetText("Code Generator:");
+      c_MessageResultText += "</td>";
+      c_MessageResultText += mhc_HTML_TABLE_DATA_START;
+      c_MessageResultText +=
+         C_Uti::h_GetLink(rc_ReportData.c_CodeGeneratorPath, mc_STYLE_GUIDE_COLOR_LINK,
+                          c_DirFileInfo.absoluteDir().absolutePath()); // use directory for link target location
+      c_MessageResultText += "</td>";
+      c_MessageResultText += "</tr>";
+
+      // second table row:  | Code Structure Version: | 3 |
+      c_MessageResultText += "<tr>";
+      c_MessageResultText += mhc_HTML_TABLE_DATA_START;
+      c_MessageResultText += C_GtGetText::h_GetText("Code Structure:");
+      c_MessageResultText += "</td>";
+      c_MessageResultText += mhc_HTML_TABLE_DATA_START;
+      c_MessageResultText += C_GtGetText::h_GetText("Version ");
+      c_MessageResultText += QString::number(rc_ReportData.u16_CodeVersion);
+      c_MessageResultText += "</td>";
+      c_MessageResultText += "</tr>";
+
+      // third table row:  | Location:| C:/path/to/files |
+      c_MessageResultText += "<tr>";
+      c_MessageResultText += mhc_HTML_TABLE_DATA_START;
+      c_MessageResultText += C_GtGetText::h_GetText("Location:");
+      c_MessageResultText += "</td>";
+      c_MessageResultText += mhc_HTML_TABLE_DATA_START;
+      c_MessageResultText += C_Uti::h_GetLink(rc_ReportData.c_Directory, mc_STYLE_GUIDE_COLOR_LINK,
+                                              rc_ReportData.c_Directory);
+      c_MessageResultText += "</td>";
+      c_MessageResultText += "</tr>";
+
+      // fourth table row:  | Generated Files:| my_datapool.c (one row for each generated file) |
+      c_MessageResultText += "<tr>";
+      c_MessageResultText += mhc_HTML_TABLE_DATA_START;
+      c_MessageResultText += C_GtGetText::h_GetText("Generated Files:");
+      c_MessageResultText += "</td>";
+      c_MessageResultText += mhc_HTML_TABLE_DATA_START;
+
+      // add generated files to table
+      for (QStringList::ConstIterator c_ItFiles = rc_ReportData.c_GeneratedFiles.begin();
+           c_ItFiles != rc_ReportData.c_GeneratedFiles.end(); ++c_ItFiles)
       {
-         c_MessageResultText += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>").
-                                arg(c_Line).
-                                arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                                arg(c_FileInfo.fileName()); // show only files; link will point to actual file
+         QFileInfo c_FileInfo(*c_ItFiles);
+         // show only file names; link will point to actual file
+         c_MessageResultText += C_Uti::h_GetLink(c_FileInfo.fileName(), mc_STYLE_GUIDE_COLOR_LINK,
+                                                 c_FileInfo.filePath());
          c_MessageResultText += "<br>";
       }
-      // line is section header
-      else
+
+      // add extra new line if file list is empty
+      if (rc_ReportData.c_GeneratedFiles.isEmpty() == true)
       {
-         // close previous table
-         c_MessageResultText += "</td></tr></table>";
-         c_MessageResultText += "<h4>";
-         c_MessageResultText += c_Line;
-         c_MessageResultText += "</h4>";
-         // open new table
-         c_MessageResultText += "<table><tr>";
+         c_MessageResultText += "<br>";
       }
+
+      // close table
+      c_MessageResultText += "</td></tr></table>";
    }
 
    this->mpc_Ui->pc_TextBrowserReport->setHtml(c_MessageResultText);
@@ -159,7 +184,7 @@ void C_ImpCodeGenerationReportWidget::CreateReport(const std::list<QString> & or
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_ImpCodeGenerationReportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)

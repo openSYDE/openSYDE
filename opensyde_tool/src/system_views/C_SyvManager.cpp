@@ -80,7 +80,7 @@ void C_SyvManager::AddView(const bool oq_SendSigChangeMode)
    {
       //Select new view
       Q_EMIT (this->SigChangeMode(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP, u32_NewViewIndex, c_SubMode,
-                                 c_SubSubMode));
+                                  c_SubSubMode));
    }
 }
 
@@ -186,9 +186,10 @@ void C_SyvManager::DuplicateSysView(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle delete view action
 
-   \param[in] ou32_Index           View index to delete
-   \param[in] os32_SelectedSubMode Currently selected submode
-   \param[in] ou32_SelectedIndex   Currently selected view index
+   \param[in]     ou32_Index           View index to delete
+   \param[in]     os32_SelectedSubMode Currently selected submode
+   \param[in]     ou32_SelectedIndex   Currently selected view index
+   \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::DeleteSysView(const uint32 ou32_Index, const sint32 os32_SelectedSubMode,
@@ -206,6 +207,7 @@ void C_SyvManager::DeleteSysView(const uint32 ou32_Index, const sint32 os32_Sele
                                      pc_View->GetName()));
          c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
          c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         c_Message.SetCustomMinHeight(180, 180);
          if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
          {
             QString c_SubMode;
@@ -241,6 +243,7 @@ void C_SyvManager::DeleteSysView(const uint32 ou32_Index, const sint32 os32_Sele
       C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eINFORMATION);
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("View delete"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("You cannot delete the last view."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
    }
 }

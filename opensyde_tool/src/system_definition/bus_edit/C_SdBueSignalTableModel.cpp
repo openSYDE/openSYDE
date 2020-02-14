@@ -384,9 +384,9 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                if (pc_OSCSignalCommon != NULL)
                {
                   c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OSCSignalCommon->c_MinValue,
-                                                                                         pc_OSCSignalCommon->f64_Factor,
-                                                                                         pc_OSCSignalCommon->f64_Offset,
-                                                                                         0);
+                                                                                   pc_OSCSignalCommon->f64_Factor,
+                                                                                   pc_OSCSignalCommon->f64_Offset,
+                                                                                   0);
                }
                break;
             case eMAXIMUM_VALUE:
@@ -395,9 +395,9 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                if (pc_OSCSignalCommon != NULL)
                {
                   c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OSCSignalCommon->c_MaxValue,
-                                                                                         pc_OSCSignalCommon->f64_Factor,
-                                                                                         pc_OSCSignalCommon->f64_Offset,
-                                                                                         0);
+                                                                                   pc_OSCSignalCommon->f64_Factor,
+                                                                                   pc_OSCSignalCommon->f64_Offset,
+                                                                                   0);
                }
                break;
             case eUNIT:

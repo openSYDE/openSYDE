@@ -48,9 +48,9 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_OSCDataPool      Reference to the actual core datapool object
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpSelectorAddWidget::C_SdNdeDpSelectorAddWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 ou32_NodeIndex,
-   C_OSCNodeDataPool & orc_OSCDataPool) :
+C_SdNdeDpSelectorAddWidget::C_SdNdeDpSelectorAddWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                       const uint32 ou32_NodeIndex,
+                                                       C_OSCNodeDataPool & orc_OSCDataPool) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpSelectorAddWidget),
    mrc_ParentDialog(orc_Parent),
@@ -331,8 +331,8 @@ void C_SdNdeDpSelectorAddWidget::m_OnSharedDataPoolChanged(void) const
       uint32 u32_DatapoolCounter;
 
       tgl_assert(C_SdNdeDpUtil::GetSharedDatapoolGroup(u32_SharedGroup, c_SelectedDatapoolId,
-                                                             this->mu32_NodeIndex,
-                                                             c_SharedDatapoolGroup) == C_NO_ERR);
+                                                       this->mu32_NodeIndex,
+                                                       c_SharedDatapoolGroup) == C_NO_ERR);
 
       for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < c_SharedDatapoolGroup.size(); ++u32_DatapoolCounter)
       {

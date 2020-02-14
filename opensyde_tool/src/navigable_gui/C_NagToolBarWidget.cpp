@@ -123,6 +123,8 @@ void C_NagToolBarWidget::InitText(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Configures the function buttons
+
+   \param[in]  opc_UseCaseWidget    Current use case widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget * const opc_UseCaseWidget)
@@ -343,7 +345,7 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
                      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Do not do this!"));
                      c_MessageBox.SetDescription(C_GtGetText::h_GetText("Never type openSYDE into openSYDE! ;-)"));
                      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Sorry, I'll never do this again"));
-
+                     c_MessageBox.SetCustomMinHeight(180, 180);
                      c_MessageBox.Execute();
                   }
 

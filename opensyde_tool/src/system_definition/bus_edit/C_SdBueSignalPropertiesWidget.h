@@ -100,7 +100,6 @@ private:
    void m_CheckMUXType(const bool & orq_SignalErrorChange = true);
    void m_CheckMUXValue(const bool & orq_SignalErrorChange = true);
    void m_CheckMessagePosition(const bool & orq_SignalErrorChange = true);
-   void m_CheckMinMaxAndInitValue(const bool & orq_SignalErrorChange = true);
    void m_HandleNameChangeWithoutSignal(void);
    void m_HandleNameChangeWithSignal(void);
    void m_HandleCommentChange(void);
@@ -138,7 +137,8 @@ private:
    stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType m_GetMuxType(void) const;
    void m_InitComboBox(const stw_opensyde_core::C_OSCCanMessage & orc_Message,
                        const stw_types::uint32 ou32_SignalIndex) const;
-   void m_HandleMuxValueRange(const stw_opensyde_core::C_OSCCanMessage & orc_Message, const stw_types::uint32 ou32_SignalIndex) const;
+   void m_HandleMuxValueRange(const stw_opensyde_core::C_OSCCanMessage & orc_Message,
+                              const stw_types::uint32 ou32_SignalIndex) const;
 
    void m_HandleAnyChange(const E_Change oe_Change, const bool oq_AllowSignalsToInformOtherWidgets = true);
    void m_ApplyNewValueFromUI(const E_Change oe_Change);

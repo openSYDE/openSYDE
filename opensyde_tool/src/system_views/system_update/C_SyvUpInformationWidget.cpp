@@ -50,7 +50,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
@@ -69,7 +69,6 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
 {
    QWidget * const pc_Top = C_OgeWiUtil::h_GetWidgetUnderNextPopUp(this);
    QWinTaskbarButton * const pc_Button = new QWinTaskbarButton(pc_Top);
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    this->mpc_Ui->setupUi(this);
 
@@ -82,36 +81,6 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
    this->mpc_Progress = pc_Button->progress();
 
    this->ResetSummary();
-
-   if (pc_View != NULL)
-   {
-      //Init update rate
-      const uint32 u32_Checksum = pc_View->CalcSetupHash();
-      const C_UsSystemView c_View = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
-      const QMap<uint32, uint64> & rc_UpdateDataRateHistory = c_View.GetUpdateDataRateHistory();
-      const QMap<uint32,
-                 QMap<uint32, float64> > & rc_UpdateDataRateHistoryPerNode = c_View.GetUpdateDataRateHistoryPerNode();
-      const QMap<uint32, uint64>::const_iterator c_ItGlobal = rc_UpdateDataRateHistory.find(u32_Checksum);
-      const QMap<uint32, QMap<uint32, float64> >::const_iterator c_ItPerNode = rc_UpdateDataRateHistoryPerNode.find(
-         u32_Checksum);
-      if (c_ItGlobal != rc_UpdateDataRateHistory.end())
-      {
-         this->mu64_LastKnownDataRateS = c_ItGlobal.value();
-      }
-      if (c_ItPerNode != rc_UpdateDataRateHistoryPerNode.end())
-      {
-         this->mc_FileSizeInformation.SetFileSizesByteMapPerNode(c_ItPerNode.value());
-      }
-
-      if (c_View.GetUpdateSummaryBig() == true)
-      {
-         this->m_HideSmallUpdateSummary();
-      }
-      else
-      {
-         this->m_HideBigUpdateSummary();
-      }
-   }
 
    this->m_UpdateEstimatedWaitTime(false);
 
@@ -135,22 +104,7 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpInformationWidget::~C_SyvUpInformationWidget()
 {
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-   // store configuration of the view
-   if (pc_View != NULL)
-   {
-      // splitter
-      const QList<sintn> c_Sizes = this->mpc_Ui->pc_SplitterVert->sizes();
-      if (c_Sizes.count() > 1)
-      {
-         C_UsHandler::h_GetInstance()->SetProjSvUpdateSplitterX(pc_View->GetName(), c_Sizes.at(1));
-      }
-
-      // summary widget style type
-      C_UsHandler::h_GetInstance()->SetProjSvUpdateSummaryBig(pc_View->GetName(),
-                                                              this->mpc_Ui->pc_SplitterVert->isVisibleTo(this));
-   }
+   m_SaveUserSettings();
 
    delete this->mpc_Progress;
    delete this->mpc_Ui;
@@ -159,7 +113,7 @@ C_SyvUpInformationWidget::~C_SyvUpInformationWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the view index of sub widgets.
 
-   \param[in]     ou32_ViewIndex         View index
+   \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetViewIndex(const stw_types::uint32 ou32_ViewIndex)
@@ -189,7 +143,7 @@ void C_SyvUpInformationWidget::SetUpdateStarted(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward information that the node update was started
 
-   \param[in]     ou32_NodeIndex         Index of node
+   \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetUpdateNodeStarted(const uint32 ou32_NodeIndex)
@@ -201,7 +155,7 @@ void C_SyvUpInformationWidget::SetUpdateNodeStarted(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward information that the node update was finished
 
-   \param[in] ou32_NodeIndex Index of node
+   \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetUpdateNodeSuccess(const uint32 ou32_NodeIndex)
@@ -214,8 +168,8 @@ void C_SyvUpInformationWidget::SetUpdateNodeSuccess(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward information that the application update was started
 
-   \param[in]     ou32_NodeIndex         Index of node
-   \param[in]     oq_IsParam             Flag if "application" was a parameter set file
+   \param[in]  ou32_NodeIndex    Index of node
+   \param[in]  oq_IsParam        Flag if "application" was a parameter set file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetUpdateApplicationStarted(const stw_types::uint32 ou32_NodeIndex,
@@ -228,8 +182,8 @@ void C_SyvUpInformationWidget::SetUpdateApplicationStarted(const stw_types::uint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward information that the application update was finished
 
-   \param[in]     ou32_NodeIndex         Index of node
-   \param[in]     oq_IsParam             Flag if "application" was a parameter set file
+   \param[in]  ou32_NodeIndex    Index of node
+   \param[in]  oq_IsParam        Flag if "application" was a parameter set file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetUpdateApplicationFinished(const stw_types::uint32 ou32_NodeIndex,
@@ -251,7 +205,7 @@ void C_SyvUpInformationWidget::SetUpdateApplicationFinished(const stw_types::uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward information that errors occured on application update
 
-   \param[in]     ou32_NodeIndex         Index of node
+   \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetUpdateApplicationError(const stw_types::uint32 ou32_NodeIndex) const
@@ -262,7 +216,7 @@ void C_SyvUpInformationWidget::SetUpdateApplicationError(const stw_types::uint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward trigger for application information discard
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::DiscardApplicationStatus(const stw_types::uint32 ou32_NodeIndex) const
@@ -291,8 +245,8 @@ void C_SyvUpInformationWidget::SetDisconnected(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward update device information
 
-   \param[in] orc_NodeIndexes       Node indices
-   \param[in] orc_DeviceInformation Device info
+   \param[in]  orc_NodeIndexes         Node indices
+   \param[in]  orc_DeviceInformation   Device info
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::UpdateDeviceInformation(const std::vector<stw_types::uint32> & orc_NodeIndexes,
@@ -305,8 +259,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward set node progress
 
-   \param[in]     ou32_NodeIndex         Index of node
-   \param[in]     ou8_Progress           Entire progress of node of update process
+   \param[in]  ou32_NodeIndex    Index of node
+   \param[in]  ou8_Progress      Entire progress of node of update process
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetNodeProgress(const stw_types::uint32 ou32_NodeIndex,
@@ -317,6 +271,13 @@ void C_SyvUpInformationWidget::SetNodeProgress(const stw_types::uint32 ou32_Node
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Forward update package.
+
+   \param[in,out]  orc_ApplicationsToWrite   Applications to write
+   \param[in,out]  orc_NodesOrder            Nodes order
+   \param[in,out]  opc_AllApplications       All applications
+
+   \return
+   STW error code, see called function for detailed description
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_SyvUpInformationWidget::GetUpdatePackage(
@@ -358,7 +319,10 @@ void C_SyvUpInformationWidget::ResetSummary(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle new heading.
 
-   \param[in]  orc_Text  Heading text
+   \param[in]  orc_Icon    Icon
+   \param[in]  orc_Text    Heading text
+   \param[in]  oq_Failure  Failure
+   \param[in]  oq_Success  Success
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::SetHeading(const QString & orc_Icon, const QString & orc_Text, const bool oq_Failure,
@@ -371,10 +335,10 @@ void C_SyvUpInformationWidget::SetHeading(const QString & orc_Icon, const QStrin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set known update configuration for flash progress assumptions
 
-   \param[in]  orc_Flashpackage             Complete flash package
-   \param[in]  orc_Order                    Flash order
-   \param[in]  orc_IsFileBased              File based flag for all included devices
-   \param[in]  oq_IncludesCurrentNodeStatus Flag if the current call includes the current node status
+   \param[in]  orc_Flashpackage              Complete flash package
+   \param[in]  orc_Order                     Flash order
+   \param[in]  orc_IsFileBased               File based flag for all included devices
+   \param[in]  oq_IncludesCurrentNodeStatus  Flag if the current call includes the current node status
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::InitUpdatePackage(
@@ -482,7 +446,8 @@ void C_SyvUpInformationWidget::InitUpdatePackage(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update progress value
 
-   \param[in] ou16_Progress100 Progress in percent
+   \param[in]  ou16_Progress100  Progress in percent
+   \param[in]  oq_Finished       Finished
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progress100, const bool oq_Finished)
@@ -652,29 +617,12 @@ void C_SyvUpInformationWidget::StopElapsedTimer(void)
 
    Here: Load splitter position
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::showEvent(QShowEvent * const opc_Event)
 {
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-
-   // restore configuration of the view
-   if (pc_View != NULL)
-   {
-      const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
-
-      //splitter
-      sint32 s32_LastSegmentWidth  = c_UserView.GetUpdateSplitterX();
-
-      //Revert to default if necessary
-      if (s32_LastSegmentWidth <= 0)
-      {
-         s32_LastSegmentWidth = 320;
-      }
-
-      this->mpc_Ui->pc_SplitterVert->SetSecondSegment(s32_LastSegmentWidth);
-   }
+   m_LoadUserSettings();
    QWidget::showEvent(opc_Event);
 }
 
@@ -699,12 +647,11 @@ void C_SyvUpInformationWidget::m_UpdateTime(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update transfer data count
- *
-   \param[in]  oru64_OverallFlashedBytes   Overall number of flashed bytes
-   \param[in]  oq_ShowDataRate             Flag to request show of data rate
 
-   \return
-   Current average data rate
+ *
+
+   \param[in]  oru64_OverallFlashedBytes  Overall number of flashed bytes
+   \param[in]  oq_ShowDataRate            Flag to request show of data rate
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::m_UpdateDataTransfer(const uint64 & oru64_OverallFlashedBytes,
@@ -794,7 +741,7 @@ void C_SyvUpInformationWidget::m_UpdateLabel(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update estimated wait time calculation
 
-   \param[in]  oq_IncludesCurrentNodeStatus Flag if the current call includes the current node status
+   \param[in]  oq_IncludesCurrentNodeStatus  Flag if the current call includes the current node status
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesCurrentNodeStatus)
@@ -917,8 +864,8 @@ void C_SyvUpInformationWidget::m_UpdateDataRate()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set task bar progress
 
-   \param[in] oq_Visible Progress is visible flag
-   \param[in] os32_Value Progress value (0-100)
+   \param[in]  oq_Visible  Progress is visible flag
+   \param[in]  os32_Value  Progress value (0-100)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::m_UpdateWinProgress(const bool oq_Visible, const sint32 os32_Value)
@@ -932,8 +879,8 @@ void C_SyvUpInformationWidget::m_UpdateWinProgress(const bool oq_Visible, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Forward progress to update visualization (bar/circle)
 
-   \param[in]   ou16_Progress100  progress as number between 0 and 100
-   \param[in]   oq_Finished       Flag if already finished
+   \param[in]  ou16_Progress100  progress as number between 0 and 100
+   \param[in]  oq_Finished       Flag if already finished
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::m_UpdateProgressVisualization(const uint16 ou16_Progress100,
@@ -963,4 +910,82 @@ void C_SyvUpInformationWidget::m_HideSmallUpdateSummary(void) const
    this->mpc_Ui->pc_WidgetUpdateSummarySmall->setVisible(false);
    this->mpc_Ui->pc_LayoutSplitter->insertWidget(0, this->mpc_Ui->pc_WidgetUpdatePackage);
    this->mpc_Ui->pc_SplitterVert->setVisible(true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpInformationWidget::m_LoadUserSettings()
+{
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   // restore configuration of the view
+   if (pc_View != NULL)
+   {
+      const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
+
+      //splitter
+      sint32 s32_LastSegmentWidth  = c_UserView.GetUpdateSplitterX();
+
+      //Revert to default if necessary
+      if (s32_LastSegmentWidth <= 0)
+      {
+         s32_LastSegmentWidth = 320;
+      }
+
+      this->mpc_Ui->pc_SplitterVert->SetSecondSegment(s32_LastSegmentWidth);
+      {
+         //Init update rate
+         const uint32 u32_Checksum = pc_View->CalcSetupHash();
+         const QMap<uint32, uint64> & rc_UpdateDataRateHistory = c_UserView.GetUpdateDataRateHistory();
+         const QMap<uint32,
+                    QMap<uint32,
+                         float64> > & rc_UpdateDataRateHistoryPerNode = c_UserView.GetUpdateDataRateHistoryPerNode();
+         const QMap<uint32, uint64>::const_iterator c_ItGlobal = rc_UpdateDataRateHistory.find(u32_Checksum);
+         const QMap<uint32, QMap<uint32, float64> >::const_iterator c_ItPerNode = rc_UpdateDataRateHistoryPerNode.find(
+            u32_Checksum);
+         if (c_ItGlobal != rc_UpdateDataRateHistory.end())
+         {
+            this->mu64_LastKnownDataRateS = c_ItGlobal.value();
+         }
+         if (c_ItPerNode != rc_UpdateDataRateHistoryPerNode.end())
+         {
+            this->mc_FileSizeInformation.SetFileSizesByteMapPerNode(c_ItPerNode.value());
+         }
+
+         if (c_UserView.GetUpdateSummaryBig() == true)
+         {
+            this->m_HideSmallUpdateSummary();
+         }
+         else
+         {
+            this->m_HideBigUpdateSummary();
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpInformationWidget::m_SaveUserSettings() const
+{
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   // store configuration of the view
+   if (pc_View != NULL)
+   {
+      // splitter
+      const QList<sintn> c_Sizes = this->mpc_Ui->pc_SplitterVert->sizes();
+      if (c_Sizes.count() > 1)
+      {
+         C_UsHandler::h_GetInstance()->SetProjSvUpdateSplitterX(pc_View->GetName(), c_Sizes.at(1));
+      }
+
+      // summary widget style type
+      C_UsHandler::h_GetInstance()->SetProjSvUpdateSummaryBig(pc_View->GetName(),
+                                                              this->mpc_Ui->pc_SplitterVert->isVisibleTo(this));
+   }
 }

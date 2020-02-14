@@ -387,6 +387,10 @@ bool C_OgeWiUtil::h_CheckGlobalKey(const QKeyEvent * const opc_Event)
    {
       q_Retval = true;
    }
+   else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F8))
+   {
+      q_Retval = true;
+   }
    else
    {
       q_Retval = false;
@@ -470,7 +474,7 @@ void C_OgeWiUtil::h_ShowPathInvalidError(QWidget * const opc_Parent, const QStri
    c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Path"));
    c_Message.SetDescription(C_GtGetText::h_GetText("Path contains invalid characters."));
    c_Message.SetDetails(QString(C_GtGetText::h_GetText("Path(s):\n%1")).arg(orc_InvalidPaths));
-
+   c_Message.SetCustomMinHeight(180, 250);
    c_Message.Execute();
 }
 

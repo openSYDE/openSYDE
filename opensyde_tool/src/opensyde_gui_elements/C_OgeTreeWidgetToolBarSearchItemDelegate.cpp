@@ -41,7 +41,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTreeWidgetToolBarSearchItemDelegate::C_OgeTreeWidgetToolBarSearchItemDelegate(QObject * const opc_Parent) :
@@ -54,9 +54,9 @@ C_OgeTreeWidgetToolBarSearchItemDelegate::C_OgeTreeWidgetToolBarSearchItemDelega
 
    Custom way to paint tree widget item
 
-   \param[in,out] opc_Painter Painter (default interface)
-   \param[in]     orc_Option  Option (default interface)
-   \param[in]     orc_index   Index (default interface)
+   \param[in,out]  opc_Painter   Painter (default interface)
+   \param[in]      orc_Option    Option (default interface)
+   \param[in]      orc_Index     Index (default interface)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeWidgetToolBarSearchItemDelegate::paint(QPainter * const opc_Painter,
@@ -127,8 +127,11 @@ void C_OgeTreeWidgetToolBarSearchItemDelegate::paint(QPainter * const opc_Painte
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reimplement default size hint
 
-   \param[in] orc_Option Option
-   \param[in] orc_Index  Index
+   \param[in]  orc_Option  Option
+   \param[in]  orc_Index   Index
+
+   \return
+   Current required size
 */
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_OgeTreeWidgetToolBarSearchItemDelegate::sizeHint(const QStyleOptionViewItem & orc_Option,

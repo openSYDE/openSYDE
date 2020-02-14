@@ -51,8 +51,8 @@ public:
    const stw_opensyde_core::C_OSCNodeDataPoolList * GetOSCList(const QString & orc_File,
                                                                const QString & orc_Message) const;
    const C_CieConverter::C_CIECanMessage * GetDbcMessage(const QString & orc_File, const QString & orc_Message) const;
-   const QMap<QString, C_CamDbDbc> & GetDBCFiles(void);
-   const QMap<QString, C_CamDbOsy> & GetOSYFiles(void);
+   const QMap<QString, C_CamDbDbc> & GetDBCFiles(void) const;
+   const QMap<QString, C_CamDbOsy> & GetOSYFiles(void) const;
 
    //Set
    stw_types::sint32 SetDBCActive(const QString & orc_File, const bool oq_Active);

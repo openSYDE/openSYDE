@@ -85,6 +85,9 @@
       </item>
       <item>
        <spacer name="verticalSpacer_1">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
         <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
@@ -118,6 +121,9 @@
       </item>
       <item>
        <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
         <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
@@ -140,7 +146,7 @@
            <number>2</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonLightBlue">
+           <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonLightBlue">
             <property name="maximumSize">
              <size>
               <width>20</width>
@@ -153,7 +159,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonGreen">
+           <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonGreen">
             <property name="maximumSize">
              <size>
               <width>20</width>
@@ -166,7 +172,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonGold">
+           <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonGold">
             <property name="maximumSize">
              <size>
               <width>20</width>
@@ -179,7 +185,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonOrange">
+           <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonOrange">
             <property name="maximumSize">
              <size>
               <width>20</width>
@@ -192,7 +198,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonRed">
+           <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonRed">
             <property name="maximumSize">
              <size>
               <width>20</width>
@@ -205,7 +211,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonPurple">
+           <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonPurple">
             <property name="maximumSize">
              <size>
               <width>20</width>
@@ -218,7 +224,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonLightGreen">
+           <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonLightGreen">
             <property name="maximumSize">
              <size>
               <width>20</width>
@@ -231,7 +237,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonDarkBlueGreen">
+           <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonDarkBlueGreen">
             <property name="maximumSize">
              <size>
               <width>20</width>
@@ -244,7 +250,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonLavendel">
+           <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonLavendel">
             <property name="maximumSize">
              <size>
               <width>20</width>
@@ -275,6 +281,9 @@
       </item>
       <item>
        <spacer name="verticalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
         <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
@@ -334,7 +343,7 @@
          <number>2</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonRecentColorNr1">
+         <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonRecentColorNr1">
           <property name="maximumSize">
            <size>
             <width>20</width>
@@ -347,7 +356,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonRecentColorNr2">
+         <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonRecentColorNr2">
           <property name="maximumSize">
            <size>
             <width>20</width>
@@ -360,7 +369,46 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonRecentColorNr3">
+         <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonRecentColorNr3">
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonRecentColorNr4">
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonRecentColorNr5">
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgePubColor" name="pc_PushButtonRecentColorNr6">
           <property name="maximumSize">
            <size>
             <width>20</width>
@@ -389,6 +437,9 @@
       </item>
       <item>
        <spacer name="verticalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
         <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
@@ -422,6 +473,9 @@
       </item>
       <item>
        <spacer name="verticalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
         <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
@@ -434,10 +488,17 @@
        </spacer>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5"/>
+       <layout class="QHBoxLayout" name="pc_horizontalLayout_5">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+       </layout>
       </item>
       <item>
        <spacer name="verticalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
         <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
@@ -455,7 +516,7 @@
          <number>3</number>
         </property>
         <item>
-         <widget class="QPushButton" name="pc_PushButtonHTML">
+         <widget class="stw_opensyde_gui_elements::C_OgePubTextOnly" name="pc_PushButtonHTML">
           <property name="minimumSize">
            <size>
             <width>30</width>
@@ -468,13 +529,10 @@
             <pointsize>8</pointsize>
            </font>
           </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="pc_LabelPipeSymbol">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelPipeSymbol">
           <property name="minimumSize">
            <size>
             <width>2</width>
@@ -493,7 +551,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pc_PushButtonRGBA">
+         <widget class="stw_opensyde_gui_elements::C_OgePubTextOnly" name="pc_PushButtonRGBA">
           <property name="minimumSize">
            <size>
             <width>30</width>
@@ -504,9 +562,6 @@
            <font>
             <family>Segoe UI</family>
            </font>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -527,6 +582,9 @@
       </item>
       <item>
        <spacer name="verticalSpacer_7">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
         <property name="sizeType">
          <enum>QSizePolicy::Fixed</enum>
         </property>
@@ -551,7 +609,7 @@
             <height>40</height>
            </size>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <layout class="QHBoxLayout" name="horizontalLayout">
            <property name="topMargin">
             <number>0</number>
            </property>
@@ -562,9 +620,12 @@
             <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonIcon">
              <property name="minimumSize">
               <size>
-               <width>20</width>
-               <height>20</height>
+               <width>25</width>
+               <height>25</height>
               </size>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -579,23 +640,23 @@
             </widget>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonSelectedColor">
-             <property name="maximumSize">
+            <widget class="stw_opensyde_gui::C_GiSyColorShower" name="pc_PushButtonColorShower">
+             <property name="minimumSize">
               <size>
-               <width>30</width>
-               <height>30</height>
+               <width>28</width>
+               <height>28</height>
               </size>
              </property>
             </widget>
            </item>
           </layout>
           <zorder>pc_LineEditColor</zorder>
-          <zorder>pc_PushButtonSelectedColor</zorder>
           <zorder>pc_PushButtonIcon</zorder>
+          <zorder>pc_PushButtonColorShower</zorder>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="pc_LabelNote">
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelNote">
           <property name="minimumSize">
            <size>
             <width>291</width>
@@ -619,6 +680,9 @@
    </item>
    <item>
     <spacer name="pc_VerticalSpacerAboveButtons">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
      <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
@@ -734,6 +798,9 @@
    </item>
    <item>
     <spacer name="pc_VerticalSpacerBelowButtons">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
      <property name="sizeType">
       <enum>QSizePolicy::Fixed</enum>
      </property>
@@ -785,6 +852,26 @@
    <extends>QGroupBox</extends>
    <header>C_OgeGbxGrayed.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_GiSyColorShower</class>
+   <extends>QPushButton</extends>
+   <header>C_GiSyColorShower.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubTextOnly</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubTextOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubColor</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubColor.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -90,7 +90,6 @@ SOURCES +=\
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileAsc.cpp \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocols.cpp \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocolOpenSYDE.cpp \
-    ../libs/opensyde_core/miniz/miniz.c \
     ../src/can_monitor/cam_main.cpp \
     ../src/project_operations/C_PopErrorHandling.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/Attribute.cpp \
@@ -299,7 +298,25 @@ SOURCES +=\
     ../src/can_monitor/message_trace/C_CamMetTreeLoggerDataGreyOutInformation.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.cpp
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfig.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigChannel.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigDomain.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigFiler.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameter.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameterStruct.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDef.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelAvailability.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelUseCase.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContent.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContentBitmaskItem.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefDomain.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefElement.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefFiler.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStruct.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStructFiler.cpp \
+    ../libs/opensyde_core/halc/definition/base/C_OSCHalcDefBase.cpp \
+    ../src/can_monitor/table_base/C_CamTblDelegate.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/can_monitor/precomp_headers.h
 
@@ -402,7 +419,6 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileAsc.h \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocols.h \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocolOpenSYDE.h \
-    ../libs/opensyde_core/miniz/miniz.h \
     ../src/project_operations/C_PopErrorHandling.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiError.h \
@@ -712,7 +728,25 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../src/can_monitor/message_trace/C_CamMetTreeLoggerDataGreyOutInformation.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.h
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfig.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigChannel.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigDomain.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigFiler.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameter.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameterStruct.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDef.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelAvailability.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelUseCase.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContent.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContentBitmaskItem.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefDomain.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefElement.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefFiler.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStruct.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStructFiler.h \
+    ../libs/opensyde_core/halc/definition/base/C_OSCHalcDefBase.h \
+    ../src/can_monitor/table_base/C_CamTblDelegate.h
 
 FORMS    += \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.ui \
@@ -764,6 +798,7 @@ INCLUDEPATH += ../src \
                ../src/can_monitor/can_monitor_gui_elements/spin_box \
                ../src/can_monitor/can_monitor_gui_elements/tool_button \
                ../src/can_monitor/can_monitor_gui_elements/widget \
+               ../src/can_monitor/table_base \
                ../src/can_monitor/util \
                ../src/help_engine \
                ../src/opensyde_gui_elements \
@@ -797,6 +832,9 @@ INCLUDEPATH += ../src \
                ../libs/opensyde_core/can_dispatcher \
                ../libs/opensyde_core/can_dispatcher/target_windows_stw_dlls \
                ../libs/opensyde_core/can_dispatcher/dispatcher \
+               ../libs/opensyde_core/halc/configuration \
+               ../libs/opensyde_core/halc/definition \
+               ../libs/opensyde_core/halc/definition/base \
                ../libs/opensyde_core/logging \
                ../libs/opensyde_core/md5 \
                ../libs/opensyde_core/project \
@@ -811,7 +849,6 @@ INCLUDEPATH += ../src \
                ../libs/opensyde_core/kefex_diaglib/tgl_windows \
                ../libs/opensyde_core/xml_parser \
                ../libs/opensyde_core/xml_parser/tinyxml2 \
-               ../libs/opensyde_core/miniz \
                ../libs/gettext \
                ../libs/dbc_driver_library/src \
                ../libs/dbc_driver_library/src/Vector \

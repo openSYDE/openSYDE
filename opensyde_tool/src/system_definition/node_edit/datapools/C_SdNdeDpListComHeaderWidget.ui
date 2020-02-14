@@ -48,7 +48,7 @@
       </spacer>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,0,1,0,0,0,0,0,0,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,0,1,0,0,0,0,0">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -337,42 +337,6 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
-         <item>
-          <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonImport">
-           <property name="minimumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_7">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
         <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0">
          <property name="spacing">
           <number>0</number>
@@ -432,15 +396,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
    <header>C_OgeGbxTransparent.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubIconOnly.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabListHeader</class>

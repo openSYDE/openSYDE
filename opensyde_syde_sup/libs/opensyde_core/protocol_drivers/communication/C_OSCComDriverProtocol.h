@@ -48,15 +48,21 @@ public:
                                   stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
                                   C_OSCIpDispatcher * const opc_IpDispatcher);
    stw_types::sint32 SendTesterPresent(const std::set<stw_types::uint32> * const opc_SkipNodes = NULL);
+   stw_types::sint32 SendTesterPresent(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const;
    stw_types::sint32 StartRouting(const stw_types::uint32 ou32_NodeIndex,
                                   stw_types::uint32 * const opu32_ErrorNodeIndex = NULL);
    stw_types::sint32 StopRouting(const stw_types::uint32 ou32_NodeIndex);
    stw_types::sint32 IsRoutingNecessary(const stw_types::uint32 ou32_NodeIndex);
+   bool IsEthToEthRoutingNecessary(const stw_types::uint32 ou32_RouterNodeIndex) const;
    stw_types::sint32 GetBusIndexOfRoutingNode(const stw_types::uint32 ou32_NodeIndex,
                                               stw_types::uint32 & oru32_BusIndex);
    stw_types::uint32 GetRoutingPointMaximum(void) const;
    stw_types::uint32 GetRoutingPointCount(const stw_types::uint32 ou32_NodeIndex, bool & orq_Active) const;
    void GetRouteOfNode(const stw_types::uint32 ou32_NodeIndex, C_OSCRoutingRoute & orc_Route) const;
+   stw_types::sint32 GetRoutingTargetInterfaceType(const stw_types::uint32 ou32_NodeIndex,
+                                                   C_OSCSystemBus::E_Type & ore_InterfaceType) const;
+   stw_types::sint32 GetServerIdOfLastRouter(const stw_types::uint32 ou32_NodeIndex,
+                                             stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_RouterServerId) const;
 
    const stw_opensyde_core::C_OSCProtocolDriverOsyNode & GetClientId(void) const;
    bool GetNodeIndex(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId,
@@ -92,6 +98,9 @@ protected:
    ///Length matches number of active nodes.
    std::vector<stw_opensyde_core::C_OSCCanDispatcherOsyRouter *> mc_LegacyRouterDispatchers;
 
+   ///Active nodes which are the last CAN node on a route before the concrete target
+   std::vector<stw_types::uint32> mc_ActiveNodesLastCanRouters;
+
    stw_opensyde_core::C_OSCProtocolDriverOsyTpCan * mpc_CanTransportProtocolBroadcast;
    stw_opensyde_core::C_OSCProtocolDriverOsyTpIp * mpc_IpTransportProtocolBroadcast;
 
@@ -117,7 +126,8 @@ protected:
    stw_types::sint32 m_SetNodeSecurityAccess(const stw_types::uint32 ou32_ActiveNode,
                                              const stw_types::uint8 ou8_SecurityLevel,
                                              stw_types::uint8 * const opu8_NrCode) const;
-   stw_types::sint32 m_SetNodesSecurityAccess(const stw_types::uint8 ou8_SecurityLevel) const;
+   stw_types::sint32 m_SetNodesSecurityAccess(const stw_types::uint8 ou8_SecurityLevel,
+                                              std::set<stw_types::uint32> & orc_ErrorActiveNodes) const;
 
    stw_types::sint32 m_StartRoutingIp2Ip(const stw_types::uint32 ou32_ActiveNode,
                                          stw_types::uint32 * const opu32_ErrorActiveNodeIndex);

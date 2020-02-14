@@ -53,8 +53,7 @@ const QSize C_SdNdeDpSelectorItemWidget::hc_MinimumSize = QSize(145, 61);
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpSelectorItemWidget::C_SdNdeDpSelectorItemWidget(const bool oq_UsageViewActive,
-                                                                     QWidget * const opc_Parent) :
+C_SdNdeDpSelectorItemWidget::C_SdNdeDpSelectorItemWidget(const bool oq_UsageViewActive, QWidget * const opc_Parent) :
    C_OgeWiWithToolTip(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpSelectorItemWidget),
    mpc_UsageBar(NULL),
@@ -178,8 +177,8 @@ void C_SdNdeDpSelectorItemWidget::SetData(const stw_opensyde_core::C_OSCNodeData
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemWidget::SetData(const QString & orc_DatapoolName, const QString & orc_DatapoolComment,
-                                                const bool oq_Safety, const uint32 ou32_Size, const uint32 ou32_Used,
-                                                const uint32 ou32_Reserved)
+                                          const bool oq_Safety, const uint32 ou32_Size, const uint32 ou32_Used,
+                                          const uint32 ou32_Reserved)
 {
    this->mpc_Ui->pc_TextEditDpName->setText(orc_DatapoolName);
    this->mpc_Ui->pc_TextEditDpComment->setText(orc_DatapoolComment);
@@ -256,8 +255,19 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
          c_ToolTipText += "\n";
       }
 
+      // Scope flag
+      c_ToolTipText += C_GtGetText::h_GetText("   Scope of Content: ");
+      if (pc_OSCDataPool->q_ScopeIsPrivate == true)
+      {
+         c_ToolTipText += C_GtGetText::h_GetText("Private");
+      }
+      else
+      {
+         c_ToolTipText += C_GtGetText::h_GetText("Public");
+      }
+
       // Safety flag
-      c_ToolTipText += C_GtGetText::h_GetText("   Safety Relevant Content: ");
+      c_ToolTipText += C_GtGetText::h_GetText("\n   Safety Relevant Content: ");
       if (pc_OSCDataPool->q_IsSafety == true)
       {
          c_ToolTipText += C_GtGetText::h_GetText("Yes");
@@ -301,7 +311,7 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
          c_ToolTipText += C_GtGetText::h_GetText("Share configuration with:\n");
 
          C_SdNdeDpUtil::GetSharedDatapoolGroup(u32_SharedGroup, this->mc_DatapoolId,
-                                                     this->mc_DatapoolId.u32_NodeIndex, c_SharedDatapoolGroup);
+                                               this->mc_DatapoolId.u32_NodeIndex, c_SharedDatapoolGroup);
 
          for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < c_SharedDatapoolGroup.size(); ++u32_DatapoolCounter)
          {

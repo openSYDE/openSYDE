@@ -43,7 +43,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSliDashboard::C_OgeSliDashboard(QWidget * const opc_Parent) :
@@ -70,8 +70,8 @@ C_OgeSliDashboard::~C_OgeSliDashboard(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current style
 
-   \param[in] oe_Style  Widget style
-   \param[in] oq_IsDark Dark mode active flag
+   \param[in]  oe_Style    Widget style
+   \param[in]  oq_IsDark   Dark mode active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::SetCurrentStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_IsDark)
@@ -84,8 +84,7 @@ void C_OgeSliDashboard::SetCurrentStyle(const C_PuiSvDbWidgetBase::E_Style oe_St
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply style
 
-   \param[in] oe_Style New style type
-   \param[in] oe_Type  New item type
+   \param[in]  oe_Type  New item type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::SetDisplayStyle(const C_PuiSvDbSlider::E_Type oe_Type)
@@ -159,7 +158,7 @@ void C_OgeSliDashboard::HandleResize(void)
 
    Here: Update style
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::resizeEvent(QResizeEvent * const opc_Event)
@@ -174,7 +173,7 @@ void C_OgeSliDashboard::resizeEvent(QResizeEvent * const opc_Event)
 
    Here: paint handle manually
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::paintEvent(QPaintEvent * const opc_Event)
@@ -186,7 +185,7 @@ void C_OgeSliDashboard::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set SVG path
 
-   \param[in] orc_Path SVG path
+   \param[in]  orc_Path    SVG path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::m_SetSvg(const QString & orc_Path)
@@ -205,6 +204,8 @@ void C_OgeSliDashboard::m_SetSvg(const QString & orc_Path)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Manually draw handle
+
+   \param[in]  orc_Rect    Rectangle to draw in
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::m_DrawHandle(const QRect & orc_Rect)
@@ -253,24 +254,10 @@ void C_OgeSliDashboard::m_ReinitStyle(void)
          }
          break;
       case C_PuiSvDbSlider::eOPENSYDE_2:
-         if (this->mq_IsDark == false)
-         {
-            this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleOpenSYDE2Bright1.svg");
-         }
-         else
-         {
-            this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleOpenSYDE2Bright1.svg");
-         }
+         this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleOpenSYDE2Bright1.svg");
          break;
       case C_PuiSvDbSlider::eFLAT:
-         if (this->mq_IsDark == false)
-         {
-            this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleFlat1.svg");
-         }
-         else
-         {
-            this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleFlat1.svg");
-         }
+         this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleFlat1.svg");
          break;
       case C_PuiSvDbSlider::eSKEUOMORPH:
          if (this->mq_IsDark == false)
@@ -309,14 +296,7 @@ void C_OgeSliDashboard::m_ReinitStyle(void)
          }
          break;
       case C_PuiSvDbSlider::eFLAT:
-         if (this->mq_IsDark == false)
-         {
-            this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleFlat2.svg");
-         }
-         else
-         {
-            this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleFlat2.svg");
-         }
+         this->m_SetSvg("://images/system_views/dashboards/icons/SliderHandleFlat2.svg");
          break;
       case C_PuiSvDbSlider::eSKEUOMORPH:
          if (this->mq_IsDark == false)

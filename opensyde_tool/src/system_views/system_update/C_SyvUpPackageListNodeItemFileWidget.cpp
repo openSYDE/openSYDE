@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui;
    \param[in]     orc_DeviceName       Name of device for comparing with application block
    \param[in]     oq_FileBased         Flag if node is a file based device
    \param[in]     oq_StwFlashloader    Flag if node has not an openSYDE Flashloader but a STW Flashloader
-   \param[in,out] opc_parent           Optional pointer to parent
+   \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPackageListNodeItemFileWidget::C_SyvUpPackageListNodeItemFileWidget(const uint32 ou32_ViewIndex,

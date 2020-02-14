@@ -74,6 +74,7 @@ C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueSignalPropertiesWidget),
    mpc_MessageSyncManager(NULL),
+   mu32_SignalIndex(0U),
    me_DataType(eTY_UNSIGNED)
 {
    // init UI
@@ -1264,64 +1265,6 @@ void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_Sign
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check min, max or init value
-
-   \param[in] orq_SignalErrorChange Optional flag to suppress error signal
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_CheckMinMaxAndInitValue(const bool & orq_SignalErrorChange)
-{
-   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
-      this->mc_MessageId.u32_NodeIndex, this->mc_MessageId.e_ComProtocol, this->mc_MessageId.u32_InterfaceIndex,
-      this->mc_MessageId.u32_DatapoolIndex, this->mc_MessageId.q_MessageIsTx);
-
-   //check
-   if ((pc_Message != NULL) && (pc_List != NULL))
-   {
-      bool q_InitValid;
-      bool q_MinOverMax = false;
-      bool q_ValueBelowMin = false;
-      bool q_ValueOverMax = false;
-      bool q_MinMaxValid;
-
-      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL,
-                                           &q_MinOverMax, &q_ValueBelowMin, &q_ValueOverMax, NULL, NULL,
-                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                              this->mc_MessageId.e_ComProtocol));
-      q_InitValid = (q_ValueBelowMin == false) && (q_ValueOverMax == false);
-      q_MinMaxValid = (q_MinOverMax == false);
-      //set invalid text property
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetMin, "Valid", q_MinMaxValid);
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetMax, "Valid", q_MinMaxValid);
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetInit, "Valid", q_InitValid);
-      if (q_MinMaxValid == true)
-      {
-         this->mpc_Ui->pc_WidgetMin->SetToolTipInformation("", "", stw_opensyde_gui::C_NagToolTip::eDEFAULT);
-         this->mpc_Ui->pc_WidgetMax->SetToolTipInformation("", "", stw_opensyde_gui::C_NagToolTip::eDEFAULT);
-      }
-      else
-      {
-         const QString c_Content = C_GtGetText::h_GetText("Minimum over maximum value");
-         this->mpc_Ui->pc_WidgetMin->SetToolTipInformation("", c_Content, stw_opensyde_gui::C_NagToolTip::eERROR);
-         this->mpc_Ui->pc_WidgetMax->SetToolTipInformation("", c_Content, stw_opensyde_gui::C_NagToolTip::eERROR);
-      }
-      if (q_InitValid == true)
-      {
-         this->mpc_Ui->pc_WidgetInit->SetToolTipInformation("", "", stw_opensyde_gui::C_NagToolTip::eDEFAULT);
-      }
-      else
-      {
-         const QString c_Content = C_GtGetText::h_GetText("Init value out of range of maximum and minimum value");
-         this->mpc_Ui->pc_WidgetInit->SetToolTipInformation("", c_Content, stw_opensyde_gui::C_NagToolTip::eDEFAULT);
-      }
-      if (orq_SignalErrorChange == true)
-      {
-         Q_EMIT this->SigRecheckError(this->mc_MessageId);
-      }
-   }
-}
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle name change and do every check without sending any error changed signals yet
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1369,6 +1312,7 @@ void C_SdBueSignalPropertiesWidget::m_SaveToData(const E_Change oe_Change)
          if ((pc_Message != NULL) && (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE))
          {
             C_OSCCanMessage c_Copy = *pc_Message;
+            c_Copy.u32_CycleTimeMs = 0U;
             c_Copy.e_TxMethod = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
             this->mpc_MessageSyncManager->SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
                this->mc_MessageId, c_Copy);
@@ -1527,8 +1471,8 @@ void C_SdBueSignalPropertiesWidget::m_HandleAnyChange(const C_SdBueSignalPropert
       c_Message.SetHeading(C_GtGetText::h_GetText("Multiplexer type"));
       c_Message.SetDescription(c_UserNotificationText);
       c_Message.SetDetails(c_UserNotificationAdditionalInformation);
-      c_Message.SetCustomMinHeight(200); //unknown issue: message box grabs the place it need.
-                                         //but better than without custom adaptation
+      c_Message.SetCustomMinHeight(230, 400); //unknown issue: message box grabs the place it need.
+                                              //but better than without custom adaptation
       c_Message.Execute();
    }
 }
@@ -1984,6 +1928,8 @@ void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
          if ((pc_OSCMessage != NULL) && (pc_OSCMessage->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE))
          {
             C_OSCCanMessage c_Copy = *pc_OSCMessage;
+            // On event has no cycle time
+            c_Copy.u32_CycleTimeMs = 0U;
             c_Copy.e_TxMethod = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
             this->mpc_MessageSyncManager->SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
                this->mc_MessageId, c_Copy);

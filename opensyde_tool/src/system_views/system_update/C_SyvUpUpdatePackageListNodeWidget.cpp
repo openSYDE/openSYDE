@@ -59,7 +59,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent           Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpUpdatePackageListNodeWidget::C_SyvUpUpdatePackageListNodeWidget(QWidget * const opc_Parent) :
@@ -112,11 +112,10 @@ C_SyvUpUpdatePackageListNodeWidget::~C_SyvUpUpdatePackageListNodeWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialization of the widget
 
-   \param[in]     ou32_ViewIndex       View index
-   \param[in]     ou32_PositionNumber  Position number of node for showing
-   \param[in]     ou32_NodeIndex       Node index
-   \param[in]     orc_NodeName         Name of the node
-   \param[in]     oq_FirstList         Flag if list is first in showing order
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_PositionNumber  Position number of node for showing
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  orc_NodeName         Name of the node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::InitWidget(const uint32 ou32_ViewIndex, const uint32 ou32_PositionNumber,
@@ -184,8 +183,6 @@ void C_SyvUpUpdatePackageListNodeWidget::SetUpdateApplicationFinished(void) cons
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the widget when the application update hat an error
-
-   \param[in]     ou32_NodeIndex         Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::SetUpdateApplicationError(void) const
@@ -249,7 +246,7 @@ void C_SyvUpUpdatePackageListNodeWidget::SetDisconnected(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the position number
 
-   \param[in]     ou32_PositionNumber         New position number
+   \param[in]  ou32_PositionNumber  New position number
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::UpdatePositionNumber(const uint32 ou32_PositionNumber)
@@ -262,7 +259,7 @@ void C_SyvUpUpdatePackageListNodeWidget::UpdatePositionNumber(const uint32 ou32_
 
    Default implementation can not add new files
 
-   \param[in]     orc_File      New path
+   \param[in]  orc_File    New path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::AddFile(const QString & orc_File)
@@ -273,8 +270,8 @@ void C_SyvUpUpdatePackageListNodeWidget::AddFile(const QString & orc_File)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a new file for the application
 
-   \param[in]     orc_File      New path
-   \param[in]     opc_App       Application widget
+   \param[in]  orc_File    New path
+   \param[in]  opc_App     Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::AdaptFile(const QString & orc_File,
@@ -292,7 +289,7 @@ void C_SyvUpUpdatePackageListNodeWidget::AdaptFile(const QString & orc_File,
 
    Default implementation can not revert files
 
-   \param[in]     opc_App       Application widget
+   \param[in]  opc_App  Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::RevertFile(C_SyvUpUpdatePackageListNodeItemWidget * const opc_App)
@@ -303,7 +300,7 @@ void C_SyvUpUpdatePackageListNodeWidget::RevertFile(C_SyvUpUpdatePackageListNode
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Removes the current application
 
-   \param[in]     opc_App       Application widget
+   \param[in]  opc_App  Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::RemoveFile(C_SyvUpUpdatePackageListNodeItemWidget * const opc_App)
@@ -358,7 +355,7 @@ void C_SyvUpUpdatePackageListNodeWidget::RemoveAllFiles(void)
    Check and update of information which application is already finished and must not be updated
    Default implementation sets all files to hu32_STATE_TO_DO
 
-   \param[in] orc_DeviceInformation Device info
+   \param[in]  orc_DeviceInformation   Device info
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::UpdateDeviceInformation(const C_SyvUpDeviceInfo & orc_DeviceInformation)
@@ -391,9 +388,9 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks all paths for existence
 
-   \param[out]    oru32_CountFiles           Number of files
-   \param[out]    opc_MissingApps            App names of apps with missing file
-   \param[out]    opc_FlashwareWarningsApps  App names of apps with flashware warnings
+   \param[out]  oru32_CountFiles             Number of files
+   \param[out]  opc_MissingApps              App names of apps with missing file
+   \param[out]  opc_FlashwareWarningsApps    App names of apps with flashware warnings
 
    \return
    C_NO_ERR    All files are existent
@@ -481,7 +478,7 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::CheckAllFiles(stw_types::uint32 & oru
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns and select the application on the position
 
-   \param[in]     orc_Pos     Position of application
+   \param[in]  orc_Pos  Position of application
 
    \return
    Pointer to application
@@ -504,8 +501,8 @@ C_SyvUpUpdatePackageListNodeItemWidget * C_SyvUpUpdatePackageListNodeWidget::Get
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the application on the position
 
-   \param[in]     orc_Pos        Position of application
-   \param[out]    opu32_Number   Optional parameter for found app number
+   \param[in]   orc_Pos       Position of application
+   \param[out]  opu32_Number  Optional parameter for found app number
 
    \return
    Pointer to application
@@ -559,8 +556,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Sets the select state of an specific application
 
-   \param[in]       ou32_Application     Application number
-   \param[in]       oq_Select            Flag if application should be selected
+   \param[in]  ou32_Application  Application number
+   \param[in]  oq_Select         Flag if application should be selected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::SetApplicationSelect(const uint32 ou32_Application, const bool oq_Select) const
@@ -619,9 +616,9 @@ bool C_SyvUpUpdatePackageListNodeWidget::IsUpdateNecessary(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates and returns the update package with all information for the system update for the concrete node
 
-   \param[out]    orc_ApplicationsToWrite       Vector with node update configuration
-   \param[out]    orc_ApplicationsToWrite       Optional vector with all node applications
-   \param[out]    oru32_FilesUpdated            Number of already updated files or no update necessary
+   \param[out]  orc_ApplicationsToWrite   Vector with node update configuration
+   \param[out]  opc_AllApplications       Optional vector with all node applications
+   \param[out]  oru32_FilesUpdated        Number of already updated files or no update necessary
 
    \return
    C_NO_ERR    Update package with all information created
@@ -714,11 +711,11 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if mime valid
 
-   \param[in,out]   orc_PathList             File paths to analyze, relevant paths in opc_RelevantFilePaths in
-                                             will be removed here
-   \param[in]       orc_Pos                  Mouse position
-   \param[out]      opc_RelevantFilePaths    File paths which could be used for this list
-   \param[out]      oppc_App                 Found application widget
+   \param[in,out]  orc_PathList           File paths to analyze, relevant paths in opc_RelevantFilePaths in
+                                          will be removed here
+   \param[in]      orc_Pos                Mouse position
+   \param[out]     opc_RelevantFilePaths  File paths which could be used for this list
+   \param[out]     oppc_App               Found application widget
 
    \return
    true  Valid
@@ -789,7 +786,10 @@ bool C_SyvUpUpdatePackageListNodeWidget::IsExpanded(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Returns path of specific application
 
-   \param[in]       ou32_Application     Application number
+   \param[in]  ou32_Application  Application number
+
+   \return
+   Path of application
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvUpUpdatePackageListNodeWidget::m_GetApplicationPath(const uint32 ou32_Application) const
@@ -850,7 +850,7 @@ void C_SyvUpUpdatePackageListNodeWidget::m_SetApplicationState(const uint32 ou32
 
    Here: expand/collapse on  mouse press
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::mousePressEvent(QMouseEvent * const opc_Event)
@@ -867,7 +867,7 @@ void C_SyvUpUpdatePackageListNodeWidget::mousePressEvent(QMouseEvent * const opc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of expand signal.
 
-   \param[in] oq_Expand    true: expand; false: collapse
+   \param[in]  oq_Expand   true: expand; false: collapse
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::m_OnExpand(const bool oq_Expand)

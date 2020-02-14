@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string>C_CamMetStatusBarWidget</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0,1">
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0,0">
    <property name="leftMargin">
     <number>10</number>
    </property>
@@ -39,43 +39,16 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="widget" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>350</width>
-       <height>0</height>
-      </size>
+    <widget class="stw_opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_ActiveFiltersLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>350</width>
-       <height>16777215</height>
-      </size>
+     <property name="text">
+      <string>TextLabel</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="stw_opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_ActiveFiltersLabel">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item>
@@ -101,43 +74,16 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_2" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>250</width>
-       <height>0</height>
-      </size>
+    <widget class="stw_opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_BusLoadLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>250</width>
-       <height>16777215</height>
-      </size>
+     <property name="text">
+      <string>TextLabel</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>4</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="stw_opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_BusLoadLabel">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item>
@@ -163,43 +109,16 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" name="widget_3" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>250</width>
-       <height>0</height>
-      </size>
+    <widget class="stw_opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_TxErrorsLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>250</width>
-       <height>16777215</height>
-      </size>
+     <property name="text">
+      <string>TextLabel</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>4</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="stw_opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_TxErrorsLabel">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item>

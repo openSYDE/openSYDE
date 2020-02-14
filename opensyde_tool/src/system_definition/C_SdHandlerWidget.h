@@ -68,6 +68,7 @@ private:
    void m_ErrorChange(void);
    void GenerateCode(void) const;
    void Export(void);
+   void Import(void);
    void RtfExport(void);
 
    Ui::C_SdHandlerWidget * mpc_Ui;
@@ -83,6 +84,7 @@ private:
 
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_APPLY;
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_GENERATE_CODE;
+   static const stw_types::uint32 mhu32_USER_INPUT_FUNC_IMPORT;
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_EXPORT;
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_RTF_EXPORT;
 

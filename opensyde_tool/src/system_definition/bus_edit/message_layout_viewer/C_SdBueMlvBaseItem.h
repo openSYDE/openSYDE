@@ -45,9 +45,9 @@ public:
    //lint -restore
 
 protected:
-   const QColor mc_BackgroundColorDefault;
+   QColor mc_BackgroundColorDefault;
    QColor mc_DrawBackgroundColor;
-   const QColor mc_FontColorDefault;
+   QColor mc_FontColorDefault;
    QColor mc_DrawFontColor;
    QFont mc_Font;
    QString mc_Text;

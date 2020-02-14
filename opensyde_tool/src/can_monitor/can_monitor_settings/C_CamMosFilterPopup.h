@@ -78,7 +78,7 @@ private:
    stw_types::sint32 m_GetCurrentSelectedRowIndex(void) const;
    void m_UpdateTitleFilterItemCount(void) const;
    void m_SetMessageDataFromDatabase(const stw_types::uint32 ou32_CanId, const bool oq_IsExtended);
-   static QString mh_GetValueAsHex(const stw_types::uint32 u32_Value);
+   static QString mh_GetValueAsHex(const stw_types::uint32 ou32_Value);
 
    //Avoid call
    C_CamMosFilterPopup(const C_CamMosFilterPopup &);

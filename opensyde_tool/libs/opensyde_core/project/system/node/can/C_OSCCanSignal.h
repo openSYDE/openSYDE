@@ -43,6 +43,7 @@ public:
    C_OSCCanSignal(void);
 
    bool operator !=(const C_OSCCanSignal & orc_Cmp) const;
+   bool operator ==(const C_OSCCanSignal & orc_Cmp) const;
 
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
    // Helper functions for byte order

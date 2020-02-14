@@ -820,15 +820,6 @@ void C_GiLiBusConnectorBase::m_UpdateGenericItem(C_GiBiConnectableItem * const o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Restore last valid bus
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnectorBase::m_RestoreLastValidBus(void)
-{
-   m_UpdateBus(this->mc_Points[this->m_GetBusInteractionIndex()]->scenePos(), this->mpc_LastKnownBusItem);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Restore bus connection state to normal and reconnect all in air interaction points
 */
 //----------------------------------------------------------------------------------------------------------------------

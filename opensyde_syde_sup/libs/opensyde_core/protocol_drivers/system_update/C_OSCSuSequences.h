@@ -60,6 +60,8 @@ public:
       std::vector<stw_scl::C_SCLString> c_FilesToFlash;
       ///list of parameter files to write to NVM (keep size to 0 to not write any files)
       std::vector<stw_scl::C_SCLString> c_FilesToWriteToNvm;
+      ///optional list of names to allow (other than the device name itself)
+      std::vector<stw_scl::C_SCLString> c_OtherAcceptedDeviceNames;
    };
 
    ///set of information used to identify one application
@@ -93,6 +95,7 @@ public:
       eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR,
       eACTIVATE_FLASHLOADER_ROUTING_START,
       eACTIVATE_FLASHLOADER_ROUTING_ERROR,
+      eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR, // problem with available features of flashloader
       eACTIVATE_FLASHLOADER_FINISHED,
 
       eREAD_DEVICE_INFO_START, //supports aborting
@@ -152,18 +155,18 @@ public:
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED,
 
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START,          //reported once for each node (if there are > 0 NVM files)
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START, //reported once for each node (if there are > 0 NVM files)
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR,
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR, // problem getting the available features
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR,      // problem getting the available features
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of flashloader
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR,
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR, //problem getting maximum block size from device
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START, //reported once for each file; supports aborting
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR, //problem opening input file
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR,   //problem getting maximum block size from device
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START,  //reported once for each file; supports aborting
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR,  //problem opening input file
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_START, //reported once for each file; supports aborting
       eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR, //problem writing file data to device
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED,  //reported for each finished file
-      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED,       //reported once for each node (if there are > 0 NVM files)
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED,    //reported for each finished file
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED,         //reported once for each node (if there are > 0 NVM files)
 
       eUPDATE_SYSTEM_OSY_NODE_FINISHED,
       eUPDATE_SYSTEM_ABORTED,
@@ -231,6 +234,7 @@ private:
    C_OSCProtocolDriverOsyNode mc_CurrentNode; //node we currently deal with
 
    stw_types::sint32 m_FlashNodeOpenSydeHex(const std::vector<stw_scl::C_SCLString> & orc_FilesToFlash,
+                                            const std::vector<stw_scl::C_SCLString> & orc_OtherAcceptedDeviceNames,
                                             const stw_types::uint32 ou32_RequestDownloadTimeout,
                                             const stw_types::uint32 ou32_TransferDataTimeout);
    stw_types::sint32 m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexDataDump & orc_HexDataDump,

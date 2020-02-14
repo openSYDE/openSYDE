@@ -52,6 +52,7 @@ public:
 
    void SetEditMode(const bool oq_Active);
    void SetDarkMode(const bool oq_Active);
+   void SetEnabled(const bool oq_Enabled) const;
    void Save(void) const;
    void HandleManualOperationFinished(const stw_types::sint32 os32_Result, const stw_types::uint8 ou8_NRC) const;
    void SetErrorForFailedCyclicElementIdRegistrations(

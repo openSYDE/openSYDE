@@ -56,7 +56,7 @@ C_PuiSvPc::C_PuiSvPc(void) :
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::CalcHash(uint32 & oru32_HashValue) const
@@ -111,7 +111,7 @@ const C_PuiBsLineBase & C_PuiSvPc::GetConnectionData(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connection UI data
 
-   \param[in] orc_Value New connection UI data
+   \param[in]  orc_Value   New connection UI data
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetConnectionData(const C_PuiBsLineBase & orc_Value)
@@ -122,9 +122,9 @@ void C_PuiSvPc::SetConnectionData(const C_PuiBsLineBase & orc_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connected state of pc in view
 
-   \param[in] oq_Connected       Flag if pc is connected
-   \param[in] ou32_BusIndex      Bus index PC is connected to
-   \param[in] orq_ForceSimpleSet Optional flag to indicate if this function is used as a simple set or a logic operation
+   \param[in]  oq_Connected         Flag if pc is connected
+   \param[in]  ou32_BusIndex        Bus index PC is connected to
+   \param[in]  orq_ForceSimpleSet   Optional flag to indicate if this function is used as a simple set or a logic operation
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetConnected(const bool oq_Connected, const uint32 ou32_BusIndex, const bool & orq_ForceSimpleSet)
@@ -210,7 +210,7 @@ QString C_PuiSvPc::GetCANDllAbsolute(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set DLL type. See get for type definition.
 
-   \param[in]     ors32_CanDllType   CAN DLL type
+   \param[in]  oe_Type  CAN DLL type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetCANDllType(const C_PuiSvPc::E_CANDllType oe_Type)
@@ -221,7 +221,7 @@ void C_PuiSvPc::SetCANDllType(const C_PuiSvPc::E_CANDllType oe_Type)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set path for the CAN DLL
 
-   \param[in]     orc_DllPath   Path for the CAN DLL
+   \param[in]  orc_Path    Path for the CAN DLL
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetCustomCANDllPath(const QString & orc_Path)
@@ -232,11 +232,7 @@ void C_PuiSvPc::SetCustomCANDllPath(const QString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set UI box
 
-   \param[in] orc_Box New UI box
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
+   \param[in]  orc_Box  New UI box
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetBox(const C_PuiBsBox & orc_Box)
@@ -250,7 +246,7 @@ void C_PuiSvPc::SetBox(const C_PuiBsBox & orc_Box)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sync view bus index to added bus index
 
-   \param[in] ou32_Index Added bus index
+   \param[in]  ou32_Index  Added bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::OnSyncBusAdded(const uint32 ou32_Index)
@@ -279,7 +275,7 @@ void C_PuiSvPc::OnSyncBusAdded(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sync view bus index to deleted bus index
 
-   \param[in] ou32_Index Deleted bus index
+   \param[in]  ou32_Index  Deleted bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::OnSyncBusDeleted(const uint32 ou32_Index)

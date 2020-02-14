@@ -55,7 +55,7 @@ C_SdNdeDpListTableErrorManager::C_SdNdeDpListTableErrorManager(void) :
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableErrorManager::Init(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                                const uint32 & oru32_ListIndex)
+                                          const uint32 & oru32_ListIndex)
 {
    const C_OSCNodeDataPool * pc_DataPool;
 
@@ -87,6 +87,6 @@ void C_SdNdeDpListTableErrorManager::OnErrorChange(void)
    }
    if (q_PreviousErrorState != this->mq_ElementsInvalid)
    {
-      Q_EMIT this->SigErrorChange();
+      Q_EMIT (this->SigErrorChange());
    }
 }

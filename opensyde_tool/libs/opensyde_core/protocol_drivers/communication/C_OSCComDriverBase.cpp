@@ -230,6 +230,7 @@ void C_OSCComDriverBase::StopLogging(void)
 void C_OSCComDriverBase::ContinueLogging(void)
 {
    uintn un_Counter;
+
    this->mq_Paused = false;
 
    // Inform all logger about the continue
@@ -249,6 +250,7 @@ void C_OSCComDriverBase::ContinueLogging(void)
 void C_OSCComDriverBase::PauseLogging(void)
 {
    uintn un_Counter;
+
    this->mq_Paused = true;
 
    // Inform all logger about the pause
@@ -348,7 +350,7 @@ void C_OSCComDriverBase::DistributeMessages(void)
          }
       }
 
-      // Inform about TX errros
+      // Inform about Tx errros
       for (un_LoggerCounter = 0U; un_LoggerCounter < this->mc_Logger.size(); ++un_LoggerCounter)
       {
          this->mc_Logger[un_LoggerCounter]->UpdateTxErrors(this->mu32_CanTxErrors);

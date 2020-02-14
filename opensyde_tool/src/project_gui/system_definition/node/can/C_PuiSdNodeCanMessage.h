@@ -29,7 +29,14 @@ public:
 
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
-   bool q_UseAutoReceiveTimeout;
+   enum E_RxTimeoutMode ///< Rx timeout mode
+   {
+      eRX_TIMEOUT_MODE_CUSTOM,  ///< Timeout time is defined by user
+      eRX_TIMEOUT_MODE_AUTO,    ///< Timeout time is calculated automatically
+      eRX_TIMEOUT_MODE_DISABLED ///< Timeout monitoring is disabled for the message (only for on event)
+   };
+
+   E_RxTimeoutMode e_ReceiveTimeoutMode;
    std::vector<C_PuiSdNodeCanSignal> c_Signals;
 };
 

@@ -126,7 +126,7 @@ uint32 C_OSCDataDealer::GetNodeIndex(void) const
    C_RANGE     specified data pool, list, element does not exist in data pools of configured node
                protocol driver reported parameter out of range (does the protocol support the index range ?)
    C_TIMEOUT   expected response not received within timeout
-   C_NOACT     could not send request (e.g. TX buffer full)
+   C_NOACT     could not send request (e.g. Tx buffer full)
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response received
    C_OVERFLOW  size of data received from server does not match size of specified data pool element
@@ -216,7 +216,7 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
                protocol driver reported parameter out of range (does the protocol support the index range ?)
    C_OVERFLOW  value in data pool does not lie within defined min/max range (checked on client side)
    C_TIMEOUT   expected response not received within timeout
-   C_NOACT     could not send request (e.g. TX buffer full)
+   C_NOACT     could not send request (e.g. Tx buffer full)
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response received
    C_COM       communication driver reported error
@@ -302,7 +302,7 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
    C_RANGE     specified data pool, list, element does not exist in data pools of configured node
                protocol driver reported parameter out of range (does the protocol support the address range ?)
    C_TIMEOUT   expected response not received within timeout
-   C_NOACT     could not send request (e.g. TX buffer full)
+   C_NOACT     could not send request (e.g. Tx buffer full)
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response reveived
    C_COM       expected server response not received because of communication error
@@ -382,7 +382,7 @@ sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16
                protocol driver reported parameter out of range (does the protocol support the index range ?)
    C_OVERFLOW  value in data pool does not lie within defined min/max range (checked on client side)
    C_TIMEOUT   expected response not received within timeout
-   C_NOACT     could not send request (e.g. TX buffer full)
+   C_NOACT     could not send request (e.g. Tx buffer full)
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response reveived
    C_COM       expected server response not received because of communication error

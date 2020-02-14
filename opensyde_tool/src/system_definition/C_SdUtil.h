@@ -73,7 +73,10 @@ public:
       const stw_types::sint32 os32_SpecialBusIndex);
    static void h_AdaptMessageToProtocolType(stw_opensyde_core::C_OSCCanMessage & orc_Message,
                                             const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Type,
-                                            QString * const opc_AdaptationInfos);
+                                            QStringList * const opc_AdaptationInfos);
+   static void h_AdaptSignalToProtocolType(stw_opensyde_core::C_OSCCanSignal & orc_Signal,
+                                           const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Type,
+                                           QStringList * const opc_AdaptationInfos);
    static void h_InitUsedNodeIdsLabel(const std::vector<stw_types::uint32> & orc_UsedNodeIds,
                                       const QString & orc_BusName, QLabel * const opc_Label);
    static QString h_InitUsedIdsString(const std::vector<stw_types::uint32> & orc_UsedIds, const QString & orc_ItemName,

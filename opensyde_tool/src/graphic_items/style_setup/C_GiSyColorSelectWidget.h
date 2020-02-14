@@ -9,13 +9,19 @@
 #define C_GISYCOLORSELECTWIDGET_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <QVector>
 #include <QWidget>
-#include "C_OgePopUpDialog.h"
 #include <QTimer>
 #include <QWindow>
-#include "C_ColorPickingEventFilter.h"
-#include "C_ColorOptions.h"
-#include "C_PlatformColorHelper.h"
+#include <QScreen>
+
+#include "stwtypes.h"
+
+#include "C_OgePopUpDialog.h"
+#include "C_GiSyScreenColorPickingEventFilter.h"
+#include "C_GiSyColorPicker.h"
+#include "C_GiSyColorBrightnessPicker.h"
+#include "C_OgePubColor.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -28,92 +34,26 @@ namespace stw_opensyde_gui
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-
+//lint -e{1960}  Forward declarations necessary for automatic registration
 class C_GiSyColorSelectWidget :
    public QWidget
 {
    Q_OBJECT
 
 public:
-   explicit C_GiSyColorSelectWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent);
+   explicit C_GiSyColorSelectWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const QColor c_Color);
    ~C_GiSyColorSelectWidget(void);
 
-   QColor m_ChooseSelectedColor(QColor);
-
-//   enum SetColorMode {
-//       ShowColor = 0x1,
-//       SelectColor = 0x2,
-//       SetColorAll = ShowColor | SelectColor
-//   };
-
-//   enum {
-//       colorColumns = 8,
-//       standardColorRows = 6,
-//       customColorRows = 2
-//   };
-
-////   C_GiSyColorSelectWidget() : options(new C_ColorOptions)
-////#ifdef Q_OS_WIN32
-////      , updateTimer(0)
-////#endif
-////    {}
-
-//   C_PlatformColorHelper *platformHelper() const;
-//   C_PlatformColorHelper *platformColorHelper() const
-//       { return static_cast<C_PlatformColorHelper *>(platformHelper()); }
-
-//   bool nativeDialogInUse;
-////   QTimer * updateTimer;
-////   QWindow dummyTransparentWindow;
-//   C_ColorPickingEventFilter *colorPickingEventFilter;
-//   void m_pickScreenColor();
-//   void setCurrentColor(const QColor &color,  SetColorMode setColorMode = SetColorAll);
-//   QColor grabScreenColor(const QPoint &p);
-//   void m_updateColorPicking();
-//   void updateColorPicking(const QPoint &globalPos);
-//   void setCurrentRgbColor(QRgb rgb);
-//   void m_newColorTypedIn(QRgb rgb);
-//   inline void setCurrentAlpha(int a);
-//   bool selectColor(const QColor &col);
-//   static inline void rgb2hsv(QRgb rgb, int &h, int &s, int &v);
-//   QColorShower *cs;
-//   QRgb beforeScreenColorPicking;
-//   QSharedPointer<C_ColorOptions> options;
-//   bool crossVisible;
-//   bool setCrossVisible(bool visible);
-
-//   bool handleColorPickingMouseMove(QMouseEvent *event);
-//   bool handleColorPickingMouseButtonRelease(QMouseEvent *event);
-//   bool handleColorPickingKeyPress(QKeyEvent *event);
-
-//#ifdef Q_OS_WIN32
-//    QTimer *updateTimer;
-//    QWindow dummyTransparentWindow;
-//#endif
+   QColor ChooseSelectedColor(void) const;
+   bool HandleColorPickingMouseMove(const QMouseEvent * const opc_MouseEvent);
+   bool HandleColorPickingMouseButtonRelease(const QMouseEvent * const opc_MouseEvent);
 
 protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
+   virtual void showEvent(QShowEvent * const opc_Event) override;
    //lint -restore
-
-private Q_SLOTS:
-   void m_OkClicked(void);
-   void m_CancelClicked(void);
-
-   void m_LightBlueClicked(void);
-   void m_GreenClicked(void);
-   void m_GoldClicked(void);
-   void m_OrangeClicked(void);
-   void m_RedClicked(void);
-   void m_PurpleClicked(void);
-   void m_LightGreenClicked(void);
-   void m_DarkBlueGreenClicked(void);
-   void m_LavendelClicked(void);
-
-   void m_HMTLClicked(void);
-   void m_RGBAClicked(void);
-   void m_LineEditTextChanged();
 
 private:
    Ui::C_GiSyColorSelectWidget * mpc_Ui;
@@ -124,21 +64,85 @@ private:
    C_GiSyColorSelectWidget(const C_GiSyColorSelectWidget &);
    C_GiSyColorSelectWidget & operator =(const C_GiSyColorSelectWidget &);
 
-   QColor * lightBlue;
-   QColor * green;
-   QColor * gold;
-   QColor * orange;
-   QColor * red;
-   QColor * purple;
-   QColor * lightGreen;
-   QColor * darkBlueGreen;
-   QColor * lavendel;
+   QColor mc_PreviousColor;
+   bool mq_ColorPickingActive;
+   C_GiSyScreenColorPickingEventFilter * mpc_ScreenColorPickingEventFilter;
+   mutable stw_types::sintn msn_NextRecentButton;
+   QTimer * mpc_UpdateTimer;
+   QWindow mc_DummyTransparentWindow;
+   C_GiSyColorPicker * mpc_ColorPicker;
+   C_GiSyColorBrightnessPicker * mpc_ColorBrightnessPicker;
+   QColor mc_LightBlue;
+   QColor mc_Green;
+   QColor mc_Gold;
+   QColor mc_Orange;
+   QColor mc_Red;
+   QColor mc_Purple;
+   QColor mc_LightGreen;
+   QColor mc_DarkBlueGreen;
+   QColor mc_Lavendel;
+   QVector<stw_opensyde_gui_elements::C_OgePubColor *> mc_StandardColorButtons;
 
-   void InitStaticNames(void) const;
-   void InitStandardColors(void);
-   void InitElements(void) const;
+   QLabel * mpc_LabelTransparentColorShower;
+   QLabel * mpc_LabelTransparentRecentColorNr1;
+   QLabel * mpc_LabelTransparentRecentColorNr2;
+   QLabel * mpc_LabelTransparentRecentColorNr3;
+   QLabel * mpc_LabelTransparentRecentColorNr4;
+   QLabel * mpc_LabelTransparentRecentColorNr5;
+   QLabel * mpc_LabelTransparentRecentColorNr6;
+
+   QColor mc_RecentColorNr1;
+   QColor mc_RecentColorNr2;
+   QColor mc_RecentColorNr3;
+   QColor mc_RecentColorNr4;
+   QColor mc_RecentColorNr5;
+   QColor mc_RecentColorNr6;
+
+   QColor mc_ColorBeforeScreenColorPicking;
+
+   void m_InitStaticNames(void) const;
+   void m_InitStandardColors(void);
+   void m_InitElements(void) const;
+   void m_InitStandardColorButtons(void);
+   void m_SetTransparentBackground(void);
+   void m_InitConnects(void);
+   void m_RepaintColorShowerButton(void) const;
+   void m_OkClicked(void);
+   void m_CancelClicked(void);
+   void m_StandardColorClicked(const stw_opensyde_gui_elements::C_OgePubColor * const opc_Button);
+   void m_LightBlueClicked(void);
+   void m_GreenClicked(void);
+   void m_GoldClicked(void);
+   void m_OrangeClicked(void);
+   void m_RedClicked(void);
+   void m_PurpleClicked(void);
+   void m_LightGreenClicked(void);
+   void m_DarkBlueGreenClicked(void);
+   void m_LavendelClicked(void);
+   void m_RecentColorNr1Clicked(void);
+   void m_RecentColorNr2Clicked(void);
+   void m_RecentColorNr3Clicked(void);
+   void m_RecentColorNr4Clicked(void);
+   void m_RecentColorNr5Clicked(void);
+   void m_RecentColorNr6Clicked(void);
+   void m_HMTLClicked(void) const;
+   void m_RGBAClicked(void) const;
    void m_PushButtonHTML(void) const;
    void m_PushButtonRGBA(void) const;
+   void m_UpdateLineEditColor(void) const;
+   void m_NewColor(void);
+   void m_AutomaticallyFillOutLineEditColor(void);
+   void m_SetRecentColorToRecentButton(stw_opensyde_gui_elements::C_OgePubColor * const opc_Button,
+                                       const QColor c_Color) const;
+   void m_AddRecentColors(void);
+   void m_NewHsv(const stw_types::sintn osn_H, const stw_types::sintn osn_S, const stw_types::sintn osn_V);
+   void m_PickScreenColor(void);
+   void m_UpdatePositionWhileScreenColorPicking(void);
+   void m_UpdateColorPicking(const QPoint & orc_GlobalPosition);
+   void m_SetCurrentRgbColor(const QRgb oun_Rgb);
+   QColor m_GrabScreenColor(const QPoint & orc_Position) const;
+   void m_NewColorTypedIn(const QRgb oun_Rgb);
+   void m_LeaveColorPicking(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

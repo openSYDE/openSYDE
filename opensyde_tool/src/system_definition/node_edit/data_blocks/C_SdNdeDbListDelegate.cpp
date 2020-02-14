@@ -54,8 +54,8 @@ C_SdNdeDbListDelegate::C_SdNdeDbListDelegate(QObject * const opc_Parent) :
    Here: Draw widget for drag event
 
    \param[in,out] opc_Painter Painter
-   \param[in,out] opc_Option  Option
-   \param[in,out] opc_Widget  Widget
+   \param[in,out] orc_Option  Option
+   \param[in,out] orc_Index   Model index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,

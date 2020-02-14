@@ -263,9 +263,10 @@ sint32 C_OSCSuSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_S
    * Reports progress from 0..100 for the overall process
    * Reports 0..100 for each file being flashed
 
-   \param[in]     orc_FilesToFlash              Files to flash
-   \param[in]     ou32_RequestDownloadTimeout   Maximum time in ms it can take to erase one continuous area in flash
-   \param[in]     ou32_TransferDataTimeout      Maximum time in ms it can take to write up to 4kB of data to flash
+   \param[in]  orc_FilesToFlash              Files to flash
+   \param[in]  orc_OtherAcceptedDeviceNames  Other accepted device names
+   \param[in]  ou32_RequestDownloadTimeout   Maximum time in ms it can take to erase one continuous area in flash
+   \param[in]  ou32_TransferDataTimeout      Maximum time in ms it can take to write up to 4kB of data to flash
 
    \return
    C_NO_ERR    flashed all files
@@ -279,6 +280,7 @@ sint32 C_OSCSuSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_S
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> & orc_FilesToFlash,
+                                                const std::vector<C_SCLString> & orc_OtherAcceptedDeviceNames,
                                                 const uint32 ou32_RequestDownloadTimeout,
                                                 const uint32 ou32_TransferDataTimeout)
 {
@@ -326,28 +328,18 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
       C_SCLString c_DeviceName;
       uint8 u8_NrCode;
 
-      //if connected via Ethernet we might need to reconnect (in case we ran into the session timeout)
-      s32_Return = this->m_ReconnectToTargetServer();
+      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_START, C_NO_ERR, 10U, mc_CurrentNode,
+                             "X-checking device name of device against HEX file contents ...");
+      //get target device name for comparison with PC-side files:
+      s32_Return = this->mpc_ComDriver->SendOsyReadDeviceName(mc_CurrentNode, c_DeviceName, &u8_NrCode);
       if (s32_Return != C_NO_ERR)
       {
-         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_RECONNECT_ERROR, s32_Return, 10U, mc_CurrentNode,
-                                "Could not reconnect to node");
+         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR, s32_Return, 10U,
+                                mc_CurrentNode, "Could not read device name from device. Details:" +
+                                C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return, u8_NrCode));
          s32_Return = C_COM;
       }
-      if (s32_Return == C_NO_ERR)
-      {
-         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_START, C_NO_ERR, 10U, mc_CurrentNode,
-                                "X-checking device name of device against HEX file contents ...");
-         //get target device name for comparison with PC-side files:
-         s32_Return = this->mpc_ComDriver->SendOsyReadDeviceName(mc_CurrentNode, c_DeviceName, &u8_NrCode);
-         if (s32_Return != C_NO_ERR)
-         {
-            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR, s32_Return, 10U,
-                                   mc_CurrentNode, "Could not read device name from device. Details:" +
-                                   C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(s32_Return, u8_NrCode));
-            s32_Return = C_COM;
-         }
-      }
+
       if (s32_Return == C_NO_ERR)
       {
          //for all files check whether:
@@ -381,12 +373,31 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
             }
             else
             {
-               if (c_DeviceName.Trim() != c_DeviceNameHexFile.Trim())
+               bool q_IsSame = false;
+               //Check actual device name
+               if (c_DeviceName.Trim().UpperCase() == c_DeviceNameHexFile.Trim().UpperCase())
+               {
+                  q_IsSame = true;
+               }
+               else
+               {
+                  //Check other accepted names
+                  for (uint32 u32_ItName = 0UL;
+                       (u32_ItName < orc_OtherAcceptedDeviceNames.size()) && (q_IsSame == false); ++u32_ItName)
+                  {
+                     if (orc_OtherAcceptedDeviceNames[u32_ItName].Trim().UpperCase() ==
+                         c_DeviceNameHexFile.Trim().UpperCase())
+                     {
+                        q_IsSame = true;
+                     }
+                  }
+               }
+               if (q_IsSame == false)
                {
                   C_SCLString c_ErrorText = "Device names of device and HEX file " + orc_FilesToFlash[u32_File] +
-                                            " do not match. Device reported: \"" + c_DeviceName.Trim() +
+                                            " do not match. Device reported: \"" + c_DeviceName.Trim().UpperCase() +
                                             "\". HEX file contains: \"" +
-                                            c_DeviceNameHexFile.Trim() + "\".";
+                                            c_DeviceNameHexFile.Trim().UpperCase() + "\".";
                   (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR, C_OVERFLOW, 10U,
                                          mc_CurrentNode, c_ErrorText);
                   s32_Return = C_OVERFLOW;
@@ -486,8 +497,6 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
       }
    }
 
-   (void)this->m_DisconnectFromTargetServer();
-
    //clean up hex file instances:
    for (uint32 u32_File = 0U; u32_File < c_Files.size(); u32_File++)
    {
@@ -549,8 +558,10 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexData
       //calculate progress percentage:
       // (we just need a rough approximation; so integer calculation will suffice)
       tgl_assert(u32_TotalNumberOfBytes != 0U); //prerequisite for function: non-empty hex file
+      // Prevent an overflow when file is bigger than 43MB
       //lint -e{414}  //see assertion
-      uint8 u8_ProgressPercentage = static_cast<uint8>((u32_TotalNumberOfBytesFlashed * 100U) / u32_TotalNumberOfBytes);
+      uint8 u8_ProgressPercentage = static_cast<uint8>((static_cast<uint64>(u32_TotalNumberOfBytesFlashed) * 100ULL) /
+                                                       static_cast<uint64>(u32_TotalNumberOfBytes));
       q_Abort = m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START, C_NO_ERR, u8_ProgressPercentage,
                                  mc_CurrentNode,
                                  "Erasing flash memory for area " + C_SCLString::IntToStr(s32_Area + 1) + "...");
@@ -634,9 +645,11 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexData
                   u32_RemainingBytes -= c_Data.size();
                   u8_BlockSequenceCounter = (u8_BlockSequenceCounter < 0xFFU) ? (u8_BlockSequenceCounter + 1U) : 0x00U;
                   u32_TotalNumberOfBytesFlashed += c_Data.size();
+                  // Prevent an overflow when file is bigger than 43MB
                   //lint -e{414}  //see assertion at initial assignment
-                  u8_ProgressPercentage = static_cast<uint8>((u32_TotalNumberOfBytesFlashed * 100U) /
-                                                             u32_TotalNumberOfBytes);
+                  u8_ProgressPercentage =
+                     static_cast<uint8>((static_cast<uint64>(u32_TotalNumberOfBytesFlashed) * 100ULL) /
+                                        static_cast<uint64>(u32_TotalNumberOfBytes));
                }
                else
                {
@@ -746,28 +759,16 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeFile(const std::vector<C_SCLString> 
 {
    sint32 s32_Return;
 
-   //if connected via Ethernet we might need to reconnect (in case we ran into the session timeout)
-   s32_Return = this->m_ReconnectToTargetServer();
+   //start the actual transfers
+   //we need to enter the programming session for that:
+   (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START, C_NO_ERR, 20U, mc_CurrentNode,
+                          "Checking memory availability ...");
+   s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
    if (s32_Return != C_NO_ERR)
    {
-      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_RECONNECT_ERROR, s32_Return, 10U, mc_CurrentNode,
-                             "Could not reconnect to node");
+      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR, s32_Return, 20U, mc_CurrentNode,
+                             "Could not activate programming session.");
       s32_Return = C_COM;
-   }
-
-   if (s32_Return == C_NO_ERR)
-   {
-      //start the actual transfers
-      //we need to enter the programming session for that:
-      (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START, C_NO_ERR, 20U, mc_CurrentNode,
-                             "Checking memory availability ...");
-      s32_Return = this->mpc_ComDriver->SendOsySetProgrammingMode(mc_CurrentNode);
-      if (s32_Return != C_NO_ERR)
-      {
-         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR, s32_Return, 20U, mc_CurrentNode,
-                                "Could not activate programming session.");
-         s32_Return = C_COM;
-      }
    }
 
    if (s32_Return == C_NO_ERR)
@@ -793,8 +794,6 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeFile(const std::vector<C_SCLString> 
          }
       }
    }
-
-   (void)this->m_DisconnectFromTargetServer();
 
    return s32_Return;
 }
@@ -929,9 +928,10 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
          C_SCLString c_Text;
          bool q_Abort;
          tgl_assert(u32_TotalNumberOfBytes != 0U); //prerequisite for function: non-empty hex file
+         // Prevent an overflow when file is bigger than 43MB
          //lint -e{414}  //see assertion
-         u8_ProgressPercentage = static_cast<uint8>((u32_TotalNumberOfBytesFlashed * 100U) /
-                                                    u32_TotalNumberOfBytes);
+         u8_ProgressPercentage = static_cast<uint8>((static_cast<uint64>(u32_TotalNumberOfBytesFlashed) * 100ULL) /
+                                                    static_cast<uint64>(u32_TotalNumberOfBytes));
 
          c_Text.PrintFormatted("Writing data byte %08d/%08d ...", u32_TotalNumberOfBytesFlashed,
                                u32_TotalNumberOfBytes);
@@ -1095,6 +1095,8 @@ sint32 C_OSCSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SCLString> & orc
    tgl_assert(pc_TransportProtocol != NULL);
    if (pc_TransportProtocol != NULL)
    {
+      C_OSCProtocolDriverOsy::C_ListOfFeatures c_AvailableFeatures;
+
       //get node-IDs from ProtocolDriver and set in DiagProtocol:
       pc_TransportProtocol->GetNodeIdentifiers(c_Client, c_Server);
       s32_Return = c_DiagProtocol.SetNodeIdentifiers(c_Client, c_Server);
@@ -1109,41 +1111,27 @@ sint32 C_OSCSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SCLString> & orc
       (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START, C_NO_ERR, 0U, mc_CurrentNode,
                              "Writing parameter set image files ...");
 
-      //if connected via Ethernet we might need to reconnect (in case we ran into the session timeout)
-      s32_Return = this->m_ReconnectToTargetServer();
+      // Check if the flashloader has enough features to write the NVM files
+      s32_Return = this->mpc_ComDriver->SendOsyReadListOfFeatures(this->mc_CurrentNode, c_AvailableFeatures);
+
       if (s32_Return != C_NO_ERR)
       {
-         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR, s32_Return, 5U, mc_CurrentNode,
-                                "Could not reconnect to node");
+         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR, s32_Return, 5U, mc_CurrentNode,
+                                "Could not read available openSYDE Flashloader features.");
          s32_Return = C_COM;
       }
-
-      // Check if the flashloader has enough features to write the NVM files
-      if (s32_Return == C_NO_ERR)
+      else if ((c_AvailableFeatures.q_FlashloaderCanWriteToNvm == false) ||
+               (c_AvailableFeatures.q_MaxNumberOfBlockLengthAvailable == false))
       {
-         C_OSCProtocolDriverOsy::C_ListOfFeatures c_AvailableFeatures;
-
-         s32_Return = this->mpc_ComDriver->SendOsyReadListOfFeatures(this->mc_CurrentNode, c_AvailableFeatures);
-
-         if (s32_Return != C_NO_ERR)
-         {
-            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR, s32_Return, 5U, mc_CurrentNode,
-                                   "Could not read available openSYDE Flashloader features.");
-            s32_Return = C_COM;
-         }
-         else if ((c_AvailableFeatures.q_FlashloaderCanWriteToNvm == false) ||
-                  (c_AvailableFeatures.q_MaxNumberOfBlockLengthAvailable == false))
-         {
-            s32_Return = C_RANGE;
-            // Both features are necessary to write NVM files to flashloader
-            (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return, 5U,
-                                   mc_CurrentNode,
-                                   "Not all necessary openSYDE Flashloader features are available on the node.");
-         }
-         else
-         {
-            // Nothing to do
-         }
+         s32_Return = C_RANGE;
+         // Both features are necessary to write NVM files to flashloader
+         (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR, s32_Return, 5U,
+                                mc_CurrentNode,
+                                "Not all necessary openSYDE Flashloader features are available on the node.");
+      }
+      else
+      {
+         // Nothing to do
       }
 
       if (s32_Return == C_NO_ERR)
@@ -1237,9 +1225,6 @@ sint32 C_OSCSuSequences::m_WriteNvmOpenSyde(const std::vector<C_SCLString> & orc
             }
          }
       }
-
-      //disconnect if connected via TCP:
-      (void)this->m_DisconnectFromTargetServer();
 
       if (s32_Return == C_NO_ERR)
       {
@@ -1625,6 +1610,11 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
    if ((orc_TargetPath[orc_TargetPath.Length()] != '\\') && (orc_TargetPath[orc_TargetPath.Length()] != '/'))
    {
       s32_Return = C_RANGE;
+
+      if (opc_ErrorPath != NULL)
+      {
+         *opc_ErrorPath = orc_TargetPath;
+      }
    }
    else
    {
@@ -1670,6 +1660,10 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                   if (TGL_FileExists(c_File) == false)
                   {
                      s32_Return = C_RANGE;
+                     if (opc_ErrorPath != NULL)
+                     {
+                        *opc_ErrorPath = c_File;
+                     }
                      break;
                   }
                }
@@ -1681,6 +1675,10 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                   if (TGL_FileExists(c_File) == false)
                   {
                      s32_Return = C_RANGE;
+                     if (opc_ErrorPath != NULL)
+                     {
+                        *opc_ErrorPath = c_File;
+                     }
                      break;
                   }
                }
@@ -1729,6 +1727,10 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
          if (s32_Return != 0)
          {
             s32_Return = C_BUSY;
+            if (opc_ErrorPath != NULL)
+            {
+               *opc_ErrorPath = orc_TargetPath;
+            }
          }
       }
    }
@@ -1941,7 +1943,7 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
    sint32 s32_Return = C_NO_ERR;
    bool q_AtLeastOneError = false;
    const uint32 u32_SCAN_TIME_MS = 5000U;
-   const uint32 u32_SCAN_TIME_ROUTING_MS = 1000U;
+   const uint32 u32_INTERVAL_TESTER_PRESENT = 1000U;
 
    if (this->mpc_SystemDefinition == NULL)
    {
@@ -2016,6 +2018,14 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
          if (this->mpc_SystemDefinition->c_Buses[this->mu32_ActiveBusIndex].e_Type == C_OSCSystemBus::eCAN)
          {
             uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+            uint32 u32_WaitTime = this->GetMinimumFlashloaderResetWaitTime(C_OSCComDriverFlash::eNO_CHANGES_CAN);
+
+            if (u32_WaitTime < u32_SCAN_TIME_MS)
+            {
+               // The scan time is necessary for the manual triggering of the nodes
+               u32_WaitTime = u32_SCAN_TIME_MS;
+            }
+
             (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_XFL_BC_ENTER_FLASHLOADER_START, C_NO_ERR, 20U,
                                    "Broadcasting enter Flashloader request ...");
             do
@@ -2052,14 +2062,18 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
 
                stw_tgl::TGL_Sleep(5);
             }
-            while (stw_tgl::TGL_GetTickCount() < (u32_SCAN_TIME_MS + u32_StartTime));
+            while (stw_tgl::TGL_GetTickCount() < (u32_WaitTime + u32_StartTime));
          }
          else
          {
-            //Ethernet. Give the targets some time to reset and initialize their Ethernet interfaces ...
-            TGL_Sleep(5500U);
+            //Ethernet. Give the targets the minimum reset time to reset and initialize their Ethernet interfaces ...
+            TGL_Sleep(this->GetMinimumFlashloaderResetWaitTime(C_OSCComDriverFlash::eNO_CHANGES_ETHERNET));
          }
       }
+
+      //Previous broadcasts might have caused responses placed in the receive queues of the device
+      // specific driver instances. Dump them.
+      this->mpc_ComDriver->ClearDispatcherQueue();
 
       //use simple read service for all nodes that are expected to be present (as "ping")
       if (s32_Return == C_NO_ERR)
@@ -2226,12 +2240,72 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
 
                            if (s32_Return == C_NO_ERR)
                            {
-                              // TODO: How long ? We might need TesterPresent to keep the routing connection alive
-                              //Ethernet. Give the targets some time to reset and initialize their Ethernet interfaces
-                              // ...
-                              TGL_Sleep(2000U);
+                              uint32 u32_StartTime;
+                              uint32 u32_CurrentTime;
+                              uint32 u32_LastSentTesterPresent;
+                              uint32 u32_WaitTime;
+                              C_OSCSystemBus::E_Type e_TargetInterfaceType = C_OSCSystemBus::eCAN;
+                              C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType e_WaitType;
+                              stw_opensyde_core::C_OSCProtocolDriverOsyNode c_LastRouter;
 
-                              s32_Return = this->m_ReconnectToTargetServer(true, u16_Node);
+                              // Check what interface is used of target (not the local bus)
+                              tgl_assert(this->mpc_ComDriver->GetRoutingTargetInterfaceType(
+                                            u16_Node, e_TargetInterfaceType) == C_NO_ERR);
+                              if (e_TargetInterfaceType == C_OSCSystemBus::eCAN)
+                              {
+                                 e_WaitType = C_OSCComDriverFlash::eNO_CHANGES_CAN;
+                              }
+                              else
+                              {
+                                 e_WaitType = C_OSCComDriverFlash::eNO_CHANGES_ETHERNET;
+                              }
+
+                              tgl_assert(this->GetMinimumFlashloaderResetWaitTime(e_WaitType,
+                                                                                  this->mc_CurrentNode,
+                                                                                  u32_WaitTime) == C_NO_ERR);
+
+                              tgl_assert(this->mpc_ComDriver->GetServerIdOfLastRouter(u16_Node,
+                                                                                      c_LastRouter) == C_NO_ERR);
+
+                              u32_StartTime = stw_tgl::TGL_GetTickCount();
+                              u32_LastSentTesterPresent = u32_StartTime;
+
+                              // Give the targets some time to reset and initialize their interfaces
+                              // and wait the minimum time
+                              do
+                              {
+                                 u32_CurrentTime = stw_tgl::TGL_GetTickCount();
+
+                                 // Tester present is only necessary in case of CAN. In case of Ethernet the entire
+                                 // routing will be restarted anyway by m_ReconnectToTargetServer
+                                 if ((e_TargetInterfaceType == C_OSCSystemBus::eCAN) &&
+                                     (u32_CurrentTime > (u32_LastSentTesterPresent + u32_INTERVAL_TESTER_PRESENT)))
+                                 {
+                                    // We need TesterPresent to keep the routing connection alive
+                                    // Send it to the last routing point
+                                    s32_Return = this->mpc_ComDriver->SendTesterPresent(c_LastRouter);
+
+                                    if (s32_Return != C_NO_ERR)
+                                    {
+                                       (void)m_ReportProgress(eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR, s32_Return,
+                                                              50U,
+                                                              this->mc_CurrentNode,
+                                                              "Sending Tester Present to router node failed.");
+                                       s32_Return = C_COM;
+                                       break;
+                                    }
+
+                                    u32_LastSentTesterPresent = u32_CurrentTime;
+                                 }
+
+                                 TGL_Sleep(5);
+                              }
+                              while (u32_CurrentTime < (u32_WaitTime + u32_StartTime));
+
+                              if (s32_Return == C_NO_ERR)
+                              {
+                                 s32_Return = this->m_ReconnectToTargetServer(true, u16_Node);
+                              }
                            }
 
                            if (s32_Return == C_NO_ERR)
@@ -2275,7 +2349,15 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
 
                            if (s32_Return == C_NO_ERR)
                            {
-                              uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+                              const uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+                              uint32 u32_WaitTime;
+
+                              // Get the minimum wait time of the concrete routing node
+                              tgl_assert(this->GetMinimumFlashloaderResetWaitTime(
+                                            C_OSCComDriverFlash::eNO_CHANGES_CAN,
+                                            this->mc_CurrentNode,
+                                            u32_WaitTime) == C_NO_ERR);
+
                               do
                               {
                                  s32_Return = this->mpc_ComDriver->SendStwSendFlash(this->mc_CurrentNode);
@@ -2291,7 +2373,7 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
 
                                  stw_tgl::TGL_Sleep(5);
                               }
-                              while (stw_tgl::TGL_GetTickCount() < (u32_SCAN_TIME_ROUTING_MS + u32_StartTime));
+                              while (stw_tgl::TGL_GetTickCount() < (u32_WaitTime + u32_StartTime));
 
                               if (s32_Return == C_NO_ERR)
                               {
@@ -2315,9 +2397,18 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
                      }
                      else
                      {
-                        (void)m_ReportProgress(eACTIVATE_FLASHLOADER_ROUTING_ERROR, s32_Return, 50U,
-                                               mc_CurrentNode,
-                                               "Starting routing for node failed");
+                        if (s32_Return == C_NOACT)
+                        {
+                           (void)m_ReportProgress(eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR, s32_Return,
+                                                  50U, mc_CurrentNode,
+                                                  "Starting routing for node failed due to not capable node");
+                        }
+                        else
+                        {
+                           (void)m_ReportProgress(eACTIVATE_FLASHLOADER_ROUTING_ERROR, s32_Return, 50U,
+                                                  mc_CurrentNode,
+                                                  "Starting routing for node failed");
+                        }
                         osc_write_log_error(
                            "Activate Flashloader",
                            "Activate Flashloader: Start of routing for node (" + C_SCLString::IntToStr(
@@ -2602,7 +2693,6 @@ sint32 C_OSCSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
    C_BUSY      procedure aborted by user (as returned by m_ReportProgress)
    C_CHECKSUM  parameter writing: one of the files is present but checksum is invalid
    C_RANGE     At least one feature of the openSYDE Flashloader is not available for NVM writing
-
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
@@ -2778,30 +2868,48 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
                      tgl_assert(pc_DeviceDefinition != NULL);
                      if (pc_DeviceDefinition != NULL)
                      {
-                        //files for flash ?
-                        if (orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash.size() > 0)
+                        //if connected via Ethernet we might need to reconnect (in case we ran into the session timeout)
+                        s32_Return = this->m_ReconnectToTargetServer();
+                        if (s32_Return != C_NO_ERR)
                         {
-                           //address based or file based ?
-                           if (pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == false)
+                           (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_RECONNECT_ERROR, s32_Return, 10U, mc_CurrentNode,
+                                                  "Could not reconnect to node");
+                           s32_Return = C_COM;
+                        }
+
+                        if (s32_Return == C_NO_ERR)
+                        {
+                           //files for flash ?
+                           if (orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash.size() > 0)
                            {
-                              s32_Return = m_FlashNodeOpenSydeHex(
-                                 orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
-                                 pc_DeviceDefinition->u32_FlashloaderOpenSydeRequestDownloadTimeout,
-                                 pc_DeviceDefinition->u32_FlashloaderOpenSydeTransferDataTimeout);
+                              //address based or file based ?
+                              if (pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == false)
+                              {
+                                 s32_Return = m_FlashNodeOpenSydeHex(
+                                    orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
+                                    orc_ApplicationsToWrite[u32_NodeIndex].c_OtherAcceptedDeviceNames,
+                                    pc_DeviceDefinition->u32_FlashloaderOpenSydeRequestDownloadTimeout,
+                                    pc_DeviceDefinition->u32_FlashloaderOpenSydeTransferDataTimeout);
+                              }
+                              else
+                              {
+                                 s32_Return = m_FlashNodeOpenSydeFile(
+                                    orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
+                                    pc_DeviceDefinition->u32_FlashloaderOpenSydeRequestDownloadTimeout,
+                                    pc_DeviceDefinition->u32_FlashloaderOpenSydeTransferDataTimeout);
+                              }
                            }
-                           else
+
+                           //files to write to Nvm ?
+                           if ((s32_Return == C_NO_ERR) &&
+                               (orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToWriteToNvm.size() > 0))
                            {
-                              s32_Return = m_FlashNodeOpenSydeFile(
-                                 orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToFlash,
-                                 pc_DeviceDefinition->u32_FlashloaderOpenSydeRequestDownloadTimeout,
-                                 pc_DeviceDefinition->u32_FlashloaderOpenSydeTransferDataTimeout);
+                              s32_Return =
+                                 m_WriteNvmOpenSyde(orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToWriteToNvm);
                            }
                         }
-                        //files to write to Nvm ?
-                        if (orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToWriteToNvm.size() > 0)
-                        {
-                           s32_Return = m_WriteNvmOpenSyde(orc_ApplicationsToWrite[u32_NodeIndex].c_FilesToWriteToNvm);
-                        }
+
+                        (void)this->m_DisconnectFromTargetServer();
                      }
                      if (s32_Return == C_NO_ERR)
                      {
@@ -3035,13 +3143,8 @@ void C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
                          orc_Info.c_MoreInformation.au8_ProtocolVersion[2]);
    orc_Text.Add(c_Line);
    orc_Text.Add("Flash count: " + C_SCLString::IntToStr(orc_Info.c_MoreInformation.u32_FlashCount));
-   c_Line.PrintFormatted("Device serial number: %02X.%02X%02X%02X.%02X%02X",
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[0],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[1],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[2],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[3],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[4],
-                         orc_Info.c_MoreInformation.au8_EcuSerialNumber[5]);
+   c_Line = "Device serial number: " +
+            (C_OSCUtils::h_SerialNumberToString(&orc_Info.c_MoreInformation.au8_EcuSerialNumber[0]));
    orc_Text.Add(c_Line);
    orc_Text.Add("Device article number: " + C_SCLString::IntToStr(orc_Info.c_MoreInformation.u32_EcuArticleNumber));
    orc_Text.Add("Device article version: " + orc_Info.c_MoreInformation.c_EcuHardwareVersionNumber);

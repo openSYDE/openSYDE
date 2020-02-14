@@ -61,7 +61,7 @@ using namespace stw_tgl;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListTableView::C_SdNdeDpListTableView(QWidget * const opc_Parent) :
@@ -158,13 +158,13 @@ C_SdNdeDpListTableView::~C_SdNdeDpListTableView(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Specify associated list
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::SetList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                           const uint32 & oru32_ListIndex)
+                                     const uint32 & oru32_ListIndex)
 {
    if (this->mpc_ModelViewManager != NULL)
    {
@@ -180,9 +180,9 @@ void C_SdNdeDpListTableView::SetList(const uint32 & oru32_NodeIndex, const uint3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if equal
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 
    \return
    True  Match
@@ -190,7 +190,7 @@ void C_SdNdeDpListTableView::SetList(const uint32 & oru32_NodeIndex, const uint3
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListTableView::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                          const uint32 & oru32_ListIndex) const
+                                    const uint32 & oru32_ListIndex) const
 {
    bool q_Retval;
 
@@ -285,7 +285,7 @@ void C_SdNdeDpListTableView::InsertAction(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert tree item
 
-   \param[in] orq_SetFocus Optional flag if inital focus should be set
+   \param[in]  orq_SetFocus   Optional flag if inital focus should be set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::Insert(const bool & orq_SetFocus)
@@ -325,6 +325,7 @@ void C_SdNdeDpListTableView::Insert(const bool & orq_SetFocus)
       }
       c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Only %1 %2 allowed per list.")).arg(
                                      mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX).arg(c_Text));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
    }
 }
@@ -436,7 +437,7 @@ void C_SdNdeDpListTableView::EditInitial(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set undo stack
 
-   \param[in,out] opc_Value Undo stack
+   \param[in,out]  opc_Value  Undo stack
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::SetUndoStack(C_SdNdeUnoDataPoolManager * const opc_Value)
@@ -468,21 +469,17 @@ void C_SdNdeDpListTableView::OnSizeChangePossible(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do data change
 
-   \param[in]     oru32_NodeIndex                Node index
-   \param[in]     oru32_DataPoolIndex            Node data pool index
-   \param[in]     oru32_DataPoolListIndex        Node data pool list index
-   \param[in,out] opc_DataPoolListTableModel     Data pool lists table model to perform actions on
-   \param[in]     oru32_DataPoolListElementIndex Node data pool list element index
-   \param[in]     orc_NewData                    New data
-   \param[in]     ore_DataChangeType             Data change type
-   \param[in]     oru32_ArrayIndex               Optional array index
-   \param[in]     ors32_DataSetIndex             Optional data set index
+   \param[in]  oru32_DataPoolListElementIndex   Node data pool list element index
+   \param[in]  orc_NewData                      New data
+   \param[in]  ore_DataChangeType               Data change type
+   \param[in]  oru32_ArrayIndex                 Optional array index
+   \param[in]  ors32_DataSetIndex               Optional data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::OnDataChangeElements(const uint32 & oru32_DataPoolListElementIndex,
-                                                        const QVariant & orc_NewData,
-                                                        const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType, const uint32 & oru32_ArrayIndex,
-                                                        const sint32 & ors32_DataSetIndex)
+                                                  const QVariant & orc_NewData,
+                                                  const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType,
+                                                  const uint32 & oru32_ArrayIndex, const sint32 & ors32_DataSetIndex)
 {
    this->mc_UndoManager.DoDataChangeElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                              this->mpc_ModelViewManager, oru32_DataPoolListElementIndex, orc_NewData,
@@ -494,7 +491,7 @@ void C_SdNdeDpListTableView::OnDataChangeElements(const uint32 & oru32_DataPoolL
 
    Here: handle list paste
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::keyPressEvent(QKeyEvent * const opc_Event)
@@ -564,7 +561,7 @@ void C_SdNdeDpListTableView::keyPressEvent(QKeyEvent * const opc_Event)
 
    if (q_CallOrig == true)
    {
-      QTableView::keyPressEvent(opc_Event);
+      C_TblViewScroll::keyPressEvent(opc_Event);
    }
 }
 
@@ -573,7 +570,7 @@ void C_SdNdeDpListTableView::keyPressEvent(QKeyEvent * const opc_Event)
 
    Here: Move elements
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::dropEvent(QDropEvent * const opc_Event)
@@ -666,15 +663,15 @@ void C_SdNdeDpListTableView::dropEvent(QDropEvent * const opc_Event)
 
    Here: Register selection change
 
-   \param[in] orc_Selected   Selected items
-   \param[in] orc_Deselected Deselected items
+   \param[in]  orc_Selected      Selected items
+   \param[in]  orc_Deselected    Deselected items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::selectionChanged(const QItemSelection & orc_Selected,
-                                                    const QItemSelection & orc_Deselected)
+                                              const QItemSelection & orc_Deselected)
 {
    std::vector<uint32> c_SelectedIndices;
-   QTableView::selectionChanged(orc_Selected, orc_Deselected);
+   C_TblViewScroll::selectionChanged(orc_Selected, orc_Deselected);
 
    c_SelectedIndices = C_SdNdeDpUtil::h_ConvertVector(this->selectedIndexes());
    C_Uti::h_Uniqueify(c_SelectedIndices);
@@ -687,7 +684,7 @@ void C_SdNdeDpListTableView::selectionChanged(const QItemSelection & orc_Selecte
 
    Here: start drag manually (for custom preview)
 
-   \param[in] oc_SupportedActions Supported actions
+   \param[in]  oc_SupportedActions  Supported actions
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::startDrag(const Qt::DropActions oc_SupportedActions)
@@ -709,7 +706,7 @@ void C_SdNdeDpListTableView::startDrag(const Qt::DropActions oc_SupportedActions
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set model view manager
 
-   \param[in,out] opc_Value Model view manager
+   \param[in,out]  opc_Value  Model view manager
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::SetModelViewManager(C_SdNdeDpListModelViewManager * const opc_Value)
@@ -720,7 +717,7 @@ void C_SdNdeDpListTableView::SetModelViewManager(C_SdNdeDpListModelViewManager *
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to select a concrete dataelement
 
-   \param[in] os32_DataElementIndex   Data element index
+   \param[in]  os32_DataElementIndex   Data element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::SelectDataElement(const sint32 os32_DataElementIndex)
@@ -733,8 +730,8 @@ void C_SdNdeDpListTableView::SelectDataElement(const sint32 os32_DataElementInde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Select data elements in a specific range
 
-   \param[in] ou32_FirstRow First row to select
-   \param[in] ou32_LastRow  Last row to select
+   \param[in]  ou32_FirstRow  First row to select
+   \param[in]  ou32_LastRow   Last row to select
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::SelectRange(const uint32 ou32_FirstRow, const uint32 ou32_LastRow) const
@@ -762,7 +759,7 @@ bool C_SdNdeDpListTableView::IsSelected(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update selection for new data set column
 
-   \param[in] os32_DataSetColumn Index of new data set
+   \param[in]  os32_DataSetColumn   Index of new data set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::UpdateSelectionForNewDataSetColumn(const sint32 os32_DataSetColumn)
@@ -811,7 +808,7 @@ void C_SdNdeDpListTableView::Reset(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set selected variable names
 
-   \param[in] orc_VariableNames New selected variable names
+   \param[in]  orc_VariableNames    New selected variable names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::SetSelectedVariableNames(const std::vector<QString> & orc_VariableNames)
@@ -880,7 +877,7 @@ std::vector<QString> C_SdNdeDpListTableView::GetSelectedVariableNames(void) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete specified indices
 
-   \param[in] orc_Indices Indices
+   \param[in]  orc_Indices    Indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::m_DeleteIndices(const std::vector<uint32> & orc_Indices)
@@ -895,12 +892,12 @@ void C_SdNdeDpListTableView::m_DeleteIndices(const std::vector<uint32> & orc_Ind
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move item in tree
 
-   \param[in] oru32_SourceIndices Source index
-   \param[in] oru32_TargetIndices Target index
+   \param[in]  oru32_SourceIndices  Source index
+   \param[in]  oru32_TargetIndices  Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::m_Move(const std::vector<uint32> & oru32_SourceIndices,
-                                          const std::vector<uint32> & oru32_TargetIndices)
+                                    const std::vector<uint32> & oru32_TargetIndices)
 {
    this->mc_UndoManager.DoMoveElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                        this->mpc_ModelViewManager,
@@ -984,7 +981,7 @@ void C_SdNdeDpListTableView::m_SetupContextMenu(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
 
-   \param[in] orc_Pos Local context menu position
+   \param[in]  orc_Pos  Local context menu position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
@@ -1031,7 +1028,7 @@ void C_SdNdeDpListTableView::m_HandleColumnChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Recheck if actions statuses are still up to date
 
-   \param[in] orc_SelectedIndices Selected indices
+   \param[in]  orc_SelectedIndices  Selected indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::m_CheckActions(const std::vector<uint32> & orc_SelectedIndices)
@@ -1167,7 +1164,7 @@ void C_SdNdeDpListTableView::m_UpdateModelView(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle link clicked
 
-   \param[in] oc_Index Index of clicked link
+   \param[in]  orc_Index   Index of clicked link
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)

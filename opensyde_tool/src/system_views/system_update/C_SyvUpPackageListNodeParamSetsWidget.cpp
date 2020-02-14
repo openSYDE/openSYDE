@@ -55,7 +55,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent           Optional pointer to parent
+   \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPackageListNodeParamSetsWidget::C_SyvUpPackageListNodeParamSetsWidget(QWidget * const opc_Parent) :
@@ -342,9 +342,9 @@ bool C_SyvUpPackageListNodeParamSetsWidget::CheckMime(QStringList & orc_PathList
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates and returns the update package with all information for the system update for the concrete node
 
-   \param[out]    orc_ApplicationsToWrite       Vector with node update configuration
-   \param[out]    orc_ApplicationsToWrite       Optional vector with all node applications
-   \param[out]    oru32_FilesUpdated            Number of already updated files or no update necessary
+   \param[out]    orc_ApplicationsToWrite     Vector with node update configuration
+   \param[out]    opc_AllApplications         Optional vector with all node applications
+   \param[out]    oru32_FilesUpdated          Number of already updated files or no update necessary
 
    \return
    C_NO_ERR    Update package with all information created
@@ -571,6 +571,7 @@ sint32 C_SyvUpPackageListNodeParamSetsWidget::GetParamsetFileInfo(const QString 
          c_Message.SetHeading(C_GtGetText::h_GetText("Update package configuration"));
          c_Message.SetDescription(C_GtGetText::h_GetText("File is not a valid parameter set image file."));
          c_Message.SetDetails(c_Details);
+         c_Message.SetCustomMinHeight(180, 250);
          c_Message.Execute();
 
          s32_Return = C_RD_WR;

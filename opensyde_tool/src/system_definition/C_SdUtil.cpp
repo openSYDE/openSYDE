@@ -65,11 +65,11 @@ C_SdUtil::C_SdUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Generate node and interface names
 
-   \param[in]  orc_NodeIndices      Node indices (match with interface indices expected)
-   \param[in]  orc_InterfaceIndices Interface indices (match with node indices expected)
-   \param[out] orc_Names            Generate node & interface names
-   \param[in]  opc_DatapoolIndices  Optional pointer to Datapool indices (match with node indices expected)
-   \param[out] opc_DatapoolNames    Optional pointer to found Datapool names
+   \param[in]   orc_NodeIndices        Node indices (match with interface indices expected)
+   \param[in]   orc_InterfaceIndices   Interface indices (match with node indices expected)
+   \param[out]  orc_Names              Generate node & interface names
+   \param[in]   opc_DatapoolIndices    Optional pointer to Datapool indices (match with node indices expected)
+   \param[out]  opc_DatapoolNames      Optional pointer to found Datapool names
 
    \return
    C_NO_ERR Operation success
@@ -150,8 +150,8 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Generate node name
 
-   \param[in]  orc_NodeIndices      Node index
-   \param[out] orc_Names            Generate node & interface name
+   \param[in]      oru32_NodeIndex  Node index
+   \param[in,out]  orc_Name         Generate node & interface name
 
    \return
    C_NO_ERR Operation success
@@ -177,9 +177,9 @@ sint32 C_SdUtil::h_GetName(const uint32 & oru32_NodeIndex, QString & orc_Name)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Generate node and interface name
 
-   \param[in]  orc_NodeIndices      Node index
-   \param[in]  orc_InterfaceIndices Interface index
-   \param[out] orc_Names            Generate node & interface name
+   \param[in]      oru32_NodeIndex        Node index
+   \param[in]      oru32_InterfaceIndex   Interface index
+   \param[in,out]  orc_Name               Generate node & interface name
 
    \return
    C_NO_ERR Operation success
@@ -215,7 +215,7 @@ sint32 C_SdUtil::h_GetName(const uint32 & oru32_NodeIndex, const uint32 & oru32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init icon image for all states
 
-   \param[in] orc_File File to use as icon
+   \param[in]  orc_File    File to use as icon
 
    \return
    Static icon
@@ -239,8 +239,8 @@ QIcon C_SdUtil::h_InitStaticIcon(const QString & orc_File)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init icon SVG image for all states
 
-   \param[in] orc_File SVG file to use as icon
-   \param[in] orc_Size Icon size
+   \param[in]  orc_File    SVG file to use as icon
+   \param[in]  orc_Size    Icon size
 
    \return
    Static icon
@@ -265,7 +265,7 @@ QIcon C_SdUtil::h_InitStaticIconSvg(const QString & orc_File, const QSize & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert tx method to name
 
-   \param[in] ore_Type Tx method
+   \param[in]  ore_Type    Tx method
 
    \return
    Name
@@ -296,7 +296,7 @@ QString C_SdUtil::h_ConvertTxMethodToName(const C_OSCCanMessage::E_TxMethodType 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert byte order to name
 
-   \param[in] ore_Type Byte order
+   \param[in]  ore_Type    Byte order
 
    \return
    Name
@@ -324,11 +324,11 @@ QString C_SdUtil::h_ConvertByteOrderToName(const C_OSCCanSignal::E_ByteOrderType
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get error tooltip suggestion
 
-   \param[in]  ou32_NodeIndex    Node index (identifier)
-   \param[in]  orc_Indices       Invalid datapool indices
-   \param[in]  oq_NvmSizeInvalid Flag if NVM size invalid
-   \param[out] orc_Heading       Heading suggestion
-   \param[out] orc_Content       Content suggestion
+   \param[in]   ou32_NodeIndex      Node index (identifier)
+   \param[in]   orc_Indices         Invalid datapool indices
+   \param[in]   oq_NvmSizeInvalid   Flag if NVM size invalid
+   \param[out]  orc_Heading         Heading suggestion
+   \param[out]  orc_Content         Content suggestion
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std::vector<uint32> & orc_Indices,
@@ -361,8 +361,8 @@ void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sort source vector descending ( Sorting steps are done for the target vector in sync)
 
-   \param[in,out] orc_Source Unsorted source indices
-   \param[in,out] orc_Target Unsorted target indices
+   \param[in,out]  orc_Source    Unsorted source indices
+   \param[in,out]  orc_Target    Unsorted target indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_SortSourceDescending(std::vector<uint32> & orc_Source, std::vector<uint32> & orc_Target)
@@ -397,7 +397,7 @@ void C_SdUtil::h_SortSourceDescending(std::vector<uint32> & orc_Source, std::vec
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if input vector is sorted descending
 
-   \param[in] orc_Indices Input vector to evaluate
+   \param[in]  orc_Indices    Input vector to evaluate
 
    \return
    true:  Sorted
@@ -430,7 +430,7 @@ bool C_SdUtil::h_CheckSortedDescending(const std::vector<uint32> & orc_Indices)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sort indices ascending
 
-   \param[in,out] orc_IndicesTmp Unsorted indices
+   \param[in,out]  orc_IndicesTmp   Unsorted indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_SortIndicesAscending(std::vector<uint32> & orc_IndicesTmp)
@@ -461,7 +461,7 @@ void C_SdUtil::h_SortIndicesAscending(std::vector<uint32> & orc_IndicesTmp)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get node id maximum
 
-   \param[in] oru32_NodeIndex Node index
+   \param[in]  oru32_NodeIndex   Node index
 
    \return
    Node id maximum
@@ -490,9 +490,9 @@ uint8 C_SdUtil::h_GetNodeIdMaximum(const uint32 & oru32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get selected node interface
 
-   \param[in] opc_ComboBox     ComboBox with node interfaces
-   \param[in] oru32_NodeIndex  Corresponding node index
-   \param[in] ore_Type         Corresponding bus type
+   \param[in]  orc_ComboBox      Combo with node interfaces
+   \param[in]  oru32_NodeIndex   Corresponding node index
+   \param[in]  ore_Type          Corresponding bus type
 
    \return
    Selected node interface (Not necessarily the index)
@@ -533,13 +533,13 @@ uint32 C_SdUtil::h_GetActiveNodeInterface(const QComboBox & orc_ComboBox, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize the combo box for one interface
 
-   \param[in]     orc_Interfaces             Node interfaces
-   \param[in]     ore_BusType                Bus type
-   \param[in,out] opc_ComboBox               ComboBox for using the node interfaces
-   \param[in]     ors32_SpecialInterface     Special interface to allow and use as default, even if already connected
-   \param[out]    orq_ComProtocolL2          Flag if Layer 2 COM datapool exist
-   \param[out]    orq_ComProtocolECeS        Flag if ECeS COM datapool exist
-   \param[out]    orq_ComProtocolECoS        Flag if ECoS COM datapool exist
+   \param[in]      orc_Node                  Node
+   \param[in]      ore_BusType               Bus type
+   \param[in,out]  opc_ComboBox              ComboBox for using the node interfaces
+   \param[in]      ors32_SpecialInterface    Special interface to allow and use as default, even if already connected
+   \param[out]     orq_ComProtocolL2         Flag if Layer 2 COM datapool exist
+   \param[out]     orq_ComProtocolECeS       Flag if ECeS COM datapool exist
+   \param[out]     orq_ComProtocolECoS       Flag if ECoS COM datapool exist
 
    \return
    True  At least one radio button is intractable
@@ -629,9 +629,9 @@ bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OSCNode & orc_Node, const C_O
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all used node ids for current bus
 
-   \param[in] oru32_BusIndex         Bus index
-   \param[in] oru32_SpecialNodeIndex Special node index to skip
-   \param[in] ors32_SpecialInterface Special interface to skip
+   \param[in]  oru32_BusIndex          Bus index
+   \param[in]  oru32_SpecialNodeIndex  Special node index to skip
+   \param[in]  ors32_SpecialInterface  Special interface to skip
 
    \return
    Vector of used node ids (unique and sorted ascending)
@@ -686,8 +686,8 @@ std::vector<uint32> C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all used process ids for current node
 
-   \param[in] ou32_NodeIndex               Node index
-   \param[in] os32_SpecialApplicationIndex Special application to skip
+   \param[in]  ou32_NodeIndex                Node index
+   \param[in]  os32_SpecialApplicationIndex  Special application to skip
 
    \return
    Vector of used process ids (unique and sorted ascending)
@@ -718,7 +718,7 @@ std::vector<uint32> C_SdUtil::h_GetUsedProcessIdsForApplicationUniqueAndSortedAs
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all used bus ids
 
-   \param[in] os32_SpecialBusIndex Special bus to skip
+   \param[in]  os32_SpecialBusIndex    Special bus to skip
 
    \return
    Vector of bus process ids (unique and sorted ascending)
@@ -744,89 +744,131 @@ std::vector<uint32> C_SdUtil::h_GetUsedBusIdsUniqueAndSortedAscending(const sint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt message to protocol restrictions
 
-   \param[in,out] orc_Message         Message to adapt
-   \param[in]     oe_Type             Protocol type
-   \param[in,out] opc_AdaptationInfos Optional report about adaptations
+   \param[in,out]  orc_Message            Message to adapt
+   \param[in]      oe_Type                Protocol type
+   \param[in,out]  opc_AdaptationInfos    Optional report about adaptations
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message,  const C_OSCCanProtocol::E_Type oe_Type,
-                                            QString * const opc_AdaptationInfos)
+                                            QStringList * const opc_AdaptationInfos)
 {
-   std::vector<QString> c_Info;
-   switch (oe_Type)
+   QStringList c_Info;
+
+   if ((oe_Type == C_OSCCanProtocol::eECES) || (oe_Type == C_OSCCanProtocol::eCAN_OPEN_SAFETY))
    {
-   case C_OSCCanProtocol::eECES:
-      //DLC fix 8
-      if (orc_Message.u16_Dlc != 8U)
-      {
-         c_Info.push_back(QString(C_GtGetText::h_GetText(
-                                     "Message DLC changed from %1 to 8 due to ECeS protocol restrictions.")).arg(
-                             orc_Message.u16_Dlc));
-         orc_Message.u16_Dlc = 8U;
-      }
-      //TX method always cyclic
+      // general changes for safety protocols
+
+      //Tx method always cyclic
       if (orc_Message.e_TxMethod != C_OSCCanMessage::eTX_METHOD_CYCLIC)
       {
-         c_Info.push_back(QString(C_GtGetText::h_GetText(
-                                     "Message transmission type changed from \"%1\" to \"%2\" due to ECeS protocol restrictions.")).arg(
-                             C_SdUtil::h_ConvertTxMethodToName(orc_Message.e_TxMethod)).arg(
-                             C_SdUtil::h_ConvertTxMethodToName(C_OSCCanMessage::eTX_METHOD_CYCLIC)));
+         c_Info.push_back(QString(C_GtGetText::h_GetText("Message transmission type changed from \"%1\" to \"%2\" due "
+                                                         "to ECeS/ECoS protocol restrictions.")).
+                          arg(C_SdUtil::h_ConvertTxMethodToName(orc_Message.e_TxMethod)).
+                          arg(C_SdUtil::h_ConvertTxMethodToName(C_OSCCanMessage::eTX_METHOD_CYCLIC)));
          orc_Message.e_TxMethod = C_OSCCanMessage::eTX_METHOD_CYCLIC;
       }
-      break;
-   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
-      //Extended type
-      if (orc_Message.q_IsExtended == true)
+
+      // specific changes
+      switch (oe_Type)
       {
-         c_Info.push_back(C_GtGetText::h_GetText(
-                             "Message extended flag changed from \"extended\" to \"standard\" due to ECoS protocol restrictions."));
-         orc_Message.q_IsExtended = false;
+      case C_OSCCanProtocol::eECES:
+         //DLC fix 8
+         if (orc_Message.u16_Dlc != 8U)
+         {
+            c_Info.push_back(QString(C_GtGetText::h_GetText("Message DLC changed from %1 to 8 due to ECeS/ECoS "
+                                                            "protocol restrictions.")).arg(orc_Message.u16_Dlc));
+            orc_Message.u16_Dlc = 8U;
+         }
+         break;
+      case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
+         //Extended type
+         if (orc_Message.q_IsExtended == true)
+         {
+            c_Info.push_back(C_GtGetText::h_GetText("Message extended flag changed from \"extended\" to \"standard\" "
+                                                    "due to ECoS protocol restrictions."));
+            orc_Message.q_IsExtended = false;
+         }
+         //CAN ID
+         if ((orc_Message.u32_CanId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN) ||
+             (orc_Message.u32_CanId > mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX))
+         {
+            c_Info.push_back(QString(C_GtGetText::h_GetText("Message ID changed from 0x%1 to 0x%2 due to ECoS protocol "
+                                                            "restrictions. Allowed IDs: 0x%3-0x%2.")).
+                             arg(orc_Message.u32_CanId, 0, 16).
+                             arg(mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX, 0, 16).
+                             arg(mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN, 0, 16));
+            orc_Message.u32_CanId = mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX;
+         }
+         break;
+      case C_OSCCanProtocol::eLAYER2:
+         //No restrictions
+         break;
       }
-      //CAN ID
-      if ((orc_Message.u32_CanId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN) ||
-          (orc_Message.u32_CanId > mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX))
+
+      //Adapt signals
+      for (std::vector<C_OSCCanSignal>::iterator c_SignalIt = orc_Message.c_Signals.begin();
+           c_SignalIt != orc_Message.c_Signals.end(); ++c_SignalIt)
       {
-         c_Info.push_back(QString(C_GtGetText::h_GetText(
-                                     "Message ID changed from 0x%1 to 0x%2 due to ECoS protocol restrictions. Allowed IDs: 0x%3-0x%2.")).arg(
-                             orc_Message.u32_CanId, 0, 16).arg(
-                             mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX, 0, 16).arg(
-                             mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN, 0, 16));
-         orc_Message.u32_CanId = mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX;
+         h_AdaptSignalToProtocolType(*c_SignalIt, oe_Type, &c_Info);
       }
-      //TX method always cyclic
-      if (orc_Message.e_TxMethod != C_OSCCanMessage::eTX_METHOD_CYCLIC)
-      {
-         c_Info.push_back(QString(C_GtGetText::h_GetText(
-                                     "Message transmission type changed from \"%1\" to \"%2\" due to ECoS protocol restrictions.")).arg(
-                             C_SdUtil::h_ConvertTxMethodToName(orc_Message.e_TxMethod)).arg(
-                             C_SdUtil::h_ConvertTxMethodToName(C_OSCCanMessage::eTX_METHOD_CYCLIC)));
-         orc_Message.e_TxMethod = C_OSCCanMessage::eTX_METHOD_CYCLIC;
-      }
-      break;
-   case C_OSCCanProtocol::eLAYER2:
-      //No restrictions
-      break;
+      c_Info.removeDuplicates();
    }
+
    if (opc_AdaptationInfos != NULL)
    {
-      for (uint32 u32_ItInfo = 0; u32_ItInfo < c_Info.size(); ++u32_ItInfo)
+      opc_AdaptationInfos->append(c_Info);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt signal to protocol restrictions
+
+   \param[in,out]  orc_Signal             Signal to adapt
+   \param[in]      oe_Type                Protocol type
+   \param[in,out]  opc_AdaptationInfos    Optional report about adaptations
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdUtil::h_AdaptSignalToProtocolType(C_OSCCanSignal & orc_Signal, const C_OSCCanProtocol::E_Type oe_Type,
+                                           QStringList * const opc_AdaptationInfos)
+{
+   QStringList c_Info;
+
+   if ((oe_Type == C_OSCCanProtocol::eECES) || (oe_Type == C_OSCCanProtocol::eCAN_OPEN_SAFETY))
+   {
+      //Remove multiplex information
+      if (orc_Signal.e_MultiplexerType != C_OSCCanSignal::eMUX_DEFAULT)
       {
-         //Add line break if necessary
-         if (u32_ItInfo > 0UL)
-         {
-            *opc_AdaptationInfos += "\n";
-         }
-         *opc_AdaptationInfos += c_Info[u32_ItInfo];
+         c_Info.append(C_GtGetText::h_GetText("Multiplex information removed from signal because this is not supported "
+                                              "in ECeS/ECoS protocols."));
+         orc_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_DEFAULT;
+         orc_Signal.u16_MultiplexValue = 0U;
       }
+
+      // Keep reserved bytes free
+      if (oe_Type == C_OSCCanProtocol::eECES)
+      {
+         if (orc_Signal.u16_ComBitStart >= mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX)
+         {
+            c_Info.append(QString(C_GtGetText::h_GetText("Start bit of signal set from %1 to 0 because "
+                                                         "of reserved bytes in ECeS protocol.")).
+                          arg(orc_Signal.u16_ComBitStart));
+            orc_Signal.u16_ComBitStart = 0;
+         }
+      }
+   }
+
+   if (opc_AdaptationInfos != NULL)
+   {
+      opc_AdaptationInfos->append(c_Info);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt used node ids label handling
 
-   \param[in]     orc_UsedNodeIds Unused node ids (unique and sorted ascending)
-   \param[in]     orc_BusName     Bus name
-   \param[in,out] opc_Label       Label to adapt
+   \param[in]      orc_UsedNodeIds  Unused node ids (unique and sorted ascending)
+   \param[in]      orc_BusName      Bus name
+   \param[in,out]  opc_Label        Label to adapt
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_InitUsedNodeIdsLabel(const std::vector<uint32> & orc_UsedNodeIds, const QString & orc_BusName,
@@ -851,9 +893,10 @@ void C_SdUtil::h_InitUsedNodeIdsLabel(const std::vector<uint32> & orc_UsedNodeId
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt used ids string handling
 
-   \param[in] orc_UsedIds  Unused ids (unique and sorted ascending)
-   \param[in] orc_ItemName Item name
-   \param[in] orc_ItemType Item type
+   \param[in]  orc_UsedIds    Unused ids (unique and sorted ascending)
+   \param[in]  orc_ItemName   Item name
+   \param[in]  orc_ItemType   Item type
+   \param[in]  oq_SkipItem    Flag to skip item
 
    \return
    String for already used IDs
@@ -891,9 +934,9 @@ QString C_SdUtil::h_InitUsedIdsString(const std::vector<uint32> & orc_UsedIds, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get next free node id
 
-   \param[in] orc_Interfaces         Node interfaces
-   \param[in] orc_UsedNodeIds        Unused node ids (unique and sorted ascending)
-   \param[in] ors32_SpecialInterface Special interface to use as default
+   \param[in]  orc_Interfaces          Node interfaces
+   \param[in]  orc_UsedNodeIds         Unused node ids (unique and sorted ascending)
+   \param[in]  ors32_SpecialInterface  Special interface to use as default
 
    \return
    Node ID proposal (Always in range but may be invalid)
@@ -931,8 +974,8 @@ uint32 C_SdUtil::h_GetNextFreeNodeId(const std::vector<C_OSCNodeComInterfaceSett
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if node has at least one connection of this bus type
 
-   \param[in] orc_Node  Node for check
-   \param[in] oe_Type   Bus type
+   \param[in]  orc_Node    Node for check
+   \param[in]  oe_Type     Bus type
 
    \return
    true     Node has connection of this type
@@ -960,8 +1003,8 @@ bool C_SdUtil::h_HasConnectionType(const C_OSCNode & orc_Node, const C_OSCSystem
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if any com interfaces for the specified bus type are available and free
 
-   \param[in] orc_ComInterfaces Com interfaces
-   \param[in] ore_BusType       Bus type
+   \param[in]  orc_ComInterfaces    Com interfaces
+   \param[in]  ore_BusType          Bus type
 
    \return
    True  At least one selectable interface available
@@ -991,8 +1034,8 @@ bool C_SdUtil::h_CheckNodeInterfaceAvailable(const std::vector<C_OSCNodeComInter
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if at least one com interfaces for the specified bus type is connected
 
-   \param[in] orc_ComInterfaces Com interfaces
-   \param[in] ore_BusType       Bus type
+   \param[in]  orc_ComInterfaces    Com interfaces
+   \param[in]  ore_BusType          Bus type
 
    \return
    True  At least one selectable interface connected
@@ -1023,9 +1066,9 @@ bool C_SdUtil::h_CheckNodeInterfaceConnected(const std::vector<C_OSCNodeComInter
 
    The total number of datapools is bounded above by mu32_NODE_DATA_POOL_MAX.
 
-   \param[in]     oru32_NodeIndex         node index
-   \param[in]     orq_AlreadyChecked      for pre-checking cases (true: we know that the number exceeds the maximum)
-   \param[in]     opc_Parent              parent widget
+   \param[in]  oru32_NodeIndex      node index
+   \param[in]  orq_AlreadyChecked   for pre-checking cases (true: we know that the number exceeds the maximum)
+   \param[in]  opc_Parent           parent widget
 
    \return
       true:  total number is ok
@@ -1039,11 +1082,7 @@ bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const bool 
 
    if (orq_AlreadyChecked == true)
    {
-      C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Datapool add"));
-      c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("The allowed maximum number of Datapools is %1.")).
-                                  arg(mu32_NODE_DATA_POOL_MAX));
-      c_MessageBox.Execute();
+      q_Return = true;
    }
    else
    {
@@ -1051,31 +1090,34 @@ bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const bool 
       if (pc_Node != NULL)
       {
          // is enough space available
-         if (pc_Node->c_DataPools.size() >= mu32_NODE_DATA_POOL_MAX)
-         {
-            C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
-            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Datapool add"));
-            c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                   "The allowed maximum number of Datapools is %1.")).
-                                        arg(mu32_NODE_DATA_POOL_MAX));
-            c_MessageBox.Execute();
-         }
-         else
+         if (pc_Node->c_DataPools.size() < mu32_NODE_DATA_POOL_MAX)
          {
             // all OK
             q_Return = true;
          }
       }
    }
+
+   if (q_Return == false)
+   {
+      C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
+
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Datapool add"));
+      c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("The allowed maximum number of Datapools is %1.")).
+                                  arg(mu32_NODE_DATA_POOL_MAX));
+      c_MessageBox.SetCustomMinHeight(180, 180);
+      c_MessageBox.Execute();
+   }
+
    return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get error tool tip for node
 
-   \param[in]  oru32_NodeIndex   Node index
-   \param[out] orc_Text          Tool tip text
-   \param[out] orq_ErrorDetected Flag if any errors detected
+   \param[in]   oru32_NodeIndex     Node index
+   \param[out]  orc_Text            Tool tip text
+   \param[out]  orq_ErrorDetected   Flag if any errors detected
 
    \return
    C_NO_ERR Operation success
@@ -1189,12 +1231,8 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get error tool tip for bus
 
-   \param[in]  oru32_BusIndex Bus index
-   \param[out] orc_Text       Tool tip text
-
-   \return
-   C_NO_ERR Operation success
-   C_CONFIG Operation failure: configuration invalid
+   \param[in]   oru32_BusIndex   Bus index
+   \param[out]  orc_Text         Tool tip text
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc_Text)
@@ -1253,12 +1291,12 @@ void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string for tooltip content for datapool list.
 
-   \param[in]     orc_NodeIndex        index of node where the list belongs to
-   \param[in]     oru32_DatapoolIndex  index of datapool where the list belongs to
-   \param[in]     oru32_ListIndex      index of list for which the tooltip is requested
+   \param[in]  oru32_NodeIndex      index of node where the list belongs to
+   \param[in]  oru32_DatapoolIndex  index of datapool where the list belongs to
+   \param[in]  oru32_ListIndex      index of list for which the tooltip is requested
 
    \return
-      content as string
+   content as string
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -1314,9 +1352,9 @@ QString C_SdUtil::h_GetToolTipContentDpList(const uint32 & oru32_NodeIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string for tooltip content for datapool list element.
 
-   \param[in]     orc_NodeDatapoolListElementId    indexes of element for which the tooltip is requested
-   \param[in]     orc_AdditionalInformation        Optional additional information string which will get inserted after comment
-                                                    (no "\n" at end necessary)
+   \param[in]  orc_NodeDatapoolListElementId    indexes of element for which the tooltip is requested
+   \param[in]  orc_AdditionalInformation        Optional additional information string which will get inserted after comment
+                                                (no "\n" at end necessary)
 
    \return
       content as string
@@ -1562,7 +1600,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string for tooltip content for message.
 
-   \param[in] orc_MessageId Message id belonging to the signal for which the tooltip is requested
+   \param[in]  orc_MessageId  Message id belonging to the signal for which the tooltip is requested
 
    \return
    Content as string
@@ -1584,10 +1622,10 @@ QString C_SdUtil::h_GetToolTipContentMessage(const C_OSCCanMessageIdentification
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string for tooltip content for signal.
 
-   \param[in]     orc_MessageId                message id belonging to the signal for which the tooltip is requested
-   \param[in]     ou32_SignalIndex             for which the tooltip is requested
-   \param[in]     orc_AdditionalInformation    Optional additional information string which will get inserted after comment
-                                               (no "\n" at end necessary)
+   \param[in]  orc_MessageId              message id belonging to the signal for which the tooltip is requested
+   \param[in]  oru32_SignalIndex          index of signal for which the tooltip is requested
+   \param[in]  orc_AdditionalInformation  Optional additional information string which will get inserted after comment
+                                          (no "\n" at end necessary)
 
    \return
       content as string
@@ -1632,9 +1670,9 @@ QString C_SdUtil::h_GetToolTipContentSignal(const C_OSCCanMessageIdentificationI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sort indices descending ( Sorting steps are done for the content vectors in sync)
 
-   \param[in,out] orc_IndicesTmp    Unsorted indices
-   \param[in,out] orc_OSCContentTmp Unsorted OSC content
-   \param[in,out] orc_UIContentTmp  Unsorted UI content
+   \param[in,out]  orc_IndicesTmp      Unsorted indices
+   \param[in,out]  orc_OSCContentTmp   Unsorted OSC content
+   \param[in,out]  orc_UIContentTmp    Unsorted UI content
 */
 //----------------------------------------------------------------------------------------------------------------------
 template <typename T, typename U>
@@ -1696,9 +1734,9 @@ void C_SdUtil::h_SortIndicesDescendingAndSync<C_OSCNodeDataPoolListElement, C_Pu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sort indices ascending ( Sorting steps are done for the content vectors in sync)
 
-   \param[in,out] orc_IndicesTmp    Unsorted indices
-   \param[in,out] orc_OSCContentTmp Unsorted OSC content
-   \param[in,out] orc_UIContentTmp  Unsorted UI content
+   \param[in,out]  orc_IndicesTmp      Unsorted indices
+   \param[in,out]  orc_OSCContentTmp   Unsorted OSC content
+   \param[in,out]  orc_UIContentTmp    Unsorted UI content
 */
 //----------------------------------------------------------------------------------------------------------------------
 template <typename T, typename U>

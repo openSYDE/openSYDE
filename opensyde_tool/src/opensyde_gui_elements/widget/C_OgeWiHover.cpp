@@ -34,11 +34,11 @@ using namespace stw_types;
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 static const sintn msn_SHADOW_WIDTH = 8;
 
-static const sintn msn_MAXIMIZED_HEIGHT_MINIMUM = 300U + (2 * msn_SHADOW_WIDTH);
-static const sintn msn_MINIMIZED_HEIGHT = 66U + (2 * msn_SHADOW_WIDTH);
-static const sintn msn_SCROLL_AREA_SIZE = 9U;
+static const sintn msn_MAXIMIZED_HEIGHT_MINIMUM = 300 + (2 * msn_SHADOW_WIDTH);
+static const sintn msn_MINIMIZED_HEIGHT = 31 + (2 * msn_SHADOW_WIDTH);
+static const sintn msn_SCROLL_AREA_SIZE = 9;
 
-static const sintn msn_WIDTH_MINIMUM = 323U + (2 * msn_SHADOW_WIDTH);
+static const sintn msn_WIDTH_MINIMUM = 323 + (2 * msn_SHADOW_WIDTH);
 
 static const sintn msn_TOP_BORDER_AREA = 4;
 
@@ -73,12 +73,13 @@ static const uint32 mu32_RESIZE_VER_TOP = 8U;
 
    \param[in,out] orc_Widget          Reference to embedded widget
    \param[in]     oc_Title            String with title for showing in the heading
+   \param[in]     oc_Icon             Icon of which one
    \param[in]     oq_Search           Flag if search function shall be active or not
    \param[in,out] opc_ContainerWidget Optional widget for resize restriction
    \param[in,out] opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, const bool oq_Search,
+C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, QString oc_Icon, const bool oq_Search,
                            QWidget * const opc_ContainerWidget, QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiHover),
@@ -87,15 +88,17 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, const bool oq
    mq_Maximized(true),
    mu32_MouseMode(mu32_MOUSE_MODE_NO_FUNC),
    mu32_ResizeMode(mu32_RESIZE_NONE),
+   mc_IconPath(oc_Icon),
    mq_SearchActive(oq_Search),
    msn_OffsetX(0),
    msn_OffsetY(0),
    msn_OffsetXRight(0),
    mq_DarkMode(false)
 {
+   QImage c_Icon;
    sintn sn_Index;
 
-   mpc_Ui->setupUi(this);
+   this->mpc_Ui->setupUi(this);
 
    this->setMinimumSize(msn_WIDTH_MINIMUM, msn_MAXIMIZED_HEIGHT_MINIMUM);
 
@@ -106,13 +109,24 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, const bool oq
    this->SetMaximizedHeight(this->height());
 
    // deactivate search elements
-   this->mpc_Ui->pc_LabelSearchImg->setVisible(this->mq_SearchActive);
-   this->mpc_Ui->pc_LineEditSearch->setVisible(this->mq_SearchActive);
+   this->mpc_Ui->pc_GroupBoxSearch->setVisible(this->mq_SearchActive);
+
+   // set icons to elements
+   c_Icon.load(oc_Icon);
+   this->mpc_Ui->pc_LabelIcon->setPixmap(QPixmap::fromImage(c_Icon));
+   this->mpc_Ui->pc_LabelSearchImg->SetSvg("://images/IconSearch.svg");
+   this->mpc_Ui->pc_BtnCancelSearch->SetCustomIcons(":images/DeleteSearchInput.svg",  // enabled
+                                                    ":images/DeleteSearchInput.svg",  // hovered
+                                                    ":images/DeleteSearchInput.svg",  // clicked
+                                                    ":images/DeleteSearchInput.svg"); // disabled
+   this->mpc_Ui->pc_BtnCancelSearch->setVisible(false);
 
    InitStaticNames();
 
    // set title
    this->mpc_Ui->pc_LabelTitle->setText(oc_Title);
+   this->mpc_Ui->pc_LabelTitle->SetForegroundColor(3);
+   this->mpc_Ui->pc_LabelTitle->SetFontPixel(13, false, true);
 
    // set specific widget
    this->mpc_Widget->setParent(this);
@@ -127,10 +141,16 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, const bool oq
 
    this->mc_TimerAnimation.setInterval(msn_TIMER_INTERVAL);
 
+   //search connect
+   connect(this->mpc_Ui->pc_BtnCancelSearch, &QPushButton::clicked, this, &C_OgeWiHover::m_CancelSearch);
    // connect the signals
-   connect(this->mpc_Ui->pc_BtnMinMax, &QPushButton::clicked, this, &C_OgeWiHover::m_MinmaxClicked);
+   connect(this->mpc_Ui->pc_BtnMin, &QPushButton::clicked, this, &C_OgeWiHover::SigWiHoverMinBtnClicked);
    connect(&this->mc_TimerAnimation, &QTimer::timeout, this, &C_OgeWiHover::m_AnimationTimerEvent);
    connect(this->mpc_Ui->pc_LineEditSearch, &QLineEdit::textChanged, this, &C_OgeWiHover::m_SearchChanged);
+   connect(this->mpc_Ui->pc_LabelTitle, &C_OgeLabDoubleClick::SigDoubleClicked,
+           this, &C_OgeWiHover::SigWiHoverMinBtnClicked);
+   connect(this->mpc_Ui->pc_LabelIcon, &C_OgeLabDoubleClick::SigDoubleClicked,
+           this, &C_OgeWiHover::SigWiHoverMinBtnClicked);
    //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
 }
 
@@ -168,6 +188,17 @@ bool C_OgeWiHover::GetMaximized(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets actual state about maximized or minimized
+
+   \param[in]   oq_Maximized   Actual maximized state of widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiHover::SetMaximized(const bool oq_Maximized)
+{
+   this->mq_Maximized = oq_Maximized;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns maximized height
 
    \return     Actual maximized height
@@ -190,25 +221,6 @@ void C_OgeWiHover::SetMaximizedHeight(const sintn osn_Height)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the widget in minimized mode without animation
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiHover::SetMinimize(void)
-{
-   this->mq_Maximized = false;
-
-   // Update the elements
-   this->mpc_Ui->pc_LabelSearchImg->setVisible(false);
-   this->mpc_Ui->pc_LineEditSearch->setVisible(false);
-   this->mpc_Widget->setVisible(false);
-
-   this->setMinimumSize(msn_WIDTH_MINIMUM, msn_MINIMIZED_HEIGHT);
-   this->setGeometry(this->x(), this->y(), this->width(), msn_MINIMIZED_HEIGHT);
-
-   this->m_AdaptBtnIcon(true);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply current dark mode setting
 
    \param[in] oq_Active Dark mode active
@@ -216,12 +228,12 @@ void C_OgeWiHover::SetMinimize(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::ApplyDarkMode(const bool oq_Active)
 {
+   QImage c_Icon;
+   QImage c_Image;
    QColor c_Color;
    QGraphicsDropShadowEffect * pc_Shadow;
 
    this->mq_DarkMode = oq_Active;
-
-   this->m_AdaptBtnIcon(!this->mq_Maximized);
 
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "DarkMode", oq_Active);
 
@@ -231,35 +243,31 @@ void C_OgeWiHover::ApplyDarkMode(const bool oq_Active)
    if (oq_Active == true)
    {
       c_Color = mc_STYLE_GUIDE_COLOR_32;
+      c_Image.load(":images/IconDoubleArrowRightDark.svg");
+      if (this->mc_IconPath.contains("IconToolbox") == true)
+      {
+         this->mc_IconPath = ":images/IconToolboxDark.svg";
+      }
+      this->mpc_Ui->pc_LabelTitle->SetForegroundColor(32);
    }
    else
    {
       c_Color = mc_STYLE_GUIDE_COLOR_33;
+      c_Image.load(":images/IconDoubleArrowRight.svg");
+      if (this->mc_IconPath.contains("IconToolbox") == true)
+      {
+         this->mc_IconPath = ":images/IconToolbox.svg";
+      }
+      this->mpc_Ui->pc_LabelTitle->SetForegroundColor(3);
    }
+   c_Icon.load(this->mc_IconPath);
+   this->mpc_Ui->pc_LabelIcon->setPixmap(QPixmap::fromImage(c_Icon));
+   this->mpc_Ui->pc_BtnMin->setIcon(QPixmap::fromImage(c_Image));
    c_Color.setAlpha(128);
    pc_Shadow->setColor(c_Color);
    this->mpc_Ui->pc_GroupBox->setGraphicsEffect(pc_Shadow);
+
    //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for button minimizing and maximizing click
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiHover::m_MinmaxClicked()
-{
-   m_UpdateParentSize();
-   this->mq_Maximized = !this->mq_Maximized;
-
-   // has the widget size changed?
-   if ((this->mc_ParentWidgetSize.height() - msn_TOP_BORDER_AREA) < this->msn_Height)
-   {
-      this->msn_Height = this->mc_ParentWidgetSize.height() - msn_TOP_BORDER_AREA;
-   }
-
-   this->msn_StepSize = (this->msn_Height - msn_MINIMIZED_HEIGHT) / msn_ANIMATION_STEPS;
-
-   this->mc_TimerAnimation.start();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -305,7 +313,9 @@ void C_OgeWiHover::m_AnimationTimerEvent()
       else
       {
          // finished
-         this->m_AdaptBtnIcon(true);
+         QImage c_Image;
+         c_Image.load(":images/IconDoubleArrowRight.svg");
+         this->mpc_Ui->pc_BtnMin->setIcon(QPixmap::fromImage(c_Image));
          this->mc_TimerAnimation.stop();
       }
    }
@@ -349,7 +359,9 @@ void C_OgeWiHover::m_AnimationTimerEvent()
       else
       {
          // finished
-         this->m_AdaptBtnIcon(false);
+         QImage c_Image;
+         c_Image.load(":images/IconDoubleArrowRight.svg");
+         this->mpc_Ui->pc_BtnMin->setIcon(QPixmap::fromImage(c_Image));
          this->mpc_Widget->setVisible(true);
          this->mc_TimerAnimation.stop();
 
@@ -366,6 +378,14 @@ void C_OgeWiHover::m_AnimationTimerEvent()
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_SearchChanged(const QString & orc_Text)
 {
+   if (this->mpc_Ui->pc_LineEditSearch->text() != "")
+   {
+      this->mpc_Ui->pc_BtnCancelSearch->setVisible(true);
+   }
+   else
+   {
+      this->mpc_Ui->pc_BtnCancelSearch->setVisible(false);
+   }
    Q_EMIT this->SigSearchChanged(orc_Text);
 }
 
@@ -399,37 +419,6 @@ void C_OgeWiHover::m_UpdateParentSize(void)
       this->msn_OffsetY = msn_TOP_BORDER_AREA + msn_SHADOW_WIDTH;
       this->msn_OffsetXRight = msn_SHADOW_WIDTH;
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiHover::m_AdaptBtnIcon(const bool oq_BtnWidgetMax) const
-{
-   QImage c_Image;
-
-   if (this->mq_DarkMode == true)
-   {
-      if (oq_BtnWidgetMax == false)
-      {
-         c_Image.load(":images/BtnWidgetMinDark.png");
-      }
-      else
-      {
-         c_Image.load(":images/BtnWidgetMaxDark.png");
-      }
-   }
-   else
-   {
-      if (oq_BtnWidgetMax == false)
-      {
-         c_Image.load(":images/BtnWidgetMin.png");
-      }
-      else
-      {
-         c_Image.load(":images/BtnWidgetMax.png");
-      }
-   }
-
-   this->mpc_Ui->pc_BtnMinMax->setIcon(QPixmap::fromImage(c_Image));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -556,6 +545,14 @@ void C_OgeWiHover::m_HandleBasicCursorState(const QPoint & orc_Pos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiHover::m_CancelSearch(void) const
+{
+   //cancel search
+   this->mpc_Ui->pc_LineEditSearch->setText("");
+   this->mpc_Ui->pc_BtnCancelSearch->setVisible(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten mouse press event slot
 
    For moving or resizing.
@@ -636,12 +633,12 @@ void C_OgeWiHover::mouseReleaseEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overrided resize event
 
-   \param[in,out] opc_event  Pointer to resize event
+   \param[in,out] opc_Event  Pointer to resize event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::resizeEvent(QResizeEvent * const opc_Event)
 {
-   // for maximizing and minimizing animation
+   // for maximizing animation
    if ((this->mq_Maximized == true) &&
        (this->mc_TimerAnimation.isActive() == false))
    {

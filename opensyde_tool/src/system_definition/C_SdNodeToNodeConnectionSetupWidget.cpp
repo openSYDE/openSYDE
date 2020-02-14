@@ -991,6 +991,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode1(void) const
                                      arg(pc_OscNode->c_Properties.c_Name.c_str()).
                                      arg(u32_DatapoolsToAdd).
                                      arg(mu32_NODE_DATA_POOL_MAX));
+         c_MessageBox.SetCustomMinHeight(180, 180);
          c_MessageBox.Execute();
       }
       else
@@ -1088,6 +1089,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode2(void) const
                                      arg(pc_OscNode->c_Properties.c_Name.c_str()).
                                      arg(u32_DatapoolsToAdd).
                                      arg(mu32_NODE_DATA_POOL_MAX));
+         c_MessageBox.SetCustomMinHeight(180, 180);
          c_MessageBox.Execute();
       }
       else

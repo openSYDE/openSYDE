@@ -42,7 +42,7 @@ C_OSCIOConfigDataDomain::C_OSCIOConfigDataDomain(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 
-   \param[in]  orc_Path   Path to IO description
+   \param[in] orc_Base Base
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCIOConfigDataDomain::C_OSCIOConfigDataDomain(const C_OSCIOFileDataDomain & orc_Base)

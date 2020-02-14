@@ -48,7 +48,8 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in]      ou32_ViewIndex   View index
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * const opc_Parent) :
@@ -200,7 +201,8 @@ void C_SyvSeSetupWidget::Abort(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the edit mode
 
-   \param[in]     oq_Active      Flag for edit mode
+   \param[in]  oq_Active      Flag for edit mode
+   \param[in]  oq_WithSave    Flag if changes should get saved
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::SetEditMode(const bool oq_Active, const bool oq_WithSave)
@@ -310,9 +312,9 @@ void C_SyvSeSetupWidget::PrepareToClose(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided key press event
+/*! \brief   Overridden key press event
 
-   \param[in,out] opc_event  Pointer to key event
+   \param[in,out]  opc_Event  Pointer to key event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::keyPressEvent(QKeyEvent * const opc_Event)
@@ -373,7 +375,7 @@ void C_SyvSeSetupWidget::m_CheckViewForError(const bool oq_SendError) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Handle change of any node connectionn state
+/*! \brief  Handle change of any node connection state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::m_OnViewConnectionChange(void)

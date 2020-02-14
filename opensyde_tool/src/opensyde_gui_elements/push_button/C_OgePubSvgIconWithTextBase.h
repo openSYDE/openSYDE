@@ -25,6 +25,7 @@ class C_OgePubSvgIconWithTextBase :
 public:
    C_OgePubSvgIconWithTextBase(QWidget * const opc_Parent = NULL);
    void SetMargins(const stw_types::sint32 os32_MarginLeft, const stw_types::sint32 os32_MarginInBetween);
+   void SetDarkMode(const bool oq_Active);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -50,6 +51,7 @@ protected:
    QColor mc_BorderColorDisabledBottom;
    QColor mc_TextColorEnabled;
    QColor mc_TextColorDisabled;
+   QColor mc_TextColorDarkMode;
    QColor mc_BackgroundColorDisabled;
    QColor mc_BackgroundColorEnabledDefault;
    QColor mc_BackgroundColorEnabledHover;
@@ -59,6 +61,7 @@ protected:
 private:
    stw_types::sint32 ms32_MarginLeft;
    stw_types::sint32 ms32_MarginInBetween;
+   bool mq_Dark;
 
    QRect GetInnerRect(void) const;
    static void h_DrawRectBorders(const QRect & orc_RectOuter, QPainter & orc_Painter,

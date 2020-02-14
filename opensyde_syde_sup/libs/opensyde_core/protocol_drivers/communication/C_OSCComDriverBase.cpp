@@ -170,7 +170,7 @@ void C_OSCComDriverBase::RegisterLogger(C_OSCComMessageLogger * const opc_Logger
 
    The CAN dispatcher must be set and initialized already
 
-   \param[in]  os32_Bitrate          CAN bitrate in kBit/s. Is used for the bus load calculation not the initialization
+   \param[in]  os32_Bitrate          CAN bitrate in kbit/s. Is used for the bus load calculation not the initialization
 
    \return
    C_NO_ERR                          CAN initialized and logging started
@@ -230,6 +230,7 @@ void C_OSCComDriverBase::StopLogging(void)
 void C_OSCComDriverBase::ContinueLogging(void)
 {
    uintn un_Counter;
+
    this->mq_Paused = false;
 
    // Inform all logger about the continue
@@ -249,6 +250,7 @@ void C_OSCComDriverBase::ContinueLogging(void)
 void C_OSCComDriverBase::PauseLogging(void)
 {
    uintn un_Counter;
+
    this->mq_Paused = true;
 
    // Inform all logger about the pause
@@ -261,7 +263,7 @@ void C_OSCComDriverBase::PauseLogging(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update the bitrate to adapt the calculation for the bus load
 
-   \param[in]  os32_Bitrate          CAN bitrate in kBit/s. Is used for the bus load calculation not the initialization
+   \param[in]  os32_Bitrate          CAN bitrate in kbit/s. Is used for the bus load calculation not the initialization
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComDriverBase::UpdateBitrate(const sint32 os32_Bitrate)
@@ -348,7 +350,7 @@ void C_OSCComDriverBase::DistributeMessages(void)
          }
       }
 
-      // Inform about TX errros
+      // Inform about Tx errros
       for (un_LoggerCounter = 0U; un_LoggerCounter < this->mc_Logger.size(); ++un_LoggerCounter)
       {
          this->mc_Logger[un_LoggerCounter]->UpdateTxErrors(this->mu32_CanTxErrors);

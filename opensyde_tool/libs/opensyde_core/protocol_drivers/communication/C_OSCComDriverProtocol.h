@@ -48,6 +48,7 @@ public:
                                   stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
                                   C_OSCIpDispatcher * const opc_IpDispatcher);
    stw_types::sint32 SendTesterPresent(const std::set<stw_types::uint32> * const opc_SkipNodes = NULL);
+   stw_types::sint32 SendTesterPresent(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const;
    stw_types::sint32 StartRouting(const stw_types::uint32 ou32_NodeIndex,
                                   stw_types::uint32 * const opu32_ErrorNodeIndex = NULL);
    stw_types::sint32 StopRouting(const stw_types::uint32 ou32_NodeIndex);
@@ -58,6 +59,10 @@ public:
    stw_types::uint32 GetRoutingPointMaximum(void) const;
    stw_types::uint32 GetRoutingPointCount(const stw_types::uint32 ou32_NodeIndex, bool & orq_Active) const;
    void GetRouteOfNode(const stw_types::uint32 ou32_NodeIndex, C_OSCRoutingRoute & orc_Route) const;
+   stw_types::sint32 GetRoutingTargetInterfaceType(const stw_types::uint32 ou32_NodeIndex,
+                                                   C_OSCSystemBus::E_Type & ore_InterfaceType) const;
+   stw_types::sint32 GetServerIdOfLastRouter(const stw_types::uint32 ou32_NodeIndex,
+                                             stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_RouterServerId) const;
 
    const stw_opensyde_core::C_OSCProtocolDriverOsyNode & GetClientId(void) const;
    bool GetNodeIndex(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId,

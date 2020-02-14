@@ -57,7 +57,8 @@ public:
    void OnErrorChangePossible(void);
    void OnSizeChangePossible(void);
    void OnDataChangeElements(const stw_types::uint32 & oru32_DataPoolListElementIndex, const QVariant & orc_NewData,
-                             const stw_opensyde_gui_logic::C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType, const stw_types::uint32 & oru32_ArrayIndex, const stw_types::sint32 & ors32_DataSetIndex);
+                             const stw_opensyde_gui_logic::C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType,
+                             const stw_types::uint32 & oru32_ArrayIndex, const stw_types::sint32 & ors32_DataSetIndex);
    void SetModelViewManager(stw_opensyde_gui_logic::C_SdNdeDpListModelViewManager * const opc_Value);
    void SelectDataElement(const stw_types::sint32 os32_DataElementIndex);
    void SelectRange(const stw_types::uint32 ou32_FirstRow, const stw_types::uint32 ou32_LastRow) const;

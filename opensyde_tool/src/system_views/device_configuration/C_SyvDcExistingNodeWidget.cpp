@@ -98,10 +98,11 @@ C_SyvDcExistingNodeWidget::~C_SyvDcExistingNodeWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set indices
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
-   \param[in] os32_ItemIndex Item index
-   \param[in] opc_Item       List item
+   \param[in] ou32_ViewIndex     View index
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] os32_ItemIndex     Item index
+   \param[in] opc_Item           List item
+   \param[in] oq_ShowAssignment  Show assignment flag
 
    \return
    C_NO_ERR    Initialization successful
@@ -367,6 +368,7 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
                                          "Device type does not match. Expected \"%1\", dropped: \"%2\"")).arg(this->
                                                                                                               mc_DeviceName).arg(
                                  c_DroppedDevice));
+         c_Box.SetCustomMinHeight(180, 180);
          c_Box.Execute();
       }
       //Always disable the hover state after drop

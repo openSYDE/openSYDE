@@ -119,7 +119,7 @@ void C_SyvComMessageLoggerFileBlf::AddMessageToFile(const C_OSCComMessageLoggerD
       c_CanObj.channel = 1U;
       c_CanObj.dlc = orc_MessageData.c_CanMsg.u8_DLC;
 
-      // TX and RTR information
+      // Tx and RTR information
       c_CanObj.flags = 0U;
       if (orc_MessageData.q_IsTx == true)
       {

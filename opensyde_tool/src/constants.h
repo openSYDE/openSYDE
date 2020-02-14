@@ -113,6 +113,7 @@ const QString mc_STYLESHEET_GUIDE_COLOR_24 = "rgb(230, 58, 63)";
 const QString mc_STYLESHEET_GUIDE_COLOR_LINK = "rgb(57, 57, 109)";
 
 //Style guide fonts (design studio)
+const QFont mc_STYLE_GUIDE_FONT_REGULAR_7  = QFont("Segoe UI", 7);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_10  = QFont("Segoe UI", 10);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_11  = QFont("Segoe UI", 11);
 const QFont mc_STYLE_GUIDE_FONT_REGULAR_12  = QFont("Segoe UI", 12);
@@ -157,6 +158,7 @@ const stw_types::uint8 mu8_MAX_NODE_ID_STW = static_cast<stw_types::uint8> (254)
 //Data pool sizes
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN = 0x101U;
 const stw_types::uint32 mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX = 0x17FU;
+const stw_types::uint32 mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX = 48U;
 const stw_types::uint32 mu32_NODE_DATA_POOL_MAX = 32U;
 const stw_types::uint32 mu32_NODE_DATA_POOL_LIST_MAX = 128U;
 const stw_types::uint32 mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX = 2048U;
@@ -191,7 +193,7 @@ const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET = 1U;
 const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE = 2U;
 
 // Highest known generated code structure version
-const stw_types::uint16 mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION = 3U;
+const stw_types::uint16 mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION = 4U;
 
 //User roles
 //----------------------------------------------------------------------------------------------------------------------

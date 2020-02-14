@@ -360,6 +360,9 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eACTIVATE_FLASHLOADER_ROUTING_ERROR:
       c_Text = "Activate Flashloader - Error on starting routing";
       break;
+   case eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
+      c_Text = "Activate Flashloader - Error on start routing due to available features";
+      break;
    case eACTIVATE_FLASHLOADER_FINISHED:
       c_Text = "Activate Flashloader - Finished";
       break;
@@ -418,8 +421,7 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
       c_Text = "Read Device Information - Start";
       break;
    case eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
-      c_Text =
-         "Read Device Information - Could not read information from STW Flashloader device";
+      c_Text = "Read Device Information - Could not read information from STW Flashloader device";
       break;
    case eUPDATE_SYSTEM_START:
       c_Text = "Update System - Start";

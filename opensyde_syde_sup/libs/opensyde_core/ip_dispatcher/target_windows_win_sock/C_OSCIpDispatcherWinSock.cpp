@@ -20,7 +20,9 @@
 #include "stwerrors.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCIpDispatcherWinSock.h"
+#include "TGLFile.h"
 #include "CSCLString.h"
+#include "CSCLIniFile.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -147,8 +149,10 @@ C_OSCIpDispatcherWinSock::C_OSCIpDispatcherWinSock(void) :
    C_OSCIpDispatcher()
 {
    WSADATA t_Data;
+   const stw_types::sintn sn_Result = WSAStartup(0x0201U, &t_Data); //Request version 2.1
 
-   stw_types::sintn sn_Result = WSAStartup(0x0201U, &t_Data); //Request version 2.1
+   this->mc_PreferredInterfaceName = "";
+
    if (sn_Result != 0)
    {
       throw "WSAp ?";
@@ -210,6 +214,8 @@ sint32 C_OSCIpDispatcherWinSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & or
    Does not report "localhost".
    Results will be placed in mc_LocalInterfaceIps
 
+   If mc_PreferredInterfaceName is not an empty string, only IPs of an adapter with this name will be used.
+
    \return
    C_NO_ERR     IPs listed
    C_NOACT      could not get IP information
@@ -217,43 +223,75 @@ sint32 C_OSCIpDispatcherWinSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & or
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
 {
-   uint32 u32_Size = 0U;
    sint32 s32_Return = C_NOACT;
-   uint32 u32_Result;
+   PIP_ADAPTER_ADDRESSES pt_Addresses;
+   uint32 u32_RetVal;
+   uint32 u32_AddressesBufLen = 0U;
 
    mc_LocalInterfaceIps.resize(0);
 
-   //Get required buffer size:
-   u32_Result = GetIpAddrTable(NULL, &u32_Size, 0);
+   // Make an initial call to GetAdaptersAddresses to get
+   // the necessary size into the u32_OutBufLen variable
+   GetAdaptersAddresses(AF_INET, 0U, NULL, NULL, &u32_AddressesBufLen);
+   pt_Addresses = new IP_ADAPTER_ADDRESSES[static_cast<uintn>(u32_AddressesBufLen)];
 
-   //we really should get an error here:
-   if (u32_Result == ERROR_INSUFFICIENT_BUFFER) //lint !e1960 //constant defined by API; no problem
+   u32_RetVal = GetAdaptersAddresses(AF_INET, 0U, NULL, pt_Addresses, &u32_AddressesBufLen);
+
+   if (u32_RetVal == NO_ERROR) //lint !e1960 //constant defined by API; no problem
    {
-      //Now get the actual data:
-      //lint -e{1960,927,433,826} //this is one beast of an API; but we have to use it ...
-      MIB_IPADDRTABLE * const pt_Table = reinterpret_cast<MIB_IPADDRTABLE * const>(new uint8[u32_Size]);
-      u32_Result = GetIpAddrTable(pt_Table, &u32_Size, 0);
-      if (u32_Result != NO_ERROR) //lint !e1960 //constant defined by API; no problem
+      PIP_ADAPTER_ADDRESSES pt_Adapter = pt_Addresses;
+      while (pt_Adapter != NULL)
       {
-         osc_write_log_error("openSYDE IP-TP", "UDP init failed. Could not get TP address table");
-         delete[] pt_Table;
-         s32_Return = C_NOACT;
-      }
-      else
-      {
-         s32_Return = C_NO_ERR;
-         for (uint32 u32_Interface = 0U; u32_Interface < pt_Table->dwNumEntries; u32_Interface++)
+         // Only active adapters are relevant
+         if (pt_Adapter->OperStatus == IfOperStatusUp)
          {
-            //ignore localhost; otherwise "locally" running servers will get requests via the localhost and
-            // a physical local interface
-            if (ntohl(pt_Table->table[u32_Interface].dwAddr) != 0x7F000001U)
+            IP_ADAPTER_UNICAST_ADDRESS * pt_Address = pt_Adapter->FirstUnicastAddress;
+
+            while (pt_Address != NULL)
             {
-               mc_LocalInterfaceIps.push_back(ntohl(pt_Table->table[u32_Interface].dwAddr));
+               if ((this->mc_PreferredInterfaceName == "") ||
+                   (pt_Adapter->FriendlyName == this->mc_PreferredInterfaceName))
+               {
+                  // sockaddr is the generic descriptor and sockaddr_in is IPV4 specific
+                  // https://stackoverflow.com/questions/21099041/why-do-we-cast-sockaddr-in-to-sockaddr-when-calling-bind/21099196
+                  //lint -e{929,740} // Both struct have the same size and is a kind of C style polymorphism
+                  in_addr t_IpAddr = reinterpret_cast<sockaddr_in *>(pt_Address->Address.lpSockaddr)->sin_addr;
+
+                  //ignore localhost; otherwise "locally" running servers will get requests via the localhost and
+                  // a physical local interface
+                  if (ntohl(t_IpAddr.S_un.S_addr) != 0x7F000001U)
+                  {
+                     C_SCLString c_Info;
+
+                     mc_LocalInterfaceIps.push_back(ntohl(t_IpAddr.S_un.S_addr)); //add to list of known interfaces
+
+                     c_Info =  "Local IP interface used with IP: " + C_SCLString(inet_ntoa(t_IpAddr)) +
+                              ", name of adapter: \"" + C_SCLString(pt_Adapter->FriendlyName) +
+                              "\"";
+
+                     osc_write_log_info("openSYDE IP-TP", c_Info);
+
+                     s32_Return = C_NO_ERR;
+                  }
+               }
+
+               pt_Address = pt_Address->Next;
             }
          }
-         delete[] pt_Table;
+         pt_Adapter = pt_Adapter->Next;
       }
    }
+   else
+   {
+      osc_write_log_error("openSYDE IP-TP", "UDP init failed. Could not get IP addresses with error: " +
+                          C_SCLString::IntToStr(u32_RetVal));
+   }
+
+   if (pt_Addresses != NULL)
+   {
+      delete[] pt_Addresses;
+   }
+
    return s32_Return;
 }
 
@@ -866,7 +904,7 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<u
       {
          sintn sn_Return;
          uint32 u32_SizeInBuffer;
-         //do we have enough bytes in RX buffer ?
+         //do we have enough bytes in Rx buffer ?
          sn_Return = ioctlsocket(this->mc_SocketsTcp[ou32_Handle].un_Socket, m_WsFionRead(), &u32_SizeInBuffer);
          if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= orc_Data.size()))
          {
@@ -1146,7 +1184,7 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
       {
          if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
          {
-            //do we have a package in RX buffer ?
+            //do we have a package in Rx buffer ?
             uint32 u32_SizeInBuffer;
             sintn sn_Return = ioctlsocket(mc_SocketsUdpServer[u32_Interface], m_WsFionRead(), &u32_SizeInBuffer);
             if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= 1U))
@@ -1212,4 +1250,25 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Loads optional configuration file
+
+   If the file does not exist, no specific configuration will be used for Ethernet.
+
+   \param[in] orc_FileLocation Log file location path and file name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCIpDispatcherWinSock::LoadConfigFile(const C_SCLString & orc_FileLocation)
+{
+   if (TGL_FileExists(orc_FileLocation) == true)
+   {
+      C_SCLIniFile c_Ini(orc_FileLocation);
+      this->mc_PreferredInterfaceName = c_Ini.ReadString("ETH_CONFIG", "ETH_INTERFACE_NAME", "");
+   }
+   else
+   {
+      this->mc_PreferredInterfaceName = "";
+   }
 }

@@ -44,7 +44,7 @@ using namespace stw_opensyde_gui;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PopFileTableView::C_PopFileTableView(QWidget * const opc_Parent) :
@@ -99,6 +99,9 @@ C_PopFileTableView::C_PopFileTableView(QWidget * const opc_Parent) :
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal data changes to table
+
+   \param[in]  orc_RecentFilePaths  Recent file paths
+   \param[in]  orc_RecentProjects   Recent projects
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::UpdateData(const std::vector<QString> & orc_RecentFilePaths,
@@ -110,8 +113,8 @@ void C_PopFileTableView::UpdateData(const std::vector<QString> & orc_RecentFileP
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert row to message
 
-   \param[in]  ors32_Row     Model row
-   \param[out] orc_MessageId Message identification indices
+   \param[in]   ors32_Row     Model row
+   \param[out]  orc_FilePath  File path
 
    \return
    C_NO_ERR Operation success
@@ -128,7 +131,7 @@ sint32 C_PopFileTableView::ConvertRowToFile(const sint32 & ors32_Row, QString & 
 
    Here: Track mouse hover
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
@@ -153,7 +156,7 @@ void C_PopFileTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 
    Here: Paint background
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::mousePressEvent(QMouseEvent * const opc_Event)
@@ -181,7 +184,7 @@ void C_PopFileTableView::mousePressEvent(QMouseEvent * const opc_Event)
 
    Here: Paint background
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -200,7 +203,7 @@ void C_PopFileTableView::mouseReleaseEvent(QMouseEvent * const opc_Event)
 
    Here: Handle hover effect change
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::leaveEvent(QEvent * const opc_Event)

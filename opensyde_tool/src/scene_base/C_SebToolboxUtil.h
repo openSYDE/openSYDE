@@ -16,6 +16,7 @@
 #include <QVBoxLayout>
 #include "stwtypes.h"
 #include "C_SdTopologyListWidget.h"
+#include "C_OgeFrameSeparator.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -30,8 +31,10 @@ public:
    static stw_opensyde_gui::C_SdTopologyListWidget * h_AddNewList(const QString & orc_Name,
                                                                   QVBoxLayout * const opc_Layout,
                                                                   QVector<stw_opensyde_gui::C_SdTopologyListWidget *> & orc_ListWidgets, QWidget * const opc_Parent);
-   static void h_AddNewHeading(const QString & orc_Name, QVBoxLayout * const opc_Layout, QWidget * const opc_Parent,
-                               const bool oq_AddSpacerBefore);
+   static stw_opensyde_gui_elements::C_OgeFrameSeparator * h_AddNewHeading(const QString & orc_Name,
+                                                                           QVBoxLayout * const opc_Layout,
+                                                                           QWidget * const opc_Parent,
+                                                                           const bool oq_AddSpacerBefore);
    static void h_InitFreeElements(QListWidget * const opc_ListWidget);
    static void h_AddElementToList(QListWidget * const opc_ListWidget, const QString & orc_Text,
                                   const QString & orc_IconPath, const QString & orc_IconPathDark = "",

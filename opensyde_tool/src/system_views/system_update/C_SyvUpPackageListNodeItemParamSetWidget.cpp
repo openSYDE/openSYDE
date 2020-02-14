@@ -52,7 +52,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     orc_DeviceName       Name of device for comparing with application block
    \param[in]     oq_FileBased         Flag if node is a file based device
    \param[in]     oq_StwFlashloader    Flag if node has not an openSYDE Flashloader but a STW Flashloader
-   \param[in,out] opc_parent           Optional pointer to parent
+   \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPackageListNodeItemParamSetWidget::C_SyvUpPackageListNodeItemParamSetWidget(const uint32 ou32_ViewIndex,
@@ -224,6 +224,7 @@ void C_SyvUpPackageListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_
          c_Message.SetHeading(C_GtGetText::h_GetText("Update package configuration"));
          c_Message.SetDescription(C_GtGetText::h_GetText("File is not a valid parameter set image file."));
          c_Message.SetDetails(c_Details);
+         c_Message.SetCustomMinHeight(180, 250);
          c_Message.Execute();
          //File invalid
          orq_TriggerRemove = false;

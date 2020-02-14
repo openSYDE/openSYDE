@@ -20,7 +20,7 @@ namespace stw_opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgePubPathVariables :
-      public C_OgePubToolTipBase
+   public C_OgePubToolTipBase
 {
    Q_OBJECT
 

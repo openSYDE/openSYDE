@@ -68,7 +68,7 @@ C_SyvDcDeviceInformation::C_SyvDcDeviceInformation(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a device name and its valid flag
 
-   \param[in]     orc_DeviceName    New device name
+   \param[in]  orc_DeviceName    New device name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcDeviceInformation::SetDeviceName(const C_SCLString & orc_DeviceName)
@@ -80,7 +80,7 @@ void C_SyvDcDeviceInformation::SetDeviceName(const C_SCLString & orc_DeviceName)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a serial number and its valid flag
 
-   \param[in]     orau8_SerialNumer   New serial number
+   \param[in]  orau8_SerialNumber   New serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcDeviceInformation::SetSerialNumber(const uint8 (&orau8_SerialNumber)[6])
@@ -92,7 +92,7 @@ void C_SyvDcDeviceInformation::SetSerialNumber(const uint8 (&orau8_SerialNumber)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a node id and its valid flag
 
-   \param[in]     ou8_NodeId      New node id
+   \param[in]  ou8_NodeId  New node id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcDeviceInformation::SetNodeId(const uint8 ou8_NodeId)
@@ -104,7 +104,7 @@ void C_SyvDcDeviceInformation::SetNodeId(const uint8 ou8_NodeId)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a ip address and its valid flag
 
-   \param[in]     orau8_IpAddress      New node id
+   \param[in]  orau8_IpAddress   New node id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcDeviceInformation::SetIpAddress(const uint8 (&orau8_IpAddress)[4])
@@ -186,7 +186,7 @@ C_SyvDcDeviceConfiguation::C_SyvDcDeviceConfiguation(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Assignment operator.
 
-   \param[in]  orc_Source    instance to assign
+   \param[in]  orc_Source  instance to assign
 
    \return
    reference to new instance
@@ -310,8 +310,8 @@ sint32 C_SyvDcSequences::InitDcSequences(const uint32 ou32_ViewIndex)
    - size of c_NodeIds must be one
    - the value in c_NodeIds is the node id for the server to configure on the current used bus
 
-   \param[in,out] orc_Config      Device configuration which will be completed
-   \param[out]    ore_Flashloader Detected flashloader protocol for the node
+   \param[in,out]  orc_Config       Device configuration which will be completed
+   \param[out]     ore_Flashloader  Detected flashloader protocol for the node
 
    \return
    C_NO_ERR    filling device configuration finished
@@ -445,7 +445,7 @@ sint32 C_SyvDcSequences::FillDeviceConfig(C_SyvDcDeviceConfiguation & orc_Config
 
    Concrete implementation is in function m_RunScanCanEnterFlashloader
 
-   \param[in]     ou32_UsedBitrate   Bitrate in kbit/s of the previous configuration of the devices
+   \param[in]  ou32_UsedBitrate  Bitrate in kbit/s of the previous configuration of the devices
 
    \return
    C_NO_ERR   started sequence
@@ -476,9 +476,9 @@ sint32 C_SyvDcSequences::ScanCanEnterFlashloader(const uint32 ou32_UsedBitrate)
 
    Concrete implementation is in function m_RunScanCanSendFlashloaderReqeust
 
-   \param[in]  ou32_ScanTime    Time till stop sending the requests in ms
-   \param[in]  oq_ScanEndless   Flag if sending of the request shall not stop if the time is over
-                                Can be stopped by StopScanCanSendFlashloaderRequest
+   \param[in]  ou32_ScanTime     Time till stop sending the requests in ms
+   \param[in]  oq_ScanEndless    Flag if sending of the request shall not stop if the time is over
+                                 Can be stopped by StopScanCanSendFlashloaderRequest
 
    \return
    C_NO_ERR   started sequence
@@ -614,7 +614,7 @@ sint32 C_SyvDcSequences::ScanEthGetInfoFromOpenSydeDevices(void)
    3. ConfCanOpenSydeDevices
    no changes will be made on the server if at least one configuration is invalid.
 
-   \param[in]     orc_DeviceConfig  Configuration for all openSYDE devices and their communication interfaces
+   \param[in]  orc_DeviceConfig  Configuration for all openSYDE devices and their communication interfaces
 
    \return
    C_NO_ERR    all devices are configured
@@ -639,7 +639,7 @@ const
    3. ConfCanOpenSydeDevices
    no changes will be made on the server if minimum one configuration is invalid.
 
-   \param[in]     orc_DeviceConfig  Configuration for all STW flashloader devices
+   \param[in]  orc_DeviceConfig  Configuration for all STW flashloader devices
 
    \return
    C_NO_ERR   started sequence
@@ -674,10 +674,10 @@ sint32 C_SyvDcSequences::ConfCanStwFlashloaderDevices(const std::vector<C_SyvDcD
    3. ConfCanOpenSydeDevices
    no changes will be made on the server if minimum one configuration is invalid.
 
-   \param[in]     orc_DeviceConfig             Configuration for all openSYDE devices and its
-                                               communication interfaces
-   \param[in]     oq_ConfigureAllInterfaces    Flag if the settings of all connected interfaces shall be set
-                                               or only the settings of the used CAN bus
+   \param[in]  orc_DeviceConfig           Configuration for all openSYDE devices and its
+                                          communication interfaces
+   \param[in]  oq_ConfigureAllInterfaces  Flag if the settings of all connected interfaces shall be set
+                                          or only the settings of the used CAN bus
 
    \return
    C_NO_ERR   started sequence
@@ -707,10 +707,10 @@ sint32 C_SyvDcSequences::ConfCanOpenSydeDevices(const std::vector<C_SyvDcDeviceC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Starts thread to write new configuration to openSYDE devices via ETH-TP.
 
-   \param[in]     orc_DeviceConfig             Configuration for all openSYDE devices and its
-                                               communication interfaces
-   \param[in]     oq_ConfigureAllInterfaces    Flag if the settings of all connected interfaces shall be set
-                                               or only the settings of the used Ethernet bus
+   \param[in]  orc_DeviceConfig           Configuration for all openSYDE devices and its
+                                          communication interfaces
+   \param[in]  oq_ConfigureAllInterfaces  Flag if the settings of all connected interfaces shall be set
+                                          or only the settings of the used Ethernet bus
 
    \return
    C_NO_ERR   started sequence
@@ -740,13 +740,13 @@ sint32 C_SyvDcSequences::ConfEthOpenSydeDevices(const std::vector<C_SyvDcDeviceC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sends the service broadcast requestProgramming
 
-   \param[out]    orq_NotAccepted   true: at least one "not accepted" response was received
-                                    false: no "not accepted" response was received
+   \param[out]  orq_NotAccepted  true: at least one "not accepted" response was received
+                                 false: no "not accepted" response was received
 
    \return
    C_NO_ERR   Request programming flag sent and set
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_CONFIG   no transport protocol installed or broadcast protocol not initialized
@@ -822,68 +822,26 @@ sint32 C_SyvDcSequences::ResetCanStwFlashloaderDevices(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Resets all CAN openSYDE devices
+/*! \brief   Resets all openSYDE devices
 
    Function returns immediately with the result. It will not be run in the separate thread.
-
-   The client bitrate of the bus will be reset to the purposed bitrate.
-   The initialization of the CAN bus will be made by ReadBackCan and ScanCanEnterFlashloader.
 
    This function shall be called only, if only openSYDE devices are connected to the bus.
 
+   In case of CAN:
+   The client bitrate of the bus will be reset to the purposed bitrate.
+   The initialization of the CAN bus will be made by ReadBackCan and ScanCanEnterFlashloader.
+
+   \param[in]  oq_ToFlashloader  Flag for reset to flashloader
+
    \return
    C_NO_ERR   no problems
-   C_BUSY     previously started sequence still going on
-   C_COM      could not send request
-   C_CONFIG   no dispatcher installed or broadcast protocol not initialized
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcSequences::ResetCanOpenSydeDevices(const bool oq_ToFlashloader) const
-{
-   sint32 s32_Return = C_NO_ERR;
-
-   if (this->mpc_Thread->isRunning() == true)
-   {
-      s32_Return = C_BUSY;
-   }
-   else
-   {
-      uint8 u8_ResetType;
-
-      if (oq_ToFlashloader == true)
-      {
-         u8_ResetType = C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_RESET_TO_FLASHLOADER;
-      }
-      else
-      {
-         u8_ResetType = C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_KEY_OFF_ON;
-      }
-
-      s32_Return = this->mpc_ComDriver->SendOsyBroadcastEcuReset(u8_ResetType);
-      if (s32_Return == C_NO_ERR)
-      {
-         osc_write_log_info("Reset CAN openSYDE devices", "openSYDE broadcast ECU reset sent.");
-      }
-      else
-      {
-         osc_write_log_error("Reset CAN openSYDE devices",
-                             "openSYDE broadcast ECU reset failed with error: " + C_SCLString::IntToStr(s32_Return));
-      }
-   }
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Resets all Ethernet openSYDE devices
-
-   Function returns immediately with the result. It will not be run in the separate thread.
-
-   \return
-   C_NO_ERR    Devices reset
    C_BUSY      previously started sequence still going on
+   C_COM       could not send request
+   C_CONFIG    no dispatcher installed or broadcast protocol not initialized
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(const bool oq_ToFlashloader) const
+sint32 C_SyvDcSequences::ResetOpenSydeDevices(const bool oq_ToFlashloader) const
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -905,16 +863,17 @@ sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(const bool oq_ToFlashloader) co
       }
 
       // Disconnect from all nodes before reset if still connected. Because of broadcast no active connection necessary
+      // In case of CAN it makes no difference
       this->mpc_ComDriver->DisconnectNodes();
 
       s32_Return = this->mpc_ComDriver->SendOsyBroadcastEcuReset(u8_ResetType);
       if (s32_Return == C_NO_ERR)
       {
-         osc_write_log_info("Reset ETH openSYDE devices", "openSYDE broadcast ECU reset sent.");
+         osc_write_log_info("Reset openSYDE devices", "openSYDE broadcast ECU reset sent.");
       }
       else
       {
-         osc_write_log_error("Reset ETH openSYDE devices",
+         osc_write_log_error("Reset openSYDE devices",
                              "openSYDE broadcast ECU reset failed with error: " + C_SCLString::IntToStr(s32_Return));
       }
    }
@@ -924,7 +883,7 @@ sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(const bool oq_ToFlashloader) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the new CAN bitrate
 
-   \param[in] ou32_Bitrate      Bitrate in kbit/s
+   \param[in]  ou32_Bitrate   Bitrate in kbit/s
 
    \return
    C_NO_ERR    Bitrate set
@@ -962,9 +921,8 @@ sint32 C_SyvDcSequences::InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bi
 
    Result of sequence can be get by calling GetDeviceInfosResult
 
-   \param[in]     ou32_UsedBitrate CAN bitrate after changing the bitrate
-   \param[in]     orc_OpenSydeIds  Ids for openSYDE flashloader to read
-   \param[in]     orc_StwIds       Ids for STW flashloader to read
+   \param[in]  orc_OpenSydeIds   Ids for openSYDE flashloader to read
+   \param[in]  orc_StwIds        Ids for STW flashloader to read
 
    \return
    C_NO_ERR   started sequence
@@ -998,7 +956,7 @@ sint32 C_SyvDcSequences::ReadBackCan(const std::vector<C_OSCProtocolDriverOsyNod
 
    Result of sequence can be get by calling GetDeviceInfosResult
 
-   \param[in]     orc_OpenSydeIds  Ids for openSYDE flashloader to read
+   \param[in]  orc_OpenSydeIds   Ids for openSYDE flashloader to read
 
    \return
    C_NO_ERR   started sequence
@@ -1029,8 +987,8 @@ sint32 C_SyvDcSequences::ReadBackEth(const std::vector<C_OSCProtocolDriverOsyNod
 
    Can be used to extract the results of one service execution after it has finished.
 
-   \param[out]  ors32_Result       result code of executed service function
-                                   for possible values see the DataDealer's function documentation
+   \param[out]  ors32_Result  result code of executed service function
+                              for possible values see the DataDealer's function documentation
 
    \return
    C_NO_ERR       result code read
@@ -1056,7 +1014,7 @@ sint32 C_SyvDcSequences::GetResults(sint32 & ors32_Result) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the device information result
 
-   \param[out]    orc_DeviceInfo       Vector for sequence results
+   \param[out]  orc_DeviceInfo   Vector for sequence results
 
    \return
    C_NO_ERR       result code read
@@ -1086,8 +1044,8 @@ sint32 C_SyvDcSequences::GetDeviceInfosResult(std::vector<C_SyvDcDeviceInformati
    The functions we use for the device configuration is not necessary.
    "Sending FLASH request" would spam the log file.
 
-   \param[in]    ou8_Progress   reported progress of operation (0..100)
-   \param[in]    orc_Text       reported information
+   \param[in]  ou8_Progress   reported progress of operation (0..100)
+   \param[in]  orc_Text       reported information
 
    \return
    C_NO_ERR       continue with procedure
@@ -1103,7 +1061,7 @@ sint32 C_SyvDcSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_S
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reports the progress of the STW flashloader configuration sequence
 
-   \param[in]     ou32_Progress     Progress of sequence
+   \param[in]  ou32_Progress  Progress of sequence
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfCanStwFlashloaderDevicesProgress(const uint32 ou32_Progress)
@@ -1114,7 +1072,7 @@ void C_SyvDcSequences::m_RunConfCanStwFlashloaderDevicesProgress(const uint32 ou
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reports the progress of the openSYDE CAN configuration sequence
 
-   \param[in]     ou32_Progress     Progress of sequence
+   \param[in]  ou32_Progress  Progress of sequence
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfCanOpenSydeDevicesProgress(const uint32 ou32_Progress)
@@ -1125,7 +1083,7 @@ void C_SyvDcSequences::m_RunConfCanOpenSydeDevicesProgress(const uint32 ou32_Pro
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reports the progress of the openSYDE Ethernet configuration sequence
 
-   \param[in]     ou32_Progress     Progress of sequence
+   \param[in]  ou32_Progress  Progress of sequence
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfEthOpenSydeDevicesProgress(const uint32 ou32_Progress)
@@ -1136,12 +1094,12 @@ void C_SyvDcSequences::m_RunConfEthOpenSydeDevicesProgress(const uint32 ou32_Pro
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reports the state of a concrete step of STW flashloader configuration sequence
 
-   \param[in]     ou32_Step         Step of node configuration
-                                    - hu32_SETNODEID
-                                    - hu32_SETCANBITRATE
-                                    - hu32_SETIPADDRESS
-   \param[in]     os32_Result       Result of service
-   \param[in]     orc_Server        Configured server
+   \param[in]  ou32_Step      Step of node configuration
+                              - hu32_SETNODEID
+                              - hu32_SETCANBITRATE
+                              - hu32_SETIPADDRESS
+   \param[in]  os32_Result    Result of service
+   \param[in]  orc_Server     Configured server
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfCanStwFlashloaderDevicesState(const uint32 ou32_Step, const sint32 os32_Result,
@@ -1154,15 +1112,16 @@ void C_SyvDcSequences::m_RunConfCanStwFlashloaderDevicesState(const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reports the state of a concrete step of openSYDE configuration sequence
 
-   \param[in]     ou32_Step               Step of node configuration
-                                          - hu32_SETNODEID
-                                          - hu32_SETCANBITRATE
-                                          - hu32_SETIPADDRESS
-   \param[in]     os32_Result             Result of service
-   \param[in]     orc_Server              Configured server interface
-                                             Node ID and Bus ID of the configured interface,
-                                             must not be the connected interface
-   \param[in]     ou32_InterfaceNumber    Number of interface
+   \param[in]  ou32_Step            Step of node configuration
+                                    - hu32_SETNODEID
+                                    - hu32_SETCANBITRATE
+                                    - hu32_SETIPADDRESS
+   \param[in]  os32_Result          Result of service
+   \param[in]  orc_Server           Configured server interface
+                                    Node ID and Bus ID of the configured interface,
+                                    must not be the connected interface
+   \param[in]  oe_InterfaceType     Interface type
+   \param[in]  ou8_InterfaceNumber  Interface number
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfOpenSydeDevicesState(const uint32 ou32_Step, const sint32 os32_Result,
@@ -1252,10 +1211,12 @@ void C_SyvDcSequences::m_ThreadFunc(void)
    * the correct number of nodes on the CAN bus we are connected to
    * instanced protocol drivers for openSYDE and STW Flashloader nodes on that CAN bus
 
+   \param[in]  ou32_CanBitrate   CAN bitrate
+
    \return
    C_NO_ERR   Sequence finished
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed or no dispatcher installed
               no com driver installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
@@ -1322,8 +1283,16 @@ sint32 C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32 ou32_CanBitra
 
       if (s32_Return == C_NO_ERR)
       {
+         uint32 u32_WaitTime = this->GetMinimumFlashloaderResetWaitTime(C_OSCComDriverFlash::eNO_CHANGES_CAN);
+
+         if (u32_WaitTime < mhu32_DEFAULT_SCAN_TIME_MS)
+         {
+            // The scan time is necessary for the manual triggering of the nodes
+            u32_WaitTime = mhu32_DEFAULT_SCAN_TIME_MS;
+         }
+
          this->mq_RunScanSendFlashloaderRequestEndless = false;
-         s32_Return = this->m_RunScanCanSendFlashloaderRequest(mhu32_DEFAULT_SCAN_TIME_MS);
+         s32_Return = this->m_RunScanCanSendFlashloaderRequest(u32_WaitTime);
       }
    }
 
@@ -1341,7 +1310,7 @@ sint32 C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32 ou32_CanBitra
    Sending the STW flashloader request "FLASH" and the openSYDE broadcast service PreProgrammingSession
    till at least the scan time is over and the flag mq_RunScanSendFlashloaderRequestEndless is set to false.
 
-   \param[in]  ou32_ScanTime    Time till stop sending the requests in ms
+   \param[in]  ou32_ScanTime  Time till stop sending the requests in ms
 
    \return
    C_NO_ERR   Sequence finished
@@ -1757,8 +1726,8 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
       {
          std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults> c_ReadDeviceInfoResults;
 
-         //wait a little (all nodes should now be in the default session of the flashloader)
-         stw_tgl::TGL_Sleep(mhu32_RESET_WAIT_TIME_MS);
+         //wait the minimum wait time (all nodes should now be in the default session of the flashloader)
+         stw_tgl::TGL_Sleep(this->GetMinimumFlashloaderResetWaitTime(C_OSCComDriverFlash::eNO_CHANGES_ETHERNET));
 
          //broadcast: "get device info" (returns serial number and device name)
          s32_Return = this->mpc_ComDriver->SendOsyEthBroadcastGetDeviceInformation(c_ReadDeviceInfoResults);
@@ -1770,6 +1739,8 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
          }
          else
          {
+            osc_write_log_info("Scan ETH get info from openSYDE devices", "Number of responses detected: " +
+                               C_SCLString::IntToStr(c_ReadDeviceInfoResults.size()));
             // Fill the result container
             for (uint32 u32_ResultCounter = 0U; u32_ResultCounter < c_ReadDeviceInfoResults.size(); ++u32_ResultCounter)
             {
@@ -1978,8 +1949,8 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
    ** for all interfaces (CAN + Ethernet)
    *** "setNodeIDForChannel" (including for the one we are connected to)
 
-   \param[in]   oq_ViaCan         true: running via CAN; false: running via Etherner (only used for user feedback)
-   \param[in]   orc_UsedServerIds Vector with server ids of all configured nodes and their connected and used bus
+   \param[in]  oq_ViaCan            true: running via CAN; false: running via Etherner (only used for user feedback)
+   \param[in]  orc_UsedServerIds    Vector with server ids of all configured nodes and their connected and used bus
 
    \return
    C_NO_ERR    all devices are configured
@@ -2053,13 +2024,21 @@ sint32 C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
 
    if (s32_Return == C_NO_ERR)
    {
-      // * wait a little (all nodes should now be in the default session of the flashloader)
-      stw_tgl::TGL_Sleep(mhu32_RESET_WAIT_TIME_MS);
-
-      // TODO BAY: Workaround! The TC3G does not respond to the reconnect if no communication
-      // was triggered after changing the IP address.
-      std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults> c_ReadDeviceInfoResults;
-      this->mpc_ComDriver->SendOsyEthBroadcastGetDeviceInformation(c_ReadDeviceInfoResults);
+      // * wait the minimum wait time (all nodes should now be in the default session of the flashloader)
+      if (oq_ViaCan == true)
+      {
+         // The CAN broadcast does not change the CAN bitrate and so no fundamental changes were made
+         // when using CAN
+         stw_tgl::TGL_Sleep(this->GetMinimumFlashloaderResetWaitTime(C_OSCComDriverFlash::
+                                                                     eNO_FUNDAMENTAL_COM_CHANGES_CAN));
+      }
+      else
+      {
+         // The Ethernet broadcast does change the IP address and so fundamental changes were made
+         // when using Ethernet
+         stw_tgl::TGL_Sleep(this->GetMinimumFlashloaderResetWaitTime(C_OSCComDriverFlash::
+                                                                     eFUNDAMENTAL_COM_CHANGES_ETHERNET));
+      }
 
       // Bring all nodes into the necessary state before changing the bitrate.
       // The bitrate is the most critical part. We have to try to avoid different configured bitrates on the
@@ -2552,7 +2531,7 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
    All connected interfaces of the node must be in the device configuration.
    Bus and node ids must be valid.
 
-   \param[in]    orc_DeviceConfiguration   information about intended device configuration for all nodes
+   \param[in]  orc_DeviceConfiguration    information about intended device configuration for all nodes
 
    \return
    C_NO_ERR    all devices are configured
@@ -2708,15 +2687,15 @@ sint32 C_SyvDcSequences::m_CheckConfOpenSydeDevices(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the bitrate for all connected and configured CAN interfaces of the server
 
-   \param[in]  orc_ServerId          Server id for communication
-   \param[in]  orc_DeviceConfig      Configuration for the server
+   \param[in]  orc_ServerId      Server id for communication
+   \param[in]  orc_DeviceConfig  Configuration for the server
 
    \return
    C_NO_ERR    Bitrate set on server successfully
    C_RANGE     device configuration is invalid
                openSYDE protocol not found
    C_TIMEOUT   expected response not received within timeout
-   C_NOACT     could not put request in TX queue ...
+   C_NOACT     could not put request in Tx queue ...
    C_CONFIG    no transport protocol installed
                no com driver installed
    C_WARN      error response (negative response code placed in *opu8_NrCode)
@@ -2829,15 +2808,15 @@ sint32 C_SyvDcSequences::m_SetCanOpenSydeBitrate(const C_OSCProtocolDriverOsyNod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the ip address for all connected and configured ethernet interfacs of the server
 
-   \param[in]  orc_ServerId          Server id for communication
-   \param[in]  orc_DeviceConfig      Configuration for the server
+   \param[in]  orc_ServerId      Server id for communication
+   \param[in]  orc_DeviceConfig  Configuration for the server
 
    \return
    C_NO_ERR   Bitrate set on server successfully
    C_RANGE    device configuration is invalid
               openSYDE protocol not found
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
               no com driver installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
@@ -2928,14 +2907,14 @@ sint32 C_SyvDcSequences::m_SetEthOpenSydeIpAddress(const C_OSCProtocolDriverOsyN
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets node and bus ids for all configured communication interfaces except the interface of orc_ServerId
 
-   \param[in]  orc_ServerId          Server id for communication
-   \param[in]  orc_DeviceConfig      Configuration for the server
+   \param[in]  orc_ServerId      Server id for communication
+   \param[in]  orc_DeviceConfig  Configuration for the server
 
    \return
    C_RANGE    openSYDE protocol not found
               orc_ServerId is invalid
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
               no com driver installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
@@ -3051,7 +3030,7 @@ sint32 C_SyvDcSequences::m_SetOpenSydeNodeIds(const C_OSCProtocolDriverOsyNode &
    \return
    C_NO_ERR   read back was successful
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed or no dispatcher installed
               no com driver installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
@@ -3100,7 +3079,7 @@ sint32 C_SyvDcSequences::m_ReadBackCan(void)
    C_BUSY      could not re-connect to node
    C_RANGE     node not found or no openSYDE protocol installed
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -3118,9 +3097,6 @@ sint32 C_SyvDcSequences::m_ReadBackEth(void)
    if (this->mpc_ComDriver != NULL)
    {
       uint32 u32_DeviceCounter;
-
-      //wait a little after previous reset (all nodes should now be in the default session of the flashloader)
-      stw_tgl::TGL_Sleep(mhu32_RESET_WAIT_TIME_MS);
 
       // * for all openSYDE nodes:
       // Connect to the devices again and prepare them for the read back function
@@ -3211,7 +3187,7 @@ sint32 C_SyvDcSequences::m_ReadBackEth(void)
    C_CONFIG   no com driver installed or no transport protocol installed
    C_RANGE    openSYDE protocol not found
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      error on creating temporary needed protocol

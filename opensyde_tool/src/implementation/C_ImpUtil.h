@@ -17,6 +17,7 @@
 #include <QString>
 #include "stwtypes.h"
 #include "C_OSCNodeApplication.h"
+#include "C_ImpCodeGenerationReportWidget.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -54,12 +55,11 @@ private:
 
    static void mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName, std::vector<HWND> & orc_Windows);
    static stw_types::sint32 mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QString & orc_AppName,
-                                                    const QString & orc_ExportFolder,
-                                                    std::vector<QString> & orc_ExportedFiles,
+                                                    const QString & orc_ExportFolder, QStringList & orc_ExportedFiles,
                                                     const QString & orc_CodeGenerator, const bool & orq_Erase);
    static stw_types::sint32 mh_ExportCodeNode(const stw_types::uint32 ou32_NodeIndex,
                                               const std::vector<stw_types::uint32> & orc_AppIndices,
-                                              std::list<QString> & orc_ExportedFiles, const bool & orq_Erase);
+                                              std::vector<stw_opensyde_gui::C_ImpCodeGenerationReportWidget::C_ReportData> & orc_ExportInfo, const bool & orq_Erase);
    static WINBOOL CALLBACK mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM os32_LParam);
 };
 

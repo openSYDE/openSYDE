@@ -64,6 +64,9 @@ public:
    // save as
    void SaveAs(void);
 
+   // open color pciker
+   void OpenColorPicker(void);
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 
@@ -77,7 +80,7 @@ Q_SIGNALS:
                                       const QString & orc_ToolTipContent);
    void SigChangeMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
                       const stw_types::uint32 ou32_Index, const QString & orc_Name, const QString & orc_SubSubItemName,
-                      const stw_types::uint32 ou32_Flag);
+                      const stw_types::uint32 ou32_Flag, const bool oq_ChangeUseCase = false);
    void SigDataChanged(const bool oq_Changed, const bool oq_All, const stw_types::sint32 os32_Mode,
                        const stw_types::sint32 os32_SubMode = 0, const stw_types::uint32 ou32_Index = 0U);
    void SigErrorChanged(const stw_types::uint32 ou32_Index);

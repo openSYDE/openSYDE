@@ -1,5 +1,15 @@
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       CAN message to text conversion base class
+
+   Provides basic functionality useful for all kinds of protocol interpreters.
+
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
@@ -104,9 +114,9 @@ uint16 C_CMONProtocolBase::m_BytesToWordHighLow(const uint8 oau8_Bytes[2])
 uint32 C_CMONProtocolBase::m_BytesToDwordLowHigh(const uint8 oau8_Bytes[4])
 {
    return static_cast<uint32>(oau8_Bytes[0] +
-        ((static_cast<uint32>(oau8_Bytes[1])) << 8) +
-        ((static_cast<uint32>(oau8_Bytes[2])) << 16) +
-        ((static_cast<uint32>(oau8_Bytes[3])) << 24));
+                              ((static_cast<uint32>(oau8_Bytes[1])) << 8) +
+                              ((static_cast<uint32>(oau8_Bytes[2])) << 16) +
+                              ((static_cast<uint32>(oau8_Bytes[3])) << 24));
 }
 
 //-----------------------------------------------------------------------------
@@ -122,9 +132,9 @@ uint32 C_CMONProtocolBase::m_BytesToDwordLowHigh(const uint8 oau8_Bytes[4])
 uint32 C_CMONProtocolBase::m_BytesToDwordHighLow(const uint8 oau8_Bytes[4])
 {
    return static_cast<uint32>(oau8_Bytes[3] +
-        ((static_cast<uint32>(oau8_Bytes[2])) << 8) +
-        ((static_cast<uint32>(oau8_Bytes[1])) << 16) +
-        ((static_cast<uint32>(oau8_Bytes[0])) << 24));
+                              ((static_cast<uint32>(oau8_Bytes[2])) << 8) +
+                              ((static_cast<uint32>(oau8_Bytes[1])) << 16) +
+                              ((static_cast<uint32>(oau8_Bytes[0])) << 24));
 }
 
 //-----------------------------------------------------------------------------
@@ -145,6 +155,7 @@ uint32 C_CMONProtocolBase::m_BytesToDwordHighLow(const uint8 oau8_Bytes[4])
 C_SCLString C_CMONProtocolBase::m_GetValueDecHex(const uint32 ou32_Value) const
 {
    C_SCLString c_Text;
+
    if (mq_Decimal == true)
    {
       (void)c_Text.PrintFormatted("%u", ou32_Value);
@@ -176,6 +187,7 @@ C_SCLString C_CMONProtocolBase::m_GetValueDecHex(const uint32 ou32_Value) const
 C_SCLString C_CMONProtocolBase::m_GetWordAsStringFormat(const uint16 ou16_Value) const
 {
    C_SCLString c_Help;
+
    if (mq_Decimal == true)
    {
       (void)c_Help.PrintFormatted("%05d", ou16_Value);
@@ -207,6 +219,7 @@ C_SCLString C_CMONProtocolBase::m_GetWordAsStringFormat(const uint16 ou16_Value)
 C_SCLString C_CMONProtocolBase::m_GetByteAsStringFormat(const uint8 ou8_Value) const
 {
    C_SCLString c_Help;
+
    if (mq_Decimal == true)
    {
       (void)c_Help.PrintFormatted("%03d", ou8_Value);
@@ -271,10 +284,10 @@ C_SCLString C_CMONProtocolKEFEX_IVA::m_KFXTextAndIndexToString(const charn * con
 
 //---------------------------------------------------------------------------
 
-C_SCLString C_CMONProtocolKEFEX_IVA::m_KFXIndexToString(const uint16 ou16_Index,
-                                                          const bool oq_IsKEFEXVarIndex) const
+C_SCLString C_CMONProtocolKEFEX_IVA::m_KFXIndexToString(const uint16 ou16_Index, const bool oq_IsKEFEXVarIndex) const
 {
    C_SCLString c_Help = "";
+
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
    uint16 u16_List;
    uint16 u16_Variable;
@@ -282,7 +295,6 @@ C_SCLString C_CMONProtocolKEFEX_IVA::m_KFXIndexToString(const uint16 ou16_Index,
    {
       if (mpc_KFXLists != NULL)
       {
-
          stw_diag_lib::C_KFXVariableLists::UnpackIndex(ou16_Index, &u16_List, &u16_Variable);
          u16_List -= mu16_KFXListOffset;
          if (mpc_KFXLists->VariableExists(u16_List, u16_Variable) == true)
@@ -310,5 +322,42 @@ C_SCLString C_CMONProtocolKEFEX_IVA::m_KFXIndexToString(const uint16 ou16_Index,
    return c_Help;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert serial number array to string
 
+   Support of two serial number formats:
+      1: format up to and including 2019. E.g: 05.123456.1001
+      2: format from 2020. E.g: 200012345678
+
+   \param[in]       opu8_SerialNumber     Pointer to first of six serial number array elements
+
+   \return
+   serial number string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_CMONProtocolBase::mh_SerialNumberToString(const stw_types::uint8 * const opu8_SerialNumber)
+{
+   C_SCLString c_Result;
+
+   if (opu8_SerialNumber != NULL)
+   {
+      if (opu8_SerialNumber[0] < static_cast<uint8>(0x20))
+      {
+         //format up to and including 2019. E.g: 05.123456.1001
+         c_Result.PrintFormatted("%02X.%02X%02X%02X.%02X%02X",
+                                 opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
+                                 opu8_SerialNumber[4], opu8_SerialNumber[5]);
+      }
+      else
+      {
+         //format from 2020. E.g: 200012345678
+         c_Result.PrintFormatted("%02X%02X%02X%02X%02X%02X",
+                                 opu8_SerialNumber[0], opu8_SerialNumber[1], opu8_SerialNumber[2], opu8_SerialNumber[3],
+                                 opu8_SerialNumber[4], opu8_SerialNumber[5]);
+      }
+   }
+
+   return c_Result;
+}
+
+//---------------------------------------------------------------------------

@@ -31,7 +31,6 @@ public:
    stw_types::sint32 Load(stw_types::uint16 * const opu16_FileVersion);
    bool HasHashChanged(void) const;
    void SetPath(const QString & orc_Path);
-   static QString h_GetDefaultPath(void);
    QString GetPath(void) const;
    QString GetFolderPath(void) const;
    QString GetName(void) const;

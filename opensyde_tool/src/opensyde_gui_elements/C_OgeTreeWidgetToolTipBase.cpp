@@ -39,7 +39,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTreeWidgetToolTipBase::C_OgeTreeWidgetToolTipBase(QWidget * const opc_Parent) :
@@ -53,7 +53,7 @@ C_OgeTreeWidgetToolTipBase::C_OgeTreeWidgetToolTipBase(QWidget * const opc_Paren
 
    Here: Handle tooltip if necessary
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeWidgetToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
@@ -67,7 +67,7 @@ void C_OgeTreeWidgetToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 
    Here: Handle tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -84,8 +84,8 @@ bool C_OgeTreeWidgetToolTipBase::event(QEvent * const opc_Event)
 
    Here: Handle tool tip move in special occasion
 
-   \param[in,out] opc_Object Event sender object
-   \param[in,out] opc_Event  Event identification and information
+   \param[in,out]  opc_Object    Event sender object
+   \param[in,out]  opc_Event     Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -101,7 +101,7 @@ bool C_OgeTreeWidgetToolTipBase::eventFilter(QObject * const opc_Object, QEvent 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Call native "mapToGlobal"
 
-   \param[in] orc_LocalPos native parameter
+   \param[in]  orc_LocalPos   native parameter
 
    \return
    Native return value
@@ -139,7 +139,7 @@ const QAbstractItemModel * C_OgeTreeWidgetToolTipBase::m_Model(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Call base "event"
 
-   \param[in] orc_LocalPos Base parameter
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    Base return value
@@ -153,7 +153,7 @@ bool C_OgeTreeWidgetToolTipBase::m_BaseEvent(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Call native "setMouseTracking"
 
-   \param[in] oq_Active native parameter
+   \param[in]  oq_Active   native parameter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeWidgetToolTipBase::m_SetMouseTracking(const bool oq_Active)
@@ -164,7 +164,7 @@ void C_OgeTreeWidgetToolTipBase::m_SetMouseTracking(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get index at global position
 
-   \param[in] orc_GlobalPos Global pos
+   \param[in]  orc_GlobalPos  Global pos
 
    \return
    Found index if any

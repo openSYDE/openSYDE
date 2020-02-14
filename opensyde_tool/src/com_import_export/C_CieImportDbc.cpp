@@ -30,6 +30,7 @@
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
+using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
@@ -87,14 +88,14 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
    osc_write_log_info("DBC file import", "Reading DBC file \"" + orc_File + "\" ...");
    s32_Return = mh_ReadFile(orc_File, c_DbcNetwork);
 
-   if (s32_Return == stw_errors::C_NO_ERR)
+   if (s32_Return == C_NO_ERR)
    {
       // get attribute definitions for send type
       osc_write_log_info("DBC file import", "Reading attribute definitions of DBC file ...");
       s32_Return = mh_GetAttributeDefinitions(c_DbcNetwork);
    }
 
-   if ((s32_Return == stw_errors::C_NO_ERR) || (s32_Return == stw_errors::C_WARN))
+   if ((s32_Return == C_NO_ERR) || (s32_Return == C_WARN))
    {
       uint32 u32_Nodes = 0U;
       stw_scl::C_SCLString c_FileName = stw_tgl::TGL_ExtractFileName(orc_File);
@@ -119,9 +120,9 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
       {
          C_CieConverter::C_CIENode & c_Node = orc_Definition.c_Nodes[u32_Nodes];
 
-         if (mh_GetNode(c_DbcNode.second, c_Node) != stw_errors::C_NO_ERR)
+         if (mh_GetNode(c_DbcNode.second, c_Node) != C_NO_ERR)
          {
-            s32_Return = stw_errors::C_WARN;
+            s32_Return = C_WARN;
          }
 
          osc_write_log_info("DBC file import", "Reading messages with signals for node \"" + c_Node.c_Properties.c_Name +
@@ -131,7 +132,7 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
          {
             sint32 s32_Tmp = mh_GetMessage(c_DbcMessage.second, c_Node);
             // check if message is assigned to a node
-            if (s32_Tmp != stw_errors::C_CONFIG)
+            if (s32_Tmp != C_CONFIG)
             {
                // message is assigned to a node, then we erase this message from temporary message assignment set
                std::set<std::string>::const_iterator c_Iter = c_MessageAssignment.find(c_DbcMessage.second.name);
@@ -140,9 +141,9 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
                   c_MessageAssignment.erase(c_Iter);
                }
                // check if there are any warnings
-               if (s32_Tmp != stw_errors::C_NO_ERR)
+               if (s32_Tmp != C_NO_ERR)
                {
-                  s32_Return = stw_errors::C_WARN;
+                  s32_Return = C_WARN;
                }
             }
          }
@@ -161,16 +162,12 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
                {
                   if (c_DbcMessage.second.name.compare(*c_Iter) == 0)
                   {
-                     //Add found message to unmapped messages
-                     C_CieConverter::C_CIENodeMessage c_Message;
-
-                     if (C_CieImportDbc::mh_PrepareMessage(c_DbcMessage.second, c_Message) != stw_errors::C_NO_ERR)
+                     //Add found valid message to unmapped messages
+                     if (mh_ConvertAndAddMessage(c_DbcMessage.second, orc_Definition.c_UnmappedMessages) !=
+                         stw_errors::C_NO_ERR)
                      {
                         s32_Return = stw_errors::C_WARN;
                      }
-
-                     orc_Definition.c_UnmappedMessages.push_back(c_Message);
-
                      //Stop searching after finding the message
                      break;
                   }
@@ -187,7 +184,7 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
          }
          if (oq_AddUnmappedMessages == false)
          {
-            s32_Return = stw_errors::C_WARN;
+            s32_Return = C_WARN;
          }
       }
    }
@@ -215,17 +212,17 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_ReadFile(const C_SCLString & orc_File, Vector::DBC::Network & orc_Network)
 {
-   sint32 s32_Return = stw_errors::C_NO_ERR;
+   sint32 s32_Return = C_NO_ERR;
 
    if (orc_File == "")
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = C_RANGE;
    }
    else if (stw_tgl::TGL_FileExists(orc_File) == false)
    {
       mhc_ErrorMessage = "DBC file \"" + orc_File + "\" does not exist.";
       osc_write_log_error("DBC file import", mhc_ErrorMessage);
-      s32_Return = stw_errors::C_CONFIG;
+      s32_Return = C_CONFIG;
    }
    else
    {
@@ -235,7 +232,7 @@ sint32 C_CieImportDbc::mh_ReadFile(const C_SCLString & orc_File, Vector::DBC::Ne
       {
          mhc_ErrorMessage = "Can't read DBC file \"" + orc_File + "\".";
          osc_write_log_error("DBC file import", mhc_ErrorMessage);
-         s32_Return = stw_errors::C_RD_WR;
+         s32_Return = C_RD_WR;
       }
    }
 
@@ -255,7 +252,7 @@ sint32 C_CieImportDbc::mh_ReadFile(const C_SCLString & orc_File, Vector::DBC::Ne
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieConverter::C_CIENode & orc_Node)
 {
-   sint32 s32_Return = stw_errors::C_NO_ERR;
+   sint32 s32_Return = C_NO_ERR;
 
    orc_Node.c_Properties.c_Name = orc_DbcNode.name.c_str();
    orc_Node.c_Properties.c_Comment = orc_DbcNode.comment.c_str();
@@ -277,7 +274,7 @@ sint32 C_CieImportDbc::mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieCo
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage, C_CieConverter::C_CIENode & orc_Node)
 {
-   sint32 s32_Return = stw_errors::C_NO_ERR;
+   sint32 s32_Return = C_NO_ERR;
    bool q_IsTxMessage = false;
    bool q_IsRxMessage = false;
 
@@ -327,30 +324,24 @@ sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage
 
    if (q_IsTxMessage == true)
    {
-      C_CieConverter::C_CIENodeMessage c_TxMessage;
-
-      if (C_CieImportDbc::mh_PrepareMessage(orc_DbcMessage, c_TxMessage) != stw_errors::C_NO_ERR)
+      // add message if valid
+      if (mh_ConvertAndAddMessage(orc_DbcMessage, orc_Node.c_TxMessages) != stw_errors::C_NO_ERR)
       {
          s32_Return = stw_errors::C_WARN;
       }
-
-      orc_Node.c_TxMessages.push_back(c_TxMessage);
    }
    else if (q_IsRxMessage == true)
    {
-      C_CieConverter::C_CIENodeMessage c_RxMessage;
-
-      if (C_CieImportDbc::mh_PrepareMessage(orc_DbcMessage, c_RxMessage) != stw_errors::C_NO_ERR)
+      // add message if valid
+      if (mh_ConvertAndAddMessage(orc_DbcMessage, orc_Node.c_RxMessages) != stw_errors::C_NO_ERR)
       {
          s32_Return = stw_errors::C_WARN;
       }
-
-      orc_Node.c_RxMessages.push_back(c_RxMessage);
    }
    else
    {
       // message is not assigned to this node
-      s32_Return = stw_errors::C_CONFIG;
+      s32_Return = C_CONFIG;
    }
 
    return s32_Return;
@@ -364,14 +355,13 @@ sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage
 
    \retval   C_NO_ERR   No error occurred
    \retval   C_WARN     Could not find at least one thing
+   \retval   C_CONFIG   Message ID invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMessage,
                                          C_CieConverter::C_CIENodeMessage & orc_Message)
 {
-   sint32 s32_Return = stw_errors::C_NO_ERR;
-   bool q_MultiplexedMessage = false;
-   bool q_MessageAdapted = false;
+   sint32 s32_Return = C_NO_ERR;
 
    orc_Message.c_CanMessage.c_Name = orc_DbcMessage.name.c_str();
    orc_Message.c_CanMessage.c_Comment = orc_DbcMessage.comment.c_str();
@@ -387,40 +377,85 @@ sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMes
    orc_Message.c_CanMessage.u32_CanId = orc_DbcMessage.id & 0x7FFFFFFF;
    orc_Message.c_CanMessage.u16_Dlc = static_cast<uint16>(orc_DbcMessage.size);
 
-   osc_write_log_info("DBC file import",
-                      "Importing signals for CAN message \"" + orc_Message.c_CanMessage.c_Name + "\" ...");
-
-   // get all signal definitions for this message
-   for (auto c_DbcSignal : orc_DbcMessage.signals)
+   if (orc_Message.c_CanMessage.u32_CanId > 0x1FFFFFFF)
    {
-      // If a multiplexer signal exists the message is a multiplexed message
-      if (mh_GetSignal(c_DbcSignal.second, q_MultiplexedMessage, q_MessageAdapted, orc_Message) != stw_errors::C_NO_ERR)
+      s32_Return = C_CONFIG;
+      osc_write_log_error("DBC file import", "CAN message \"" + orc_Message.c_CanMessage.c_Name + "\" has invalid ID.");
+   }
+
+   if (s32_Return == C_NO_ERR)
+   {
+      bool q_MultiplexedMessage = false;
+      bool q_MessageAdapted = false;
+
+      osc_write_log_info("DBC file import",
+                         "Importing signals for CAN message \"" + orc_Message.c_CanMessage.c_Name + "\" ...");
+
+      // get all signal definitions for this message
+      for (auto c_DbcSignal : orc_DbcMessage.signals)
       {
-         s32_Return = stw_errors::C_WARN;
+         // If a multiplexer signal exists the message is a multiplexed message
+         if (mh_GetSignal(c_DbcSignal.second, q_MultiplexedMessage, q_MessageAdapted, orc_Message) != C_NO_ERR)
+         {
+            s32_Return = C_WARN;
+         }
+      }
+
+      // get transmission definitions
+      if (mh_GetTransmission(orc_DbcMessage, orc_Message) != C_NO_ERR)
+      {
+         s32_Return = C_WARN;
+      }
+
+      if (q_MessageAdapted == true)
+      {
+         s32_Return = C_WARN;
+         osc_write_log_warning("DBC file import",
+                               "CAN Message \"" + orc_Message.c_CanMessage.c_Name +
+                               "\" was adapted due to a multiplexed message.");
+         orc_Message.c_Warnings.Append("The multiplexer signal properties were adapted due to a multiplexed message.\n"
+                                       "Multiplexer signal restrictions:\n"
+                                       "- Auto min/max: active\n"
+                                       "- Factor: 1\n"
+                                       "- Offset: 0\n"
+                                       "- Init value: 0\n"
+                                       "- Unit: disabled\n"
+                                       "- Length: Maximum 16 bit\n"
+                                       "- Type: unsigned");
       }
    }
 
-   // get transmission definitions
-   if (mh_GetTransmission(orc_DbcMessage, orc_Message) != stw_errors::C_NO_ERR)
-   {
-      s32_Return = stw_errors::C_WARN;
-   }
+   return s32_Return;
+}
 
-   if (q_MessageAdapted == true)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add valid messages to list of import messages.
+
+   \param[in]      orc_DbcMessage   DBC message to convert
+   \param[in,out]  rc_Messages      Messages where imported message should be added if valid
+
+   \retval   C_NO_ERR   No error occurred
+   \retval   C_WARN     Could not find at least one thing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_CieImportDbc::mh_ConvertAndAddMessage(const Vector::DBC::Message & orc_DbcMessage,
+                                               std::vector<C_CieConverter::C_CIENodeMessage> & orc_Messages)
+{
+   sint32 s32_Return = C_WARN;
+
+   C_CieConverter::C_CIENodeMessage c_Message;
+   const sint32 s32_RetPrepMessage = C_CieImportDbc::mh_PrepareMessage(orc_DbcMessage, c_Message);
+
+   // Add message if not invalid
+   if ((s32_RetPrepMessage == C_NO_ERR) || (s32_RetPrepMessage == C_WARN))
    {
-      s32_Return = stw_errors::C_WARN;
+      orc_Messages.push_back(c_Message);
+      s32_Return = s32_RetPrepMessage;
+   }
+   else
+   {
       osc_write_log_warning("DBC file import",
-                            "CAN Message \"" + orc_Message.c_CanMessage.c_Name +
-                            "\" was adapted due to a multiplexed message.");
-      orc_Message.c_Warnings.Append("The multiplexer signal properties were adapted due to a multiplexed message.\n"
-                                    "Multiplexer signal restrictions:\n"
-                                    "- Auto min/max: active\n"
-                                    "- Factor: 1\n"
-                                    "- Offset: 0\n"
-                                    "- Init value: 0\n"
-                                    "- Unit: disabled\n"
-                                    "- Length: Maximum 16 bit\n"
-                                    "- Type: unsigned");
+                            "Invalid CAN message \"" + c_Message.c_CanMessage.c_Name + "\" was not imported.");
    }
 
    return s32_Return;
@@ -442,7 +477,7 @@ sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMes
 sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, bool & orq_MultiplexerSignalExists,
                                     bool & orq_SignalAdapted, C_CieConverter::C_CIENodeMessage & orc_Message)
 {
-   sint32 s32_Return = stw_errors::C_NO_ERR;
+   sint32 s32_Return = C_NO_ERR;
 
    std::map<uintn, std::string>::const_iterator c_ItValueDescr;
    C_CieConverter::C_CIECanSignal c_Signal;
@@ -452,7 +487,7 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, b
    if (orc_DbcSignal.multiplexorSwitch == true)
    {
       c_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL;
-      c_Signal.u16_MultiplexValue = 0; //
+      c_Signal.u16_MultiplexValue = 0; // default
       q_MultiplexerSignal = true;
    }
    else if (orc_DbcSignal.multiplexedSignal == true)
@@ -488,7 +523,7 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, b
       osc_write_log_warning("DBC file import",
                             "Invalid bit length of signal \"" + c_String + "\". Bit length set to \"1\".");
       orc_Message.c_Warnings.Append("Invalid bit length of signal \"" + c_String + "\". Bit length set to \"1\".");
-      s32_Return = stw_errors::C_WARN;
+      s32_Return = C_WARN;
    }
 
    if ((orc_DbcSignal.byteOrder == Vector::DBC::ByteOrder::Motorola) ||
@@ -509,7 +544,7 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, b
       c_Signal.e_ComByteOrder = C_OSCCanSignal::E_ByteOrderType::eBYTE_ORDER_INTEL;
       osc_write_log_warning("DBC file import", "\"" + c_String + "\" signal byte order type error");
       orc_Message.c_Warnings.Append("\"" + c_String + "\" signal byte order type error");
-      s32_Return = stw_errors::C_WARN;
+      s32_Return = C_WARN;
    }
 
    // Copy and convert the value descriptions
@@ -546,9 +581,9 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, b
    }
 
    if (mh_GetSignalValues(orc_DbcSignal, q_MultiplexerSignal, orq_SignalAdapted,
-                          c_Signal.c_Element, orc_Message.c_Warnings) != stw_errors::C_NO_ERR)
+                          c_Signal.c_Element, orc_Message.c_Warnings) != C_NO_ERR)
    {
-      s32_Return = stw_errors::C_WARN;
+      s32_Return = C_WARN;
    }
 
    C_CieImportDbc::mh_VerifySignalValueTable(c_Signal);
@@ -621,7 +656,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                           bool & orq_SignalAdapted, C_CieConverter::C_CIEDataPoolElement & orc_Element,
                                           C_SCLStringList & orc_WarningMessages)
 {
-   sint32 s32_Return = stw_errors::C_NO_ERR;
+   sint32 s32_Return = C_NO_ERR;
    C_SCLString c_String = orc_DbcSignal.name.c_str();
 
    Vector::DBC::Signal c_DbcSignal = orc_DbcSignal; // remove const binding because of minimumRawValue() and
@@ -765,7 +800,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
 
          osc_write_log_warning("DBC file import", "Unknown value type error for signal \"" + c_String + "\".");
          orc_WarningMessages.Append("Unknown value type error for signal \"" + c_String + "\".");
-         s32_Return = stw_errors::C_WARN;
+         s32_Return = C_WARN;
       }
    }
    else if (c_DbcSignal.extendedValueType == Vector::DBC::Signal::ExtendedValueType::Float)
@@ -794,14 +829,14 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
 
       osc_write_log_warning("DBC file import", "Unknown value type error for signal \"" + c_String + "\".");
       orc_WarningMessages.Append("Unknown value type error for signal \"" + c_String + "\".");
-      s32_Return = stw_errors::C_WARN;
+      s32_Return = C_WARN;
    }
 
    // set the same types for all values
    orc_Element.c_MinValue.SetType(e_CurrentType);
    orc_Element.c_MaxValue.SetType(e_CurrentType);
    // check if raw values of DBC signals are in range for data type
-   if (mh_CheckRange(f64_MinValue, e_CurrentType) != stw_errors::C_NO_ERR)
+   if (mh_CheckRange(f64_MinValue, e_CurrentType) != C_NO_ERR)
    {
       const C_SCLString c_Message = "Signal \"" + c_String +
                                     "\": violation of datatype range in DBC file for minimum raw value \"" +
@@ -809,9 +844,9 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                     "\". Correct datatype with \"Start Bit\" and \"Length\" has to be set manually.";
       osc_write_log_warning("DBC file import", c_Message);
       orc_WarningMessages.Append(c_Message);
-      s32_Return = stw_errors::C_WARN;
+      s32_Return = C_WARN;
    }
-   if (mh_CheckRange(f64_MaxValue, e_CurrentType) != stw_errors::C_NO_ERR)
+   if (mh_CheckRange(f64_MaxValue, e_CurrentType) != C_NO_ERR)
    {
       const C_SCLString c_Message = "Signal \"" + c_String +
                                     "\": violation of datatype range in DBC file for maximum raw value \"" +
@@ -819,7 +854,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                     "\". Correct datatype with \"Start Bit\" and \"Length\" has to be set manually.";
       osc_write_log_warning("DBC file import", c_Message);
       orc_WarningMessages.Append(c_Message);
-      s32_Return = stw_errors::C_WARN;
+      s32_Return = C_WARN;
    }
    // set values via comfort data pool util interface
    C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_MinValue, orc_Element.c_MinValue);
@@ -860,7 +895,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
          osc_write_log_warning("DBC file import", c_Message);
          orc_WarningMessages.Append(c_Message);
          f64_InitialValue = f64_DEFAULT;
-         s32_Return = stw_errors::C_WARN;
+         s32_Return = C_WARN;
       }
 
       if ((oq_MultiplexerSignal == true) &&
@@ -874,7 +909,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
       f64_InitialValuePhy = (f64_InitialValue * c_DbcSignal.factor) + c_DbcSignal.offset;
 
       // check if raw value of DBC signal are in range for data type
-      if (mh_CheckRange(f64_InitialValue, e_CurrentType) != stw_errors::C_NO_ERR)
+      if (mh_CheckRange(f64_InitialValue, e_CurrentType) != C_NO_ERR)
       {
          const C_SCLString c_Message = "Signal \"" + c_String +
                                        "\": violation of datatype range in DBC file for initial raw value \"" +
@@ -883,7 +918,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                        " has to be set manually.";
          osc_write_log_warning("DBC file import", c_Message);
          orc_WarningMessages.Append(c_Message);
-         s32_Return = stw_errors::C_WARN;
+         s32_Return = C_WARN;
       }
       // set available initial value
       C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_InitialValue, c_InitialValue);
@@ -894,7 +929,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                                                              c_InitialValue,
                                                                              eValueChangedTo,
                                                                              C_OSCNodeDataPoolContentUtil::eLEAVE_VALUE);
-      if (s32_Tmp == stw_errors::C_RANGE)
+      if (s32_Tmp == C_RANGE)
       {
          // min and max values are interchanged
          // rare case with no practical scenario yet
@@ -907,14 +942,14 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                        "\" are interchanged. This is not supported. Values left as they are.";
          osc_write_log_warning("DBC file import", c_Message);
          orc_WarningMessages.Append(c_Message);
-         s32_Return = stw_errors::C_WARN;
+         s32_Return = C_WARN;
       }
       else
       {
          if (eValueChangedTo != C_OSCNodeDataPoolContentUtil::eNO_CHANGE)
          {
             // value was out of range, take closer min or max value
-            s32_Return = stw_errors::C_WARN;
+            s32_Return = C_WARN;
             C_SCLString c_PlaceholderMinMax;
             if (eValueChangedTo == C_OSCNodeDataPoolContentUtil::eMIN)
             {
@@ -968,7 +1003,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                                                              c_InitialValue,
                                                                              eValueChangedTo,
                                                                              C_OSCNodeDataPoolContentUtil::eLEAVE_VALUE);
-      if (s32_Tmp == stw_errors::C_RANGE)
+      if (s32_Tmp == C_RANGE)
       {
          // min and max values are interchanged
          // rare case with no practical scenario yet
@@ -981,7 +1016,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                        "\" are interchanged. This is not supported. Values left as they are.";
          osc_write_log_warning("DBC file import", c_Message);
          orc_WarningMessages.Append(c_Message);
-         s32_Return = stw_errors::C_WARN;
+         s32_Return = C_WARN;
       }
       else
       {
@@ -997,7 +1032,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                              "\".";
                osc_write_log_warning("DBC file import", c_Message);
                orc_WarningMessages.Append(c_Message);
-               s32_Return = stw_errors::C_WARN;
+               s32_Return = C_WARN;
             }
          }
          else
@@ -1040,13 +1075,13 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                orc_WarningMessages.Append(c_Message);
             }
 
-            s32_Return = stw_errors::C_WARN;
+            s32_Return = C_WARN;
          }
       }
    }
 
    // check if raw value of DBC signal are in range for data type after it was set automatically
-   if (mh_CheckRange(f64_InitialValue, e_CurrentType) != stw_errors::C_NO_ERR)
+   if (mh_CheckRange(f64_InitialValue, e_CurrentType) != C_NO_ERR)
    {
       const C_SCLString c_Message = "Signal \"" + c_String +
                                     "\": violation of datatype range in DBC file for initial raw value \"" +
@@ -1055,7 +1090,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
                                     " has to be set manually.";
       osc_write_log_warning("DBC file import", c_Message);
       orc_WarningMessages.Append(c_Message);
-      s32_Return = stw_errors::C_WARN;
+      s32_Return = C_WARN;
    }
 
    orc_Element.c_DataSetValues.push_back(c_InitialValue); // init value is the first and only element of c_DataSetValues
@@ -1078,7 +1113,7 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & orc_DbcNetwork)
 {
-   sint32 s32_Return = stw_errors::C_NO_ERR;
+   sint32 s32_Return = C_NO_ERR;
    bool q_ValueFound;
 
    // search Send Type
@@ -1096,7 +1131,7 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
    // attribute found?
    if (q_ValueFound == false)
    {
-      s32_Return = stw_errors::C_WARN;
+      s32_Return = C_WARN;
       mhc_WarningMessages.Append("Missing attribute definition for send type \"" + mhc_SendType + "\".");
       osc_write_log_warning("DBC file import", "Missing attribute definition for send type \"" + mhc_SendType + "\".");
    }
@@ -1116,7 +1151,7 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
    // default attribute found?
    if (q_ValueFound == false)
    {
-      s32_Return = stw_errors::C_WARN;
+      s32_Return = C_WARN;
       mhc_DefaultSendTypeValue = "OnEvent";
       mhc_WarningMessages.Append("Missing default attribute definition for send type \"" + mhc_SendType + "\"."
                                  " Set to \"" + mhc_DefaultSendTypeValue + "\".");
@@ -1149,7 +1184,7 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
             else
             {
                // strange, print a warning to user
-               s32_Return = stw_errors::C_WARN;
+               s32_Return = C_WARN;
                mhc_WarningMessages.Append("Default initial value for signals \"" + c_DefaultInitialValue +
                                           "\" could not be interpreted. Default value set to \"0\".");
                osc_write_log_warning("DBC file import",
@@ -1190,11 +1225,12 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
 sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMessage,
                                           C_CieConverter::C_CIENodeMessage & orc_Message)
 {
-   sint32 s32_Return = stw_errors::C_NO_ERR;
+   sint32 s32_Return = C_NO_ERR;
    C_SCLString c_MessageType;
+   bool q_CycleTimeFound = false;
 
    // this is the default (in case of attribute missing)
-   orc_Message.c_CanMessage.u32_CycleTimeMs = 0U;
+   orc_Message.c_CanMessage.u32_CycleTimeMs = 100U;
 
    // search for attribute cycle time (cycle time also means cyclic transmission method)
    for (auto c_DbcAttributeValue : orc_DbcMessage.attributeValues)
@@ -1204,6 +1240,7 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
          if (c_DbcAttributeValue.second.valueType == Vector::DBC::AttributeValueType::Int)
          {
             orc_Message.c_CanMessage.u32_CycleTimeMs = c_DbcAttributeValue.second.integerValue;
+            q_CycleTimeFound = true;
             break;
          }
       }
@@ -1267,6 +1304,24 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
       }
    }
 
+   if ((orc_Message.c_CanMessage.e_TxMethod == C_OSCCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC) &&
+       (q_CycleTimeFound == false))
+   {
+      const C_SCLString c_Message = "Message cycle time was 0ms or not valid, default set to " +
+                                    C_SCLString::IntToStr(orc_Message.c_CanMessage.u32_CycleTimeMs) + "ms.";
+
+      osc_write_log_warning("DBC file import", c_Message);
+      orc_Message.c_Warnings.Append(c_Message);
+   }
+   else if (orc_Message.c_CanMessage.e_TxMethod == C_OSCCanMessage::E_TxMethodType::eTX_METHOD_ON_EVENT)
+   {
+      orc_Message.c_CanMessage.u32_CycleTimeMs = 0U;
+   }
+   else
+   {
+      // Nothing to do
+   }
+
    return s32_Return;
 }
 
@@ -1288,47 +1343,47 @@ stw_types::sint32 C_CieImportDbc::mh_CheckRange(float64 of64_Value, C_OSCNodeDat
    if ((oe_Datatype == C_OSCNodeDataPoolContent::eUINT8) &&
        ((of64_Value < 0) || (of64_Value >= pow(2, 8))))
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = C_RANGE;
    }
    else if ((oe_Datatype == C_OSCNodeDataPoolContent::eSINT8) &&
             ((of64_Value < -pow(2, 7)) || (of64_Value >= pow(2, 7))))
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = C_RANGE;
    }
    else if ((oe_Datatype == C_OSCNodeDataPoolContent::eUINT16) &&
             ((of64_Value < 0) || (of64_Value >= pow(2, 16))))
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = C_RANGE;
    }
    else if ((oe_Datatype == C_OSCNodeDataPoolContent::eSINT16) &&
             ((of64_Value < -pow(2, 15)) || (of64_Value >= pow(2, 15))))
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = C_RANGE;
    }
    else if ((oe_Datatype == C_OSCNodeDataPoolContent::eUINT32) &&
             ((of64_Value < 0) || (of64_Value >= pow(2, 32))))
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = C_RANGE;
    }
    else if ((oe_Datatype == C_OSCNodeDataPoolContent::eSINT32) &&
             ((of64_Value < -pow(2, 31)) || (of64_Value >= pow(2, 31))))
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = C_RANGE;
    }
    else if ((oe_Datatype == C_OSCNodeDataPoolContent::eUINT64) &&
             ((of64_Value < 0) || (of64_Value >= std::pow(2, 64))))
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = C_RANGE;
    }
    else if ((oe_Datatype == C_OSCNodeDataPoolContent::eSINT64) &&
             ((of64_Value < -pow(2, 63)) || (of64_Value >= pow(2, 63))))
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = C_RANGE;
    }
    else
    {
       // OK, we do not check for float range because there should be no case in practice
-      s32_Return = stw_errors::C_NO_ERR;
+      s32_Return = C_NO_ERR;
    }
 
    return s32_Return;

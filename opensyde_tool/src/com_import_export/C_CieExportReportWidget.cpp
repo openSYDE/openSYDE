@@ -245,7 +245,7 @@ sint32 C_CieExportReportWidget::m_BuildReport(void)
    //Add node mapping
    c_CompleteLog += QString(C_GtGetText::h_GetText(c_Nodes.c_str()));
    c_CompleteLog += "<br/>";
-   //Translation: 1=Number of TX messages, 2=Number of RX messages
+   //Translation: 1=Number of Tx messages, 2=Number of Rx messages
    c_CompleteLog += QString(C_GtGetText::h_GetText("Messages: %1;")).arg(
       this->mc_ExportStatistic.u32_NumOfMessages);
    //Translation: 1=Number of signals

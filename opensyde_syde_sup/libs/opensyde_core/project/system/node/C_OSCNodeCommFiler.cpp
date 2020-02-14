@@ -388,12 +388,12 @@ void C_OSCNodeCommFiler::h_SaveNodeComMessageContainer(const C_OSCCanMessageCont
 {
    orc_XMLParser.SetAttributeBool("com-protocol-usage-flag",
                                   orc_NodeComMessageContainer.q_IsComProtocolUsedByInterface);
-   //TX messages
+   //Tx messages
    orc_XMLParser.CreateAndSelectNodeChild("tx-messages");
    h_SaveNodeComMessages(orc_NodeComMessageContainer.c_TxMessages, orc_XMLParser);
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-container");
-   //RX messages
+   //Rx messages
    orc_XMLParser.CreateAndSelectNodeChild("rx-messages");
    h_SaveNodeComMessages(orc_NodeComMessageContainer.c_RxMessages, orc_XMLParser);
    //Return
@@ -736,6 +736,25 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComSignal(C_OSCCanSignal & orc_NodeComSigna
                           "Could not find \"com-message\".\"com-signals\".\nbyte-order\" node.");
       s32_Retval = C_CONFIG;
    }
+   if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("multiplexer-type") == "multiplexer-type"))
+   {
+      s32_Retval = mh_StringToCommunicationMuxType(orc_XMLParser.GetNodeContent(), orc_NodeComSignal.e_MultiplexerType);
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-signal");
+   }
+   else
+   {
+      //Optional
+      orc_NodeComSignal.e_MultiplexerType = C_OSCCanSignal::eMUX_DEFAULT;
+   }
+   if (orc_XMLParser.AttributeExists("multiplexer-value"))
+   {
+      orc_NodeComSignal.u16_MultiplexValue = static_cast<uint16>(orc_XMLParser.GetAttributeUint32("multiplexer-value"));
+   }
+   else
+   {
+      orc_NodeComSignal.u16_MultiplexValue = 0;
+   }
    return s32_Retval;
 }
 
@@ -756,7 +775,10 @@ void C_OSCNodeCommFiler::h_SaveNodeComSignal(const C_OSCCanSignal & orc_NodeComS
    orc_XMLParser.SetAttributeUint32("data-element-index", orc_NodeComSignal.u32_ComDataElementIndex);
    orc_XMLParser.SetAttributeUint32("bit-start", orc_NodeComSignal.u16_ComBitStart);
    orc_XMLParser.SetAttributeUint32("bit-length", orc_NodeComSignal.u16_ComBitLength);
+   orc_XMLParser.SetAttributeSint32("multiplexer-value", orc_NodeComSignal.u16_MultiplexValue);
    orc_XMLParser.CreateNodeChild("byte-order", mh_CommunicationByteOrderToString(orc_NodeComSignal.e_ComByteOrder));
+   orc_XMLParser.CreateNodeChild("multiplexer-type", mh_CommunicationMuxTypeToString(
+                                    orc_NodeComSignal.e_MultiplexerType));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -864,9 +886,6 @@ C_SCLString C_OSCNodeCommFiler::mh_CommunicationByteOrderToString(
    case C_OSCCanSignal::eBYTE_ORDER_MOTOROLA:
       c_Retval = "motorola";
       break;
-   default:
-      c_Retval = "invalid";
-      break;
    }
    return c_Retval;
 }
@@ -898,6 +917,73 @@ sint32 C_OSCNodeCommFiler::mh_StringToCommunicationByteOrder(const C_SCLString &
    else
    {
       osc_write_log_error("Loading node definition", "Invalid value for \"com-message\".\"com-signals\".\nbyte-order\":" +
+                          orc_String);
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform node data pool communication mux type to string
+
+   \param[in] ore_CommunicationByteOrder Node data pool communication mux type
+
+   \return
+   Stringified node data pool communication mux type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCNodeCommFiler::mh_CommunicationMuxTypeToString(
+   const C_OSCCanSignal::E_MultiplexerType & ore_CommunicationByteOrder)
+{
+   C_SCLString c_Retval;
+
+   switch (ore_CommunicationByteOrder)
+   {
+   case C_OSCCanSignal::eMUX_DEFAULT:
+      c_Retval = "default";
+      break;
+   case C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL:
+      c_Retval = "multiplexer";
+      break;
+   case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
+      c_Retval = "multiplexed";
+      break;
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform string to node data pool communication mux type
+
+   \param[in]  orc_String String to interpret
+   \param[out] ore_Type   Node data pool communication mux type
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeCommFiler::mh_StringToCommunicationMuxType(const C_SCLString & orc_String,
+                                                           C_OSCCanSignal::E_MultiplexerType & ore_Type)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_String == "default")
+   {
+      ore_Type = C_OSCCanSignal::eMUX_DEFAULT;
+   }
+   else if (orc_String == "multiplexer")
+   {
+      ore_Type = C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL;
+   }
+   else if (orc_String == "multiplexed")
+   {
+      ore_Type = C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL;
+   }
+   else
+   {
+      osc_write_log_error("Loading node definition", "Invalid value for \"com-message\".\"com-signals\".\nmultiplexer-type\":" +
                           orc_String);
       s32_Retval = C_RANGE;
    }

@@ -253,7 +253,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                      }
                      else
                      {
-                        c_Retval = QString("0x%1").arg(QString::number(pc_Message->u32_CanId, 16));
+                        c_Retval = "0x" + QString::number(pc_Message->u32_CanId, 16).toUpper();
                      }
                      break;
                   case eDLC:

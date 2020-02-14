@@ -36,7 +36,7 @@ public:
    virtual ~C_SyvDaUnoAddSnapshotCommand(void);
 
 protected:
-   virtual void m_AddNew(void);
+   virtual void m_AddNew(void) override;
 
 private:
    void m_InitialReadRailHandling(void);

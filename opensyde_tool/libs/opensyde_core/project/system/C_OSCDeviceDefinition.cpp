@@ -53,6 +53,7 @@ void C_OSCDeviceDefinition::Clear(void)
    c_DeviceDescription = "";
    c_ImagePath = "";
    c_FilePath = "";
+   c_OtherAcceptedNames.clear();
 
    u8_NumCanBusses = 0U;
    u8_NumEthernetBusses = 0U;
@@ -67,7 +68,12 @@ void C_OSCDeviceDefinition::Clear(void)
    q_FlashloaderOpenSydeIsFileBased = false;
    u32_UserEepromSizeBytes = 0U;
    //Special default values
-   u32_FlashloaderResetWaitTime = 500U;
+   u32_FlashloaderResetWaitTimeNoChangesCan = 1000U;
+   u32_FlashloaderResetWaitTimeNoChangesEthernet = 5500U;
+   u32_FlashloaderResetWaitTimeNoFundamentalChangesCan = 1000U;
+   u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet = 5500U;
+   u32_FlashloaderResetWaitTimeFundamentalChangesCan = 1000U;
+   u32_FlashloaderResetWaitTimeFundamentalChangesEthernet = 5500U;
    u32_FlashloaderOpenSydeRequestDownloadTimeout = 20000U;
    u32_FlashloaderOpenSydeTransferDataTimeout = 2000U;
 }

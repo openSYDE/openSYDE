@@ -30,22 +30,21 @@ namespace stw_opensyde_gui_elements
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-
 class C_OgeWiHover :
    public QWidget
 {
    Q_OBJECT
 
 public:
-   explicit C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, const bool oq_Search,
+   explicit C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, QString oc_Icon, const bool oq_Search,
                          QWidget * const opc_ContainerWidget, QWidget * const opc_Parent = NULL);
 
    virtual ~C_OgeWiHover();
    void InitStaticNames(void) const;
    bool GetMaximized(void) const;
+   void SetMaximized(const bool oq_Maximized);
    stw_types::sintn GetMaximizedHeight(void) const;
    void SetMaximizedHeight(const stw_types::sintn osn_Height);
-   void SetMinimize(void);
    void ApplyDarkMode(const bool oq_Active);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -54,6 +53,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigSearchChanged(const QString & orc_Text);
+   void SigWiHoverMinBtnClicked(void);
 
 private:
    Ui::C_OgeWiHover * mpc_Ui;
@@ -66,6 +66,7 @@ private:
    stw_types::sintn msn_StepSize;
    stw_types::uint32 mu32_MouseMode;
    stw_types::uint32 mu32_ResizeMode;
+   QString mc_IconPath;
    const bool mq_SearchActive;
    QSize mc_ParentWidgetSize;
    QPoint mc_ParentWidgetTopLeft;
@@ -77,11 +78,9 @@ private:
    void m_MoveWidget(const QMouseEvent * const opc_Event);
    void m_ResizeWidget(const QMouseEvent * const opc_Event);
 
-   void m_MinmaxClicked(void);
    void m_AnimationTimerEvent(void);
    void m_SearchChanged(const QString & orc_Text);
    void m_UpdateParentSize(void);
-   void m_AdaptBtnIcon(const bool oq_BtnWidgetMax) const;
 
    static stw_types::uint32 mhu32_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_Size,
                                                 const bool oq_Maximized);
@@ -89,6 +88,7 @@ private:
    static void mh_AdaptMouseRangePos(QPoint & orc_Pos, const QSize & orc_Range, const QPoint & orc_TopLeft,
                                      const stw_types::sintn osn_OffsetX, const stw_types::sintn osn_OffsetY);
    void m_HandleBasicCursorState(const QPoint & orc_Pos);
+   void m_CancelSearch(void) const;
 
    //Avoid call
    C_OgeWiHover(const C_OgeWiHover &);

@@ -125,9 +125,9 @@ void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Updates the label with TX errors
+/*! \brief  Updates the label with Tx errors
 
-   \param[in] ou32_TxErrors Count of TX errors
+   \param[in] ou32_TxErrors Count of Tx errors
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::SetTxErrors(const stw_types::uint32 ou32_TxErrors)

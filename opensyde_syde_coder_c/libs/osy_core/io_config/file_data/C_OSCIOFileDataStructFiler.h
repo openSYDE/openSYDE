@@ -53,12 +53,12 @@ public:
                                       const stw_scl::C_SCLString & orc_CurrentNodeName,
                                       const stw_scl::C_SCLString & orc_UseCaseForLog);
    static stw_types::sint32 h_ParseAttributeIntoContent(C_OSCIOFileDataContent & orc_Content,
-                                                         const C_OSCXMLParserBase & orc_XMLParser,
-                                                         const stw_scl::C_SCLString & orc_AttributeName,
-                                                         const stw_scl::C_SCLString & orc_Type,
-                                                         const stw_scl::C_SCLString & orc_BaseType,
-                                                         const bool oq_RequireAttribute,
-                                                         const stw_scl::C_SCLString & orc_CurrentNodeName);
+                                                        const C_OSCXMLParserBase & orc_XMLParser,
+                                                        const stw_scl::C_SCLString & orc_AttributeName,
+                                                        const stw_scl::C_SCLString & orc_Type,
+                                                        const stw_scl::C_SCLString & orc_BaseType,
+                                                        const bool oq_RequireAttribute,
+                                                        const stw_scl::C_SCLString & orc_CurrentNodeName);
 
 private:
    static const stw_scl::C_SCLString mhc_False;

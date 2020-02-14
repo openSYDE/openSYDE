@@ -37,7 +37,7 @@ using namespace stw_errors;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPool::C_OSCNodeDataPool(void) :
@@ -46,6 +46,7 @@ C_OSCNodeDataPool::C_OSCNodeDataPool(void) :
    c_Comment(""),
    s32_RelatedDataBlockIndex(-1),
    q_IsSafety(false),
+   q_ScopeIsPrivate(true),
    u32_NvMStartAddress(0),
    u32_NvMSize(1000),
    c_Lists()
@@ -60,12 +61,12 @@ C_OSCNodeDataPool::C_OSCNodeDataPool(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates the hash value over all data
+/*! \brief  Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
+   \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::CalcHash(uint32 & oru32_HashValue) const
@@ -78,6 +79,7 @@ void C_OSCNodeDataPool::CalcHash(uint32 & oru32_HashValue) const
                                       oru32_HashValue);
    // pc_RelatedApplication is dynamic
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsSafety, sizeof(this->q_IsSafety), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_ScopeIsPrivate, sizeof(this->q_ScopeIsPrivate), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMStartAddress, sizeof(this->u32_NvMStartAddress), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMSize, sizeof(this->u32_NvMSize), oru32_HashValue);
 
@@ -88,13 +90,13 @@ void C_OSCNodeDataPool::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates the hash value over data pool definition
+/*! \brief  Calculates the hash value over data pool definition
 
    The hash value is a 32 bit CRC value.
    Only essential data are covered.
    It is endian-safe, so it may be used on systems with different endianness.
 
-   \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
+   \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::CalcDefinitionHash(uint32 & oru32_HashValue) const
@@ -135,7 +137,7 @@ void C_OSCNodeDataPool::CalcDefinitionHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Move list in data pool
+/*! \brief  Move list in data pool
 
    \param[in] oru32_Start  Start index
    \param[in] oru32_Target Target index
@@ -156,7 +158,7 @@ void C_OSCNodeDataPool::MoveList(const stw_types::uint32 & oru32_Start, const st
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Recalculate data pool list addresses
+/*! \brief  Recalculate data pool list addresses
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::RecalculateAddress(void)
@@ -173,7 +175,7 @@ void C_OSCNodeDataPool::RecalculateAddress(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get number of bytes occupied by variables
+/*! \brief  Get number of bytes occupied by variables
 
    \return
    Number of bytes occupied by variables
@@ -192,7 +194,7 @@ uint32 C_OSCNodeDataPool::GetNumBytesUsed(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get number of bytes not occupied by variables
+/*! \brief  Get number of bytes not occupied by variables
 
    \return
    Number of bytes not occupied by variables
@@ -204,7 +206,7 @@ sint32 C_OSCNodeDataPool::GetFreeBytes(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get number of bytes occupied by lists
+/*! \brief  Get number of bytes occupied by lists
 
    \return
    Number of bytes occupied by lists
@@ -223,7 +225,7 @@ uint32 C_OSCNodeDataPool::GetListsSize(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check error for specified list
+/*! \brief  Check error for specified list
 
    \param[in]  oru_ListIndex             Node data pool list index
    \param[out] opq_NameConflict          Name conflict
@@ -234,12 +236,6 @@ uint32 C_OSCNodeDataPool::GetListsSize(void) const
    \param[out] opq_ElementsInvalid       One or more elements are invalid
    \param[out] opc_InvalidDataSetIndices Indices of invalid data sets
    \param[out] opc_InvalidElementIndices Indices of invalid elements
-
-   \return
-   C_NO_ERR   No error
-   C_CONFIG   Name conflict
-   C_NOACT    Name not usable as variable
-   C_RANGE    Usage over 100 percent
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * const opq_NameConflict,
@@ -449,7 +445,7 @@ void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get hash for element
+/*! \brief  Get hash for element
 
    \param[in] ou32_ListIndex    List index
    \param[in] ou32_ElementIndex Element index

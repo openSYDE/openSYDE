@@ -16,6 +16,7 @@
 #include "stwerrors.h"
 #include "C_GtGetText.h"
 #include "TGLUtils.h"
+#include "C_PuiSdHandler.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_OgePopUpDialog.h"
 
@@ -51,12 +52,12 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_ViewIndex       View index
-   \param[in]     ou32_NodeIndex       Node index
-   \param[in]     orc_DeviceName       Name of device for comparing with application block
-   \param[in]     oq_FileBased         Flag if node is a file based device
-   \param[in]     oq_StwFlashloader    Flag if node has not an openSYDE Flashloader but a STW Flashloader
-   \param[in,out] opc_parent           Optional pointer to parent
+   \param[in]      ou32_ViewIndex      View index
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      orc_DeviceName      Name of device for comparing with application block
+   \param[in]      oq_FileBased        Flag if node is a file based device
+   \param[in]      oq_StwFlashloader   Flag if node has not an openSYDE Flashloader but a STW Flashloader
+   \param[in,out]  opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPackageListNodeItemDatablockWidget::C_SyvUpPackageListNodeItemDatablockWidget(const uint32 ou32_ViewIndex,
@@ -75,10 +76,10 @@ C_SyvUpPackageListNodeItemDatablockWidget::C_SyvUpPackageListNodeItemDatablockWi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the application is identical with the parameters
 
-   \param[in]     orc_AppName              Application / Project name (Not the name of the system definition)
-   \param[in]     orc_AppVersion           Application version
-   \param[in]     orc_AppBuildTime         Application build time
-   \param[in]     orc_AppBuildDate         Application build date
+   \param[in]  orc_AppName       Application / Project name (Not the name of the system definition)
+   \param[in]  orc_AppVersion    Application version
+   \param[in]  orc_AppBuildTime  Application build time
+   \param[in]  orc_AppBuildDate  Application build date
 
    \return
    true     Is identical
@@ -152,13 +153,13 @@ bool C_SyvUpPackageListNodeItemDatablockWidget::IsViewFileInfoPossible(void) con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load application information.
 
-   \param[out]    orq_FileExists          true: file exists  false: file not found
-   \param[out]    orq_FlashwareWarning    true: flashware warning occured
-                                                (only relevant for STW Flashloader; wrong device name in hex file)
-                                          false: no warnings occured
-   \param[out]    orq_TriggerRemove       true: remove item widget
-                                                (only relevant if user discards file)
-                                          false: keep widget
+   \param[out]  orq_FileExists         true: file exists  false: file not found
+   \param[out]  orq_FlashwareWarning   true: flashware warning occured
+                                       (only relevant for STW Flashloader; wrong device name in hex file)
+                                       false: no warnings occured
+   \param[out]  orq_TriggerRemove      true: remove item widget
+                                       (only relevant if user discards file)
+                                       false: keep widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq_FileExists,
@@ -232,16 +233,36 @@ void C_SyvUpPackageListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq
                   }
                   else
                   {
-                     // openSYDE nodes must use HEX files with matching device IDs
-                     C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-                     c_Message.SetHeading(C_GtGetText::h_GetText("Update Package Configuration"));
-                     c_Message.SetDescription(C_GtGetText::h_GetText("Device type of selected HEX file does not "
-                                                                     "match the node type."));
-                     c_Message.SetDetails(
-                        QString(C_GtGetText::h_GetText("Device type of %1 does not match node type %2."))
-                        .arg(this->mc_AppDeviceType.trimmed(), this->mc_NodeDeviceType.trimmed()));
-                     c_Message.Execute();
-                     q_Reset = true;
+                     bool q_FileIsOk = false;
+                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                        this->mu32_NodeIndex);
+                     if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+                     {
+                        for (uint32 u32_ItName = 0UL;
+                             u32_ItName < pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames.size(); ++u32_ItName)
+                        {
+                           const QString c_AllowedDevice =
+                              pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames[u32_ItName].Trim().UpperCase().c_str();
+                           if (QString::compare(c_AllowedDevice, this->mc_AppDeviceType, Qt::CaseInsensitive) == 0)
+                           {
+                              q_FileIsOk = true;
+                           }
+                        }
+                     }
+                     if (q_FileIsOk == false)
+                     {
+                        // openSYDE nodes must use HEX files with matching device IDs
+                        C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+                        c_Message.SetHeading(C_GtGetText::h_GetText("Update Package Configuration"));
+                        c_Message.SetDescription(C_GtGetText::h_GetText("Device type of selected HEX file does not "
+                                                                        "match the node type."));
+                        c_Message.SetDetails(
+                           QString(C_GtGetText::h_GetText("Device type of %1 does not match node type %2."))
+                           .arg(this->mc_AppDeviceType.trimmed(), this->mc_NodeDeviceType.trimmed()));
+                        c_Message.SetCustomMinHeight(230, 250);
+                        c_Message.Execute();
+                        q_Reset = true;
+                     }
                   }
                }
             }
@@ -254,10 +275,12 @@ void C_SyvUpPackageListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq
                {
                   c_Message.SetDescription(C_GtGetText::h_GetText("HEX file has multiple application information "
                                                                   "blocks with non-equal device names!"));
+                  c_Message.SetCustomMinHeight(180, 180);
                }
                else
                {
                   c_Message.SetDescription(C_GtGetText::h_GetText("HEX file has no application information block!"));
+                  c_Message.SetCustomMinHeight(180, 180);
                }
                c_Message.Execute();
                q_Reset = true;
@@ -271,6 +294,7 @@ void C_SyvUpPackageListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq
             c_Message.SetHeading(C_GtGetText::h_GetText("Update Package configuration"));
             c_Message.SetDescription(C_GtGetText::h_GetText("File is not a valid HEX file!"));
             c_Message.SetDetails(c_Details);
+            c_Message.SetCustomMinHeight(180, 250);
             c_Message.Execute();
 
             q_Reset = true;

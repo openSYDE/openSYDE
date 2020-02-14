@@ -34,8 +34,8 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Standard constructor
 
-   \param[in] ors32_Index Index of connected data item
-   \param[in] ore_Type    Type of data
+   \param[in]  ors32_Index    Index of connected data item
+   \param[in]  ore_Type       Type of data
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdDataElement::C_PuiSdDataElement(const stw_types::sint32 & ors32_Index, const E_Type & ore_Type) :
@@ -55,9 +55,9 @@ C_PuiSdDataElement::~C_PuiSdDataElement()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt index if array was resized
 
-   \param[in]   ore_Type      Type of affected items
-   \param[in]   ors32_Index   Index of which segment
-   \param[in]   ore_Action    Type of change
+   \param[in]  ore_Type       Type of affected items
+   \param[in]  ors32_Index    Index of which segment
+   \param[in]  ore_Action     Type of change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdDataElement::SyncIndex(const E_Type & ore_Type, const stw_types::sint32 & ors32_Index,

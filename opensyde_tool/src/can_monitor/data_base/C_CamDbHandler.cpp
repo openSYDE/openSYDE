@@ -325,7 +325,7 @@ const C_CieConverter::C_CIECanMessage * C_CamDbHandler::GetDbcMessage(const QStr
    All DBC files
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QMap<QString, C_CamDbDbc> & C_CamDbHandler::GetDBCFiles(void)
+const QMap<QString, C_CamDbDbc> & C_CamDbHandler::GetDBCFiles(void) const
 {
    return this->mc_DBCFiles;
 }
@@ -337,7 +337,7 @@ const QMap<QString, C_CamDbDbc> & C_CamDbHandler::GetDBCFiles(void)
    All OSY files
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QMap<QString, C_CamDbOsy> & C_CamDbHandler::GetOSYFiles(void)
+const QMap<QString, C_CamDbOsy> & C_CamDbHandler::GetOSYFiles(void) const
 {
    return this->mc_OSYFiles;
 }

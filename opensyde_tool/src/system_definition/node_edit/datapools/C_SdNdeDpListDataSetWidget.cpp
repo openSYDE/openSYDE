@@ -43,9 +43,10 @@ using namespace stw_opensyde_core;
    \param[in]     oru32_ListIndex     List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 & oru32_NodeIndex,
-   const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex) :
+C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                       const uint32 & oru32_NodeIndex,
+                                                       const uint32 & oru32_DataPoolIndex,
+                                                       const uint32 & oru32_ListIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListDataSetWidget),
    mpc_ContextMenu(NULL),
@@ -346,10 +347,9 @@ void C_SdNdeDpListDataSetWidget::m_CancelClicked(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetWidget::m_HandleButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
-                                                            const bool & orq_CopyActive, const bool & orq_PasteActive,
-                                                            const bool & orq_DeleteActive,
-                                                            const bool & orq_MoveLeftActive,
-                                                            const bool & orq_MoveRightActive)
+                                                      const bool & orq_CopyActive, const bool & orq_PasteActive,
+                                                      const bool & orq_DeleteActive, const bool & orq_MoveLeftActive,
+                                                      const bool & orq_MoveRightActive)
 {
    this->mpc_Ui->pc_PushButtonAdd->setEnabled(orq_AddActive);
    if (this->mpc_ActionAdd != NULL)

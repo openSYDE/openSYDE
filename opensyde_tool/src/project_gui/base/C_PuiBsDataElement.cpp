@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in] ors32_Index Index of connected data item
+   \param[in]  ors32_Index    Index of connected data item
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiBsDataElement::C_PuiBsDataElement(const sint32 & ors32_Index) :
@@ -53,7 +53,10 @@ C_PuiBsDataElement::~C_PuiBsDataElement(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get index
+/*! \brief   Get index of data item
+
+   \return
+   Index of data item in specific data array
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_PuiBsDataElement::GetIndex(void) const

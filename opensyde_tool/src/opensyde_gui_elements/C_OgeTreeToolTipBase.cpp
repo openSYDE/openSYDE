@@ -50,7 +50,7 @@ C_OgeTreeToolTipBase::C_OgeTreeToolTipBase(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Call after call of base "mouseMove" (in override of mouseMove)
 
-   \param[in] opc_Event "mouseMove" parameter
+   \param[in]  opc_Event   "mouseMove" parameter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeToolTipBase::CallAfterMouseMove(const QMouseEvent * const opc_Event)
@@ -61,7 +61,10 @@ void C_OgeTreeToolTipBase::CallAfterMouseMove(const QMouseEvent * const opc_Even
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Call instead of "event" (in override of event)
 
-   \param[in,out] opc_Event "event" parameter
+   \param[in,out]  opc_Event  "event" parameter
+
+   \retval true      Event was recognized and processed
+   \retval false     Event ignored
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeTreeToolTipBase::CallForEvent(QEvent * const opc_Event)
@@ -183,7 +186,7 @@ bool C_OgeTreeToolTipBase::CallForEvent(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Call before "eventFilter" (in override of eventFilter)
 
-   \param[in,out] opc_Event "eventFilter" parameter
+   \param[in,out]  opc_Event  "eventFilter" parameter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeToolTipBase::CallBeforeEventFilter(const QEvent * const opc_Event)
@@ -224,7 +227,7 @@ void C_OgeTreeToolTipBase::m_LastMinuteToolTipUpdate(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle mouse move (tool tip related)
 
-   \param[in] orc_GlobalPos Global mouse pos
+   \param[in]  orc_GlobalPos  Global mouse pos
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)
@@ -271,7 +274,7 @@ void C_OgeTreeToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Count number of parents
 
-   \param[in] orc_Index Index to count parents from
+   \param[in]  orc_Index   Index to count parents from
 
    \return
    Number of parents

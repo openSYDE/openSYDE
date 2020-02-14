@@ -43,15 +43,15 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeLeFilePathBase::C_OgeLeFilePathBase(QWidget * const opc_Parent) :
-   C_OgeLeToolTipBase(opc_Parent)
+   C_OgeLeToolTipBase(opc_Parent),
+   mc_Path(""),
+   mc_RelativeTo(""),
+   ms32_LastKnownCursorPos(-1)
 {
-   this->ms32_LastKnownCursorPos = -1;
-   this->mc_Path = "";
-   this->mc_RelativeTo = "";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -59,8 +59,8 @@ C_OgeLeFilePathBase::C_OgeLeFilePathBase(QWidget * const opc_Parent) :
 
    For appropriate QLineEdit the minimized path is shown.
 
-   \param[in] orc_New            New value
-   \param[in] orc_RelativeTo     Optional directory where path is relative to if it is relative (must be absolute)
+   \param[in]  orc_New           New value
+   \param[in]  orc_RelativeTo    Optional directory where path is relative to if it is relative (must be absolute)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::SetPath(const QString & orc_New, const QString & orc_RelativeTo)
@@ -105,8 +105,7 @@ QString C_OgeLeFilePathBase::GetPath(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Insert selected path variable in front of string.
 
-   \param[in]       orc_Variable     path variable
-   \param[in]       sn_Position      index of position where to insert variable
+   \param[in]  orc_Variable   path variable
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::InsertVariable(const QString & orc_Variable)
@@ -139,7 +138,7 @@ void C_OgeLeFilePathBase::UpdateText(void)
 
    Here: show full path
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::focusInEvent(QFocusEvent * const opc_Event)
@@ -153,7 +152,7 @@ void C_OgeLeFilePathBase::focusInEvent(QFocusEvent * const opc_Event)
 
    Here: show minimized path if necessary
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::focusOutEvent(QFocusEvent * const opc_Event)
@@ -173,7 +172,7 @@ void C_OgeLeFilePathBase::focusOutEvent(QFocusEvent * const opc_Event)
    Here: Set new path on enter or return key press.
    This is analogue to normal line edit but often not needed because of following focus loose.
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -193,7 +192,7 @@ void C_OgeLeFilePathBase::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 
    Here: Reload minimized path
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::showEvent(QShowEvent * const opc_Event)
@@ -207,7 +206,7 @@ void C_OgeLeFilePathBase::showEvent(QShowEvent * const opc_Event)
 
    Here: Recalculate minimized path on resize.
 
-   \param[in]     opc_Event      event identification and information
+   \param[in]  opc_Event   event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::resizeEvent(QResizeEvent * const opc_Event)
@@ -223,8 +222,7 @@ void C_OgeLeFilePathBase::resizeEvent(QResizeEvent * const opc_Event)
    But line edit must know resolve-stuff to adapt tool tip on editing finished and focus out.
    Default implementation does nothing.
 
-   \param[in]       orc_Path           path that probably contains variables
-   \param[in]       orc_DbProjectPath  optional path to replace special variable (Data Block project)
+   \param[in]  orc_Path    path that probably contains variables
 
    \return
    Resolved path

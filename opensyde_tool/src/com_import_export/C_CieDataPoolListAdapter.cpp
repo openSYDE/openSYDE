@@ -68,13 +68,13 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDBCFileIm
    // get node name
    c_DataStructure.c_NodeName = QString((orc_CIENode.c_Properties.c_Name).c_str());
 
-   // get TX core data
+   // get Tx core data
    mh_FillUpCoreStructureByDBCValues(orc_CIENode.c_TxMessages,
                                      c_DataStructure.c_Core.c_OSCTxMessageData,
                                      c_DataStructure.c_Core.c_OSCTxSignalData,
                                      c_DataStructure.c_Core.c_WarningMessagesPerTxMessage);
 
-   // get RX core data
+   // get Rx core data
    mh_FillUpCoreStructureByDBCValues(orc_CIENode.c_RxMessages,
                                      c_DataStructure.c_Core.c_OSCRxMessageData,
                                      c_DataStructure.c_Core.c_OSCRxSignalData,
@@ -89,10 +89,10 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDBCFileIm
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add all necessary elements to the imported core elements
 
-   \param[in] orc_OSCRxMessageData           Imported core RX message data
-   \param[in] orc_OSCRxSignalData            Imported core RX signal data
-   \param[in] orc_OSCTxMessageData           Imported core TX message data
-   \param[in] orc_OSCTxSignalData            Imported core TX signal data
+   \param[in] orc_OSCRxMessageData           Imported core Rx message data
+   \param[in] orc_OSCRxSignalData            Imported core Rx signal data
+   \param[in] orc_OSCTxMessageData           Imported core Tx message data
+   \param[in] orc_OSCTxSignalData            Imported core Tx signal data
    \param[in] orc_InfoMessagesPerMessage     Information messages per message
 
    \return
@@ -202,6 +202,15 @@ void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
       c_CanMessage.e_TxMethod = c_CanMessageIter->c_CanMessage.e_TxMethod;
       c_CanMessage.u32_CycleTimeMs = c_CanMessageIter->c_CanMessage.u32_CycleTimeMs;
 
+      if (c_CanMessage.e_TxMethod != C_OSCCanMessage::eTX_METHOD_ON_EVENT)
+      {
+         c_CanMessage.u32_TimeoutMs = mh_GetAutoTimeoutTime(c_CanMessage.u32_CycleTimeMs);
+      }
+      else
+      {
+         c_CanMessage.u32_TimeoutMs = 0U;
+      }
+
       // fill up signals
       std::vector<C_CieConverter::C_CIECanSignal>::const_iterator c_CanMessageSignalsIter;
       for (c_CanMessageSignalsIter = c_CanMessageIter->c_CanMessage.c_Signals.begin();
@@ -274,6 +283,35 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
    {
       C_PuiSdNodeCanMessage c_UiMessage;
       c_UiMessage.c_Signals.resize(c_MessageIter->c_Signals.size());
+      // Adaption of Ui specific timeout mode
+      if (c_MessageIter->u32_TimeoutMs == 0U)
+      {
+         if (c_MessageIter->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT)
+         {
+            // Special case: 0 means disabled timeout check for on event
+            c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_DISABLED;
+         }
+         else
+         {
+            // Using default value in case of cyclic and on change
+            c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
+         }
+      }
+      else
+      {
+         if ((c_MessageIter->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT) ||
+             (c_MessageIter->u32_TimeoutMs != mh_GetAutoTimeoutTime(c_MessageIter->u32_CycleTimeMs)))
+         {
+            // Using the specific value as custom value
+            c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM;
+         }
+         else
+         {
+            // In case of a cyclic message the timeout time matches the auto value
+            c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
+         }
+      }
+
       orc_DataPoolListStructure.c_Ui.c_UiRxMessageData.push_back(c_UiMessage);
    }
    // Tx messages
@@ -400,4 +438,20 @@ sint32 C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(const uint32 ou32_B
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the automatic timeout time of a CAN message depending of the cylce time
+
+   The time is (3 * cycle time) + 10
+
+   \param[in]       ou32_CycleTime     Cycle time of CAN message
+
+   \return
+   Calculated timeout time
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_CieDataPoolListAdapter::mh_GetAutoTimeoutTime(const uint32 ou32_CycleTime)
+{
+   return (ou32_CycleTime * 3U) + 10U;
 }

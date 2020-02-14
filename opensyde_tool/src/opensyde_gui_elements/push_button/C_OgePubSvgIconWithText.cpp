@@ -48,6 +48,7 @@ C_OgePubSvgIconWithText::C_OgePubSvgIconWithText(QWidget * const opc_Parent) :
    this->msn_LeftBorderEnabledWidth = 0;
    this->mc_TextColorEnabled = mc_STYLE_GUIDE_COLOR_4;
    this->mc_TextColorDisabled = mc_STYLE_GUIDE_COLOR_9;
+   this->mc_TextColorDarkMode = mc_STYLE_GUIDE_COLOR_27;
    this->mc_FontPixel = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_SEMIBOLD_13);
    this->mc_BackgroundColorDisabled = Qt::transparent;
    this->mc_BackgroundColorEnabledDefault = Qt::transparent;

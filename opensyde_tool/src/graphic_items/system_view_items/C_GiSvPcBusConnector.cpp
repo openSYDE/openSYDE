@@ -40,10 +40,11 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     ou64_UniqueID   Unique ID
-   \param[in]     ou32_ViewIndex  View index
-   \param[in]     opc_BusItem     Bus item for initial connection
-   \param[in,out] opc_GenericItem PC item to connect to
+   \param[in]     ou64_UniqueID           Unique ID
+   \param[in]     ou32_ViewIndex          View index
+   \param[in]     orc_InteractionPoints   Interaction points
+   \param[in]     opc_BusItem             Bus item for initial connection
+   \param[in,out] opc_GenericItem         PC item to connect to
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvPcBusConnector::C_GiSvPcBusConnector(const uint64 ou64_UniqueID, const uint32 ou32_ViewIndex,

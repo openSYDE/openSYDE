@@ -70,6 +70,8 @@ public:
    void DeleteSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 ou32_SignalIndex) const;
 
+   void ImportMessages(void);
+
    stw_opensyde_core::C_OSCCanProtocol::E_Type GetActProtocol(void) const;
    void TriggerLoadOfSplitterUserSettings(void) const;
    void TriggerSaveOfSplitterUserSettings(void) const;
@@ -98,7 +100,6 @@ private:
    void m_ConnectNodeToProtAndAddDataPool(const stw_types::uint32 ou32_NodeIndex,
                                           const stw_types::uint32 ou32_InterfaceIndex);
    void m_DisconnectNodeFromProt(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
-   void m_AddDataPool(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
 
    void m_ProtocolChanged(void);
    void m_ReloadMessages(void);

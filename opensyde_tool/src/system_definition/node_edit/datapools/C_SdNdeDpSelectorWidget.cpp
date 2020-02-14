@@ -152,9 +152,10 @@ void C_SdNdeDpSelectorWidget::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Inits the widget with all necessary information
 
-   \param[in]     orc_Title         Title for category label
-   \param[in]     orc_Description   Description for category label
-   \param[in]     orc_InstanceName  Name of the instance of this class of using stylesheets
+   \param[in]     orc_Title            Title for category label
+   \param[in]     orc_TooltipTitle     Title for tooltip
+   \param[in]     orc_TooltipContent   Tooltip content
+   \param[in]     orc_InstanceName     Name of the instance of this class of using stylesheets
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorWidget::InitWidget(const QString & orc_Title, const QString & orc_TooltipTitle,

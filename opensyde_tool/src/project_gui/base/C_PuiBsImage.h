@@ -29,7 +29,7 @@ class C_PuiBsImage :
 public:
    C_PuiBsImage();
 
-   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
 
    QPixmap c_UIImagePixmap;
 };

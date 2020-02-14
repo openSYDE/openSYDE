@@ -183,6 +183,7 @@ void C_SdNdeDbViewWidget::AddApp(void)
       c_MessageBox.SetDetails(C_GtGetText::h_GetText(
                                  "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
       c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+      c_MessageBox.SetCustomMinHeight(230, 270);
       c_MessageBox.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
       if (c_MessageBox.Execute() != C_OgeWiCustomMessage::eOK)
       {
@@ -215,25 +216,8 @@ void C_SdNdeDbViewWidget::AddApp(void)
                {
                   if (pc_Dialog->GetFromTSP() == true)
                   {
-                     const uint32 u32_NumApplications = pc_Node->c_Applications.size();
-                     //Clear all existing
-                     for (uint32 u32_It = u32_NumApplications; u32_It > 0UL; --u32_It)
-                     {
-                        //Re-get application as our vector might not be valid anymore
-                        const C_OSCNodeApplication * const pc_App = C_PuiSdHandler::h_GetInstance()->GetApplication(
-                           this->mu32_NodeIndex,
-                           u32_It -
-                           1UL);
-                        if ((pc_App != NULL) && (pc_App->e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION))
-                        {
-                           tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveApplication(this->mu32_NodeIndex,
-                                                                                         u32_It - 1UL) == C_NO_ERR);
-                        }
-                     }
-                     //First reload: update deleted data blocks
-                     this->SetNodeIndex(this->mu32_NodeIndex);
                      m_AddFromTSP();
-                     //Second/final reload: show data blocks as they were imported
+                     //Final reload: show data blocks as they were imported
                      this->SetNodeIndex(this->mu32_NodeIndex);
                   }
                   else
@@ -257,6 +241,7 @@ void C_SdNdeDbViewWidget::AddApp(void)
             c_MessageBox.SetHeading(C_GtGetText::h_GetText("Add Datablocks"));
             c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                            "There is no Flashloader support for this device type. Data Blocks cannot be added."));
+            c_MessageBox.SetCustomMinHeight(180, 180);
             c_MessageBox.Execute();
          }
       }
@@ -447,6 +432,7 @@ void C_SdNdeDbViewWidget::m_AddFromTSP(void)
                               arg(pc_Dialog->GetTSPApplicationCount());
       QString c_Details = "";
       c_Message.SetHeading(C_GtGetText::h_GetText("Add new Data Blocks"));
+      c_Message.SetCustomMinHeight(180, 180);
       for (uint32 u32_It = 0; u32_It < pc_Dialog->GetTSPApplicationCount(); ++u32_It)
       {
          C_OSCNodeApplication c_Tmp;
@@ -463,6 +449,7 @@ void C_SdNdeDbViewWidget::m_AddFromTSP(void)
       {
          c_Message.SetType(C_OgeWiCustomMessage::eWARNING);
          c_Description += C_GtGetText::h_GetText(" Some warnings occured. See details for more information.");
+         c_Message.SetCustomMinHeight(180, 300);
          c_Message.SetDetails(c_Details);
       }
 
@@ -535,6 +522,7 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
       c_Message.SetDescription(C_GtGetText::h_GetText(
                                   "Code generation settings are not available. "
                                   "\nThere are no Data Blocks of type programmable applications declared."));
+      c_Message.SetCustomMinHeight(180, 180);
       c_Message.Execute();
    }
 }

@@ -14,6 +14,7 @@
 #include "ui_C_SyvDaDashboardToolbox.h"
 #include "C_GtGetText.h"
 #include "C_SebToolboxUtil.h"
+#include "C_OgeWiUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -38,14 +39,16 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardToolbox::C_SyvDaDashboardToolbox(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   mpc_Ui(new Ui::C_SyvDaDashboardToolbox)
+   mpc_Ui(new Ui::C_SyvDaDashboardToolbox),
+   mpc_FrameSeparatorReadingWidgets(NULL),
+   mpc_FrameSeparatorWritingWidgets(NULL)
 {
-   mpc_Ui->setupUi(this);
+   this->mpc_Ui->setupUi(this);
 
    this->mpc_Ui->pc_ScrollAreaWidgetsWidget->SetBackgroundColor(-1);
    this->mpc_Ui->pc_ScrollAreaFunctionBlocksWidget->SetBackgroundColor(-1);
@@ -57,7 +60,7 @@ C_SyvDaDashboardToolbox::C_SyvDaDashboardToolbox(QWidget * const opc_Parent) :
    // set the 'nodes' tab initially
    this->mpc_Ui->pc_TabWidget->setCurrentIndex(0);
 
-   mpc_Ui->pc_ListWidgetDrawing->setDropIndicatorShown(false);
+   this->mpc_Ui->pc_ListWidgetDrawing->setDropIndicatorShown(false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,6 +72,8 @@ C_SyvDaDashboardToolbox::C_SyvDaDashboardToolbox(QWidget * const opc_Parent) :
 C_SyvDaDashboardToolbox::~C_SyvDaDashboardToolbox()
 {
    delete mpc_Ui;
+   delete mpc_FrameSeparatorReadingWidgets;
+   delete mpc_FrameSeparatorWritingWidgets;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -98,6 +103,16 @@ void C_SyvDaDashboardToolbox::ApplyDarkMode(const bool oq_Active)
       {
          pc_ListWidget->ApplyDarkMode(oq_Active);
       }
+   }
+
+   if (this->mpc_FrameSeparatorReadingWidgets != NULL)
+   {
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_FrameSeparatorReadingWidgets, "HasColor39Background", oq_Active);
+   }
+
+   if (this->mpc_FrameSeparatorWritingWidgets != NULL)
+   {
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_FrameSeparatorWritingWidgets, "HasColor39Background", oq_Active);
    }
 }
 
@@ -150,12 +165,13 @@ void C_SyvDaDashboardToolbox::m_FillToolboxStatic(void)
    //---------------
    pc_List = C_SebToolboxUtil::h_AddNewList(C_GtGetText::h_GetText("Parametrization"), this->mpc_Ui->pc_VerticalLayout3,
                                             this->mc_ListWidgets, this);
-   C_SebToolboxUtil::h_AddElementToList(pc_List, C_GtGetText::h_GetText(
-                                           "Parametrization Widget"),
+   C_SebToolboxUtil::h_AddElementToList(pc_List,
+                                        C_GtGetText::h_GetText("Parametrization Widget"),
                                         "://images/system_views/dashboards/function_blocks/PreviewParamWidget.svg",
                                         "://images/system_views/dashboards/function_blocks/PreviewParamWidgetDark.svg",
-                                        C_GtGetText::h_GetText(
-                                           "This widget is used to read data from and write data to the NVM memory of the ECU reference over the NVM Datapools."),
+                                        C_GtGetText::h_GetText("This widget is used to read data from and write data "
+                                                               "to the NVM memory of the ECU reference over the NVM "
+                                                               "Datapools."),
                                         C_GtGetText::h_GetText("Parametrization Widget"));
 
    // add a final spacer
@@ -184,22 +200,9 @@ void C_SyvDaDashboardToolbox::m_AddWidgetItems(void)
    const QString c_ToolTipPrefix = C_GtGetText::h_GetText(" Theme");
    C_SdTopologyListWidget * pc_List;
 
-   //not supported yet
-   //   pc_List = C_SebToolboxUtil::h_AddNewList(C_GtGetText::h_GetText(
-   //                                               "Combo-Box"), this->mpc_Ui->pc_VerticalLayout1,
-   // this->mc_ListWidgets,
-   //                                            this);
-   //   C_SebToolboxUtil::h_AddElementToList(pc_List, c_Theme1, "://images/system_views/dashboards/ComboBoxStw.png",
-   //                                        "://images/system_views/dashboards/ComboBoxStwDark.png", c_Theme1);
-   //   C_SebToolboxUtil::h_AddElementToList(pc_List, c_Theme2, "://images/system_views/dashboards/ComboBoxStw2.png",
-   //                                        "://images/system_views/dashboards/ComboBoxStw2Dark.png", c_Theme2);
-   //   C_SebToolboxUtil::h_AddElementToList(pc_List, c_Theme3, "://images/system_views/dashboards/ComboBoxFlat.png",
-   //                                        "://images/system_views/dashboards/ComboBoxFlatDark.png", c_Theme3);
-   //   C_SebToolboxUtil::h_AddElementToList(pc_List, c_Theme4, "://images/system_views/dashboards/ComboBoxSkeu.png",
-   //                                        "://images/system_views/dashboards/ComboBoxSkeuDark.png", c_Theme4);
-
-   C_SebToolboxUtil::h_AddNewHeading(C_GtGetText::h_GetText(
-                                        "Reading Widgets"), this->mpc_Ui->pc_VerticalLayout1, this, false);
+   this->mpc_FrameSeparatorReadingWidgets =
+      C_SebToolboxUtil::h_AddNewHeading(C_GtGetText::h_GetText("Reading Widgets"),
+                                        this->mpc_Ui->pc_VerticalLayout1, this, false);
    pc_List = C_SebToolboxUtil::h_AddNewList(C_GtGetText::h_GetText(
                                                "Value Label"), this->mpc_Ui->pc_VerticalLayout1, this->mc_ListWidgets,
                                             this);
@@ -281,8 +284,9 @@ void C_SyvDaDashboardToolbox::m_AddWidgetItems(void)
                                         c_Theme4 + c_ToolTipPrefix);
 
    //add free space
-   C_SebToolboxUtil::h_AddNewHeading(C_GtGetText::h_GetText(
-                                        "Writing Widgets"), this->mpc_Ui->pc_VerticalLayout1, this, true);
+   this->mpc_FrameSeparatorWritingWidgets =
+      C_SebToolboxUtil::h_AddNewHeading(C_GtGetText::h_GetText("Writing Widgets"),
+                                        this->mpc_Ui->pc_VerticalLayout1, this, true);
 
    pc_List = C_SebToolboxUtil::h_AddNewList(C_GtGetText::h_GetText(
                                                "Toggle"), this->mpc_Ui->pc_VerticalLayout1, this->mc_ListWidgets,

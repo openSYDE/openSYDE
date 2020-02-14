@@ -106,7 +106,6 @@ protected:
    virtual bool m_InterpretSysDef(stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData) const;
    stw_scl::C_SCLString m_GetOsySysDefStringHex(void) const;
    stw_scl::C_SCLString m_GetOsySysDefStringDec(void) const;
-   stw_scl::C_SCLString m_GetTimestampAsString(const stw_types::uint64 ou64_TimeStamp) const;
 
    // Functions for integrating other CAN message interpretations
    virtual bool m_CheckInterpretation(C_OSCComMessageLoggerData & orc_MessageData);
@@ -138,6 +137,8 @@ private:
    C_OSCComMessageLogger & operator =(const C_OSCComMessageLogger &);
 
    void m_ConvertCanMessage(const stw_can::T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx);
+   void m_InterpretSysDefCanSignal(C_OSCComMessageLoggerData & orc_MessageData,
+                                   const C_OSCCanSignal & orc_OscSignal) const;
    void m_ResetCounter(void);
 
    C_OSCComMessageLoggerData mc_HandledCanMessage;

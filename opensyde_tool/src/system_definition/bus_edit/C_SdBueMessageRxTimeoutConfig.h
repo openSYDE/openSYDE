@@ -14,6 +14,7 @@
 #include "stwtypes.h"
 
 #include "C_OgePopUpDialog.h"
+#include "C_PuiSdNodeCanMessage.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -34,16 +35,13 @@ class C_SdBueMessageRxTimeoutConfig :
 
 public:
    explicit C_SdBueMessageRxTimeoutConfig(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                          const bool oq_UseAutoReceiveTimeoutFlag,
-                                          const stw_types::uint32 ou32_ReceiveTimeoutValue,
-                                          const stw_types::uint32 ou32_LastKnownCycleTimeValue,
-                                          const stw_types::uint32 ou32_AutoReceiveTimeoutValue,
+                                          const stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode, const bool oq_TxMethodOnEvent, const stw_types::uint32 ou32_ReceiveTimeoutValue, const stw_types::uint32 ou32_LastKnownCycleTimeValue, const stw_types::uint32 ou32_AutoReceiveTimeoutValue,
                                           const QString & orc_NameForTitle);
    ~C_SdBueMessageRxTimeoutConfig(void);
 
    void InitStaticNames(void) const;
 
-   bool GetUseAutoReceiveTimeoutFlag(void) const;
+   stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode GetReceiveTimeoutMode(void) const;
    stw_types::uint32 GetReceiveTimeoutValue(void) const;
 
 protected:
@@ -61,6 +59,7 @@ private:
 
    static const stw_types::sint32 mhs32_IndexAuto;
    static const stw_types::sint32 mhs32_IndexCustom;
+   static const stw_types::sint32 mhs32_IndexDisabled;
 
    //Avoid call
    C_SdBueMessageRxTimeoutConfig(const C_SdBueMessageRxTimeoutConfig &);
@@ -70,7 +69,7 @@ private:
    void m_CancelClicked(void);
 
    void m_HandleInactiveStates(void) const;
-   void m_OnUseReceiveTimeoutChanged(void) const;
+   void m_OnReceiveTimeoutModeChanged(void) const;
    void m_UpdateAutoReceiveTimeoutValue(void) const;
 };
 

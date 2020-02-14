@@ -12,7 +12,7 @@
 #define C_CAMGENTABLEDELEGATE_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_TblDelegate.h"
+#include "C_CamTblDelegate.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -22,7 +22,7 @@ namespace stw_opensyde_gui
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamGenTableDelegate :
-   public C_TblDelegate
+   public C_CamTblDelegate
 {
 public:
    C_CamGenTableDelegate(QObject * const opc_Parent = NULL);

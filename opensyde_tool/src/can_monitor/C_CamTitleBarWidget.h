@@ -51,6 +51,12 @@ Q_SIGNALS:
    void SigPrepareForSave(void);
    void SigSavedAsNew(void);
 
+protected:
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   virtual void resizeEvent(QResizeEvent * const opc_Event) override;
+   //lint -restore
+
 private:
    Ui::C_CamTitleBarWidget * mpc_Ui;
    stw_opensyde_gui_elements::C_CamOgeMuRecentProjects * mpc_Menu;
@@ -68,9 +74,10 @@ private:
    void m_OnOpenProjectClicked(void);
    void m_OnRecentProjectSelected(const QAction * const opc_Action);
    void m_RemapOnSaveAs(const QString & orc_NewFileName) const;
+   void m_SetButtonsText(const bool oq_IconOnly) const;
 
-   void m_OnAboutToShow(void) const;
-   void m_OnAboutToHide(void) const;
+   void m_OnAboutToShowMenu(void) const;
+   void m_OnAboutToHideMenu(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

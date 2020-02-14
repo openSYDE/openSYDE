@@ -51,6 +51,7 @@ C_OSCNodeApplication::C_OSCNodeApplication(void) :
    c_IDECall(""),
    c_CodeGeneratorPath(""),
    c_GeneratePath(""),
+   u16_GenCodeVersion(0),
    c_ResultPath("")
 {
 }
@@ -76,6 +77,7 @@ void C_OSCNodeApplication::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_CodeGeneratorPath.c_str(),
                                       this->c_CodeGeneratorPath.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_GeneratePath.c_str(), this->c_GeneratePath.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_GenCodeVersion, sizeof(this->u16_GenCodeVersion), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_ResultPath.c_str(), this->c_ResultPath.Length(), oru32_HashValue);
 }
 

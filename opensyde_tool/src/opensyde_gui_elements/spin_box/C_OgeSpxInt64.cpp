@@ -39,8 +39,8 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent     Optional pointer to parent
-   \param[in]     orq_IsUnsigned Indicator if this spin box should handle unsigned 64 bit or signed 64 bit
+   \param[in,out]  opc_Parent       Optional pointer to parent
+   \param[in]      orq_IsUnsigned   Indicator if this spin box should handle unsigned 64 bit or signed 64 bit
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxInt64::C_OgeSpxInt64(QWidget * const opc_Parent, const bool & orq_IsUnsigned) :
@@ -77,8 +77,8 @@ bool C_OgeSpxInt64::GetIsUnsigned(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new internal value
 
-   \param[in] orc_Value           New value
-   \param[in] oq_AllowValueUpdate Flag to suppress or request value update signals
+   \param[in]  orc_Value            New value
+   \param[in]  oq_AllowValueUpdate  Flag to suppress or request value update signals
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetValue(const QVariant & orc_Value, const bool oq_AllowValueUpdate)
@@ -146,7 +146,7 @@ void C_OgeSpxInt64::SetValue(const QVariant & orc_Value, const bool oq_AllowValu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set single step width
 
-   \param[in] ou64_Step Single step width
+   \param[in]  ou64_Step   Single step width
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetStepWidth(const uint64 ou64_Step)
@@ -162,7 +162,7 @@ void C_OgeSpxInt64::SetStepWidth(const uint64 ou64_Step)
 
    Warning: No action if new value over maximum
 
-   \param[in] orc_Minimum New minimum
+   \param[in]  orc_Minimum    New minimum
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetMinimum(const QVariant & orc_Minimum)
@@ -176,7 +176,7 @@ void C_OgeSpxInt64::SetMinimum(const QVariant & orc_Minimum)
 
    Warning: No action if new value below minimum
 
-   \param[in] orc_Maximum New maximum
+   \param[in]  orc_Maximum    New maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetMaximum(const QVariant & orc_Maximum)
@@ -188,7 +188,7 @@ void C_OgeSpxInt64::SetMaximum(const QVariant & orc_Maximum)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set suffix
 
-   \param[in] orc_Value New suffix
+   \param[in]  orc_Value   New suffix
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetSuffix(const QString & orc_Value)
@@ -277,7 +277,7 @@ uint64 C_OgeSpxInt64::GetStepWidth(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do x steps
 
-   \param[in] osn_Steps Step count to do
+   \param[in]  osn_Steps   Step count to do
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
@@ -396,8 +396,8 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Validate current input string
 
-   \param[in,out] orc_Input Input string
-   \param[in,out] orc_Pos   Position
+   \param[in,out]  orc_Input  Input string
+   \param[in,out]  orc_Pos    Position
 
    \return
    Invalid      Unusable
@@ -515,7 +515,7 @@ QAbstractSpinBox::StepEnabled C_OgeSpxInt64::stepEnabled(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set unsigned or signed state
 
-   \param[in] orq_Value Flag if is unsigned
+   \param[in]  orq_Value   Flag if is unsigned
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetIsUnsigned(const bool & orq_Value)
@@ -529,7 +529,7 @@ void C_OgeSpxInt64::SetIsUnsigned(const bool & orq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt value to range
 
-   \param[in,out] orc_Value Value to check and adapt
+   \param[in,out]  orc_Value  Value to check and adapt
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::m_ApplyMinMax(QVariant & orc_Value) const
@@ -555,9 +555,9 @@ void C_OgeSpxInt64::m_ApplyMinMax(QVariant & orc_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if value in range
 
-   \param[in]  orc_Value          Value to check
-   \param[out] orq_IsUnderMinimum Indicator if value under allowed range
-   \param[out] orq_IsOverMaximum  Indicator if value over allowed range
+   \param[in]   orc_Value           Value to check
+   \param[out]  orq_IsUnderMinimum  Indicator if value under allowed range
+   \param[out]  orq_IsOverMaximum   Indicator if value over allowed range
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::m_CheckMinMax(const QVariant & orc_Value, bool & orq_IsUnderMinimum, bool & orq_IsOverMaximum) const
@@ -613,7 +613,7 @@ void C_OgeSpxInt64::m_ResetMinMax(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert value in expected internal storage format
 
-   \param[in] orc_Value Numeric QVariant
+   \param[in]  orc_Value   Numeric QVariant
 
    \return
    QVariant in expected format

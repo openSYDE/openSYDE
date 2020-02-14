@@ -1453,28 +1453,6 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="17" column="2" colspan="4">
-         <widget class="stw_opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditIDE">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::StrongFocus</enum>
-          </property>
-          <property name="cursorPosition">
-           <number>0</number>
-          </property>
-         </widget>
-        </item>
         <item row="9" column="4">
          <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PubMenuCodeGenerate">
           <property name="minimumSize">
@@ -1517,6 +1495,66 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="text">
            <string>Process ID</string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="2" colspan="2">
+         <widget class="stw_opensyde_gui_elements::C_OgeLePlaceholderVar" name="pc_LineEditIDE">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="cursorPosition">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="4">
+         <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PubMenuIDE">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>ABC</string>
+          </property>
+         </widget>
+        </item>
+        <item row="17" column="5">
+         <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonIDE">
+          <property name="minimumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>33</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>...</string>
           </property>
          </widget>
         </item>
@@ -1681,11 +1719,6 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeLeFilePath.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubOpen</class>
    <extends>QPushButton</extends>
    <header>C_OgePubOpen.h</header>
@@ -1742,6 +1775,11 @@ p, li { white-space: pre-wrap; }
    <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
    <extends>QComboBox</extends>
    <header>C_OgeCbxText.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLePlaceholderVar</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLePlaceholderVar.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

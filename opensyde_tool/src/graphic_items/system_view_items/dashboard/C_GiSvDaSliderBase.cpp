@@ -273,6 +273,8 @@ void C_GiSvDaSliderBase::SendCurrentValue(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call properties for widgets
+
+   \return true (configurable properties called)
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaSliderBase::CallProperties(void)
@@ -442,8 +444,8 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                                                                rc_Config.c_ElementScaling.f64_Factor,
                                                                rc_Config.c_ElementScaling.f64_Offset);
                   if (C_SdNdeDpContentUtil::h_GetNumberOfAvailableSteps(pc_Element->c_MinValue,
-                                                                              pc_Element->c_MaxValue,
-                                                                              u64_Steps, 0) == C_NO_ERR)
+                                                                        pc_Element->c_MaxValue,
+                                                                        u64_Steps, 0) == C_NO_ERR)
                   {
                      if (u64_Steps > 0)
                      {

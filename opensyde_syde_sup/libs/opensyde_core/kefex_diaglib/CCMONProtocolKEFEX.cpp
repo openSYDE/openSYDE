@@ -1,3 +1,14 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       CAN message to text conversion class for the STW KEFEX protocol
+
+   Converts a CAN message structure to text. The interpretation is based on
+   the STW KEFEX CAN protocol specification.
+
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop

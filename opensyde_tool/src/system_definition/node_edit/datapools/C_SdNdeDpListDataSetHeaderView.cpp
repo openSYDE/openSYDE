@@ -39,7 +39,7 @@ using namespace stw_opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListDataSetHeaderView::C_SdNdeDpListDataSetHeaderView(const Qt::Orientation & ore_Orientation,
-                                                                           QWidget * const opc_Parent) :
+                                                               QWidget * const opc_Parent) :
    C_SdNdeDpListTableHeaderView(ore_Orientation, opc_Parent)
 {
 }

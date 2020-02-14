@@ -148,7 +148,7 @@ void C_SdTopologyListWidget::SetGroupName(const QString & orc_Name)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten start drag event
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out] oc_SupportedActions Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyListWidget::startDrag(const Qt::DropActions oc_SupportedActions)

@@ -37,6 +37,8 @@ using namespace stw_opensyde_gui_elements;
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
+
+   \param[in,out]  opc_Parent    Parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiProgressBopperle::C_OgeWiProgressBopperle(QWidget * const opc_Parent) :
@@ -52,14 +54,14 @@ C_OgeWiProgressBopperle::C_OgeWiProgressBopperle(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the color of the outer circle of the progress bopperle
 
-   \param[in]     orc_OuterColer         Color of the pen
-   \param[in]     orc_InnerColor         Color of the brush
+   \param[in]  orc_BorderColor   Color of the pen
+   \param[in]  orc_InnerColor    Color of the brush
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiProgressBopperle::SetOuterBopperleColor(const QColor & orc_BorderColer, const QColor & orc_InnerColor)
+void C_OgeWiProgressBopperle::SetOuterBopperleColor(const QColor & orc_BorderColor, const QColor & orc_InnerColor)
 {
    this->mc_BrushOuterCircle.setColor(orc_InnerColor);
-   this->mc_PenOuterCircle.setColor(orc_BorderColer);
+   this->mc_PenOuterCircle.setColor(orc_BorderColor);
 
    this->update();
 }
@@ -67,14 +69,14 @@ void C_OgeWiProgressBopperle::SetOuterBopperleColor(const QColor & orc_BorderCol
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the color of the inner circle of the progress bopperle
 
-   \param[in]     orc_OuterColer         Color of the pen
-   \param[in]     orc_InnerColor         Color of the brush
+   \param[in]  orc_BorderColor   Color of the pen
+   \param[in]  orc_InnerColor    Color of the brush
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiProgressBopperle::SetMainBopperleColor(const QColor & orc_BorderColer, const QColor & orc_InnerColor)
+void C_OgeWiProgressBopperle::SetMainBopperleColor(const QColor & orc_BorderColor, const QColor & orc_InnerColor)
 {
    this->mc_BrushMainCircle.setColor(orc_InnerColor);
-   this->mc_PenMainCircle.setColor(orc_BorderColer);
+   this->mc_PenMainCircle.setColor(orc_BorderColor);
 
    this->update();
 }
@@ -92,11 +94,11 @@ void C_OgeWiProgressBopperle::HideMainBopperle(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided paint event
+/*! \brief   Overridden paint event
 
-   Draws the usage bar
+   Here: Draws the usage bar
 
-   \param[in,out] opc_Event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiProgressBopperle::paintEvent(QPaintEvent * const opc_Event)

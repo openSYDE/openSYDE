@@ -64,6 +64,7 @@ private:
 
    // For loading files
    QString mc_CurrentLoadedFile;
+   QString mc_CurrentLoadedFileOrg;
    std::vector<stw_scl::C_SCLString> mc_OsySysDefs;
    std::vector<stw_types::uint32> mc_OsySysDefBuses;
    std::vector<stw_scl::C_SCLString> mc_DbcFiles;
@@ -105,10 +106,10 @@ private:
 
    void m_OnClearOldConfiguration(void);
    void m_OnNewConfiguration(void);
-   void m_OnDatabaseLoadStarted(const QString & orc_File);
+   void m_OnDatabaseLoadStarted(const QString & orc_File, const QString & orc_OrgPath);
    void m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Result);
-   void m_OnDatabaseRemove(const QString & orc_File, const bool oq_IsUpdate);
-   void m_OnActivateDatabase(const QString & orc_File, const bool oq_Active);
+   void m_OnDatabaseRemove(const QString & orc_File, const QString & orc_OrgPath, const bool oq_IsUpdate);
+   void m_OnActivateDatabase(const QString & orc_File, const QString & orc_OrgPath, const bool oq_Active);
    void m_OnOsyChangeBus(const QString & orc_File, const stw_types::uint32 ou32_BusIndex);
    void m_OnCanDllConfigChange(void);
 };

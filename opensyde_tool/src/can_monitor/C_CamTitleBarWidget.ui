@@ -25,9 +25,9 @@
   <property name="windowTitle">
    <string>C_CamTitleBarWidget</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0,0,0,0,1,0,0,0,0,0">
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0,0,0,0,0">
    <property name="spacing">
-    <number>0</number>
+    <number>15</number>
    </property>
    <property name="leftMargin">
     <number>10</number>
@@ -47,22 +47,6 @@
       <string>Save</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <spacer name="horizontalSpacer_7">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>15</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="pc_Frame">
@@ -87,43 +71,11 @@
     </widget>
    </item>
    <item>
-    <spacer name="horizontalSpacer_6">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
     <widget class="stw_opensyde_gui_elements::C_CamOgePubProjOp" name="pc_PushButtonNew">
      <property name="text">
       <string>New</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <spacer name="horizontalSpacer_5">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <widget class="stw_opensyde_gui_elements::C_CamOgeTobRecentProjects" name="pc_ToolButtonLoad">
@@ -137,22 +89,6 @@
       <string>Open</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <spacer name="horizontalSpacer_4">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <widget class="stw_opensyde_gui_elements::C_CamOgePubProjOp" name="pc_PushButtonSaveAs">
@@ -180,22 +116,6 @@
       <string>About</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <spacer name="horizontalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>30</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <widget class="stw_opensyde_gui_elements::C_CamOgePubProjOp" name="pc_PushButtonHelp">
@@ -226,7 +146,7 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>118</width>
+       <width>100</width>
        <height>20</height>
       </size>
      </property>

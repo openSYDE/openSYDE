@@ -54,7 +54,6 @@ C_OgeWiDashboardTab::C_OgeWiDashboardTab(QWidget * const opc_Parent, const bool 
    mpc_ActionPaste(NULL),
    mpc_ActionDelete(NULL),
    mpc_ActionClose(NULL),
-   mq_Pinned(false),
    mq_Current(false),
    mq_Active(false),
    mq_EditActive(false),
@@ -251,18 +250,6 @@ void C_OgeWiDashboardTab::SetCurrent(const bool oq_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set pinned flag
-
-   \param[in] oq_Value New flag value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiDashboardTab::SetPinned(const bool oq_Value)
-{
-   this->mq_Pinned = oq_Value;
-   m_HandleMode();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle mode change
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -339,17 +326,6 @@ void C_OgeWiDashboardTab::m_InitContextMenu(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Toggle active state
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiDashboardTab::m_ToggleActive(void)
-{
-   const bool q_Active = !this->mq_Active;
-
-   this->SetActive(q_Active);
-   Q_EMIT this->SigActiveChanged(this, q_Active);
-}
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
@@ -403,15 +379,6 @@ void C_OgeWiDashboardTab::m_PasteAction(void)
 void C_OgeWiDashboardTab::m_DeleteAction(void)
 {
    Q_EMIT this->SigDeleteAction(this);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Signal close action
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiDashboardTab::m_CloseAction(void)
-{
-   Q_EMIT this->SigCloseAction(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

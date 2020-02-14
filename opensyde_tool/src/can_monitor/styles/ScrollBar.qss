@@ -157,7 +157,7 @@ stw_opensyde_gui--C_CamGenSigTableView QScrollBar:horizontal
 {
 margin-left:10px;
 margin-right:10px;
-height:19px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
+height:19px; /*real height of scroll bar is 5px; Real height = height - padding-bottom/top */
 padding-top:8px;
 padding-bottom:6px;
 padding-left:0px;
@@ -170,6 +170,7 @@ stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView QScrollBar:vertical,
 stw_opensyde_gui_elements--C_CamOgeCbxTableSmall QAbstractItemView QScrollBar:vertical,
 stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar:vertical
 {
+margin-top:5px;
 width:9px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
 padding-right:2px;
 padding-left:2px;

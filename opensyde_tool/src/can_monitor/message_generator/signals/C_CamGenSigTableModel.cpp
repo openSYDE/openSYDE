@@ -51,7 +51,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigTableModel::C_CamGenSigTableModel(QObject * const opc_Parent) :
@@ -73,7 +73,7 @@ void C_CamGenSigTableModel::TriggerSignalReload(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set current message index
 
-   \param[in] ou32_Message Message index
+   \param[in]  ou32_Message   Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableModel::SetMessage(const uint32 ou32_Message)
@@ -96,7 +96,7 @@ void C_CamGenSigTableModel::SetMessage(const uint32 ou32_Message)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update the message DLC
 
-   \param[in] ou32_MessageIndex Message index
+   \param[in]  ou32_MessageIndex    Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableModel::UpdateMessageDLC(const uint32 ou32_MessageIndex)
@@ -111,9 +111,9 @@ void C_CamGenSigTableModel::UpdateMessageDLC(const uint32 ou32_MessageIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
@@ -127,7 +127,7 @@ QVariant C_CamGenSigTableModel::headerData(const sintn osn_Section, const Qt::Or
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
       const C_CamGenSigTableModel::E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING))
+      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
       {
          switch (e_Col)
          {
@@ -142,6 +142,27 @@ QVariant C_CamGenSigTableModel::headerData(const sintn osn_Section, const Qt::Or
             break;
          case ePHYSICAL:
             c_Retval = C_GtGetText::h_GetText("Phys Value");
+            break;
+         case eUNIT:
+            c_Retval = C_GtGetText::h_GetText("Unit");
+            break;
+         }
+      }
+      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      {
+         switch (e_Col)
+         {
+         case eNAME:
+            c_Retval = C_GtGetText::h_GetText("Name");
+            break;
+         case eBIT_POS:
+            c_Retval = C_GtGetText::h_GetText("Start Bit");
+            break;
+         case eRAW:
+            c_Retval = C_GtGetText::h_GetText("Raw Value");
+            break;
+         case ePHYSICAL:
+            c_Retval = C_GtGetText::h_GetText("Physical Value");
             break;
          case eUNIT:
             c_Retval = C_GtGetText::h_GetText("Unit");
@@ -184,7 +205,7 @@ QVariant C_CamGenSigTableModel::headerData(const sintn osn_Section, const Qt::Or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -213,7 +234,7 @@ sintn C_CamGenSigTableModel::columnCount(const QModelIndex & orc_Parent) const
 
    Compare with file header description.
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -280,8 +301,8 @@ sintn C_CamGenSigTableModel::rowCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -500,7 +521,7 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                switch (e_Col)
                {
                case eNAME:
-                  c_Retval = QString("Byte %1").arg(u32_Index + 1UL);
+                  c_Retval = QString("Byte %1").arg(u32_Index);
                   break;
                case eBIT_POS:
                   c_Retval = static_cast<uint64>(u32_Index) * 8ULL;
@@ -512,7 +533,8 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
                      {
                         c_Retval =
-                           QString("0x%1").arg(QString("%1").arg(pc_Message->c_Bytes[u32_Index], 0, 16).toUpper());
+                           QString("0x%1").arg(QString("%1").arg(pc_Message->c_Bytes[u32_Index], 2, 16, QChar(
+                                                                    '0')).toUpper());
                      }
                      else
                      {
@@ -554,7 +576,7 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                switch (e_Col)
                {
                case eRAW:
-                  c_Retval = QString("0x0");
+                  c_Retval = QString("0x00");
                   break;
                default:
                   //None
@@ -598,9 +620,9 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set data at index
 
-   \param[in] orc_Index Index
-   \param[in] orc_Value New data
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  orc_Value   New data
+   \param[in]  osn_Role    Data role
 
    \return
    true  success
@@ -812,13 +834,20 @@ bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVarian
          Q_EMIT this->SigTriggerModelUpdateCyclicMessage(this->mu32_MessageIndex, true);
       }
    }
+   else
+   {
+      //Even though the data is the same the display format might have to change
+      //so its better to indicate a data change anyways
+      //lint -e{1793} Qt example
+      Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
+   }
    return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get flags for item
 
-   \param[in] orc_Index Item
+   \param[in]  orc_Index   Item
 
    \return
    Flags for item
@@ -886,7 +915,7 @@ Qt::ItemFlags C_CamGenSigTableModel::flags(const QModelIndex & orc_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Column to enum conversion
 
-   \param[in] os32_Column Column
+   \param[in]  os32_Column    Column
 
    \return
    Enum value
@@ -922,7 +951,7 @@ C_CamGenSigTableModel::E_Columns C_CamGenSigTableModel::h_ColumnToEnum(const sin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Enum to column conversion
 
-   \param[in] oe_Value Enum value
+   \param[in]  oe_Value    Enum value
 
    \return
    Column
@@ -1007,7 +1036,7 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamGenSigTableModel::m_GetMessageIn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get interpreted OSY signal
 
-   \param[in] ou32_Index Signal index
+   \param[in]  ou32_Index  Signal index
 
    \return
    Interpreted OSY signal
@@ -1051,7 +1080,7 @@ const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamGenSigTableModel::m_GetMes
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get interpreted OSY signal common part
 
-   \param[in] ou32_Index Signal index
+   \param[in]  ou32_Index  Signal index
 
    \return
    Interpreted OSY signal common part
@@ -1096,7 +1125,7 @@ const C_CieConverter::C_CIECanMessage * C_CamGenSigTableModel::m_GetMessageInter
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get interpreted DBC signal
 
-   \param[in] ou32_Index Signal index
+   \param[in]  ou32_Index  Signal index
 
    \return
    Interpreted DBC signal
@@ -1120,8 +1149,8 @@ const C_CieConverter::C_CIECanSignal * C_CamGenSigTableModel::m_GetSignalInterpr
 
    Based on: DBC
 
-   \param[in] orc_Raw    Raw value
-   \param[in] orc_Signal Signal description
+   \param[in]  orc_Raw     Raw value
+   \param[in]  orc_Signal  Signal description
 
    \return
    Value as C_OSCNodeDataPoolContent
@@ -1141,8 +1170,8 @@ C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_DecodeRawToContentDbc(const s
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if a checkbox is possible for the raw value
 
-   \param[in] orc_Min Minimum value
-   \param[in] orc_Max Maximum value
+   \param[in]  orc_Min  Minimum value
+   \param[in]  orc_Max  Maximum value
 
    \return
    True  Use check box
@@ -1176,8 +1205,8 @@ bool C_CamGenSigTableModel::m_CheckUseCheckBox(const C_OSCNodeDataPoolContent & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle all requests for column "Raw" in interpreted mode
 
-   \param[in] ou32_Index Row index
-   \param[in] osn_Role   Requested role type
+   \param[in]  ou32_Index  Row index
+   \param[in]  osn_Role    Requested role type
 
    \return
    Returned value as specified by role
@@ -1419,8 +1448,8 @@ QVariant C_CamGenSigTableModel::m_HandleColRawInterpreted(const uint32 ou32_Inde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle all requests for column "Physical" in interpreted mode
 
-   \param[in] ou32_Index Row index
-   \param[in] osn_Role   Requested role type
+   \param[in]  ou32_Index  Row index
+   \param[in]  osn_Role    Requested role type
 
    \return
    Returned value as specified by role
@@ -1519,7 +1548,10 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
       if (pc_DbcSignal != NULL)
       {
          uint64 u64_Counter = 0ULL;
-         uint64 u64_AllowedNumValues;
+         //Use one bit less for signed
+         const uint64 u64_AllowedNumValuesSigned =
+            C_CamGenSigTableModel::mh_GetMax(pc_DbcSignal->u16_ComBitLength - 1UL);
+         const uint64 u64_AllowedNumValues = C_CamGenSigTableModel::mh_GetMax(pc_DbcSignal->u16_ComBitLength);
          bool q_IsSigned;
          QStringList c_Strings;
          //Check for length and number of bits
@@ -1534,15 +1566,6 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
          default:
             q_IsSigned = false;
             break;
-         }
-         if (q_IsSigned)
-         {
-            //Use one bit less for signed
-            u64_AllowedNumValues = C_CamGenSigTableModel::mh_GetMax(pc_DbcSignal->u16_ComBitLength - 1UL);
-         }
-         else
-         {
-            u64_AllowedNumValues = C_CamGenSigTableModel::mh_GetMax(pc_DbcSignal->u16_ComBitLength);
          }
          //Handle allowed combo box values
          c_Strings.reserve(pc_DbcSignal->c_ValueDescription.size());
@@ -1559,7 +1582,17 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
                }
                else
                {
-                  c_Strings.push_back(QString::number(c_It->first));
+                  //Temporary fix for signed values
+                  if ((q_IsSigned) && (static_cast<uint64>(c_It->first) > u64_AllowedNumValuesSigned))
+                  {
+                     QString c_Negative = "-";
+                     c_Negative += QString::number(u64_AllowedNumValues - static_cast<uint64>(c_It->first));
+                     c_Strings.push_back(c_Negative);
+                  }
+                  else
+                  {
+                     c_Strings.push_back(QString::number(c_It->first));
+                  }
                }
                //Keep track of number of added values (don't allow index out of range)
                ++u64_Counter;
@@ -1656,8 +1689,8 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
    true -> 1
    false -> 0
 
-   \param[in,out] orc_Value Value to change
-   \param[in]     oq_Value  New value to set
+   \param[in,out]  orc_Value  Value to change
+   \param[in]      oq_Value   New value to set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableModel::mh_SetBoolInContent(C_OSCNodeDataPoolContent & orc_Value, const bool oq_Value)
@@ -1770,9 +1803,9 @@ void C_CamGenSigTableModel::mh_SetBoolInContent(C_OSCNodeDataPoolContent & orc_V
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Function to get border (min/max) values depending on current bit length
 
-   \param[in] orc_InitValue  Init value to use for output content type
-   \param[in] ou16_BitLength Signal bit length (only supported up to 64 bit)
-   \param[in] oq_IsMin       Flag to switch for min or max value
+   \param[in]  orc_InitValue     Init value to use for output content type
+   \param[in]  ou16_BitLength    Signal bit length (only supported up to 64 bit)
+   \param[in]  oq_IsMin          Flag to switch for min or max value
 
    \return
    Border value with the init value type and the value set as specified by the bit length and the border flag
@@ -1995,7 +2028,7 @@ C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_GetBorderValue(const C_OSCNod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get maximum value for an unsigned variable with the specified number of bits
 
-   \param[in] ou16_Bit Number of bits for variable (only supported up to 64 bit)
+   \param[in]  ou16_Bit    Number of bits for variable (only supported up to 64 bit)
 
    \return
    Maximum value for an unsigned variable with the specified number of bits
@@ -2024,8 +2057,8 @@ uint64 C_CamGenSigTableModel::mh_GetMax(const uint16 ou16_Bit)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if message is multiplexed
 
-   \param[in] opc_OsyMessage OSY message
-   \param[in] opc_DbcMessage DBC message
+   \param[in]  opc_OsyMessage    OSY message
+   \param[in]  opc_DbcMessage    DBC message
 
    \retval true  Is multiplexed
    \retval false Not multiplexed
@@ -2063,8 +2096,8 @@ bool C_CamGenSigTableModel::mh_IsMultiplexed(const C_OSCCanMessage * const opc_O
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get multiplexer value if any
 
-   \param[in] opc_OsyMessage OSY message
-   \param[in] opc_DbcMessage DBC message
+   \param[in]  opc_OsyMessage    OSY message
+   \param[in]  opc_DbcMessage    DBC message
 
    \return
    Multiplexer value if any
@@ -2132,9 +2165,9 @@ uint16 C_CamGenSigTableModel::m_GetMultiplexerValue(const C_OSCCanMessage * cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get number of signals for the current mux value
 
-   \param[in] opc_OsyMessage OSY message
-   \param[in] opc_DbcMessage DBC message
-   \param[in] ou16_MuxValue  Current mux value
+   \param[in]  opc_OsyMessage    OSY message
+   \param[in]  opc_DbcMessage    DBC message
+   \param[in]  ou16_MuxValue     Current mux value
 
    \return
    Number of signals for the current mux value
@@ -2196,7 +2229,7 @@ sint32 C_CamGenSigTableModel::mh_GetNumRowsForMuxValue(const C_OSCCanMessage * c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Translate row index in message index
 
-   \param[in] os32_Row Row
+   \param[in]  os32_Row    Row
 
    \return
    Index in message
@@ -2269,9 +2302,9 @@ uint32 C_CamGenSigTableModel::m_TranslateRowToIndex(const sint32 os32_Row) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get start bit locations for the current mux value
 
-   \param[in] opc_OsyMessage OSY message
-   \param[in] opc_DbcMessage DBC message
-   \param[in] ou16_MuxValue  Mux value
+   \param[in]  opc_OsyMessage    OSY message
+   \param[in]  opc_DbcMessage    DBC message
+   \param[in]  ou16_MuxValue     Mux value
 
    \return
    Start bit locations for the current mux value

@@ -436,7 +436,7 @@ bool C_PuiSvDbNodeDataPoolListElementId::GetUseArrayElementIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set array element index usage flag
 
-   \param[in] ou32_Value New array element index usage flag
+   \param[in] oq_Value   New array element index usage flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbNodeDataPoolListElementId::SetUseArrayElementIndex(const bool oq_Value)

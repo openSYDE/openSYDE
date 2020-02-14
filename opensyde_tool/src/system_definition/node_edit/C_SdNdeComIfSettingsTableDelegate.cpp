@@ -47,7 +47,8 @@ using namespace stw_types;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out] opc_Parent        Optional pointer to parent
+   \param[in]     ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeComIfSettingsTableDelegate::C_SdNdeComIfSettingsTableDelegate(QObject * const opc_Parent,
@@ -186,35 +187,6 @@ void C_SdNdeComIfSettingsTableDelegate::m_CheckValue(const sintn & orsn_Value) c
                                                                                                   this->mc_Edit.row(),
                                                                                                   static_cast<uint8>(
                                                                                                      orsn_Value));
-      //Deactivate error tool tip on interaction item
-      //if (this->mc_Edit.row() >= 0)
-      //{
-      //   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-      //   if (pc_Node != NULL)
-      //   {
-      //      const uint32 u32_Interface = static_cast<uint32>(this->mc_Edit.row());
-      //      if (u32_Interface < pc_Node->c_Properties.c_ComInterfaces.size())
-      //      {
-      //         const C_OSCNodeComInterfaceSettings & rc_Interface =
-      //            pc_Node->c_Properties.c_ComInterfaces[u32_Interface];
-      //         if (rc_Interface.q_IsBusConnected == true)
-      //         {
-      //            const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
-      //               rc_Interface.u32_BusIndex);
-      //            if (pc_Bus != NULL)
-      //            {
-      //               const std::vector<uint32> c_UsedIds = C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(
-      //                  rc_Interface.u32_BusIndex, this->mu32_NodeIndex, u32_Interface);
-      //               const QString c_Content = C_SdUtil::h_InitUsedIdsString(c_UsedIds,
-      //                                                                       pc_Bus->c_Name.c_str(),
-      //                                                                       C_GtGetText::h_GetText("bus"));
-      //               pc_Widget->SetToolTipAdditionalInfo(c_Content, !q_IdIsValid);
-      //            }
-      //         }
-      //      }
-      //   }
-      //}
-
       C_OgeWiUtil::h_ApplyStylesheetProperty(pc_Widget, "Valid", q_IdIsValid);
    }
 }

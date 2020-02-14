@@ -64,7 +64,6 @@ private:
    void m_StoreRenderer(const QString & orc_Path, QSvgRenderer * const opc_Renderer);
    static bool mh_PaintChildCell(QPainter * const opc_Painter, const QRect & orc_CellRect,
                                  const QModelIndex & orc_Index, const bool oq_Selected);
-   static stw_types::sint32 mh_GetMaxLength(const QStringList & orc_Names);
    static std::vector<stw_types::sint32> mh_GetChildColWidths(const bool oq_IsThirdLayer);
    static std::vector<QFlags<Qt::AlignmentFlag> > mh_GetTopAlignmentFlags(void);
    static std::vector<QString> mh_GetTopSpaces(void);

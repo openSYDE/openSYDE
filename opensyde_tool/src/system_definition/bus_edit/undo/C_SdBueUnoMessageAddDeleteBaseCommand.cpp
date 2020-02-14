@@ -97,16 +97,6 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::Add(void)
       {
          //Layer 2 -> all
       }
-      //Restrict signals
-      if (this->mc_LastMessageId.e_ComProtocol != C_OSCCanProtocol::eLAYER2)
-      {
-         for (uint32 u32_ItSig = 0; u32_ItSig < this->mc_Message.c_Signals.size(); ++u32_ItSig)
-         {
-            C_OSCCanSignal & rc_Signal = this->mc_Message.c_Signals[u32_ItSig];
-            rc_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_DEFAULT;
-            rc_Signal.u16_MultiplexValue = 0;
-         }
-      }
       //Cycle time
       if (this->mc_Message.u32_CycleTimeMs == 0)
       {
@@ -130,13 +120,13 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::Add(void)
              (rc_CurMessageId.u32_InterfaceIndex != this->mc_LastMessageId.u32_InterfaceIndex) ||
              (rc_CurMessageId.u32_DatapoolIndex != this->mc_LastMessageId.u32_DatapoolIndex))
          {
-            //Always add as RX
+            //Always add as Rx
             tgl_assert(this->mpc_MessageSyncManager->AddCanMessageRx(this->mc_LastMessageId,
                                                                      rc_CurMessageId.u32_NodeIndex,
                                                                      rc_CurMessageId.u32_InterfaceIndex,
                                                                      rc_CurMessageId.u32_DatapoolIndex) ==
                        C_NO_ERR);
-            //Change to TX
+            //Change to Tx
             if (rc_CurMessageId.q_MessageIsTx == true)
             {
                const C_OSCCanMessageContainer * const pc_Container =
@@ -147,7 +137,7 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::Add(void)
 
                if ((pc_Container != NULL) && (pc_Container->c_RxMessages.size() > 0UL))
                {
-                  //Should be the newest RX message
+                  //Should be the newest Rx message
                   const C_OSCCanMessageIdentificationIndices c_Tmp(rc_CurMessageId.u32_NodeIndex,
                                                                    this->mc_LastMessageId.e_ComProtocol,
                                                                    rc_CurMessageId.u32_InterfaceIndex,
@@ -220,165 +210,4 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Remove(void)
                                                                    mu64_UniqueId)) ==
                  C_NO_ERR);
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Debug function to check if UI part still in sync
-
-   \param[in] orc_MessageId Message to check for
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueUnoMessageAddDeleteBaseCommand::mh_CheckSync(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
-{
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_MessageId.u32_NodeIndex);
-   const C_PuiSdNode * const pc_UiNode = C_PuiSdHandler::h_GetInstance()->GetUINode(orc_MessageId.u32_NodeIndex);
-
-   if ((pc_OSCNode != NULL) && (pc_UiNode != NULL))
-   {
-      if (pc_OSCNode->c_DataPools.size() == pc_UiNode->c_UIDataPools.size())
-      {
-         const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPool(
-            orc_MessageId.u32_NodeIndex, orc_MessageId.e_ComProtocol, orc_MessageId.u32_DatapoolIndex);
-         const C_PuiSdNodeDataPool * const pc_UiDataPool = C_PuiSdHandler::h_GetInstance()->GetUiCanDataPool(
-            orc_MessageId.u32_NodeIndex, orc_MessageId.e_ComProtocol, orc_MessageId.u32_DatapoolIndex);
-         if ((pc_OSCDataPool != NULL) && (pc_UiDataPool != NULL))
-         {
-            if (pc_OSCNode->c_ComProtocols.size() == pc_UiNode->c_UICanProtocols.size())
-            {
-               const C_OSCCanProtocol * const pc_OSCProtocol = C_PuiSdHandler::h_GetInstance()->GetCanProtocol(
-                  orc_MessageId.u32_NodeIndex,
-                  orc_MessageId.e_ComProtocol,
-                  orc_MessageId.u32_DatapoolIndex);
-               const C_PuiSdNodeCanProtocol * const pc_UiProtocol =
-                  C_PuiSdHandler::h_GetInstance()->GetUiCanProtocolConst(orc_MessageId.u32_NodeIndex,
-                                                                         orc_MessageId.e_ComProtocol,
-                                                                         orc_MessageId.u32_DatapoolIndex);
-               if ((pc_OSCProtocol != NULL) && (pc_UiProtocol != NULL))
-               {
-                  if (pc_OSCProtocol->c_ComMessages.size() == pc_UiProtocol->c_ComMessages.size())
-                  {
-                     if (orc_MessageId.u32_InterfaceIndex < pc_OSCProtocol->c_ComMessages.size())
-                     {
-                        const C_OSCCanMessageContainer & rc_OSCContainer =
-                           pc_OSCProtocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-                        const C_PuiSdNodeCanMessageContainer & rc_UiContainer =
-                           pc_UiProtocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-                        if ((rc_OSCContainer.c_RxMessages.size() == rc_UiContainer.c_RxMessages.size()) &&
-                            (rc_OSCContainer.c_TxMessages.size() == rc_UiContainer.c_TxMessages.size()))
-                        {
-                           uint32 u32_SumRxSi = 0;
-                           uint32 u32_SumTxSi = 0;
-                           uint32 u32_TxListIndex;
-                           uint32 u32_RxListIndex;
-                           for (uint32 u32_ItTxM = 0; u32_ItTxM < rc_OSCContainer.c_TxMessages.size(); ++u32_ItTxM)
-                           {
-                              const C_OSCCanMessage & rc_CurOSCMessage = rc_OSCContainer.c_TxMessages[u32_ItTxM];
-                              const C_PuiSdNodeCanMessage & rc_CurUiMessage = rc_UiContainer.c_TxMessages[u32_ItTxM];
-                              u32_SumTxSi += rc_CurOSCMessage.c_Signals.size();
-                              if (rc_CurOSCMessage.c_Signals.size() != rc_CurUiMessage.c_Signals.size())
-                              {
-                                 s32_Retval = C_CONFIG;
-                              }
-                           }
-                           for (uint32 u32_ItRxM = 0; u32_ItRxM < rc_OSCContainer.c_RxMessages.size(); ++u32_ItRxM)
-                           {
-                              const C_OSCCanMessage & rc_CurOSCMessage = rc_OSCContainer.c_RxMessages[u32_ItRxM];
-                              const C_PuiSdNodeCanMessage & rc_CurUiMessage = rc_UiContainer.c_RxMessages[u32_ItRxM];
-                              u32_SumRxSi += rc_CurOSCMessage.c_Signals.size();
-                              if (rc_CurOSCMessage.c_Signals.size() != rc_CurUiMessage.c_Signals.size())
-                              {
-                                 s32_Retval = C_CONFIG;
-                              }
-                           }
-                           if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
-                                                                   true, u32_TxListIndex) == C_NO_ERR)
-                           {
-                              if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
-                                                                      false, u32_RxListIndex) == C_NO_ERR)
-                              {
-                                 if ((u32_TxListIndex < pc_OSCDataPool->c_Lists.size()) &&
-                                     (u32_RxListIndex < pc_OSCDataPool->c_Lists.size()))
-                                 {
-                                    const C_OSCNodeDataPoolList & rc_OSCTxList =
-                                       pc_OSCDataPool->c_Lists[u32_TxListIndex];
-                                    const C_OSCNodeDataPoolList & rc_OSCRxList =
-                                       pc_OSCDataPool->c_Lists[u32_RxListIndex];
-                                    const C_PuiSdNodeDataPoolList & rc_UiTxList =
-                                       pc_UiDataPool->c_DataPoolLists[u32_TxListIndex];
-                                    const C_PuiSdNodeDataPoolList & rc_UiRxList =
-                                       pc_UiDataPool->c_DataPoolLists[u32_RxListIndex];
-                                    if ((rc_OSCTxList.c_Elements.size() == rc_UiTxList.c_DataPoolListElements.size()) &&
-                                        (rc_OSCRxList.c_Elements.size() == rc_UiRxList.c_DataPoolListElements.size()))
-                                    {
-                                       if ((rc_OSCTxList.c_Elements.size() == u32_SumTxSi) &&
-                                           (rc_OSCRxList.c_Elements.size() == u32_SumRxSi))
-                                       {
-                                          //All fine
-                                       }
-                                       else
-                                       {
-                                          s32_Retval = C_CONFIG;
-                                       }
-                                    }
-                                    else
-                                    {
-                                       s32_Retval = C_CONFIG;
-                                    }
-                                 }
-                                 else
-                                 {
-                                    s32_Retval = C_CONFIG;
-                                 }
-                              }
-                              else
-                              {
-                                 s32_Retval = C_CONFIG;
-                              }
-                           }
-                           else
-                           {
-                              s32_Retval = C_CONFIG;
-                           }
-                        }
-                        else
-                        {
-                           s32_Retval = C_CONFIG;
-                        }
-                     }
-                     else
-                     {
-                        s32_Retval = C_CONFIG;
-                     }
-                  }
-                  else
-                  {
-                     s32_Retval = C_CONFIG;
-                  }
-               }
-               else
-               {
-                  s32_Retval = C_CONFIG;
-               }
-            }
-            else
-            {
-               s32_Retval = C_CONFIG;
-            }
-         }
-         else
-         {
-            s32_Retval = C_CONFIG;
-         }
-      }
-      else
-      {
-         s32_Retval = C_CONFIG;
-      }
-   }
-   else
-   {
-      s32_Retval = C_CONFIG;
-   }
-   return s32_Retval;
 }

@@ -112,28 +112,6 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoDisconnectNodeToProt
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Connect node & interface to protocol and create data pool
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoAddDataPool(void)
-{
-   this->m_AddDataPool();
-
-   m_UpdateUi();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Disconnect node & interface from protocol and delete data pool
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoDeleteDataPool(void)
-{
-   this->m_DeleteDataPool();
-
-   m_UpdateUi();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_SetComProtocolUsedByInterfaceFlag(const bool oq_Flag) const
 {
    C_PuiSdHandler::h_GetInstance()->SetCanProtocolMessageContainerConnected(this->mu32_NodeIndex,
@@ -144,36 +122,7 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_SetComProtocolUsedByIn
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_AddDataPool(void) const
 {
-   C_OSCNodeDataPool c_NewDatapool;
-   C_PuiSdNodeDataPool c_UIDataPool;
-   sint32 s32_Return;
-   QString c_Comment;
-   QString c_ProtocolName = C_PuiSdUtil::h_ConvertProtocolTypeToString(this->me_Protocol);
-
-   // add the new datapool
-   c_NewDatapool.e_Type = C_OSCNodeDataPool::eCOM;
-
-   c_Comment = C_GtGetText::h_GetText("Automatically generated Datapool for ");
-   c_Comment += c_ProtocolName;
-   c_Comment += C_GtGetText::h_GetText(" CAN communication");
-
-   // special case layer 2 -> no spaces and no underscore number at the end
-   c_ProtocolName = C_PuiSdUtil::h_ConvertProtocolTypeToDatapoolNameString(this->me_Protocol);
-
-   c_NewDatapool.c_Name = C_PuiSdHandler::h_GetInstance()->GetUniqueDataPoolName(this->mu32_NodeIndex,
-                                                                                 c_ProtocolName.toStdString().c_str());
-
-   c_NewDatapool.c_Comment = c_Comment.toStdString().c_str();
-
-   // set the default safety flag to true if protocol is a safety protocol
-   c_NewDatapool.q_IsSafety = ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN_SAFETY) ||
-                              (this->me_Protocol == C_OSCCanProtocol::eECES));
-
-   s32_Return = C_PuiSdHandler::h_GetInstance()->AddDataPool(this->mu32_NodeIndex,
-                                                             c_NewDatapool, c_UIDataPool,
-                                                             this->me_Protocol);
-
-   return s32_Return;
+   return C_PuiSdHandler::h_GetInstance()->AddAutoGenCommDataPool(this->mu32_NodeIndex, this->me_Protocol);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

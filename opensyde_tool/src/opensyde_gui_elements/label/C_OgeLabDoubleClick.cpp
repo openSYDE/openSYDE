@@ -46,6 +46,8 @@ C_OgeLabDoubleClick::C_OgeLabDoubleClick(QWidget * const opc_Parent) :
 /*! \brief   Overwritten double click event
 
    Open version edit on double click
+
+   \param[in,out] opc_Event Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabDoubleClick::mouseDoubleClickEvent(QMouseEvent * const opc_Event)

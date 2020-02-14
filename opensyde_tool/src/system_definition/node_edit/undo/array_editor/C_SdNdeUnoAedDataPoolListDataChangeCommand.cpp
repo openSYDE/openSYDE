@@ -50,7 +50,8 @@ using namespace stw_opensyde_core;
                                                    Else use data set index
    \param[in]     oru32_ArrayElementIndex          Array index
    \param[in]     orc_NewData                      New data
-   \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
+   \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform
+                                                   actions on
    \param[in,out] opc_Parent                       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -119,15 +120,15 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
       {
       case C_SdNdeDpUtil::eARRAY_EDIT_MIN:
          orc_PreviousData = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OSCData->c_MinValue,
-                                                                                        pc_OSCData->f64_Factor,
-                                                                                        pc_OSCData->f64_Offset,
-                                                                                        this->mu32_ItemIndex);
+                                                                                  pc_OSCData->f64_Factor,
+                                                                                  pc_OSCData->f64_Offset,
+                                                                                  this->mu32_ItemIndex);
          break;
       case C_SdNdeDpUtil::eARRAY_EDIT_MAX:
          orc_PreviousData = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OSCData->c_MaxValue,
-                                                                                        pc_OSCData->f64_Factor,
-                                                                                        pc_OSCData->f64_Offset,
-                                                                                        this->mu32_ItemIndex);
+                                                                                  pc_OSCData->f64_Factor,
+                                                                                  pc_OSCData->f64_Offset,
+                                                                                  this->mu32_ItemIndex);
          break;
       case C_SdNdeDpUtil::eARRAY_EDIT_DATA_SET:
          if (this->mu32_DataSetIndex < pc_OSCData->c_DataSetValues.size())
@@ -142,8 +143,8 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
       }
       //Copy new value
       C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData, c_Generic,
-                                                                          pc_OSCData->f64_Factor,
-                                                                          pc_OSCData->f64_Offset, 0);
+                                                                    pc_OSCData->f64_Factor,
+                                                                    pc_OSCData->f64_Offset, 0);
       switch (this->me_ArrayEditType)
       {
       case C_SdNdeDpUtil::eARRAY_EDIT_MIN:
@@ -187,8 +188,8 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
                for (uint32 u32_ItDataSet = 0; u32_ItDataSet < pc_Element->c_DataSetValues.size(); ++u32_ItDataSet)
                {
                   if (C_SdNdeDpUtil::h_CompareSpecifiedItemSmaller(pc_Element->c_DataSetValues[u32_ItDataSet],
-                                                                         pc_Element->c_MinValue,
-                                                                         this->mu32_ItemIndex) == true)
+                                                                   pc_Element->c_MinValue,
+                                                                   this->mu32_ItemIndex) == true)
                   {
                      new C_SdNdeUnoAedDataPoolListDataChangeCommand(this->mu32_NodeIndex,
                                                                     this->mu32_DataPoolIndex,
@@ -221,8 +222,8 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
                for (uint32 u32_ItDataSet = 0; u32_ItDataSet < pc_Element->c_DataSetValues.size(); ++u32_ItDataSet)
                {
                   if (C_SdNdeDpUtil::h_CompareSpecifiedItemSmaller(pc_Element->c_MaxValue,
-                                                                         pc_Element->c_DataSetValues[u32_ItDataSet],
-                                                                         this->mu32_ItemIndex) == true)
+                                                                   pc_Element->c_DataSetValues[u32_ItDataSet],
+                                                                   this->mu32_ItemIndex) == true)
                   {
                      new C_SdNdeUnoAedDataPoolListDataChangeCommand(this->mu32_NodeIndex,
                                                                     this->mu32_DataPoolIndex,
@@ -255,32 +256,4 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
             this->mu32_ElementIndex, C_SdNdeDpUtil::eELEMENT_DATA_SET, this->mu32_DataSetIndex);
       }
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Convert to generic data change type
-
-   \return
-   generic data change type
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpUtil::E_ElementDataChangeType C_SdNdeUnoAedDataPoolListDataChangeCommand::m_ConvertToChangeType(void)
-const
-{
-   C_SdNdeDpUtil::E_ElementDataChangeType e_Retval = C_SdNdeDpUtil::eELEMENT_MIN;
-   switch (this->me_ArrayEditType)
-   {
-   case C_SdNdeDpUtil::eARRAY_EDIT_MIN:
-      e_Retval = C_SdNdeDpUtil::eELEMENT_MIN;
-      break;
-   case C_SdNdeDpUtil::eARRAY_EDIT_MAX:
-      e_Retval = C_SdNdeDpUtil::eELEMENT_MAX;
-      break;
-   case C_SdNdeDpUtil::eARRAY_EDIT_DATA_SET:
-      e_Retval = C_SdNdeDpUtil::eELEMENT_DATA_SET;
-      break;
-   default:
-      break;
-   }
-   return e_Retval;
 }

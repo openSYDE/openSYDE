@@ -43,6 +43,7 @@ public:
                                                const stw_types::uint32 ou32_DatapoolIndex,
                                                const C_OSCCanProtocol::E_Type & ore_Protocol,
                                                const stw_scl::C_SCLString & orc_ExportToolInfo = "");
+   static stw_types::uint16 h_ConvertOverallCodeVersion(const stw_types::uint16 ou16_GenCodeVersion);
 
 protected:
    static const bool mhq_IS_HEADER_FILE = false;

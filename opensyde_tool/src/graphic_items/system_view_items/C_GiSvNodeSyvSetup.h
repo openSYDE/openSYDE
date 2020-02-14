@@ -41,8 +41,6 @@ public:
    bool IsViewConnected(void) const;
    void SetEditMode(const bool oq_Active);
 
-   virtual void GenerateHint(void) override;
-
    virtual void UpdateData(void) override;
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -56,7 +54,6 @@ protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
-   virtual void hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    //lint -restore
 
 private:
@@ -65,11 +62,8 @@ private:
    C_GiSvNodeSyvSetup & operator =(const C_GiSvNodeSyvSetup &);
 
    void m_InitCheckBox(void);
-   void m_UpdateCheckBox(void);
 
    C_GiCheckBox * mpc_CheckBox;
-   std::vector<C_GiRectPixmap *> mc_InteractiveIcons;
-   C_GiRectPixmap * mpc_HoveredInteractiveIcon;
    bool mq_EditMode;
 };
 

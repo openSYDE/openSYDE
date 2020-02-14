@@ -48,6 +48,8 @@ const sint32 ms32_TX_TYPE_INDEX_SPONTANEOUS = 2;
 const uint8 mu8_DIRECTION_INDEX_TRANSMIT = 0;
 const uint8 mu8_DIRECTION_INDEX_RECEIVE = 1;
 
+const uint32 mu32_DEFAULT_CYCLE_TIME = 100U;
+
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
@@ -224,6 +226,9 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
       C_GtGetText::h_GetText("But no later than"),
       C_GtGetText::h_GetText("On change method property. "
                              "\nIf the signal does not change, the message will still be sent after this time."));
+   this->mpc_Ui->pc_LabelDirection->SetToolTipInformation(
+      C_GtGetText::h_GetText("Direction"),
+      C_GtGetText::h_GetText("Message is either transmitted or received."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -278,6 +283,7 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
       tgl_assert(pc_Message != NULL);
       if (pc_Message != NULL)
       {
+         uint32 u32_UsedCylceTime;
          //Name
          this->mpc_Ui->pc_LineEditName->setText(pc_Message->c_Name.c_str());
 
@@ -289,26 +295,41 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
 
          //Id
          this->mpc_Ui->pc_SpinBoxId->setValue(pc_Message->u32_CanId);
+         this->mpc_Ui->pc_SpinBoxId->textFromValue(this->mpc_Ui->pc_SpinBoxId->value());
 
          //Dlc
          this->mpc_Ui->pc_SpinBoxDlc->setValue(pc_Message->u16_Dlc);
 
          //Tx method
          this->mpc_Ui->pc_ComboBoxTxMethod->setCurrentIndex(h_TxMethodToIndex(pc_Message->e_TxMethod));
+
          if (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT)
          {
-            this->mpc_Ui->pc_WidgetReceiver->SetAlwaysHideTimeout(true);
+            this->mpc_Ui->pc_WidgetReceiver->SetTxMethodOnEvent(true);
+            // No configurable cycle time
+            u32_UsedCylceTime = 0U;
          }
          else
          {
-            this->mpc_Ui->pc_WidgetReceiver->SetAlwaysHideTimeout(false);
+            this->mpc_Ui->pc_WidgetReceiver->SetTxMethodOnEvent(false);
+
+            u32_UsedCylceTime = pc_Message->u32_CycleTimeMs;
          }
          this->mpc_Ui->pc_ComboBoxTxMethod->SetItemState(ms32_TX_TYPE_INDEX_ON_CHANGE, !pc_Message->IsMultiplexed());
 
          //Cycle time
-         this->mpc_Ui->pc_SpinBoxCycleTime->setValue(pc_Message->u32_CycleTimeMs);
-         this->mpc_Ui->pc_SpinBoxLater->setValue(pc_Message->u32_CycleTimeMs);
-         this->mpc_Ui->pc_WidgetReceiver->SetLastKnownCycleTimeValue(static_cast<sintn>(pc_Message->u32_CycleTimeMs));
+         this->mpc_Ui->pc_SpinBoxCycleTime->setValue(u32_UsedCylceTime);
+         this->mpc_Ui->pc_SpinBoxLater->setValue(u32_UsedCylceTime);
+
+         if (pc_Message->e_TxMethod != C_OSCCanMessage::eTX_METHOD_ON_EVENT)
+         {
+            this->mpc_Ui->pc_WidgetReceiver->SetLastKnownCycleTimeValue(static_cast<sintn>(u32_UsedCylceTime));
+         }
+         else
+         {
+            // In case of on Event the receive timeout need the default cycle time for correct calculations
+            this->mpc_Ui->pc_WidgetReceiver->SetLastKnownCycleTimeValue(mu32_DEFAULT_CYCLE_TIME);
+         }
 
          //Delay time
          this->mpc_Ui->pc_SpinBoxEarly->setValue(pc_Message->u16_DelayTimeMs);
@@ -407,7 +428,7 @@ void C_SdBueMessagePropertiesWidget::m_OnTxMethodChange(const sint32 & ors32_Sta
       this->mpc_Ui->pc_LabelLater->setVisible(false);
       this->mpc_Ui->pc_SpinBoxLater->setVisible(false);
       //Handle timeout section
-      this->mpc_Ui->pc_WidgetReceiver->SetAlwaysHideTimeout(false);
+      this->mpc_Ui->pc_WidgetReceiver->SetTxMethodOnEvent(false);
       break;
    case ms32_TX_TYPE_INDEX_ON_CHANGE:
       this->mpc_Ui->pc_LabelCycleTime->setVisible(false);
@@ -417,7 +438,7 @@ void C_SdBueMessagePropertiesWidget::m_OnTxMethodChange(const sint32 & ors32_Sta
       this->mpc_Ui->pc_LabelLater->setVisible(true);
       this->mpc_Ui->pc_SpinBoxLater->setVisible(true);
       //Handle timeout section
-      this->mpc_Ui->pc_WidgetReceiver->SetAlwaysHideTimeout(false);
+      this->mpc_Ui->pc_WidgetReceiver->SetTxMethodOnEvent(false);
       break;
    default:
       this->mpc_Ui->pc_LabelCycleTime->setVisible(false);
@@ -427,26 +448,8 @@ void C_SdBueMessagePropertiesWidget::m_OnTxMethodChange(const sint32 & ors32_Sta
       this->mpc_Ui->pc_LabelLater->setVisible(false);
       this->mpc_Ui->pc_SpinBoxLater->setVisible(false);
       //Handle timeout section
-      this->mpc_Ui->pc_WidgetReceiver->SetAlwaysHideTimeout(true);
+      this->mpc_Ui->pc_WidgetReceiver->SetTxMethodOnEvent(true);
       break;
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle dlc change
-
-   \param[in] orsn_NewValue New dlc value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessagePropertiesWidget::m_OnDlcChange(const sintn & orsn_NewValue) const
-{
-   if (orsn_NewValue == 1)
-   {
-      this->mpc_Ui->pc_SpinBoxDlc->setSuffix(C_GtGetText::h_GetText(" Byte"));
-   }
-   else
-   {
-      this->mpc_Ui->pc_SpinBoxDlc->setSuffix(C_GtGetText::h_GetText(" Bytes"));
    }
 }
 
@@ -555,8 +558,17 @@ void C_SdBueMessagePropertiesWidget::m_OnDlcChanged(void)
 void C_SdBueMessagePropertiesWidget::m_OnCycleTimeChanged(void)
 {
    m_OnPropertiesChanged();
-   this->mpc_Ui->pc_WidgetReceiver->SetLastKnownCycleTimeValue(static_cast<uint32>(this->mpc_Ui->pc_SpinBoxCycleTime->
-                                                                                   value()));
+
+   if (this->mpc_Ui->pc_ComboBoxTxMethod->currentIndex() != ms32_TX_TYPE_INDEX_SPONTANEOUS)
+   {
+      // Only in case of Tx Method on Event the SpinBox value is not usable for sure
+      this->mpc_Ui->pc_WidgetReceiver->SetLastKnownCycleTimeValue(
+         static_cast<uint32>(this->mpc_Ui->pc_SpinBoxCycleTime->value()));
+   }
+   else
+   {
+      this->mpc_Ui->pc_WidgetReceiver->SetLastKnownCycleTimeValue(mu32_DEFAULT_CYCLE_TIME);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -601,6 +613,7 @@ void C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged(void)
             //save data
             //copy current message
             C_OSCCanMessage c_MessageData = *pc_CanMessage;
+            C_OSCCanMessage::E_TxMethodType e_CurrentTxMethod;
 
             //name
             c_MessageData.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
@@ -618,17 +631,45 @@ void C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged(void)
             c_MessageData.u16_Dlc = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxDlc->value());
 
             //Tx method
-            c_MessageData.e_TxMethod = h_IndexToTxMethod(this->mpc_Ui->pc_ComboBoxTxMethod->currentIndex());
+            e_CurrentTxMethod = h_IndexToTxMethod(this->mpc_Ui->pc_ComboBoxTxMethod->currentIndex());
+            if (e_CurrentTxMethod != c_MessageData.e_TxMethod)
+            {
+               if (c_MessageData.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT)
+               {
+                  // In case of change from on event with no valid cycle times, set cycle time values to default
+                  this->mpc_Ui->pc_SpinBoxCycleTime->setValue(mu32_DEFAULT_CYCLE_TIME);
+                  this->mpc_Ui->pc_SpinBoxLater->setValue(mu32_DEFAULT_CYCLE_TIME);
+                  this->mpc_Ui->pc_WidgetReceiver->SetLastKnownCycleTimeValue(
+                     static_cast<sintn>(mu32_DEFAULT_CYCLE_TIME));
+               }
+               else if (e_CurrentTxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT)
+               {
+                  // In case of change to on event with no valid cycle times, set cycle time values to 0
+                  this->mpc_Ui->pc_SpinBoxCycleTime->setValue(0);
+                  this->mpc_Ui->pc_SpinBoxLater->setValue(0);
+                  this->mpc_Ui->pc_WidgetReceiver->SetLastKnownCycleTimeValue(
+                     static_cast<sintn>(mu32_DEFAULT_CYCLE_TIME));
+               }
+               else
+               {
+                  // Nothing to do
+               }
+            }
+            c_MessageData.e_TxMethod = e_CurrentTxMethod;
 
             //Cycle time
             if (c_MessageData.e_TxMethod == C_OSCCanMessage::eTX_METHOD_CYCLIC)
             {
-               c_MessageData.u32_CycleTimeMs =
-                  static_cast<uint32>(this->mpc_Ui->pc_SpinBoxCycleTime->value());
+               c_MessageData.u32_CycleTimeMs = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxCycleTime->value());
+            }
+            else if (c_MessageData.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE)
+            {
+               c_MessageData.u32_CycleTimeMs = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxLater->value());
             }
             else
             {
-               c_MessageData.u32_CycleTimeMs = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxLater->value());
+               // No cycle time in case of an on event message
+               c_MessageData.u32_CycleTimeMs = 0U;
             }
 
             //Delay time
@@ -696,7 +737,7 @@ void C_SdBueMessagePropertiesWidget::m_OnDirectionChanged(void)
             }
          }
 
-         Q_EMIT this->SigMessageIdChanged(this->mc_MessageId);
+         Q_EMIT (this->SigMessageIdChanged(this->mc_MessageId));
 
          if (this->mc_NodeDatapoolIndexes.size() > 1)
          {
@@ -959,7 +1000,7 @@ void C_SdBueMessagePropertiesWidget::m_OnRxChanged(const uint32 ou32_NodeIndex, 
                   std::vector<stw_types::uint32> c_TmpDatapoolIndexes;
                   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR, C_GtGetText::h_GetText(
                                                        "A message can not exist without a receiver and transmitter."));
-
+                  c_MessageBox.SetCustomMinHeight(180, 180);
                   c_TmpNodeIndexes.push_back(ou32_NodeIndex);
                   c_TmpInterfaceIndexes.push_back(ou32_InterfaceIndex);
                   c_TmpDatapoolIndexes.push_back(ou32_DatapoolIndex);
@@ -990,12 +1031,13 @@ void C_SdBueMessagePropertiesWidget::m_OnRxChanged(const uint32 ou32_NodeIndex, 
    \param[in] ou32_NodeIndex      Node index (ID)
    \param[in] ou32_InterfaceIndex Interface index (ID)
    \param[in] ou32_DatapoolIndex  Datapool index (ID)
-   \param[in] oq_UseAuto          Flag if automatic receive timeout
+   \param[in] oe_TimeoutMode      Receive timeout mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutFlagChanged(const uint32 ou32_NodeIndex,
                                                               const uint32 ou32_InterfaceIndex,
-                                                              const uint32 ou32_DatapoolIndex, const bool oq_UseAuto)
+                                                              const uint32 ou32_DatapoolIndex,
+                                                              const C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_TimeoutMode)
 {
    if (this->mq_IdIsValid)
    {
@@ -1003,7 +1045,7 @@ void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutFlagChanged(const uint32 ou32_
       tgl_assert(this->mpc_MessageSyncManager->SetCanMessageReceiveTimeoutAutoFlag(this->mc_MessageId, ou32_NodeIndex,
                                                                                    ou32_InterfaceIndex,
                                                                                    ou32_DatapoolIndex,
-                                                                                   oq_UseAuto) == C_NO_ERR);
+                                                                                   oe_TimeoutMode) == C_NO_ERR);
    }
 }
 
@@ -1086,7 +1128,7 @@ void C_SdBueMessagePropertiesWidget::m_ConnectNodeSpecificFields(void)
            &C_SdBueMessagePropertiesWidget::m_OnTxChanged);
    connect(this->mpc_Ui->pc_WidgetReceiver, &C_SdBueMessageRxList::SigNodeToggled, this,
            &C_SdBueMessagePropertiesWidget::m_OnRxChanged);
-   connect(this->mpc_Ui->pc_WidgetReceiver, &C_SdBueMessageRxList::SigNodeUseAutoReceiveTimeout, this,
+   connect(this->mpc_Ui->pc_WidgetReceiver, &C_SdBueMessageRxList::SigNodeReceiveTimeoutMode, this,
            &C_SdBueMessagePropertiesWidget::m_OnRxTimeoutFlagChanged);
    connect(this->mpc_Ui->pc_WidgetReceiver, &C_SdBueMessageRxList::SigNodeReceiveTimeout, this,
            &C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged);
@@ -1108,7 +1150,7 @@ void C_SdBueMessagePropertiesWidget::m_DisconnectNodeSpecificFields(void)
               &C_SdBueMessagePropertiesWidget::m_OnTxChanged);
    disconnect(this->mpc_Ui->pc_WidgetReceiver, &C_SdBueMessageRxList::SigNodeToggled, this,
               &C_SdBueMessagePropertiesWidget::m_OnRxChanged);
-   disconnect(this->mpc_Ui->pc_WidgetReceiver, &C_SdBueMessageRxList::SigNodeUseAutoReceiveTimeout, this,
+   disconnect(this->mpc_Ui->pc_WidgetReceiver, &C_SdBueMessageRxList::SigNodeReceiveTimeoutMode, this,
               &C_SdBueMessagePropertiesWidget::m_OnRxTimeoutFlagChanged);
    disconnect(this->mpc_Ui->pc_WidgetReceiver, &C_SdBueMessageRxList::SigNodeReceiveTimeout, this,
               &C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged);
@@ -1372,7 +1414,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
    if (C_SdUtil::h_GetNames(this->mc_BusNodeIndexes, this->mc_BusInterfaceIndexes, c_NodeNames,
                             &this->mc_BusDatapoolIndexes, &c_DatapoolNames) == C_NO_ERR)
    {
-      std::vector<bool> c_UseAutoReceiveTimeoutFlags;
+      std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_ReceiveTimeoutModes;
       std::vector<uint32> c_ReceiveTimeoutValues;
       const sint32 s32_CurrentNodeIndex = this->mpc_Ui->pc_ComboBoxTransmitterNode->currentIndex();
 
@@ -1381,7 +1423,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
           (this->mc_BusNodeIndexes.size() == this->mc_BusDatapoolIndexes.size()))
       {
          c_ReceiveTimeoutValues.reserve(this->mc_BusNodeIndexes.size());
-         c_UseAutoReceiveTimeoutFlags.reserve(this->mc_BusNodeIndexes.size());
+         c_ReceiveTimeoutModes.reserve(this->mc_BusNodeIndexes.size());
          for (uint32 u32_ItNode = 0; u32_ItNode < this->mc_BusNodeIndexes.size(); ++u32_ItNode)
          {
             bool q_Found = false;
@@ -1405,7 +1447,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
                      //Timeout value
                      c_ReceiveTimeoutValues.push_back(pc_OSCData->u32_TimeoutMs);
                      //Timeout flag
-                     c_UseAutoReceiveTimeoutFlags.push_back(pc_UiData->q_UseAutoReceiveTimeout);
+                     c_ReceiveTimeoutModes.push_back(pc_UiData->e_ReceiveTimeoutMode);
                      q_Found = true;
                   }
                   break;
@@ -1414,7 +1456,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
             if (q_Found == false)
             {
                //Add default
-               c_UseAutoReceiveTimeoutFlags.push_back(true);
+               c_ReceiveTimeoutModes.push_back(C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO);
                c_ReceiveTimeoutValues.push_back(this->m_GetDefaultTimeout());
             }
          }
@@ -1433,7 +1475,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
          std::vector<uint32> c_RxInterfaceIndexes;
          std::vector<uint32> c_RxDatapoolIndexes;
          std::vector<QString> c_RxDatapoolNames;
-         std::vector<bool> c_RxUseAutoReceiveTimeoutFlags;
+         std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_RxReceiveTimeoutModes;
          std::vector<uint32> c_RxReceiveTimeoutValues;
          std::vector<uint32> * pc_MappedDatapools;
          uint32 u32_EntryCounter = 0U;
@@ -1479,7 +1521,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
                c_RxInterfaceIndexes.push_back(this->mc_BusInterfaceIndexes[u32_EntryCounter]);
                c_RxDatapoolIndexes.push_back(this->mc_BusDatapoolIndexes[u32_EntryCounter]);
                c_RxDatapoolNames.push_back(c_DatapoolNames[u32_EntryCounter]);
-               c_RxUseAutoReceiveTimeoutFlags.push_back(c_UseAutoReceiveTimeoutFlags[u32_EntryCounter]);
+               c_RxReceiveTimeoutModes.push_back(c_ReceiveTimeoutModes[u32_EntryCounter]);
                c_RxReceiveTimeoutValues.push_back(c_ReceiveTimeoutValues[u32_EntryCounter]);
             }
             ++u32_EntryCounter;
@@ -1494,7 +1536,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
          this->mpc_Ui->pc_WidgetReceiver->AddNodes(c_NodeNames, c_RxDatapoolNames, c_RxNodeIndexes,
                                                    c_RxInterfaceIndexes,
                                                    c_RxDatapoolIndexes,
-                                                   c_RxUseAutoReceiveTimeoutFlags, c_RxReceiveTimeoutValues);
+                                                   c_RxReceiveTimeoutModes, c_RxReceiveTimeoutValues);
 
          q_TxSelected = true;
       }
@@ -1504,7 +1546,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
          this->mpc_Ui->pc_WidgetReceiver->AddNodes(c_NodeNames, c_DatapoolNames, this->mc_BusNodeIndexes,
                                                    this->mc_BusInterfaceIndexes,
                                                    this->mc_BusDatapoolIndexes,
-                                                   c_UseAutoReceiveTimeoutFlags, c_ReceiveTimeoutValues);
+                                                   c_ReceiveTimeoutModes, c_ReceiveTimeoutValues);
       }
    }
 
@@ -1759,7 +1801,7 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Di
             if (this->mpc_Ui->pc_ComboBoxDirection->currentIndex() == mu8_DIRECTION_INDEX_RECEIVE)
             {
                // Prepare receive widget for single node mode
-               std::vector<bool> c_UseAutoReceiveTimeoutFlags;
+               std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_ReceiveTimeoutModes;
                std::vector<uint32> c_ReceiveTimeoutValues;
                const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds =
                   this->mpc_MessageSyncManager->GetMatchingMessageVector(this->mc_MessageId);
@@ -1771,7 +1813,7 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Di
                this->m_SetNodeModeReceiveVisible(true);
 
                c_ReceiveTimeoutValues.reserve(c_NodeIndexes.size());
-               c_UseAutoReceiveTimeoutFlags.reserve(c_NodeIndexes.size());
+               c_ReceiveTimeoutModes.reserve(c_NodeIndexes.size());
 
                for (uint32 u32_ItDatapools = 0U; u32_ItDatapools < this->mc_NodeDatapoolIndexes.size();
                     ++u32_ItDatapools)
@@ -1798,7 +1840,7 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Di
                            //Timeout value
                            c_ReceiveTimeoutValues.push_back(pc_OSCData->u32_TimeoutMs);
                            //Timeout flag
-                           c_UseAutoReceiveTimeoutFlags.push_back(pc_UiData->q_UseAutoReceiveTimeout);
+                           c_ReceiveTimeoutModes.push_back(pc_UiData->e_ReceiveTimeoutMode);
                            q_Found = true;
                         }
 
@@ -1810,7 +1852,7 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Di
                   if (q_Found == false)
                   {
                      //Add default
-                     c_UseAutoReceiveTimeoutFlags.push_back(true);
+                     c_ReceiveTimeoutModes.push_back(C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO);
                      c_ReceiveTimeoutValues.push_back(this->m_GetDefaultTimeout());
                   }
                }
@@ -1818,7 +1860,7 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Di
                this->mpc_Ui->pc_WidgetReceiver->AddNodes(c_NodeNames, c_DatapoolNames, c_NodeIndexes,
                                                          c_InterfaceIndexes,
                                                          this->mc_NodeDatapoolIndexes,
-                                                         c_UseAutoReceiveTimeoutFlags, c_ReceiveTimeoutValues);
+                                                         c_ReceiveTimeoutModes, c_ReceiveTimeoutValues);
 
                this->mpc_Ui->pc_WidgetReceiver->SetModeSingleNode(true);
 
@@ -1928,7 +1970,21 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeTransmitDatapoolChanged(void)
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdBueMessagePropertiesWidget::m_GetDefaultTimeout(void) const
 {
-   return (static_cast<uint32>(this->mpc_Ui->pc_SpinBoxCycleTime->value()) * 3UL) + 10UL;
+   uint32 u32_Return;
+
+   if (this->mpc_Ui->pc_ComboBoxTxMethod->currentIndex() != ms32_TX_TYPE_INDEX_SPONTANEOUS)
+   {
+      // Only in case of Tx Method on Event the SpinBox value is not usable for sure
+      u32_Return = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxCycleTime->value());
+   }
+   else
+   {
+      u32_Return = mu32_DEFAULT_CYCLE_TIME;
+   }
+
+   u32_Return = (u32_Return * 3UL) + 10UL;
+
+   return u32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

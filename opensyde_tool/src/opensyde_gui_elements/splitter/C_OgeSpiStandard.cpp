@@ -48,7 +48,7 @@ const sint32 ms32_HANDLE_LENGTH = 30; //px
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpiStandard::C_OgeSpiStandard(QWidget * const opc_Parent) :
@@ -63,7 +63,7 @@ C_OgeSpiStandard::C_OgeSpiStandard(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the drawing color
 
-   \param[in]     orc_Color       New color
+   \param[in]  orc_Color   New color
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiStandard::SetColor(const QColor & orc_Color) const
@@ -81,8 +81,8 @@ void C_OgeSpiStandard::SetColor(const QColor & orc_Color) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set margins
 
-   \param[in] os32_MarginTop    Margin top (resp. left if handle is horizontal)
-   \param[in] os32_MarginBottom Margin bottom (resp. right if handle is horizontal)
+   \param[in]  os32_MarginTop       Margin top (resp. left if handle is horizontal)
+   \param[in]  os32_MarginBottom    Margin bottom (resp. right if handle is horizontal)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiStandard::SetMargins(const sint32 os32_MarginTop, const sint32 os32_MarginBottom) const
@@ -102,7 +102,8 @@ void C_OgeSpiStandard::SetMargins(const sint32 os32_MarginTop, const sint32 os32
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in]      oe_Orientation   Orientation (horizontal/vertical)
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpiStandardHandle::C_OgeSpiStandardHandle(const Qt::Orientation oe_Orientation, QSplitter * const opc_Parent) :
@@ -116,7 +117,7 @@ C_OgeSpiStandardHandle::C_OgeSpiStandardHandle(const Qt::Orientation oe_Orientat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the drawing color
 
-   \param[in]     orc_Color       New color
+   \param[in]  orc_Color   New color
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiStandardHandle::SetColor(const QColor & orc_Color)
@@ -127,8 +128,8 @@ void C_OgeSpiStandardHandle::SetColor(const QColor & orc_Color)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set margins
 
-   \param[in] os32_MarginTop    Margin top (resp. left if handle is horizontal)
-   \param[in] os32_MarginBottom Margin bottom (resp. right if handle is horizontal)
+   \param[in]  os32_MarginTop       Margin top (resp. left if handle is horizontal)
+   \param[in]  os32_MarginBottom    Margin bottom (resp. right if handle is horizontal)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiStandardHandle::SetMargins(const sint32 os32_MarginTop, const sint32 os32_MarginBottom)
@@ -138,11 +139,11 @@ void C_OgeSpiStandardHandle::SetMargins(const sint32 os32_MarginTop, const sint3
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided paint event
+/*! \brief   Overridden paint event
 
    Draws the background element
 
-   \param[in,out] opc_Event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiStandardHandle::paintEvent(QPaintEvent * const opc_Event)

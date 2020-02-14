@@ -97,10 +97,9 @@ void C_CamDbOsy::FindAllMessages(void)
                c_CurListId.u32_NodeIndex = c_NodeIndexes[u32_ItFoundItem];
                c_CurId.u32_NodeIndex = c_NodeIndexes[u32_ItFoundItem];
                //All protocols
-               for (uint8 u32_ItProt = 0U; u32_ItProt < rc_Node.c_ComProtocols.size();
-                    ++u32_ItProt)
+               for (uint8 u8_ItProt = 0U; u8_ItProt < rc_Node.c_ComProtocols.size(); ++u8_ItProt)
                {
-                  const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u32_ItProt];
+                  const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u8_ItProt];
                   //Id
                   c_CurListId.u32_DataPoolIndex = rc_Protocol.u32_DataPoolIndex;
                   c_CurId.e_ComProtocol = rc_Protocol.e_Type;
@@ -117,7 +116,7 @@ void C_CamDbOsy::FindAllMessages(void)
                      if (C_OSCCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem], false,
                                                              c_CurListId.u32_ListIndex) == C_NO_ERR)
                      {
-                        //Each RX message
+                        //Each Rx message
                         for (uint32 u32_ItMsg = 0UL; u32_ItMsg < rc_Container.c_RxMessages.size(); ++u32_ItMsg)
                         {
                            const C_OSCCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMsg];
@@ -131,7 +130,7 @@ void C_CamDbOsy::FindAllMessages(void)
                      if (C_OSCCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem], true,
                                                              c_CurListId.u32_ListIndex) == C_NO_ERR)
                      {
-                        //Each TX message
+                        //Each Tx message
                         for (uint32 u32_ItMsg = 0UL;
                              u32_ItMsg < rc_Container.c_TxMessages.size(); ++u32_ItMsg)
                         {
@@ -182,16 +181,16 @@ sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
             //Found node
             const C_OSCNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_NodeIndexes[u32_ItFoundItem]];
             //All protocols
-            for (uint8 u32_ItProt = 0U; (u32_ItProt < rc_Node.c_ComProtocols.size()) && (s32_Retval == C_NOACT);
-                 ++u32_ItProt)
+            for (uint8 u8_ItProt = 0U; (u8_ItProt < rc_Node.c_ComProtocols.size()) && (s32_Retval == C_NOACT);
+                 ++u8_ItProt)
             {
-               const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u32_ItProt];
+               const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u8_ItProt];
                if (c_InterfaceIndexes[u32_ItFoundItem] < rc_Protocol.c_ComMessages.size())
                {
                   //Found container
                   const C_OSCCanMessageContainer & rc_Container =
                      rc_Protocol.c_ComMessages[c_InterfaceIndexes[u32_ItFoundItem]];
-                  //Each RX message
+                  //Each Rx message
                   for (uint32 u32_ItMsg =
                           0UL; (u32_ItMsg < rc_Container.c_RxMessages.size()) && (s32_Retval == C_NOACT);
                        ++u32_ItMsg)
@@ -204,7 +203,7 @@ sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
                         s32_Retval = C_NO_ERR;
                      }
                   }
-                  //Each TX message
+                  //Each Tx message
                   for (uint32 u32_ItMsg = 0UL;
                        (u32_ItMsg < rc_Container.c_TxMessages.size()) && (s32_Retval == C_NOACT); ++u32_ItMsg)
                   {
@@ -266,10 +265,10 @@ sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
                c_CurListId.u32_NodeIndex = c_NodeIndexes[u32_ItFoundItem];
                c_CurId.u32_NodeIndex = c_NodeIndexes[u32_ItFoundItem];
                //All protocols
-               for (uint8 u32_ItProt = 0U; (u32_ItProt < rc_Node.c_ComProtocols.size()) && (s32_Retval == C_NOACT);
-                    ++u32_ItProt)
+               for (uint8 u8_ItProt = 0U; (u8_ItProt < rc_Node.c_ComProtocols.size()) && (s32_Retval == C_NOACT);
+                    ++u8_ItProt)
                {
-                  const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u32_ItProt];
+                  const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u8_ItProt];
                   //Id
                   c_CurListId.u32_DataPoolIndex = rc_Protocol.u32_DataPoolIndex;
                   c_CurId.e_ComProtocol = rc_Protocol.e_Type;
@@ -283,7 +282,7 @@ sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
                         rc_Protocol.c_ComMessages[c_InterfaceIndexes[u32_ItFoundItem]];
                      //Id
                      c_CurId.u32_InterfaceIndex = c_InterfaceIndexes[u32_ItFoundItem];
-                     //Each RX message
+                     //Each Rx message
                      for (uint32 u32_ItMsg = 0UL; u32_ItMsg < rc_Container.c_RxMessages.size(); ++u32_ItMsg)
                      {
                         const C_OSCCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMsg];
@@ -302,7 +301,7 @@ sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
                            break;
                         }
                      }
-                     //Each TX message
+                     //Each Tx message
                      for (uint32 u32_ItMsg = 0UL;
                           (u32_ItMsg < rc_Container.c_TxMessages.size()) && (s32_Retval == C_NOACT); ++u32_ItMsg)
                      {

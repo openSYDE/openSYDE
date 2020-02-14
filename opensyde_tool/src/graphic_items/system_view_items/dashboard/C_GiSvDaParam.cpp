@@ -48,11 +48,11 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     oru32_ViewIndex      Index of system view
-   \param[in]     oru32_DashboardIndex Index of dashboard in system view
-   \param[in]     ors32_DataIndex      Index of data element in dashboard in system view
-   \param[in]     oru64_ID             Unique ID
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in]      oru32_ViewIndex        Index of system view
+   \param[in]      oru32_DashboardIndex   Index of dashboard in system view
+   \param[in]      ors32_DataIndex        Index of data element in dashboard in system view
+   \param[in]      oru64_ID               Unique ID
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaParam::C_GiSvDaParam(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
@@ -100,8 +100,8 @@ sintn C_GiSvDaParam::type(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply style
 
-   \param[in] oe_Style    New style type
-   \param[in] oq_DarkMode Flag if dark mode is active
+   \param[in]  oe_Style       New style type
+   \param[in]  oq_DarkMode    Flag if dark mode is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
@@ -205,7 +205,9 @@ void C_GiSvDaParam::DeleteData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle double click
+/*! \brief   Call properties for widgets
+
+   \return false (no configurable properties)
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaParam::CallProperties(void)
@@ -225,7 +227,7 @@ void C_GiSvDaParam::UpdateShowValue(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active      Flag if connection is active or not active now
+   \param[in]  oq_Active   Flag if connection is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::ConnectionActiveChanged(const bool oq_Active)
@@ -247,7 +249,7 @@ void C_GiSvDaParam::ConnectionActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of edit mode
 
-   \param[in]  oq_Active  Flag if edit mode is active or not active now
+   \param[in]  oq_Active   Flag if edit mode is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::EditModeActiveChanged(const bool oq_Active)
@@ -263,8 +265,8 @@ void C_GiSvDaParam::EditModeActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle manual user operation finished event
 
-   \param[in] os32_Result Operation result
-   \param[in] ou8_NRC     Negative response code, if any
+   \param[in]  os32_Result    Operation result
+   \param[in]  ou8_NRC        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
@@ -285,8 +287,8 @@ void C_GiSvDaParam::HandleManualOperationFinished(const sint32 os32_Result, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal all widgets which read rail element ID registrations failed
 
-   \param[in]     orc_FailedIdRegisters    Failed IDs
-   \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
+   \param[in]      orc_FailedIdRegisters     Failed IDs
+   \param[in,out]  orc_FailedIdErrorDetails  Error details for element IDs which failed registration (if any)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::SetErrorForFailedCyclicElementIdRegistrations(
@@ -301,7 +303,7 @@ void C_GiSvDaParam::SetErrorForFailedCyclicElementIdRegistrations(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the com driver for parametrization functions
 
-   \param[in]  opc_ComDriver     Pointer to the com driver
+   \param[in]  orc_ComDriver  Reference to the com driver
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::SetSyvComDriver(C_SyvComDriverDiag & orc_ComDriver)
@@ -318,8 +320,8 @@ void C_GiSvDaParam::SetSyvComDriver(C_SyvComDriverDiag & orc_ComDriver)
 
    This function is thread safe.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_Value                             Raw result value
+   \param[in]   ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[out]  orc_Value                          Raw result value
 
    \return
    C_NO_ERR    Value read
@@ -381,7 +383,7 @@ const C_PuiSvDbParam * C_GiSvDaParam::GetParamItem(void) const
 
    WARNING: Data element changes have to trigger HandleNewDataElement
 
-   \param[in] orc_Content New content
+   \param[in]  orc_Content    New content
 
    \return
    C_NO_ERR Operation success
@@ -435,8 +437,8 @@ sint32 C_GiSvDaParam::ClearParamItemDataElement(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   View dashboard param widget add new data pool element
 
-   \param[in] orc_NewId   New ID
-   \param[in] opc_Content Optional init value
+   \param[in]  orc_Id         New ID
+   \param[in]  opc_Content    Optional init value
 
    \return
    C_NO_ERR Operation success
@@ -504,7 +506,7 @@ void C_GiSvDaParam::HandleNewDataElement(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete lists
 
-   \param[in] orc_ListIds Lists to delete
+   \param[in]  orc_ListIds    Lists to delete
 
    \return
    C_NO_ERR Operation success
@@ -532,15 +534,16 @@ sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNode
             if (pc_Param->c_DataPoolElementsConfig.size() == pc_Param->c_ListValues.size())
             {
                C_PuiSvDbParam c_Copy = *pc_Param;
-               //Each found list
-               for (uint32 u32_ItListId = 0; u32_ItListId < orc_ListIds.size(); ++u32_ItListId)
+               //Check each element (back to front!)
+               for (uint32 u32_ItElement = pc_Param->c_DataPoolElementsConfig.size(); u32_ItElement > 0UL;
+                    --u32_ItElement)
                {
-                  const C_OSCNodeDataPoolListId & rc_ListId = orc_ListIds[u32_ItListId];
-                  //Check each element
-                  for (uint32 u32_ItElement = 0; u32_ItElement < c_Copy.c_DataPoolElementsConfig.size();)
+                  const C_PuiSvDbNodeDataElementConfig & rc_Config =
+                     pc_Param->c_DataPoolElementsConfig[u32_ItElement - 1UL];
+                  //Each found list
+                  for (uint32 u32_ItListId = 0; u32_ItListId < orc_ListIds.size(); ++u32_ItListId)
                   {
-                     const C_PuiSvDbNodeDataElementConfig & rc_Config =
-                        c_Copy.c_DataPoolElementsConfig[u32_ItElement];
+                     const C_OSCNodeDataPoolListId & rc_ListId = orc_ListIds[u32_ItListId];
                      tgl_assert(rc_Config.c_ElementId.GetIsValid() == true);
                      if (rc_Config.c_ElementId.GetIsValid() == true)
                      {
@@ -553,35 +556,26 @@ sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNode
                            //Update internal data (BEFORE deleting)
                            this->RemoveDataPoolElement(rc_Config.c_ElementId);
                            //Match -> delete all relevant items
-                           c_Copy.RemoveElement(u32_ItElement);
+                           c_Copy.RemoveElement(u32_ItElement - 1UL);
                            //No iteration because new element at current index
                         }
-                        else
-                        {
-                           //Important iterator step
-                           ++u32_ItElement;
-                        }
-                     }
-                     else
-                     {
-                        //Important iterator step
-                        ++u32_ItElement;
                      }
                   }
-                  for (uint32 u32_ItExpansion = 0UL; u32_ItExpansion < c_Copy.c_ExpandedItems.size();)
+               }
+               //Each found list
+               for (uint32 u32_ItListId = 0; u32_ItListId < orc_ListIds.size(); ++u32_ItListId)
+               {
+                  const C_OSCNodeDataPoolListId & rc_ListId = orc_ListIds[u32_ItListId];
+                  //Handle expansion (back to front!)
+                  for (uint32 u32_ItExpansion = c_Copy.c_ExpandedItems.size(); u32_ItExpansion > 0UL; --u32_ItExpansion)
                   {
-                     const C_PuiSvDbExpandedTreeIndex & rc_Expanded = c_Copy.c_ExpandedItems[u32_ItExpansion];
+                     const C_PuiSvDbExpandedTreeIndex & rc_Expanded = c_Copy.c_ExpandedItems[u32_ItExpansion - 1UL];
                      if (((rc_Expanded.c_ExpandedId.u32_NodeIndex == rc_ListId.u32_NodeIndex) &&
                           (rc_Expanded.c_ExpandedId.u32_DataPoolIndex == rc_ListId.u32_DataPoolIndex)) &&
                          (rc_Expanded.c_ExpandedId.u32_ListIndex == rc_ListId.u32_ListIndex))
                      {
                         //New item at current position
-                        c_Copy.c_ExpandedItems.erase(c_Copy.c_ExpandedItems.begin() + u32_ItExpansion);
-                     }
-                     else
-                     {
-                        //Important iterator step
-                        ++u32_ItExpansion;
+                        c_Copy.c_ExpandedItems.erase(c_Copy.c_ExpandedItems.begin() + (u32_ItExpansion - 1UL));
                      }
                   }
                }
@@ -678,8 +672,8 @@ QString C_GiSvDaParam::m_GetCommonToolTipContent(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Map widget data element index to data element handler index
 
-   \param[in]  ou32_DataElementIndex      Widget data element index
-   \param[out] oru32_InternalElementIndex Data element handler index
+   \param[in]   ou32_DataElementIndex        Widget data element index
+   \param[out]  oru32_InternalElementIndex   Data element handler index
 
    \return
    C_NO_ERR Operation success

@@ -48,14 +48,11 @@ C_OSCIOFileDataElement::~C_OSCIOFileDataElement(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Change type
+/*! \brief  Change type
 
    Attempt conversion of previous value(s) to new type
 
-   \param[in] ore_Value New Type
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in] oe_Value Value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCIOFileDataElement::SetType(const C_OSCNodeDataPoolContent::E_Type oe_Value)
@@ -66,7 +63,7 @@ void C_OSCIOFileDataElement::SetType(const C_OSCNodeDataPoolContent::E_Type oe_V
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Change array status
+/*! \brief  Change array status
 
    \param[in] oq_Value New value
 */

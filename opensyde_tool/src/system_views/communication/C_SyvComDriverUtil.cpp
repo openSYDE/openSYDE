@@ -39,13 +39,13 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Fills all parameter for C_OSCComDriverProtocol based on specific view and prepares the CAN dispatcher
 
-   \param[in]   ou32_ViewIndex          Index of current used view
-   \param[out]  ou32_ActiveBusIndex     Bus index of bus in system definition where we are connected to
-   \param[out]  orc_ActiveNodes         Flags for all available nodes in the system
-   \param[out]  opc_CanDispatcher       Pointer to concrete CAN dispatcher
-   \param[out]  opc_IpDispatcher        Pointer to concrete IP dispatcher
-   \param[in]   oq_InitCan              Optional flag to initialize the CAN bus. Default is true.
-                                        DLL will be opened although.
+   \param[in]      ou32_ViewIndex         Index of current used view
+   \param[out]     oru32_ActiveBusIndex   Bus index of bus in system definition where we are connected to
+   \param[out]     orc_ActiveNodes        Flags for all available nodes in the system
+   \param[in,out]  oppc_CanDispatcher     Pointer to concrete CAN dispatcher
+   \param[in,out]  oppc_IpDispatcher      Pointer to concrete IP dispatcher
+   \param[in]      oq_InitCan             Optional flag to initialize the CAN bus. Default is true.
+                                          DLL will be opened although.
 
    \return
    C_NO_ERR    Parameter filled

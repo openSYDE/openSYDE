@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Export code of a openSYDE node (header)
+   \brief       Export code of an openSYDE node (header)
 
    See cpp file for detailed description
 
@@ -21,7 +21,7 @@ namespace stw_opensyde_core
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-///Code exporter for server code: data pools, comm configuration, DPD and DPH initialization
+///Code exporter for server code: Datapools, comm configuration, DPD and DPH initialization
 class C_OSCExportNode
 {
 public:
@@ -34,6 +34,27 @@ public:
                                                const stw_scl::C_SCLString & orc_ExportToolInfo = "");
 
 private:
+   static stw_types::sint32 mh_CreateOsyInitCode(const C_OSCNode & orc_Node,
+                                                 const stw_types::uint16 ou16_ApplicationIndex,
+                                                 const stw_scl::C_SCLString & orc_Path,
+                                                 std::vector<stw_scl::C_SCLString> & orc_Files,
+                                                 const stw_scl::C_SCLString & orc_ExportToolInfo = "");
+   static stw_types::sint32 mh_CreateDatapoolCode(const C_OSCNode & orc_Node,
+                                                  const stw_types::uint16 ou16_ApplicationIndex,
+                                                  const stw_scl::C_SCLString & orc_Path,
+                                                  std::vector<stw_scl::C_SCLString> & orc_Files,
+                                                  const stw_scl::C_SCLString & orc_ExportToolInfo = "");
+   static stw_types::sint32 mh_CreateCOMMStackCode(const C_OSCNode & orc_Node,
+                                                   const stw_types::uint16 ou16_ApplicationIndex,
+                                                   const stw_scl::C_SCLString & orc_Path,
+                                                   std::vector<stw_scl::C_SCLString> & orc_Files,
+                                                   const stw_scl::C_SCLString & orc_ExportToolInfo = "");
+   static stw_types::sint32 mh_CreateHALConfigCode(const C_OSCNode & orc_Node,
+                                                   const stw_types::uint16 ou16_ApplicationIndex,
+                                                   const stw_scl::C_SCLString & orc_Path,
+                                                   std::vector<stw_scl::C_SCLString> & orc_Files,
+                                                   const stw_scl::C_SCLString & orc_ExportToolInfo = "");
+
    static stw_types::sint32 mh_CheckPrerequisites(const C_OSCNode & orc_Node);
    static stw_types::sint32 mh_GetAdaptedComDataPool(const C_OSCNode & orc_Node,
                                                      const stw_types::uint32 ou32_DataPoolIndex,

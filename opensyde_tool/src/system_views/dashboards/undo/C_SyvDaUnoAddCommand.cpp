@@ -128,7 +128,7 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             c_ParamWidgetData.f64_ZOrder = this->mf64_ZValue;
             c_ParamWidgetData.c_UIPosition = mc_NewPos;
             c_ParamWidgetData.f64_Height = 246.0;
-            c_ParamWidgetData.f64_Width = 895.0;
+            c_ParamWidgetData.f64_Width = 981.0;
             tgl_assert(c_InitialData.AddWidget(&c_ParamWidgetData, this->me_Type) == C_NO_ERR);
             break;
          case C_PuiSvDbDataElement::ePIE_CHART:

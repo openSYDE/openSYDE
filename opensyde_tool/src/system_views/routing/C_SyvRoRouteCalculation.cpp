@@ -97,6 +97,15 @@ const C_OSCRoutingRoute * C_SyvRoRouteCalculation::GetBestRoute(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks a specific interface of a specific node if it is relevant and usable
+
+   \param[in]       ou32_TargetNodeIndex     Node index of node to check
+   \param[in]       orc_ComItfSettings       Interface of node for check
+
+   \retval   true   Interface can be used
+   \retval   false  Interface can not be used or is not relevant
+*/
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvRoRouteCalculation::CheckItfNumberForRouting(const uint32 ou32_TargetNodeIndex,
                                                        const C_OSCNodeComInterfaceSettings & orc_ComItfSettings) const
 {
@@ -110,6 +119,7 @@ bool C_SyvRoRouteCalculation::CheckItfNumberForRouting(const uint32 ou32_TargetN
    C_NO_ERR    Routes were found
    C_RANGE     Target node does not exist
    C_COM       No routes were found
+   C_CONFIG    A route was removed due to not possible routing from CAN to Ethernet
    C_NOACT     Target function (update or diagnostic) deactivated on all connected bus. No routing necessary.
 */
 //----------------------------------------------------------------------------------------------------------------------

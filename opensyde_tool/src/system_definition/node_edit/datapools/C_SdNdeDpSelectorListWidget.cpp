@@ -699,6 +699,8 @@ void C_SdNdeDpSelectorListWidget::Paste(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks all datapools for conflicts and sets the icon
 
+   \param[out]  opc_InvalidDatapoolIndices    Invalid Datapool indices (optional)
+
    \return
    true   Conflict found
    false  No conflict found
@@ -1448,11 +1450,12 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
             if (q_IsDatapoolShared == true)
             {
                sintn sn_WidgetCounter;
-               C_SdNdeDpSelectorItemWidget * pc_WidgetItem;
-               QListWidgetItem * pc_Item;
 
                for (sn_WidgetCounter = 0U; sn_WidgetCounter < this->count(); ++sn_WidgetCounter)
                {
+                  C_SdNdeDpSelectorItemWidget * pc_WidgetItem;
+                  QListWidgetItem * pc_Item;
+
                   // update all widgets in this case
                   pc_Item = this->item(sn_WidgetCounter);
                   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -1532,6 +1535,7 @@ void C_SdNdeDpSelectorListWidget::m_Delete(const bool oq_AskUser)
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to delete the selected Datapool(s)?"));
       c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
       c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
       if (e_ReturnMessageBox != C_OgeWiCustomMessage::eYES)

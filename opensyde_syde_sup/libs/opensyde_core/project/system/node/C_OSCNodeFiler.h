@@ -64,6 +64,11 @@ private:
                                              C_OSCXMLParserBase & orc_XMLParser,
                                              const stw_scl::C_SCLString & orc_BasePath,
                                              std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles);
+   static stw_types::sint32 mh_LoadHALC(C_OSCHalcConfig & orc_Config, C_OSCXMLParserBase & orc_XMLParser,
+                                        const stw_scl::C_SCLString & orc_BasePath);
+   static stw_types::sint32 mh_SaveHALC(const C_OSCHalcConfig & orc_Config, C_OSCXMLParserBase & orc_XMLParser,
+                                        const stw_scl::C_SCLString & orc_BasePath,
+                                        std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles);
    static stw_scl::C_SCLString mh_DiagnosticServerToString(
       const C_OSCNodeProperties::E_DiagnosticServerProtocol & ore_DiagnosticProtocol);
    static stw_types::sint32 mh_StringToDiagnosticServer(const stw_scl::C_SCLString & orc_String,

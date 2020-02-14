@@ -76,10 +76,13 @@ Q_SIGNALS:
    void SigRenameView(const stw_types::uint32 ou32_Index, const QString & orc_Name, const bool oq_UpdateDisplayName);
    void SigDeleteView(const stw_types::uint32 ou32_Index, const stw_types::sint32 os32_SelectedSubMode,
                       const stw_types::uint32 ou32_SelectedIndex);
-   bool SigChangeUseCase(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode);
+   void SigChangeUseCase(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
+                         const bool oq_ChangeUseCase = true);
+   void SigSysDefRequest(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode);
    void SigChangeMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode = 0,
                       const stw_types::uint32 ou32_Index = 0U, const QString & orc_Name = "",
-                      const QString & orc_SubSubItemName = "", const stw_types::uint32 ou32_Flag = 0U);
+                      const QString & orc_SubSubItemName = "", const stw_types::uint32 ou32_Flag = 0U,
+                      const bool oq_ChangeUseCase = false);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -102,7 +105,6 @@ private:
    stw_types::sintn msn_StepSize;
 
    // slots
-   void m_MinmaxClicked(void);
    void m_StartViewClicked(void);
    void m_AnimationTimerEvent(void);
 

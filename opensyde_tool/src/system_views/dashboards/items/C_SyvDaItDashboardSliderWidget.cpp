@@ -38,7 +38,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItDashboardSliderWidget::C_SyvDaItDashboardSliderWidget(QWidget * const opc_Parent) :
@@ -72,8 +72,8 @@ C_SyvDaItDashboardSliderWidget::~C_SyvDaItDashboardSliderWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current style
 
-   \param[in] oe_Style  Widget style
-   \param[in] oq_IsDark Dark mode active flag
+   \param[in]  oe_Style    Widget style
+   \param[in]  oq_IsDark   Dark mode active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetCurrentStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style,
@@ -85,8 +85,7 @@ void C_SyvDaItDashboardSliderWidget::SetCurrentStyle(const C_PuiSvDbWidgetBase::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply style
 
-   \param[in] oe_Style New style type
-   \param[in] oe_Type  New item type
+   \param[in]  oe_Type  New item type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbSlider::E_Type oe_Type)
@@ -136,8 +135,8 @@ void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set minimum
 
-   \param[in] osn_Value  New minimum
-   \param[in] orc_String New displayed minimum
+   \param[in]  osn_Value   New minimum
+   \param[in]  orc_String  New displayed minimum
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetMin(const sintn osn_Value, const QString & orc_String)
@@ -151,8 +150,8 @@ void C_SyvDaItDashboardSliderWidget::SetMin(const sintn osn_Value, const QString
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set maximum
 
-   \param[in] osn_Value  New maximum
-   \param[in] orc_String New displayed maximum
+   \param[in]  osn_Value   New maximum
+   \param[in]  orc_String  New displayed maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetMax(const sintn osn_Value, const QString & orc_String)
@@ -166,7 +165,7 @@ void C_SyvDaItDashboardSliderWidget::SetMax(const sintn osn_Value, const QString
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the flag for showing minimum and maximum
 
-   \param[in]     oq_Value       Flag for showing minimum and maximum
+   \param[in]  oq_Value    Flag for showing minimum and maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetShowMinMax(const bool oq_Value)
@@ -179,7 +178,7 @@ void C_SyvDaItDashboardSliderWidget::SetShowMinMax(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value
 
-   \param[in] orc_Value New value
+   \param[in]  osn_Value   New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetValue(const sintn osn_Value) const
@@ -204,9 +203,10 @@ sintn C_SyvDaItDashboardSliderWidget::GetValue(void) const
 
    Formula: ((Value - of64_ToolTipRangeOffset) * of64_ToolTipFactor) + of64_ToolTipOffset
 
-   \param[in] of64_ToolTipRangeOffset See formula
-   \param[in] of64_ToolTipOffset      See formula
-   \param[in] of64_ToolTipFactor      See formula
+   \param[in]  of64_ToolTipRangeOffset    See formula
+   \param[in]  of64_ToolTipOffset         See formula
+   \param[in]  of64_ToolTipFactor         See formula
+   \param[in]  oe_RepresentationType      Representation type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetToolTipParameters(const float64 of64_ToolTipRangeOffset,
@@ -224,7 +224,7 @@ const
 
    Here: Handle resize specific update
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::resizeEvent(QResizeEvent * const opc_Event)

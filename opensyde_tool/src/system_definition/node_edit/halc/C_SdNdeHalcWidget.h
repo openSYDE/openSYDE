@@ -13,6 +13,9 @@
 
 #include "stwtypes.h"
 
+#include "C_OSCHalcDef.h"
+#include "C_OSCHalcConfig.h"
+
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
@@ -35,7 +38,7 @@ public:
    ~C_SdNdeHalcWidget(void);
 
    void InitStaticNames(void) const;
-   void SetNode(const stw_types::uint32 & oru32_NodeIndex);
+   void SetNode(const stw_types::uint32 ou32_NodeIndex);
 
 private:
    Ui::C_SdNdeHalcWidget * mpc_Ui;
@@ -49,11 +52,12 @@ private:
    void m_OnExportConfigClicked (void) const;
    void m_OnSettingsClicked(void) const;
    void m_OnCleanUpClicked(void) const;
-   void m_OnLoadClicked(void) const;
+   void m_OnLoadClicked(void);
    void m_OnViewDetailsClicked(void) const;
-   void m_OnOverviewClicked(void) const;
-   void m_OnUseCaseChanged(void) const;
-   void m_OnChannelSelected(void) const;
+   void m_OnMagicRequested(void); // TODO remove - development only
+   void m_OnOverviewToggled(const bool oq_Checked) const;
+   void m_OnChannelSelected(const QModelIndex & orc_Index) const;
+   void m_OnChannelUpdate(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex) const;
 
    void m_LoadNodeData(void) const;
 };

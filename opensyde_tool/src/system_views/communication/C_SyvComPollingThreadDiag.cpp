@@ -48,6 +48,12 @@ using namespace stw_opensyde_gui_logic;
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: remember parameters for service execution
+
+   \param[in]      oe_Service          Service
+   \param[in,out]  orc_Dealer          Dealer
+   \param[in]      ou8_DataPoolIndex   Data pool index
+   \param[in]      ou16_ListIndex      List index
+   \param[in]      ou16_ElementIndex   Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
@@ -63,6 +69,11 @@ void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utlity: remember parameters for service execution
+
+   \param[in]      oe_Service          Service
+   \param[in,out]  orc_Dealer          Dealer
+   \param[in]      ou8_DataPoolIndex   Data pool index
+   \param[in]      ou16_ListIndex      List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
@@ -77,6 +88,10 @@ void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: remember parameters for service execution
+
+   \param[in]      oe_Service    Service
+   \param[in,out]  orc_Dealer    Dealer
+   \param[in]      orc_ListIds   List ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
@@ -90,6 +105,9 @@ void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: remember parameters for service execution
+
+   \param[in]      oe_Service    Service
+   \param[in,out]  orc_Dealer    Dealer
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
@@ -181,10 +199,10 @@ C_SyvComPollingThreadDiag::~C_SyvComPollingThreadDiag(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start executing service in thread
 
-   \param[in]  orc_Dealer         data dealer to use
-   \param[in]  ou8_DataPoolIndex  index of data pool to read from
-   \param[in]  ou16_ListIndex     index of list to read from
-   \param[in]  ou16_ElementIndex  index of element to read from
+   \param[in]  orc_Dealer           data dealer to use
+   \param[in]  ou8_DataPoolIndex    index of data pool to read from
+   \param[in]  ou16_ListIndex       index of list to read from
+   \param[in]  ou16_ElementIndex    index of element to read from
 
    \return
    C_NO_ERR   started polling
@@ -212,10 +230,10 @@ sint32 C_SyvComPollingThreadDiag::StartDataPoolRead(C_SyvComDataDealer & orc_Dea
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start executing service in thread
 
-   \param[in]  orc_Dealer         data dealer to use
-   \param[in]  ou8_DataPoolIndex  index of data pool to write to
-   \param[in]  ou16_ListIndex     index of list to write to
-   \param[in]  ou16_ElementIndex  index of element to write to
+   \param[in]  orc_Dealer           data dealer to use
+   \param[in]  ou8_DataPoolIndex    index of data pool to write to
+   \param[in]  ou16_ListIndex       index of list to write to
+   \param[in]  ou16_ElementIndex    index of element to write to
 
    \return
    C_NO_ERR   started polling
@@ -243,10 +261,10 @@ sint32 C_SyvComPollingThreadDiag::StartDataPoolWrite(C_SyvComDataDealer & orc_De
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start executing service in thread
 
-   \param[in]  orc_Dealer         data dealer to use
-   \param[in]  ou8_DataPoolIndex  index of data pool to read from
-   \param[in]  ou16_ListIndex     index of list to read from
-   \param[in]  ou16_ElementIndex  index of element to read from
+   \param[in]  orc_Dealer           data dealer to use
+   \param[in]  ou8_DataPoolIndex    index of data pool to read from
+   \param[in]  ou16_ListIndex       index of list to read from
+   \param[in]  ou16_ElementIndex    index of element to read from
 
    \return
    C_NO_ERR   started polling
@@ -274,10 +292,10 @@ sint32 C_SyvComPollingThreadDiag::StartNvmRead(C_SyvComDataDealer & orc_Dealer, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start executing service in thread
 
-   \param[in]  orc_Dealer         data dealer to use
-   \param[in]  ou8_DataPoolIndex  index of data pool to write to
-   \param[in]  ou16_ListIndex     index of list to write to
-   \param[in]  ou16_ElementIndex  index of element to write to
+   \param[in]  orc_Dealer           data dealer to use
+   \param[in]  ou8_DataPoolIndex    index of data pool to write to
+   \param[in]  ou16_ListIndex       index of list to write to
+   \param[in]  ou16_ElementIndex    index of element to write to
 
    \return
    C_NO_ERR   started polling
@@ -305,9 +323,9 @@ sint32 C_SyvComPollingThreadDiag::StartNvmWrite(C_SyvComDataDealer & orc_Dealer,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start executing service in thread
 
-   \param[in]  orc_Dealer         data dealer to use
-   \param[in]  ou8_DataPoolIndex  index of data pool to read from
-   \param[in]  ou16_ListIndex     index of list to read from
+   \param[in]  orc_Dealer           data dealer to use
+   \param[in]  ou8_DataPoolIndex    index of data pool to read from
+   \param[in]  ou16_ListIndex       index of list to read from
 
    \return
    C_NO_ERR   started polling
@@ -335,8 +353,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmReadList(C_SyvComDataDealer & orc_Deal
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start executing service in thread
 
-   \param[in]  orc_Dealer           data dealer to use
-   \param[in]  orc_ListIds          Lists to update CRC only
+   \param[in]  orc_Dealer     data dealer to use
+   \param[in]  orc_ListIds    Lists to update CRC only
 
    \return
    C_NO_ERR   started polling
@@ -366,7 +384,7 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteChangedValues(C_SyvComDataDea
 
    Must be called after the thread was finished after calling StartNvmSafeWriteChangedValues
 
-   \param[out]    orc_ChangedElements  All changed datapool elements
+   \param[out]  orc_ChangedElements    All changed datapool elements
 
    \return
    C_NO_ERR   result returned
@@ -394,9 +412,7 @@ sint32 C_SyvComPollingThreadDiag::GetNvmSafeWriteChangedValuesOutput(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start executing service in thread
 
-   \param[in]  orc_Dealer           data dealer to use
-   \param[in]  orc_ChangedElements  All changed datapool elements
-   \param[in]  orc_CommLock         critical section to lock during service execution
+   \param[in]  orc_Dealer  data dealer to use
 
    \return
    C_NO_ERR   started polling
@@ -425,7 +441,7 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadValues(C_SyvComDataDealer & or
 
    Must be called after the thread was finished after calling NvmSafeReadValues
 
-   \param[out]    orpc_ParamNodeValues  Pointer to node with read values
+   \param[out]  orpc_ParamNodeValues   Pointer to node with read values
 
    \return
    C_NO_ERR   result returned
@@ -454,7 +470,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start executing service in thread
 
-   \param[in]  orc_Dealer           data dealer to use
+   \param[in]  orc_Dealer  data dealer to use
 
    \return
    C_NO_ERR   started polling
@@ -481,9 +497,9 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteCrcs(C_SyvComDataDealer & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start executing service in thread
 
-   \param[in]  orc_Dealer         data dealer to use
-   \param[in]  ou8_DataPoolIndex  index of data pool to read from
-   \param[in]  ou16_ListIndex     index of list to read from
+   \param[in]  orc_Dealer           data dealer to use
+   \param[in]  ou8_DataPoolIndex    index of data pool to read from
+   \param[in]  ou16_ListIndex       index of list to read from
 
    \return
    C_NO_ERR   started polling
@@ -513,8 +529,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmNotifyOfChanges(C_SyvComDataDealer & o
 
    Must be called after the thread was finished after calling StartNvmNotifyOfChanges
 
-   \param[out]    orq_ApplicationAcknowledge  true: positive acknowledge from server
-                                              false: negative acknowledge from server
+   \param[out]  orq_ApplicationAcknowledge   true: positive acknowledge from server
+                                             false: negative acknowledge from server
 
    \return
    C_NO_ERR   result returned
@@ -573,8 +589,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadParameterValues(C_SyvComDataDe
 
    Can be used to extract the results of one service execution after it has finished.
 
-   \param[out]  ors32_Result       result code of executed service function
-                                   for possible values see the DataDealer's function documentation
+   \param[out]  ors32_Result  result code of executed service function
+                              for possible values see the DataDealer's function documentation
 
    \return
    C_NO_ERR       result code read
@@ -603,8 +619,8 @@ sint32 C_SyvComPollingThreadDiag::GetResults(sint32 & ors32_Result) const
 
    Can be used to extract the results of one service execution after it has finished.
 
-   \param[out]  oru8_NRC       negative response code of executed service function
-                               for possible values see the DataDealer's function documentation
+   \param[out]  oru8_NRC   negative response code of executed service function
+                           for possible values see the DataDealer's function documentation
 
    \return
    C_NO_ERR       result code read

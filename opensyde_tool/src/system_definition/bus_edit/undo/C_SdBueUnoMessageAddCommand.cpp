@@ -59,7 +59,7 @@ C_SdBueUnoMessageAddCommand::C_SdBueUnoMessageAddCommand(const C_OSCCanMessageId
    \param[in] orc_OwnerNodeName           Owner node names
    \param[in] orc_OwnerNodeInterfaceIndex Owner node interface index
    \param[in] orc_OwnerNodeDatapoolIndex  Owner node Datapool index
-   \param[in] orc_OwnerIsTxFlag           Owner has message as TX flags
+   \param[in] orc_OwnerIsTxFlag           Owner has message as Tx flags
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Message,

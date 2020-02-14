@@ -177,10 +177,12 @@ void C_PopSaveAsDialogWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 void C_PopSaveAsDialogWidget::m_InitDefaultProjectName(void) const
 {
    const QString c_ProjectPath = C_PuiProject::h_GetInstance()->GetPath();
-   const QFileInfo c_ProjectFileInfo(m_GetValidPath(c_ProjectPath));
    QString c_Proposal;
+   QString c_AbsolutePath = QFileInfo(m_GetValidPath(c_ProjectPath)).absoluteDir().absolutePath();
 
-   this->mpc_Ui->pc_LineEditPath->SetPath(c_ProjectFileInfo.absoluteDir().absolutePath());
+   c_AbsolutePath.remove(c_AbsolutePath.lastIndexOf("/"), c_AbsolutePath.length());
+
+   this->mpc_Ui->pc_LineEditPath->SetPath(c_AbsolutePath);
 
    if (c_ProjectPath.compare("") == 0)
    {
@@ -292,20 +294,37 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
 
       if (c_Dir.exists() == false)
       {
-         bool q_UseV2;
          c_Dir.mkdir(c_Path);
          if (this->mpc_Ui->pc_ComboBoxVersion->currentIndex() == C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V2)
          {
-            q_UseV2 = true;
+            C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::eINFORMATION);
+            c_Box.SetHeading(C_GtGetText::h_GetText("Project save as \"V2\""));
+            c_Box.SetDescription(C_GtGetText::h_GetText("Project is exported in file format \"V2\" "
+                                                        "as a copy of the current project.\n"
+                                                        "You are still working on current project."));
+            c_Box.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+            c_Box.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+            c_Box.SetCustomMinHeight(180, 180);
+            if (c_Box.Execute() == C_OgeWiCustomMessage::eOK)
+            {
+               if (m_SaveToFile(c_FilePathAndName, true) == C_NO_ERR)
+               {
+                  // accept dialog if successfully saved
+                  this->mrc_ParentDialog.accept();
+               }
+            }
+            else
+            {
+               c_Dir.rmdir(c_Path);
+            }
          }
          else
          {
-            q_UseV2 = false;
-         }
-         if (m_SaveToFile(c_FilePathAndName, q_UseV2) == C_NO_ERR)
-         {
-            // accept dialog if successfully saved
-            this->mrc_ParentDialog.accept();
+            if (m_SaveToFile(c_FilePathAndName, false) == C_NO_ERR)
+            {
+               // accept dialog if successfully saved
+               this->mrc_ParentDialog.accept();
+            }
          }
          QApplication::restoreOverrideCursor();
       }
@@ -315,6 +334,7 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
          QApplication::restoreOverrideCursor();
          c_Box.SetHeading(C_GtGetText::h_GetText("Project save"));
          c_Box.SetDescription(C_GtGetText::h_GetText("A project with this name already exists. Choose another name."));
+         c_Box.SetCustomMinHeight(180, 180);
          c_Box.Execute();
       }
    }
@@ -338,6 +358,7 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
       c_Box.SetDescription(C_GtGetText::h_GetText("Name or/and path is empty or contains invalid characters. "
                                                   "Please choose valid name and path."));
       c_Box.SetDetails(c_Details);
+      c_Box.SetCustomMinHeight(230, 270);
       c_Box.Execute();
    }
 }

@@ -35,12 +35,12 @@ class C_PuiSvDbParam :
 public:
    C_PuiSvDbParam(void);
 
-   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
-   virtual bool IsReadElement(void) const;
+   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
+   virtual bool IsReadElement(void) const override;
    stw_types::sint32 CheckError(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_ListId, bool & orq_Error) const;
    static stw_types::sint32 h_CheckMinMax(const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_Elem,
                                           const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Value, bool & orq_Ok);
-   virtual stw_types::sint32 RemoveElement(const stw_types::uint32 & oru32_Index);
+   virtual stw_types::sint32 RemoveElement(const stw_types::uint32 & oru32_Index) override;
 
    std::vector<stw_types::sint32> c_DataSetSelectionIndices; ///< Index of selected data set (-1 if
    ///< invalid)

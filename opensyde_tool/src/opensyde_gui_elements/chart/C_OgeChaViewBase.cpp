@@ -35,8 +35,8 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Chart      Pointer to chart
-   \param[in,out] opc_Parent     Optional pointer to parent
+   \param[in,out]  opc_Chart     Pointer to chart
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeChaViewBase::C_OgeChaViewBase(QChart * const opc_Chart, QWidget * const opc_Parent) :
@@ -61,7 +61,7 @@ C_OgeChaViewBase::C_OgeChaViewBase(QChart * const opc_Chart, QWidget * const opc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Function to activate or deactivate drawing of performance heavy widgets
 
-   \param[in] oq_Active Flag if widgets should currently be drawn
+   \param[in]  oq_Active   Flag if widgets should currently be drawn
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::SetDrawingActive(const bool oq_Active)
@@ -72,7 +72,7 @@ void C_OgeChaViewBase::SetDrawingActive(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the current zoom mode
 
-   \param[in]       oe_SettingZoomMode     Current used zoom mode
+   \param[in]  oe_ZoomMode    Current used zoom mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::SetZoomMode(const C_OgeChaViewBase::E_SettingZoomMode oe_ZoomMode)
@@ -85,7 +85,7 @@ void C_OgeChaViewBase::SetZoomMode(const C_OgeChaViewBase::E_SettingZoomMode oe_
 
    Here: Don't paint if not visible
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::paintEvent(QPaintEvent * const opc_Event)
@@ -101,7 +101,10 @@ void C_OgeChaViewBase::paintEvent(QPaintEvent * const opc_Event)
 
    Here: Remember user touch event
 
-   \param[in,out] opc_event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
+
+   \retval true      Event was recognized and processed
+   \retval false     Event ignored
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeChaViewBase::viewportEvent(QEvent * const opc_Event)
@@ -119,7 +122,7 @@ bool C_OgeChaViewBase::viewportEvent(QEvent * const opc_Event)
 
    Here: ignore all events while user touch event
 
-   \param[in,out] opc_event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::mousePressEvent(QMouseEvent * const opc_Event)
@@ -151,7 +154,7 @@ void C_OgeChaViewBase::mousePressEvent(QMouseEvent * const opc_Event)
 
    Here: ignore all events while user touch event
 
-   \param[in,out] opc_event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::mouseMoveEvent(QMouseEvent * const opc_Event)
@@ -184,7 +187,7 @@ void C_OgeChaViewBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 
    Here: ignore all events while user touch event
 
-   \param[in,out] opc_event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::mouseReleaseEvent(QMouseEvent * const opc_Event)
@@ -257,7 +260,7 @@ void C_OgeChaViewBase::mouseReleaseEvent(QMouseEvent * const opc_Event)
 
    Here: allow zoom / scroll by keys
 
-   \param[in,out] opc_event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::keyPressEvent(QKeyEvent * const opc_Event)
@@ -297,7 +300,7 @@ void C_OgeChaViewBase::keyPressEvent(QKeyEvent * const opc_Event)
 
    Here: allow zoom
 
-   \param[in,out] opc_event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::wheelEvent(QWheelEvent * const opc_Event)
@@ -317,9 +320,9 @@ void C_OgeChaViewBase::wheelEvent(QWheelEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Zooming in or out dependent of the zoom mode
 
-   \param[in]       oq_ZoomIn    true  -> Zooming in
-                                 false -> Zooming out
-   \param[in]       orc_ZoomPos  Center position for zooming (TODO: Not active yet)
+   \param[in]  oq_ZoomIn      true  -> Zooming in
+                              false -> Zooming out
+   \param[in]  orc_ZoomPos    Center position for zooming (TODO: Not active yet)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::m_Zoom(const bool oq_ZoomIn, const QPointF & orc_ZoomPos) const
@@ -357,8 +360,8 @@ void C_OgeChaViewBase::m_Zoom(const bool oq_ZoomIn, const QPointF & orc_ZoomPos)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Scrolls the view of the chart
 
-   \param[in]       orc_Start     Start point of scrolling
-   \param[in]       orc_End       End point of scrolling
+   \param[in]  orc_Start   Start point of scrolling
+   \param[in]  orc_End     End point of scrolling
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::m_Scroll(const QPointF & orc_Start, const QPointF & orc_End) const

@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpiVerticalNavi::C_OgeSpiVerticalNavi(QWidget * const opc_Parent) :
@@ -127,7 +127,8 @@ QSplitterHandle * C_OgeSpiVerticalNavi::createHandle(void)
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in]      oe_Orientation   Orientation (vertical/horizontal)
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpiVerticalNaviHandle::C_OgeSpiVerticalNaviHandle(const Qt::Orientation oe_Orientation,
@@ -141,7 +142,7 @@ C_OgeSpiVerticalNaviHandle::C_OgeSpiVerticalNaviHandle(const Qt::Orientation oe_
 
    Here: forward double click
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiVerticalNaviHandle::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
@@ -155,7 +156,7 @@ void C_OgeSpiVerticalNaviHandle::mouseDoubleClickEvent(QMouseEvent * const opc_E
 
    Draws the background element
 
-   \param[in,out] opc_Event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiVerticalNaviHandle::paintEvent(QPaintEvent * const opc_Event)

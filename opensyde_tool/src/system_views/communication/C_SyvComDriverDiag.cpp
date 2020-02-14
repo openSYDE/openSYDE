@@ -54,7 +54,7 @@ using namespace stw_opensyde_gui_logic;
 
    Initialize all members based on view
 
-   \param[in] ou32_ViewIndex View index
+   \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvComDriverDiag::C_SyvComDriverDiag(const uint32 ou32_ViewIndex) :
@@ -196,7 +196,7 @@ sint32 C_SyvComDriverDiag::InitDiag(void)
    * bring server nodes into required sessions
    * activate security access level required for diagnostics
 
-   \param[in] orc_ErrorDetails Details for current error
+   \param[in]  orc_ErrorDetails  Details for current error
 
    \return
    C_NO_ERR    All nodes set to session successfully
@@ -272,14 +272,14 @@ sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
 
    The function will abort on the first communication problem.
 
-   \param[in,out] orc_ErrorDetails              Error details (if any)
-   \param[in,out] orc_FailedIdRegisters         Element IDs which failed registration (if any)
-   \param[in,out] orc_FailedIdErrorDetails      Error details for element IDs which failed registration (if any)
-   \param[out]    orc_FailedNodesElementNumber  Map with all nodes as key with the number (not the index) of the
-                                                element which caused the error OSY_UDS_NRC_UPLOAD_DOWNLOAD_NOT_ACCEPTED
-                                                (0x70: To many transmissions already registered)
-   \param[out]    orc_NodesElementNumber        Map with all nodes as key with the number (not the index) of the
-                                                element which should be registered (With and without error)
+   \param[in,out]  orc_ErrorDetails                Error details (if any)
+   \param[in,out]  orc_FailedIdRegisters           Element IDs which failed registration (if any)
+   \param[in,out]  orc_FailedIdErrorDetails        Error details for element IDs which failed registration (if any)
+   \param[out]     orc_FailedNodesElementNumber    Map with all nodes as key with the number (not the index) of the
+                                                   element which caused the error OSY_UDS_NRC_UPLOAD_DOWNLOAD_NOT_ACCEPTED
+                                                   (0x70: To many transmissions already registered)
+   \param[out]     orc_NodesElementNumber          Map with all nodes as key with the number (not the index) of the
+                                                   element which should be registered (With and without error)
 
    \return
    C_CONFIG   configured view does not exist
@@ -656,10 +656,10 @@ sint32 C_SyvComDriverDiag::SendTesterPresentWithoutDefectNodes(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start thread for polled reading from data pool
 
-   \param[in]   ou32_NodeIndex       node index to read from
-   \param[in]   ou8_DataPoolIndex    data pool to read from
-   \param[in]   ou16_ListIndex       list index to read from
-   \param[in]   ou16_ElementIndex    element index to read from
+   \param[in]  ou32_NodeIndex       node index to read from
+   \param[in]  ou8_DataPoolIndex    data pool to read from
+   \param[in]  ou16_ListIndex       list index to read from
+   \param[in]  ou16_ElementIndex    element index to read from
 
    \return
    C_RANGE   node index out of range
@@ -687,10 +687,10 @@ sint32 C_SyvComDriverDiag::PollDataPoolRead(const uint32 ou32_NodeIndex, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start thread for polled writing to data pool
 
-   \param[in]   ou32_NodeIndex       node index to write from
-   \param[in]   ou8_DataPoolIndex    data pool to write from
-   \param[in]   ou16_ListIndex       list index to write from
-   \param[in]   ou16_ElementIndex    element index to write from
+   \param[in]  ou32_NodeIndex       node index to write from
+   \param[in]  ou8_DataPoolIndex    data pool to write from
+   \param[in]  ou16_ListIndex       list index to write from
+   \param[in]  ou16_ElementIndex    element index to write from
 
    \return
    C_RANGE   node index out of range
@@ -718,10 +718,10 @@ sint32 C_SyvComDriverDiag::PollDataPoolWrite(const uint32 ou32_NodeIndex, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start thread for polled reading from data pool
 
-   \param[in]   ou32_NodeIndex       node index to read from
-   \param[in]   ou8_DataPoolIndex    data pool to read from
-   \param[in]   ou16_ListIndex       list index to read from
-   \param[in]   ou16_ElementIndex    element index to read from
+   \param[in]  ou32_NodeIndex       node index to read from
+   \param[in]  ou8_DataPoolIndex    data pool to read from
+   \param[in]  ou16_ListIndex       list index to read from
+   \param[in]  ou16_ElementIndex    element index to read from
 
    \return
    C_RANGE   node index out of range
@@ -749,10 +749,10 @@ sint32 C_SyvComDriverDiag::PollNvmRead(const uint32 ou32_NodeIndex, const uint8 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start thread for polled writing to data pool
 
-   \param[in]   ou32_NodeIndex       node index to write from
-   \param[in]   ou8_DataPoolIndex    data pool to write from
-   \param[in]   ou16_ListIndex       list index to write from
-   \param[in]   ou16_ElementIndex    element index to write from
+   \param[in]  ou32_NodeIndex       node index to write from
+   \param[in]  ou8_DataPoolIndex    data pool to write from
+   \param[in]  ou16_ListIndex       list index to write from
+   \param[in]  ou16_ElementIndex    element index to write from
 
    \return
    C_RANGE   node index out of range
@@ -780,9 +780,9 @@ sint32 C_SyvComDriverDiag::PollNvmWrite(const uint32 ou32_NodeIndex, const uint8
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start thread for polled reading a list from data pool
 
-   \param[in]   ou32_NodeIndex       node index to read from
-   \param[in]   ou8_DataPoolIndex    data pool to read from
-   \param[in]   ou16_ListIndex       list index to read from
+   \param[in]  ou32_NodeIndex       node index to read from
+   \param[in]  ou8_DataPoolIndex    data pool to read from
+   \param[in]  ou16_ListIndex       list index to read from
 
    \return
    C_RANGE   node index out of range
@@ -811,8 +811,8 @@ sint32 C_SyvComDriverDiag::PollNvmReadList(const uint32 ou32_NodeIndex, const ui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start thread for polled writing changed NVM elements to data pool
 
-   \param[in] ou32_NodeIndex Node index to write to
-   \param[in] orc_ListIds    Lists to update CRC only
+   \param[in]  ou32_NodeIndex    Node index to write to
+   \param[in]  orc_ListIds       Lists to update CRC only
 
    \return
    C_RANGE   node index out of range
@@ -839,7 +839,7 @@ sint32 C_SyvComDriverDiag::PollSafeNvmWriteChangedElements(const uint32 ou32_Nod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the output of PollSafeNvmWriteChangedElements
 
-   \param[out]    orc_ChangedElements       All changed elements
+   \param[out]  orc_ChangedElements    All changed elements
 
    \return
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
@@ -856,7 +856,7 @@ sint32 C_SyvComDriverDiag::GetPollSafeNvmWriteChangedElementsOutput(
 
    PollSafeNvmWriteChangedElements must be called before calling PollSafeNvmReadValues
 
-   \param[in]   ou32_NodeIndex       node index to read from
+   \param[in]  ou32_NodeIndex    node index to read from
 
    \return
    C_RANGE   node index out of range
@@ -884,7 +884,7 @@ sint32 C_SyvComDriverDiag::PollSafeNvmReadValues(const uint32 ou32_NodeIndex)
 
    Must be called after the thread was finished after calling NvmSafeReadValues
 
-   \param[out]    orpc_ParamNodeValues  Pointer to node with read values
+   \param[out]  orpc_ParamNodeValues   Pointer to node with read values
 
    \return
    C_NO_ERR   result returned
@@ -901,7 +901,7 @@ sint32 C_SyvComDriverDiag::GetPollNvmSafeReadValuesOutput(const C_OSCNode * & or
 
    PollSafeNvmWriteChangedElements must be called before calling PollSafeNvmReadValues
 
-   \param[in]   ou32_NodeIndex       node index to read from
+   \param[in]  ou32_NodeIndex    node index to read from
 
    \return
    C_RANGE   node index out of range
@@ -929,9 +929,9 @@ sint32 C_SyvComDriverDiag::PollSafeNvmSafeWriteCrcs(const uint32 ou32_NodeIndex)
 
    PollSafeNvmWriteChangedElements must be called before calling PollSafeNvmReadValues
 
-   \param[in]   ou32_NodeIndex       node index to read from
-   \param[in]   ou8_DataPoolIndex    data pool to read from
-   \param[in]   ou16_ListIndex       list index to read from
+   \param[in]  ou32_NodeIndex       node index to read from
+   \param[in]  ou8_DataPoolIndex    data pool to read from
+   \param[in]  ou16_ListIndex       list index to read from
 
    \return
    C_RANGE   node index out of range
@@ -959,8 +959,8 @@ sint32 C_SyvComDriverDiag::PollNvmNotifyOfChanges(const uint32 ou32_NodeIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Gets the output of PollSafeNvmWriteChangedElements
 
-   \param[out] orq_ApplicationAcknowledge  true: positive acknowledge from server
-                                           false: negative acknowledge from server
+   \param[out]  orq_ApplicationAcknowledge   true: positive acknowledge from server
+                                             false: negative acknowledge from server
 
    \return
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
@@ -976,8 +976,8 @@ sint32 C_SyvComDriverDiag::GetPollNvmNotifyOfChangesOutput(bool & orq_Applicatio
 
    Can be used to extract the results of one service execution after it has finished.
 
-   \param[out]  ors32_Result       result code of executed service function
-                                   for possible values see the DataDealer's function documentation
+   \param[out]  ors32_Result  result code of executed service function
+                              for possible values see the DataDealer's function documentation
 
    \return
    C_NO_ERR   result code read
@@ -994,8 +994,8 @@ sint32 C_SyvComDriverDiag::GetPollResults(sint32 & ors32_Result) const
 
    Can be used to extract the results of one service execution after it has finished.
 
-   \param[out]  oru8_NRC       negative response code of executed service function
-                               for possible values see the DataDealer's function documentation
+   \param[out]  oru8_NRC   negative response code of executed service function
+                           for possible values see the DataDealer's function documentation
 
    \return
    C_NO_ERR       result code read
@@ -1010,7 +1010,7 @@ sint32 C_SyvComDriverDiag::GetPollResultNRC(uint8 & oru8_NRC) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Wrapping call of h_NvmSafeClearInternalContent
 
-   \param[in] ou32_NodeIndex     Index of node
+   \param[in]  ou32_NodeIndex    Index of node
 
    \return
    C_NO_ERR  started polling
@@ -1045,8 +1045,8 @@ sint32 C_SyvComDriverDiag::NvmSafeClearInternalContent(const uint32 ou32_NodeInd
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Start thread for polled reading of NVM values for creating parameter set file
 
-   \param[in] ou32_NodeIndex     Index of node
-   \param[in] orc_ListIds        Container will relevant list IDs
+   \param[in]  ou32_NodeIndex    Index of node
+   \param[in]  orc_ListIds       Container will relevant list IDs
 
    \return
    C_NO_ERR  started polling
@@ -1075,9 +1075,9 @@ sint32 C_SyvComDriverDiag::PollNvmSafeReadParameterValues(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Wrapping call of h_NvmSafeCreateCleanFileWithoutCRC
 
-   \param[in] ou32_NodeIndex Node index to work with
-   \param[in] orc_FilePath   Parameter file path
-   \param[in] orc_FileInfo   Optional general file information
+   \param[in]  ou32_NodeIndex    Node index to work with
+   \param[in]  orc_Path          Parameter file path
+   \param[in]  orc_FileInfo      Optional general file information
 
    \return
    C_NO_ERR   data saved
@@ -1121,8 +1121,8 @@ const
 
    Warning: CRC is not checked
 
-   \param[in] ou32_NodeIndex Node index to work with
-   \param[in] orc_FilePath   Parameter file path
+   \param[in]  ou32_NodeIndex    Node index to work with
+   \param[in]  orc_Path          Parameter file path
 
    \return
    C_NO_ERR   data read
@@ -1161,9 +1161,9 @@ sint32 C_SyvComDriverDiag::NvmSafeReadFileWithoutCRC(const uint32 ou32_NodeIndex
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Wrapping call of NvmSafeCheckParameterFileContents
 
-   \param[in]  ou32_NodeIndex    node index to read from
-   \param[in]  orc_Path          File path
-   \param[out] orc_DataPoolLists Loaded data pool lists (Always cleared at start)
+   \param[in]   ou32_NodeIndex      node index to read from
+   \param[in]   orc_Path            File path
+   \param[out]  orc_DataPoolLists   Loaded data pool lists (Always cleared at start)
 
    \return
    C_NO_ERR   Lists valid
@@ -1196,8 +1196,8 @@ sint32 C_SyvComDriverDiag::NvmSafeCheckParameterFileContents(const uint32 ou32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Wrapping call of h_NvmSafeUpdateCRCForFile
 
-   \param[in] ou32_NodeIndex Node index to work with
-   \param[in] orc_FilePath   Parameter file path
+   \param[in]  ou32_NodeIndex    Node index to work with
+   \param[in]  orc_Path          Parameter file path
 
    \return
    C_NO_ERR   CRC updated
@@ -1248,7 +1248,7 @@ const std::vector<C_SyvComDataDealer *> & C_SyvComDriverDiag::GetAllDataDealer(v
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a widget to inform about new datapool com signal events
 
-   \param[in]     opc_Widget     Pointer to dashboard widget base
+   \param[in]  opc_Widget  Pointer to dashboard widget base
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_Widget)
@@ -1351,7 +1351,7 @@ void C_SyvComDriverDiag::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the information about the routing configuration
 
-   \param[out]    ore_Mode       Needed routing mode
+   \param[out]  ore_Mode   Needed routing mode
 
    \return
    true     Routing is necessary
@@ -1380,7 +1380,7 @@ uint8 C_SyvComDriverDiag::m_GetRoutingSessionId(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the routing for a not openSYDE server is necessary
 
-   \param[in]     orc_Node                             Current node
+   \param[in]  orc_Node    Current node
 
    \return
    true    Specific server and legacy routing necessary
@@ -1402,11 +1402,11 @@ bool C_SyvComDriverDiag::m_IsRoutingSpecificNecessary(const C_OSCNode & orc_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepares the routing for a KEFEX server
 
-   \param[in]     ou32_ActiveNode                      Active node index of vector mc_ActiveNodes
-   \param[in]     opc_Node                             Pointer to current node
-   \param[in]     orc_LastNodeOfRouting                The last node in the routing chain before the final target server
-   \param[in]     opc_ProtocolOsyOfLastNodeOfRouting   The protocol of the last node
-   \param[out]    oppc_RoutingDispatcher               The legacy routing dispatcher
+   \param[in]   ou32_ActiveNode                       Active node index of vector mc_ActiveNodes
+   \param[in]   opc_Node                              Pointer to current node
+   \param[in]   orc_LastNodeOfRouting                 The last node in the routing chain before the final target server
+   \param[in]   opc_ProtocolOsyOfLastNodeOfRouting    The protocol of the last node
+   \param[out]  oppc_RoutingDispatcher                The legacy routing dispatcher
 
    \return
    C_NO_ERR    Specific server necessary and legacy routing dispatcher created
@@ -1454,7 +1454,7 @@ sint32 C_SyvComDriverDiag::m_StartRoutingSpecific(const uint32 ou32_ActiveNode, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Stops the specific routing configuration for one specific node
 
-   \param[in]     ou32_ActiveNode                      Active node index of vector mc_ActiveNodes
+   \param[in]  ou32_ActiveNode   Active node index of vector mc_ActiveNodes
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
@@ -1482,7 +1482,7 @@ void C_SyvComDriverDiag::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
 
    In this case diagnostic and update functionality
 
-   \param[in]     orc_ComItfSettings         Interface configuration
+   \param[in]  orc_ComItfSettings   Interface configuration
 
    \return
    true     Interface has relevant functions activated and is connected
@@ -1506,8 +1506,8 @@ bool C_SyvComDriverDiag::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfac
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Distributes the CAN message to all registered C_OSCDataDealer for all relevant Datapool comm signals
 
-   \param[in]     orc_Msg        Current CAN message
-   \param[in]     oq_IsTx        Message was sent by C_OSCComDriverBase itself
+   \param[in]  orc_Msg  Current CAN message
+   \param[in]  oq_IsTx  Message was sent by C_OSCComDriverBase itself
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::m_HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx)
@@ -1617,8 +1617,6 @@ void C_SyvComDriverDiag::m_HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, con
 /*! \brief   Default constructor
 
    Initialize all members based on view
-
-   \param[in] ou32_ViewIndex View index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvComDriverDiag::C_SyvComDriverDiagWidgetRegistration::C_SyvComDriverDiagWidgetRegistration(void) :
@@ -1631,7 +1629,7 @@ C_SyvComDriverDiag::C_SyvComDriverDiagWidgetRegistration::C_SyvComDriverDiagWidg
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current equal to orc_Cmp
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current equal to orc_Cmp
@@ -1866,8 +1864,8 @@ sint32 C_SyvComDriverDiag::m_InitDataDealer(void)
    - legacy routing for a KEFEX server
    - legacy routing for a KEFEX server after openSYDE routing to a openSYDE server
 
-   \param[in]  orc_ErrorDetails        Details for current error
-   \param[out] orc_ErrorActiveNodes    All active node indexes of nodes which can not be reached
+   \param[in]   orc_ErrorDetails       Details for current error
+   \param[out]  orc_ErrorActiveNodes   All active node indexes of nodes which can not be reached
 
    \return
    C_NO_ERR Operation success
@@ -1952,7 +1950,7 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
 
    Calling the verify function to start all diag servers.
 
-   \param[in,out] orc_ErrorDetails     Details for current error
+   \param[in,out]  orc_ErrorDetails    Details for current error
 
    \return
    C_NO_ERR   request sent, positive response received
@@ -2065,7 +2063,9 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
 
    Each Datapool will be checked for matching name, version and CRC
 
-   \param[in,out] orc_ErrorDetails     Details for current error
+   \param[in]      opc_Node            Node
+   \param[in,out]  opc_Protocol        Protocol
+   \param[in,out]  orc_ErrorDetails    Details for current error
 
    \return
    C_NO_ERR   Datapools are as expected
@@ -2321,8 +2321,8 @@ void C_SyvComDriverDiag::m_HandlePollingFinished(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get node name for active node index
 
-   \param[in] ou32_ViewIndex       View index (identifier)
-   \param[in] ou32_ActiveNodeIndex Active node index (depending on number of active nodes)
+   \param[in]  ou32_ViewIndex          View index (identifier)
+   \param[in]  ou32_ActiveNodeIndex    Active node index (depending on number of active nodes)
 
    \return
    Node name if any found

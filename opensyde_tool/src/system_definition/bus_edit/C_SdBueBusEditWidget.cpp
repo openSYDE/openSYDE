@@ -11,8 +11,8 @@
 #include "precomp_headers.h"
 
 #include "constants.h"
+#include "stwerrors.h"
 #include "C_SdBueBusEditWidget.h"
-
 #include "ui_C_SdBueBusEditWidget.h"
 
 #include "C_PuiSdHandler.h"
@@ -22,6 +22,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
+using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
@@ -44,7 +45,7 @@ using namespace stw_opensyde_gui_logic;
 
    \param[in]     ou32_BusIndex     Bus index
    \param[in]     osn_TabIndex      Tab index to show
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sintn osn_TabIndex,
@@ -127,6 +128,15 @@ void C_SdBueBusEditWidget::InitStaticNames(void) const
 sintn C_SdBueBusEditWidget::GetTabIndex(void) const
 {
    return this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Forward call to import messages from DBC, EDS or DCF file to this bus.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueBusEditWidget::ImportMessages(void) const
+{
+   this->mpc_Ui->pc_WidgetComIfDescr->ImportMessages();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

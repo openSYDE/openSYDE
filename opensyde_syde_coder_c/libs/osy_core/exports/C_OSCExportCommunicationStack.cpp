@@ -72,7 +72,7 @@ C_SCLString C_OSCExportCommunicationStack::h_GetFileName(const uint8 ou8_Interfa
                                                          const C_OSCCanProtocol::E_Type & ore_ProtocolType)
 {
    // assemble filename
-   // add data pool name + protocol name + node index
+   // add Datapool name + protocol name + node index
    const C_SCLString c_Text = "comm_" + mh_GetProtocolNameByType(ore_ProtocolType).LowerCase() + "_can" +
                               C_SCLString::IntToStr(ou8_InterfaceIndex + 1L);
 
@@ -100,6 +100,40 @@ C_SCLString C_OSCExportCommunicationStack::h_GetConfigurationName(const uint8 ou
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert overall code structure version to process data communication code subversion.
+
+   The overall code generation version decodes the format versions of parametrization (*_datapool.c/.h files)
+   and process data communication code (comm_*.c/.h files).
+
+   \param[in]       ou16_GenCodeVersion     Overall code format version
+
+   \return version of parametrization code
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint16 C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(const uint16 ou16_GenCodeVersion)
+{
+   uint16 u16_Return = ou16_GenCodeVersion;
+
+   switch (ou16_GenCodeVersion)
+   {
+   case 1:
+   case 2:
+   case 3:
+      u16_Return = ou16_GenCodeVersion;
+      break;
+   case 4:
+      u16_Return = ou16_GenCodeVersion - 1; // -1 because of no changes from version 3 to 4
+      break;
+   default:
+      // should never occur...
+      tgl_assert(false);
+      break;
+   }
+
+   return u16_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create source files
 
    The caller must provide a valid path and node configuration.
@@ -114,8 +148,9 @@ C_SCLString C_OSCExportCommunicationStack::h_GetConfigurationName(const uint8 ou
 
    \return
    C_NO_ERR    Operation success
+   C_NOACT     Application is not of type ePROGRAMMABLE_APPLICATION or has unknown code structure version
    C_RD_WR     Operation failure: cannot store files
-   C_CONFIG    Protocol or data pool not available in node for interface or application index out of range
+   C_CONFIG    Protocol or Datapool not available in node for interface or application index out of range
    C_RANGE     Application index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -127,8 +162,6 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
                                                          const C_SCLString & orc_ExportToolInfo)
 {
    sint32 s32_Retval = C_NO_ERR;
-   const C_OSCCanProtocol * const pc_ComProtocol = orc_Node.GetCANProtocolConst(ore_Protocol, ou32_DatapoolIndex);
-   const C_OSCNodeDataPool * const pc_DataPool = orc_Node.GetComDataPoolConst(ore_Protocol, ou32_DatapoolIndex);
    C_OSCNodeApplication c_Application;
 
    if (ou16_ApplicationIndex < orc_Node.c_Applications.size())
@@ -140,31 +173,47 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
       s32_Retval = C_RANGE;
    }
 
-   if ((s32_Retval == C_NO_ERR) && (pc_ComProtocol != NULL) && (pc_DataPool != NULL))
+   if (s32_Retval == C_NO_ERR)
    {
-      uint32 u32_HashValue = 0U;
-      //calculate hash value over the current state of the data pool and protocol definitions
-      pc_ComProtocol->CalcHash(u32_HashValue);
-      pc_DataPool->CalcHash(u32_HashValue);
-      const C_SCLString c_ProjectId = C_SCLString::IntToStr(u32_HashValue);
-
-      // create header file
-      s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, c_Application, *pc_ComProtocol, ou8_InterfaceIndex,
-                                       c_ProjectId);
-
-      // create implementation file
-      if (s32_Retval == C_NO_ERR)
+      // make sure version is known and application is programmable
+      if ((c_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION) ||
+          (c_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION))
       {
-         s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, c_Application, *pc_ComProtocol,
-                                                  *pc_DataPool, ou8_InterfaceIndex, c_ProjectId);
+         s32_Retval = C_NOACT;
       }
    }
-   else
+
+   if (s32_Retval == C_NO_ERR)
    {
-      osc_write_log_error("Creating source code",
-                          "Protocol definition or data pool does not exist for specified communication protocol" +
-                          mh_GetProtocolNameByType(ore_Protocol));
-      s32_Retval = C_CONFIG;
+      const C_OSCCanProtocol * const pc_ComProtocol = orc_Node.GetCANProtocolConst(ore_Protocol, ou32_DatapoolIndex);
+      const C_OSCNodeDataPool * const pc_DataPool = orc_Node.GetComDataPoolConst(ore_Protocol, ou32_DatapoolIndex);
+
+      if ((pc_ComProtocol != NULL) && (pc_DataPool != NULL))
+      {
+         uint32 u32_HashValue = 0U;
+         //calculate hash value over the current state of the Datapool and protocol definitions
+         pc_ComProtocol->CalcHash(u32_HashValue);
+         pc_DataPool->CalcHash(u32_HashValue);
+         const C_SCLString c_ProjectId = C_SCLString::IntToStr(u32_HashValue);
+
+         // create header file
+         s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, c_Application, *pc_ComProtocol,
+                                          ou8_InterfaceIndex, c_ProjectId);
+
+         // create implementation file
+         if (s32_Retval == C_NO_ERR)
+         {
+            s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, c_Application, *pc_ComProtocol,
+                                                     *pc_DataPool, ou8_InterfaceIndex, c_ProjectId);
+         }
+      }
+      else
+      {
+         osc_write_log_error("Creating source code",
+                             "Protocol definition or Datapool does not exist for specified communication protocol" +
+                             mh_GetProtocolNameByType(ore_Protocol));
+         s32_Retval = C_CONFIG;
+      }
    }
 
    return s32_Retval;
@@ -253,14 +302,14 @@ sint32 C_OSCExportCommunicationStack::mh_CreateHeaderFile(const C_SCLString & or
    \param[in] orc_Path                 storage path for created file
    \param[in] orc_Applicaton           application data
    \param[in] orc_ComProtocol          communication protocol configuration
-   \param[in] orc_DataPool             data pool configuration
+   \param[in] orc_DataPool             Datapool configuration
    \param[in] ou8_InterfaceIndex       index of CAN interface
    \param[in] orc_ProjectId            project id for consistency check
 
    \return
    C_NO_ERR    Operation success
    C_RD_WR     Operation failure: cannot store file
-   C_CONFIG    data pool not available for interface
+   C_CONFIG    Datapool not available for interface
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportCommunicationStack::mh_CreateImplementationFile(const C_SCLString & orc_ExportToolInfo,
@@ -322,7 +371,7 @@ sint32 C_OSCExportCommunicationStack::mh_CreateImplementationFile(const C_SCLStr
    else
    {
       osc_write_log_error("Creating source code",
-                          "Data pool does not exist for specified communication protocol" +
+                          "Datapool does not exist for specified communication protocol" +
                           mh_GetProtocolNameByType(orc_ComProtocol.e_Type) + " with interface index " +
                           C_SCLString::IntToStr(ou8_InterfaceIndex));
       s32_Retval = C_CONFIG;
@@ -383,7 +432,7 @@ void C_OSCExportCommunicationStack::mh_AddHeader(const C_SCLString & orc_ExportT
 /*! \brief   Add includes into C file
 
    \param[in,out] orc_Data             converted data to string list
-   \param[in]     orc_DataPoolName     name of data pool
+   \param[in]     orc_DataPoolName     name of Datapool
    \param[in]     ou8_InterfaceIndex   index of interface
    \param[in]     ore_Protocol         protocol type (CL2, ECeS, ECoS)
    \param[in]     oq_NullRequired      true: definition of NULL required in .c file
@@ -473,7 +522,7 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
                       C_SCLString::IntToStr(orc_ComMessage.c_RxMessages.size()) + "U)");
       orc_Data.Append("");
 
-      if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+      if (ou16_GenCodeVersion >= 2U)
       {
          bool q_CommentAdded = false;
          // TX MUX messages
@@ -553,11 +602,13 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
    }
    else
    {
-      if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+      if (ou16_GenCodeVersion >= 2U)
       {
          orc_Data.Append("///check for correct version of structure definitions");
-         orc_Data.Append("#if OSY_COM_CONFIG_DEFINITION_VERSION != 0x000" +
-                         C_SCLString::IntToStr(ou16_GenCodeVersion) + "U");
+         orc_Data.Append(
+            "#if OSY_COM_CONFIG_DEFINITION_VERSION != 0x000" +
+            C_SCLString::IntToStr(static_cast<sint32>(C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(
+                                                         ou16_GenCodeVersion))) + "U");
          orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
                          "generated code");
          orc_Data.Append("static T_osy_non_existing_type_" + orc_ProjectId + " mt_Variable;");
@@ -605,8 +656,8 @@ void C_OSCExportCommunicationStack::mh_AddFunctionPrototypes(C_SCLStringList & o
    \param[in]     ou8_InterfaceIndex    index of interface
    \param[in]     ore_Protocol          protocol type (CL2, ECeS, ECoS)
    \param[in]     ou16_GenCodeVersion   version of structure (generate code as specified for this version)
-   \param[in]     ou32_TxListIndex      data pool list index for Tx messages
-   \param[in]     ou32_RxListIndex      data pool list index for Rx messages
+   \param[in]     ou32_TxListIndex      Datapool list index for Tx messages
+   \param[in]     ou32_RxListIndex      Datapool list index for Rx messages
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Data, const bool oq_SafeData,
@@ -622,7 +673,7 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
    if (oq_SafeData == true)
    {
       //status data needs to be placed in safe memory as the driver deals with safety relevant data
-      if (ou16_GenCodeVersion == 3U)
+      if (ou16_GenCodeVersion >= 3U)
       {
          c_SafeRamData = "OSY_DPA_SAFE_RAM_DATA_PRIVATE_ZERO ";
       }
@@ -639,7 +690,7 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
    // TX messages
    if (orc_ComMessage.c_TxMessages.size() > 0)
    {
-      if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+      if (ou16_GenCodeVersion >= 2U)
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_status mat_StatusTx[COMM_" +
                          c_ProtocolName + "_CAN" +
@@ -656,7 +707,7 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
    // RX messages
    if (orc_ComMessage.c_RxMessages.size() > 0)
    {
-      if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+      if (ou16_GenCodeVersion >= 2U)
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_status mat_StatusRx[COMM_" +
                          c_ProtocolName + "_CAN" +
@@ -671,7 +722,7 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
    }
 
    // mux messages (since V2)
-   if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+   if (ou16_GenCodeVersion >= 2U)
    {
       orc_Data.Append("");
       orc_Data.Append("///mux status");
@@ -706,7 +757,7 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
    if (orc_ComMessage.c_TxMessages.size() > 0)
    {
       orc_Data.Append("///Tx message definitions");
-      if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+      if (ou16_GenCodeVersion >= 2U)
       {
          // add message mux definitions (since V2)
          mh_AddMessageMuxDefinitions(orc_Data, orc_ComMessage.c_TxMessages, "Tx");
@@ -718,7 +769,7 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
    if (orc_ComMessage.c_RxMessages.size() > 0)
    {
       orc_Data.Append("///Rx message definitions");
-      if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+      if (ou16_GenCodeVersion >= 2U)
       {
          // add message mux definitions (since V2)
          mh_AddMessageMuxDefinitions(orc_Data, orc_ComMessage.c_RxMessages, "Rx");
@@ -736,7 +787,7 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
 /*! \brief   Add global variables
 
    \param[in,out] orc_Data              converted data to string list
-   \param[in]     orc_DataPoolName      name of data pool
+   \param[in]     orc_DataPoolName      name of Datapool
    \param[in]     orc_ComMessage        communication protocol message definition
    \param[in]     ou8_InterfaceIndex    index of interface
    \param[in]     ore_Protocol          protocol type (CL2, ECeS, ECoS)
@@ -804,7 +855,7 @@ void C_OSCExportCommunicationStack::mh_AddCGlobalVariables(C_SCLStringList & orc
       orc_Data.Append("      NULL,  ///< status of RX messages (none defined)");
    }
    orc_Data.Append("      &gt_" + orc_DataPoolName +
-                   "_DataPool  ///< data pool containing signal values");
+                   "_DataPool  ///< Datapool containing signal values");
    orc_Data.Append("   },");
    orc_Data.Append("   OSY_COM_" + c_ProtocolName + "_DRIVER  ///< pointer to protocol specific driver");
    orc_Data.Append("};");
@@ -815,7 +866,7 @@ void C_OSCExportCommunicationStack::mh_AddCGlobalVariables(C_SCLStringList & orc
 /*! \brief   Add signal definition section to C file
 
    \param[in,out]  orc_Data               list of strings to add to
-   \param[in]      ou32_SignalListIndex   index of data pool list containing signals
+   \param[in]      ou32_SignalListIndex   index of Datapool list containing signals
    \param[in]      orc_Messages           definition of messages
    \param[in]      ou16_GenCodeVersion    version of structure (generate code as specified for this version)
 
@@ -831,7 +882,7 @@ void C_OSCExportCommunicationStack::mh_AddSignalDefinitions(C_SCLStringList & or
       bool q_AddNonMux = false;
       const C_OSCCanMessage & rc_Message = orc_Messages[u16_MessageIndex];
 
-      if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+      if (ou16_GenCodeVersion >= 2U)
       {
          // check for mux messages
          uint32 u32_MultiplexerIndex;
@@ -1035,8 +1086,8 @@ void C_OSCExportCommunicationStack::mh_AddMessageDefinitions(C_SCLStringList & o
          C_SCLString::IntToStr(rc_Message.q_IsExtended) + "U, " +                                   // extended flag
          C_SCLString::IntToStr(u16_Dlc) + "U, " + c_Trigger + ", ";                                 // DLC
 
-      // order of entries is a bit different for V1 und V2
-      if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+      // order of entries changed a bit since V2
+      if (ou16_GenCodeVersion >= 2U)
       {
          c_Text +=  C_SCLString::IntToStr(u32_MessageCounterGap) + "U, "; //message counter gap
       }
@@ -1057,8 +1108,8 @@ void C_OSCExportCommunicationStack::mh_AddMessageDefinitions(C_SCLStringList & o
          c_Text += C_SCLString::IntToStr(rc_Message.u32_TimeoutMs) + "U, ";
       }
 
-      // order of entries is a bit different for V1 und V2
-      if ((ou16_GenCodeVersion == 2U) || (ou16_GenCodeVersion == 3U))
+      // order of entries changed a bit since V2
+      if (ou16_GenCodeVersion >= 2U)
       {
          std::set<uint16> c_MultiplexerValues;
          rc_Message.GetMultiplexerValues(c_MultiplexerValues);
@@ -1298,7 +1349,7 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetTransmissionTriggerNameByType(
 
    \param[in,out] orc_Data               converted data to string list
    \param[in]     orc_Signals            list of signals for creating signal declarations for
-   \param[in]     ou32_SignalListIndex   index of data pool list containing signals
+   \param[in]     ou32_SignalListIndex   index of Datapool list containing signals
    \param[in]     oq_RemoveLastComma     flag to handle comma (very last signals string should not end on comma)
 */
 //----------------------------------------------------------------------------------------------------------------------

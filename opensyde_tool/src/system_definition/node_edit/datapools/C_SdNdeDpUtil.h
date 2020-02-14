@@ -130,8 +130,6 @@ public:
 
 private:
    C_SdNdeDpUtil();
-
-   static void mh_ApplyStyleSheet(QWidget * const opc_Widget, const QFont & orc_Font, const QColor & orc_Color);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

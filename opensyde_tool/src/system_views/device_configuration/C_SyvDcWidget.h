@@ -111,7 +111,7 @@ private:
                                     const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
                                     const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
                                     QString & orc_Text, const bool q_BusConnected, const bool q_Configured);
-   void m_ResetFlashloader(const bool oq_SameBitrate);
+   void m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate);
    stw_types::sint32 m_GetRelevantConfigInfo(
       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_StwIds, stw_types::uint32 & oru32_Bitrate);

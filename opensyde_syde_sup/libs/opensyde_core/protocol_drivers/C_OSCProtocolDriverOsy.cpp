@@ -50,6 +50,8 @@ using namespace stw_scl;
 C_OSCProtocolDriverOsy::C_OSCProtocolDriverOsy(void) :
    mpr_OnOsyTunnelCanMessageReceived(NULL),
    mpv_OnAsyncTunnelCanMessageInstance(NULL),
+   mpr_OnOsyWaitTime(NULL),
+   mpv_OnOsyWaitTimeInstance(NULL),
    mpc_TransportProtocol(NULL),
    //lint -e{1938}  //constant is initialized as it's in the same translation unit
    mu32_TimeoutPollingMs(hu32_DEFAULT_TIMEOUT),
@@ -65,6 +67,8 @@ C_OSCProtocolDriverOsy::~C_OSCProtocolDriverOsy(void)
 {
    mpc_TransportProtocol = NULL;
    mpv_OnAsyncTunnelCanMessageInstance = NULL;
+   mpr_OnOsyWaitTime = NULL;
+   mpv_OnOsyWaitTimeInstance = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -118,6 +122,21 @@ void C_OSCProtocolDriverOsy::InitializeTunnelCanMessage(
 {
    this->mpr_OnOsyTunnelCanMessageReceived = opr_OsyTunnelCanMessageReceived;
    this->mpv_OnAsyncTunnelCanMessageInstance = opv_Instance;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialization of the handling of long waiting times for services with high timeout times
+
+   \param[in]  opr_OsyHandleWaitTime               function to be called if a service has a long waiting time for the
+                                                   response
+   \param[in]  opv_Instance                        instance pointer to pass back when invoking read event callback
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCProtocolDriverOsy::InitializeHandleWaitTime(
+   const C_OSCProtocolDriverOsy::PR_OsyHandleWaitTime opr_OsyHandleWaitTime, void * const opv_Instance)
+{
+   this->mpr_OnOsyWaitTime = opr_OsyHandleWaitTime;
+   this->mpv_OnOsyWaitTimeInstance = opv_Instance;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -212,11 +231,12 @@ void C_OSCProtocolDriverOsy::m_LogServiceError(const C_SCLString & orc_Service, 
 {
    if (os32_ReturnCode != C_NO_ERR)
    {
-      C_SCLString c_ErrorText;
+      bool q_IsHardError; //we want to log error responses just as "warnings"
 
-      c_ErrorText = C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(os32_ReturnCode, ou8_NrCode);
+      const C_SCLString c_ErrorText =
+         C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(os32_ReturnCode, ou8_NrCode, &q_IsHardError);
       m_LogErrorWithHeader("openSYDE protocol driver", "Service " + orc_Service + " failed. Error: " + c_ErrorText,
-                           TGL_UTIL_FUNC_ID);
+                           TGL_UTIL_FUNC_ID, q_IsHardError);
    }
 }
 
@@ -228,7 +248,7 @@ void C_OSCProtocolDriverOsy::m_LogServiceError(const C_SCLString & orc_Service, 
 
    Option:
    If a non event-driven response with service ID "ou8_ExpectedServiceId" is
-    received the function will return, otherwise it will continue to read all incoming responses from the RX queue.
+    received the function will return, otherwise it will continue to read all incoming responses from the Rx queue.
 
    \param[in]   oq_CheckForSpecificServiceId    false: try to treat all responses as event-driven
                                                 true: return if a response to service ou8_ExpectedServiceId is received
@@ -239,7 +259,7 @@ void C_OSCProtocolDriverOsy::m_LogServiceError(const C_SCLString & orc_Service, 
    \return
    C_NO_ERR   if oq_CheckForSpecificServiceId is true: expected service response (positive or negative) received and
                                                        placed in orc_ReceivedService
-              if oq_CheckForSpecificServiceId is false: finished with handling RX queue
+              if oq_CheckForSpecificServiceId is false: finished with handling Rx queue
    C_WARN     if oq_CheckForSpecificServiceId is true: expected service not received
    C_CONFIG   no transport protocol or transport protocol returns error
    C_NOACT    nothing received
@@ -262,7 +282,7 @@ sint32 C_OSCProtocolDriverOsy::m_Cycle(const bool oq_CheckForSpecificServiceId, 
       {
          bool q_ExpectedServiceReceived = false;
          C_OSCProtocolDriverOsyService c_Service;
-         //handle all full services in RX queue:
+         //handle all full services in Rx queue:
          s32_Return = C_NO_ERR;
          while (s32_Return == C_NO_ERR)
          {
@@ -362,6 +382,7 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
 {
    sint32 s32_Return = C_NO_ERR;
    uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+   uint32 u32_LastWaitTimeHandled = u32_StartTime;
    uint16 u16_RxSize;
    bool q_Finished = false;
 
@@ -375,7 +396,7 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
 
    while (((stw_tgl::TGL_GetTickCount() - mu32_TimeoutPollingMs) < u32_StartTime) && (q_Finished == false))
    {
-      //trigger handling of RX and TX communication
+      //trigger handling of Rx and Tx communication
       s32_Return = this->m_Cycle(true, ou8_ExpectedServiceId, &orc_Service);
       if (s32_Return == C_NO_ERR)
       {
@@ -407,9 +428,20 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
                             orc_Service.c_Data[static_cast<uintn>(u32_Counter) + 3U])
                         {
                            q_Match = false;
-                           m_LogErrorWithHeader("Synchronous communication", "Sync negative response to expected service"
-                                                " but unexpected data bytes received. Ignoring.",
-                                                TGL_UTIL_FUNC_ID);
+                           //when starting cyclic calls we might interpret the first data transmission of the last call
+                           // as the response of the next cyclic service registration,
+                           // so we should not discard this message but instead handle the error accordingly
+                           if (orc_Service.c_Data[1] == mhu8_OSY_SI_READ_DATA_POOL_DATA_EVENT_DRIVEN)
+                           {
+                              //handle data error
+                              s32_Return = m_HandleAsyncResponse(orc_Service);
+                           }
+                           else
+                           {
+                              m_LogErrorWithHeader("Synchronous communication", "Sync negative response to expected service"
+                                                   " but unexpected data bytes received. Ignoring.",
+                                                   TGL_UTIL_FUNC_ID);
+                           }
                            break;
                         }
                      }
@@ -426,10 +458,12 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
                if (q_Match == true)
                {
                   // Matching error response found!
-                  // special handling for "responsePending": rewind RX timeout expectation
+                  // special handling for "responsePending": rewind Rx timeout expectation
                   if (orc_Service.c_Data[2] == hu8_NR_CODE_RESPONSE_PENDING)
                   {
                      u32_StartTime = stw_tgl::TGL_GetTickCount();
+                     // The response of the server resets the session timeouts
+                     u32_LastWaitTimeHandled = u32_StartTime;
                   }
                   else
                   {
@@ -485,7 +519,16 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
       }
       else
       {
-         // Nothing to do
+         // Handle long waiting time by registered function
+         if (this->mpr_OnOsyWaitTime != NULL)
+         {
+            const uint32 u32_CurrentTime = stw_tgl::TGL_GetTickCount();
+            if ((u32_CurrentTime - hu32_DEFAULT_HANDLE_WAIT_TIME) > u32_LastWaitTimeHandled)
+            {
+               this->mpr_OnOsyWaitTime(this->mpv_OnOsyWaitTimeInstance);
+               u32_LastWaitTimeHandled = u32_CurrentTime;
+            }
+         }
       }
 
       if (q_Finished == false)
@@ -525,7 +568,7 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong session ID)
@@ -593,7 +636,7 @@ sint32 C_OSCProtocolDriverOsy::OsyDiagnosticSessionControl(const uint8 ou8_Sessi
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -673,7 +716,7 @@ sint32 C_OSCProtocolDriverOsy::m_ReadDataByIdentifier(const uint16 ou16_Identifi
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -742,7 +785,7 @@ sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identif
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -784,7 +827,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -829,7 +872,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareNumber(uint32 & oru32_HardwareNumb
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -877,7 +920,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareVersionNumber(C_SCLString & orc_Ha
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -924,7 +967,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadListOfFeatures(C_ListOfFeatures & orc_List
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -969,7 +1012,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumberOfBlockLength(uint16 & oru16_MaxN
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1016,7 +1059,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDeviceName(C_SCLString & orc_DeviceName, s
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1063,7 +1106,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationName(C_SCLString & orc_Applicat
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1118,7 +1161,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationVersion(C_SCLString & orc_Appli
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID, or: number of modules is not 1)
@@ -1168,7 +1211,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadBootSoftwareIdentification(uint8 (&orau8_V
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
    C_COM      communication driver reported error
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1211,7 +1254,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadActiveDiagnosticSession(uint8 & oru8_Sessi
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1266,7 +1309,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationSoftwareFingerprint(uint8 (&ora
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1319,7 +1362,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteApplicationSoftwareFingerprint(const uint
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1363,7 +1406,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumOfEventDrivenTransmissions(uint16 & 
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1407,7 +1450,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadProtocolVersion(uint8 (&orau8_Version)[3],
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1448,7 +1491,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashloaderProtocolVersion(uint8 (&orau8_V
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1495,7 +1538,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashCount(uint32 & oru32_FlashCount, uint
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1599,7 +1642,7 @@ void C_OSCProtocolDriverOsy::m_UnpackDataPoolIdentifier(const uint8 (&orau8_Pack
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
    C_RANGE    data pool, list or element index out of range
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1699,7 +1742,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolData(const uint8 ou8_DataPoolIndex
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
    C_RANGE    data pool, list or element index out of range; length of data zero
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1797,7 +1840,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolData(const uint8 ou8_DataPoolInde
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1864,7 +1907,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolEventDataRate(const uint8 ou8_Tra
    \return
    C_NO_ERR   request sent
    C_RANGE    data pool, list, element index, rail index out of range; length of data zero
-   C_NOACT    could not put request in TX queue
+   C_NOACT    could not put request in Tx queue
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
@@ -1971,7 +2014,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataCyclic(const uint8 ou8_DataPoo
    \return
    C_NO_ERR   request sent
    C_RANGE    data pool, list, element index, rail index out of range; length of data zero
-   C_NOACT    could not put request in TX queue
+   C_NOACT    could not put request in Tx queue
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
@@ -2082,7 +2125,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataChangeDriven(const uint8 ou8_D
    \return
    C_NO_ERR   request sent
    C_RANGE    data pool, list, element index, rail index out of range; length of data zero
-   C_NOACT    could not put request in TX queue
+   C_NOACT    could not put request in Tx queue
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
@@ -2141,7 +2184,7 @@ sint32 C_OSCProtocolDriverOsy::OsyStopDataPoolEvents(uint8 * const opu8_NrCode)
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
@@ -2248,7 +2291,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolMetaData(const uint8 ou8_DataPoolI
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
@@ -2314,7 +2357,7 @@ sint32 C_OSCProtocolDriverOsy::OsyVerifyDataPool(const uint8 ou8_DataPoolIndex, 
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -2383,7 +2426,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetRouteDiagnosisCommunication(const uint8 ou8
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -2431,7 +2474,7 @@ sint32 C_OSCProtocolDriverOsy::OsyStopRouteDiagnosisCommunication(uint8 * const 
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -2510,7 +2553,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetRouteIp2IpCommunication(const uint8 ou8_Out
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -2566,7 +2609,7 @@ sint32 C_OSCProtocolDriverOsy::OsyCheckRouteIp2IpCommunication(uint8 & oru8_Stat
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
    C_RANGE    CAN message invalid (RTR bit set; ID out of range; DLC out of range)
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -2649,7 +2692,7 @@ sint32 C_OSCProtocolDriverOsy::OsySendCanMessage(const uint8 ou8_ChannelIndex,
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -2707,7 +2750,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetTunnelCanMessages(const uint8 ou8_CanChanne
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -2746,15 +2789,26 @@ sint32 C_OSCProtocolDriverOsy::OsyStopTunnelCanMessages(uint8 * const opu8_NrCod
    \param[in]     orc_Activity        Current activity
    \param[in]     orc_Information     text to log
    \param[in]     opcn_Function       Function name
+   \param[in]     oq_AsError          true: log as "ERROR"
+                                      false: log as "WARNING"
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::m_LogErrorWithHeader(const C_SCLString & orc_Activity,
                                                   const stw_scl::C_SCLString & orc_Information,
-                                                  const charn * const opcn_Function) const
+                                                  const charn * const opcn_Function, const bool oq_AsError) const
 {
-   C_OSCLoggingHandler::h_WriteLogError(
-      orc_Activity, "openSYDE protocol driver node " + C_SCLString::IntToStr(mc_ServerId.u8_BusIdentifier) + "." +
-      C_SCLString::IntToStr(mc_ServerId.u8_NodeIdentifier) + ": " + orc_Information, __FILE__, opcn_Function);
+   const C_SCLString c_LogText = "openSYDE protocol driver node " +
+                                 C_SCLString::IntToStr(mc_ServerId.u8_BusIdentifier) + "." +
+                                 C_SCLString::IntToStr(mc_ServerId.u8_NodeIdentifier) + ": " + orc_Information;
+
+   if (oq_AsError == true)
+   {
+      C_OSCLoggingHandler::h_WriteLogError(orc_Activity, c_LogText, __FILE__, opcn_Function);
+   }
+   else
+   {
+      C_OSCLoggingHandler::h_WriteLogWarning(orc_Activity, c_LogText, __FILE__, opcn_Function);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2838,8 +2892,8 @@ C_OSCProtocolDriverOsyTpBase * C_OSCProtocolDriverOsy::GetTransportProtocol(void
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get configured client and server identifiers
 
-   \param[our] orc_ClientId    client ID (= our own ID)
-   \param[our] orc_ServerId    server ID (= ID of server we communicate with)
+   \param[out] orc_ClientId    client ID (= our own ID)
+   \param[out] orc_ServerId    server ID (= ID of server we communicate with)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc_ClientId,
@@ -2856,7 +2910,7 @@ void C_OSCProtocolDriverOsy::GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc
    * Invoke transport protocol's "Cycle" function
    * Invoke virtual functions to report all incoming event driven responses.
      If a non event-driven response is received the function will return,
-     otherwise it will continue to read all incoming responses from the RX queue.
+     otherwise it will continue to read all incoming responses from the Rx queue.
    * Relinquish exclusive access to reception handling
 
    If reception is already in progress the function will return with no action.
@@ -2954,7 +3008,7 @@ void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventErrorReceived(const uint8
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -3016,7 +3070,7 @@ sint32 C_OSCProtocolDriverOsy::OsyCheckFlashMemoryAvailable(const uint32 ou32_St
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -3107,7 +3161,7 @@ sint32 C_OSCProtocolDriverOsy::m_RoutineControl(const uint16 ou16_RoutineIdentif
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -3164,7 +3218,7 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8 ou8_Secu
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -3221,7 +3275,7 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessSendKey(const uint8 ou8_Security
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -3602,7 +3656,7 @@ void C_OSCProtocolDriverOsy::mh_ConvertVariableToNecessaryBytes(const uint32 ou3
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: incorrect response length)
@@ -3710,7 +3764,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestDownload(const uint32 ou32_StartAddress
    C_NO_ERR   request sent, positive response received
    C_RANGE    file path too long (theoretical maximum: 0xFFFF characters)
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response
@@ -3824,7 +3878,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestFileTransfer(const C_SCLString & orc_Fi
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -3908,7 +3962,7 @@ sint32 C_OSCProtocolDriverOsy::OsyTransferData(const uint8 ou8_BlockSequenceCoun
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_COM      communication driver reported error
@@ -3996,7 +4050,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestTransferExitAddressBased(const bool oq_
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_COM      communication driver reported error
@@ -4077,7 +4131,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestTransferExitFileBased(const uint8 (&ora
    \return
    C_NO_ERR   request(s) sent, positive response(s) received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RANGE    size of orc_DataRecord is zero
@@ -4196,7 +4250,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMemoryByAddress(const uint32 ou32_MemoryAd
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: unexpected length or address)
@@ -4327,7 +4381,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32 ou32_MemoryA
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool or list index)
@@ -4390,7 +4444,7 @@ sint32 C_OSCProtocolDriverOsy::OsyNotifyNvmDataChanges(const uint8 ou8_DataPoolI
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -4483,7 +4537,7 @@ sint32 C_OSCProtocolDriverOsy::OsyTesterPresent(const uint8 ou8_SuppressResponse
 
    \return
    C_NO_ERR   request sent
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -4540,7 +4594,7 @@ sint32 C_OSCProtocolDriverOsy::OsyEcuReset(const uint8 ou8_ResetType)
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -4606,7 +4660,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetNodeIdForChannel(const uint8 ou8_ChannelTyp
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -4680,7 +4734,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetBitrate(const uint8 ou8_ChannelType, const 
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -4798,7 +4852,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -4838,7 +4892,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestProgramming(uint8 * const opu8_NrCode)
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -4898,7 +4952,7 @@ sint32 C_OSCProtocolDriverOsy::OsyConfigureFlashloaderCommunicationChannel(const
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -5010,15 +5064,24 @@ C_OSCProtocolDriverOsy::C_DataPoolMetaData::C_DataPoolMetaData(void) :
 
    \param[in]  os32_FunctionResult   error result as returned by openSYDE protocol driver service function
    \param[in]  ou8_NrCode            negative response code received
+   \param[out] opq_IsHardError       set by function if not NULL:
+                                     false: service was performed but an error response was received
+                                     true: all other errors
 
    \return
    string representation
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(const sint32 os32_FunctionResult,
-                                                                     const uint8 ou8_NrCode)
+                                                                     const uint8 ou8_NrCode,
+                                                                     bool * const opq_IsHardError)
 {
    C_SCLString c_Text;
+
+   if (opq_IsHardError != NULL)
+   {
+      (*opq_IsHardError) = true;
+   }
 
    switch (os32_FunctionResult)
    {
@@ -5038,6 +5101,10 @@ C_SCLString C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(const sint3
       c_Text = "Misconfigured protocol stack.";
       break;
    case C_WARN:
+      if (opq_IsHardError != NULL)
+      {
+         (*opq_IsHardError) = false;
+      }
       c_Text = "Error response received (";
       switch (ou8_NrCode)
       {

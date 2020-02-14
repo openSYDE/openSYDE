@@ -50,12 +50,12 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_ViewIndex       View index
-   \param[in]     ou32_NodeIndex       Node index
-   \param[in]     orc_DeviceName       Name of device for comparing with application block
-   \param[in]     oq_FileBased         Flag if node is a file based device
-   \param[in]     oq_StwFlashloader    Flag if node has not an openSYDE Flashloader but a STW Flashloader
-   \param[in,out] opc_parent           Pointer to parent and the list which holds the widget. The original parent could
+   \param[in]      ou32_ViewIndex      View index
+   \param[in]      ou32_NodeIndex      Node index
+   \param[in]      orc_DeviceName      Name of device for comparing with application block
+   \param[in]      oq_FileBased        Flag if node is a file based device
+   \param[in]      oq_StwFlashloader   Flag if node has not an openSYDE Flashloader but a STW Flashloader
+   \param[in,out]  opc_Parent          Pointer to parent and the list which holds the widget. The original parent could
                                        be replaced by the layout handling of Qt. This must be the list widget which
                                        holds all items (base class must be C_SyvUpUpdatePackageListNodeWidget).
 */
@@ -142,7 +142,7 @@ QWidget * C_SyvUpUpdatePackageListNodeItemWidget::GetListParent(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the selected state
 
-   \param[in]     oq_Selected         Flag if selected
+   \param[in]  oq_Selected    Flag if selected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::SetSelected(const bool oq_Selected)
@@ -157,7 +157,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::SetSelected(const bool oq_Selected)
 
    The icon will be adapted
 
-   \param[in]     ou32_State         State of application
+   \param[in]  ou32_State  State of application
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::SetState(const uint32 ou32_State)
@@ -199,7 +199,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::SetState(const uint32 ou32_State)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets application name
 
-   \param[in]     orc_Name         Application name
+   \param[in]  orc_Name    Application name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::SetAppName(const QString & orc_Name)
@@ -214,7 +214,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::SetAppName(const QString & orc_Name
 
    Adapts the background of the widget
 
-   \param[in]     ou32_Number         Application number
+   \param[in]  ou32_Number    Application number
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::SetAppNumber(const stw_types::uint32 ou32_Number)
@@ -232,8 +232,8 @@ void C_SyvUpUpdatePackageListNodeItemWidget::SetAppNumber(const stw_types::uint3
 
    Can be relative to openSYDE project. In case of a data block project the data block project path must be included.
 
-   \param[in]     orc_Path         Application path
-   \param[in]     oq_DefaultPath   Flag if default or specific view path is used
+   \param[in]  orc_File          Application path
+   \param[in]  oq_DefaultFile    Flag if default or specific view path is used
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::SetAppFile(const QString & orc_File, const bool oq_DefaultFile)
@@ -261,7 +261,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::SetAppFile(const QString & orc_File
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the default path for comparing with an import configuration
 
-   \param[in]     orc_Path         Application default path
+   \param[in]  orc_File    Application default path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::SetDefaultFile(const QString & orc_File)
@@ -272,7 +272,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::SetDefaultFile(const QString & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets application type
 
-   \param[in]     oe_Type         Application type
+   \param[in]  oe_Type  Application type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::SetAppType(const C_OSCNodeApplication::E_Type oe_Type)
@@ -416,7 +416,7 @@ bool C_SyvUpUpdatePackageListNodeItemWidget::IsAppInfoAmbiguous() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepares the update package node configuration
 
-   \param[out]     orc_AppConfig         Node configuration
+   \param[out]  orc_AppConfig    Node configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::PrepareExportConfig(C_SyvUpUpdatePackageConfigNodeApp & orc_AppConfig)
@@ -430,7 +430,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Loads all matching configurations for this application of the import node configuration
 
-   \param[out]     orc_Config         Import configuration
+   \param[in]  orc_NodeConfig    Import configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::LoadImportConfig(const C_SyvUpUpdatePackageConfigNode & orc_NodeConfig)
@@ -532,10 +532,10 @@ sint32 C_SyvUpUpdatePackageListNodeItemWidget::CheckPath(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the application is identical with the parameters
 
-   \param[in]     orc_AppName              Application / Project name (Not the name of the system definition)
-   \param[in]     orc_AppVersion           Application version
-   \param[in]     orc_AppBuildTime         Application build time
-   \param[in]     orc_AppBuildDate         Application build date
+   \param[in]  orc_AppName       Application / Project name (Not the name of the system definition)
+   \param[in]  orc_AppVersion    Application version
+   \param[in]  orc_AppBuildTime  Application build time
+   \param[in]  orc_AppBuildDate  Application build date
 
    \return
    true     Is identical
@@ -579,7 +579,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::ViewFileInfo(void)
 
    Here: Adapt the path text
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::resizeEvent(QResizeEvent * const opc_Event)
@@ -596,7 +596,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::resizeEvent(QResizeEvent * const op
 
    Here: Handle background color on mouse hover
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -627,13 +627,13 @@ bool C_SyvUpUpdatePackageListNodeItemWidget::event(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load application information.
 
-   \param[out]    orq_FileExists          true: file exists  false: file not found
-   \param[out]    orq_FlashwareWarning    true: flashware warning occured
-                                                (only relevant for STW Flashloader; wrong device name in hex file)
-                                          false: no warnings occured
-   \param[out]    orq_TriggerRemove       true: remove item widget
-                                                (only relevant if user discards file)
-                                          false: keep widget
+   \param[out]  orq_FileExists         true: file exists  false: file not found
+   \param[out]  orq_FlashwareWarning   true: flashware warning occured
+                                       (only relevant for STW Flashloader; wrong device name in hex file)
+                                       false: no warnings occured
+   \param[out]  orq_TriggerRemove      true: remove item widget
+                                       (only relevant if user discards file)
+                                       false: keep widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeItemWidget::m_LoadFileInformation(bool & orq_FileExists, bool & orq_FlashwareWarning,

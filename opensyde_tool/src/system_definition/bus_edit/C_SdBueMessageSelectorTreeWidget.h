@@ -161,8 +161,6 @@ private:
    static stw_types::uint16 mh_GetStartBit(const stw_opensyde_core::C_OSCCanMessage * const opc_Message,
                                            const stw_types::uint16 ou16_SignalSize,
                                            const stw_opensyde_core::C_OSCCanSignal::E_ByteOrderType oe_Type);
-   static void mh_AdaptSignalStartBits(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                       std::vector<stw_opensyde_core::C_OSCCanSignal> & orc_Signals);
    bool m_GetHighestSelected(QModelIndex & orc_Index) const;
 
    stw_opensyde_gui_logic::C_SdBueUnoManager * mpc_UndoManager;

@@ -54,7 +54,7 @@ const QString C_SyvUpPackageListNodeDatablocksWidget::mhc_RemovePathText("<Add F
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent           Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPackageListNodeDatablocksWidget::C_SyvUpPackageListNodeDatablocksWidget(QWidget * const opc_Parent) :
@@ -65,8 +65,8 @@ C_SyvUpPackageListNodeDatablocksWidget::C_SyvUpPackageListNodeDatablocksWidget(Q
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a new file for the application
 
-   \param[in]     orc_File      New path (already contains Db Project path and might be relative to openSYDE project)
-   \param[in]     opc_App       Application widget
+   \param[in]  orc_File    New path (already contains Db Project path and might be relative to openSYDE project)
+   \param[in]  opc_App     Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageListNodeDatablocksWidget::AdaptFile(const QString & orc_File,
@@ -108,14 +108,33 @@ void C_SyvUpPackageListNodeDatablocksWidget::AdaptFile(const QString & orc_File,
                   }
                   else
                   {
-                     C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-                     c_Message.SetHeading(C_GtGetText::h_GetText("Update Package Configuration"));
-                     c_Message.SetDescription(C_GtGetText::h_GetText("Device type of selected HEX file does not "
-                                                                     "match the node type."));
-                     c_Message.SetDetails(
-                        QString(C_GtGetText::h_GetText("Device type of %1 does not match node type %2."))
-                        .arg(c_AppDeviceType.trimmed(), this->mc_DeviceType.trimmed()));
-                     c_Message.Execute();
+                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                        this->mu32_NodeIndex);
+                     if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+                     {
+                        for (uint32 u32_ItName = 0UL;
+                             u32_ItName < pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames.size(); ++u32_ItName)
+                        {
+                           const QString c_AllowedDevice =
+                              pc_Node->pc_DeviceDefinition->c_OtherAcceptedNames[u32_ItName].Trim().UpperCase().c_str();
+                           if (QString::compare(c_AllowedDevice, c_AppDeviceType, Qt::CaseInsensitive) == 0)
+                           {
+                              q_FileIsOk = true;
+                           }
+                        }
+                     }
+                     if (q_FileIsOk == false)
+                     {
+                        C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+                        c_Message.SetHeading(C_GtGetText::h_GetText("Update Package Configuration"));
+                        c_Message.SetDescription(C_GtGetText::h_GetText("Device type of selected HEX file does not "
+                                                                        "match the node type."));
+                        c_Message.SetDetails(
+                           QString(C_GtGetText::h_GetText("Device type of %1 does not match node type %2."))
+                           .arg(c_AppDeviceType.trimmed(), this->mc_DeviceType.trimmed()));
+                        c_Message.SetCustomMinHeight(230, 250);
+                        c_Message.Execute();
+                     }
                   }
                }
                else
@@ -127,10 +146,12 @@ void C_SyvUpPackageListNodeDatablocksWidget::AdaptFile(const QString & orc_File,
                   {
                      c_Message.SetDescription(C_GtGetText::h_GetText("HEX file has multiple application information "
                                                                      "blocks with non-equal device names!"));
+                     c_Message.SetCustomMinHeight(180, 180);
                   }
                   else
                   {
                      c_Message.SetDescription(C_GtGetText::h_GetText("HEX file has no application information block!"));
+                     c_Message.SetCustomMinHeight(180, 180);
                   }
                   c_Message.Execute();
                }
@@ -143,6 +164,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::AdaptFile(const QString & orc_File,
                c_Message.SetHeading(C_GtGetText::h_GetText("Update Package configuration"));
                c_Message.SetDescription(C_GtGetText::h_GetText("File is not a valid HEX file!"));
                c_Message.SetDetails(c_Details);
+               c_Message.SetCustomMinHeight(180, 250);
                c_Message.Execute();
             }
 
@@ -174,7 +196,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::AdaptFile(const QString & orc_File,
 
    Only for address based devices
 
-   \param[in]     opc_App       Application widget
+   \param[in]  opc_App  Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageListNodeDatablocksWidget::RevertFile(C_SyvUpUpdatePackageListNodeItemWidget * const opc_App)
@@ -219,7 +241,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::RevertFile(C_SyvUpUpdatePackageList
 
    Not remove of datablock, adaption of the current associated file only
 
-   \param[in]     opc_App       Application widget
+   \param[in]  opc_App  Application widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageListNodeDatablocksWidget::RemoveFile(C_SyvUpUpdatePackageListNodeItemWidget * const opc_App)
@@ -230,7 +252,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::RemoveFile(C_SyvUpUpdatePackageList
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepares the update package node configuration
 
-   \param[out]     orc_NodeConfig         Node configuration
+   \param[out]  orc_NodeConfig   Node configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageListNodeDatablocksWidget::PrepareExportConfig(C_SyvUpUpdatePackageConfigNode & orc_NodeConfig) const
@@ -269,7 +291,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::PrepareExportConfig(C_SyvUpUpdatePa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Loads all matching configurations for this node of the import configuration
 
-   \param[out]     orc_Config         Import configuration
+   \param[out]  orc_Config    Import configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageListNodeDatablocksWidget::LoadImportConfig(const C_SyvUpUpdatePackageConfig & orc_Config)
@@ -312,7 +334,7 @@ void C_SyvUpPackageListNodeDatablocksWidget::LoadImportConfig(const C_SyvUpUpdat
 
    Check and update of information which application is already finished and must not be updated
 
-   \param[in] orc_DeviceInformation Device info
+   \param[in]  orc_DeviceInformation   Device info
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageListNodeDatablocksWidget::UpdateDeviceInformation(const C_SyvUpDeviceInfo & orc_DeviceInformation)
@@ -410,10 +432,10 @@ const
 
    Datablocks accept only one file for a specific datablock. No multiple files. No adding of new files.
 
-   \param[in]     orc_PathList File paths to analyze
-   \param[in]     orc_Pos      Mouse position
-   \param[out]    opc_RelevantFilePaths    File paths which could be used for this list
-   \param[out]    oppc_App     Found application widget
+   \param[in]   orc_PathList           File paths to analyze
+   \param[in]   orc_Pos                Mouse position
+   \param[out]  opc_RelevantFilePaths  File paths which could be used for this list
+   \param[out]  oppc_App               Found application widget
 
    \return
    true  Valid
@@ -470,8 +492,8 @@ uint32 C_SyvUpPackageListNodeDatablocksWidget::Type(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialization of the applications in case of datablock configuration
 
-   \param[in]       orc_Node         Current node
-   \param[in]       orc_UpdateInfo   Configured update configuration of view
+   \param[in]  orc_Node          Current node
+   \param[in]  orc_UpdateInfo    Configured update configuration of view
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPackageListNodeDatablocksWidget::m_InitSpecificItem(const stw_opensyde_core::C_OSCNode & orc_Node,
@@ -503,12 +525,12 @@ void C_SyvUpPackageListNodeDatablocksWidget::m_InitSpecificItem(const stw_opensy
          else
          {
             pc_AppWidget->SetAppFile(C_PuiUtil::h_MakeIndependentOfDbProjectPath(pc_App->c_ProjectPath.c_str(),
-                                                                                pc_App->c_ResultPath.c_str()), true);
+                                                                                 pc_App->c_ResultPath.c_str()), true);
          }
 
          // Set the default path for comparing with import configuration
          pc_AppWidget->SetDefaultFile(C_PuiUtil::h_MakeIndependentOfDbProjectPath(pc_App->c_ProjectPath.c_str(),
-                                                                                   pc_App->c_ResultPath.c_str()));
+                                                                                  pc_App->c_ResultPath.c_str()));
 
          pc_AppWidget->SetAppType(pc_App->e_Type);
          pc_AppWidget->SetAppNumber(u32_Counter);

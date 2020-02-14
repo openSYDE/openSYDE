@@ -40,7 +40,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueNodeSelectorCheckBoxListWidget::C_SdBueNodeSelectorCheckBoxListWidget(QWidget * const opc_Parent) :
@@ -77,6 +77,7 @@ C_SdBueNodeSelectorCheckBoxListWidget::~C_SdBueNodeSelectorCheckBoxListWidget()
 
    \param[in]     orc_Names       Names of Nodes
    \param[in]     orc_Indexes     Indexes of Nodes
+   \param[in]     orc_SubIndexes  Sub Indexes of Nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> & orc_Names,
@@ -103,9 +104,6 @@ void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> 
          //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
          disconnect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigNodeToggled,
                     this, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled);
-         //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
-         disconnect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigComImport,
-                    this, &C_SdBueNodeSelectorCheckBoxListWidget::SigComImport);
          delete pc_SelectorItem;
       }
 
@@ -281,9 +279,6 @@ void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, 
    //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigNodeToggled,
            this, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled);
-   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
-   connect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigComImport,
-           this, &C_SdBueNodeSelectorCheckBoxListWidget::SigComImport);
 
    this->mpc_Ui->pc_CbxVerticalLayout->addWidget(pc_SelectorItem);
 

@@ -420,8 +420,8 @@ sint32 C_OSCIOFileDataStructFiler::h_SaveSimpleValueAsAttribute(const stw_scl::C
 
    \param[in,out] orc_XMLParser       XML parser
    \param[in,out] orc_Content         Content
-   \param[in,out] orc_Type            Type
-   \param[in,out] orc_BaseType        Base type
+   \param[in,out] orc_TypeStr         Type str
+   \param[in,out] orc_BaseTypeStr     Base type str
    \param[in]     orc_CurrentNodeName Current node name
    \param[in]     orc_UseCaseForLog   Use case for log
 
@@ -882,12 +882,12 @@ C_OSCIOFileDataStructFiler::C_OSCIOFileDataStructFiler(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load IO parameter struct
 
-   \param[out]    orc_Struct          Storage
-   \param[in,out] orc_XMLParser       XML with default state
-   \param[in]     orc_UseCases        All available channel use cases for this domain
-   \param[in]     orc_GroupNodeName   XML node name of section elements to parse
-   \param[in]     orc_SingleNodeName  XML node name of group elements to parse
-   \param[in]     oq_RequireId        Flag if ID is required in this section
+   \param[out]    orc_Struct         Storage
+   \param[in,out] orc_XMLParser      XML with default state
+   \param[in]     orc_UseCases       All available channel use cases for this domain
+   \param[in]     orc_GroupNodeName  XML node name of section elements to parse
+   \param[in]     orc_SingleNodeName XML node name of group elements to parse
+   \param[in]     oq_RequireId       Flag if ID is required in this section
 
    \return
    C_NO_ERR    data read
@@ -1370,7 +1370,9 @@ sint32 C_OSCIOFileDataStructFiler::mh_ParseAttributeAvailability(std::vector<stw
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get availability string
 
-   \param[in] orc_Availability Availability
+   \param[in]     orc_Availability Availability
+   \param[in]     orc_UseCases     Use cases
+   \param[in,out] orc_Output       Output
 
    \return
    Availability string

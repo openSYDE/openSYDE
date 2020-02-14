@@ -33,7 +33,7 @@ public:
 
    virtual stw_types::sintn type(void) const override;
    virtual void SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style,
-                                const bool oq_DarkMode);
+                                const bool oq_DarkMode) override;
    virtual void ReInitializeSize(void) override;
 
    virtual void LoadData(void) override;

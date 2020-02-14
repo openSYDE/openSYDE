@@ -48,7 +48,7 @@ using namespace stw_errors;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListDataSetModel::C_SdNdeDpListDataSetModel(QObject * const opc_Parent) :
@@ -62,13 +62,13 @@ C_SdNdeDpListDataSetModel::C_SdNdeDpListDataSetModel(QObject * const opc_Parent)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Specify associated list
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetModel::SetList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                              const uint32 & oru32_ListIndex)
+                                        const uint32 & oru32_ListIndex)
 {
    beginResetModel();
    this->mu32_NodeIndex = oru32_NodeIndex;
@@ -80,9 +80,9 @@ void C_SdNdeDpListDataSetModel::SetList(const uint32 & oru32_NodeIndex, const ui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if equal
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 
    \return
    True  Match
@@ -90,7 +90,7 @@ void C_SdNdeDpListDataSetModel::SetList(const uint32 & oru32_NodeIndex, const ui
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListDataSetModel::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                             const uint32 & oru32_ListIndex) const
+                                       const uint32 & oru32_ListIndex) const
 {
    bool q_Retval;
 
@@ -109,16 +109,16 @@ bool C_SdNdeDpListDataSetModel::Equals(const uint32 & oru32_NodeIndex, const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDpListDataSetModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                                     const sintn osn_Role) const
+                                               const sintn osn_Role) const
 {
    QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
 
@@ -179,7 +179,7 @@ QVariant C_SdNdeDpListDataSetModel::headerData(const sintn osn_Section, const Qt
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -200,7 +200,7 @@ sintn C_SdNdeDpListDataSetModel::rowCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -225,8 +225,8 @@ sintn C_SdNdeDpListDataSetModel::columnCount(const QModelIndex & orc_Parent) con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -324,16 +324,17 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
       {
+         c_Retval = "";
          switch (e_Col)
          {
          case eNAME:
             if (this->data(orc_Index, msn_USER_ROLE_ERROR).toBool() == true)
             {
-               c_Retval = C_GtGetText::h_GetText("Dataset name");
+               c_Retval = C_GtGetText::h_GetText("Dataset Name");
             }
             break;
          default:
-            c_Retval = false;
+            // default already set to ""
             break;
          }
       }
@@ -358,6 +359,7 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
       {
+         c_Retval = "";
          switch (e_Col)
          {
          case eNAME:
@@ -388,7 +390,7 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
             }
             break;
          default:
-            c_Retval = false;
+            // default already set to ""
             break;
          }
       }
@@ -439,17 +441,16 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data at index
 
-   \param[in] orc_Index Index
-   \param[in] orc_Value New data
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  orc_Value   New data
+   \param[in]  osn_Role    Data role
 
    \return
    true  success
    false failure
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListDataSetModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
-                                              const sintn osn_Role)
+bool C_SdNdeDpListDataSetModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
 {
    bool q_Retval = false;
 
@@ -493,7 +494,7 @@ bool C_SdNdeDpListDataSetModel::setData(const QModelIndex & orc_Index, const QVa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get flags for item
 
-   \param[in] orc_Index Item
+   \param[in]  orc_Index   Item
 
    \return
    Flags for item
@@ -538,16 +539,16 @@ Qt::DropActions C_SdNdeDpListDataSetModel::supportedDropActions(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Insert rows with content
+/*! \brief   Insert columns with content
 
-   \param[in] orc_OSCInsertedElements Inserted elements OSC content
-   \param[in] orc_UIInsertedElements  Inserted elements UI content
-   \param[in] oru32_Row               Starting Row
+   \param[in]  orc_OSCNames            Inserted elements OSC names
+   \param[in]  orc_OSCDataSetValues    Inserted elements OSC data set values
+   \param[in]  oru32_Row               Starting Row
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetModel::DoInsertColumns(const std::vector<C_OSCNodeDataPoolDataSet> & orc_OSCNames,
-                                                      const std::vector<std::vector<C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues,
-                                                      const uint32 & oru32_Row)
+                                                const std::vector<std::vector<C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues,
+                                                const uint32 & oru32_Row)
 {
    if (orc_OSCNames.size() == orc_OSCDataSetValues.size())
    {
@@ -560,9 +561,9 @@ void C_SdNdeDpListDataSetModel::DoInsertColumns(const std::vector<C_OSCNodeDataP
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert items into model
 
-   \param[in] osn_Row    Starting row
-   \param[in] osn_Count  Number of inserted items
-   \param[in] orc_Parent Parent
+   \param[in]  osn_Column  Starting column
+   \param[in]  osn_Count   Number of inserted items
+   \param[in]  orc_Parent  Parent
 
    \return
    true  success
@@ -570,7 +571,7 @@ void C_SdNdeDpListDataSetModel::DoInsertColumns(const std::vector<C_OSCNodeDataP
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListDataSetModel::insertColumns(const sintn osn_Column, const sintn osn_Count,
-                                                    const QModelIndex & orc_Parent)
+                                              const QModelIndex & orc_Parent)
 {
    bool q_Retval = false;
 
@@ -600,9 +601,9 @@ bool C_SdNdeDpListDataSetModel::insertColumns(const sintn osn_Column, const sint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove items from model
 
-   \param[in] osn_Row    Starting row
-   \param[in] osn_Count  Number of removed items
-   \param[in] orc_Parent Parent
+   \param[in]  osn_Column  Starting column
+   \param[in]  osn_Count   Number of removed items
+   \param[in]  orc_Parent  Parent
 
    \return
    true  success
@@ -610,7 +611,7 @@ bool C_SdNdeDpListDataSetModel::insertColumns(const sintn osn_Column, const sint
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListDataSetModel::removeColumns(const sintn osn_Column, const sintn osn_Count,
-                                                    const QModelIndex & orc_Parent)
+                                              const QModelIndex & orc_Parent)
 {
    bool q_Retval = false;
 
@@ -636,11 +637,11 @@ bool C_SdNdeDpListDataSetModel::removeColumns(const sintn osn_Column, const sint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move rows
 
-   \param[in] orc_SourceParent      Source parent
-   \param[in] osn_SourceRow         Source row
-   \param[in] osn_Count             Count
-   \param[in] orc_DestinationParent Destination parent
-   \param[in] osn_DestinationChild  Destination child
+   \param[in]  orc_SourceParent        Source parent
+   \param[in]  osn_SourceColumn        Source column
+   \param[in]  osn_Count               Count
+   \param[in]  orc_DestinationParent   Destination parent
+   \param[in]  osn_DestinationChild    Destination child
 
    \return
    true  success
@@ -648,8 +649,8 @@ bool C_SdNdeDpListDataSetModel::removeColumns(const sintn osn_Column, const sint
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListDataSetModel::moveColumns(const QModelIndex & orc_SourceParent, const sintn osn_SourceColumn,
-                                                  const sintn osn_Count, const QModelIndex & orc_DestinationParent,
-                                                  const sintn osn_DestinationChild)
+                                            const sintn osn_Count, const QModelIndex & orc_DestinationParent,
+                                            const sintn osn_DestinationChild)
 {
    bool q_Retval = false;
 
@@ -672,7 +673,7 @@ bool C_SdNdeDpListDataSetModel::moveColumns(const QModelIndex & orc_SourceParent
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Row to enum conversion
 
-   \param[in]  ors32_Row Column
+   \param[in]  ors32_Row   Column
 
    \return
    Enum value
@@ -700,7 +701,7 @@ C_SdNdeDpListDataSetModel::E_Rows C_SdNdeDpListDataSetModel::h_RowToEnum(const s
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Enum to column conversion
 
-   \param[in] ore_Value Enum value
+   \param[in]  ore_Value   Enum value
 
    \return
    Column
@@ -749,7 +750,7 @@ QStringList C_SdNdeDpListDataSetModel::mimeTypes(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get mime data of specified indices
 
-   \param[in] orc_Indices Indices
+   \param[in]  orc_Indices    Indices
 
    \return
    Mime data of specified indices
@@ -810,12 +811,12 @@ QMimeData * C_SdNdeDpListDataSetModel::mimeData(const QModelIndexList & orc_Indi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal model update
 
-   \param[in] oru32_Row      Changed row
-   \param[in] ore_ChangeType Change type
+   \param[in]  oru32_Column      Changed column
+   \param[in]  ore_ChangeType    Change type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetModel::HandleDataChange(const uint32 & oru32_Column,
-                                                       const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_ChangeType)
+                                                 const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_ChangeType)
 {
    sint32 s32_Row = -1;
 
@@ -860,8 +861,8 @@ void C_SdNdeDpListDataSetModel::HandleErrorChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check name
 
-   \param[in] oru32_Index Data set index
-   \param[in] orc_Name    Name
+   \param[in]  oru32_Index    Data set index
+   \param[in]  orc_Name       Name
 
    \return
    true  Available

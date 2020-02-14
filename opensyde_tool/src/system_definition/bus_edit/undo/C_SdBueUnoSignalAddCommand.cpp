@@ -16,6 +16,7 @@
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "C_SdBueUnoSignalAddCommand.h"
+#include "C_SdUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -100,12 +101,9 @@ void C_SdBueUnoSignalAddCommand::SetInitialData(const C_OSCCanSignal & orc_Signa
    this->mc_UISignalCommon = orc_UISignalCommon;
    this->mc_UISignal = orc_UISignal;
    this->mc_UISignal.u8_ColorIndex = 0U;
-   //Restrict multiplexer
-   if (oe_ProtocolType != C_OSCCanProtocol::eLAYER2)
-   {
-      this->mc_Signal.e_MultiplexerType = C_OSCCanSignal::eMUX_DEFAULT;
-      this->mc_Signal.u16_MultiplexValue = 0;
-   }
+
+   // Adapt do safety protocol restrictions
+   C_SdUtil::h_AdaptSignalToProtocolType(this->mc_Signal, oe_ProtocolType, NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

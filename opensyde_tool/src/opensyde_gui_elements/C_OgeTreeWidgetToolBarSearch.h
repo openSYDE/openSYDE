@@ -52,7 +52,6 @@ Q_SIGNALS:
                       const stw_types::sint32 os32_Flag);
 
 protected:
-   void m_DeleteChildren(QTreeWidgetItem * const opc_ItemParent) const;
    void m_MarkResultString(QString & orc_ResultString) const;
 
    QString mc_SearchString;

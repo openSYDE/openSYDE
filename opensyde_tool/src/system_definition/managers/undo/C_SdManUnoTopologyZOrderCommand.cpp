@@ -38,9 +38,10 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Scene  Pointer to currently active scene
-   \param[in]     orc_IDs    Affected unique IDs
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out] opc_Scene         Pointer to currently active scene
+   \param[in]     orc_IDs           Affected unique IDs
+   \param[in]     orc_NewZValues    New Z values
+   \param[in,out] opc_Parent        Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyZOrderCommand::C_SdManUnoTopologyZOrderCommand(QGraphicsScene * const opc_Scene,

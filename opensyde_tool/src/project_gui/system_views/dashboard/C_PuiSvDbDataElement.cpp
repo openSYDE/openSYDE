@@ -34,10 +34,10 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in] oru32_ViewIndex      Index of system view
-   \param[in] oru32_DashboardIndex Index of dashboard in system view
-   \param[in] ors32_DataIndex      Index of connected data item
-   \param[in] ore_Type             Type of data
+   \param[in]  oru32_ViewIndex         Index of system view
+   \param[in]  oru32_DashboardIndex    Index of dashboard in system view
+   \param[in]  ors32_DataIndex         Index of connected data item
+   \param[in]  ore_Type                Type of data
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbDataElement::C_PuiSvDbDataElement(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
@@ -62,9 +62,9 @@ C_PuiSvDbDataElement::~C_PuiSvDbDataElement(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt index if array was resized
 
-   \param[in]   ore_Type      Type of affected items
-   \param[in]   ors32_Index   Index of which segment
-   \param[in]   ore_Action    Type of change
+   \param[in]  ore_Type       Type of affected items
+   \param[in]  ors32_Index    Index of which segment
+   \param[in]  ore_Action     Type of change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElement::SyncIndex(const E_Type & ore_Type, const stw_types::sint32 & ors32_Index,
@@ -92,7 +92,7 @@ void C_PuiSvDbDataElement::SyncIndex(const E_Type & ore_Type, const stw_types::s
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard index
 
-   \param[in] orc_Value New dashboard index
+   \param[in]  ou32_Value  New dashboard index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElement::SetDashboardIndex(const uint32 ou32_Value)

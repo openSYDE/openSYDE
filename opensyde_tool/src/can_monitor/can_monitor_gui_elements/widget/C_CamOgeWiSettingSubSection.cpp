@@ -171,6 +171,6 @@ void C_CamOgeWiSettingSubSection::mousePressEvent(QMouseEvent * const opc_Event)
    else
    {
       // Popup mode. Hide the widget.
-      Q_EMIT(this->SigHide());
+      Q_EMIT (this->SigHide());
    }
 }

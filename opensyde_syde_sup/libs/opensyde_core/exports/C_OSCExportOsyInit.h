@@ -33,12 +33,20 @@ public:
    virtual ~C_OSCExportOsyInit(void);
 
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_FilePath, const C_OSCNode & orc_Node,
-                                               const bool oq_RunsDpd, const stw_types::uint16 ou16_ApplicationIndex);
+                                               const bool oq_RunsDpd, const stw_types::uint16 ou16_ApplicationIndex,
+                                               const stw_scl::C_SCLString & orc_ExportToolInfo = "");
+
+   //Minimum buffer size required for DPD-services
+   //greatest size for openSYDE server: routine control DP meta data)
+   //ETH-Header + Service: (8+2+2) + 5 + (1+3) + (1+1+32)
+   static const stw_types::uint8 hu8_MIN_SIZE_DPD_BUF_INSTANCE = 55U;
 
 private:
    static bool mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSettings & orc_Settings);
-
    static stw_types::uint32 mh_GetSizeOfLargestDataPoolElement(const std::vector<C_OSCNodeDataPool> & orc_DataPools);
+   static bool mh_IsDpKnownToApp(const stw_types::uint8 ou8_DataPoolIndex,
+                                 const stw_types::uint16 ou16_ApplicationIndex, const C_OSCNode & orc_Node,
+                                 const bool oq_RunsDpd);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

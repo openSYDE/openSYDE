@@ -44,7 +44,7 @@ using namespace stw_opensyde_core;
    \param[in]     oru32_DataPoolIndex              Node data pool index
    \param[in]     oru32_DataPoolListIndex          Node data pool list index
    \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
-   \param[in]     oru32_DataPoolListElementIndex   Node data pool list element index
+   \param[in]     oru32_DataPoolListDataSetIndex   Node data pool list element index
    \param[in]     orc_NewData                      New data
    \param[in]     ore_DataChangeType               Data change type
    \param[in,out] opc_Parent                       Optional pointer to parent

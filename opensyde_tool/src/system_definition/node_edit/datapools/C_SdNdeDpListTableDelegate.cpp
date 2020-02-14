@@ -91,9 +91,8 @@ C_SdNdeDpListTableDelegate::C_SdNdeDpListTableDelegate(QObject * const opc_Paren
    Editor widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent,
-                                                         const QStyleOptionViewItem & orc_Option,
-                                                         const QModelIndex & orc_Index) const
+QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
+                                                   const QModelIndex & orc_Index) const
 {
    QWidget * pc_Retval = NULL;
 
@@ -365,7 +364,7 @@ void C_SdNdeDpListTableDelegate::setEditorData(QWidget * const opc_Editor, const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
-                                                    const QModelIndex & orc_Index) const
+                                              const QModelIndex & orc_Index) const
 {
    if ((((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true)) && (this->mpc_Model != NULL))
    {
@@ -490,7 +489,7 @@ void C_SdNdeDpListTableDelegate::setModelData(QWidget * const opc_Editor, QAbstr
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
-                                             const QModelIndex & orc_Index) const
+                                       const QModelIndex & orc_Index) const
 {
    bool q_CallOriginal = true;
 
@@ -608,7 +607,7 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set model for column look up
 
-   \param[in] opc_Model  Model for column look up
+   \param[in] opc_Value  Model for column look up
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableDelegate::SetModel(C_SdNdeDpListTableModel * const opc_Value)
@@ -639,7 +638,7 @@ void C_SdNdeDpListTableDelegate::SetUndoStack(QUndoStack * const opc_Value)
 */
 //----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDpListTableDelegate::m_CreateEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index,
-                                                           const C_SdNdeDpListTableModel::E_Columns oe_Col) const
+                                                     const C_SdNdeDpListTableModel::E_Columns oe_Col) const
 {
    QWidget * pc_Retval = NULL;
 
@@ -657,8 +656,8 @@ QWidget * C_SdNdeDpListTableDelegate::m_CreateEditor(QWidget * const opc_Parent,
                C_OSCNodeDataPoolContent c_NewMin = pc_Element->c_MinValue;
                C_SdNdeDpContentUtil::h_InitMin(c_NewMin);
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, c_NewMin,
-                                                                      pc_Element->c_MaxValue, pc_Element->f64_Factor,
-                                                                      pc_Element->f64_Offset, 0, false);
+                                                                pc_Element->c_MaxValue, pc_Element->f64_Factor,
+                                                                pc_Element->f64_Offset, 0, false);
             }
             else if (oe_Col == C_SdNdeDpListTableModel::eMAX)
             {
@@ -666,14 +665,14 @@ QWidget * C_SdNdeDpListTableDelegate::m_CreateEditor(QWidget * const opc_Parent,
                C_OSCNodeDataPoolContent c_NewMax = pc_Element->c_MaxValue;
                C_SdNdeDpContentUtil::h_InitMax(c_NewMax);
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
-                                                                      c_NewMax, pc_Element->f64_Factor,
-                                                                      pc_Element->f64_Offset, 0, false);
+                                                                c_NewMax, pc_Element->f64_Factor,
+                                                                pc_Element->f64_Offset, 0, false);
             }
             else
             {
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
-                                                                      pc_Element->c_MaxValue, pc_Element->f64_Factor,
-                                                                      pc_Element->f64_Offset, 0, false);
+                                                                pc_Element->c_MaxValue, pc_Element->f64_Factor,
+                                                                pc_Element->f64_Offset, 0, false);
             }
             if (pc_Retval == NULL)
             {

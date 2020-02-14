@@ -380,7 +380,7 @@ void C_SdNdeDpViewWidget::m_ErrorCheck(void) const
    this->mpc_Ui->pc_WidgetDpCom->ErrorCheck();
    this->mpc_Ui->pc_WidgetDpDiag->ErrorCheck();
    this->mpc_Ui->pc_WidgetDpNvm->ErrorCheck();
-   Q_EMIT this->SigErrorChange();
+   Q_EMIT (this->SigErrorChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

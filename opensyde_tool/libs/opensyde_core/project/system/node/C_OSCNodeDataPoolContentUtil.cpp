@@ -37,7 +37,7 @@ const float64 C_OSCNodeDataPoolContentUtil::mhf64_Epsilon = 1e-5; // to check fo
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set input content values to zero
+/*! \brief  Set input content values to zero
 
    \param[in,out] orc_Content Content
 */
@@ -122,7 +122,7 @@ void C_OSCNodeDataPoolContentUtil::h_ZeroContent(C_OSCNodeDataPoolContent & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a float value in the content class
+/*! \brief  Sets a float value in the content class
 
    The of64_Value value will be casted to the current type of the orc_Content class.
    If the orc_Content holds an array, the value will be set to the position ou32_ArrayIndex.
@@ -476,7 +476,7 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a value in range of minimum and maximum value.
+/*! \brief  Sets a value in range of minimum and maximum value.
 
    If value is in range that means between min and max value, the caller can
    choose if value should be left as it is or should be set to zero.
@@ -500,12 +500,12 @@ void C_OSCNodeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value,
    * function is not tested with precision issues for huge values like 2^51
    * Also works with arrays!
 
-   \param[in]     orc_Min              minimum value
-   \param[in]     orc_Max              maximum value
-   \param[in,out] orc_Value            specific value which is should be set in range
-   \param[out]    ore_ValueChangeTo    flag for what was done with value:
-                                        value was in range (eNoChange or eZero) respectively out of range (eMin or eMax)
-   \param[in]     oe_SetValue          flag for user choice if value should be left in range as it is or set to zero
+   \param[in]     orc_Min            minimum value
+   \param[in]     orc_Max            maximum value
+   \param[in,out] orc_Value          specific value which is should be set in range
+   \param[out]    ore_ValueChangedTo flag for what was done with value:
+                                     value was in range (eNoChange or eZero) respectively out of range (eMin or eMax
+   \param[in]     oe_SetValue        flag for user choice if value should be left in range as it is or set to zero
 
    \return
    C_NO_ERR    expected standard case, value was set (or left) successfully
@@ -655,6 +655,43 @@ sint32 C_OSCNodeDataPoolContentUtil::h_SetValueInMinMaxRange(const C_OSCNodeData
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get data type size in byte
+
+   \param[in] oe_Type Type
+
+   \return
+   Data type size in byte
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCNodeDataPoolContentUtil::h_GetDataTypeSizeInByte(const C_OSCNodeDataPoolContent::E_Type oe_Type)
+{
+   uint32 u32_Retval = 0UL;
+
+   switch (oe_Type)
+   {
+   case C_OSCNodeDataPoolContent::eSINT8:
+   case C_OSCNodeDataPoolContent::eUINT8:
+      u32_Retval = 1UL;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT16:
+   case C_OSCNodeDataPoolContent::eUINT16:
+      u32_Retval = 2UL;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT32:
+   case C_OSCNodeDataPoolContent::eUINT32:
+   case C_OSCNodeDataPoolContent::eFLOAT32:
+      u32_Retval = 4UL;
+      break;
+   case C_OSCNodeDataPoolContent::eSINT64:
+   case C_OSCNodeDataPoolContent::eUINT64:
+   case C_OSCNodeDataPoolContent::eFLOAT64:
+      u32_Retval = 8UL;
+      break;
+   }
+   return u32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

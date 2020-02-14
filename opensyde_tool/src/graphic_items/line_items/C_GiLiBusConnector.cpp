@@ -22,6 +22,7 @@
 #include "C_GtGetText.h"
 #include "C_SebUtil.h"
 #include "C_PuiSdUtil.h"
+#include "C_Uti.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
@@ -243,7 +244,14 @@ void C_GiLiBusConnector::GenerateHint(void)
          {
             QString c_Hint;
             // In case of Ethernet an empty string comes back
-            const QString c_Bitrate = this->GetBusItem()->GetBitrate(true);
+            QString c_TypeSpecificInfo = this->GetBusItem()->GetBitrate(true);
+
+            if (c_TypeSpecificInfo == "")
+            {
+               // Get the IP address
+               c_TypeSpecificInfo = ", IP: ";
+               c_TypeSpecificInfo += C_Uti::h_IpAddressToString(pc_ComInterfaceData->c_Ip.au8_IpAddress);
+            }
 
             //heading
             c_Hint = C_GtGetText::h_GetText("Bus Connection");
@@ -257,7 +265,7 @@ void C_GiLiBusConnector::GenerateHint(void)
                C_PuiSdUtil::h_GetInterfaceName(this->GetBusItem()->GetType(),
                                                pc_NodeConnection->u8_InterfaceNumber), //Interface
                QString::number(pc_ComInterfaceData->u8_NodeID),                        //Node ID
-               c_Bitrate);                                                             // CAN bitrate
+               c_TypeSpecificInfo);                                                    // CAN bitrate or IP address
             this->SetDefaultToolTipContent(c_Hint);
          }
       }
@@ -675,57 +683,5 @@ void C_GiLiBusConnector::m_UpdatePort(const QPointF & orc_Pos)
    if (this->mpc_GenericPositionItem != NULL)
    {
       m_CalcInitialLocalPos(orc_Pos);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnector::m_RestoreLastValidNode(void)
-{
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   m_UpdateGenericItem(dynamic_cast<C_GiNode *>(this->mpc_LastKnownGenericSignalItem));
-   //Port
-   if (this->mpc_GenericPositionItem != NULL)
-   {
-      //If changed port unregister of starting point
-      if (this->mpc_GenericPositionItem != this->mpc_LastKnownGenericPositionItem)
-      {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         C_GiPort * const pc_Port = dynamic_cast<C_GiPort *>(this->mpc_GenericPositionItem);
-         if (pc_Port != NULL)
-         {
-            pc_Port->RemoveConnectorFromRegistry();
-         }
-      }
-   }
-   this->mpc_GenericPositionItem = this->mpc_LastKnownGenericPositionItem;
-   if (this->mpc_GenericPositionItem != NULL)
-   {
-      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      C_GiPort * const pc_Port = dynamic_cast<C_GiPort *>(this->mpc_GenericPositionItem);
-      if (pc_Port != NULL)
-      {
-         //Restore visibility
-         pc_Port->AbortTemporaryUnregister();
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnector::m_AcceptNewPort(void)
-{
-   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   C_GiPort * const pc_Port = dynamic_cast<C_GiPort *>(this->mpc_LastKnownGenericPositionItem);
-
-   //Dismiss saved port
-   if (pc_Port != NULL)
-   {
-      //Restore visibility
-      pc_Port->AbortTemporaryUnregister();
-      //If changed port unregister of starting point
-      if (this->mpc_GenericPositionItem != this->mpc_LastKnownGenericPositionItem)
-      {
-         pc_Port->RemoveConnectorFromRegistry();
-      }
-      this->mpc_LastKnownGenericPositionItem = NULL;
    }
 }

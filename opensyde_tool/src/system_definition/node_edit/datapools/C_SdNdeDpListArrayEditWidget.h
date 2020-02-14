@@ -40,12 +40,12 @@ class C_SdNdeDpListArrayEditWidget :
 
 public:
    explicit C_SdNdeDpListArrayEditWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                               const stw_types::uint32 & oru32_NodeIndex,
-                                               const stw_types::uint32 & oru32_DataPoolIndex,
-                                               const stw_types::uint32 & oru32_ListIndex,
-                                               const stw_types::uint32 & oru32_ElementIndex,
-                                               const stw_opensyde_gui_logic::C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                               const stw_types::uint32 & oru32_DataSetIndex);
+                                         const stw_types::uint32 & oru32_NodeIndex,
+                                         const stw_types::uint32 & oru32_DataPoolIndex,
+                                         const stw_types::uint32 & oru32_ListIndex,
+                                         const stw_types::uint32 & oru32_ElementIndex,
+                                         const stw_opensyde_gui_logic::C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                         const stw_types::uint32 & oru32_DataSetIndex);
    ~C_SdNdeDpListArrayEditWidget(void);
    void InitStaticNames(void) const;
    QUndoCommand * TakeUndoCommand(void) const;

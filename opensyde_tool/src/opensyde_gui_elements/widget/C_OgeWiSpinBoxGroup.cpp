@@ -42,7 +42,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiSpinBoxGroup::C_OgeWiSpinBoxGroup(QWidget * const opc_Parent) :
@@ -96,10 +96,11 @@ QString C_OgeWiSpinBoxGroup::GetText(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize widget with valid values
 
-   \param[in] orc_Min     Unscaled minimum value
-   \param[in] orc_Max     Unscaled maximum value
-   \param[in] of64_Factor Scaling factor
-   \param[in] of64_Offset Scaling offset
+   \param[in]  orc_Min        Unscaled minimum value
+   \param[in]  orc_Max        Unscaled maximum value
+   \param[in]  of64_Factor    Scaling factor
+   \param[in]  of64_Offset    Scaling offset
+   \param[in]  ou32_Index     Optional data index (used if array)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C_OSCNodeDataPoolContent & orc_Max,
@@ -108,7 +109,7 @@ void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
    std::vector<C_OSCNodeDataPoolContent::E_Type> c_Types;
    m_DeactivateConnections();
    if (C_SdNdeDpContentUtil::h_GetMinimalTypeAfterScaling(orc_Min, orc_Max, of64_Factor, of64_Offset,
-                                                                c_Types) == C_NO_ERR)
+                                                          c_Types) == C_NO_ERR)
    {
       if (ou32_Index < c_Types.size())
       {
@@ -164,7 +165,7 @@ void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update suffix
 
-   \param[in] orc_Value New suffix
+   \param[in]  orc_Value   New suffix
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::SetSuffix(const QString & orc_Value) const
@@ -176,7 +177,7 @@ void C_OgeWiSpinBoxGroup::SetSuffix(const QString & orc_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Assign new value to spin box
 
-   \param[in] orc_Value New value
+   \param[in]  orc_Value   New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::SetValue(const QVariant & orc_Value) const
@@ -270,9 +271,9 @@ void C_OgeWiSpinBoxGroup::SelectAll(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the strings for the tooltip
 
-   \param[in]     orc_Heading     String with heading
-   \param[in]     orc_Content     String with content
-   \param[in]     oe_Type         Optional tooltip type
+   \param[in]  orc_Heading    String with heading
+   \param[in]  orc_Content    String with content
+   \param[in]  oe_Type        Optional tooltip type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::SetToolTipInformation(const QString & orc_Heading, const QString & orc_Content,
@@ -293,7 +294,10 @@ void C_OgeWiSpinBoxGroup::SetToolTipInformation(const QString & orc_Heading, con
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
+
+   \retval true      Event was recognized and processed
+   \retval false     Event ignored
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OgeWiSpinBoxGroup::event(QEvent * const opc_Event)
@@ -332,7 +336,7 @@ bool C_OgeWiSpinBoxGroup::event(QEvent * const opc_Event)
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::keyPressEvent(QKeyEvent * const opc_Event)
@@ -352,7 +356,7 @@ void C_OgeWiSpinBoxGroup::keyPressEvent(QKeyEvent * const opc_Event)
 
    Here: Forward event to spin box (Necessary to properly register key release)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::keyReleaseEvent(QKeyEvent * const opc_Event)
@@ -372,7 +376,7 @@ void C_OgeWiSpinBoxGroup::keyReleaseEvent(QKeyEvent * const opc_Event)
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::mousePressEvent(QMouseEvent * const opc_Event)
@@ -392,7 +396,7 @@ void C_OgeWiSpinBoxGroup::mousePressEvent(QMouseEvent * const opc_Event)
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::mouseReleaseEvent(QMouseEvent * const opc_Event)
@@ -412,7 +416,7 @@ void C_OgeWiSpinBoxGroup::mouseReleaseEvent(QMouseEvent * const opc_Event)
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::focusInEvent(QFocusEvent * const opc_Event)
@@ -433,7 +437,7 @@ void C_OgeWiSpinBoxGroup::focusInEvent(QFocusEvent * const opc_Event)
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::focusOutEvent(QFocusEvent * const opc_Event)
@@ -450,10 +454,12 @@ void C_OgeWiSpinBoxGroup::focusOutEvent(QFocusEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Resize to default height (30)
+/*! \brief   Resize to specified height
+
+   \param[in]  osn_Height  New height (optional)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiSpinBoxGroup::m_ResizeToDefault(const stw_types::sintn osn_Height) const
+void C_OgeWiSpinBoxGroup::m_Resize(const stw_types::sintn osn_Height) const
 {
    this->mpc_Ui->pc_SpinBox64->setMinimumHeight(osn_Height);
    this->mpc_Ui->pc_DoubleSpinBox->setMinimumHeight(osn_Height);

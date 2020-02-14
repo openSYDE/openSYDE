@@ -46,6 +46,7 @@ public:
    void SetHovered(const bool oq_Hover);
    void SetError(const bool oq_Active);
    void SetSelected(const bool oq_Selected);
+   void SetColors(const QColor & orc_BackgroundColor, const QColor & orc_FontColor, const QColor & orc_ResizeItemColor);
 
    bool ContainsPoint(const QPointF & orc_Pos) const;
    bool ContainsLeftResizeItemPoint(const QPointF & orc_Pos) const;
@@ -97,7 +98,7 @@ private:
    const stw_types::float64 mf64_Space;
    static const stw_types::float64 mhf64_ResizeItemHeight;
    static const stw_types::float64 mhf64_ResizeItemClickOffset;
-   const QColor mc_DrawReizeItemColor;
+   QColor mc_DrawReizeItemColor;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

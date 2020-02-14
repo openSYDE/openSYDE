@@ -40,14 +40,14 @@ public:
    virtual void UpdateData(void) override;
    virtual void DeleteData(void) override;
 
-   virtual void SendCurrentValue(void);
+   virtual void SendCurrentValue(void) override;
    virtual bool CallProperties(void) override;
-   virtual void ConnectionActiveChanged(const bool oq_Active);
+   virtual void ConnectionActiveChanged(const bool oq_Active) override;
 
    void UpdateType(const stw_opensyde_gui_logic::C_PuiSvDbToggle::E_Type oe_Type);
 
 protected:
-   virtual bool m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const;
+   virtual bool m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const override;
 
 private:
    stw_opensyde_gui_elements::C_OgePubDashboard * mpc_CheckBoxWidget;

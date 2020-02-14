@@ -54,7 +54,7 @@ using namespace stw_opensyde_gui_logic;
 
    Sort vector ascending by value and remove duplicate entries.
 
-   \param[in] orc_Indices Input to uniqueify
+   \param[in]  orc_Indices    Input to uniqueify
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_Uti::h_Uniqueify(std::vector<uint32> & orc_Indices)
@@ -74,7 +74,7 @@ void C_Uti::h_Uniqueify(std::vector<uint32> & orc_Indices)
 
    Also: sorted ascending
 
-   \param[in] orc_Indices Indices
+   \param[in]  orc_Indices    Indices
 
    \return
    Input as contiguous sections
@@ -120,7 +120,7 @@ std::vector<std::vector<uint32> > C_Uti::h_GetContiguousSectionsAscending(const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if floating point value does contain a fraction part
 
-   \param[in] of64_Value Value to check
+   \param[in]  of64_Value  Value to check
 
    \return
    True  Value does not have fraction part
@@ -145,7 +145,7 @@ bool C_Uti::h_CheckFloatHasNoFractionPart(const float64 of64_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get number of decimals for floating point value
 
-   \param[in] of64_Value Value to check
+   \param[in]  of64_Value  Value to check
 
    \return
    -1   Decimals could not be determined
@@ -201,6 +201,8 @@ sint32 C_Uti::h_GetNumberOfDecimals(const float64 of64_Value)
    0.000000000000456677
 
    not: 1.9000 or 33333333333333333333333333333333333.0
+
+   \param[in]  of64_Value  Value
 
    \return
    Obtained QString.
@@ -293,7 +295,7 @@ QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
 
    Sort vector ascending by value and remove duplicate entries.
 
-   \param[in] orc_Items Items
+   \param[in]  orc_Items   Items
 
    \return
    Items uniquified and sorted ascending
@@ -311,7 +313,7 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortAscending(const std::vector<uint32> 
 
    Sort vector ascending by value and remove duplicate entries.
 
-   \param[in] orc_Items Items
+   \param[in]  orc_Items   Items
 
    \return
    Items uniquified and sorted descending
@@ -338,8 +340,8 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint32>
    The functions adapts the color by calculating the percentage of the difference to the maximum 255
    of all three colors.
 
-   \param[in] orc_Color        Reference color
-   \param[in] ou32_Percentage  Percentage value
+   \param[in]  orc_Color         Reference color
+   \param[in]  ou32_Percentage   Percentage value
 
    \return
    Adapted color
@@ -404,7 +406,7 @@ QColor C_Uti::h_ScaleColor(const QColor & orc_Color, const uint32 ou32_Percentag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility function to calculate disabled look for current color
 
-   \param[in] orc_DefaultColorLook Default color look
+   \param[in]  orc_DefaultColorLook    Default color look
 
    \return
    Disabled look for orc_DefaultColorLook
@@ -423,8 +425,9 @@ QColor C_Uti::h_GetDisabledColorLook(const QColor & orc_DefaultColorLook)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the string with three dots at the end if not enough space is available
 
-   \param[in] orc_FontMetrics Used font configuration
-   \param[in] osn_Width       Available space
+   \param[in]  orc_String        Input string
+   \param[in]  orc_FontMetrics   Used font configuration
+   \param[in]  osn_Width         Available space
 
    \return
    Adapted string
@@ -439,8 +442,9 @@ QString C_Uti::h_AdaptStringToSize(const QString & orc_String, const QFontMetric
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapts the string with three dots at the end if not enough space is available
 
-   \param[in] orc_FontMetrics Used font configuration
-   \param[in] of64_Width      Available space
+   \param[in]  orc_String        Input string
+   \param[in]  orc_FontMetrics   Used font configuration
+   \param[in]  of64_Width        Available space
 
    \return
    Adapted string
@@ -455,7 +459,7 @@ QString C_Uti::h_AdaptStringToSize(const QString & orc_String, const QFontMetric
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Prepare byte count as string
 
-   \param[in] ou32_ByteCount   Byte count
+   \param[in]  ou32_ByteCount    Byte count
 
    \return
    String: 1 Byte or ou32_ByteCount Bytes
@@ -480,8 +484,8 @@ QString C_Uti::h_GetByteCountAsString(const stw_types::uint32 ou32_ByteCount)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for specific key modifier
 
-   \param[in] orc_ActiveKeyModifiers Active key modifiers
-   \param[in] ore_CheckKeyModifier   Key modifier to check for
+   \param[in]  orc_ActiveKeyModifiers  Active key modifiers
+   \param[in]  ore_CheckKeyModifier    Key modifier to check for
 
    \return
    true  Modifier active
@@ -497,8 +501,8 @@ bool C_Uti::h_CheckKeyModifier(const Qt::KeyboardModifiers & orc_ActiveKeyModifi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for specific style state modifier
 
-   \param[in] orc_ActiveState Active states
-   \param[in] ore_CheckState  State to check for
+   \param[in]  orc_ActiveState   Active states
+   \param[in]  ore_CheckState    State to check for
 
    \return
    true  State active
@@ -512,6 +516,9 @@ bool C_Uti::h_CheckStyleState(const QStyle::State & orc_ActiveState, const QStyl
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current executable path (No slash at end)
+
+   \return
+   Current executable path
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetExePath(void)
@@ -527,7 +534,7 @@ QString C_Uti::h_GetExePath(void)
    This function is Windows specific and needs to be replaced by another solution
     when porting to a non-Windows system
 
-   \param[in] oq_UseSTWFormat Optional flag to output STW format
+   \param[in]  oq_UseSTWFormat   Optional flag to output STW format
 
    \return
    string with version information ("V?.??r?" on error)
@@ -540,7 +547,6 @@ QString C_Uti::h_GetApplicationVersion(const bool oq_UseSTWFormat)
    VS_FIXEDFILEINFO * pt_Info;
    uintn un_ValSize;
    sint32 s32_InfoSize;
-   uint8 * pu8_Buffer;
    C_SCLString c_Version;
 
    c_Version = "V?.\?\?r?";
@@ -548,6 +554,7 @@ QString C_Uti::h_GetApplicationVersion(const bool oq_UseSTWFormat)
    s32_InfoSize = GetFileVersionInfoSizeA(c_FileName.toStdString().c_str(), NULL);
    if (s32_InfoSize != 0)
    {
+      uint8 * pu8_Buffer;
       pu8_Buffer = new uint8[static_cast<uintn>(s32_InfoSize)];
       if (GetFileVersionInfoA(c_FileName.toStdString().c_str(), 0, s32_InfoSize, pu8_Buffer) != FALSE)
       {
@@ -578,7 +585,7 @@ QString C_Uti::h_GetApplicationVersion(const bool oq_UseSTWFormat)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check default path and replace by exe path if necessary
 
-   \param[in] orc_Path Default path to choose if set
+   \param[in]  orc_Path    Default path to choose if set
 
    \return
    Always contains some path
@@ -602,9 +609,11 @@ QString C_Uti::h_CheckAndReplaceWithExePathIfNecessary(const QString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert text to styled link
 
-   \param[in] orc_DisplayedText Text displayed by link
-   \param[in] orc_Color         Link color
-   \param[in] orc_HyperLink     Hyperlink target
+   When problems occure with \n as new line symbol using <br/> can fix the problem probably
+
+   \param[in]  orc_DisplayedText    Text displayed by link
+   \param[in]  orc_Color            Link color
+   \param[in]  orc_HyperLink        Hyperlink target
 
    \return
    Styled link text
@@ -627,7 +636,7 @@ QString C_Uti::h_GetLink(const QString & orc_DisplayedText, const QColor & orc_C
 
    Warning: only for onetime usage
 
-   \param[in] orc_Extension Extension to use for log file
+   \param[in]  orc_Extension  Extension to use for log file
 
    \return
    Absolute log file path and location
@@ -662,7 +671,7 @@ QString C_Uti::h_GetCompleteLogFileLocation(const QString & orc_Extension)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get readable stw error
 
-   \param[in] os32_Error STW error value
+   \param[in]  os32_Error  STW error value
 
    \return
    STW error string
@@ -699,11 +708,11 @@ QString C_Uti::h_StwError(const sint32 os32_Error)
    * do not convert the result of this function to std::string because the ellipsis "..."
      has an Unicode character representation (U+2026).
 
-   \param[in]     orc_Path       full file path
-   \param[in]     orc_Font       font to calculate number of maximal possible characters
-   \param[in]     ou32_Width     size in pixels for minimized file path to fit e.g. in line edit field
-   \param[in]     ou32_Buffer    left and right margin for text e.g. in line edit field, if this parameter is not needed
-                                 then set value to 0.
+   \param[in]  orc_Path       full file path
+   \param[in]  orc_Font       font to calculate number of maximal possible characters
+   \param[in]  ou32_Width     size in pixels for minimized file path to fit e.g. in line edit field
+   \param[in]  ou32_Buffer    left and right margin for text e.g. in line edit field, if this parameter is not needed
+                              then set value to 0.
 
    \return
    minimized file path
@@ -801,7 +810,7 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
 
    4 byte array to x.x.x.x
 
-   \param[in]     orau8_IpAddress         IP address for conversion
+   \param[in]  orau8_IpAddress   IP address for conversion
 
    \return
    String with IP address
@@ -823,7 +832,7 @@ QString C_Uti::h_IpAddressToString(const uint8 (&orau8_IpAddress)[4])
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert font from point size into pixel size
 
-   \param[in] orc_Font Font to convert
+   \param[in]  orc_Font    Font to convert
 
    \return
    Font with previous point size as new pixel size
@@ -840,7 +849,7 @@ QFont C_Uti::h_GetFontPixel(const QFont & orc_Font)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert version in format 1.00.0 to STW format V1.00r0
 
-   \param[in]     orc_Version    version in format 1.00.0 (e.g. APPLICATION_VERSION)
+   \param[in]  orc_Version    version in format 1.00.0 (e.g. APPLICATION_VERSION)
 
    \return
    version
@@ -869,8 +878,8 @@ QString C_Uti::h_ConvertVersionToSTWStyle(const QString & orc_Version)
 
    Warning: assuming orc_AbsoluteBaseDir is not an empty string and no file.
 
-   \param[in] orc_AbsoluteBaseDir         Base path if relative and could itself be relative
-   \param[in] orc_RelativeOrAbsoluteFile  Path which might be relative or absolute (and could be empty)
+   \param[in]  orc_BaseDir                   Base path if relative and could itself be relative
+   \param[in]  orc_RelativeOrAbsolutePath    Path which might be relative or absolute (and could be empty)
 
    \return
    Absolute file path if input fulfills assumptions
@@ -899,7 +908,11 @@ QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QStrin
       c_Retval = orc_RelativeOrAbsolutePath;
    }
 
-   // remove double slashes
+   // remove all double slashes but the first (network paths)
+   if (c_Retval.startsWith("//"))
+   {
+      c_Retval = '/' + c_Retval;
+   }
    c_Retval.replace("//", "/");
 
    return c_Retval;
@@ -908,9 +921,9 @@ QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QStrin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get unique item name based on proposal
 
-   \param[in] orc_ExistingStrings Existing item names
-   \param[in] orc_ProposedName    Proposal for item name
-   \param[in] orc_SkipName        Optional name to block any adaptations for
+   \param[in]  orc_ExistingStrings  Existing item names
+   \param[in]  orc_ProposedName     Proposal for item name
+   \param[in]  orc_SkipName         Optional name to block any adaptations for
 
    \return
    Unique node name
@@ -972,8 +985,8 @@ stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get unique item name based on proposal
 
-   \param[in] orc_ExistingStrings Existing item names
-   \param[in] orc_ProposedName    Proposal for item name
+   \param[in]  orc_ExistingStrings  Existing item names
+   \param[in]  orc_ProposedName     Proposal for item name
 
    \return
    Unique node name
@@ -990,9 +1003,9 @@ QString C_Uti::h_GetUniqueNameQ(const std::map<C_SCLString, bool> & orc_Existing
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get number at string end
 
-   \param[in]  orc_ProposedName Proposal for name
-   \param[out] orc_CutString    String without number
-   \param[out] ors32_Number     Number at end (else -1)
+   \param[in]   orc_ProposedName    Proposal for name
+   \param[out]  orc_CutString       String without number
+   \param[out]  ors32_Number        Number at end (else -1)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_Uti::h_GetNumberAtStringEnd(const C_SCLString & orc_ProposedName, C_SCLString & orc_CutString,
@@ -1062,7 +1075,7 @@ void C_Uti::h_GetNumberAtStringEnd(const C_SCLString & orc_ProposedName, C_SCLSt
    -1:        index was not part of input vector
    otherwise: index was part of input vector and the value shows at which position this index was standing
 
-   \param[in] orc_UnsortedIndices Unsorted indices
+   \param[in]  orc_UnsortedIndices  Unsorted indices
 
    \return
    Ascending sorted index map
@@ -1087,7 +1100,7 @@ std::vector<sint32> C_Uti::h_CreateAscendingIndexMap(const std::vector<uint32> &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if input vector is sorted ascending
 
-   \param[in] orc_Indices Input vector to evaluate
+   \param[in]  orc_Indices    Input vector to evaluate
 
    \return
    true:  Sorted
@@ -1122,7 +1135,7 @@ bool C_Uti::h_CheckSortedAscending(const std::vector<uint32> & orc_Indices)
 
    Empty input results in exe path!
 
-   \param[in] orc_Path Absolute or relative path
+   \param[in]  orc_Path    Absolute or relative path
 
    \return
    Absolute path
@@ -1146,10 +1159,10 @@ QString C_Uti::h_GetAbsolutePathFromExe(const QString & orc_Path)
    If the reference path is not absolute, behavior is undefined
    (Qt then defaults to calling path, which is often but not always the path of the executable).
 
-   \param[in]     orc_PathIn                 relative or absolute path of file or directory
-   \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
-   \param[out]    orc_PathAbsolute           absolute path
-   \param[out]    orc_PathRelative           relative path
+   \param[in]   orc_PathIn                relative or absolute path of file or directory
+   \param[in]   orc_AbsoluteReferenceDir  absolute path of reference directory
+   \param[out]  orc_PathAbsolute          absolute path
+   \param[out]  orc_PathRelative          relative path
 
    \return
    true  path can be represented relative to directory
@@ -1190,7 +1203,7 @@ bool C_Uti::h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & or
    Do not call this function for replacing every path variable!
    This functionality can be found in a utility class that knows project stuff.
 
-   \param[in]       orc_Path     path that probably contains variables
+   \param[in]  orc_Path    path that probably contains variables
 
    \return
    Resolved path
@@ -1237,8 +1250,11 @@ QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sort indices ascending ( Sorting steps are done for the content vectors in sync)
 
-   \param[in,out] orc_IndicesTmp  Unsorted indices
-   \param[in,out] orc_SyncContent Unsorted content to sync
+   \param[in,out]  orc_IndicesTmp   Unsorted indices
+   \param[in,out]  orc_SyncContent  Unsorted content to sync
+
+   \return
+   ascending sorted indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 template <typename T>

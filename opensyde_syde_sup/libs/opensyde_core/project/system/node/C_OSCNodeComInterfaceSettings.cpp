@@ -47,18 +47,6 @@ C_OSCNodeComInterfaceSettings::C_OSCNodeComInterfaceSettings(void) :
    q_IsBusConnected(false),
    u32_BusIndex(0)
 {
-   c_Ip.au8_IpAddress[0] = 0U;
-   c_Ip.au8_IpAddress[1] = 0U;
-   c_Ip.au8_IpAddress[2] = 0U;
-   c_Ip.au8_IpAddress[3] = 0U;
-   c_Ip.au8_NetMask[0] = 0U;
-   c_Ip.au8_NetMask[1] = 0U;
-   c_Ip.au8_NetMask[2] = 0U;
-   c_Ip.au8_NetMask[3] = 0U;
-   c_Ip.au8_DefaultGateway[0] = 0U;
-   c_Ip.au8_DefaultGateway[1] = 0U;
-   c_Ip.au8_DefaultGateway[2] = 0U;
-   c_Ip.au8_DefaultGateway[3] = 0U;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,6 +113,7 @@ void C_OSCNodeComInterfaceSettings::RemoveConnection(void)
 C_OSCNodeComInterfaceSettings::C_IpAddress::C_IpAddress(void)
 {
    (void)std::memset(&au8_IpAddress[0], 0, sizeof(au8_IpAddress));
-   (void)std::memset(&au8_NetMask[0], 0, sizeof(au8_NetMask));
+   (void)std::memset(&au8_NetMask[0], 255, sizeof(au8_NetMask));
+   au8_NetMask[3] = 0;
    (void)std::memset(&au8_DefaultGateway[0], 0, sizeof(au8_DefaultGateway));
 }

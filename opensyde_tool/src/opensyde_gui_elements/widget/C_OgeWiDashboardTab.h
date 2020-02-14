@@ -37,7 +37,6 @@ public:
    ~C_OgeWiDashboardTab(void);
    void SetText(const QString & orc_Text);
    void SetToolTip(const QString & orc_Heading, const QString & orc_Content) const;
-   void SetPinned(const bool oq_Value);
    void SetCurrent(const bool oq_Value);
    void SetActive(const bool oq_Value);
    void SetCloseButtonVisibility(const bool oq_Visibility);
@@ -72,7 +71,6 @@ private:
    QAction * mpc_ActionPaste;
    QAction * mpc_ActionDelete;
    QAction * mpc_ActionClose;
-   bool mq_Pinned;
    bool mq_Current;
    bool mq_Active;
    bool mq_EditActive;
@@ -84,14 +82,12 @@ private:
 
    void m_HandleMode(void);
    void m_InitContextMenu(void);
-   void m_ToggleActive(void);
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
    void m_EditProperties(void);
    void m_CopyAction(void);
    void m_CutAction(void);
    void m_PasteAction(void);
    void m_DeleteAction(void);
-   void m_CloseAction(void);
    void m_UndockAction(void);
    //Avoid call
    C_OgeWiDashboardTab(const C_OgeWiDashboardTab &);

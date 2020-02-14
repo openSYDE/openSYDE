@@ -79,7 +79,7 @@ sint32 C_OSCIOFileDataFiler::h_LoadIODataFile(C_OSCIOFileDataBase & orc_IOData, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save IO description
+/*! \brief  Save IO description
 
    Save IO description
    Will overwrite the file if it already exists.
@@ -749,7 +749,7 @@ sint32 C_OSCIOFileDataFiler::mh_LoadChannelUseCases(std::vector<C_OSCIOFileDataC
 
    \param[in]  orc_AvailabilityString Availability string
    \param[out] orc_Availability       Storage
-   \param[in]     ou32_NumChannels    Number of available channels for this domain
+   \param[in]  ou32_NumChannels       Number of available channels for this domain
 
    \return
    C_NO_ERR    data read
@@ -871,9 +871,9 @@ sint32 C_OSCIOFileDataFiler::mh_SplitAvailabilityString(const stw_scl::C_SCLStri
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Parse IO channel use-case availability string into its string sub elements
 
-   \param[in]  orc_SubElements        String subelements
-   \param[out] orc_AvailabilityString Parsed availability elements
-   \param[in]  ou32_NumChannels       Number of available channels for this domain
+   \param[in]     orc_SubElements  String subelements
+   \param[in,out] orc_Availability Availability
+   \param[in]     ou32_NumChannels Number of available channels for this domain
 
    \return
    C_NO_ERR    data read
@@ -1010,10 +1010,10 @@ sint32 C_OSCIOFileDataFiler::mh_ConvertStringToNumber(const stw_scl::C_SCLString
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle number section segment
 
-   \param[in,out]  orc_Number                 String number
-   \param[in,out]  orc_FoundNumbers           Last found numbers
-   \param[in,out]  orq_LastNumDeclaredSection Flag if last element of section should be connected to this number
-   \param[in]      orc_Section                Section string for user information
+   \param[in,out] orc_Number                 String number
+   \param[in,out] orc_FoundNumbers           Last found numbers
+   \param[in,out] orq_LastNumDeclaredSection Flag if last element of section should be connected to this number
+   \param[in]     orc_Section                Section string for user information
 
    \return
    C_NO_ERR    data read
@@ -1080,10 +1080,10 @@ sint32 C_OSCIOFileDataFiler::mh_HandleNumberSection(stw_scl::C_SCLString & orc_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle number section segment end
 
-   \param[in]     orc_FoundNumbers       Last found numbers
-   \param[in]     oq_IsGroupSection      Flag if current section is group of elements
-   \param[in,out] orc_AvailabilityString Parsed availability elements
-   \param[in]     ou32_NumChannels       Number of available channels for this domain
+   \param[in]     orc_FoundNumbers  Last found numbers
+   \param[in]     oq_IsGroupSection Flag if current section is group of elements
+   \param[in,out] orc_Availability  Availability
+   \param[in]     ou32_NumChannels  Number of available channels for this domain
 
    \return
    C_NO_ERR    data read
@@ -1140,7 +1140,7 @@ sint32 C_OSCIOFileDataFiler::mh_HandleNumberSectionEnd(const std::vector<sintn> 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get availability string
 
-   \param[in] oe_Type Availability
+   \param[in] orc_Availability Availability
 
    \return
    Availability string

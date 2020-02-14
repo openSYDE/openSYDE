@@ -77,8 +77,8 @@ C_SdNdeDpSelectorItemUsageWidget::C_SdNdeDpSelectorItemUsageWidget(QWidget * con
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemUsageWidget::SetData(const uint32 ou32_Size, const uint32 ou32_Used,
-                                                     const uint32 ou32_Reserved, uint32 & oru32_PercentageUsed,
-                                                     uint32 & oru32_PercentageReserved)
+                                               const uint32 ou32_Reserved, uint32 & oru32_PercentageUsed,
+                                               uint32 & oru32_PercentageReserved)
 {
    // Calculate the percentage
    if (ou32_Size != 0U)

@@ -157,8 +157,8 @@ void C_SyvDaItTaDelegate::paint(QPainter * const opc_Painter, const QStyleOption
 {
    //Draw background (used to fill in transparent grid)
    C_SdNdeDpUtil::h_DrawTableBackgroundGeneric(opc_Painter, orc_Option, this->mc_BackgroundColorDefault,
-                                                     this->mc_BackgroundColorAlternating,
-                                                     this->mc_BackgroundColorSelection);
+                                               this->mc_BackgroundColorAlternating,
+                                               this->mc_BackgroundColorSelection);
    //Draw element
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
    // progress bar

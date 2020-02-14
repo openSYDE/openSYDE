@@ -41,8 +41,8 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent  Optional pointer to parent
-   \param[in]     oq_DarkMode Flag for dark mode
+   \param[in,out]  orc_Parent    Parent widget
+   \param[in]      oq_DarkMode   Flag for dark mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPePieChart::C_SyvDaPePieChart(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
@@ -88,6 +88,14 @@ void C_SyvDaPePieChart::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelShowUnit->setText(C_GtGetText::h_GetText("Show Unit"));
    this->mpc_Ui->pc_LabelShowValue->setText(C_GtGetText::h_GetText("Show Value"));
+
+   //Tool tips
+   this->mpc_Ui->pc_LabelShowUnit->SetToolTipInformation(C_GtGetText::h_GetText("Show Unit"),
+                                                         C_GtGetText::h_GetText(
+                                                            "Option to display the unit after the value or hide the unit entirely"));
+   this->mpc_Ui->pc_LabelShowValue->SetToolTipInformation(C_GtGetText::h_GetText("Show Value"),
+                                                          C_GtGetText::h_GetText(
+                                                             "Option to display the value inside the pie chart or hide the value entirely"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -117,7 +125,7 @@ bool C_SyvDaPePieChart::GetShowUnit(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set show valid flag
 
-   \param[in] oq_Value New show value flag
+   \param[in]  oq_Value    New show value flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPePieChart::SetShowValue(const bool oq_Value) const
@@ -128,7 +136,7 @@ void C_SyvDaPePieChart::SetShowValue(const bool oq_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set show unit flag
 
-   \param[in] oq_Value New show unit flag
+   \param[in]  oq_Value    New show unit flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPePieChart::SetShowUnit(const bool oq_Value) const

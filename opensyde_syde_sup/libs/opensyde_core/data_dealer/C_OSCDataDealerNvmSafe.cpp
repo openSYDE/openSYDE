@@ -187,7 +187,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckCrcs(const C_OSCNode & orc_Node) cons
    C_OVERFLOW  At least one value lies outside of the defined minimum and maximum range. (checked by client side)
    C_BUSY      No changed value found and no additional lists specified (checked by client side)
    C_TIMEOUT   Expected server response not received within timeout
-   C_NOACT     Could not send request (e.g. TX buffer full)
+   C_NOACT     Could not send request (e.g. Tx buffer full)
    C_WARN      server sent error response
    C_RD_WR     unexpected content in server response
    C_COM       expected server response not received because of communication error
@@ -409,7 +409,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
    C_RANGE     At least one index of a datapool or a list of changed lists is invalid or
                datapool element size configuration does not match with count of read bytes
    C_TIMEOUT   Expected server response not received within timeout
-   C_NOACT     Could not send request (e.g. TX buffer full)
+   C_NOACT     Could not send request (e.g. Tx buffer full)
    C_WARN      Server sent error response
    C_COM       expected server response not received because of communication error
 */
@@ -451,7 +451,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCo
                // Reset of all valid flags
                for (u32_ElementCounter = 0U; u32_ElementCounter < rc_List.c_Elements.size(); ++u32_ElementCounter)
                {
-                  rc_List.c_Elements[u32_ElementCounter].q_IsValid = false;
+                  rc_List.c_Elements[u32_ElementCounter].q_NvmValueIsValid = false;
                }
 
                s32_Return = this->m_NvmReadListRaw(rc_List, c_Values, opu8_NrCode);
@@ -515,7 +515,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCo
    C_OVERFLOW  At least one changed list has no elements.
    C_DEFAULT   At least one element of the changed lists has the flag q_IsValid set to false.
    C_TIMEOUT   Expected server response not received within timeout
-   C_NOACT     Could not send request (e.g. TX buffer full)
+   C_NOACT     Could not send request (e.g. Tx buffer full)
    C_WARN      Server sent error response
    C_RD_WR     unexpected content in server response
    C_COM       expected server response not received because of communication error
@@ -615,7 +615,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteCrcs(uint8 * const opu8_NrCode)
                        ++u32_ElementCounter)
                   {
                      if (this->mc_NodeCopy.c_DataPools[u32_DataPoolCounter].c_Lists[u32_ListCounter].c_Elements[
-                            u32_ElementCounter].q_IsValid == false)
+                            u32_ElementCounter].q_NvmValueIsValid == false)
                      {
                         // Element was not read from ECU
                         s32_Return = C_BUSY;
@@ -950,6 +950,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
 
    \return
    C_NO_ERR   data saved
+   C_RANGE    file already exists
    C_OVERFLOW Wrong sequence of function calls
    C_BUSY     file already exists
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
@@ -1293,15 +1294,16 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadFileWithCRC(const C_SCLString & orc_Pa
    \param[out] ors32_ResultDetail Result detail
 
    \return
-   Return     Error Detail
-   C_NO_ERR   1            File successfully written to ECU
-   C_OVERFLOW 5            Wrong sequence of function calls
-              6            Path mismatch with previous function call
-   C_CONFIG   1            No valid diagnostic protocol is set in "C_OSCDataDealer"
-              2            No valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
-   C_NOACT    1            Communication protocol service could not be requested
-   C_TIMEOUT  1            Communication protocol service has timed out
-   C_WARN     1            Communication protocol service error response was received
+   Return        Error Detail
+   C_NO_ERR      1            File successfully written to ECU
+   C_OVERFLOW    5            Wrong sequence of function calls
+                 6            Path mismatch with previous function call
+   C_CONFIG      1            No valid diagnostic protocol is set in "C_OSCDataDealer"
+                 2            No valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
+   C_NOACT       1            Communication protocol service could not be requested
+   C_TIMEOUT     1            Communication protocol service has timed out
+   C_WARN        1            Communication protocol service error response was received
+   C_UNKNOWN_ERR <undefined>  Communication protocol failed with non-specified error code
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteParameterSetFile(const C_SCLString & orc_Path, sint32 & ors32_ResultDetail)
@@ -1345,16 +1347,16 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteParameterSetFile(const C_SCLString & 
                         s32_Retval = C_WARN;
                         ors32_ResultDetail = 1;
                         break;
-                     case C_NO_ERR: //unexpected
+                     case C_NO_ERR: //positive result
                         ors32_ResultDetail = 1;
                         break;
                      default:
                         //Not documented error was returned by function
                         s32_Retval = C_UNKNOWN_ERR;
-                        osc_write_log_info("Parametrization", "Not documented error was returned by NvmWrite");
+                        osc_write_log_info("Parametrization", "Not documented error code " +
+                                           C_SCLString::IntToStr(s32_Retval) + " was returned by NvmWrite");
                         break;
                      }
-
                      if (s32_Retval != C_NO_ERR)
                      {
                         break;
@@ -1498,7 +1500,7 @@ sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRa
    C_RANGE    List has no elements. Nothing to read.
               Datapool element size configuration does not match with count of read bytes
    C_TIMEOUT  Expected response not received within timeout
-   C_NOACT    Could not send request (e.g. TX buffer full)
+   C_NOACT    Could not send request (e.g. Tx buffer full)
    C_WARN     Error response or malformed protocol response
    C_CONFIG   Pre-requisites not correct; e.g. driver not initialized or
               parameter out of range (checked by client side)

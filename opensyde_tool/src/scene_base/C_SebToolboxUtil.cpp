@@ -16,7 +16,7 @@
 #include "C_GtGetText.h"
 #include "C_SebToolboxUtil.h"
 #include "C_OgeLabToolboxHeadingGroup.h"
-#include "C_OgeLabToolboxHeadingGroupBold.h"
+#include "C_OgeLabToolboxHeadingGroupBig.h"
 #include "C_SdUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -26,9 +26,8 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SebToolboxUtil::hsn_LabelSize = 35;
+const stw_types::sintn C_SebToolboxUtil::hsn_LabelSize = 33;
 const stw_types::sintn C_SebToolboxUtil::hsn_HeadingSpacerSizeTop = 47;
-const stw_types::sintn C_SebToolboxUtil::hsn_HeadingSpacerSizeBottom = 6;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -96,15 +95,21 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
    \param[in,out] opc_Layout         Layout to add heading to
    \param[in,out] opc_Parent         Parent widget
    \param[in]     oq_AddSpacerBefore Optional flag to add spacer on top
+
+   \return
+   Pointer to frame separator item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, QVBoxLayout * const opc_Layout,
-                                       QWidget * const opc_Parent, const bool oq_AddSpacerBefore)
+C_OgeFrameSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, QVBoxLayout * const opc_Layout,
+                                                        QWidget * const opc_Parent, const bool oq_AddSpacerBefore)
 {
+   C_OgeFrameSeparator * pc_FrameSeparator = NULL;
+
    if (opc_Layout != NULL)
    {
-      C_OgeLabToolboxHeadingGroupBold * const pc_Heading = new C_OgeLabToolboxHeadingGroupBold(opc_Parent);
-      QSpacerItem * const pc_SpacerBottom = new QSpacerItem(0, C_SebToolboxUtil::hsn_HeadingSpacerSizeBottom);
+      C_OgeLabToolboxHeadingGroupBig * const pc_Heading = new C_OgeLabToolboxHeadingGroupBig(opc_Parent);
+      pc_FrameSeparator = new C_OgeFrameSeparator(opc_Parent);
+      QVBoxLayout * const pc_FrameLayout = new QVBoxLayout();
       sintn sn_Index;
 
       //Optional top spacer
@@ -125,11 +130,18 @@ void C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, QVBoxLayout * c
       sn_Index = opc_Layout->indexOf(pc_Heading);
       opc_Layout->setStretch(sn_Index, 0);
 
-      //Bottom spacer
-      opc_Layout->addSpacerItem(pc_SpacerBottom);
-      //lint -e{429}  no memory leak because of the parent of pc_SpacerBottom, the call of addSpacerItem and the Qt
+      // add frame separator between heading and subheading to new layout
+      pc_FrameLayout->addWidget(pc_FrameSeparator);
+      pc_FrameSeparator->setMinimumHeight(1);
+
+      // add new layout with frame separator to existing layout
+      opc_Layout->addLayout(pc_FrameLayout);
+      pc_FrameLayout->setContentsMargins(13, 0, 0, 0);
+
+      //lint -e{429}  no memory leak because of the parent of the call of addSpacerItem and the Qt
       // memory management
    }
+   return pc_FrameSeparator;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

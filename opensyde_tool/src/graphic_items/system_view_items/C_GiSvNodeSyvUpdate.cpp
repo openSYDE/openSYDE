@@ -995,31 +995,35 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
    //Font
    if (u32_ScaleCategory == mhu32_ScaleCategory1)
    {
-      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_15);
+      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_10);
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory2)
    {
-      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_20);
+      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_15);
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory3)
    {
-      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_25);
+      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_20);
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory4)
    {
-      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_30);
+      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_25);
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory5)
    {
-      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_35);
+      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_30);
    }
    else if (u32_ScaleCategory == mhu32_ScaleCategory6)
+   {
+      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_35);
+   }
+   else if (u32_ScaleCategory == mhu32_ScaleCategory7)
    {
       this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_40);
    }
    else
    {
-      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_10);
+      this->mpc_IconBottom->SetTextFont(mc_STYLE_GUIDE_FONT_REGULAR_7);
    }
 
    //Icons

@@ -77,20 +77,6 @@ bool C_OgeTreeWidgetToolBarSearch::HasResults(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTreeWidgetToolBarSearch::m_DeleteChildren(QTreeWidgetItem * const opc_ItemParent) const
-{
-   while (opc_ItemParent->childCount() > 0)
-   {
-      QTreeWidgetItem * pc_Item = opc_ItemParent->child(0);
-      if (pc_Item != NULL)
-      {
-         opc_ItemParent->removeChild(pc_Item);
-         delete pc_Item;
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeWidgetToolBarSearch::m_MarkResultString(QString & orc_ResultString) const
 {
    const sintn sn_Pos = orc_ResultString.indexOf(this->mc_SearchString, 0, Qt::CaseInsensitive);

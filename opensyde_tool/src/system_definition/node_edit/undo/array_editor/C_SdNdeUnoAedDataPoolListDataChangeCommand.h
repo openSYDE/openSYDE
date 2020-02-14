@@ -56,7 +56,6 @@ private:
    C_SdNdeDpListModelViewManager * const mpc_DataPoolListModelViewManager;
 
    void m_Change(QVariant & orc_PreviousData, const QVariant & orc_NewData);
-   C_SdNdeDpUtil::E_ElementDataChangeType m_ConvertToChangeType(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -37,15 +37,14 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     oru32_NodeIndex            Node index
-   \param[in]     oru32_DataPoolIndex        Node data pool index
-   \param[in]     oru32_DataPoolListIndex    Node data pool list index
-   \param[in,out] opc_DataPoolListTableModel Data pool lists table model to perform actions on
-   \param[in,out] opc_DataPoolListTableView  Data pool lists table widget to perform actions on
-   \param[in]     orc_SourceCol              Source columns
-   \param[in]     orc_TargetCol              Target columns
-   \param[in]     orq_AdaptIndices           Flag, if target columns should be adapted to source column deletion
-   \param[in,out] opc_Parent                 Optional pointer to parent
+   \param[in]      oru32_NodeIndex                    Node index
+   \param[in]      oru32_DataPoolIndex                Node data pool index
+   \param[in]      oru32_DataPoolListIndex            Node data pool list index
+   \param[in,out]  opc_DataPoolListModelViewManager   Data pool list model view manager to perform actions on
+   \param[in]      orc_SourceCol                      Source columns
+   \param[in]      orc_TargetCol                      Target columns
+   \param[in]      orq_AdaptIndices                   Flag, if target columns should be adapted to source column deletion
+   \param[in,out]  opc_Parent                         Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDasDataPoolListMoveCommand::C_SdNdeUnoDasDataPoolListMoveCommand(const uint32 & oru32_NodeIndex,

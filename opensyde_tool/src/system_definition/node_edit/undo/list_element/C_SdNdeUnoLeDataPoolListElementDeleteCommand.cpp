@@ -44,8 +44,8 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementDeleteCommand::C_SdNdeUnoLeDataPoolListElementDeleteCommand(
    const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
-   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-   const std::vector<uint32> & orc_Indices, QUndoCommand * const opc_Parent) :
+   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32> & orc_Indices,
+   QUndoCommand * const opc_Parent) :
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                                        opc_DataPoolListModelViewManager,
                                                        orc_Indices,

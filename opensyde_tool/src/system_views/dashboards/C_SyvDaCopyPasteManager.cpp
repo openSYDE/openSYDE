@@ -81,6 +81,8 @@ C_SyvDaCopyPasteManager::~C_SyvDaCopyPasteManager(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data snapshot
 
+   \param[in,out]  opc_Parent  Optional pointer to parent
+
    \return
    NULL No valid data snap shot found
    Else Valid data snapshot
@@ -188,6 +190,7 @@ const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc
             {
                c_Details = C_GtGetText::h_GetText("Another parametrization widget in this view is already "
                                                   "using at least one of the containing lists.");
+               c_Message.SetCustomMinHeight(180, 250);
             }
             else if (q_ElementMissing)
             {
@@ -199,6 +202,7 @@ const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc
                   c_Details += *c_It;
                   c_Details += "\n";
                }
+               c_Message.SetCustomMinHeight(180, 270);
             }
             else
             {
@@ -222,6 +226,7 @@ const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc
          c_Message.SetDescription(C_GtGetText::h_GetText(
                                      "Some data elements were not found in your SYSTEM DEFINITION.\n"
                                      "These were automatically removed from the pasted widgets"));
+         c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
       }
    }

@@ -14,6 +14,7 @@
 
 #include "C_SyvDaItChartSettingsWidget.h"
 #include "ui_C_SyvDaItChartSettingsWidget.h"
+#include "C_OgeWiUtil.h"
 
 #include "C_GtGetText.h"
 
@@ -131,6 +132,32 @@ C_PuiSvDbChart::E_SettingZoomMode C_SyvDaItChartSettingsWidget::GetSettingZoomMo
    }
 
    return e_Setting;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply current dark mode setting
+
+   \param[in] oe_Style    Style type
+   \param[in] oq_DarkMode Dark mode active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItChartSettingsWidget::ApplyDarkMode(const C_PuiSvDbWidgetBase::E_Style oe_Style,
+                                                 const bool oq_DarkMode) const
+{
+   if (oq_DarkMode == true)
+   {
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelZoomMode, "HasColor2",
+                                             (oe_Style == C_PuiSvDbWidgetBase::eOPENSYDE));
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelZoomMode, "HasColor0",
+                                             (oe_Style != C_PuiSvDbWidgetBase::eOPENSYDE));
+   }
+   else
+   {
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelZoomMode, "HasColor0", oq_DarkMode);
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelZoomMode, "HasColor2", oq_DarkMode);
+   }
+
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelZoomMode, "HasColor8", !oq_DarkMode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

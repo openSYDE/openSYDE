@@ -22,6 +22,7 @@
 #include "C_SyvUpScene.h"
 #include "C_SyvUpSequences.h"
 #include "C_SyvUpProgressLog.h"
+#include "C_OgeWiFixPosition.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -101,7 +102,6 @@ private:
 
    void m_Timer(void);
 
-   QString m_GetTimeStamp(const bool oq_Bold) const;
    void m_UpdateReportText(const QString & orc_NewTextPart) const;
 
    void m_HandleConnectionFailure(void);
@@ -116,7 +116,6 @@ private:
 
    std::vector<bool> m_GetIsFileBasedFlagForEach(void) const;
 
-   static bool mh_IsAnimated(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsConnectionStart(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsConnectionSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsConnectionFailure(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
@@ -128,13 +127,16 @@ private:
    static bool mh_IsUpdateNodeSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsUpdateFailure(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsUpdateAbort(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
-   static QString mh_GetString(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
+
+   void m_WiFixPosMaxBtnClicked(void);
+   void m_WiHoverMinBtnClicked(void);
 
    Ui::C_SyvUpUpdateWidget * mpc_Ui;
    stw_types::uint32 mu32_ViewIndex;
    stw_types::uint32 mu32_ApplicationIndex;
    C_SyvUpScene * mpc_Scene;
    stw_opensyde_gui_elements::C_OgeWiHover * mpc_ProgressLog;
+   stw_opensyde_gui_elements::C_OgeWiFixPosition * mpc_FixMinimizedProgressLog;
    QWidget * const mpc_ProgressLogParent;
    C_SyvUpProgressLog * mpc_ProgressLogContent;
 

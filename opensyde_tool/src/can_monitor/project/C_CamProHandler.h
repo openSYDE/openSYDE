@@ -91,6 +91,7 @@ public:
    void AddDatabase(const C_CamProDatabaseData & orc_NewDatabase);
 
    //Move
+   void ReplaceDatabaseName(const QString & orc_PrevName, const QString & orc_NewName);
    stw_types::sint32 MoveMessage(const stw_types::uint32 ou32_StartIndex, const stw_types::uint32 ou32_TargetIndex);
 
    //Delete

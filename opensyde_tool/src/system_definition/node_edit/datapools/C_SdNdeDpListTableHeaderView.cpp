@@ -45,7 +45,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListTableHeaderView::C_SdNdeDpListTableHeaderView(const Qt::Orientation & ore_Orientation,
-                                                                       QWidget * const opc_Parent) :
+                                                           QWidget * const opc_Parent) :
    QHeaderView(ore_Orientation, opc_Parent)
 {
    //May be cyclic trigger directly in paintSection necessary
@@ -110,7 +110,7 @@ QStyleOptionViewItem C_SdNdeDpListTableHeaderView::viewOptions(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableHeaderView::paintSection(QPainter * const opc_Painter, const QRect & orc_Rect,
-                                                      const sintn osn_LogicalIndex) const
+                                                const sintn osn_LogicalIndex) const
 {
    QHeaderView::paintSection(opc_Painter, orc_Rect, osn_LogicalIndex);
    //You can draw anything here, it is not shown as long as you do call the original function

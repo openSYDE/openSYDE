@@ -34,8 +34,8 @@ public:
    virtual ~C_GiLiCANBus();
 
    virtual stw_types::sintn type() const override;
-   virtual bool OpenStyleDialog(void);
-   virtual stw_opensyde_core::C_OSCSystemBus::E_Type GetType() const;
+   virtual bool OpenStyleDialog(void) override;
+   virtual stw_opensyde_core::C_OSCSystemBus::E_Type GetType() const override;
 
 private:
    //Avoid call

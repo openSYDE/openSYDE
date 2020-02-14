@@ -14,6 +14,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
+#include "C_OSCCanProtocol.h"
+#include "C_OSCNodeDataPool.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core

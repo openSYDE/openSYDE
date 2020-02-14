@@ -41,7 +41,9 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]    opc_Item    Optional pointer to widget item
+   \param[in]        orc_Info    Device information
+   \param[in,out]    opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const opc_Item,

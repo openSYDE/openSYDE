@@ -68,6 +68,7 @@ public:
    virtual ~C_SdBueMlvSignalManager();
 
    void LoadSignal(const stw_types::uint32 ou32_SignalIndex, const C_SignalItemColors & orc_ColorConfiguration);
+   void SetColorConfiguration(const C_SignalItemColors & orc_ColorConfiguration);
    void SetName(const QString & orc_Name);
    bool SetStartBit(const stw_types::uint16 ou16_Position);
    bool SetLastBit(const stw_types::uint16 ou16_Position);

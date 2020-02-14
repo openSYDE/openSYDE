@@ -26,6 +26,8 @@ class C_PuiSdNodeCanSignal
 public:
    C_PuiSdNodeCanSignal(void);
 
+   void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+
    stw_types::uint8 u8_ColorIndex;
 };
 

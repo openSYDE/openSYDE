@@ -57,11 +57,11 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in]     oru32_ViewIndex        Index of system view
-   \param[in]     oru32_DashboardIndex   Index of dashboard in system view
-   \param[in]     ors32_DataIndex        Index of data element in dashboard in system view
-   \param[in]     oru64_ID               Unique ID
-   \param[in,out] opc_Parent             Optional pointer to parent
+   \param[in]      oru32_ViewIndex        Index of system view
+   \param[in]      oru32_DashboardIndex   Index of dashboard in system view
+   \param[in]      ors32_DataIndex        Index of data element in dashboard in system view
+   \param[in]      oru64_ID               Unique ID
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaSpinBoxBase::C_GiSvDaSpinBoxBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
@@ -73,7 +73,7 @@ C_GiSvDaSpinBoxBase::C_GiSvDaSpinBoxBase(const uint32 & oru32_ViewIndex, const u
 {
    QFont c_Font;
 
-   mpc_SpinBoxWidget = new C_OgeWiDashboardSpinBoxGroup();
+   this->mpc_SpinBoxWidget = new C_OgeWiDashboardSpinBoxGroup();
    //Default font
    c_Font = this->mpc_SpinBoxWidget->font();
    c_Font.setFamily("Segoe UI");
@@ -187,7 +187,7 @@ void C_GiSvDaSpinBoxBase::DeleteData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active Flag if connection is active or not active now
+   \param[in]  oq_Active   Flag if connection is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::ConnectionActiveChanged(const bool oq_Active)
@@ -266,6 +266,8 @@ void C_GiSvDaSpinBoxBase::SendCurrentValue(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Call properties for widgets
+
+   \return true (configurable properties called)
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaSpinBoxBase::CallProperties(void)
@@ -317,7 +319,6 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
             C_PuiSvDbSpinBox c_Box = *pc_Box;
             C_PuiSvDbNodeDataElementConfig c_Tmp;
             //Save
-            this->me_Style = pc_Dialog->GetTheme();
             c_Box.e_DisplayStyle = pc_Dialog->GetTheme();
             c_Box.e_Type = pc_PropertiesWidget->GetType();
             c_Box.q_ShowUnit = pc_PropertiesWidget->GetShowUnit();
@@ -333,8 +334,12 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
 
             //Apply
             this->me_WriteMode = pc_Dialog->GetWriteMode();
-            this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
-            this->UpdateTypePe(c_Box.e_Type, c_Box.q_ShowUnit);
+            this->SetDisplayStyle(c_Box.e_DisplayStyle, this->mq_DarkMode);
+            if (this->mpc_SpinBoxWidget != NULL)
+            {
+               this->mpc_SpinBoxWidget->SetDesignType(c_Box.e_Type);
+               this->mpc_SpinBoxWidget->SetShowUnit(c_Box.q_ShowUnit);
+            }
             this->ClearDataPoolElements();
             if (c_Tmp.c_ElementId.GetIsValid())
             {
@@ -364,8 +369,8 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
 
    Warning: Only use for preview
 
-   \param[in] oe_Type        Type
-   \param[in] oq_ShowUnit    Show unit
+   \param[in]  oe_Type        Type
+   \param[in]  oq_ShowUnit    Show unit
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::UpdateTypePe(const C_PuiSvDbSpinBox::E_Type oe_Type, const bool oq_ShowUnit)
@@ -382,7 +387,7 @@ void C_GiSvDaSpinBoxBase::UpdateTypePe(const C_PuiSvDbSpinBox::E_Type oe_Type, c
 
    Warning: Only use for preview
 
-   \param[in] os32_Value New value
+   \param[in]  os32_Value  New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::SetValuePe(const sint32 os32_Value)
@@ -412,7 +417,7 @@ void C_GiSvDaSpinBoxBase::SetValuePe(const sint32 os32_Value)
 
    Warning: Only use for preview
 
-   \param[in] orc_Value New unit
+   \param[in]  orc_Value   New unit
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::SetUnitPe(const QString & orc_Value)

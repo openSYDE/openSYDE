@@ -71,7 +71,7 @@ Q_SIGNALS:
    //lint -restore
    void SigChangeMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
                       const stw_types::uint32 ou32_Index, const QString & orc_Name, const QString & orc_SubSubItemName,
-                      const stw_types::uint32 ou32_Flag = 0U);
+                      const stw_types::uint32 ou32_Flag = 0U, const bool oq_ChangeUseCase = false);
    void SigOpenDetail(const stw_types::sint32 os32_Index, const stw_types::sint32 os32_SubIndex,
                       const stw_types::sint32 os32_SubSubIndex, const stw_types::sint32 os32_SubSubSubIndex,
                       const stw_types::sint32 os32_Flag);

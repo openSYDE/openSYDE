@@ -53,7 +53,7 @@ C_OSCNodeDataPoolListElement::C_OSCNodeDataPoolListElement(void) :
    c_Value(),
    c_NvmValue(),
    q_NvMValueChanged(false),
-   q_IsValid(false),
+   q_NvmValueIsValid(false),
    u32_NvMStartAddress(0)
 {
    this->SetType(C_OSCNodeDataPoolContent::eUINT8);

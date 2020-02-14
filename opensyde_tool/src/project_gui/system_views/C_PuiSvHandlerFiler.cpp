@@ -1960,7 +1960,7 @@ void C_PuiSvHandlerFiler::mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & or
                                                   u32_ElementIndex);
       C_OSCNodeDataPool::E_Type e_InvalidTypePlaceholder = C_OSCNodeDataPool::eDIAG;
       QString c_InvalidNamePlaceholder = "";
-      uint32 q_UseArrayElementIndex;
+      bool q_UseArrayElementIndex;
       uint32 u32_ArrayElementIndex;
       C_PuiSvDbNodeDataPoolListElementId::E_Type e_SourceType;
 
@@ -2005,11 +2005,8 @@ void C_PuiSvHandlerFiler::mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & or
       {
          q_UseArrayElementIndex = false;
       }
-      //lint -e{1786,1960}   false positive, probably wrong constructor selected
       orc_Id = C_PuiSvDbNodeDataPoolListElementId(c_Base, e_SourceType, q_UseArrayElementIndex, u32_ArrayElementIndex,
-                                                  q_IsValid,
-                                                  e_InvalidTypePlaceholder,
-                                                  c_InvalidNamePlaceholder);
+                                                  q_IsValid, e_InvalidTypePlaceholder, c_InvalidNamePlaceholder);
    }
 }
 

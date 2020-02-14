@@ -130,7 +130,7 @@ sint32 C_OSCComDriverFlash::Init(const C_OSCSystemDefinition & orc_SystemDefinit
 
    An old connection will be closed.
 
-   \param[in] ou32_Bitrate      Bitrate in kBit/s
+   \param[in] ou32_Bitrate      Bitrate in kbit/s
 
    \return
    C_NO_ERR    Bitrate set
@@ -206,6 +206,70 @@ sint32 C_OSCComDriverFlash::OsyResetPollingTimeout(const C_OSCProtocolDriverOsyN
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the minimum Flashloader reset wait time in ms
+
+   Default minimum value is 500 ms independent of the type.
+
+   \param[in]  oe_Type  Type of minimum flashloader reset wait time
+
+   \return
+   Time in ms all nodes need at least to get from application to the Flashloader or from Flashloader to Flashloader
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCComDriverFlash::GetMinimumFlashloaderResetWaitTime(const E_MinimumFlashloaderResetWaitTimeType oe_Type)
+const
+{
+   uint32 u32_WaitTime = 500U;
+   uint32 u32_Counter;
+
+   for (u32_Counter = 0U; u32_Counter < this->mc_ActiveNodesIndexes.size(); ++u32_Counter)
+   {
+      uint32 u32_NodeWaitTime;
+      tgl_assert(m_GetMinimumFlashloaderResetWaitTime(oe_Type, this->mc_ActiveNodesIndexes[u32_Counter],
+                                                      u32_NodeWaitTime) == C_NO_ERR);
+      if (u32_NodeWaitTime > u32_WaitTime)
+      {
+         // The node needs a longer wait time
+         u32_WaitTime = u32_NodeWaitTime;
+      }
+   }
+
+   return u32_WaitTime;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the minimum Flashloader reset wait time in ms for a specific node
+
+   Default minimum value is 500 ms independent of the type.
+
+   \param[in]   oe_Type             Type of minimum flashloader reset wait time
+   \param[in]   orc_ServerId        Server id to get the configured wait time
+   \param[out]  oru32_TimeValue     Time in ms the node need at least to get from application to the Flashloader or
+                                    from Flashloader to Flashloader
+
+   \retval   C_NO_ERR   Time returned
+   \retval   C_RANGE    Node with orc_ServerId does not exist or is not active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverFlash::GetMinimumFlashloaderResetWaitTime(const E_MinimumFlashloaderResetWaitTimeType oe_Type,
+                                                               const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                               uint32 & oru32_TimeValue) const
+{
+   sint32 s32_Return = C_RANGE;
+   bool q_Found = false;
+   const uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
+
+   if (q_Found == true)
+   {
+      s32_Return = this->m_GetMinimumFlashloaderResetWaitTime(oe_Type,
+                                                              this->mc_ActiveNodesIndexes[u32_ActiveNodeIndex],
+                                                              oru32_TimeValue);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send request programming
 
    Sending service as broadcast via CAN or ETH TP.
@@ -217,7 +281,7 @@ sint32 C_OSCComDriverFlash::OsyResetPollingTimeout(const C_OSCProtocolDriverOsyN
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_CONFIG   no transport protocol installed or broadcast protocol not initialized
@@ -396,7 +460,7 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastReadSerialNumber(
    C_NO_ERR   request sent, positive response received
    C_RANGE    openSYDE protocol not found
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -446,7 +510,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadDeviceName(const C_OSCProtocolDriverOsyNo
    C_NO_ERR   request sent, positive response received
    C_RANGE    openSYDE protocol not found
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -612,7 +676,7 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const uint8 (&orau8_
    C_NO_ERR    Received positive response
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -646,7 +710,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestProgramming(const C_OSCProtocolDriverO
    C_NO_ERR    Received positive response
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM      communication driver reported error
@@ -680,7 +744,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OSCProtoc
    C_NO_ERR    Read information for at least one block
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received (except for requestOutOfRange for block > 0)
    C_TIMEOUT   Expected response not received within timeout
    C_COM      communication driver reported error
@@ -743,7 +807,7 @@ const
    C_NO_ERR    Read information (placed in orc_Information)
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -833,7 +897,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OSCPro
    C_NO_ERR    service finished without problems
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -868,7 +932,7 @@ sint32 C_OSCComDriverFlash::SendOsyCheckFlashMemoryAvailable(const C_OSCProtocol
    C_NO_ERR    service finished without problems
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -904,7 +968,7 @@ sint32 C_OSCComDriverFlash::SendOsyWriteApplicationSoftwareFingerprint(const C_O
    C_NO_ERR    service finished without problems
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -938,7 +1002,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestDownload(const C_OSCProtocolDriverOsyN
    C_NO_ERR    service finished without problems
    C_RANGE     openSYDE protocol not found; file path too long
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -971,7 +1035,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestFileTransfer(const C_OSCProtocolDriver
    C_NO_ERR    service finished without problems
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -1006,7 +1070,7 @@ sint32 C_OSCComDriverFlash::SendOsyTransferData(const C_OSCProtocolDriverOsyNode
    C_NO_ERR    service finished without problems
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -1039,7 +1103,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitAddressBased(const C_OSCPr
    C_NO_ERR    service finished without problems
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
@@ -1079,7 +1143,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitFileBased(const C_OSCProto
    C_NO_ERR    Request sent
    C_RANGE     openSYDE protocol not found
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
-   C_NOACT     Could not put request in TX queue
+   C_NOACT     Could not put request in Tx queue
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCComDriverFlash::SendOsyEcuReset(const C_OSCProtocolDriverOsyNode & orc_ServerId,
@@ -1202,7 +1266,7 @@ sint32 C_OSCComDriverFlash::SendOsySetSecurityLevel(const C_OSCProtocolDriverOsy
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets a new bitrate on a openSYDE server
+/*! \brief   Sets a new bitrate on an openSYDE server
 
    Only for CAN
 
@@ -1215,7 +1279,7 @@ sint32 C_OSCComDriverFlash::SendOsySetSecurityLevel(const C_OSCProtocolDriverOsy
    C_NO_ERR   Bitrate was set successful
    C_RANGE    openSYDE protocol not found
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1253,7 +1317,7 @@ sint32 C_OSCComDriverFlash::SendOsySetBitrate(const C_OSCProtocolDriverOsyNode &
    C_NO_ERR   Bitrate was set successful
    C_RANGE    openSYDE protocol not found
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -1293,7 +1357,7 @@ sint32 C_OSCComDriverFlash::SendOsySetIpAddressForChannel(const C_OSCProtocolDri
    C_RANGE    openSYDE protocol not found
               ou8_BusId or ou8_NodeId is out of range
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
@@ -1328,17 +1392,16 @@ sint32 C_OSCComDriverFlash::SendOsySetNodeIdForChannel(const C_OSCProtocolDriver
    C_NO_ERR   List of features was read successfully
    C_RANGE    openSYDE protocol not found
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadListOfFeatures(
-   const C_OSCProtocolDriverOsyNode & orc_ServerId,
-   C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ListOfFeatures,
-   stw_types::uint8 * const opu8_NrCode) const
+sint32 C_OSCComDriverFlash::SendOsyReadListOfFeatures(const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                      C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ListOfFeatures,
+                                                      stw_types::uint8 * const opu8_NrCode) const
 {
    sint32 s32_Return = C_RANGE;
    C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
@@ -1757,7 +1820,7 @@ sint32 C_OSCComDriverFlash::SendStwSetBitrateCan(const C_OSCProtocolDriverOsyNod
       pc_ExistingProtocol = &c_StwProtocol;
    }
 
-   // We support only 16 bit bitrate for STW flashloader -> bitrate resolution kBits/second
+   // We support only 16 bit bitrate for STW flashloader -> bitrate resolution kbit/second
    s32_Return = pc_ExistingProtocol->SetBitrateCAN(ou32_Bitrate / 1000U, false);
    return s32_Return;
 }
@@ -2026,9 +2089,10 @@ sint32 C_OSCComDriverFlash::m_StartRoutingSpecific(const uint32 ou32_ActiveNode,
           (opc_ProtocolOsyOfLastNodeOfRouting != NULL))
       {
          (*oppc_RoutingDispatcher) = new C_OSCCanDispatcherOsyRouter(*opc_ProtocolOsyOfLastNodeOfRouting);
-         // TODO Filter settings?
-         (*oppc_RoutingDispatcher)->SetFilterParameters(orc_LastNodeOfRouting.u8_OutInterfaceNumber, 0x00000000,
-                                                        0x00000000);
+
+         // Only 0x52 for Rx is relevant
+         (*oppc_RoutingDispatcher)->SetFilterParameters(orc_LastNodeOfRouting.u8_OutInterfaceNumber, 0x00000052,
+                                                        0x000007FF);
 
          this->mc_LegacyRouterDispatchers[ou32_ActiveNode] = (*oppc_RoutingDispatcher);
          // Set the new dispatcher
@@ -2184,6 +2248,7 @@ sint32 C_OSCComDriverFlash::m_InitFlashProtocol(void)
             {
             case C_OSCNodeProperties::eFL_OPEN_SYDE:
                pc_ProtocolOsy = new C_OSCProtocolDriverOsy();
+               pc_ProtocolOsy->InitializeHandleWaitTime(&C_OSCComDriverFlash::mh_HandleWaitTime, this);
                s32_Return = pc_ProtocolOsy->SetTransportProtocol(this->mc_TransportProtocols[u32_ActiveNodeCounter]);
                if (s32_Return == C_NO_ERR)
                {
@@ -2305,4 +2370,124 @@ sint32 C_OSCComDriverFlash::m_GetStwResetMessage(const uint32 ou32_NodeIndex, T_
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the minimum Flashloader reset wait time in ms for a specific node
+
+   Default minimum value is 500 ms independent of the type.
+
+   \param[in]   oe_Type             Type of minimum flashloader reset wait time
+   \param[in]   ou32_NodeIndex      Node index to get the configured wait time
+   \param[out]  oru32_TimeValue     Time in ms the node need at least to get from application to the Flashloader or
+                                    from Flashloader to Flashloader
+
+   \retval   C_NO_ERR   Time returned
+   \retval   C_RANGE    Node with orc_ServerId does not exist or is not active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComDriverFlash::m_GetMinimumFlashloaderResetWaitTime(
+   const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type, const uint32 ou32_NodeIndex,
+   uint32 & oru32_TimeValue) const
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mpc_SysDef->c_Nodes.size())
+   {
+      const C_OSCNode & rc_Node = this->mpc_SysDef->c_Nodes[ou32_NodeIndex];
+
+      tgl_assert(rc_Node.pc_DeviceDefinition != NULL);
+      if (rc_Node.pc_DeviceDefinition != NULL)
+      {
+         s32_Return = C_NO_ERR;
+
+         switch (oe_Type)
+         {
+         case C_OSCComDriverFlash::eNO_CHANGES_CAN:
+            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeNoChangesCan;
+            break;
+         case C_OSCComDriverFlash::eNO_CHANGES_ETHERNET:
+            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeNoChangesEthernet;
+            break;
+         case C_OSCComDriverFlash::eNO_FUNDAMENTAL_COM_CHANGES_CAN:
+            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeNoFundamentalChangesCan;
+            break;
+         case C_OSCComDriverFlash::eNO_FUNDAMENTAL_COM_CHANGES_ETHERNET:
+            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet;
+            break;
+         case C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_CAN:
+            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeFundamentalChangesCan;
+            break;
+         case C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_ETHERNET:
+            oru32_TimeValue = rc_Node.pc_DeviceDefinition->u32_FlashloaderResetWaitTimeFundamentalChangesEthernet;
+            break;
+         }
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  In C_OSCProtocolDriverOsy registered function for handling long waiting times
+
+   See m_HandleWaitTime for detailed description
+
+   \param[in]     opv_Instance     Pointer to the instance of C_OSCComDriverFlash
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCComDriverFlash::mh_HandleWaitTime(void * const opv_Instance)
+{
+   //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
+   C_OSCComDriverFlash * const pc_ComDriver = reinterpret_cast<C_OSCComDriverFlash * const>(opv_Instance);
+
+   tgl_assert(pc_ComDriver != NULL);
+   if (pc_ComDriver != NULL)
+   {
+      pc_ComDriver->m_HandleWaitTime();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  In C_OSCProtocolDriverOsy registered function for handling long waiting times
+
+   For example erasing of flash can have a long timeout time. It can be longer than five seconds.
+   An active CAN routing would be stopped of the server by the session timeout. This function sends
+   the tester present to the last CAN router node on the route to keep the route alive
+
+   \param[in]     opv_Instance     Pointer to the instance of C_OSCComDriverFlash
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCComDriverFlash::m_HandleWaitTime(void)
+{
+   if (this->mq_Initialized == true)
+   {
+      uint32 u32_Counter;
+
+      for (u32_Counter = 0U; u32_Counter < this->mc_ActiveNodesLastCanRouters.size(); ++u32_Counter)
+      {
+         const uint32 u32_ActiveNodeRouter = this->mc_ActiveNodesLastCanRouters[u32_Counter];
+
+         tgl_assert(u32_ActiveNodeRouter < this->mc_OsyProtocols.size());
+         if (u32_ActiveNodeRouter < this->mc_OsyProtocols.size())
+         {
+            C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNodeRouter];
+            if (pc_ProtocolOsy != NULL)
+            {
+               // Send tester present message without expecting a response
+               const sint32 s32_Return = pc_ProtocolOsy->OsyTesterPresent(1U);
+
+               if (s32_Return != C_NO_ERR)
+               {
+                  osc_write_log_error("Sending Tester Present", "Sending Tester Present failed with error code: " +
+                                      C_OSCLoggingHandler::h_StwError(s32_Return));
+               }
+               else
+               {
+                  osc_write_log_info("Sending Tester Present", "Tester Present sent successfully.");
+               }
+            }
+         }
+      }
+   }
 }

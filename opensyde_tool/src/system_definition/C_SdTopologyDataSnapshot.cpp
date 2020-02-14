@@ -70,6 +70,9 @@ void C_SdTopologyDataSnapshot::Clear(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Count sum of all items
+
+   \return
+   sum of all items
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdTopologyDataSnapshot::Count(void) const

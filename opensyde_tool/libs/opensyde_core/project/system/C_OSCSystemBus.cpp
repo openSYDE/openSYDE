@@ -34,7 +34,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCSystemBus::C_OSCSystemBus(void) :
@@ -48,7 +48,7 @@ C_OSCSystemBus::C_OSCSystemBus(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -58,12 +58,12 @@ C_OSCSystemBus::~C_OSCSystemBus(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates the hash value over all data
+/*! \brief  Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
+   \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
@@ -77,14 +77,14 @@ void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Compare bus names for greater
+/*! \brief  Compare bus names for greater
 
    Buses are compared by name.
    Primary sorting criteria: Name length: Shortest first
    Secondary sorting criteria: First difference in alphabetic ordering
 
-   \param[in] orc_Bus1  Bus 1
-   \param[in] orc_Bus2  Bus 2
+   \param[in] orc_Bus1 Bus 1
+   \param[in] orc_Bus2 Bus 2
 
    \return
    true:  Bus 1 smaller than Bus 2
@@ -107,7 +107,7 @@ bool C_OSCSystemBus::h_CompareNameGreater(const C_OSCSystemBus & orc_Bus1, const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if bus ID invalid
+/*! \brief  Check if bus ID invalid
 
    \return
    true  Error

@@ -178,7 +178,7 @@ C_OSCDiagProtocolKfx::~C_OSCDiagProtocolKfx(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Make communication dispatcher to use known
 
-   Pass dispatcher down to KEFEX protocol driver class and set RX filters.
+   Pass dispatcher down to KEFEX protocol driver class and set Rx filters.
 
    \param[in]    opc_Dispatcher  CAN dispatcher to use for communication
 */
@@ -187,7 +187,7 @@ void C_OSCDiagProtocolKfx::SetDispatcher(stw_can::C_CAN_Dispatcher * const opc_D
 {
    stw_diag_lib::C_KFXCommConfiguration c_Config;
    this->mpc_CommKefex->SetCommDispatcher(opc_Dispatcher);
-   //the protocol driver does not automatically apply the RX filters when setting a new dispatcher
+   //the protocol driver does not automatically apply the Rx filters when setting a new dispatcher
    //-> trigger manually by "re-setting" parameters
    if (opc_Dispatcher == NULL)
    {
@@ -205,7 +205,7 @@ void C_OSCDiagProtocolKfx::SetDispatcher(stw_can::C_CAN_Dispatcher * const opc_D
 /*! \brief   Configure communication parameters
 
    Pass parameters down to KEFEX protocol driver class.
-   Will update the RX filters of the installed CAN dispatcher.
+   Will update the Rx filters of the installed CAN dispatcher.
 
    \param[in]    orc_Config   communication parameters
 */
@@ -297,7 +297,7 @@ sint32 C_OSCDiagProtocolKfx::Cycle(void)
               - element index > 1023
               - expected size not 1,2,4,8 (valid sizes of numeric elements)
    C_TIMEOUT  expected response not received within timeout (for elements <= 4 bytes)
-   C_NOACT    could not send request (TX error or no CAN dispatcher installed)
+   C_NOACT    could not send request (Tx error or no CAN dispatcher installed)
               expected response not received within timeout (for elements with 8 bytes size)
    C_CONFIG   segmented transfer required but BSmax set to zero; communication already in use by another thread
               CAN dispatcher not installed
@@ -413,7 +413,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
               - element index > 1023
               - expected size 0
               - expected size > 0xFFFFFF (limit by protocol)
-   C_NOACT    could not send request (TX error)
+   C_NOACT    could not send request (Tx error)
               expected response not received within timeout
    C_CONFIG   BSmax set to zero; communication already in use by another thread
               CAN dispatcher not installed
@@ -494,7 +494,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
               - element index > 1023
               - expected size not 1,2,4,8 (valid sizes of numeric elements)
    C_TIMEOUT  expected response not received within timeout (for elements <= 4 bytes)
-   C_NOACT    could not send request (TX error)
+   C_NOACT    could not send request (Tx error)
               expected response not received within timeout (for elements with 8 bytes size)
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
               CAN dispatcher not installed
@@ -609,7 +609,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
               - list index > 63
               - element index > 1023
               - size to write is zero or > 0xFFFFFF
-   C_NOACT    could not send request (TX error)
+   C_NOACT    could not send request (Tx error)
               expected response not received within timeout
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
               CAN dispatcher not installed
@@ -723,7 +723,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolSetEventDataRate(const uint8 ou8_Rail, cons
    \return
    C_NO_ERR   request sent
    C_RANGE    ou8_DataPoolIndex is zero; list index > 63; element index > 1023; rail > 2
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   CAN dispatcher not installed
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -782,7 +782,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, c
    \return
    C_NO_ERR   request sent
    C_RANGE    ou8_DataPoolIndex is zero; list index > 63; element index > 1023; rail > 2
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   CAN dispatcher not installed
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -828,7 +828,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
    \return
    C_NO_ERR   request sent
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not send request (e.g. TX buffer full)
+   C_NOACT    could not send request (e.g. Tx buffer full)
    C_CONFIG   CAN dispatcher not installed
    C_WARN     error response (none specified in protocol; but who knows ...)
 */

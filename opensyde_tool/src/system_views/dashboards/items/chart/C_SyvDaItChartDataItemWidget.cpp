@@ -49,8 +49,8 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_ViewIndex             Index of system view
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in]      ou32_ViewIndex   Index of system view
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItChartDataItemWidget::C_SyvDaItChartDataItemWidget(const uint32 ou32_ViewIndex, QWidget * const opc_Parent) :
@@ -100,18 +100,19 @@ C_SyvDaItChartDataItemWidget::~C_SyvDaItChartDataItemWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initializes the widget and fills all elements
 
-   \param[in]     orc_DataPoolElementId               Datapool element identification
-   \param[in]     orc_DisplayName                     Name to display
-   \param[in]     oq_Active                           Flag if data serie is active / visible
-   \param[in]     orc_DataPoolElementColor            Associated color to the datapool element
-   \param[in]     orc_Unit                            Unit of current scaling
-   \param[in]     oq_Warning                          Flag if a warning for this data element was detected
-   \param[in]     oq_Invalid                          Flag if data elment is invalid and invalid placeholder info
-                                                      shall be used
-   \param[in]     oe_InvalidPlaceholderDataPoolType   Placeholder datapool type of data element in case of
-                                                      invalid data element
-   \param[in]     orc_ToolTipErrorTextHeading         Heading of tool tip in case of a warning
-   \param[in]     orc_ToolTipErrorText                Text of tool tip in case of a warning
+   \param[in]  ou32_DataPoolElementConfigIndex     Data pool element configuration identification index
+   \param[in]  orc_DataPoolElementId               Datapool element identification
+   \param[in]  orc_DisplayName                     Name to display
+   \param[in]  oq_Active                           Flag if data series is active / visible
+   \param[in]  orc_DataPoolElementColor            Associated color to the datapool element
+   \param[in]  orc_Unit                            Unit of current scaling
+   \param[in]  oq_Warning                          Flag if a warning for this data element was detected
+   \param[in]  oq_Invalid                          Flag if data element is invalid and invalid placeholder info
+                                                   shall be used
+   \param[in]  oe_InvalidPlaceholderDataPoolType   Placeholder datapool type of data element in case of
+                                                   invalid data element
+   \param[in]  orc_ToolTipErrorTextHeading         Heading of tool tip in case of a warning
+   \param[in]  orc_ToolTipErrorText                Text of tool tip in case of a warning
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementConfigIndex,
@@ -206,7 +207,7 @@ void C_SyvDaItChartDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the datapool element configuration index
 
-   \param[in]     ou32_DataPoolElementConfigIndex         Datapool element configuration index
+   \param[in]  ou32_DataPoolElementConfigIndex  Datapool element configuration index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::UpdateIndex(const uint32 ou32_DataPoolElementConfigIndex)
@@ -215,9 +216,9 @@ void C_SyvDaItChartDataItemWidget::UpdateIndex(const uint32 ou32_DataPoolElement
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Updates the shown value of the data itme
+/*! \brief   Updates the shown value of the data item
 
-   \param[in]     orc_Value              New value
+   \param[in]  orc_Value   New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::UpdateValue(const QString & orc_Value) const
@@ -226,9 +227,9 @@ void C_SyvDaItChartDataItemWidget::UpdateValue(const QString & orc_Value) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update of the color transparence value configured by the actual timeout state
+/*! \brief   Update of the color transparency value configured by the actual timeout state
 
-   \param[in] osn_Value                       Value for transparence (0..255)
+   \param[in]  osn_Value   Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::UpdateTransparence(const sintn osn_Value) const
@@ -240,9 +241,9 @@ void C_SyvDaItChartDataItemWidget::UpdateTransparence(const sintn osn_Value) con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Error update for data element
 
-   \param[in] orc_ErrorText           Error description
-   \param[in] orq_IsTransmissionError Flag if transmission error occurred
-   \param[in] oq_ErrorActive          Flag if error is active or should be cleared
+   \param[in]  orc_ErrorText           Error description
+   \param[in]  oq_IsTransmissionError  Flag if transmission error occurred
+   \param[in]  oq_ErrorActive          Flag if error is active or should be cleared
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::UpdateError(const QString & orc_ErrorText, const bool oq_IsTransmissionError,
@@ -319,7 +320,8 @@ bool C_SyvDaItChartDataItemWidget::GetDataElementToggledState(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a new unit
 
-   \param[in]     orc_Unit                Element unit
+   \param[in]  orc_DisplayName   Display name
+   \param[in]  orc_Unit          Element unit
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::SetDataElementUnit(const QString & orc_DisplayName, const QString & orc_Unit)
@@ -332,7 +334,7 @@ void C_SyvDaItChartDataItemWidget::SetDataElementUnit(const QString & orc_Displa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the state of the data element widget selection
 
-   \param[in]     ou8_Aa         input parameter description
+   \param[in]  oq_Selected    Flag if selected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::SetDataElementSelected(const bool oq_Selected)
@@ -347,7 +349,7 @@ void C_SyvDaItChartDataItemWidget::SetDataElementSelected(const bool oq_Selected
 
    Here: Handle tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -411,7 +413,7 @@ bool C_SyvDaItChartDataItemWidget::event(QEvent * const opc_Event)
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::paintEvent(QPaintEvent * const opc_Event)
@@ -421,11 +423,11 @@ void C_SyvDaItChartDataItemWidget::paintEvent(QPaintEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided mouse press event
+/*! \brief   Overridden mouse press event
 
    Selecting or unselecting the widget
 
-   \param[in,out] opc_event  Pointer to mouse event
+   \param[in,out]  opc_Event  Pointer to mouse event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::mousePressEvent(QMouseEvent * const opc_Event)

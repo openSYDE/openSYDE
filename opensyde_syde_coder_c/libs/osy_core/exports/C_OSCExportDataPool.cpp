@@ -1,9 +1,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Export data pool settings of a openSYDE node.
+   \brief       Export Datapool settings of a openSYDE node.
 
-   Create a .c and .h file providing entire data pool configuration.
+   Create a .c and .h file providing entire Datapool configuration.
 
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -61,9 +61,9 @@ C_OSCExportDataPool::~C_OSCExportDataPool(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Return filename (without extension)
 
-   The caller must provide a valid data pool.
+   The caller must provide a valid Datapool.
 
-   \param[in]  orc_DataPool            data pool configuration
+   \param[in]  orc_DataPool            Datapool configuration
    \param[out] orc_FileName            assembled filename
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -73,46 +73,97 @@ void C_OSCExportDataPool::h_GetFileName(const C_OSCNodeDataPool & orc_DataPool, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert overall code structure version to parametrization code subversion.
+
+   The overall code generation version decodes the format versions of parametrization (*_datapool.c/.h files)
+   and process data communication code (comm_*.c/.h files).
+
+   \param[in]       ou16_GenCodeVersion     Overall code format version
+
+   \return version of parametrization code
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint16 C_OSCExportDataPool::h_ConvertOverallCodeVersion(const uint16 ou16_GenCodeVersion)
+{
+   uint16 u16_Return = ou16_GenCodeVersion;
+
+   switch (ou16_GenCodeVersion)
+   {
+   case 1:
+      u16_Return = ou16_GenCodeVersion;
+      break;
+   case 2:
+   case 3:
+   case 4:
+      u16_Return = ou16_GenCodeVersion - 1; // -1 because of no changes from version 1 to 2
+      break;
+   default:
+      // should never occur...
+      tgl_assert(false);
+      break;
+   }
+
+   return u16_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create source files
 
-   The caller must provide a valid path and data pool.
+   The caller must provide a valid path and Datapool.
 
    \param[in] orc_Path                 storage path for created files
-   \param[in] orc_DataPool             data pool configuration
+   \param[in] orc_DataPool             Datapool configuration
    \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
-   \param[in] ou8_DataPoolIndex        index of data pool within local process
-   \param[in] oq_IsRemote              true: create source code for a "remote" data pool
-   \param[in] ou8_DataPoolIndexRemote  index of data pool within remote process
-   \param[in] ou8_ProcessId            ID of process owning this data pool
+   \param[in] ou8_DataPoolIndex        index of Datapool within local process
+   \param[in] oe_Linkage               flag for linkage context
+   \param[in] ou8_DataPoolIndexRemote  index of Datapool within remote process
+   \param[in] ou8_ProcessId            ID of process owning this Datapool
    \param[in] orc_ExportToolInfo       information about calling executable (name + version)
 
    \return
    C_NO_ERR Operation success
    C_RD_WR  Operation failure: cannot store files
+   C_NOACT  Application has unknown code structure version or invalid linkage configuration
+
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, const uint16 ou16_GenCodeVersion,
                                                const C_OSCNodeDataPool & orc_DataPool, const uint8 ou8_DataPoolIndex,
-                                               const bool oq_IsRemote, const uint8 ou8_DataPoolIndexRemote,
+                                               const E_Linkage oe_Linkage, const uint8 ou8_DataPoolIndexRemote,
                                                const uint8 ou8_ProcessId, const C_SCLString & orc_ExportToolInfo)
 {
-   sint32 s32_Retval;
+   sint32 s32_Retval = C_NO_ERR;
    uint32 u32_HashValue = 0U;
 
-   //calculate hash value over the current state of the data pool definition
+   //calculate hash value over the current state of the Datapool definition
    orc_DataPool.CalcHash(u32_HashValue);
    const C_SCLString c_ProjectId = C_SCLString::IntToStr(u32_HashValue);
 
-   // create header file
-   s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, orc_DataPool, ou8_DataPoolIndex, c_ProjectId,
-                                    ou16_GenCodeVersion, oq_IsRemote);
+   // make sure version is known
+   if (ou16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
+   {
+      s32_Retval = C_NOACT;
+   }
+
+   // make sure linkage is not eREMOTEPUBLIC if code format does not support this feature
+   if ((s32_Retval == C_NO_ERR) && (ou16_GenCodeVersion < 4U) && (oe_Linkage == eREMOTEPUBLIC))
+   {
+      s32_Retval = C_NOACT;
+   }
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      // create header file
+      s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, orc_DataPool, ou8_DataPoolIndex, c_ProjectId,
+                                       ou16_GenCodeVersion, oe_Linkage);
+   }
 
    // create implementation file
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, orc_DataPool, ou8_DataPoolIndex,
                                                c_ProjectId, ou16_GenCodeVersion, ou8_DataPoolIndexRemote, ou8_ProcessId,
-                                               oq_IsRemote);
+                                               oe_Linkage);
    }
 
    return s32_Retval;
@@ -123,11 +174,11 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
 
    \param[in] orc_ExportToolInfo       information about calling executable (name + version)
    \param[in] orc_Path                 storage path for created file
-   \param[in] orc_DataPool             data pool configuration
-   \param[in] ou8_DataPoolIndex        index of data pool
+   \param[in] orc_DataPool             Datapool configuration
+   \param[in] ou8_DataPoolIndex        index of Datapool
    \param[in] orc_ProjectId            project id for consistency check
    \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
-   \param[in] oq_IsRemote              true: create for remote data pool
+   \param[in] oe_Linkage               flag for linkage context
 
    \return
    C_NO_ERR Operation success
@@ -137,7 +188,7 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
 sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportToolInfo, const C_SCLString & orc_Path,
                                                 const C_OSCNodeDataPool & orc_DataPool, const uint8 ou8_DataPoolIndex,
                                                 const C_SCLString & orc_ProjectId, const uint16 ou16_GenCodeVersion,
-                                                const bool oq_IsRemote)
+                                                const E_Linkage oe_Linkage)
 {
    sint32 s32_Retval;
    C_SCLStringList c_Data;
@@ -150,13 +201,13 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportTo
 
    // add defines
    mh_AddDefines(c_Data, orc_DataPool, ou8_DataPoolIndex, orc_ProjectId, ou16_GenCodeVersion, mhq_IS_HEADER_FILE,
-                 oq_IsRemote);
+                 oe_Linkage);
 
    // add types
-   mh_AddTypes(c_Data, orc_DataPool, mhq_IS_HEADER_FILE, oq_IsRemote);
+   mh_AddTypes(c_Data, orc_DataPool, mhq_IS_HEADER_FILE, oe_Linkage);
 
    // add global variables
-   mh_AddGlobalVariables(c_Data, orc_DataPool, ou16_GenCodeVersion, mhq_IS_HEADER_FILE, oq_IsRemote);
+   mh_AddGlobalVariables(c_Data, orc_DataPool, ou16_GenCodeVersion, mhq_IS_HEADER_FILE, oe_Linkage);
 
    // add function prototypes
    mh_AddFunctionPrototypes(c_Data, orc_DataPool, orc_ProjectId);
@@ -175,13 +226,14 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportTo
 
    \param[in] orc_ExportToolInfo       information about calling executable (name + version)
    \param[in] orc_Path                 storage path for created file
-   \param[in] orc_DataPool             data pool configuration
-   \param[in] ou8_DataPoolIndex        index of data pool
+   \param[in] orc_DataPool             Datapool configuration
+   \param[in] ou8_DataPoolIndex        index of Datapool
    \param[in] orc_ProjectId            project id for consistency check
    \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
-   \param[in] ou8_DataPoolIndexRemote  index of data pool within remote process
-   \param[in] ou8_ProcessId            ID of process owning this data pool
-   \param[in] oq_IsRemote              true: create for remote data pool
+   \param[in] ou8_DataPoolIndexRemote  index of Datapool within remote process
+   \param[in] ou8_ProcessId            ID of process owning this Datapool
+   \param[in] oe_Linkage               flag for linkage context
+
 
    \return
    C_NO_ERR Operation success
@@ -195,7 +247,7 @@ sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_
                                                         const C_SCLString & orc_ProjectId,
                                                         const uint16 ou16_GenCodeVersion,
                                                         const uint8 ou8_DataPoolIndexRemote, const uint8 ou8_ProcessId,
-                                                        const bool oq_IsRemote)
+                                                        const E_Linkage oe_Linkage)
 {
    sint32 s32_Retval;
    C_SCLStringList c_Data;
@@ -208,16 +260,16 @@ sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_
 
    // add defines
    mh_AddDefines(c_Data, orc_DataPool, ou8_DataPoolIndex, orc_ProjectId, ou16_GenCodeVersion,
-                 mhq_IS_IMPLEMENTATION_FILE, oq_IsRemote);
+                 mhq_IS_IMPLEMENTATION_FILE, oe_Linkage);
 
    // add types
-   mh_AddTypes(c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE, oq_IsRemote);
+   mh_AddTypes(c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE, oe_Linkage);
 
    // add global variables
-   mh_AddGlobalVariables(c_Data, orc_DataPool, ou16_GenCodeVersion, mhq_IS_IMPLEMENTATION_FILE, oq_IsRemote);
+   mh_AddGlobalVariables(c_Data, orc_DataPool, ou16_GenCodeVersion, mhq_IS_IMPLEMENTATION_FILE, oe_Linkage);
 
    // add module global variables and function prototypes
-   mh_AddModuleGlobal(c_Data, orc_DataPool, ou8_ProcessId, ou8_DataPoolIndexRemote, oq_IsRemote);
+   mh_AddModuleGlobal(c_Data, orc_DataPool, ou16_GenCodeVersion, ou8_ProcessId, ou8_DataPoolIndexRemote, oe_Linkage);
 
    // add implementation
    mh_AddImplementation(c_Data, mhq_IS_IMPLEMENTATION_FILE);
@@ -233,7 +285,7 @@ sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_
 
   \param[in]   orc_ExportToolInfo       information about calling executable (name + version)
    \param[out] orc_Data                 converted data to string list
-   \param[in]  orc_DataPool             data pool configuration
+   \param[in]  orc_DataPool             Datapool configuration
    \param[in]  oq_FileType              .c or .h file selected
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -246,7 +298,7 @@ void C_OSCExportDataPool::mh_AddHeader(const C_SCLString & orc_ExportToolInfo, C
    orc_Data.Append("   \\file");
    if (oq_FileType == mhq_IS_IMPLEMENTATION_FILE)
    {
-      orc_Data.Append("   \\brief       openSYDE Data Pool definition (Source file with constant definitions)");
+      orc_Data.Append("   \\brief       openSYDE Datapool definition (Source file with constant definitions)");
       if (orc_DataPool.c_Comment.IsEmpty() == false)
       {
          orc_Data.Append("");
@@ -258,7 +310,7 @@ void C_OSCExportDataPool::mh_AddHeader(const C_SCLString & orc_ExportToolInfo, C
    else
    {
       orc_Data.Append(
-         "   \\brief       openSYDE Data Pool definition (Header file with constant and global definitions)");
+         "   \\brief       openSYDE Datapool definition (Header file with constant and global definitions)");
       orc_Data.Append("");
       orc_Data.Append("   This file was generated by openSYDE " + orc_ExportToolInfo + ".");
    }
@@ -278,7 +330,7 @@ void C_OSCExportDataPool::mh_AddHeader(const C_SCLString & orc_ExportToolInfo, C
 /*! \brief   Add includes
 
    \param[out] orc_Data                 converted data to string list
-   \param[in]  orc_DataPool             data pool configuration
+   \param[in]  orc_DataPool             Datapool configuration
    \param[in]  oq_FileType              .c or .h file selected
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -312,18 +364,18 @@ void C_OSCExportDataPool::mh_AddIncludes(C_SCLStringList & orc_Data, const C_OSC
 /*! \brief   Add defines
 
    \param[out] orc_Data                 converted data to string list
-   \param[in]  orc_DataPool             data pool configuration
-   \param[in]  ou8_DataPoolIndex        index of data pool
+   \param[in]  orc_DataPool             Datapool configuration
+   \param[in]  ou8_DataPoolIndex        index of Datapool
    \param[in]  orc_ProjectId            project id for consistency check
    \param[in]  ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in]  oq_FileType              .c or .h file selected
-   \param[in]  oq_IsRemote              true: create for remote data pool
+   \param[in] oe_Linkage               flag for linkage context
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                         const uint8 ou8_DataPoolIndex, const C_SCLString & orc_ProjectId,
                                         const uint16 ou16_GenCodeVersion, const bool oq_FileType,
-                                        const bool oq_IsRemote)
+                                        const E_Linkage oe_Linkage)
 {
    const C_SCLString c_DataPoolName = orc_DataPool.c_Name.UpperCase();
    const C_SCLString c_MagicName = c_DataPoolName + "_PROJECT_ID_" + orc_ProjectId;
@@ -337,12 +389,12 @@ void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCN
       orc_Data.Append("///unique ID to ensure consistency between .h and .c files");
       orc_Data.Append("#define " + c_MagicName + " void " + c_MagicName.LowerCase() + "(void) {}");
       orc_Data.Append("");
-      orc_Data.Append("///Index of this data pool");
+      orc_Data.Append("///Index of this Datapool");
       orc_Data.Append("#define " + c_DataPoolName + "_DATA_POOL_INDEX (" + C_SCLString::IntToStr(ou8_DataPoolIndex) +
                       "U)");
       orc_Data.Append("");
 
-      if (oq_IsRemote == false)
+      if ((oe_Linkage == eLOCAL) || ((ou16_GenCodeVersion >= 4U) && (oe_Linkage == eREMOTEPUBLIC)))
       {
          orc_Data.Append("///Index of lists");
          for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
@@ -371,7 +423,7 @@ void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCN
             orc_Data.Append("");
          }
 
-         orc_Data.Append("///Index of data sets");
+         orc_Data.Append("///Index of Datasets");
          for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
          {
             const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u16_ListIndex];
@@ -397,11 +449,12 @@ void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCN
    }
    else
    {
-      if (ou16_GenCodeVersion == 3U)
+      if (ou16_GenCodeVersion >= 3U)
       {
          orc_Data.Append("///check for correct version of structure definitions");
          orc_Data.Append("#if OSY_DPA_DATA_POOL_DEFINITION_VERSION != 0x000" +
-                         C_SCLString::IntToStr(static_cast<sint32>(ou16_GenCodeVersion) - 1) + "U");
+                         C_SCLString::IntToStr(static_cast<sint32>(C_OSCExportDataPool::h_ConvertOverallCodeVersion(
+                                                                      ou16_GenCodeVersion))) + "U");
          // datapool export version is one less than over all code structure version (no changes from version 1 to 2)
          orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
                          "generated code");
@@ -420,20 +473,21 @@ void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCN
 /*! \brief   Add types
 
    \param[out] orc_Data                 converted data to string list
-   \param[in]  orc_DataPool             data pool configuration
+   \param[in]  orc_DataPool             Datapool configuration
    \param[in]  oq_FileType              .c or .h file selected
-   \param[in]  oq_IsRemote              true: create for remote data pool
+   \param[in]  oe_Linkage               flag for linkage context
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddTypes(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
-                                      const bool oq_FileType, const bool oq_IsRemote)
+                                      const bool oq_FileType, const E_Linkage oe_Linkage)
 {
    orc_Data.Append(
       "/* -- Types --------------------------------------------------------------------------------------------------------- */");
 
-   if ((oq_FileType == mhq_IS_HEADER_FILE) && (oq_IsRemote == false))
+   if ((oq_FileType == mhq_IS_HEADER_FILE) &&
+       ((oe_Linkage == eLOCAL) || (oe_Linkage == eREMOTEPUBLIC)))
    {
-      bool q_AtLeastOneElement = false;
+      bool q_AtLeastOneElement = false; // defensive (actually no file generation for empty datapools)
 
       for (uint16 u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
       {
@@ -494,17 +548,17 @@ void C_OSCExportDataPool::mh_AddTypes(C_SCLStringList & orc_Data, const C_OSCNod
 /*! \brief   Add global variables
 
    \param[out] orc_Data                 converted data to string list
-   \param[in]  orc_DataPool             data pool configuration
-   \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
+   \param[in]  orc_DataPool             Datapool configuration
+   \param[in]  ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in]  oq_FileType              .c or .h file selected
-   \param[in]  oq_IsRemote              true: create for remote data pool
+   \param[in]  oe_Linkage               flag for linkage context
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data,  const C_OSCNodeDataPool & orc_DataPool,
                                                 const uint16 ou16_GenCodeVersion, const bool oq_FileType,
-                                                const bool oq_IsRemote)
+                                                const E_Linkage oe_Linkage)
 {
-   bool q_AtLeastOneElement = false;
+   bool q_AtLeastOneElement = false;  // defensive (actually no file generation for empty datapools)
 
    for (uint16 u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
    {
@@ -519,31 +573,38 @@ void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data,  con
 
    if (oq_FileType == mhq_IS_HEADER_FILE)
    {
-      if (oq_IsRemote == false)
+      if (q_AtLeastOneElement == true)
       {
-         if (q_AtLeastOneElement == true)
+         if (oe_Linkage == eLOCAL)
          {
-            orc_Data.Append("///Global data pool RAM variables:");
-            orc_Data.Append("extern T_" + orc_DataPool.c_Name + "_DataPoolValues " + "gt_" + orc_DataPool.c_Name +
+            orc_Data.Append("///Global Datapool RAM variables:");
+            orc_Data.Append("extern T_" + orc_DataPool.c_Name + "_DataPoolValues gt_" + orc_DataPool.c_Name +
+                            "_DataPoolValues;");
+            orc_Data.Append("");
+         }
+
+         if (oe_Linkage == eREMOTEPUBLIC)
+         {
+            orc_Data.Append("///Pointer to global Datapool RAM variables in other application:");
+            orc_Data.Append("extern T_" + orc_DataPool.c_Name + "_DataPoolValues * gpt_" + orc_DataPool.c_Name +
                             "_DataPoolValues;");
             orc_Data.Append("");
          }
       }
 
-      orc_Data.Append("///Data pool instance data for API functions:");
+      orc_Data.Append("///Datapool instance data for API functions:");
       orc_Data.Append("extern const T_osy_dpa_data_pool gt_" + orc_DataPool.c_Name + "_DataPool;");
-      orc_Data.Append("");
    }
    else
    {
-      if (oq_IsRemote == false)
+      if (q_AtLeastOneElement == true)
       {
-         if (q_AtLeastOneElement == true)
+         if (oe_Linkage == eLOCAL)
          {
             C_SCLString c_SafeRamData;
             if (orc_DataPool.q_IsSafety == true)
             {
-               if (ou16_GenCodeVersion == 3U)
+               if (ou16_GenCodeVersion >= 3U)
                {
                   c_SafeRamData = "OSY_DPA_SAFE_RAM_DATA_READALL_ZERO ";
                }
@@ -554,7 +615,7 @@ void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data,  con
             }
             else
             {
-               if (ou16_GenCodeVersion == 3U)
+               if (ou16_GenCodeVersion >= 3U)
                {
                   c_SafeRamData = "OSY_DPA_NONSAFE_RAM_DATA_WRITEALL_ZERO ";
                }
@@ -562,18 +623,23 @@ void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data,  con
             orc_Data.Append(c_SafeRamData + "T_" + orc_DataPool.c_Name + "_DataPoolValues gt_" + orc_DataPool.c_Name +
                             "_DataPoolValues;");
          }
-      }
 
-      orc_Data.Append("");
-      orc_Data.Append("");
+         if (oe_Linkage == eREMOTEPUBLIC)
+         {
+            orc_Data.Append("///Pointer to global Datapool RAM variables in other application:");
+            orc_Data.Append("OSY_DPA_SAFE_RAM_DATA_PRIVATE_ZERO T_" + orc_DataPool.c_Name + "_DataPoolValues * gpt_" + orc_DataPool.c_Name +
+                            "_DataPoolValues = NULL;");
+         }
+      }
    }
+   orc_Data.Append("");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief      Add function prototypes.
 
    \param[out] orc_Data                 converted data to string list
-   \param[in]  orc_DataPool             data pool configuration
+   \param[in]  orc_DataPool             Datapool configuration
    \param[in]  orc_ProjectId            project id for consistency check
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -596,31 +662,36 @@ void C_OSCExportDataPool::mh_AddFunctionPrototypes(C_SCLStringList & orc_Data, c
    Implementation file only.
 
    \param[out] orc_Data                 converted data to string list
-   \param[in]  orc_DataPool             data pool configuration
-   \param[in]  ou8_ProcessId            ID of process owning this data pool
-   \param[in]  ou8_DataPoolIndexRemote  index of data pool within remote process (only used for remote data pools)
-   \param[in]  oq_IsRemote              true: create for remote data pool
+   \param[in]  orc_DataPool             Datapool configuration
+   \param[in]  ou16_GenCodeVersion      version of structure (generate code as specified for this version)
+   \param[in]  ou8_ProcessId            ID of process owning this Datapool
+   \param[in]  ou8_DataPoolIndexRemote  index of Datapool within remote process (only used for remote Datapools)
+   \param[in]  oe_Linkage               flag for linkage context
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
-                                             const uint8 ou8_ProcessId, const uint8 ou8_DataPoolIndexRemote,
-                                             const bool oq_IsRemote)
+                                             const uint16 ou16_GenCodeVersion, const uint8 ou8_ProcessId,
+                                             const uint8 ou8_DataPoolIndexRemote, const E_Linkage oe_Linkage)
 {
    C_SCLString c_DataPoolName = orc_DataPool.c_Name;
    C_SCLString c_String;
+   uint32 u32_HashValue = 0U;
+
+   orc_DataPool.CalcDefinitionHash(u32_HashValue);
 
    orc_Data.Append(
-      "/* -- Module Global Variables --------------------------------------------------------------------------------------- */\n");
-   if (oq_IsRemote == false)
+      "/* -- Module Global Variables --------------------------------------------------------------------------------------- */");
+
+   // list, element and dataset definitions
+   if (oe_Linkage == eLOCAL)
    {
       uint16 u16_ListIndex;
       uint16 u16_ElementIndex;
-      uint32 u32_HashValue = 0U;
       C_SCLString c_ListName;
 
-      orc_Data.Append("//Create data pool definition instance data:");
-      orc_Data.Append("OSY_DPA_CREATE_STATIC_DP_DEFINITION_INSTANCE_DATA(mt_DpDefinitionInstanceData)\n");
-
+      orc_Data.Append("///Create Datapool definition instance data:");
+      orc_Data.Append("OSY_DPA_CREATE_STATIC_DP_DEFINITION_INSTANCE_DATA(mt_DpDefinitionInstanceData)");
+      orc_Data.Append("");
       orc_Data.Append("///Min/max values:");
 
       for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
@@ -630,7 +701,8 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
          {
             orc_Data.Append("///Minimum values");
             orc_Data.Append("static const T_" + orc_DataPool.c_Name + "_" + c_List.c_Name + "_Values mt_" +
-                            c_List.c_Name + "MinValues =\n{");
+                            c_List.c_Name + "MinValues =");
+            orc_Data.Append("{");
             for (u16_ElementIndex = 0U; u16_ElementIndex < c_List.c_Elements.size(); u16_ElementIndex++)
             {
                const C_OSCNodeDataPoolListElement & rc_Element = c_List.c_Elements[u16_ElementIndex];
@@ -648,11 +720,12 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
                             C_OSCUtils::h_NiceifyStringForCComment(rc_Element.c_Comment) + ")");
                orc_Data.Append(c_String);
             }
-            orc_Data.Append("};\n");
-
+            orc_Data.Append("};");
+            orc_Data.Append("");
             orc_Data.Append("///Maximum values");
-            orc_Data.Append("static const T_" + orc_DataPool.c_Name + "_" + c_List.c_Name + "_Values mt_" + c_List.c_Name +
-                            "MaxValues =\n{");
+            orc_Data.Append("static const T_" + orc_DataPool.c_Name + "_" + c_List.c_Name + "_Values mt_" +
+                            c_List.c_Name + "MaxValues =");
+            orc_Data.Append("{");
             for (u16_ElementIndex = 0U; u16_ElementIndex < c_List.c_Elements.size(); u16_ElementIndex++)
             {
                const C_OSCNodeDataPoolListElement & rc_Element = c_List.c_Elements[u16_ElementIndex];
@@ -670,16 +743,19 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
                             C_OSCUtils::h_NiceifyStringForCComment(rc_Element.c_Comment) + ")");
                orc_Data.Append(c_String);
             }
-            orc_Data.Append("};\n");
+            orc_Data.Append("};");
+            orc_Data.Append("");
 
             if (c_List.c_DataSets.size() > 0)
             {
                uint8 u8_DataSetIndex;
-               orc_Data.Append("///Data set values");
+               orc_Data.Append("///Dataset values");
                c_ListName = c_List.c_Name;
                orc_Data.Append("static const T_" + c_DataPoolName + "_" + c_List.c_Name + "_Values mat_" + c_List.c_Name +
                                "DataSetValues [" + c_DataPoolName.UpperCase() + "_" + c_ListName.UpperCase() +
-                               "_NUMBER_OF_DATA_SETS] =\n{");
+                               "_NUMBER_OF_DATA_SETS] =");
+               orc_Data.Add("{");
+
                for (u8_DataSetIndex = 0U; u8_DataSetIndex < c_List.c_DataSets.size(); u8_DataSetIndex++)
                {
                   orc_Data.Append("   {");
@@ -711,13 +787,16 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
                      orc_Data.Append("   },");
                   }
                }
-               orc_Data.Append("};\n");
+               orc_Data.Append("};");
+               orc_Data.Append("");
 
-               orc_Data.Append("///Data set table:");
+               orc_Data.Append("///Dataset table:");
                c_ListName = c_List.c_Name;
                orc_Data.Append("static const T_osy_dpa_data_set mat_" + c_List.c_Name + "DataSetTable[" +
                                c_DataPoolName.UpperCase() + "_" +  c_ListName.UpperCase() +
-                               "_NUMBER_OF_DATA_SETS] =\n{");
+                               "_NUMBER_OF_DATA_SETS] =");
+               orc_Data.Add("{");
+
                for (u8_DataSetIndex = 0U; u8_DataSetIndex < c_List.c_DataSets.size(); u8_DataSetIndex++)
                {
                   c_String = "   { &mat_" + c_List.c_Name + "DataSetValues[" + C_SCLString::IntToStr(u8_DataSetIndex) +
@@ -832,7 +911,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
       orc_Data.Append("};");
       orc_Data.Append("");
 
-      orc_Data.Append("///Data pool definition:");
+      orc_Data.Append("///Datapool definition:");
       orc_Data.Append("static const T_osy_dpa_data_pool_definition mt_DataPoolDefinition =");
       orc_Data.Append("{");
       orc_Data.Append("   OSY_DPA_DATA_POOL_DEFINITION_VERSION,");
@@ -850,11 +929,15 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
       }
       orc_Data.Append("   { 0x" + C_SCLString::IntToHex(orc_DataPool.au8_Version[0], 2U) + "U, 0x" +
                       C_SCLString::IntToHex(orc_DataPool.au8_Version[1], 2U) + "U, 0x" +
-                      C_SCLString::IntToHex(orc_DataPool.au8_Version[2], 2U) + "U },");
-      orc_Data.Append("   \"" + orc_DataPool.c_Name + "\",");
+                      C_SCLString::IntToHex(orc_DataPool.au8_Version[2], 2U) + "U }," +
+                      " ///< Datapool definition version V" +
+                      C_SCLString::IntToStr(orc_DataPool.au8_Version[0]) + "." +
+                      C_SCLString::IntToStr(orc_DataPool.au8_Version[1]) + "r" +
+                      C_SCLString::IntToStr(orc_DataPool.au8_Version[2]));
+      orc_Data.Append("   \"" + orc_DataPool.c_Name + "\",  ///< name of Datapool");
       orc_Data.Append("   " + c_DataPoolName.UpperCase() + "_NUMBER_OF_LISTS,");
-      orc_DataPool.CalcDefinitionHash(u32_HashValue);
-      orc_Data.Append("   0x" + C_SCLString::IntToHex(static_cast<sint64>(u32_HashValue), 4U) + "U,");
+      orc_Data.Append("   0x" + C_SCLString::IntToHex(static_cast<sint64>(u32_HashValue), 4U) +
+                      "U, ///< CRC of Datapool definition");
       if (orc_DataPool.e_Type == C_OSCNodeDataPool::eNVM)
       {
          orc_Data.Append("   0x" + C_SCLString::IntToHex(static_cast<sint64>(orc_DataPool.u32_NvMStartAddress), 8U) +
@@ -873,57 +956,126 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
       orc_Data.Append("");
    }
 
-   if (oq_IsRemote == true)
+   // Remote/public structure
+   if (ou16_GenCodeVersion < 4U)
    {
-      c_String = "///Information about remote data pool.";
-      c_String += "Can be used to request information about remote data pool from another process:";
-      orc_Data.Append(c_String);
-      orc_Data.Append("static const T_osy_dpa_remote_data_pool_info mt_RemoteDataPoolInfo =");
-      orc_Data.Append("{");
-      orc_Data.Append("   " + C_SCLString::IntToStr(ou8_ProcessId) +
-                      "U, ///< Identification ID of remote server providing information about the data pool");
-      orc_Data.Append("   " + C_SCLString::IntToStr(ou8_DataPoolIndexRemote) +
-                      "U  ///< Index of data pool within process identified by ProcessId");
+      if (oe_Linkage == eLOCAL)
+      {
+         orc_Data.Append("///Information about process and Datapool:");
+         orc_Data.Append("static const T_osy_dpa_remote_data_pool_info mt_DataPoolInfo =");
+         orc_Data.Append("{");
+         orc_Data.Append("   " + C_SCLString::IntToStr(ou8_ProcessId) +
+                         "U,  ///< Identification ID of our own process");
+         orc_Data.Append("   " + c_DataPoolName.UpperCase() + "_DATA_POOL_INDEX"
+                         "  ///< Index of Datapool within process identified by ProcessId");
+         orc_Data.Append("};");
+         orc_Data.Append("");
+      }
+      else
+      {
+         c_String = "///Information about remote Datapool. ";
+         c_String += "Can be used to request information about remote Datapool from another process:";
+         orc_Data.Append(c_String);
+         orc_Data.Append("static const T_osy_dpa_remote_data_pool_info mt_RemoteDataPoolInfo =");
+         orc_Data.Append("{");
+         orc_Data.Append("   " + C_SCLString::IntToStr(ou8_ProcessId) +
+                         "U, ///< Identification ID of remote server providing information about the Datapool");
+         orc_Data.Append("   " + C_SCLString::IntToStr(ou8_DataPoolIndexRemote) +
+                         "U  ///< Index of Datapool within process identified by ProcessId");
+         orc_Data.Append("};");
+         orc_Data.Append("");
+      }
    }
    else
    {
-      orc_Data.Append("///Information about process and data pool:");
-      orc_Data.Append("static const T_osy_dpa_remote_data_pool_info mt_DataPoolInfo =");
-      orc_Data.Append("{");
-      orc_Data.Append("   " + C_SCLString::IntToStr(ou8_ProcessId) +
-                      "U, ///< Identification ID of our own process");
-      orc_Data.Append("   " + c_DataPoolName.UpperCase() + "_DATA_POOL_INDEX " +
-                      "///< Index of data pool within process identified by ProcessId");
+      if (oe_Linkage != eLOCAL) // structure was removed for local Datapools since version 4
+      {
+         orc_Data.Append("///Information about process and Datapool:");
+         orc_Data.Append("static const T_osy_dpa_remote_data_pool_info mt_RemoteDataPoolInfo =");
+         orc_Data.Append("{");
+         orc_Data.Append("   " + C_SCLString::IntToStr(ou8_ProcessId) +
+                         "U, ///< Identification ID of remote server providing information about the Datapool");
+         switch (oe_Linkage)
+         {
+         case eLOCAL:
+            // never landing here
+            break;
+         case eREMOTE:
+            orc_Data.Append("   NULL,  ///< Pointer only relevant for Datapool with public scope");
+            break;
+         case eREMOTEPUBLIC:
+            orc_Data.Append("   (void**)&gpt_" + orc_DataPool.c_Name +
+                            "_DataPoolValues,  ///< Pointer to pointer to struct containing all Datapool values");
+            break;
+         }
+         orc_Data.Append("   0x" + C_SCLString::IntToHex(static_cast<sint64>(u32_HashValue), 4U) +
+                         "U, ///< CRC of Datapool definition");
+         orc_Data.Append("   \"" + orc_DataPool.c_Name + "\"  ///< name of Datapool");
+         orc_Data.Append("};");
+         orc_Data.Append("");
+      }
    }
-   orc_Data.Append("};");
-   orc_Data.Append("");
 
-   orc_Data.Append("///Create data pool instance data:");
-   if (oq_IsRemote == true)
+   orc_Data.Append("///Create Datapool instance data:");
+   c_String = "OSY_DPA_CREATE_STATIC_DP_INSTANCE_DATA(mt_DpInstanceData, ";
+   switch (oe_Linkage)
    {
-      orc_Data.Append("OSY_DPA_CREATE_STATIC_DP_INSTANCE_DATA(mt_DpInstanceData, NULL)");
+   case eLOCAL:
+      c_String += "&mt_DataPoolDefinition)";
+      break;
+   case eREMOTE:
+   case eREMOTEPUBLIC:
+      c_String += "NULL)";
+      break;
    }
-   else
-   {
-      orc_Data.Append("OSY_DPA_CREATE_STATIC_DP_INSTANCE_DATA(mt_DpInstanceData, &mt_DataPoolDefinition)");
-   }
+
+   orc_Data.Append(c_String);
    orc_Data.Append("");
 
    orc_Data.Append("const T_osy_dpa_data_pool gt_" + c_DataPoolName + "_DataPool =");
    orc_Data.Append("{");
    orc_Data.Append("   OSY_DPA_DATA_POOL_MAGIC,  ///< identification of valid DP definition");
    orc_Data.Append("   " + c_DataPoolName.UpperCase() +
-                   "_DATA_POOL_INDEX,  ///< data pool index within this process");
-   if (oq_IsRemote == true)
+                   "_DATA_POOL_INDEX,  ///< Datapool index within this process");
+
+   c_String = "   ";
+   if (ou16_GenCodeVersion >= 4U)
    {
-      orc_Data.Append("   1U,  ///< it's remote ...");
-      orc_Data.Append("   &mt_RemoteDataPoolInfo,  ///< details about remote data pool");
+      c_String += "OSY_DPA_DATA_POOL_LINKAGE_" + C_OSCExportDataPool::mh_ConvertLinkageToString(oe_Linkage) +
+                  ",  ///< Datapool linkage";
    }
    else
    {
-      orc_Data.Append("   0U,  ///< it's local ...");
-      orc_Data.Append("   &mt_DataPoolInfo,  ///< info about our local data pool");
+      if (oe_Linkage == eLOCAL)
+      {
+         c_String += "0U,  ///< it's local ...";
+      }
+      else
+      {
+         c_String += "1U,  ///< it's remote ...";
+         // eREMOTEPUBLIC is not supported in versions >=4U
+      }
    }
+   orc_Data.Append(c_String);
+
+   switch (oe_Linkage)
+   {
+   case eLOCAL:
+      if (ou16_GenCodeVersion >= 4U)
+      {
+         orc_Data.Append("   NULL,  ///<  info about remote Datapool");
+      }
+      else
+      {
+         orc_Data.Append("   &mt_DataPoolInfo,  ///<  info about local Datapool");
+      }
+      break;
+   case eREMOTE:
+   case eREMOTEPUBLIC:
+      orc_Data.Append("   &mt_RemoteDataPoolInfo,  ///< info about remote Datapool");
+      break;
+   }
+
    orc_Data.Append("   &mt_DpInstanceData  ///< run-time data");
    orc_Data.Append("};");
    orc_Data.Append("");
@@ -963,7 +1115,7 @@ void C_OSCExportDataPool::mh_AddImplementation(C_SCLStringList & orc_Data, const
 
    \param[in] orc_Data                 converted data to string list
    \param[in] orc_Path                 storage path for created file
-   \param[in] orc_DataPoolName         name of data pool
+   \param[in] orc_DataPoolName         name of Datapool
    \param[in] oq_FileType              .c or .h file selected
 
    \return
@@ -1011,14 +1163,14 @@ sint32 C_OSCExportDataPool::mh_SaveToFile(C_SCLStringList & orc_Data, const C_SC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create filename
 
-   \param[in]  orc_DataPoolName         name of data pool
+   \param[in]  orc_DataPoolName         name of Datapool
    \param[out] orc_FileName             assembled filename
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_CreateFileName(const C_SCLString & orc_DataPoolName, C_SCLString & orc_FileName)
 {
    // assemble filename
-   // add data pool name + 'data_pool'
+   // add Datapool name + 'data_pool'
    orc_FileName = orc_DataPoolName.LowerCase() + "_data_pool";
 }
 
@@ -1348,4 +1500,33 @@ C_SCLString C_OSCExportDataPool::mh_GetElementSize(const C_OSCNodeDataPoolConten
    c_Size = C_SCLString::IntToStr(u32_Size);
 
    return c_Size;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert linkage enum to string.
+
+   \param[in]       oe_Linkage  Linkage type
+
+   \return
+   Linkage type as upper case string.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCExportDataPool::mh_ConvertLinkageToString(const C_OSCExportDataPool::E_Linkage oe_Linkage)
+{
+   C_SCLString c_Return;
+
+   switch (oe_Linkage)
+   {
+   case eLOCAL:
+      c_Return = "LOCAL";
+      break;
+   case eREMOTE:
+      c_Return = "REMOTE";
+      break;
+   case eREMOTEPUBLIC:
+      c_Return = "REMOTE_PUBLIC";
+      break;
+   }
+
+   return c_Return;
 }

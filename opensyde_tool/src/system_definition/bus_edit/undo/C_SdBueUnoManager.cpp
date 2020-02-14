@@ -18,7 +18,6 @@
 #include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.h"
 #include "C_SdBueUnoBusProtNodeConnectCommand.h"
 #include "C_SdBueUnoBusProtNodeDisconnectCommand.h"
-#include "C_SdBueUnoBusProtNodeCreateCommand.h"
 #include "C_SdBueMessageSelectorTreeWidget.h"
 #include "C_SdBueUnoMessageAddCommand.h"
 #include "C_SdBueUnoMessageDeleteCommand.h"
@@ -117,21 +116,6 @@ void C_SdBueUnoManager::DoDisconnectNodeFromProt(const uint32 ou32_NodeIndex, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Do add datapool to protocol
-
-   \param[in]     ou32_NodeIndex      Node index
-   \param[in]     ou32_InterfaceIndex Interface index
-   \param[in]     oe_Protocol         Com protocol
-   \param[in,out] opc_Widget          Widget to notify for changes
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoAddDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
-                                      const C_OSCCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget)
-{
-   this->DoPush(new C_SdBueUnoBusProtNodeCreateCommand(ou32_NodeIndex, ou32_InterfaceIndex, oe_Protocol, opc_Widget));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do add message
 
    \param[in]     orc_MessageId          Message identification indices
@@ -171,7 +155,7 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
    \param[in]     orc_OwnerNodeName           Owner node names
    \param[in]     orc_OwnerNodeInterfaceIndex Owner node interface index
    \param[in]     orc_OwnerNodeDatapoolIndex  Owner node Datapool index
-   \param[in]     orc_OwnerIsTxFlag           Owner has message as TX flags
+   \param[in]     orc_OwnerIsTxFlag           Owner has message as Tx flags
    \param[in,out] opc_MessageSyncManager      Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget       Message tree widget to perform actions on
    \param[out]    orc_NewIds                  New pasted message IDs
@@ -259,6 +243,7 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
 /*! \brief   Do paste signals
 
    \param[in]     orc_MessageId          Message identification indices
+   \param[in]     oru32_SignalIndex      Signal index
    \param[in]     orc_Signals            Signals data
    \param[in]     orc_OSCSignalCommons   Signal common osc data
    \param[in]     orc_UISignalCommons    Signal common ui data
@@ -493,11 +478,11 @@ void C_SdBueUnoManager::mh_PatchMessageId(const C_PuiSdNodeCanMessageSyncManager
    \param[in]  orc_LastOwnerNodeName           Original owners node names
    \param[in]  orc_LastOwnerNodeInterfaceIndex Original owners interface indices
    \param[in]  orc_LastOwnerNodeDatapoolIndex  Original owners Datapool indices
-   \param[in]  orc_LastOwnerIsTxFlag           Original owners TX flags
+   \param[in]  orc_LastOwnerIsTxFlag           Original owners Tx flags
    \param[out] orc_NewOwnerNodeName            New/valid owners node names (empty if no matches found)
    \param[out] orc_NewOwnerNodeInterfaceIndex  New/valid owners interface indices (empty if no matches found)
    \param[out] orc_NewOwnerNodeDatapoolIndex   New/valid owners Datapool indices (empty if no matches found)
-   \param[out] orc_NewOwnerIsTxFlag            New/valid owners TX flags (empty if no matches found)
+   \param[out] orc_NewOwnerIsTxFlag            New/valid owners Tx flags (empty if no matches found)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdentificationIndices & orc_MessageId,

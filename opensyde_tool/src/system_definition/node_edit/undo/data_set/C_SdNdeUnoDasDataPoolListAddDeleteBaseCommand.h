@@ -34,8 +34,8 @@ public:
                                                  const stw_types::uint32 & oru32_DataPoolIndex,
                                                  const stw_types::uint32 & oru32_DataPoolListIndex,
                                                  C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                 const std::vector<stw_types::uint32> & orc_Indices, const QString & orc_Text = "",
-                                                 QUndoCommand * const opc_Parent = NULL);
+                                                 const std::vector<stw_types::uint32> & orc_Indices,
+                                                 const QString & orc_Text = "", QUndoCommand * const opc_Parent = NULL);
 
 protected:
    void Add(void);

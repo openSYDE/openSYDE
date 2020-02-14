@@ -51,7 +51,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueNodeSelectorWidget::C_SdBueNodeSelectorWidget(QWidget * const opc_Parent) :
@@ -152,8 +152,7 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
 
    disconnect(this->mpc_Ui->pc_NodeSelectorListWidget, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled,
               this, &C_SdBueNodeSelectorWidget::m_NodeToggled);
-   disconnect(this->mpc_Ui->pc_NodeSelectorListWidget, &C_SdBueNodeSelectorCheckBoxListWidget::SigComImport,
-              this, &C_SdBueNodeSelectorWidget::m_NodeComImport);
+
    // save the protocol
    this->me_Protocol = oe_Protocol;
 
@@ -201,8 +200,6 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
 
    connect(this->mpc_Ui->pc_NodeSelectorListWidget, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled,
            this, &C_SdBueNodeSelectorWidget::m_NodeToggled);
-   connect(this->mpc_Ui->pc_NodeSelectorListWidget, &C_SdBueNodeSelectorCheckBoxListWidget::SigComImport,
-           this, &C_SdBueNodeSelectorWidget::m_NodeComImport);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -252,33 +249,5 @@ void C_SdBueNodeSelectorWidget::m_NodeToggled(const uint32 ou32_NodeIndex, const
    {
       // Disconnect the COM datapool of the node
       Q_EMIT (this->SigDisconnectNodeFromProt(ou32_NodeIndex, ou32_InterfaceIndex));
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorWidget::m_NodeComImport(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
-{
-   sint32 s32_Return = C_NO_ERR;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-
-   if (pc_Node != NULL)
-   {
-      // check if a protocol and therefore a Datapool exist
-      const bool q_ProtocolAndDbExists = (pc_Node->GetCANProtocolsConst(this->me_Protocol).size() > 0U);
-
-      if (q_ProtocolAndDbExists == false)
-      {
-         // No COM datapool yet. New one must be created
-         Q_EMIT (this->SigAddDataPool(ou32_NodeIndex, ou32_InterfaceIndex));
-      }
-
-      s32_Return = C_CieUtil::h_ImportFile(ou32_NodeIndex, this->me_Protocol, -1, ou32_InterfaceIndex, this);
-
-      if (s32_Return == C_NO_ERR)
-      {
-         // Refresh update
-         Q_EMIT (this->SigReload());
-         Q_EMIT (this->SigErrorChange());
-      }
    }
 }

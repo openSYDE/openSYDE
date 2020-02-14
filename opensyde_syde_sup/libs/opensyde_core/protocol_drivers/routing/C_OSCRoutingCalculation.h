@@ -62,6 +62,8 @@ private:
    void m_AddOneOpenRoute(const C_OSCRoutingRoute & orc_Route);
    void m_AddOneRouteToTarget(const C_OSCRoutingRoute & orc_Route);
 
+   stw_types::sint32 m_CheckRoutesForLimitations(void);
+
    stw_types::uint32 mu32_StartBusIndex;
    stw_types::uint32 mu32_TargetNodeIndex;
    E_Mode me_Mode;

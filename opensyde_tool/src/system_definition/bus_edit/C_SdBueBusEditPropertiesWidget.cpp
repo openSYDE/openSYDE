@@ -502,6 +502,7 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
             c_Details.append(QString("\"%1\"\n").arg(rc_Name.c_str()));
          }
          c_Message.SetDetails(c_Details);
+         c_Message.SetCustomMinHeight(180, 300);
          c_Message.Execute();
          //Restore previous name
          {

@@ -43,6 +43,7 @@ public:
    void TearOffWidget(const stw_types::sint32 os32_Index, const QPoint & orc_Pos);
 
    void SetEditMode(const bool oq_Active);
+   void SetEnabled(const bool oq_Enabled);
    void SetViewIndex(const stw_types::uint32 ou32_Value);
 
    void Save(void);
@@ -73,6 +74,7 @@ Q_SIGNALS:
                          const stw_types::uint16 ou16_ListIndex, const stw_types::uint16 ou16_ElementIndex);
    void SigDataPoolRead(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Index);
    void SigNvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id);
+   void SigEnabledDisabled(bool oq_Connected);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -121,7 +123,6 @@ private:
    void m_StoreUserSettings(void);
    void m_Connect(C_SyvDaDashboardWidget * const opc_Widget);
    void m_Disconnect(C_SyvDaDashboardWidget * const opc_Widget);
-   void m_SetDeleteButtonVisible(const bool oq_Visible) const;
    void m_OnTabChanged(const stw_types::sintn osn_Index) const;
 
    stw_opensyde_gui_elements::C_OgePubIconText * mpc_PushButton;

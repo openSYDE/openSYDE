@@ -45,28 +45,28 @@ public:
    void Clear(void);
 
    stw_opensyde_gui::C_SdNdeDpListDataSetView * GetDataSetView(const stw_types::uint32 & oru32_NodeIndex,
-                                                                     const stw_types::uint32 & oru32_DataPoolIndex,
-                                                                     const stw_types::uint32 & oru32_ListIndex);
+                                                               const stw_types::uint32 & oru32_DataPoolIndex,
+                                                               const stw_types::uint32 & oru32_ListIndex);
    C_SdNdeDpListDataSetModel * GetDataSetModel(const stw_types::uint32 & oru32_NodeIndex,
-                                                     const stw_types::uint32 & oru32_DataPoolIndex,
-                                                     const stw_types::uint32 & oru32_ListIndex);
+                                               const stw_types::uint32 & oru32_DataPoolIndex,
+                                               const stw_types::uint32 & oru32_ListIndex);
    stw_opensyde_gui::C_SdNdeDpListArrayEditView * GetArrayEditView(const stw_types::uint32 & oru32_NodeIndex,
-                                                                         const stw_types::uint32 & oru32_DataPoolIndex,
-                                                                         const stw_types::uint32 & oru32_ListIndex,
-                                                                         const stw_types::uint32 & oru32_ElementIndex,
-                                                                         const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType, const stw_types::uint32 & oru32_DataSetIndex);
-   C_SdNdeDpListArrayEditModel * GetArrayEditModel(const stw_types::uint32 & oru32_NodeIndex,
-                                                         const stw_types::uint32 & oru32_DataPoolIndex,
-                                                         const stw_types::uint32 & oru32_ListIndex,
-                                                         const stw_types::uint32 & oru32_ElementIndex,
-                                                         const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                                         const stw_types::uint32 & oru32_DataSetIndex);
-   stw_opensyde_gui::C_SdNdeDpListTableView * GetElementView(const stw_types::uint32 & oru32_NodeIndex,
                                                                    const stw_types::uint32 & oru32_DataPoolIndex,
-                                                                   const stw_types::uint32 & oru32_ListIndex);
-   C_SdNdeDpListTableModel * GetElementModel(const stw_types::uint32 & oru32_NodeIndex,
+                                                                   const stw_types::uint32 & oru32_ListIndex,
+                                                                   const stw_types::uint32 & oru32_ElementIndex,
+                                                                   const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType, const stw_types::uint32 & oru32_DataSetIndex);
+   C_SdNdeDpListArrayEditModel * GetArrayEditModel(const stw_types::uint32 & oru32_NodeIndex,
                                                    const stw_types::uint32 & oru32_DataPoolIndex,
-                                                   const stw_types::uint32 & oru32_ListIndex);
+                                                   const stw_types::uint32 & oru32_ListIndex,
+                                                   const stw_types::uint32 & oru32_ElementIndex,
+                                                   const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                                   const stw_types::uint32 & oru32_DataSetIndex);
+   stw_opensyde_gui::C_SdNdeDpListTableView * GetElementView(const stw_types::uint32 & oru32_NodeIndex,
+                                                             const stw_types::uint32 & oru32_DataPoolIndex,
+                                                             const stw_types::uint32 & oru32_ListIndex);
+   C_SdNdeDpListTableModel * GetElementModel(const stw_types::uint32 & oru32_NodeIndex,
+                                             const stw_types::uint32 & oru32_DataPoolIndex,
+                                             const stw_types::uint32 & oru32_ListIndex);
 
    void RegisterDataSetView(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
                             const stw_types::uint32 & oru32_ListIndex,
@@ -134,7 +134,8 @@ private:
    void m_OnElementDataChange(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
                               const stw_types::uint32 & oru32_DataPoolListIndex,
                               const stw_types::uint32 & oru32_DataPoolListElementIndex, const QVariant & orc_NewData,
-                              const stw_opensyde_gui_logic::C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType, const stw_types::uint32 & oru32_ArrayIndex, const stw_types::sint32 & ors32_DataSetIndex);
+                              const stw_opensyde_gui_logic::C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType,
+                              const stw_types::uint32 & oru32_ArrayIndex, const stw_types::sint32 & ors32_DataSetIndex);
    void m_OnArrayEditErrorChangePossible(const stw_types::uint32 & oru32_NodeIndex,
                                          const stw_types::uint32 & oru32_DataPoolIndex,
                                          const stw_types::uint32 & oru32_ListIndex,

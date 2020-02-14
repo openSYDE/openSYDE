@@ -40,7 +40,7 @@ using namespace stw_tgl;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNode::C_OSCNode(void)
@@ -49,7 +49,7 @@ C_OSCNode::C_OSCNode(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 
    Clean up.
 */
@@ -60,7 +60,7 @@ C_OSCNode::~C_OSCNode(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialize class content
+/*! \brief  Initialize class content
 
    Clean up.
 */
@@ -73,13 +73,14 @@ void C_OSCNode::Initialize(void)
    c_DataPools.resize(0);
    c_Applications.resize(0);
    c_ComProtocols.resize(0);
+   c_HALCConfig.Clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Insert data pool at specified position
+/*! \brief  Insert data pool at specified position
 
-   \param[in] oru32_DataPoolIndex Data pool index
-   \param[in] orc_DataPool        Data pool data
+   \param[in]  oru32_DataPoolIndex  Data pool index
+   \param[in]  orc_DataPool         Data pool data
 
    \return
    C_NO_ERR Operation success
@@ -111,9 +112,9 @@ sint32 C_OSCNode::InsertDataPool(const uint32 & oru32_DataPoolIndex, const C_OSC
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete data pool at specified position
+/*! \brief  Delete data pool at specified position
 
-   \param[in] oru32_DataPoolIndex Data pool index
+   \param[in]  oru32_DataPoolIndex  Data pool index
 
    \return
    C_NO_ERR Operation success
@@ -145,10 +146,10 @@ sint32 C_OSCNode::DeleteDataPool(const uint32 & oru32_DataPoolIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Move datapool in node
+/*! \brief  Move datapool in node
 
-   \param[in] ou32_Start  Start index
-   \param[in] ou32_Target Target index
+   \param[in]  ou32_Start     Start index
+   \param[in]  ou32_Target    Target index
 
    \return
    C_NO_ERR OK
@@ -190,15 +191,15 @@ sint32 C_OSCNode::MoveDataPool(const uint32 ou32_Start, const uint32 ou32_Target
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Insert message at specified position
+/*! \brief  Insert message at specified position
 
-   \param[in] ore_ComProtocol      Com protocol
-   \param[in] oru32_InterfaceIndex Interface index
-   \param[in] oru32_DatapoolIndex  Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx
-   \param[in] oru32_MessageIndex   Message index
-   \param[in] orc_Message          Message data
-   \param[in] orc_SignalData       Signal data
+   \param[in]  ore_ComProtocol         Com protocol
+   \param[in]  oru32_InterfaceIndex    Interface index
+   \param[in]  oru32_DatapoolIndex     Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx
+   \param[in]  oru32_MessageIndex      Message index
+   \param[in]  orc_Message             Message data
+   \param[in]  orc_SignalData          Signal data
 
    \return
    C_NO_ERR Operation success
@@ -275,17 +276,17 @@ sint32 C_OSCNode::InsertMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set message at specified position
+/*! \brief  Set message at specified position
 
-   \param[in] ore_ComProtocol      Com protocol
-   \param[in] oru32_InterfaceIndex Interface index
-   \param[in] oru32_DatapoolIndex  Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx
-   \param[in] oru32_MessageIndex   Message index
-   \param[in] orc_Message          Message data
-   \param[in] orq_NewMessageIsTx   true: the message is a TX message
-                                   false: the message is an RX message
-   \param[in] orc_SignalData       Signal data
+   \param[in]  ore_ComProtocol         Com protocol
+   \param[in]  oru32_InterfaceIndex    Interface index
+   \param[in]  oru32_DatapoolIndex     Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx
+   \param[in]  oru32_MessageIndex      Message index
+   \param[in]  orc_Message             Message data
+   \param[in]  orq_NewMessageIsTx      true: the message is a Tx message
+                                       false: the message is an Rx message
+   \param[in]  orc_SignalData          Signal data
 
    \return
    C_NO_ERR Operation success
@@ -373,13 +374,13 @@ sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete message at specified position
+/*! \brief  Delete message at specified position
 
-   \param[in] ore_ComProtocol      Com protocol
-   \param[in] oru32_InterfaceIndex Interface index
-   \param[in] oru32_DatapoolIndex  Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx
-   \param[in] oru32_MessageIndex   Message index
+   \param[in]  ore_ComProtocol         Com protocol
+   \param[in]  oru32_InterfaceIndex    Interface index
+   \param[in]  oru32_DatapoolIndex     Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx
+   \param[in]  oru32_MessageIndex      Message index
 
    \return
    C_NO_ERR Operation success
@@ -452,16 +453,16 @@ sint32 C_OSCNode::DeleteMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Insert signal at specified position
+/*! \brief  Insert signal at specified position
 
-   \param[in] ore_ComProtocol      Com protocol
-   \param[in] oru32_InterfaceIndex Interface index
-   \param[in] oru32_DatapoolIndex  Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx
-   \param[in] oru32_MessageIndex   Message index
-   \param[in] oru32_SignalIndex    Signal index
-   \param[in] orc_Signal           Signal data for message positioning
-   \param[in] orc_SignalData       Signal data for data pool
+   \param[in]  ore_ComProtocol         Com protocol
+   \param[in]  oru32_InterfaceIndex    Interface index
+   \param[in]  oru32_DatapoolIndex     Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx
+   \param[in]  oru32_MessageIndex      Message index
+   \param[in]  oru32_SignalIndex       Signal index
+   \param[in]  orc_Signal              Signal data for message positioning
+   \param[in]  orc_SignalData          Signal data for data pool
 
    \return
    C_NO_ERR Operation success
@@ -543,16 +544,16 @@ sint32 C_OSCNode::InsertSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set signal at specified position
+/*! \brief  Set signal at specified position
 
-   \param[in] ore_ComProtocol      Com protocol
-   \param[in] oru32_InterfaceIndex Interface index
-   \param[in] oru32_DatapoolIndex  Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx
-   \param[in] oru32_MessageIndex   Message index
-   \param[in] oru32_SignalIndex    Signal index
-   \param[in] orc_Signal           Signal data for message positioning
-   \param[in] orc_SignalData       Signal data for data pool
+   \param[in]  ore_ComProtocol         Com protocol
+   \param[in]  oru32_InterfaceIndex    Interface index
+   \param[in]  oru32_DatapoolIndex     Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx
+   \param[in]  oru32_MessageIndex      Message index
+   \param[in]  oru32_SignalIndex       Signal index
+   \param[in]  orc_Signal              Signal data for message positioning
+   \param[in]  orc_SignalData          Signal data for data pool
 
    \return
    C_NO_ERR Operation success
@@ -617,15 +618,15 @@ sint32 C_OSCNode::SetSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set signal at specified position
+/*! \brief  Set signal at specified position
 
-   \param[in] ore_ComProtocol      Com protocol
-   \param[in] oru32_InterfaceIndex Interface index
-   \param[in] oru32_DatapoolIndex  Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx
-   \param[in] oru32_MessageIndex   Message index
-   \param[in] oru32_SignalIndex    Signal index
-   \param[in] orc_Signal           Signal data for message positioning
+   \param[in]  ore_ComProtocol         Com protocol
+   \param[in]  oru32_InterfaceIndex    Interface index
+   \param[in]  oru32_DatapoolIndex     Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx
+   \param[in]  oru32_MessageIndex      Message index
+   \param[in]  oru32_SignalIndex       Signal index
+   \param[in]  orc_Signal              Signal data for message positioning
 
    \return
    C_NO_ERR Operation success
@@ -683,15 +684,15 @@ sint32 C_OSCNode::SetSignalPosition(const C_OSCCanProtocol::E_Type & ore_ComProt
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set signal at specified position
+/*! \brief  Set signal at specified position
 
-   \param[in] ore_ComProtocol      Com protocol
-   \param[in] oru32_InterfaceIndex Interface index
-   \param[in] oru32_DatapoolIndex  Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx
-   \param[in] oru32_MessageIndex   Message index
-   \param[in] oru32_SignalIndex    Signal index
-   \param[in] ou16_MultiplexValue  New multiplex value
+   \param[in]  ore_ComProtocol         Com protocol
+   \param[in]  oru32_InterfaceIndex    Interface index
+   \param[in]  oru32_DatapoolIndex     Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx
+   \param[in]  oru32_MessageIndex      Message index
+   \param[in]  oru32_SignalIndex       Signal index
+   \param[in]  ou16_MultiplexValue     New multiplex value
 
    \return
    C_NO_ERR Operation success
@@ -746,14 +747,14 @@ sint32 C_OSCNode::SetSignalMUXValue(const C_OSCCanProtocol::E_Type & ore_ComProt
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete signal at specified position
+/*! \brief  Delete signal at specified position
 
-   \param[in] ore_ComProtocol      Com protocol
-   \param[in] oru32_InterfaceIndex Interface index
-   \param[in] oru32_DatapoolIndex  Datapool index
-   \param[in] orq_MessageIsTx      Flag if message is tx
-   \param[in] oru32_MessageIndex   Message index
-   \param[in] oru32_SignalIndex    Signal index
+   \param[in]  ore_ComProtocol         Com protocol
+   \param[in]  oru32_InterfaceIndex    Interface index
+   \param[in]  oru32_DatapoolIndex     Datapool index
+   \param[in]  orq_MessageIsTx         Flag if message is tx
+   \param[in]  oru32_MessageIndex      Message index
+   \param[in]  oru32_SignalIndex       Signal index
 
    \return
    C_NO_ERR Operation success
@@ -818,12 +819,12 @@ sint32 C_OSCNode::DeleteSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates the hash value over all data
+/*! \brief  Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CalcHash(uint32 & oru32_HashValue) const
@@ -848,13 +849,15 @@ void C_OSCNode::CalcHash(uint32 & oru32_HashValue) const
    {
       this->c_Applications[u32_Counter].CalcHash(oru32_HashValue);
    }
+
+   this->c_HALCConfig.CalcHash(oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get datapool index by type specific datapool index
+/*! \brief  Get datapool index by type specific datapool index
 
-   \param[in] oe_DataPoolType          Type of datapool
-   \param[in] ou32_DataPoolTypeIndex   Type specific index of datapool
+   \param[in]  oe_DataPoolType         Type of datapool
+   \param[in]  ou32_DataPoolTypeIndex  Type specific index of datapool
 
    \return
    if datapool is found: zero based index
@@ -885,14 +888,14 @@ stw_types::sint32 C_OSCNode::GetDataPoolIndex(const C_OSCNodeDataPool::E_Type oe
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Compare node names for greater
+/*! \brief  Compare node names for greater
 
    Nodes are compared by name.
    Primary sorting criteria: Name length: Shortest first
    Secondary sorting criteria: First difference in alphabetic ordering
 
-   \param[in] orc_Node1   Node 1
-   \param[in] orc_Node2   Node 2
+   \param[in]  orc_Node1   Node 1
+   \param[in]  orc_Node2   Node 2
 
    \return
    true:  Node 1 smaller than Node 2
@@ -915,7 +918,7 @@ bool C_OSCNode::h_CompareNameGreater(const C_OSCNode & orc_Node1, const C_OSCNod
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get number of bytes occupied by lists in NVM data pools
+/*! \brief  Get number of bytes occupied by lists in NVM data pools
 
    \return
    Number of bytes occupied by lists in NVM data pools
@@ -937,7 +940,7 @@ uint32 C_OSCNode::GetListsSize(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get number of bytes occupied by NVM data pools
+/*! \brief  Get number of bytes occupied by NVM data pools
 
    \return
    Number of bytes occupied by NVM data pools
@@ -959,9 +962,9 @@ uint32 C_OSCNode::GetDataPoolsSize(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get node data pool absolute index
+/*! \brief  Get node data pool absolute index
 
-   \param[in] ou32_DataPoolIndex Node data pool index
+   \param[in]  ou32_DataPoolIndex   Node data pool index
 
    \return
    Node data pool absolute index
@@ -984,10 +987,10 @@ uint32 C_OSCNode::GetDataPoolAbsoluteAddress(const uint32 ou32_DataPoolIndex) co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get node data pool list absolute index
+/*! \brief  Get node data pool list absolute index
 
-   \param[in] ou32_DataPoolIndex Node data pool index
-   \param[in] ou32_ListIndex     Node data pool list index
+   \param[in]  ou32_DataPoolIndex   Node data pool index
+   \param[in]  ou32_ListIndex       Node data pool list index
 
    \return
    Node data pool list absolute index
@@ -1012,11 +1015,11 @@ uint32 C_OSCNode::GetListAbsoluteAddress(const uint32 ou32_DataPoolIndex, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get node data pool list element absolute index
+/*! \brief  Get node data pool list element absolute index
 
-   \param[in] ou32_DataPoolIndex Node data pool index
-   \param[in] ou32_ListIndex     Node data pool list index
-   \param[in] ou32_ElementIndex  Node data pool list element index
+   \param[in]  ou32_DataPoolIndex   Node data pool index
+   \param[in]  ou32_ListIndex       Node data pool list index
+   \param[in]  ou32_ElementIndex    Node data pool list element index
 
    \return
    Node data pool list element absolute index
@@ -1053,10 +1056,10 @@ uint32 C_OSCNode::GetElementAbsoluteAddress(const uint32 ou32_DataPoolIndex, con
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get communication data pool for specified protocol
+/*! \brief  Get communication data pool for specified protocol
 
-   \param[in] ore_Protocol       Communication protocol
-   \param[in] ou32_DataPoolIndex Datapool index
+   \param[in]  ore_Protocol         Communication protocol
+   \param[in]  ou32_DataPoolIndex   Datapool index
 
    \return
    NULL No matching data pool found for communication protocol
@@ -1086,10 +1089,10 @@ const C_OSCNodeDataPool * C_OSCNode::GetComDataPoolConst(const C_OSCCanProtocol:
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get communication data pool for specified protocol
+/*! \brief  Get communication data pool for specified protocol
 
-   \param[in] ore_Protocol       Communication protocol
-   \param[in] ou32_DataPoolIndex Datapool index
+   \param[in]  ore_Protocol         Communication protocol
+   \param[in]  ou32_DataPoolIndex   Datapool index
 
    \return
    NULL No matching data pool found for communication protocol
@@ -1119,9 +1122,9 @@ C_OSCNodeDataPool * C_OSCNode::GetComDataPool(const C_OSCCanProtocol::E_Type & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all communication data pools for specified protocol
+/*! \brief  Get all communication data pools for specified protocol
 
-   \param[in] ore_Protocol       Communication protocol type
+   \param[in]  ore_Protocol   Communication protocol type
 
    \return
    Empty vector            No matching data found for communication protocol
@@ -1149,9 +1152,9 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all communication data pools for specified protocol
+/*! \brief  Get all communication data pools for specified protocol
 
-   \param[in] ore_Protocol       Communication protocol type
+   \param[in]  ore_Protocol   Communication protocol type
 
    \return
    Empty vector            No matching data found for communication protocol
@@ -1178,10 +1181,10 @@ std::vector<C_OSCNodeDataPool *> C_OSCNode::GetComDataPools(const C_OSCCanProtoc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get protocol for specified communication protocol and specified Datapools
+/*! \brief  Get protocol for specified communication protocol and specified Datapools
 
-   \param[in] ore_Protocol       Communication protocol
-   \param[in] ou32_DataPoolIndex Datapool index
+   \param[in]  ore_Protocol         Communication protocol
+   \param[in]  ou32_DataPoolIndex   Datapool index
 
    \return
    NULL No matching data found for communication protocol
@@ -1205,10 +1208,10 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get protocol for specified communication protocol and specified Datapools
+/*! \brief  Get protocol for specified communication protocol and specified Datapools
 
-   \param[in] ore_Protocol       Communication protocol
-   \param[in] ou32_DataPoolIndex Datapool index
+   \param[in]  ore_Protocol         Communication protocol
+   \param[in]  ou32_DataPoolIndex   Datapool index
 
    \return
    NULL No matching data found for communication protocol
@@ -1231,9 +1234,9 @@ C_OSCCanProtocol * C_OSCNode::GetCANProtocol(const C_OSCCanProtocol::E_Type & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all protocols for specified communication protocol
+/*! \brief  Get all protocols for specified communication protocol
 
-   \param[in] ore_Protocol       Communication protocol
+   \param[in]  ore_Protocol   Communication protocol
 
    \return
    Empty vector            No matching data found for communication protocol
@@ -1258,9 +1261,9 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all protocols for specified communication protocol
+/*! \brief  Get all protocols for specified communication protocol
 
-   \param[in] ore_Protocol       Communication protocol
+   \param[in]  ore_Protocol   Communication protocol
 
    \return
    Empty vector            No matching data found for communication protocol
@@ -1284,9 +1287,9 @@ std::vector<C_OSCCanProtocol *> C_OSCNode::GetCANProtocols(const C_OSCCanProtoco
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Find com protocol for com data pool
+/*! \brief  Find com protocol for com data pool
 
-   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 
    \return
    NULL No matching data found for communication protocol
@@ -1311,9 +1314,9 @@ const C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocolConst(const uint32 ou32
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Find com protocol for com data pool
+/*! \brief  Find com protocol for com data pool
 
-   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 
    \return
    NULL No matching data found for communication protocol
@@ -1338,15 +1341,15 @@ C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocol(const uint32 ou32_DataPoolIn
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check error for data pool
+/*! \brief  Check error for data pool
 
-   \param[in]  oru32_DataPoolIndex        Data pool index
-   \param[out] opq_NameConflict           Name conflict
-   \param[out] opq_NameInvalid            Name not usable as variable
-   \param[out] opq_IsErrorInListOrMessage Indicator if any error in any list or message was detected (true)
-   \param[out] opc_InvalidListIndices     Optional storage for list of invalid list indices
-                                          If COMM: interface index
-                                          Else: list index
+   \param[in]   oru32_DataPoolIndex          Data pool index
+   \param[out]  opq_NameConflict             Name conflict
+   \param[out]  opq_NameInvalid              Name not usable as variable
+   \param[out]  opq_IsErrorInListOrMessage   Indicator if any error in any list or message was detected (true)
+   \param[out]  opc_InvalidListIndices       Optional storage for list of invalid list indices
+                                             If COMM: interface index
+                                             Else: list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * const opq_NameConflict,
@@ -1582,23 +1585,23 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if message id valid
+/*! \brief  Check if message id valid
 
-   \param[in]  oru32_InterfaceIndex     Interface index
-   \param[in]  oru32_MessageId          Message id
-   \param[out] orq_Valid                Flag if valid
-   \param[in]  ope_SkipComProtocol      Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opu32_SkipInterfaceIndex Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opq_SkipMessageIsTxFlag  Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opu32_SkipMessageIndex   Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   oru32_InterfaceIndex      Interface index
+   \param[in]   oru32_MessageId           Message id
+   \param[out]  orq_Valid                 Flag if valid
+   \param[in]   ope_SkipComProtocol       Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opu32_SkipInterfaceIndex  Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opq_SkipMessageIsTxFlag   Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opu32_SkipMessageIndex    Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CheckMessageId(const uint32 & oru32_InterfaceIndex, const uint32 & oru32_MessageId, bool & orq_Valid,
@@ -1626,23 +1629,23 @@ void C_OSCNode::CheckMessageId(const uint32 & oru32_InterfaceIndex, const uint32
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if message name valid (invalid if duplicate or invalid for use as variable)
+/*! \brief  Check if message name valid (invalid if duplicate or invalid for use as variable)
 
-   \param[in]  oru32_InterfaceIndex     Interface index
-   \param[in]  orc_MessageName          Message name
-   \param[out] orq_Valid                Flag if valid (invalid if duplicate or invalid for use as variable)
-   \param[in]  ope_SkipComProtocol      Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opu32_SkipInterfaceIndex Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opq_SkipMessageIsTxFlag  Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opu32_SkipMessageIndex   Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   oru32_InterfaceIndex      Interface index
+   \param[in]   orc_MessageName           Message name
+   \param[out]  orq_Valid                 Flag if valid (invalid if duplicate or invalid for use as variable)
+   \param[in]   ope_SkipComProtocol       Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opu32_SkipInterfaceIndex  Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opq_SkipMessageIsTxFlag   Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opu32_SkipMessageIndex    Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CheckMessageName(const uint32 & oru32_InterfaceIndex, const stw_scl::C_SCLString & orc_MessageName,
@@ -1677,10 +1680,10 @@ void C_OSCNode::CheckMessageName(const uint32 & oru32_InterfaceIndex, const stw_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check application process ID valid
+/*! \brief  Check application process ID valid
 
-   \param[in]  ou32_ApplicationIndex Application index (ID)
-   \param[out] orq_Valid             Valid check result (should only be used if the function returned C_NO_ERR)
+   \param[in]   ou32_ApplicationIndex  Application index (ID)
+   \param[out]  orq_Valid              Valid check result (should only be used if the function returned C_NO_ERR)
 
    \return
    C_NO_ERR Operation success
@@ -1723,7 +1726,7 @@ sint32 C_OSCNode::CheckApplicationProcessIdValid(const uint32 ou32_ApplicationIn
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Recalculate all com protocol data pool indices
+/*! \brief  Recalculate all com protocol data pool indices
 
    Based on assumption data pools are sorted as can protocols
 */
@@ -1754,7 +1757,7 @@ void C_OSCNode::ReCalcCanProtocolDataPoolIndices(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if any interface has update support
+/*! \brief  Check if any interface has update support
 
    \return
    True  Update available
@@ -1781,12 +1784,12 @@ bool C_OSCNode::IsAnyUpdateAvailable(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checks if the node supports routing
+/*! \brief  Checks if the node supports routing
 
    Special case: Hybrid nodes can be used with openSYDE or KEFEX server,
    but routing is available with the openSYDE server only.
 
-   \param[in]     oe_Type       Interface type
+   \param[in]  oe_Type  Interface type
 
    \return
    true  Routing is available
@@ -1807,7 +1810,7 @@ bool C_OSCNode::IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Recalculate data pool addresses
+/*! \brief  Recalculate data pool addresses
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::RecalculateAddress(void)
@@ -1827,15 +1830,15 @@ void C_OSCNode::RecalculateAddress(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility: get specific data pool element
+/*! \brief  Utility: get specific data pool element
 
    Returns pointer to specific data pool element.
    Note that the validity of the returned pointer is only guaranteed as long as the layout of the data pool is not
     changed.
 
-   \param[in]  ou32_DataPoolIndex  data pool index
-   \param[in]  ou32_ListIndex      list index
-   \param[in]  ou32_ElementIndex   element index
+   \param[in]  ou32_DataPoolIndex   data pool index
+   \param[in]  ou32_ListIndex       list index
+   \param[in]  ou32_ElementIndex    element index
 
    \return
    Pointer to specified data pool element; NULL if one of the parameters is out of range
@@ -1857,22 +1860,22 @@ C_OSCNodeDataPoolListElement * C_OSCNode::GetDataPoolListElement(const uint32 ou
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all messages
+/*! \brief  Get all messages
 
-   \param[in]  oru32_InterfaceIndex     Interface index
-   \param[out] orc_Messages             Output messages
-   \param[in]  ope_SkipComProtocol      Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opu32_SkipInterfaceIndex Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opq_SkipMessageIsTxFlag  Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opu32_SkipMessageIndex   Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   oru32_InterfaceIndex      Interface index
+   \param[out]  orc_Messages              Output messages
+   \param[in]   ope_SkipComProtocol       Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opu32_SkipInterfaceIndex  Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opq_SkipMessageIsTxFlag   Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opu32_SkipMessageIndex    Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::m_GetAllMessages(const uint32 & oru32_InterfaceIndex,
@@ -1900,26 +1903,23 @@ void C_OSCNode::m_GetAllMessages(const uint32 & oru32_InterfaceIndex,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Append all messages for one com protocol
+/*! \brief  Append all messages for one com protocol
 
-   \param[in]  oru32_InterfaceIndex     Interface index
-   \param[in]  ore_ComProtocol          Communication protocol
-   \param[out] orc_Messages             Output messages
-   \param[out] orc_Signals              Output signals
-   \param[in]  ope_SkipComProtocol      Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opu32_SkipInterfaceIndex Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opq_SkipMessageIsTxFlag  Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  opu32_SkipMessageIndex   Optional parameter to skip one index
-                                        (Only used if all other optional skip parameters are used as well)
-                                        (Use-case: skip current message to avoid conflict with itself)
-   \param[in]  orq_ExcludeRx            Flag if no rx messages should show up in result
-   \param[in]  orq_ExcludeTx            Flag if no tx messages should show up in result
+   \param[in]   oru32_InterfaceIndex      Interface index
+   \param[in]   ore_ComProtocol           Communication protocol
+   \param[out]  orc_Messages              Output messages
+   \param[in]   ope_SkipComProtocol       Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opu32_SkipInterfaceIndex  Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opq_SkipMessageIsTxFlag   Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
+   \param[in]   opu32_SkipMessageIndex    Optional parameter to skip one index
+                                          (Only used if all other optional skip parameters are used as well)
+                                          (Use-case: skip current message to avoid conflict with itself)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::m_AppendAllProtocolMessages(const uint32 & oru32_InterfaceIndex,
@@ -1971,10 +1971,10 @@ void C_OSCNode::m_AppendAllProtocolMessages(const uint32 & oru32_InterfaceIndex,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get hash for list
+/*! \brief  Get hash for list
 
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
 
    \return
    Hash for list
@@ -1997,10 +1997,10 @@ uint32 C_OSCNode::m_GetListHash(const uint32 ou32_DataPoolIndex, const uint32 ou
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get hash for container
+/*! \brief  Get hash for container
 
-   \param[in] ou32_DataPoolIndex  Data pool index
-   \param[in] ou32_ContainerIndex Container index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ContainerIndex  Container index
 
    \return
    Hash for container

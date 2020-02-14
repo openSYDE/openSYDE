@@ -40,8 +40,6 @@ protected:
    void m_DoConnectNodeToProtAndAddDataPool(void);
    void m_DoDisconnectNodeFromProt(void);
    void m_DoDisconnectNodeToProtAndDeleteDataPool(void);
-   void m_DoAddDataPool(void);
-   void m_DoDeleteDataPool(void);
 
 private:
    const stw_types::uint32 mu32_NodeIndex;

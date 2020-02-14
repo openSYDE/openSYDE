@@ -127,6 +127,7 @@ private:
    static const stw_types::uint8 mhu8_DATAELEMENT_TYPE_PARAMETER;
    static const stw_types::uint8 mhu8_DATAELEMENT_TYPE_VARIABLE;
    static const stw_types::uint8 mhu8_DATAELEMENT_TYPE_SIGNAL;
+   static const stw_types::uint8 mhu8_DATAELEMENT_TYPE_HALC;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

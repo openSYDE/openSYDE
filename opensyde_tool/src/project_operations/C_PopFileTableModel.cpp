@@ -49,7 +49,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PopFileTableModel::C_PopFileTableModel(QObject * const opc_Parent) :
@@ -59,6 +59,9 @@ C_PopFileTableModel::C_PopFileTableModel(QObject * const opc_Parent) :
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal data changes to table
+
+   \param[in]  orc_RecentFilePaths  Recent file paths
+   \param[in]  orc_RecentProjects   Recent projects
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableModel::UpdateData(const std::vector<QString> & orc_RecentFilePaths,
@@ -77,7 +80,7 @@ void C_PopFileTableModel::UpdateData(const std::vector<QString> & orc_RecentFile
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -96,7 +99,7 @@ sintn C_PopFileTableModel::rowCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -117,8 +120,8 @@ sintn C_PopFileTableModel::columnCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -149,7 +152,7 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                {
                case eNAME:
                   // Translation: %1 = sequential number, %2 = project name
-                  c_Retval = QString("#%1 - %2").arg(orc_Index.row() + 1).arg(c_ProjectFileInfo.baseName());
+                  c_Retval = QString("#%1 - %2").arg(orc_Index.row() + 1).arg(c_ProjectFileInfo.completeBaseName());
                   break;
                case eVERSION:
                   c_Retval = rc_RecentProjects.c_Version.c_str();
@@ -207,7 +210,7 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                QFileInfo c_ProjectFileInfo;
 
                c_ProjectFileInfo.setFile(rc_RecentFilePaths);
-               c_Retval = c_ProjectFileInfo.baseName();
+               c_Retval = c_ProjectFileInfo.completeBaseName();
             }
          }
       }
@@ -256,7 +259,7 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Column to enum conversion
 
-   \param[in]  ors32_Column Column
+   \param[in]  ors32_Column   Column
 
    \return
    Enum value
@@ -287,7 +290,7 @@ C_PopFileTableModel::E_Columns C_PopFileTableModel::h_ColumnToEnum(const sint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Enum to column conversion
 
-   \param[in] ore_Value Enum value
+   \param[in]  ore_Value   Enum value
 
    \return
    Column
@@ -320,8 +323,8 @@ sint32 C_PopFileTableModel::h_EnumToColumn(const C_PopFileTableModel::E_Columns 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert row to message
 
-   \param[in]  ors32_Row     Model row
-   \param[out] orc_MessageId Message identification indices
+   \param[in]   ors32_Row     Model row
+   \param[out]  orc_FilePath  File path
 
    \return
    C_NO_ERR Operation success

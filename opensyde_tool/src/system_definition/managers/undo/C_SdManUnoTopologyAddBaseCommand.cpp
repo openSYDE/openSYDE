@@ -72,7 +72,7 @@ void C_SdManUnoTopologyAddBaseCommand::redo(void)
    {
       this->m_AddNew();
       this->mq_InitialStep = false;
-      Q_EMIT this->SigErrorChange();
+      Q_EMIT (this->SigErrorChange());
    }
    else
    {

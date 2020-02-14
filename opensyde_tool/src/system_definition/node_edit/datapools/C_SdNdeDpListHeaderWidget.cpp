@@ -69,11 +69,11 @@ const sintn C_SdNdeDpListHeaderWidget::mhsn_GroupSize = 270;
    \param[in]     ou32_ListIndex       List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
-                                                                 QTreeWidget * const opc_ListWidget,
-                                                                 C_SdNdeUnoDataPoolManager * const opc_UndoManager,
-                                                                 C_SdNdeDpListModelViewManager * const opc_ModelViewManager, const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                                 const uint32 ou32_ListIndex) :
+C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent, QTreeWidget * const opc_ListWidget,
+                                                     C_SdNdeUnoDataPoolManager * const opc_UndoManager,
+                                                     C_SdNdeDpListModelViewManager * const opc_ModelViewManager,
+                                                     const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                     const uint32 ou32_ListIndex) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListHeaderWidget),
    mpc_TreeWidget(opc_ListWidget),
@@ -207,9 +207,10 @@ C_SdNdeDpListHeaderWidget::~C_SdNdeDpListHeaderWidget(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::SetInitParameters(QTreeWidget * const opc_TreeWidget,
-                                                        C_SdNdeUnoDataPoolManager * const opc_UndoManager,
-                                                        C_SdNdeDpListModelViewManager * const opc_ModelViewManager, const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                        const uint32 ou32_ListIndex)
+                                                  C_SdNdeUnoDataPoolManager * const opc_UndoManager,
+                                                  C_SdNdeDpListModelViewManager * const opc_ModelViewManager,
+                                                  const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                  const uint32 ou32_ListIndex)
 {
    this->mpc_TreeWidget = opc_TreeWidget;
    this->mpc_UndoManager = opc_UndoManager;
@@ -222,7 +223,7 @@ void C_SdNdeDpListHeaderWidget::SetInitParameters(QTreeWidget * const opc_TreeWi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new index
 
-   \param[in] ors32_Value New index
+   \param[in] oru32_Value New index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::SetIndex(const uint32 & oru32_Value)
@@ -318,7 +319,7 @@ void C_SdNdeDpListHeaderWidget::CheckError(void)
       {
          if (this->mpc_Ui->pc_LabelListError->isVisible() == false)
          {
-            Q_EMIT this->SigErrorChange();
+            Q_EMIT (this->SigErrorChange());
          }
          m_UpdateErrorToolTip();
          this->mpc_Ui->pc_LabelListError->setVisible(true);
@@ -327,7 +328,7 @@ void C_SdNdeDpListHeaderWidget::CheckError(void)
       {
          if (this->mpc_Ui->pc_LabelListError->isVisible() == true)
          {
-            Q_EMIT this->SigErrorChange();
+            Q_EMIT (this->SigErrorChange());
          }
          //Hide warning sign
          this->mpc_Ui->pc_LabelListError->setVisible(false);
@@ -337,39 +338,9 @@ void C_SdNdeDpListHeaderWidget::CheckError(void)
                                              ((q_NameConflict == false) && (q_NameInvalid == false)));
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCount, "Valid", (q_UsageInvalid == false));
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCountNumber, "Valid", (q_UsageInvalid == false));
-      //Deactivate error tool tip on interaction item
-      //if (q_UsageInvalid == true)
-      //{
-      //   const QString c_Heading = C_GtGetText::h_GetText("List usage");
-      //   const QString c_Content = C_GtGetText::h_GetText("- is over 100%");
-      //   this->mpc_Ui->pc_LabelCount->SetToolTipInformation(c_Heading, c_Content, true);
-      //   this->mpc_Ui->pc_LabelCountNumber->SetToolTipInformation(c_Heading, c_Content, true);
-      //   this->mpc_Ui->pc_UsageWidget->SetErrorToolTip(c_Heading, c_Content);
-      //}
-      //else
-      //{
-      //   //Reset tool tips
-      //   this->mpc_Ui->pc_LabelCount->SetToolTipInformation("", "", false);
-      //   this->mpc_Ui->pc_LabelCountNumber->SetToolTipInformation("", "", false);
-      //   this->mpc_Ui->pc_UsageWidget->SetErrorToolTip("", "");
-      //}
       UpdateDataSetCount();
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelSize, "Valid", (q_OutOfDataPool == false));
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxSize, "Valid", (q_OutOfDataPool == false));
-      //Deactivate error tool tip on interaction item
-      //if (q_OutOfDataPool == false)
-      //{
-      //   //Reset tool tips
-      //   this->mpc_Ui->pc_LabelSize->SetToolTipInformation("", "", false);
-      //   this->mpc_Ui->pc_SpinBoxSize->SetToolTipInformation("", "", false);
-      //}
-      //else
-      //{
-      //   const QString c_Heading = C_GtGetText::h_GetText("List size");
-      //   const QString c_Content = C_GtGetText::h_GetText("- is over datapool size (including the previous lists)");
-      //   this->mpc_Ui->pc_LabelSize->SetToolTipInformation(c_Heading, c_Content, true);
-      //   this->mpc_Ui->pc_SpinBoxSize->SetToolTipInformation(c_Heading, c_Content, true);
-      //}
    }
 }
 
@@ -402,48 +373,13 @@ void C_SdNdeDpListHeaderWidget::UpdateDataSetCount(void)
       {
          if (this->mq_DataSetError == true)
          {
-            //Deactivate error tool tip on interaction item
-            //const C_OSCNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
-            //   this->mu32_NodeIndex, this->mu32_DataPoolIndex);
             c_Text = C_Uti::h_GetLink(QString(C_GtGetText::h_GetText("Datasets: %1 ")).arg(pc_List->c_DataSets.size()),
                                       mc_STYLE_GUIDE_COLOR_24);
-            //Deactivate error tool tip on interaction item
-            //if (pc_Datapool != NULL)
-            //{
-            //   bool q_Tmp;
-            //   QString c_Content;
-            //   std::vector<uint32> c_InvalidDataSetIndices;
-            //   const QString c_Heading = C_GtGetText::h_GetText("Datasets with invalid content:");
-            //   pc_Datapool->CheckErrorList(this->mu32_ListIndex, NULL, NULL, NULL, NULL, &q_Tmp, NULL,
-            //                               &c_InvalidDataSetIndices, NULL);
-            //   for (uint32 u32_ItDataSet = 0;
-            //        (u32_ItDataSet < c_InvalidDataSetIndices.size()) &&
-            //        (u32_ItDataSet < mu32_TOOL_TIP_MAXIMUM_ITEMS);
-            //        ++u32_ItDataSet)
-            //   {
-            //      const C_OSCNodeDataPoolDataSet * const pc_DataSet =
-            //         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListDataSet(
-            //            this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
-            //            c_InvalidDataSetIndices[u32_ItDataSet]);
-            //      if (pc_DataSet != NULL)
-            //      {
-            //         c_Content += QString("%1\n").arg(pc_DataSet->c_Name.c_str());
-            //      }
-            //   }
-            //   if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDataSetIndices.size())
-            //   {
-            //      c_Content += QString("+%1\n").arg(
-            //         c_InvalidDataSetIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
-            //   }
-            //   this->mpc_Ui->pc_LabelDataSetsInfo->SetToolTipInformation(c_Heading, c_Content, true);
-            //}
          }
          else
          {
             c_Text =
                C_Uti::h_GetLink(QString(C_GtGetText::h_GetText("Datasets: %1 ")).arg(pc_List->c_DataSets.size()));
-            //Deactivate error tool tip on interaction item
-            //this->mpc_Ui->pc_LabelDataSetsInfo->SetToolTipInformation("", "", false);
          }
       }
       this->mpc_Ui->pc_LabelDataSetsInfo->setText(c_Text);
@@ -512,12 +448,12 @@ void C_SdNdeDpListHeaderWidget::PopUp(void)
    QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this, false);
 
    C_SdNdeDpListPopUp * const pc_PopUp = new C_SdNdeDpListPopUp(*c_Dialog,
-                                                                            this->mu32_NodeIndex,
-                                                                            this->mu32_DataPoolIndex,
-                                                                            this->mu32_ListIndex,
-                                                                            this->mpc_ModelViewManager,
-                                                                            this->mpc_TreeWidget,
-                                                                            this->mpc_UndoManager);
+                                                                this->mu32_NodeIndex,
+                                                                this->mu32_DataPoolIndex,
+                                                                this->mu32_ListIndex,
+                                                                this->mpc_ModelViewManager,
+                                                                this->mpc_TreeWidget,
+                                                                this->mpc_UndoManager);
 
    //Connect
    connect(this, &C_SdNdeDpListHeaderWidget::SigUpdated, pc_PopUp, &C_SdNdeDpListPopUp::UpdateHeader);
@@ -541,7 +477,7 @@ void C_SdNdeDpListHeaderWidget::PopUp(void)
          disconnect(this, &C_SdNdeDpListHeaderWidget::SigUpdated, pc_PopUp,
                     &C_SdNdeDpListPopUp::UpdateHeader);
          //Check error
-         Q_EMIT this->SigErrorChange();
+         Q_EMIT (this->SigErrorChange());
          //Reload
          this->m_UpdateUi();
          Q_EMIT this->SigUpdateTable();
@@ -739,7 +675,7 @@ void C_SdNdeDpListHeaderWidget::m_EditNameFinished(void)
          //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          this->mpc_UndoManager->DoChangeListData(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                  dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
-                                                                                                      mpc_TreeWidget),
+                                                                                                mpc_TreeWidget),
                                                  this->mu32_ListIndex, c_Data, C_SdNdeDpUtil::eLIST_NAME);
       }
       Q_EMIT this->SigUpdateAddress();
@@ -761,7 +697,7 @@ void C_SdNdeDpListHeaderWidget::m_EditCommentFinished(void)
          //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          this->mpc_UndoManager->DoChangeListData(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                  dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
-                                                                                                      mpc_TreeWidget),
+                                                                                                mpc_TreeWidget),
                                                  this->mu32_ListIndex, c_Data, C_SdNdeDpUtil::eLIST_COMMENT);
       }
    }
@@ -783,7 +719,7 @@ void C_SdNdeDpListHeaderWidget::m_EditSizeFinished(void)
          //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          this->mpc_UndoManager->DoChangeListData(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                  dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
-                                                                                                      mpc_TreeWidget),
+                                                                                                mpc_TreeWidget),
                                                  this->mu32_ListIndex, c_Data, C_SdNdeDpUtil::eLIST_SIZE);
       }
       Q_EMIT this->SigUpdateAddress();
@@ -805,8 +741,9 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
                                                         this->mu32_ListIndex, c_OSCList, c_UIList) == C_NO_ERR)
    {
       C_SdNdeDpListDataSetWidget * const pc_DataSetWidget = new C_SdNdeDpListDataSetWidget(*c_Dialog,
-                                                                                                       this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                                                                       this->mu32_ListIndex);
+                                                                                           this->mu32_NodeIndex,
+                                                                                           this->mu32_DataPoolIndex,
+                                                                                           this->mu32_ListIndex);
 
       pc_DataSetWidget->SetModelViewManager(this->mpc_ModelViewManager);
       //Resize
@@ -830,7 +767,7 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
             C_PuiSdHandler::h_GetInstance()->SetDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                              this->mu32_ListIndex, c_OSCList, c_UIList);
             this->UpdateDataSetCount();
-            Q_EMIT this->SigErrorChange();
+            Q_EMIT (this->SigErrorChange());
          }
       }
       //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management

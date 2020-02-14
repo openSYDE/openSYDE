@@ -62,9 +62,9 @@ const stw_types::uint32 C_SyvUpUpdateWidget::mhu32_WaitTime = 5100U;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_ViewIndex        View index
-   \param[in]     opc_ProgressLogParent Optional pointer to progress log parent
-   \param[in,out] opc_Parent            Optional pointer to parent
+   \param[in]      ou32_ViewIndex         View index
+   \param[in]      opc_ProgressLogParent  Optional pointer to progress log parent
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * const opc_ProgressLogParent,
@@ -74,6 +74,7 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * 
    mu32_ViewIndex(ou32_ViewIndex),
    mpc_Scene(NULL),
    mpc_ProgressLog(NULL),
+   mpc_FixMinimizedProgressLog(NULL),
    mpc_ProgressLogParent(opc_ProgressLogParent),
    mpc_ProgressLogContent(NULL),
    mpc_UpSequences(NULL),
@@ -271,6 +272,8 @@ bool C_SyvUpUpdateWidget::PrepareToClose(void)
                                         "System Update is running. Do you really want to abort the current System Update?"));
          c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue Update"));
          c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Abort Update"));
+         c_MessageBox.SetCustomMinWidth(650);
+         c_MessageBox.SetCustomMinHeight(180, 180);
          e_ReturnMessageBox = c_MessageBox.Execute();
 
          if (e_ReturnMessageBox == C_OgeWiCustomMessage::eNO)
@@ -343,7 +346,7 @@ void C_SyvUpUpdateWidget::LoadScene(void)
 
    Here: Load splitter position
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::showEvent(QShowEvent * const opc_Event)
@@ -372,7 +375,7 @@ void C_SyvUpUpdateWidget::showEvent(QShowEvent * const opc_Event)
 
    Here: hide and delete toolbox
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::hideEvent(QHideEvent * const opc_Event)
@@ -386,7 +389,7 @@ void C_SyvUpUpdateWidget::hideEvent(QHideEvent * const opc_Event)
 
    Move the toolbox.
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::resizeEvent(QResizeEvent * const opc_Event)
@@ -396,50 +399,59 @@ void C_SyvUpUpdateWidget::resizeEvent(QResizeEvent * const opc_Event)
       Q_UNUSED(opc_Event)
 
       // only resize if scene is active to avoid bad toolbox geometry in case of "open tool with *.syde double click"
-      if ((this->mpc_Scene != NULL) && (this->mpc_Scene->isActive() == true))
+      //      if ((this->mpc_Scene != NULL) && (this->mpc_Scene->isActive() == true))
+      //      {
+      QPoint c_Point = this->mpc_ProgressLog->pos();
+      QSize c_Size = this->mpc_ProgressLog->size();
+
+      QPoint c_PointFixMiniProgressLog = this->mpc_FixMinimizedProgressLog->pos();
+
+      QWidget * pc_Widget = this->mpc_ProgressLogParent;
+
+      if (pc_Widget == NULL)
       {
-         QPoint c_Point = this->mpc_ProgressLog->pos();
-         QSize c_Size = this->mpc_ProgressLog->size();
-         QWidget * pc_Widget = this->mpc_ProgressLogParent;
-
-         if (pc_Widget == NULL)
-         {
-            // if no parent exist use this widget
-            pc_Widget = this;
-         }
-
-         // would the toolbox be outside of the widget in x direction
-         if ((this->mpc_ProgressLog->x() + this->mpc_ProgressLog->width() + mhsn_WidgetBorder) > pc_Widget->width())
-         {
-            // is the toolbox to big?
-            if ((this->mpc_ProgressLog->width() + (2 * mhsn_WidgetBorder)) > pc_Widget->width())
-            {
-               c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WidgetBorder));
-            }
-            else
-            {
-               // adapt position of toolbox
-               c_Point.setX((pc_Widget->width() - this->mpc_ProgressLog->width()) - mhsn_WidgetBorder);
-            }
-         }
-
-         // would the toolbox be outside of the widget in y direction
-         if ((this->mpc_ProgressLog->y() + this->mpc_ProgressLog->height() + mhsn_WidgetBorder) > pc_Widget->height())
-         {
-            // is the toolbox to big?
-            if ((this->mpc_ProgressLog->height() + (2 * mhsn_WidgetBorder)) > pc_Widget->height())
-            {
-               c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WidgetBorder));
-            }
-            else
-            {
-               // adapt position of toolbox
-               c_Point.setY((pc_Widget->height() - this->mpc_ProgressLog->height()) - mhsn_WidgetBorder);
-            }
-         }
-
-         this->mpc_ProgressLog->setGeometry(QRect(c_Point, c_Size));
+         // if no parent exist use this widget
+         pc_Widget = this;
       }
+
+      // would the toolbox be outside of the widget in x direction
+      if ((this->mpc_ProgressLog->x() + this->mpc_ProgressLog->width() + mhsn_WidgetBorder) > pc_Widget->width())
+      {
+         // is the toolbox to big?
+         if ((this->mpc_ProgressLog->width() + (2 * mhsn_WidgetBorder)) > pc_Widget->width())
+         {
+            c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WidgetBorder));
+         }
+         else
+         {
+            // adapt position of toolbox
+            c_Point.setX((pc_Widget->width() - this->mpc_ProgressLog->width()) - mhsn_WidgetBorder);
+         }
+      }
+
+      // would the toolbox be outside of the widget in y direction
+      if ((this->mpc_ProgressLog->y() + this->mpc_ProgressLog->height() + mhsn_WidgetBorder) > pc_Widget->height())
+      {
+         // is the toolbox to big?
+         if ((this->mpc_ProgressLog->height() + (2 * mhsn_WidgetBorder)) > pc_Widget->height())
+         {
+            c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WidgetBorder));
+         }
+         else
+         {
+            // adapt position of toolbox
+            c_Point.setY((pc_Widget->height() - this->mpc_ProgressLog->height()) - mhsn_WidgetBorder);
+         }
+      }
+
+      // adapt position of fix minimized toolbox
+      c_PointFixMiniProgressLog.setX((pc_Widget->width() - this->mpc_FixMinimizedProgressLog->width()) -
+                                     mhsn_WidgetBorder);
+
+      this->mpc_ProgressLog->setGeometry(QRect(c_Point, c_Size));
+      this->mpc_FixMinimizedProgressLog->setGeometry(QRect(c_PointFixMiniProgressLog,
+                                                           this->mpc_FixMinimizedProgressLog->size()));
+      //      }
    }
 }
 
@@ -479,8 +491,28 @@ void C_SyvUpUpdateWidget::m_CheckError(void)
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpUpdateWidget::m_InitSequence(void)
 {
+   bool q_IsEthernet = false;
    QString c_Message;
    sint32 s32_Retval;
+
+   //Check if ethernet
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   if (pc_View != NULL)
+   {
+      if (pc_View->GetPcData().GetConnected())
+      {
+         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+            pc_View->GetPcData().GetBusIndex());
+         if (pc_Bus != NULL)
+         {
+            if (pc_Bus->e_Type == C_OSCSystemBus::eETHERNET)
+            {
+               q_IsEthernet = true;
+            }
+         }
+      }
+   }
 
    // Sequence initialization
 
@@ -507,51 +539,80 @@ sint32 C_SyvUpUpdateWidget::m_InitSequence(void)
       s32_Retval = this->mpc_UpSequences->ReinitDispatcher();
    }
 
+   C_OgeWiCustomMessage c_MessageBox(this);
+
    switch (s32_Retval)
    {
    case C_NO_ERR:
       break;
    case C_CONFIG:
       c_Message = QString(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_RD_WR:
       c_Message =
          QString(C_GtGetText::h_GetText("Configured communication DLL does not exist or DLL could not be opened."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_OVERFLOW:
       c_Message =
          QString(C_GtGetText::h_GetText(
                     "Unknown transport protocol or unknown diagnostic server for at least one node."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_NOACT:
       c_Message = QString(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_COM:
-      c_Message =
-         QString(C_GtGetText::h_GetText(
-                    "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
-                    "double-click on PC)."));
+      if (q_IsEthernet)
+      {
+         c_Message =
+            QString(C_GtGetText::h_GetText(
+                       "Ethernet initialization failed. Check your Ethernet adapter settings in Windows system network configuration."));
+         c_MessageBox.SetCustomMinHeight(180, 180);
+      }
+      else
+      {
+         c_Message =
+            QString(C_GtGetText::h_GetText(
+                       "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
+                       "double-click on PC)."));
+         c_MessageBox.SetCustomMinHeight(200, 200);
+      }
       break;
    case C_CHECKSUM:
       c_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_RANGE:
       c_Message = QString(C_GtGetText::h_GetText("Routing configuration failed."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_UNKNOWN_ERR:
       c_Message = QString(C_GtGetText::h_GetText("Wrapped error of internal function call."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    case C_WARN:
       c_Message = QString(C_GtGetText::h_GetText("Internal error."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
+      break;
+   case C_BUSY:
+      c_Message = QString(C_GtGetText::h_GetText(
+                             "System View is invalid. Action cannot be performed. Fix the issues and retry."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    default:
       c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       break;
    }
 
    if (s32_Retval != C_NO_ERR)
    {
-      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR, c_Message);
+      c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
+      c_MessageBox.SetDescription(c_Message);
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Enter update mode"));
       c_MessageBox.Execute();
    }
 
@@ -611,9 +672,9 @@ void C_SyvUpUpdateWidget::m_UpdatePackageState(const sint32 os32_State)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reporting slot for system update
 
-   \param[in]     ou32_Step         Step of node configuration
-   \param[in]     os32_Result       Result of service
-   \param[in]     ou8_Progress      Progress of sequence in percentage (goes from 0..100 for each function)
+   \param[in]  ou32_Step      Step of node configuration
+   \param[in]  os32_Result    Result of service
+   \param[in]  ou8_Progress   Progress of sequence in percentage (goes from 0..100 for each function)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_ReportProgress(const uint32 ou32_Step, const sint32 os32_Result, const uint8 ou8_Progress)
@@ -647,12 +708,12 @@ void C_SyvUpUpdateWidget::m_ReportProgress(const uint32 ou32_Step, const sint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reporting slot for system update for specific server
 
-   \param[in]     ou32_Step            Step of node configuration
-   \param[in]     os32_Result          Result of service
-   \param[in]     ou8_BusIdentifier    Affected sub net
-   \param[in]     ou8_NodeIdentifier   Node Id of affected node
-   \param[in]     ou8_Progress         Progress of sequence in percentage (goes from 0..100 for each function)
-                                       Progress invalid: 255
+   \param[in]  ou32_Step            Step of node configuration
+   \param[in]  os32_Result          Result of service
+   \param[in]  ou8_Progress         Progress of sequence in percentage (goes from 0..100 for each function)
+                                    Progress invalid: 255
+   \param[in]  ou8_BusIdentifier    Affected sub net
+   \param[in]  ou8_NodeIdentifier   Node Id of affected node
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, const sint32 os32_Result,
@@ -662,15 +723,15 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
    const C_OSCSuSequences::E_ProgressStep e_Step = static_cast<C_OSCSuSequences::E_ProgressStep>(ou32_Step);
    uint32 u32_NodeIndex;
    uint32 u32_BusIndex;
-   bool q_IsParam;
-
-   (void)os32_Result;
    const sint32 s32_Result = C_SyvUtil::h_GetIndicesFromBusId(ou8_BusIdentifier, ou8_NodeIdentifier, u32_NodeIndex,
                                                               u32_BusIndex);
+
+   (void)os32_Result;
 
    //Report progress
    if (s32_Result == C_NO_ERR)
    {
+      bool q_IsParam;
       if (C_SyvUpUpdateWidget::mh_IsConnectionStart(e_Step) == true)
       {
          //Signal progress log
@@ -1019,8 +1080,8 @@ void C_SyvUpUpdateWidget::m_ReportStwFlashloaderInformationRead(void)
    Checks:
    - If a NVM write is necessary, the available Flashloader will be checked
 
-   \param[in]    orc_OsyNodeIndexes         All node indexes
-   \param[in]    orc_OsyDeviceInformation   All device information associated to the node index in the same order
+   \param[in]  orc_OsyNodeIndexes         All node indexes
+   \param[in]  orc_OsyDeviceInformation   All device information associated to the node index in the same order
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_CheckOpenSydeFlashloaderInformation(const std::vector<uint32> & orc_OsyNodeIndexes,
@@ -1201,7 +1262,7 @@ void C_SyvUpUpdateWidget::m_Connect(void)
                break;
             case C_BUSY:
                c_MessageText = C_GtGetText::h_GetText("Could not erase pre-existing target path "
-                                                      "(can result in partially erased target path)\n:") + c_ErrorPath;
+                                                      "(can result in partially erased target path):\n") + c_ErrorPath;
                break;
             case C_RD_WR:
                c_MessageText =  C_GtGetText::h_GetText("Could not copy file:\n") + c_ErrorPath;
@@ -1220,6 +1281,7 @@ void C_SyvUpUpdateWidget::m_Connect(void)
             c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
             c_Message.SetDescription("Enter update mode: Error on creating temporary folder.");
             c_Message.SetDetails(c_MessageText);
+            c_Message.SetCustomMinHeight(180, 250);
             c_Message.Execute();
          }
          else
@@ -1314,6 +1376,8 @@ void C_SyvUpUpdateWidget::m_Update(void)
       c_Message.SetDescription(C_GtGetText::h_GetText(
                                   "Update process cannot be started. There are active nodes, which are not responding. \n"
                                   "Check the nodes connection and try again."));
+      c_Message.SetCustomMinHeight(180, 180);
+      c_Message.SetCustomMinWidth(650);
       c_Message.Execute();
    }
    else
@@ -1363,7 +1427,7 @@ void C_SyvUpUpdateWidget::m_Update(void)
                   c_Message.SetDetails(C_GtGetText::h_GetText(
                                           "For updating a device nevertheless, there is an option to trigger a \"Force Update\" "
                                           "in the \"Device Status Information\" dialog (double click on node)."));
-
+                  c_Message.SetCustomMinHeight(230, 270);
                   c_Message.Execute();
                }
                else if (s32_Return != C_NO_ERR)
@@ -1478,6 +1542,8 @@ void C_SyvUpUpdateWidget::m_Disconnect(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Resets the system
+
+   \param[in]  oq_ClearLogAndResetScene   Clear log and reset scene
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_DisconnectAction(const bool oq_ClearLogAndResetScene)
@@ -1551,6 +1617,8 @@ void C_SyvUpUpdateWidget::m_Cancel(void)
                                      "System Update is running. Do you really want to abort the current System Update?"));
       c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue Update"));
       c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Abort Update"));
+      c_MessageBox.SetCustomMinWidth(650);
+      c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
       if (e_ReturnMessageBox == C_OgeWiCustomMessage::eNO)
@@ -1710,6 +1778,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                                                  "There are nodes, which do not support writing"
                                                  " parameter set image files."));
                      c_Message.SetDetails(c_Details);
+                     c_Message.SetCustomMinHeight(230, 300);
                      c_Message.Execute();
                   }
 
@@ -1741,6 +1810,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                                                  "There are nodes, which do not support Ethernet"
                                                  " to Ethernet routing."));
                      c_Message.SetDetails(c_Details);
+                     c_Message.SetCustomMinHeight(230, 300);
                      c_Message.Execute();
                   }
                }
@@ -1889,23 +1959,6 @@ void C_SyvUpUpdateWidget::m_Timer(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvUpUpdateWidget::m_GetTimeStamp(const bool oq_Bold) const
-{
-   C_TGLDateTime c_DateTime;
-
-   std::string c_DateTimeFormatted;
-   QString c_Text;
-
-   Q_UNUSED(oq_Bold)
-
-   TGL_GetDateTimeNow(c_DateTime);
-   c_DateTimeFormatted = C_OSCLoggingHandler::h_UtilConvertDateTimeToString(c_DateTime);
-   c_Text = c_DateTimeFormatted.c_str();
-
-   return c_Text;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_UpdateReportText(const QString & orc_NewTextPart) const
 {
    osc_write_log_info("Update Node", orc_NewTextPart.toStdString().c_str());
@@ -2020,6 +2073,7 @@ void C_SyvUpUpdateWidget::m_HandleConnectionFailure(void)
             c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
             c_Message.SetDescription(C_GtGetText::h_GetText(
                                         "None of the active nodes are responding. Check the nodes connection and try again."));
+            c_Message.SetCustomMinHeight(180, 180);
             c_Message.Execute();
          }
       }
@@ -2064,9 +2118,17 @@ void C_SyvUpUpdateWidget::m_InitToolBox(void)
    if (this->mpc_ProgressLog == NULL)
    {
       mpc_ProgressLogContent = new C_SyvUpProgressLog();
-      mpc_ProgressLog = new C_OgeWiHover(*mpc_ProgressLogContent, C_GtGetText::h_GetText(
-                                            "PROGRESS LOG"), false, this->mpc_ProgressLogParent,
+      mpc_ProgressLog = new C_OgeWiHover(*mpc_ProgressLogContent, C_GtGetText::h_GetText("PROGRESS LOG"),
+                                         ":images/system_views/IconProgressLog.svg", false, this->mpc_ProgressLogParent,
                                          this->mpc_ProgressLogParent);
+   }
+
+   // create fix minimized progress log
+   if (this->mpc_FixMinimizedProgressLog == NULL)
+   {
+      this->mpc_FixMinimizedProgressLog = new C_OgeWiFixPosition(C_GtGetText::h_GetText("PROGRESS LOG"),
+                                                                 ":images/system_views/IconProgressLog.svg",
+                                                                 QRect(1449, 24, 190, 36), this->mpc_ProgressLogParent);
    }
 
    // check for saved default values for toolbox
@@ -2099,10 +2161,17 @@ void C_SyvUpUpdateWidget::m_InitToolBox(void)
 
    if (c_ViewSettings.GetUpdateProgressLogMaximized() == false)
    {
-      this->mpc_ProgressLog->SetMinimize();
+      this->m_WiHoverMinBtnClicked();
+   }
+   else
+   {
+      this->mpc_ProgressLog->show();
    }
 
-   this->mpc_ProgressLog->show();
+   connect(this->mpc_ProgressLog, &C_OgeWiHover::SigWiHoverMinBtnClicked,
+           this, &C_SyvUpUpdateWidget::m_WiHoverMinBtnClicked);
+   connect(this->mpc_FixMinimizedProgressLog, &C_OgeWiFixPosition::SigWiFixPosMaxBtnClicked,
+           this, &C_SyvUpUpdateWidget::m_WiFixPosMaxBtnClicked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2125,13 +2194,14 @@ void C_SyvUpUpdateWidget::m_CleanUpToolBox(void)
                                                                   this->mpc_ProgressLog->GetMaximized());
       }
       this->mpc_ProgressLog->hide();
+      this->mpc_FixMinimizedProgressLog->hide();
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add progress log connecting to node entry
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_AddProgressLogConnectEntry(const uint32 ou32_NodeIndex)
@@ -2223,7 +2293,7 @@ void C_SyvUpUpdateWidget::m_ReplaceOriginalWithTempPaths(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle trigger for application information discard
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_DiscardInfo(const uint32 ou32_NodeIndex)
@@ -2280,56 +2350,9 @@ std::vector<bool> C_SyvUpUpdateWidget::m_GetIsFileBasedFlagForEach(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if current step animated
-
-   \param[in] oe_Step Current step
-
-   \return
-   True  Animated step
-   False Irrelevant step
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsAnimated(const C_OSCSuSequences::E_ProgressStep oe_Step)
-{
-   bool q_Retval;
-
-   switch (oe_Step)
-   {
-   case C_OSCSuSequences::eUPDATE_SYSTEM_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_FINAL_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED:
-   case C_OSCSuSequences::eXFL_PROGRESS:
-      q_Retval = true;
-      break;
-   default:
-      q_Retval = false;
-   }
-   return q_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current step connection start
 
-   \param[in] oe_Step Current step
+   \param[in]  oe_Step  Current step
 
    \return
    True  Connection start step
@@ -2354,7 +2377,7 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionStart(const C_OSCSuSequences::E_Progres
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current step connection success
 
-   \param[in] oe_Step Current step
+   \param[in]  oe_Step  Current step
 
    \return
    True  Connection success step
@@ -2380,7 +2403,7 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionSuccess(const C_OSCSuSequences::E_Progr
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current step connection failure
 
-   \param[in] oe_Step Current step
+   \param[in]  oe_Step  Current step
 
    \return
    True  Connection failure step
@@ -2422,8 +2445,8 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionFailure(const C_OSCSuSequences::E_Progr
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current step update application start
 
-   \param[in]  oe_Step     Current step
-   \param[out] orq_IsParam Falg if current step was a parameter file step (only valid if return is true!)
+   \param[in]   oe_Step       Current step
+   \param[out]  orq_IsParam   Falg if current step was a parameter file step (only valid if return is true!)
 
    \return
    True  Update application start step
@@ -2456,8 +2479,8 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAppStart(const C_OSCSuSequences::E_Progress
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current step update application success
 
-   \param[in]  oe_Step     Current step
-   \param[out] orq_IsParam Falg if current step was a parameter file step (only valid if return is true!)
+   \param[in]   oe_Step       Current step
+   \param[out]  orq_IsParam   Falg if current step was a parameter file step (only valid if return is true!)
 
    \return
    True  Update application success step
@@ -2490,7 +2513,7 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(const C_OSCSuSequences::E_Progre
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current step update start
 
-   \param[in] oe_Step Current step
+   \param[in]  oe_Step  Current step
 
    \return
    True  Update start step
@@ -2516,7 +2539,7 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateNodeStart(const C_OSCSuSequences::E_Progres
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current step update success
 
-   \param[in] oe_Step Current step
+   \param[in]  oe_Step  Current step
 
    \return
    True  Update success step
@@ -2542,7 +2565,7 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateNodeSuccess(const C_OSCSuSequences::E_Progr
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current step update failure
 
-   \param[in] oe_Step Current step
+   \param[in]  oe_Step  Current step
 
    \return
    True  Update failure step
@@ -2591,7 +2614,7 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateFailure(const C_OSCSuSequences::E_ProgressS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current step update abort
 
-   \param[in] oe_Step Current step
+   \param[in]  oe_Step  Current step
 
    \return
    True  Update abort step
@@ -2614,210 +2637,25 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAbort(const C_OSCSuSequences::E_ProgressSte
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Convert state to readable string
-
-   \param[in] oe_Step State
-
-   \return
-   Readable string
+/*! \brief   Slot function of fix minimized toolbox widget for button maximizing click
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvUpUpdateWidget::mh_GetString(const C_OSCSuSequences::E_ProgressStep oe_Step)
+void C_SyvUpUpdateWidget::m_WiFixPosMaxBtnClicked(void)
 {
-   QString c_Retval;
+   this->mpc_ProgressLog->setVisible(true);
+   this->mpc_ProgressLog->SetMaximized(true);
+   this->mpc_FixMinimizedProgressLog->setVisible(false);
+}
 
-   switch (oe_Step)
-   {
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_START:
-      c_Retval = "eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_START"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_START:
-      c_Retval = "eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_START"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_START:
-      c_Retval = "eACTIVATE_FLASHLOADER_XFL_ECU_RESET_START"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_ENTER_FLASHLOADER_START:
-      c_Retval = "eACTIVATE_FLASHLOADER_OSY_XFL_BC_ENTER_FLASHLOADER_START"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START:
-      c_Retval = "eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_START:
-      c_Retval = "eACTIVATE_FLASHLOADER_ROUTING_START"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_ROUTING_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
-      c_Retval = "eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR"; break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_FINISHED:
-      c_Retval = "eACTIVATE_FLASHLOADER_FINISHED"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_START:
-      c_Retval = "eREAD_DEVICE_INFO_START"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_START:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_SET_SESSION_START"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_START:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_DEVICE_NAME_START"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_START:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_START"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_START:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_START"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
-      c_Retval = "eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_START:
-      c_Retval = "eREAD_DEVICE_INFO_XFL_READING_INFORMATION_START"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
-      c_Retval = "eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_FINISHED:
-      c_Retval = "eREAD_DEVICE_INFO_FINISHED"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_START:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_START"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_START:
-      c_Retval = "eREAD_DEVICE_INFO_XFL_START"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FINISHED:
-      c_Retval = "eREAD_DEVICE_INFO_OSY_FINISHED"; break;
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_FINISHED:
-      c_Retval = "eREAD_DEVICE_INFO_XFL_FINISHED"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_START:
-      c_Retval = "eUPDATE_SYSTEM_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINISHED:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FINISHED"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_RECONNECT_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_FINAL_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_FINAL_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_FINISHED:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_FINISHED"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_START:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED:
-      c_Retval = "eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_ABORTED:
-      c_Retval = "eUPDATE_SYSTEM_ABORTED"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_FINISHED:
-      c_Retval = "eUPDATE_SYSTEM_FINISHED"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_START:
-      c_Retval = "eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
-      c_Retval = "eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_START"; break;
-   case C_OSCSuSequences::eXFL_PROGRESS:
-      c_Retval = "eXFL_PROGRESS"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_START:
-      c_Retval = "eUPDATE_SYSTEM_XFL_NODE_START"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FINISHED:
-      c_Retval = "eUPDATE_SYSTEM_XFL_NODE_FINISHED"; break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_FINISHED:
-      c_Retval = "eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_FINISHED"; break;
-   case C_OSCSuSequences::eRESET_SYSTEM_START:
-      c_Retval = "eRESET_SYSTEM_START"; break;
-   case C_OSCSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
-      c_Retval = "eRESET_SYSTEM_OSY_NODE_ERROR"; break;
-   case C_OSCSuSequences::eRESET_SYSTEM_FINISHED:
-      c_Retval = "eRESET_SYSTEM_FINISHED"; break;
-   }
-   return c_Retval;
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function of hover widget for button minimizing click
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpUpdateWidget::m_WiHoverMinBtnClicked(void)
+{
+   this->mpc_ProgressLog->setVisible(false);
+   this->mpc_ProgressLog->SetMaximized(false);
+   this->mpc_FixMinimizedProgressLog->setVisible(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

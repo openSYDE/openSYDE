@@ -40,7 +40,7 @@ C_UsNode::C_UsNode(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get project system definition node datapool user settings
 
-   \param[in] orc_ViewName Project system definition node datapool name (identifier)
+   \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
 
    \return
    Project system definition node datapool user settings
@@ -157,6 +157,7 @@ void C_UsNode::SetDatapoolSelectedVariableNames(const QString & orc_DatapoolName
 
    \param[in] orc_DatapoolName        Datapool name (identifier)
    \param[in] orc_ListName            Datapool list name (identifier)
+   \param[in] oe_SelectedProtocol     Protocol type
    \param[in] oq_MessageSelected      Set flag if there is a selected message
    \param[in] orc_SelectedMessageName Selected message name if any
    \param[in] oq_SignalSelected       Flag if signal selected

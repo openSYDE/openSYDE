@@ -212,6 +212,8 @@ void C_NagNaviBarWidget::UpdateNames(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle view icons update
+
+   \param[in] ou32_ViewIndex       Index to specify which view changed
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::UpdateViewIcons(const uint32 ou32_ViewIndex) const
@@ -531,17 +533,6 @@ void C_NagNaviBarWidget::HandleElements()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for button minimizing or maximizing click
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_MinmaxClicked()
-{
-   this->mq_Maximized = !this->mq_Maximized;
-
-   this->mc_TimerAnimation.start();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot function for button start view (main) click
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -648,7 +639,7 @@ void C_NagNaviBarWidget::m_OpenCanMonitor(void)
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open openSYDE CAN Monitor"));
       c_MessageBox.SetDetails(QString(C_GtGetText::h_GetText(
                                          "Executable path: \n%1")).arg(c_ExecutablePath));
-
+      c_MessageBox.SetCustomMinHeight(230, 270);
       c_MessageBox.Execute();
    }
 }
@@ -737,7 +728,7 @@ void C_NagNaviBarWidget::m_TabScCLicked(void)
    this->mpc_Ui->pc_WidgetTabSd->SetActive(false);
    this->mpc_Ui->pc_WidgetTabSc->SetActive(true);
 
-   Q_EMIT this->SigChangeUseCase(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP);
+   Q_EMIT this->SigChangeUseCase(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP, true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -751,7 +742,7 @@ void C_NagNaviBarWidget::m_TabSdCLicked(void)
    this->mpc_Ui->pc_WidgetTabSd->SetActive(true);
    this->mpc_Ui->pc_WidgetTabSc->SetActive(false);
 
-   Q_EMIT this->SigChangeUseCase(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY);
+   Q_EMIT this->SigSysDefRequest(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

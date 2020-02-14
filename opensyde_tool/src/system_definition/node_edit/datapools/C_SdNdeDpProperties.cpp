@@ -38,6 +38,8 @@ using namespace stw_scl;
 using namespace stw_tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const stw_types::sintn C_SdNdeDpProperties::mhsn_INDEX_PRIVATE = 0;
+const stw_types::sintn C_SdNdeDpProperties::mhsn_INDEX_PUBLIC = 1;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -65,13 +67,12 @@ using namespace stw_tgl;
                                             Datapool. In case of an edited or stand alone Datapool the pointer is NULL
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent,
-                                                     C_OSCNodeDataPool * const opc_OSCDataPool,
-                                                     C_PuiSdNodeDataPool * const pc_UiDataPool,
-                                                     C_OSCCanProtocol::E_Type * const ope_ComProtocolType,
-                                                     const sint32 os32_DataPoolIndex, const uint32 & oru32_NodeIndex,
-                                                     const bool oq_SelectName, const bool oq_ShowApplicationSection,
-                                                     const C_OSCNodeDataPoolId * const opc_SharedDatapoolId) :
+C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNodeDataPool * const opc_OSCDataPool,
+                                         C_PuiSdNodeDataPool * const pc_UiDataPool,
+                                         C_OSCCanProtocol::E_Type * const ope_ComProtocolType,
+                                         const sint32 os32_DataPoolIndex, const uint32 & oru32_NodeIndex,
+                                         const bool oq_SelectName, const bool oq_ShowApplicationSection,
+                                         const C_OSCNodeDataPoolId * const opc_SharedDatapoolId) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpProperties()),
    mpc_ParentDialog(&orc_Parent),
@@ -105,13 +106,25 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent,
       const sintn sn_Major = static_cast<sintn>(this->mpc_OSCDataPool->au8_Version[0]);
       const sintn sn_Minor = static_cast<sintn>(this->mpc_OSCDataPool->au8_Version[1]);
       const sintn sn_Revision = static_cast<sintn>(this->mpc_OSCDataPool->au8_Version[2]);
-      const QString c_Version =
-         QString("v%1.%2r%3").arg(sn_Major, 2, 10, QChar('0')).arg(sn_Minor, 2, 10, QChar('0')).arg(sn_Revision, 2, 10, QChar(
-                                                                                                       '0'));
+      const QString c_Version = QString("v%1.%2r%3")
+                                .arg(sn_Major, 2, 10, QChar('0'))
+                                .arg(sn_Minor, 2, 10, QChar('0'))
+                                .arg(sn_Revision, 2,  10, QChar('0'));
       // load actual datapool values
       this->mpc_Ui->pc_LineEditDatapoolName->setText(this->mpc_OSCDataPool->c_Name.c_str());
       this->mpc_Ui->pc_CommentText->setText(this->mpc_OSCDataPool->c_Comment.c_str());
       this->mpc_Ui->pc_CheckBoxSafety->setChecked(this->mpc_OSCDataPool->q_IsSafety);
+
+      if (this->mpc_OSCDataPool->q_ScopeIsPrivate == true)
+      {
+         //lint -e{1938}  static const is guaranteed preinitialized before main
+         this->mpc_Ui->pc_ComboBoxScope->setCurrentIndex(mhsn_INDEX_PRIVATE);
+      }
+      else
+      {
+         //lint -e{1938}  static const is guaranteed preinitialized before main
+         this->mpc_Ui->pc_ComboBoxScope->setCurrentIndex(mhsn_INDEX_PUBLIC);
+      }
 
       //Warning: this section has to be last, due to data update triggers
       //Application
@@ -166,7 +179,8 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent,
    }
 
    //Application section
-   this->mpc_Ui->pc_GroupBoxApplication->setVisible(oq_ShowApplicationSection);
+   this->mpc_Ui->pc_LabelRelatedApplication->setVisible(oq_ShowApplicationSection);
+   this->mpc_Ui->pc_ComboBoxApplication->setVisible(oq_ShowApplicationSection);
 
    // Share Datapool configuration
    if (this->ms32_DataPoolIndex >= 0)
@@ -182,7 +196,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent,
       {
          // Scenario 1: Edit of a shared Datapool
          C_SdNdeDpUtil::GetSharedDatapoolGroup(u32_SharedDatapoolGroup, c_DpId, this->mu32_NodeIndex,
-                                                     c_DatapoolGroup);
+                                               c_DatapoolGroup);
       }
    }
    else if (opc_SharedDatapoolId != NULL)
@@ -198,9 +212,9 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent,
          // The group exist. We want all group member. The second parameter for ignoring a concrete Datapool must be
          // invalid. The new Datapool is not registered in shared Datapools yet.
          C_SdNdeDpUtil::GetSharedDatapoolGroup(u32_SharedDatapoolGroup,
-                                                     C_OSCNodeDataPoolId(0xFFFFFFFFU, 0xFFFFFFFFU),
-                                                     this->mu32_NodeIndex,
-                                                     c_DatapoolGroup);
+                                               C_OSCNodeDataPoolId(0xFFFFFFFFU, 0xFFFFFFFFU),
+                                               this->mu32_NodeIndex,
+                                               c_DatapoolGroup);
       }
       else
       {
@@ -304,6 +318,7 @@ void C_SdNdeDpProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
    this->mpc_Ui->pc_LabelVersion->setText(C_GtGetText::h_GetText("Version"));
    this->mpc_Ui->pc_LabelConfigurationHeading->setText(C_GtGetText::h_GetText("Configuration"));
+   this->mpc_Ui->pc_LabelScope->setText(C_GtGetText::h_GetText("Scope of Content"));
    this->mpc_Ui->pc_LabelSafetyContent->setText(C_GtGetText::h_GetText("Safety Relevant Content"));
    this->mpc_Ui->pc_LabelRelatedApplication->setText(C_GtGetText::h_GetText(
                                                         "Related Programmable Application"));
@@ -327,19 +342,25 @@ void C_SdNdeDpProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this Datapool."));
 
-   this->mpc_Ui->pc_LabelVersion->SetToolTipInformation(C_GtGetText::h_GetText("Version"),
-                                                        C_GtGetText::h_GetText(
-                                                           "Datapool version. (Example: v01.00r00)"));
+   this->mpc_Ui->pc_LabelVersion->SetToolTipInformation(
+      C_GtGetText::h_GetText("Version"), C_GtGetText::h_GetText("Datapool version. (Example: v01.00r00)"));
 
-   this->mpc_Ui->pc_LabelSafetyContent->SetToolTipInformation(C_GtGetText::h_GetText("Safety Relevant Content"),
-                                                              C_GtGetText::h_GetText(
-                                                                 "Does this Datapool contain safety relevant elements?"
-                                                                 "\nThis property is relevant for code generation."));
+   this->mpc_Ui->pc_LabelScope->SetToolTipInformation(
+      C_GtGetText::h_GetText("Scope of Content"),
+      C_GtGetText::h_GetText("Private scope: The content of this Datapool can not be accessed by other programmable "
+                             "applications than the owner application.\n"
+                             "Public scope: All other programmable applications of the same node have access to the "
+                             "contents of this Datapool.\n"
+                             "This property is relevant for code generation."));
+   this->mpc_Ui->pc_LabelSafetyContent->SetToolTipInformation(
+      C_GtGetText::h_GetText("Safety Relevant Content"),
+      C_GtGetText::h_GetText("Does this Datapool contain safety relevant elements?"
+                             "\nThis property is relevant for code generation."));
 
    this->mpc_Ui->pc_LabelRelatedApplication->SetToolTipInformation(
       C_GtGetText::h_GetText("Related Programmable Application"),
-      C_GtGetText::h_GetText("Which programmable application owns this Datapool? "
-                             "\nOnly relevant if code generation is enabled."));
+      C_GtGetText::h_GetText("Which programmable application owns this Datapool? \n"
+                             "This property is relevant for code generation."));
 
    this->mpc_Ui->pc_LabelComProt->SetToolTipInformation(
       C_GtGetText::h_GetText("Communication Protocol"),
@@ -366,6 +387,12 @@ void C_SdNdeDpProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelDatapoolShareConfiguration->SetToolTipInformation(
       C_GtGetText::h_GetText("Shared Datapool Configuration"),
       C_GtGetText::h_GetText("The Datapool is a shared Datapool. All connected Datapools are in the list below."));
+
+   // Scope combo box
+   this->mpc_Ui->pc_ComboBoxScope->addItem("dummy");
+   this->mpc_Ui->pc_ComboBoxScope->addItem("dummy");
+   this->mpc_Ui->pc_ComboBoxScope->setItemText(mhsn_INDEX_PRIVATE, C_GtGetText::h_GetText("Private"));
+   this->mpc_Ui->pc_ComboBoxScope->setItemText(mhsn_INDEX_PUBLIC, C_GtGetText::h_GetText("Public"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -411,6 +438,8 @@ void C_SdNdeDpProperties::m_OkClicked(void)
    bool q_Continue = true;
    QString c_Details = "";
 
+   C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+
    std::vector<C_SCLString> c_ExistingDatapoolNames;
 
    //Check valid name
@@ -421,6 +450,8 @@ void C_SdNdeDpProperties::m_OkClicked(void)
       c_Details += "\n\n";
       // Do not accept
       q_Continue = false;
+      // Set height of message
+      c_Message.SetCustomMinHeight(180, 250);
    }
 
    //Check name not duplicate
@@ -439,6 +470,8 @@ void C_SdNdeDpProperties::m_OkClicked(void)
       c_Details += ".\n\n";
       // Do not accept
       q_Continue = false;
+      // Set height of message
+      c_Message.SetCustomMinHeight(180, 270);
    }
 
    // Check application
@@ -451,12 +484,13 @@ void C_SdNdeDpProperties::m_OkClicked(void)
                    .arg(C_PuiSdUtil::h_ConvertProtocolTypeToString(this->m_GetSelectedProtocol()));
       // Do not accept
       q_Continue = false;
+      // Set height of message
+      c_Message.SetCustomMinHeight(180, 270);
    }
 
    if (q_Continue == false)
    {
       // Inform user
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Datapool Properties"));
       c_Message.SetDescription(C_GtGetText::h_GetText("Invalid content detected. For more information see details."));
       c_Message.SetDetails(c_Details);
@@ -475,6 +509,8 @@ void C_SdNdeDpProperties::m_OkClicked(void)
          this->mpc_OSCDataPool->u32_NvMSize = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxSize->value());
          this->m_HandleDataPoolSafetyAdaptation();
          this->mpc_OSCDataPool->s32_RelatedDataBlockIndex = s32_RelatedDataBlockIndex;
+         this->mpc_OSCDataPool->q_ScopeIsPrivate =
+            (this->mpc_Ui->pc_ComboBoxScope->currentIndex() != mhsn_INDEX_PUBLIC);
 
          //Parse version
          //Format: v99.99r99;0
@@ -539,22 +575,26 @@ void C_SdNdeDpProperties::m_ApplyType(const bool oq_SharedDatapool)
    {
       if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eDIAG)
       {
-         this->mpc_Ui->pc_ComProtGroup->setVisible(false);
-         this->mpc_Ui->pc_SizeGroup->setVisible(false);
-         this->mpc_Ui->pc_SizeInfoUsageGroup->setVisible(false);
-         this->mpc_Ui->pc_SizeInfoReservedGroup->setVisible(false);
+         this->mpc_Ui->pc_LabelComProt->setVisible(false);
+         this->mpc_Ui->pc_ComboBoxProtocol->setVisible(false);
+         this->mpc_Ui->pc_LabelDatapoolSize->setVisible(false);
+         this->mpc_Ui->pc_SpinBoxSize->setVisible(false);
+         this->mpc_Ui->pc_LabelDataPoolUsage->setVisible(false);
+         this->mpc_Ui->pc_LabelDataPoolReservation->setVisible(false);
          this->mpc_Ui->pc_LabDatapoolType->setText(C_GtGetText::h_GetText("DIAG"));
       }
       else if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eNVM)
       {
-         this->mpc_Ui->pc_ComProtGroup->setVisible(false);
+         this->mpc_Ui->pc_LabelComProt->setVisible(false);
+         this->mpc_Ui->pc_ComboBoxProtocol->setVisible(false);
          this->mpc_Ui->pc_LabDatapoolType->setText(C_GtGetText::h_GetText("NVM"));
       }
       else
       {
-         this->mpc_Ui->pc_SizeGroup->setVisible(false);
-         this->mpc_Ui->pc_SizeInfoUsageGroup->setVisible(false);
-         this->mpc_Ui->pc_SizeInfoReservedGroup->setVisible(false);
+         this->mpc_Ui->pc_LabelDatapoolSize->setVisible(false);
+         this->mpc_Ui->pc_SpinBoxSize->setVisible(false);
+         this->mpc_Ui->pc_LabelDataPoolUsage->setVisible(false);
+         this->mpc_Ui->pc_LabelDataPoolReservation->setVisible(false);
          this->mpc_Ui->pc_LabDatapoolType->setText(C_GtGetText::h_GetText("COMM"));
       }
    }
@@ -571,8 +611,9 @@ void C_SdNdeDpProperties::m_ApplyType(const bool oq_SharedDatapool)
    this->mpc_Ui->pc_LabDatapoolImage->SetSvg(c_Pic);
 
    // Shared configuration visibility
-   this->mpc_Ui->pc_GroupBoxShareConfiguration->setVisible(oq_SharedDatapool);
-   this->mpc_Ui->pc_GroupBoxShareConfigurationList->setVisible(oq_SharedDatapool);
+   this->mpc_Ui->pc_BushButtonBreakRelation->setVisible(oq_SharedDatapool);
+   this->mpc_Ui->pc_LabelDatapoolShareConfiguration->setVisible(oq_SharedDatapool);
+   this->mpc_Ui->pc_ListWidgetSharedDatapoolInfo->setVisible(oq_SharedDatapool);
 
    //adapt size (set min height will auto update the height to visible elements
    this->setMinimumHeight(0);
@@ -735,7 +776,7 @@ void C_SdNdeDpProperties::m_CheckDatapoolName(void) const
    }
 
    //set invalid text property
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditDatapoolName, "Valid", q_NameIsValid);
+   //   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditDatapoolName, "Valid", q_NameIsValid);
    if (q_NameIsValid == true)
    {
       this->mpc_Ui->pc_LineEditDatapoolName->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
@@ -757,8 +798,8 @@ void C_SdNdeDpProperties::m_CheckDatapoolName(void) const
    False Name in conflict
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpProperties::m_CheckDatapoolNameNotDuplicate(
-   std::vector<C_SCLString> * const opc_ExistingDatapoolNames) const
+bool C_SdNdeDpProperties::m_CheckDatapoolNameNotDuplicate(std::vector<C_SCLString> * const opc_ExistingDatapoolNames)
+const
 {
    bool q_NameIsValid = true;
    const stw_scl::C_SCLString c_Name = this->mpc_Ui->pc_LineEditDatapoolName->text().toStdString().c_str();
@@ -884,11 +925,11 @@ void C_SdNdeDpProperties::m_OnSafetyChange(const bool oq_IsSafety) const
       C_OgeWiCustomMessage::E_Outputs e_Output;
       c_Message.SetHeading(C_GtGetText::h_GetText("Safety property enable"));
       c_Message.SetDescription(C_GtGetText::h_GetText(
-                                  "When enabling the safety property, the access permission of all existing data "
-                                  "elements of this Datapool will be changed to RO (read only).\n"
+                                  "The \"Access\" property of the data elements will be set to RO (read only)\n"
                                   "Do you want to enable the safety property?"));
       c_Message.SetOKButtonText(C_GtGetText::h_GetText("Enable"));
       c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+      c_Message.SetCustomMinHeight(200, 200);
       e_Output = c_Message.Execute();
       switch (e_Output)
       {
@@ -937,7 +978,7 @@ void C_SdNdeDpProperties::m_BreakSharedRelation(void)
       c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to delete the relation to other Datapool(s)\n"
                                                       "This is not revertible.\n\n"
                                                       "After relation break, the Datapool acts like a stand-alone Datapool."));
-
+      c_Message.SetCustomMinHeight(230, 230);
       if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
       {
          rc_SharedDatapools.RemoveSharedDatapool(C_OSCNodeDataPoolId(this->mu32_NodeIndex,

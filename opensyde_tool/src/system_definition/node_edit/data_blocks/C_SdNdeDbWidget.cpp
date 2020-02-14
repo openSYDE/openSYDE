@@ -12,6 +12,7 @@
 
 #include "C_Uti.h"
 #include "C_PuiSdUtil.h"
+#include "C_PuiUtil.h"
 #include "stwerrors.h"
 #include "CSCLString.h"
 #include "C_OgeWiUtil.h"
@@ -229,7 +230,7 @@ void C_SdNdeDbWidget::UpdateDataPools(void)
                   }
 
                   c_Temp = rc_DataPool.c_Name.c_str();
-                  c_Temp += " (" + C_PuiSdUtil::h_ConvertDataPoolTypeToString(rc_DataPool.e_Type) ;
+                  c_Temp += " (" + C_PuiSdUtil::h_ConvertDataPoolTypeToString(rc_DataPool.e_Type);
                   if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
                   {
                      c_Temp += ", ";
@@ -308,8 +309,6 @@ uint32 C_SdNdeDbWidget::GetApplicationIndex(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check process ID value
-
-   \param[in] osn_Value Current value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::CheckProcessIdError(void) const
@@ -336,8 +335,6 @@ void C_SdNdeDbWidget::CheckProcessIdError(void) const
    {
       this->mpc_Ui->pc_LabelErrorIcon->SetToolTipInformation("", "", C_NagToolTip::eERROR);
    }
-   //Deactivate error tool tip on interaction item
-   //this->mpc_Ui->pc_SpinBoxProcessId->SetToolTipAdditionalInfo(c_Info, !q_Valid);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -491,6 +488,7 @@ void C_SdNdeDbWidget::m_OnDelete(void)
                                      "All owned Datapools will become unassigned."));
          c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
          c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         c_Message.SetCustomMinHeight(180, 180);
          if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
          {
             //Delete each associated data pool
@@ -516,6 +514,7 @@ void C_SdNdeDbWidget::m_OnDelete(void)
       c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to delete this Data Block?"));
       c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
       c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+      c_Message.SetCustomMinHeight(180, 180);
       if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
       {
          //Trigger application delete
@@ -639,28 +638,37 @@ void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
 {
    const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
       this->mu32_NodeIndex, this->mu32_ApplicationIndex);
-   const QString c_IDECall = QString(pc_Application->c_IDECall.c_str());
 
-   if (c_IDECall == "")
+   if (pc_Application != NULL)
    {
-      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
-                                        C_GtGetText::h_GetText("No IDE provided. Edit Data Block Properties and "
-                                                               "insert an IDE Call."));
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
-      c_MessageBox.Execute();
-   }
-   else if (C_ImpUtil::h_OpenIDE(c_IDECall) != C_NO_ERR)
-   {
-      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
-                                        C_GtGetText::h_GetText(
-                                           "Could not start IDE. Reason: Most likely due to insufficient permissions or the executable is missing."));
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
-      c_MessageBox.SetDetails(QString(C_GtGetText::h_GetText(
-                                         "The following call returned an error: \n%1")).arg(c_IDECall));
-      c_MessageBox.Execute();
-   }
-   else
-   {
-      // Nothing to do
+      const QString c_IDECall =
+         QString(C_PuiUtil::h_ResolvePlaceholderVariables(
+                    pc_Application->c_IDECall.c_str(),
+                    C_PuiUtil::h_GetResolvedAbsPathFromProject(pc_Application->c_ProjectPath.c_str())));
+
+      if (c_IDECall == "")
+      {
+         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
+                                           C_GtGetText::h_GetText("No IDE provided. Edit Data Block properties and "
+                                                                  "insert an IDE call."));
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
+         c_MessageBox.SetCustomMinHeight(180, 180);
+         c_MessageBox.Execute();
+      }
+      else if (C_ImpUtil::h_OpenIDE(c_IDECall) != C_NO_ERR)
+      {
+         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
+                                           C_GtGetText::h_GetText("Could not start IDE. Possible reasons: "
+                                                                  "Insufficient permissions or missing executable."));
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
+         c_MessageBox.SetDetails(QString(C_GtGetText::h_GetText("The following call returned an error: \n%1")).
+                                 arg(c_IDECall));
+         c_MessageBox.SetCustomMinHeight(200, 270);
+         c_MessageBox.Execute();
+      }
+      else
+      {
+         // Nothing to do
+      }
    }
 }

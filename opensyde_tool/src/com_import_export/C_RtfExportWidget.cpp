@@ -186,7 +186,7 @@ sint32 C_RtfExportWidget::GetRtfPath(C_SCLString & orc_RtfPath) const
          if (c_FileExtAct.LowerCase() == ".rtf")
          {
             QFileInfo c_Info(orc_RtfPath.c_str());
-            if (C_OSCUtils::h_CheckValidFileName(c_Info.baseName().toStdString().c_str()))
+            if (C_OSCUtils::h_CheckValidFileName(c_Info.completeBaseName().toStdString().c_str()))
             {
                if (TGL_FileExists(orc_RtfPath) == true)
                {
@@ -250,8 +250,13 @@ sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) 
    // get company logo path
    orc_CompanyLogoPath = this->mpc_Ui->pc_EditLogoPath->GetPath().toStdString().c_str();
 
+   if (orc_CompanyLogoPath == "")
+   {
+      //nothing to check. Optional parameter, empty string is OK
+      s32_Return = C_NO_ERR;
+   }
    // check if path fulfills our path requirements
-   if (C_OSCUtils::h_CheckValidFilePath(orc_CompanyLogoPath) == true)
+   else if (C_OSCUtils::h_CheckValidFilePath(orc_CompanyLogoPath) == true)
    {
       if (orc_CompanyLogoPath != "")
       {
@@ -274,11 +279,10 @@ sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) 
             }
          }
       }
-      else
-      {
-         // optional parameter, empty string is OK
-         s32_Return = C_NO_ERR;
-      }
+   }
+   else
+   {
+      // nothing to do
    }
 
    return s32_Return;
@@ -714,7 +718,7 @@ void C_RtfExportWidget::m_RtfPathClicked(void)
 /*! \brief   Slot of logo path button click to call file selector
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_RtfExportWidget::m_LogoPathClicked(void)
+void C_RtfExportWidget::m_LogoPathClicked(void) const
 {
    QString c_Folder; // for default folder
 
@@ -730,15 +734,24 @@ void C_RtfExportWidget::m_LogoPathClicked(void)
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
 
-   const QString c_FilterName = QString(C_GtGetText::h_GetText("Image file (*.jpg *.png)"));
-   const QString c_FullLogoFilePath =
-      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Company Logo"),
-                                     c_Folder, c_FilterName, "",  QFileDialog::DontConfirmOverwrite);
+   const QString c_Filter = QString(C_GtGetText::h_GetText("Image file (*.jpg *.png)"));
 
-   if (c_FullLogoFilePath != "")
+   QFileDialog c_Dialog(this->parentWidget(), C_GtGetText::h_GetText("Select Company Logo"), c_Folder, c_Filter);
+   c_Dialog.setDefaultSuffix("*.jpg");
+
+   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      this->SetCompanyLogoPath(c_FullLogoFilePath.toStdString().c_str());
+      const QString c_FullLogoFilePath = c_Dialog.selectedFiles().at(0);
+
+      if (c_FullLogoFilePath != "")
+      {
+         this->SetCompanyLogoPath(c_FullLogoFilePath.toStdString().c_str());
+      }
    }
+
+   //   const QString c_FullLogoFilePath =
+   //      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Company Logo"),
+   //                                     c_Folder, c_Filter, "",  QFileDialog::DontConfirmOverwrite);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -767,6 +780,7 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to overwrite the existing file?"));
       c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
       c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
       switch (e_ReturnMessageBox)
@@ -779,6 +793,7 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
             C_OgeWiCustomMessage c_MessageBoxErrorRemove(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eERROR);
             c_MessageBoxErrorRemove.SetHeading(C_GtGetText::h_GetText("Save RTF file"));
             c_MessageBoxErrorRemove.SetDescription(C_GtGetText::h_GetText("File cannot be overwritten!"));
+            c_MessageBoxErrorRemove.SetCustomMinHeight(180, 180);
             c_MessageBoxErrorRemove.Execute();
          }
          else
@@ -819,6 +834,7 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
       c_MessageResult.SetHeading(C_GtGetText::h_GetText("RTF File Export"));
       c_MessageResult.SetDescription(C_GtGetText::h_GetText(c_Description.c_str()));
       c_MessageResult.SetDetails(C_GtGetText::h_GetText(c_Details.c_str()));
+      c_MessageResult.SetCustomMinHeight(180, 250);
       c_MessageResult.Execute();
    }
 
@@ -849,6 +865,7 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
          c_MessageResult.SetHeading(C_GtGetText::h_GetText("RTF File Export"));
          c_MessageResult.SetDescription(C_GtGetText::h_GetText(c_Description.c_str()));
          c_MessageResult.SetDetails(C_GtGetText::h_GetText(c_Details.c_str()));
+         c_MessageResult.SetCustomMinHeight(180, 250);
          c_MessageResult.Execute();
       }
    }

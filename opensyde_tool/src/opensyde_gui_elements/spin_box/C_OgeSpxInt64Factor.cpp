@@ -36,8 +36,8 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent     Optional pointer to parent
-   \param[in]     orq_IsUnsigned Indicator if this spin box should handle unsigned 64 bit or signed 64 bit
+   \param[in,out]  opc_Parent       Optional pointer to parent
+   \param[in]      orq_IsUnsigned   Indicator if this spin box should handle unsigned 64 bit or signed 64 bit
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxInt64Factor::C_OgeSpxInt64Factor(QWidget * const opc_Parent, const bool & orq_IsUnsigned) :
@@ -72,7 +72,7 @@ void C_OgeSpxInt64Factor::InterpretValue(void)
 
    Here: Skip 0
 
-   \param[in] osn_Steps Steps
+   \param[in]  osn_Steps   Steps
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64Factor::stepBy(const sintn osn_Steps)
@@ -117,8 +117,11 @@ void C_OgeSpxInt64Factor::stepBy(const sintn osn_Steps)
 
    Here: Skip 0
 
-   \param[in] orc_Text Text
-   \param[in] orsn_Pos Pos
+   \param[in]  orc_Text    Text
+   \param[in]  orsn_Pos    Position
+
+   \return
+   Validation state (invalid, intermediate, valid)
 */
 //----------------------------------------------------------------------------------------------------------------------
 QValidator::State C_OgeSpxInt64Factor::validate(QString & orc_Text, sintn & orsn_Pos) const

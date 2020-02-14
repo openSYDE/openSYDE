@@ -43,8 +43,8 @@ const sintn C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2 = 1;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent  Optional pointer to parent
-   \param[in]     oq_DarkMode Flag for dark mode
+   \param[in,out]  orc_Parent    Parent widget
+   \param[in]      oq_DarkMode   Flag for dark mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeSlider::C_SyvDaPeSlider(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
@@ -97,10 +97,22 @@ void C_SyvDaPeSlider::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelShowMinMax->setText(C_GtGetText::h_GetText("Show Min / Max"));
    this->mpc_Ui->pc_LabelStyleColor->setText(C_GtGetText::h_GetText("Handle Style"));
    this->mpc_Ui->pc_LabelStyleHandle->setText(C_GtGetText::h_GetText("Line Style"));
+
    this->mpc_Ui->pc_ComboBoxTypeColor->addItem(C_GtGetText::h_GetText("Type 1"));
    this->mpc_Ui->pc_ComboBoxTypeColor->addItem(C_GtGetText::h_GetText("Type 2"));
    this->mpc_Ui->pc_ComboBoxTypeHandle->addItem(C_GtGetText::h_GetText("Type 1"));
    this->mpc_Ui->pc_ComboBoxTypeHandle->addItem(C_GtGetText::h_GetText("Type 2"));
+
+   //Tool tips
+   this->mpc_Ui->pc_LabelStyleColor->SetToolTipInformation(C_GtGetText::h_GetText("Line Style"),
+                                                           C_GtGetText::h_GetText(
+                                                              "Different options for styles of the slider line"));
+   this->mpc_Ui->pc_LabelStyleHandle->SetToolTipInformation(C_GtGetText::h_GetText("Handle Style"),
+                                                            C_GtGetText::h_GetText(
+                                                               "Different options for styles of the slider handle"));
+   this->mpc_Ui->pc_LabelShowMinMax->SetToolTipInformation(C_GtGetText::h_GetText("Show Min / Max"),
+                                                           C_GtGetText::h_GetText(
+                                                              "Option to display the minimum and maximum value next to the slider or hide them entirely"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -118,7 +130,7 @@ bool C_SyvDaPeSlider::GetShowMinMax(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set show minimum and maximum flag
 
-   \param[in] oq_Value New show minimum and maximum flag
+   \param[in]  oq_Value    New show minimum and maximum flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSlider::SetShowMinMax(const bool oq_Value) const
@@ -169,7 +181,7 @@ C_PuiSvDbSlider::E_Type C_SyvDaPeSlider::GetType(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set type
 
-   \param[in] oe_Type New type
+   \param[in]  oe_Type  New type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSlider::SetType(const C_PuiSvDbSlider::E_Type oe_Type) const

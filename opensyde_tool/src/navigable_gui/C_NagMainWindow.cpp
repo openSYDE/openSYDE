@@ -49,7 +49,6 @@
 #include "C_OSCSystemDefinition.h"
 #include "C_Uti.h"
 #include "C_NagToolTip.h"
-#include "C_OgeWiCustomMessage.h"
 #include "C_PopUtil.h"
 #include "C_TblTreDataElementModel.h"
 
@@ -86,7 +85,6 @@ C_NagMainWindow::C_NagMainWindow(void) :
    mq_InitialProjectLoaded(false),
    mq_BlockDragAndDrop(false),
    mq_StartView(true),
-   mq_ChangeUseCase(false),
    ms32_Mode(0),
    ms32_SubMode(-1),
    mu32_Index(0U),
@@ -141,6 +139,8 @@ C_NagMainWindow::C_NagMainWindow(void) :
    connect(&this->mc_SystemViewManager, &C_SyvManager::SigReloadNaviBarSystemViewContent, this->mpc_Ui->pc_NaviBar,
            &C_NagNaviBarWidget::InitSysView);
    connect(this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::SigChangeUseCase, this, &C_NagMainWindow::m_ChangeUseCase);
+   connect(this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::SigSysDefRequest, this,
+           &C_NagMainWindow::m_HandleSysDefRequest);
    connect(this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::SigCheckSysViews, this->mpc_Ui->pc_NaviBar,
            &C_NagNaviBarWidget::UpdateAllViewsIcons);
    connect(this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::SigRenameView, this, &C_NagMainWindow::m_HandleRenameView);
@@ -259,17 +259,29 @@ void C_NagMainWindow::m_ShowStartView()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_ChangeUseCase(const sint32 os32_Mode, const sint32 os32_SubIndex)
+void C_NagMainWindow::m_ChangeUseCase(const sint32 os32_Mode, const sint32 os32_SubIndex, const bool oq_ChangeUseCase)
 {
    bool q_Worked;
 
-   this->mq_ChangeUseCase = true;
-   q_Worked = m_ChangeMode(os32_Mode, os32_SubIndex);
-   this->mq_ChangeUseCase = false;
+   q_Worked = m_ChangeMode(os32_Mode, os32_SubIndex, 0U, "", "", 0U, oq_ChangeUseCase);
    if (q_Worked == false)
    {
       this->mpc_Ui->pc_NaviBar->ResetUseCaseAfterChangeFailure(this->ms32_Mode);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle system definition request
+
+   \param[in]  os32_Mode      Mode
+   \param[in]  os32_SubMode   Sub mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWindow::m_HandleSysDefRequest(const sint32 os32_Mode, const sint32 os32_SubMode)
+{
+   const bool q_ChangeUseCase = (this->ms32_Mode != ms32_MODE_SYSDEF);
+
+   m_ChangeUseCase(os32_Mode, os32_SubMode, q_ChangeUseCase);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -287,7 +299,7 @@ void C_NagMainWindow::m_OpenDetail(const sint32 os32_Index, const sint32 os32_Su
 
    Here: Loading initial project
 
-   \param[in,out] opc_Event    Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::showEvent(QShowEvent * const opc_Event)
@@ -317,7 +329,7 @@ void C_NagMainWindow::showEvent(QShowEvent * const opc_Event)
 
    Here: Trigger help key press handling
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -383,6 +395,12 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
          // open save as dialog
          this->mpc_MainWidget->OnSaveProjAs();
       }
+      // Open color picker
+      else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F8))
+      {
+         // open color picker dialog
+         this->mpc_MainWidget->OpenColorPicker();
+      }
       else
       {
          // nothing to do
@@ -441,7 +459,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten close event slot
 
-   \param[in,out] opc_Event    Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::closeEvent(QCloseEvent * const opc_Event)
@@ -501,7 +519,7 @@ void C_NagMainWindow::closeEvent(QCloseEvent * const opc_Event)
 
    Here: Accept external *.syde file
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::dragEnterEvent(QDragEnterEvent * const opc_Event)
@@ -521,7 +539,7 @@ void C_NagMainWindow::dragEnterEvent(QDragEnterEvent * const opc_Event)
 
    Here: Accept external *.syde file
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::dragMoveEvent(QDragMoveEvent * const opc_Event)
@@ -541,7 +559,7 @@ void C_NagMainWindow::dragMoveEvent(QDragMoveEvent * const opc_Event)
 
    Here: Handle dropped *.syde file
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::dropEvent(QDropEvent * const opc_Event)
@@ -645,6 +663,12 @@ void C_NagMainWindow::m_PrepareForSpecificWidget(const bool oq_DeleteActualWidge
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Showing a specific widget in the 'work area'
+
+   \param[in]  os32_Mode            Mode
+   \param[in]  os32_SubMode         Sub mode
+   \param[in]  oc_ItemName          Item name
+   \param[in]  orc_SubSubModeName   Sub sub mode name
+   \param[in]  ou32_Index           Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_SetNewSpecificWidget(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
@@ -716,18 +740,20 @@ void C_NagMainWindow::m_RemoveUseCaseWidget(void)
 
    The last used parameter for the use case will be used.
 
-   \param[in]     os32_Mode        Next chosen use case
-   \param[in,out] ors32_SubMode    Next sub mode
-   \param[in,out] oru32_Index      Next index
-   \param[in,out] orc_Name         Name of next screen
-   \param[in,out] orc_SubItemName  Selected sub sub mode name
-   \param[in,out] oru32_Flag       Flag value for next screen
+   \param[in]      os32_Mode           Next chosen use case
+   \param[in,out]  ors32_SubMode       Next sub mode
+   \param[in,out]  oru32_Index         Next index
+   \param[in,out]  orc_Name            Name of next screen
+   \param[in,out]  orc_SubItemName     Selected sub sub mode name
+   \param[in,out]  oru32_Flag          Flag value for next screen
+   \param[in]      oq_ChangeUseCase    Flag to signal use case change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_SubMode, uint32 & oru32_Index,
-                                       QString & orc_Name, QString & orc_SubItemName, uint32 & oru32_Flag)
+                                       QString & orc_Name, QString & orc_SubItemName, uint32 & oru32_Flag,
+                                       const bool oq_ChangeUseCase)
 {
-   if ((this->mq_StartView == true) || (this->mq_ChangeUseCase == true))
+   if ((this->mq_StartView == true) || (oq_ChangeUseCase == true))
    {
       // The name of must be adapted dynamically. It could be changed.
       if (os32_Mode == ms32_MODE_SYSDEF)
@@ -789,6 +815,12 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   show node edit
+
+   \param[in]  os32_SubMode   Sub mode
+   \param[in]  ou32_Index     Index
+   \param[in]  orc_Name       Name
+   \param[in]  orc_SubName    Sub name
+   \param[in]  ou32_Flag      Flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
@@ -838,11 +870,11 @@ void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show system view item
 
-   \param[in,out] ors32_SubMode      Target submode (may be changed if necessary for PC reconnection feature)
-   \param[in]     ou32_Index         View index
-   \param[in]     orc_Name           Display name
-   \param[in]     orc_SubSubModeName Selected sub sub mode name
-   \param[in]     ou32_Flag          Currently unused flag
+   \param[in,out]  ors32_SubMode       Target submode (may be changed if necessary for PC reconnection feature)
+   \param[in]      ou32_Index          View index
+   \param[in]      orc_Name            Display name
+   \param[in]      orc_SubSubModeName  Selected sub sub mode name
+   \param[in]      ou32_Flag           Currently unused flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ShowSysViewItem(sint32 & ors32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
@@ -906,8 +938,8 @@ void C_NagMainWindow::m_SaveScreenProperties(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if mime valid
 
-   \param[in]     opc_Mime     Mime to check
-   \param[in,out] opc_FilePath Optional parameter for file path output if valid
+   \param[in]      opc_Mime      Mime to check
+   \param[in,out]  opc_FilePath  Optional parameter for file path output if valid
 
    \return
    true  Valid
@@ -954,9 +986,9 @@ bool C_NagMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Blocking of drag and drop for opening an other project file
 
-   \param[in]     oq_Block        Flag if the drag and drop feature shall be active
-                                  - true    drag and drop will be blocked
-                                  - false   drag and drop will be allowed
+   \param[in]  oq_Block    Flag if the drag and drop feature shall be active
+                           - true    drag and drop will be blocked
+                           - false   drag and drop will be allowed
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_BlockDragAndDrop(const bool oq_Block)
@@ -1002,6 +1034,8 @@ void C_NagMainWindow::m_PrepareProjectLoad(void)
             (e.g. double click on openSYDE.exe, command line openSYDE.exe only, Qt run)
          - if project load returned an error and therefore the previous one gets restored
             (e.g. missing *.syde_sysdef file)
+
+   \param[in]  orq_SwitchToLastKnownMode  Flag to switch to last known mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ProjectLoaded(const bool & orq_SwitchToLastKnownMode)
@@ -1100,7 +1134,7 @@ void C_NagMainWindow::m_CloseAndPrepareProjectLoad(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set interaction widget
 
-   \param[in] opc_Widget Interaction widget
+   \param[in]  opc_Widget  Interaction widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_SetInteractionWidget(QWidget * const opc_Widget)
@@ -1138,8 +1172,8 @@ void C_NagMainWindow::m_HandleAddViewRequest(void)
 
    Warning: Name assumed to be correct
 
-   \param[in] ou32_Index Index identifier
-   \param[in] orc_Name   New name
+   \param[in]  ou32_Index  Index identifier
+   \param[in]  orc_Name    New name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_HandleRenameView(const uint32 ou32_Index, const QString & orc_Name) const
@@ -1167,8 +1201,8 @@ void C_NagMainWindow::m_UpdateTitle(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle move view request
 
-   \param[in] ou32_StartIndex  Start index
-   \param[in] ou32_TargetIndex Target index
+   \param[in]  ou32_StartIndex   Start index
+   \param[in]  ou32_TargetIndex  Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_HandleMoveViewRequest(const uint32 ou32_StartIndex, const uint32 ou32_TargetIndex)
@@ -1192,9 +1226,9 @@ void C_NagMainWindow::m_HandleMoveViewRequest(const uint32 ou32_StartIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle delete view request
 
-   \param[in] ou32_Index           View index to delete
-   \param[in] os32_SelectedSubMode Currently selected submode
-   \param[in] ou32_SelectedIndex   Currently selected view index
+   \param[in]  ou32_Index              View index to delete
+   \param[in]  os32_SelectedSubMode    Currently selected submode
+   \param[in]  ou32_SelectedIndex      Currently selected view index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_HandleDeleteSysViewRequest(const uint32 ou32_Index, const sint32 os32_SelectedSubMode,
@@ -1221,7 +1255,7 @@ void C_NagMainWindow::m_HandleDeleteSysViewRequest(const uint32 ou32_Index, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle duplicate system view request
 
-   \param[in] ou32_Index System view index
+   \param[in]  ou32_Index  System view index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_HandleDuplicateSysViewRequest(const uint32 ou32_Index)
@@ -1245,7 +1279,7 @@ void C_NagMainWindow::m_HandleDuplicateSysViewRequest(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint32 os32_SubMode,
                                    const uint32 ou32_Index, const QString & orc_Name, const QString & orc_SubSubName,
-                                   const uint32 ou32_Flag)
+                                   const uint32 ou32_Flag, const bool oq_ChangeUseCase)
 {
    QElapsedTimer c_Timer;
    bool q_Continue;
@@ -1261,7 +1295,7 @@ bool C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
    }
 
    // Get the previous parameter for each use case, if a change from the main widget was triggered
-   this->m_AdaptParameter(os32_Mode, s32_SubMode, u32_Index, c_Name, c_SubSubName, u32_Flag);
+   this->m_AdaptParameter(os32_Mode, s32_SubMode, u32_Index, c_Name, c_SubSubName, u32_Flag, oq_ChangeUseCase);
 
    if (((os32_Mode != this->ms32_Mode) ||
         (s32_SubMode != this->ms32_SubMode) ||

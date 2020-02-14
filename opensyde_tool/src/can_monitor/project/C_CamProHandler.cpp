@@ -48,7 +48,7 @@ C_CamProHandler C_CamProHandler::mhc_Instance;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all user configured messages
+/*! \brief  Get all user configured messages
 
    \return
    All user configured messages
@@ -60,7 +60,7 @@ const std::vector<C_CamProMessageData> & C_CamProHandler::GetMessages(void) cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get message
+/*! \brief  Get message
 
    \param[in] ou32_Index Message index
 
@@ -82,7 +82,7 @@ const C_CamProMessageData * C_CamProHandler::GetMessageConst(const uint32 ou32_I
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get CAN DLL Path
+/*! \brief  Get CAN DLL Path
 
    \return CAN DLL Path string (Peak/Vector/Custom)
 */
@@ -111,7 +111,7 @@ const QString C_CamProHandler::GetCANDllPath() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get custom CAN DLL Path
+/*! \brief  Get custom CAN DLL Path
 
    \return CAN DLL Path string (custom)
 */
@@ -122,7 +122,7 @@ const QString C_CamProHandler::GetCustomCANDllPath() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get CAN Dll type.
+/*! \brief  Get CAN Dll type.
 
    \return   CAN Dll type
 */
@@ -133,7 +133,7 @@ C_CamProHandler::E_CANDllType C_CamProHandler::GetCANDllType() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all user configured filters.
+/*! \brief  Get all user configured filters.
 
    \return
    All configured filters.
@@ -145,7 +145,7 @@ const std::vector<C_CamProFilterData> & C_CamProHandler::GetFilters() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief Get disabled/enabled state of whole filter widget.
+/*! \brief  Get disabled/enabled state of whole filter widget.
 
    \return
    true: enabled; false: disabled
@@ -157,7 +157,7 @@ const bool & C_CamProHandler::GetFilterWidgetEnabled() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all configured databases.
+/*! \brief  Get all configured databases.
 
    \return
    All configured databases.
@@ -169,7 +169,7 @@ const std::vector<C_CamProDatabaseData> & C_CamProHandler::GetDatabases() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get logging data.
+/*! \brief  Get logging data.
 
    \return
    logging data structure
@@ -181,7 +181,7 @@ const C_CamProLoggingData & C_CamProHandler::GetLoggingData() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set all messages
+/*! \brief  Set all messages
 
    \param[in] orc_Messages All messages
 */
@@ -192,7 +192,7 @@ void C_CamProHandler::SetMessages(const std::vector<C_CamProMessageData> & orc_M
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set message name value
+/*! \brief  Set message name value
 
    \param[in] ou32_Index Message index
    \param[in] orc_Name   New value
@@ -219,7 +219,7 @@ sint32 C_CamProHandler::SetMessageName(const uint32 ou32_Index, const QString & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set message uint32 value
+/*! \brief  Set message uint32 value
 
    \param[in] ou32_Index  Message index
    \param[in] oe_Selector Data specifier
@@ -249,7 +249,7 @@ sint32 C_CamProHandler::SetMessageUint32Value(const uint32 ou32_Index,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set message bool value
+/*! \brief  Set message bool value
 
    \param[in] ou32_Index  Message index
    \param[in] oe_Selector Data specifier
@@ -279,7 +279,7 @@ sint32 C_CamProHandler::SetMessageBoolValue(const uint32 ou32_Index,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set message key related values
+/*! \brief  Set message key related values
 
    \param[in] ou32_Index  Message index
    \param[in] orc_Key     New key (single character only)
@@ -307,7 +307,7 @@ sint32 C_CamProHandler::SetMessageKey(const uint32 ou32_Index, const QString & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set CAN message data bytes
+/*! \brief  Set CAN message data bytes
 
    \param[in] ou32_Index    Message index
    \param[in] orc_DataBytes New data byte content
@@ -334,9 +334,9 @@ sint32 C_CamProHandler::SetMessageDataBytes(const uint32 ou32_Index, const std::
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set CAN DLL Path.
+/*! \brief  Set CAN DLL Path.
 
-   \param[in]     orc_CANDllPath    New CAN DLL path.
+   \param[in] orc_CANDllPath New CAN DLL path.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetCustomCANDllPath(const QString & orc_CANDllPath)
@@ -345,9 +345,9 @@ void C_CamProHandler::SetCustomCANDllPath(const QString & orc_CANDllPath)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set DLL type. See get for type definition.
+/*! \brief  Set DLL type. See get for type definition.
 
-   \param[in]  oe_CANDllType  CAN DLL type
+   \param[in] oe_CANDllType CAN DLL type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetCANDllType(const E_CANDllType oe_CANDllType)
@@ -356,9 +356,9 @@ void C_CamProHandler::SetCANDllType(const E_CANDllType oe_CANDllType)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set all filters.
+/*! \brief  Set all filters.
 
-   \param[in] orc_Filters   All filters
+   \param[in] orc_Filters All filters
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetFilters(const std::vector<C_CamProFilterData> & orc_Filters)
@@ -367,10 +367,10 @@ void C_CamProHandler::SetFilters(const std::vector<C_CamProFilterData> & orc_Fil
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set new filter configuration for already existing filter.
+/*! \brief  Set new filter configuration for already existing filter.
 
-   \param[in]     ou32_Index        index of filter
-   \param[in]     orc_NewFilter     new filter configuration
+   \param[in] ou32_Index    index of filter
+   \param[in] orc_NewFilter new filter configuration
 
    \return
    C_NO_ERR    everything worked
@@ -394,10 +394,10 @@ sint32 C_CamProHandler::SetFilter(const uint32 ou32_Index, const C_CamProFilterD
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Disable/enable filter.
+/*! \brief  Disable/enable filter.
 
-   \param[in]     ou32_Index     index of filter
-   \param[in]     oq_Enable      true: enable; false: disable
+   \param[in] ou32_Index index of filter
+   \param[in] oq_Enable  true: enable; false: disable
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetFilterEnabled(const uint32 ou32_Index, const bool oq_Enable)
@@ -406,9 +406,9 @@ void C_CamProHandler::SetFilterEnabled(const uint32 ou32_Index, const bool oq_En
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief Disable/enable whole filter widget.
+/*! \brief  Disable/enable whole filter widget.
 
-   \param[in]     oq_Enable      true: enable; false: disable
+   \param[in] oq_Enable true: enable; false: disable
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetFilterWidgetEnabled(const bool oq_Enable)
@@ -417,9 +417,9 @@ void C_CamProHandler::SetFilterWidgetEnabled(const bool oq_Enable)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set all databases
+/*! \brief  Set all databases
 
-   \param[in] orc_Databases   All databases
+   \param[in] orc_Databases All databases
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetDatabases(const std::vector<C_CamProDatabaseData> & orc_Databases)
@@ -428,10 +428,10 @@ void C_CamProHandler::SetDatabases(const std::vector<C_CamProDatabaseData> & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set database name value
+/*! \brief  Set database name value
 
-   \param[in] ou32_Index      database index
-   \param[in] orc_NewName     New name
+   \param[in] ou32_Index  database index
+   \param[in] orc_NewName New name
 
    \return
    C_NO_ERR Operation success
@@ -455,10 +455,10 @@ sint32 C_CamProHandler::SetDatabaseName(const uint32 ou32_Index, const QString &
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set database name value
+/*! \brief  Set database name value
 
-   \param[in] ou32_Index         database index
-   \param[in] os32_NewBusIndex   new bus index
+   \param[in] ou32_Index       database index
+   \param[in] os32_NewBusIndex new bus index
 
    \return
    C_NO_ERR Operation success
@@ -482,10 +482,10 @@ sint32 C_CamProHandler::SetDatabaseOsySysDefBus(const uint32 ou32_Index, const s
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Disable/enable database.
+/*! \brief  Disable/enable database.
 
-   \param[in]     ou32_Index     index of database
-   \param[in]     oq_Enable      true: enable; false: disable
+   \param[in] ou32_Index index of database
+   \param[in] oq_Enable  true: enable; false: disable
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetDatabaseEnabled(const uint32 ou32_Index, const bool oq_Enable)
@@ -494,9 +494,9 @@ void C_CamProHandler::SetDatabaseEnabled(const uint32 ou32_Index, const bool oq_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set logging data.
+/*! \brief  Set logging data.
 
-   \param[in]     orc_LoggingData       logging data structure
+   \param[in] orc_LoggingData logging data structure
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetLoggingData(const C_CamProLoggingData & orc_LoggingData)
@@ -505,9 +505,9 @@ void C_CamProHandler::SetLoggingData(const C_CamProLoggingData & orc_LoggingData
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set logging directory.
+/*! \brief  Set logging directory.
 
-   \param[in]     orc_NewDir      new logging directory.
+   \param[in] orc_NewDir new logging directory.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetLoggingDirectory(const QString & orc_NewDir)
@@ -516,9 +516,9 @@ void C_CamProHandler::SetLoggingDirectory(const QString & orc_NewDir)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set logging file name.
+/*! \brief  Set logging file name.
 
-   \param[in]     orc_NewName      new logging file name.
+   \param[in] orc_NewName new logging file name.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetLoggingFileName(const QString & orc_NewName)
@@ -527,9 +527,9 @@ void C_CamProHandler::SetLoggingFileName(const QString & orc_NewName)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set logging enabled/disabled.
+/*! \brief  Set logging enabled/disabled.
 
-   \param[in]     oq_Enabled      Enabled/disabled flag
+   \param[in] oq_Enabled Enabled/disabled flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetLoggingEnabled(const bool oq_Enabled)
@@ -538,9 +538,9 @@ void C_CamProHandler::SetLoggingEnabled(const bool oq_Enabled)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set logging overwrite mode.
+/*! \brief  Set logging overwrite mode.
 
-   \param[in]     oe_NewOverwriteMode        new overwrite mode (timestamp/ask/overwrite)
+   \param[in] oe_NewOverwriteMode new overwrite mode (timestamp/ask/overwrite)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetLoggingOverwriteMode(const C_CamProLoggingData::E_OverwriteMode oe_NewOverwriteMode)
@@ -549,9 +549,9 @@ void C_CamProHandler::SetLoggingOverwriteMode(const C_CamProLoggingData::E_Overw
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set logging file format.
+/*! \brief  Set logging file format.
 
-   \param[in]     oe_NewFormat       logging file format (ASC/BLF)
+   \param[in] oe_NewFormat logging file format (ASC/BLF)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::SetLoggingFormat(const C_CamProLoggingData::E_Format oe_NewFormat)
@@ -560,7 +560,7 @@ void C_CamProHandler::SetLoggingFormat(const C_CamProLoggingData::E_Format oe_Ne
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new message to existing ones
+/*! \brief  Add new message to existing ones
 
    \param[in] ou32_Index       New message index
    \param[in] orc_NewMessage   New message initial data
@@ -592,9 +592,9 @@ void C_CamProHandler::InsertMessage(const uint32 ou32_Index, const C_CamProMessa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new filter to existing ones.
+/*! \brief  Add new filter to existing ones.
 
-   \param[in]     orc_NewFilter     new filter
+   \param[in] orc_NewFilter new filter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::AddFilter(const C_CamProFilterData & orc_NewFilter)
@@ -603,9 +603,9 @@ void C_CamProHandler::AddFilter(const C_CamProFilterData & orc_NewFilter)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add new database to existing ones.
+/*! \brief  Add new database to existing ones.
 
-   \param[in]     orc_NewDatabase     new database
+   \param[in] orc_NewDatabase new database
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::AddDatabase(const C_CamProDatabaseData & orc_NewDatabase)
@@ -614,7 +614,27 @@ void C_CamProHandler::AddDatabase(const C_CamProDatabaseData & orc_NewDatabase)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Move message
+/*! \brief  Replace database name
+
+   \param[in] orc_PrevName Prev name
+   \param[in] orc_NewName  New name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamProHandler::ReplaceDatabaseName(const QString & orc_PrevName, const QString & orc_NewName)
+{
+   //Messages
+   for (uint32 u32_It = 0UL; u32_It < this->mc_Messages.size(); ++u32_It)
+   {
+      C_CamProMessageData & rc_Message = this->mc_Messages[u32_It];
+      if (rc_Message.c_DataBaseFilePath == orc_PrevName.toStdString().c_str())
+      {
+         rc_Message.c_DataBaseFilePath = orc_NewName.toStdString().c_str();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Move message
 
    \param[in] ou32_StartIndex  Current message index
    \param[in] ou32_TargetIndex Desired message index
@@ -643,7 +663,7 @@ sint32 C_CamProHandler::MoveMessage(const uint32 ou32_StartIndex, const uint32 o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete specified message
+/*! \brief  Delete specified message
 
    \param[in] ou32_Index Message index
 
@@ -669,9 +689,9 @@ sint32 C_CamProHandler::DeleteMessage(const uint32 ou32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete specified filter
+/*! \brief  Delete specified filter
 
-   \param[in] ou32_Index   Filter index
+   \param[in] ou32_Index Filter index
 
    \return
    C_NO_ERR Operation success
@@ -695,9 +715,9 @@ sint32 C_CamProHandler::DeleteFilter(const uint32 ou32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete specified database
+/*! \brief  Delete specified database
 
-   \param[in] ou32_Index   Database index
+   \param[in] ou32_Index Database index
 
    \return
    C_NO_ERR Operation success
@@ -721,7 +741,7 @@ sint32 C_CamProHandler::DeleteDatabase(const uint32 ou32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all messages for the requested database file path
+/*! \brief  Get all messages for the requested database file path
 
    \param[in]     orc_File                 Database file path to search for
    \param[in,out] opc_CompleteMessageNames Optional storage for found message names (may be not unique)
@@ -754,11 +774,11 @@ void C_CamProHandler::GetAllMessagesFromDatabase(const QString & orc_File, QStri
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if any filter uses the provided name
+/*! \brief  Check if any filter uses the provided name
 
    Attention: Calling this with name of an existing filter returns false.
 
-   \param[in]     orc_Name    Filter name to check for
+   \param[in] orc_Name Filter name to check for
 
    \return
    true  Available
@@ -770,10 +790,10 @@ bool C_CamProHandler::CheckFilterNameAvailable(const QString & orc_Name) const
    bool q_Retval = true;
 
    std::vector<C_CamProFilterData>::const_iterator c_It;
-   for (c_It = this->mc_Filters.begin(); c_It != this->mc_Filters.end(); c_It++)
+   for (c_It = this->mc_Filters.begin(); c_It != this->mc_Filters.end(); ++c_It)
    {
       const C_CamProFilterData & rc_CurrentFilter = *c_It;
-      if(rc_CurrentFilter.c_Name == orc_Name)
+      if (rc_CurrentFilter.c_Name == orc_Name)
       {
          q_Retval = false;
          break;
@@ -784,7 +804,7 @@ bool C_CamProHandler::CheckFilterNameAvailable(const QString & orc_Name) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get the complete message name to display
+/*! \brief  Get the complete message name to display
 
    \param[in] orc_Message Message to get the name from
 
@@ -803,14 +823,14 @@ QString C_CamProHandler::h_GetCompleteMessageName(const C_CamProMessageData & or
    else
    {
       const QFileInfo c_Info(orc_Message.c_DataBaseFilePath.c_str());
-      c_Retval = QString("%1::%2").arg(c_Info.baseName()).arg(orc_Message.c_Name.c_str());
+      c_Retval = QString("%1::%2").arg(c_Info.completeBaseName()).arg(orc_Message.c_Name.c_str());
    }
 
    return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get the current file path
+/*! \brief  Get the current file path
 
    \return
    Current file path
@@ -822,7 +842,7 @@ QString C_CamProHandler::GetCurrentFilePath(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get current project directory (path of file without file name).
+/*! \brief  Get current project directory (path of file without file name).
 
    Return path is always either absolute or empty.
 
@@ -843,7 +863,7 @@ QString C_CamProHandler::GetCurrentProjDir(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load project
+/*! \brief  Load project
 
    Load project and store in information in our instance data.
 
@@ -908,7 +928,7 @@ sint32 C_CamProHandler::LoadFromFile(const stw_scl::C_SCLString & orc_Path)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save project
+/*! \brief  Save project
 
    Save project to XML file.
 
@@ -976,7 +996,7 @@ sint32 C_CamProHandler::SaveToFile(const stw_scl::C_SCLString & orc_Path)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if there are any changes
+/*! \brief  Check if there are any changes
 
    \return
    True  Unsaved changes
@@ -991,7 +1011,7 @@ bool C_CamProHandler::CheckChanges(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clear all content
+/*! \brief  Clear all content
 
    \param[in] oq_UpdateUserSettings Flag to update the user settings (avoid Qt access in constructor)
 */
@@ -1020,7 +1040,7 @@ void C_CamProHandler::Clear(const bool oq_UpdateUserSettings)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get singleton (Create if necessary)
+/*! \brief  Get singleton (Create if necessary)
 
    \return
    Pointer to singleton
@@ -1032,7 +1052,7 @@ C_CamProHandler * C_CamProHandler::h_GetInstance(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamProHandler::C_CamProHandler(void) :
@@ -1045,7 +1065,7 @@ C_CamProHandler::C_CamProHandler(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get hash for current project
+/*! \brief  Get hash for current project
 
    \return
    possible return value(s) and description
@@ -1060,7 +1080,7 @@ uint32 C_CamProHandler::m_GetHash(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates the hash value over all data
+/*! \brief  Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
@@ -1098,7 +1118,7 @@ void C_CamProHandler::m_CalcHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all current message names
+/*! \brief  Get all current message names
 
    Warning: local use only
 

@@ -331,9 +331,9 @@ void C_SdNdeDpListsWidget::m_HandleSelection(const uint32 & oru32_Count, const b
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsWidget::m_HandleButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
-                                                      const bool & orq_CopyActive, const bool & orq_PasteActive,
-                                                      const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
-                                                      const bool & orq_MoveUpActive) const
+                                                const bool & orq_CopyActive, const bool & orq_PasteActive,
+                                                const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
+                                                const bool & orq_MoveUpActive) const
 {
    this->mpc_Ui->pc_PushButtonAdd->setEnabled(orq_AddActive);
    this->mpc_Ui->pc_PushButtonCut->setEnabled(orq_CutActive);

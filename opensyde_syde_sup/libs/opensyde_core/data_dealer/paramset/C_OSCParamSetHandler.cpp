@@ -131,7 +131,6 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
                                       bool * const opq_MissingOptionalContent)
 {
    sint32 s32_Retval = C_NO_ERR;
-   bool q_MissingOptionalContent = false;
 
    this->ClearContent();
    if (TGL_FileExists(orc_FilePath) == true)
@@ -154,6 +153,7 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
             s32_Retval = C_OSCParamSetRawNodeFiler::h_CheckFileVersion(*pc_Parser);
             if (s32_Retval == C_NO_ERR)
             {
+               bool q_MissingOptionalContent = false;
                C_OSCParamSetRawNodeFiler::h_LoadFileInfo(*pc_Parser, this->mc_Data.c_FileInfo,
                                                          q_MissingOptionalContent);
                s32_Retval = this->m_LoadNodes(*pc_Parser, oq_InterpretedDataOnly, q_MissingOptionalContent);
@@ -169,6 +169,7 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
          }
          else
          {
+            osc_write_log_error("Loading Dataset data", "Could not find root element \"opensyde-parameter-sets\".");
             s32_Retval = C_RD_WR;
          }
       }
@@ -185,6 +186,13 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
    {
       s32_Retval = C_RD_WR;
    }
+   if (s32_Retval != C_NO_ERR)
+   {
+      const C_SCLString c_Text = "Could not load file \"" + orc_FilePath + "\". Error code: " +
+                                 C_SCLString::IntToStr(s32_Retval);
+      osc_write_log_error("Loading Dataset data", c_Text);
+   }
+
    return s32_Retval;
 }
 
@@ -436,6 +444,7 @@ sint32 C_OSCParamSetHandler::m_LoadNodes(C_OSCXMLParser & orc_XMLParser, const b
    }
    else
    {
+      osc_write_log_error("Loading Dataset data", "Could not find \"nodes\".");
       s32_Retval = C_CONFIG;
    }
    return s32_Retval;

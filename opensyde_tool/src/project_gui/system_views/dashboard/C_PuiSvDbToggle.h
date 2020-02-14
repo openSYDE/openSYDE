@@ -35,7 +35,7 @@ public:
    C_PuiSvDbToggle(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
-   virtual bool IsReadElement(void) const;
+   virtual bool IsReadElement(void) const override;
 
    E_Type e_Type;
    bool q_State;

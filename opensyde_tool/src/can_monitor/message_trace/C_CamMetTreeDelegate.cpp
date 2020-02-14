@@ -302,29 +302,6 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get maximum length of strings
-
-   \param[in] orc_Names Strings to evaluate
-
-   \return
-   Maximum length of strings
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMetTreeDelegate::mh_GetMaxLength(const QStringList & orc_Names)
-{
-   sint32 s32_Retval = 0;
-
-   for (QStringList::const_iterator c_ItName = orc_Names.begin(); c_ItName != orc_Names.end(); ++c_ItName)
-   {
-      const QFontMetrics c_MetricsDefault(C_CamMetTreeDelegate::mhc_DefaultFont);
-      const QString & rc_Name = *c_ItName;
-      const sint32 s32_Length = c_MetricsDefault.width(rc_Name);
-      s32_Retval = std::max(s32_Retval, s32_Length);
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get vector of all restricted column sizes
 
    \param[in] oq_IsThirdLayer Flag if these are for the third layer

@@ -68,6 +68,10 @@ public:
    void GetNodeIndexesOfBus(const stw_types::uint32 ou32_BusIndex, std::vector<stw_types::uint32> & orc_NodeIndexes,
                             std::vector<stw_types::uint32> & orc_InterfaceIndexes) const;
    void GetNodeAndComDpIndexesOfBus(const stw_types::uint32 ou32_BusIndex,
+                                    std::vector<stw_types::uint32> & orc_NodeIndexes,
+                                    std::vector<stw_types::uint32> & orc_InterfaceIndexes,
+                                    std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;
+   void GetNodeAndComDpIndexesOfBus(const stw_types::uint32 ou32_BusIndex,
                                     const C_OSCCanProtocol::E_Type & ore_ComProtocol,
                                     std::vector<stw_types::uint32> & orc_NodeIndexes,
                                     std::vector<stw_types::uint32> & orc_InterfaceIndexes,

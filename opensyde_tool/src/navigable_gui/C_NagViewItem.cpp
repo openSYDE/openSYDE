@@ -488,6 +488,7 @@ void C_NagViewItem::m_OnNameEditFinished(void)
       c_ImportWarnings.SetDescription(
          QString(C_GtGetText::h_GetText("A view with the name \"%1\" already exists. Choose another name.")).
          arg(this->mpc_Ui->pc_LineEditHeading->text()));
+      c_ImportWarnings.SetCustomMinHeight(180, 180);
       c_ImportWarnings.Execute();
    }
    else

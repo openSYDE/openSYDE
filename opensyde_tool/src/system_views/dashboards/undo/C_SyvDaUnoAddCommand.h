@@ -34,7 +34,7 @@ public:
    virtual ~C_SyvDaUnoAddCommand(void);
 
 protected:
-   virtual void m_AddNew(void);
+   virtual void m_AddNew(void) override;
 
 private:
    const C_PuiSvDbDataElement::E_Type me_Type;

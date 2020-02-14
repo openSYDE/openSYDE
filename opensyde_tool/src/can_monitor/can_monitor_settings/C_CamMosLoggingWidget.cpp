@@ -223,15 +223,15 @@ void C_CamMosLoggingWidget::OnSigSavedAsNew(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_LoadConfig(void) const
 {
-   const C_CamProLoggingData c_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
+   const C_CamProLoggingData & rc_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
 
    this->m_LoadFolderConfig();
 
    // remaining values
-   this->mpc_Ui->pc_LeFile->setText(c_LoggingData.c_FileName);
-   this->mpc_Ui->pc_CbxOverwrite->setCurrentIndex(static_cast<sintn>(c_LoggingData.e_OverwriteMode));
-   this->mpc_Ui->pc_CbxFormat->setCurrentIndex(static_cast<sintn>(c_LoggingData.e_FileFormat));
-   this->mpc_Ui->pc_WiHeader->SetToggleState(c_LoggingData.q_Enabled);
+   this->mpc_Ui->pc_LeFile->setText(rc_LoggingData.c_FileName);
+   this->mpc_Ui->pc_CbxOverwrite->setCurrentIndex(static_cast<sintn>(rc_LoggingData.e_OverwriteMode));
+   this->mpc_Ui->pc_CbxFormat->setCurrentIndex(static_cast<sintn>(rc_LoggingData.e_FileFormat));
+   this->mpc_Ui->pc_WiHeader->SetToggleState(rc_LoggingData.q_Enabled);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -240,10 +240,10 @@ void C_CamMosLoggingWidget::m_LoadConfig(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_LoadFolderConfig(void) const
 {
-   const C_CamProLoggingData c_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
+   const C_CamProLoggingData & rc_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
 
    // use default logging directory
-   if (c_LoggingData.c_Directory == "")
+   if (rc_LoggingData.c_Directory == "")
    {
       QString c_DefaultDir = "./CANlogs";
       C_CamProHandler::h_GetInstance()->SetLoggingDirectory(c_DefaultDir);
@@ -251,7 +251,7 @@ void C_CamMosLoggingWidget::m_LoadFolderConfig(void) const
    }
    else
    {
-      this->mpc_Ui->pc_LeFolder->SetPath(c_LoggingData.c_Directory,
+      this->mpc_Ui->pc_LeFolder->SetPath(rc_LoggingData.c_Directory,
                                          C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
    }
 }
@@ -291,56 +291,8 @@ void C_CamMosLoggingWidget::m_OnToggled(const bool oq_Enabled)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_OnFolderEdited(void)
 {
-   const QString c_Path =  this->mpc_Ui->pc_LeFolder->GetPath();
-   const QString c_ResolvedPath = C_CamUti::h_ResolvePlaceholderVariables(c_Path);
-
-   if (stw_opensyde_core::C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == true)
-   {
-      // update data handling
-      C_CamProHandler::h_GetInstance()->SetLoggingDirectory(c_Path);
-   }
-   else
-   {
-      // Invalid name: revert and inform user
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-      const QString c_Heading = C_GtGetText::h_GetText("Logging directory");
-      const QString c_MessageText =
-         C_GtGetText::h_GetText("Invalid directory detected. For more information see details.");
-      QString c_Details;
-
-      if (c_Path.isEmpty() == false)
-      {
-         c_Details = C_GtGetText::h_GetText("The directory contains invalid characters:\n");
-         c_Details += c_Path;
-
-         if (c_Path != c_ResolvedPath)
-         {
-            c_Details += C_GtGetText::h_GetText(" (resolved: ") + c_ResolvedPath + ")";
-         }
-      }
-      else
-      {
-         c_Details = C_GtGetText::h_GetText("The path is empty.");
-      }
-
-      // disconnect to ignore editingFinished signal on focus lose because of popup
-      disconnect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeFilePath::editingFinished,
-                 this, &C_CamMosLoggingWidget::m_OnFolderEdited);
-      c_Message.SetHeading(c_Heading);
-      c_Message.SetDescription(c_MessageText);
-      c_Message.SetDetails(c_Details);
-      c_Message.Execute();
-
-      this->m_LoadFolderConfig();
-
-      if (this->mpc_Ui->pc_LeFolder->hasFocus() == true)
-      {
-         this->mpc_Ui->pc_LeFolder->UpdateText();
-      }
-
-      connect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeFilePath::editingFinished,
-              this, &C_CamMosLoggingWidget::m_OnFolderEdited);
-   }
+   // update data handling
+   C_CamProHandler::h_GetInstance()->SetLoggingDirectory(this->mpc_Ui->pc_LeFolder->GetPath());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -350,46 +302,8 @@ void C_CamMosLoggingWidget::m_OnFolderEdited(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_OnFileNameEdited(void)
 {
-   const QString c_FileName = this->mpc_Ui->pc_LeFile->text();
-   const bool q_ValidName = stw_opensyde_core::C_OSCUtils::h_CheckValidFileName(c_FileName.toStdString().c_str());
-
-   if ((q_ValidName == true) && (c_FileName != ""))
-   {
-      // update data handling
-      C_CamProHandler::h_GetInstance()->SetLoggingFileName(c_FileName);
-   }
-   else
-   {
-      // Invalid path: revert and inform user
-      const C_CamProLoggingData c_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
-
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-      const QString c_Heading = C_GtGetText::h_GetText("Logging directory");
-      const QString c_MessageText =
-         C_GtGetText::h_GetText("Invalid file name detected. For more information see details.");
-      QString c_Details;
-
-      if (c_FileName != "")
-      {
-         c_Details = C_GtGetText::h_GetText("The file name contains invalid characters:\n");
-         c_Details += c_FileName;
-      }
-      else
-      {
-         c_Details = C_GtGetText::h_GetText("The file name is empty.");
-      }
-
-      // disconnect to ignore editingFinished signal on focus lose because of popup
-      disconnect(this->mpc_Ui->pc_LeFile, &C_OgeLeDark::editingFinished, this,
-                 &C_CamMosLoggingWidget::m_OnFileNameEdited);
-      c_Message.SetHeading(c_Heading);
-      c_Message.SetDescription(c_MessageText);
-      c_Message.SetDetails(c_Details);
-      c_Message.Execute();
-      connect(this->mpc_Ui->pc_LeFile, &C_OgeLeDark::editingFinished, this, &C_CamMosLoggingWidget::m_OnFileNameEdited);
-
-      this->mpc_Ui->pc_LeFile->setText(c_LoggingData.c_FileName);
-   }
+   // update data handling
+   C_CamProHandler::h_GetInstance()->SetLoggingFileName(this->mpc_Ui->pc_LeFile->text());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -501,46 +415,111 @@ void C_CamMosLoggingWidget::m_DecideStartStop()
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_CheckAndStartLogging()
 {
-   const C_CamProLoggingData c_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
+   const C_CamProLoggingData & rc_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
+   const QString c_ResolvedPath =
+      C_CamUti::h_ResolvePlaceholderVariables(rc_LoggingData.c_Directory.toStdString().c_str());
    QFileInfo c_FileInfo;
+   bool q_ValidDir;
+   bool q_ValidName;
    bool q_Continue = true;
 
-   // glue together file path
-   QString c_FilePath =
-      C_CamUti::h_GetResolvedAbsolutePathFromProj(c_LoggingData.c_Directory) + "/" + c_LoggingData.c_FileName;
+   // check directory
+   q_ValidDir = stw_opensyde_core::C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str());
 
-   // eventually add timestamp
-   if (c_LoggingData.e_OverwriteMode == C_CamProLoggingData::eADD_TIMESTAMP)
+   // check file name
+   q_ValidName = stw_opensyde_core::C_OSCUtils::h_CheckValidFileName(rc_LoggingData.c_FileName.toStdString().c_str());
+
+   if ((q_ValidDir == false) || (q_ValidName == false))
    {
-      QDateTime c_Time = QDateTime::currentDateTime();
-      c_FilePath += c_Time.toString("__yyyy_MM_dd__HH_mm_ss");
+      // inform user
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+      const QString c_Heading = C_GtGetText::h_GetText("Logging Directory");
+      const QString c_MessageText =
+         C_GtGetText::h_GetText("Could not start logging because of invalid log file name or directory. "
+                                "For more information see details.");
+      QString c_Details = "";
+
+      if (q_ValidDir == false)
+      {
+         if (rc_LoggingData.c_Directory.isEmpty() == false)
+         {
+            c_Details += C_GtGetText::h_GetText("The directory contains invalid characters:\n");
+            c_Details += rc_LoggingData.c_Directory;
+            if (rc_LoggingData.c_Directory != c_ResolvedPath)
+            {
+               c_Details += C_GtGetText::h_GetText(" (resolved: ") + c_ResolvedPath + ")";
+            }
+            c_Details += "\n";
+         }
+         else
+         {
+            c_Details += C_GtGetText::h_GetText("The directory path is empty.\n");
+         }
+      }
+
+      if (q_ValidName == false)
+      {
+         if (rc_LoggingData.c_FileName.isEmpty() == false)
+         {
+            c_Details += C_GtGetText::h_GetText("The file name contains invalid characters:\n");
+            c_Details += rc_LoggingData.c_FileName;
+         }
+         else
+         {
+            c_Details += C_GtGetText::h_GetText("The file name is empty.");
+         }
+      }
+
+      c_Message.SetHeading(c_Heading);
+      c_Message.SetDescription(c_MessageText);
+      c_Message.SetDetails(c_Details);
+      c_Message.Execute();
+
+      // Abort logging start
+      q_Continue = false;
    }
 
-   // add suffix
-   c_FilePath += "." + C_CamProLoggingData::h_FormatEnumToString(c_LoggingData.e_FileFormat);
-
-   // check existence if flag is warn-before-overwrite (in the "fast-click" case that a file with timestamp suffix
-   // already exists we also just overwrite because the first file would not hold much information)
-   c_FileInfo.setFile(c_FilePath);
-   if (c_LoggingData.e_OverwriteMode == C_CamProLoggingData::eWARN_BEFORE_OVERWRITE)
+   if (q_Continue == true)
    {
-      if (c_FileInfo.exists() == true)
+      QString c_FilePath;
+
+      // glue together file path
+      c_FilePath =
+         C_CamUti::h_GetResolvedAbsolutePathFromProj(rc_LoggingData.c_Directory) + "/" + rc_LoggingData.c_FileName;
+
+      // eventually add timestamp
+      if (rc_LoggingData.e_OverwriteMode == C_CamProLoggingData::eADD_TIMESTAMP)
       {
-         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eWARNING);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Log file overwrite"));
-         c_Message.SetDescription(QString(C_GtGetText::h_GetText("The log file %1 already exists. "
-                                                                 "Do you want to overwrite the file?")).
-                                  arg(c_FileInfo.absoluteFilePath()));
-         c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
-         q_Continue = (c_Message.Execute() == C_OgeWiCustomMessage::eOK);
+         QDateTime c_Time = QDateTime::currentDateTime();
+         c_FilePath += c_Time.toString("__yyyy_MM_dd__HH_mm_ss");
+      }
+
+      // add suffix
+      c_FilePath += "." + C_CamProLoggingData::h_FormatEnumToString(rc_LoggingData.e_FileFormat);
+
+      // check existence if flag is warn-before-overwrite (in the "fast-click" case that a file with timestamp suffix
+      // already exists we also just overwrite because the first file would not hold much information)
+      c_FileInfo.setFile(c_FilePath);
+      if (rc_LoggingData.e_OverwriteMode == C_CamProLoggingData::eWARN_BEFORE_OVERWRITE)
+      {
+         if (c_FileInfo.exists() == true)
+         {
+            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eWARNING);
+            c_Message.SetHeading(C_GtGetText::h_GetText("Log file overwrite"));
+            c_Message.SetDescription(QString(C_GtGetText::h_GetText("The log file %1 already exists. "
+                                                                    "Do you want to overwrite the file?")).
+                                     arg(c_FileInfo.absoluteFilePath()));
+            c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+            c_Message.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
+            q_Continue = (c_Message.Execute() == C_OgeWiCustomMessage::eOK);
+         }
       }
    }
 
    if (q_Continue == true)
    {
       // start logging
-      if (c_LoggingData.e_FileFormat == C_CamProLoggingData::eBLF)
+      if (rc_LoggingData.e_FileFormat == C_CamProLoggingData::eBLF)
       {
          Q_EMIT (this->SigAddLogFileBlf(c_FileInfo.absoluteFilePath()));
       }

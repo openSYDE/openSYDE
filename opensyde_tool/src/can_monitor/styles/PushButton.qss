@@ -41,6 +41,8 @@ border-width: 1px;
 text-align: center;
 min-height: 30px;
 max-height: 30px;
+padding-left: 15px;
+padding-right: 15px;
 }
 
 stw_opensyde_gui_elements--C_OgePubCancel:focus,

@@ -15,8 +15,17 @@
 #include "C_SdNdeHalcWidget.h"
 #include "ui_C_SdNdeHalcWidget.h"
 
+#include "stwerrors.h"
+#include "TGLUtils.h"
+#include "constants.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
+#include "C_Uti.h"
+#include "C_OgeWiUtil.h"
+
+#include "C_OSCHalcDefFiler.h"
+#include "C_OSCLoggingHandler.h"
+#include "C_OgeWiCustomMessage.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -24,6 +33,7 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
+using namespace stw_errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -42,7 +52,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcWidget::C_SdNdeHalcWidget(QWidget * const opc_Parent) :
@@ -54,32 +64,29 @@ C_SdNdeHalcWidget::C_SdNdeHalcWidget(QWidget * const opc_Parent) :
 
    this->InitStaticNames();
 
-   // TODO GS finish TODOs of this class
-
    // remove strings
    this->mpc_Ui->pc_LabFileCurrent->setText("");
-   this->mpc_Ui->pc_LabChannelCurrent->setText("");
-   this->mpc_Ui->pc_ChxSafety->setText("");
 
+   // overview button
    this->mpc_Ui->pc_PubOverview->setCheckable(true);
-   // start with overview
+   this->mpc_Ui->pc_PubOverview->setChecked(true); // start with overview
    // TODO start with last known channel from user settings
-   this->m_OnOverviewClicked();
+   // TODO do not allow to set unchecked when clicking on checked overview button ("one way toggle")
+   this->m_OnOverviewToggled(true);
 
-   // connects
+   // button connects
    connect(this->mpc_Ui->pc_PubImportConfig, &QPushButton::clicked, this, &C_SdNdeHalcWidget::m_OnImportConfigClicked);
    connect(this->mpc_Ui->pc_PubExportConfig, &QPushButton::clicked, this, &C_SdNdeHalcWidget::m_OnExportConfigClicked);
    connect(this->mpc_Ui->pc_PubSettings, &QPushButton::clicked, this, &C_SdNdeHalcWidget::m_OnSettingsClicked);
    connect(this->mpc_Ui->pc_PubCleanUp, &QPushButton::clicked, this, &C_SdNdeHalcWidget::m_OnCleanUpClicked);
    connect(this->mpc_Ui->pc_PubLoad, &QPushButton::clicked, this, &C_SdNdeHalcWidget::m_OnLoadClicked);
    connect(this->mpc_Ui->pc_PubViewDetails, &QPushButton::clicked, this, &C_SdNdeHalcWidget::m_OnViewDetailsClicked);
-   connect(this->mpc_Ui->pc_PubOverview, &QPushButton::clicked, this, &C_SdNdeHalcWidget::m_OnOverviewClicked);
-   connect(this->mpc_Ui->pc_TreeOverview, &C_SdNdeHalcOverviewTreeView::clicked,
+   connect(this->mpc_Ui->pc_PubMagic, &QPushButton::clicked, this, &C_SdNdeHalcWidget::m_OnMagicRequested);
+   connect(this->mpc_Ui->pc_PubOverview, &QPushButton::toggled, this, &C_SdNdeHalcWidget::m_OnOverviewToggled);
+   connect(this->mpc_Ui->pc_TreeChannels->selectionModel(), &QItemSelectionModel::currentRowChanged,
            this, &C_SdNdeHalcWidget::m_OnChannelSelected);
-
-   //lint -e{929} Cast required to avoid ambiguous signal of Qt interface
-   connect(this->mpc_Ui->pc_CbxUseCase, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
-           this, &C_SdNdeHalcWidget::m_OnUseCaseChanged);
+   connect(this->mpc_Ui->pc_WiChannelEdit, &C_SdNdeHalcChannelWidget::SigUpdateChannel,
+           this, &C_SdNdeHalcWidget::m_OnChannelUpdate);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -110,35 +117,18 @@ void C_SdNdeHalcWidget::InitStaticNames(void) const
    // overview section
    this->mpc_Ui->pc_PubOverview->setText(C_GtGetText::h_GetText("Overview"));
 
-   // properties section
-   this->mpc_Ui->pc_ChxActive->setText(C_GtGetText::h_GetText("Active"));
-   this->mpc_Ui->pc_LabName->setText(C_GtGetText::h_GetText("Name"));
-   this->mpc_Ui->pc_LabChannelTitle->setText(C_GtGetText::h_GetText("Channel"));
-   this->mpc_Ui->pc_LabComment->setText(C_GtGetText::h_GetText("Comment"));
-   this->mpc_Ui->pc_TedComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here..."));
-   this->mpc_Ui->pc_LabSafety->setText(C_GtGetText::h_GetText("Safety Relevant"));
-   this->mpc_Ui->pc_LabShareWith->setText(C_GtGetText::h_GetText("Share configuration with: "));
-
-   this->mpc_Ui->pc_LabDbRelation->setText(C_GtGetText::h_GetText("Data Block Relation"));
-   this->mpc_Ui->pc_LabOwnerDb->setText(C_GtGetText::h_GetText("Owner Data Block"));
-   this->mpc_Ui->pc_LabOwnerDb->setText(C_GtGetText::h_GetText("Owner Data Block"));
-
-   // configuration section
-   this->mpc_Ui->pc_LabConfig->setText(C_GtGetText::h_GetText("Configuration"));
-   this->mpc_Ui->pc_LabUseCase->setText(C_GtGetText::h_GetText("Use Case"));
-
    // TODO tool tips
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set new node index.
 
-   \param[in]       oru32_NodeIndex     Index of node
+   \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::SetNode(const uint32 & oru32_NodeIndex)
+void C_SdNdeHalcWidget::SetNode(const uint32 ou32_NodeIndex)
 {
-   this->mu32_NodeIndex = oru32_NodeIndex;
+   this->mu32_NodeIndex = ou32_NodeIndex;
    this->m_LoadNodeData();
 }
 
@@ -176,15 +166,57 @@ void C_SdNdeHalcWidget::m_OnSettingsClicked(void) const
 void C_SdNdeHalcWidget::m_OnCleanUpClicked(void) const
 {
    // TODO
+   // reset GUI elements (TODO: only clear visible widgets?)
+   this->mpc_Ui->pc_TreeChannels->Clear();
+   this->mpc_Ui->pc_PubOverview->setChecked(true); // also triggers update of visible widgets
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot for load button click.
+
+   Load HALC definition description file.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::m_OnLoadClicked(void) const
+void C_SdNdeHalcWidget::m_OnLoadClicked(void)
 {
-   // TODO
+   // TODO user settings last known halc path
+   const QString c_HalcDefPath = C_OgeWiUtil::h_GetSaveFileName(this,
+                                                                C_GtGetText::h_GetText("Select HALC description file"),
+                                                                "", "*.xml", "", QFileDialog::DontConfirmOverwrite);
+
+   if (c_HalcDefPath.isEmpty() == false)
+   {
+      // TODO: check what a second load does and eventually discuss what should happen
+
+      // load definition directly into configuration data structure
+      C_OSCHalcConfig c_HalcConfig;
+      const sint32 s32_LoadResult = C_OSCHalcDefFiler::h_LoadFile(c_HalcConfig, c_HalcDefPath.toStdString().c_str());
+
+      tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex, c_HalcConfig) == C_NO_ERR);
+
+      if (s32_LoadResult == C_NO_ERR)
+      {
+         // TODO: device type comparison
+
+         // Forward Data to overview tree TODO move set node to set node and call update here
+         this->mpc_Ui->pc_TreeChannels->SetNode(this->mu32_NodeIndex);
+
+         // Channel data is updated on channel select
+      }
+      else
+      {
+         // TODO error handling & success message
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+         c_Message.SetType(C_OgeWiCustomMessage::eERROR);
+         c_Message.SetHeading("Load HALC definition file");
+         c_Message.SetDescription(C_GtGetText::h_GetText("Error occured loading HALC file."));
+         c_Message.SetDetails(QString(C_GtGetText::h_GetText("For details see ")) +
+                              C_Uti::h_GetLink(C_GtGetText::h_GetText("log file."),  mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                               C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()));
+         c_Message.SetCustomMinHeight(180, 300);
+         c_Message.Execute();
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -197,39 +229,99 @@ void C_SdNdeHalcWidget::m_OnViewDetailsClicked(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Slot for overview button click.
-
-   \param[in]  oq_ShowOverview   true: show overview; false: show channel edit
+/*! \brief  Button for triggering datapool magician. Development only!
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::m_OnOverviewClicked(void) const
+void C_SdNdeHalcWidget::m_OnMagicRequested(void)
 {
-   this->mpc_Ui->pc_WiChannelEdit->setVisible(false);
-   this->mpc_Ui->pc_WiOverviewTable->setVisible(true);
-   this->mpc_Ui->pc_PubOverview->setChecked(true);
+   // TODO check message boxes sizes when finished
+   C_OgeWiCustomMessage c_Message(this);
+
+   const sint32 s32_Result = C_PuiSdHandler::h_GetInstance()->HALCGenerateDatapools(this->mu32_NodeIndex);
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("Generating DataPools for HALC"));
+
+   if (s32_Result == C_CONFIG)
+   {
+      c_Message.SetType(C_OgeWiCustomMessage::eERROR);
+      c_Message.SetDescription(C_GtGetText::h_GetText("Configuration Error!"));
+      c_Message.SetDetails(QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
+                           arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                           arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+                           arg(C_GtGetText::h_GetText("log file")));
+      c_Message.SetCustomMinHeight(180, 300);
+   }
+   else if (s32_Result == C_RANGE)
+   {
+      c_Message.SetType(C_OgeWiCustomMessage::eERROR);
+      c_Message.SetDescription(C_GtGetText::h_GetText("Node index invalid."));
+      c_Message.SetCustomMinHeight(180, 180);
+   }
+   else if (s32_Result == C_BUSY)
+   {
+      c_Message.SetType(C_OgeWiCustomMessage::eERROR);
+      c_Message.SetDescription(C_GtGetText::h_GetText(
+                                  "No programmable application found to assign the generated datapools to."));
+      c_Message.SetCustomMinHeight(180, 180);
+   }
+   else
+   {
+      c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
+      c_Message.SetDescription(C_GtGetText::h_GetText("Success."));
+      c_Message.SetCustomMinHeight(180, 180);
+   }
+   c_Message.exec();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Slot for use case combo box index change.
+/*! \brief  Slot for overview button click.
+
+   \param[in]  oq_Checked  true: show overview; false: show channel edit
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::m_OnUseCaseChanged(void) const
+void C_SdNdeHalcWidget::m_OnOverviewToggled(const bool oq_Checked) const
 {
-   // TODO (update  this->mpc_Ui->pc_TreeConfig)
+   this->mpc_Ui->pc_WiChannelEdit->setVisible(!oq_Checked);
+   this->mpc_Ui->pc_WiOverviewTable->setVisible(oq_Checked);
+
+   if (oq_Checked == true)
+   {
+      this->mpc_Ui->pc_TreeChannels->selectionModel()->clearSelection();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot of channel selected click.
 
+   Load channel data.
+
+   \param[in]  orc_Index   model index of selected channel
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::m_OnChannelSelected(void) const
+void C_SdNdeHalcWidget::m_OnChannelSelected(const QModelIndex & orc_Index) const
 {
-   this->mpc_Ui->pc_WiChannelEdit->setVisible(true);
-   this->mpc_Ui->pc_WiOverviewTable->setVisible(false);
-   this->mpc_Ui->pc_PubOverview->setChecked(false);
+   if ((orc_Index.isValid() == true) && (orc_Index.parent().isValid() == true))
+   {
+      const uint32 u32_DomainIndex = static_cast<uint32>(orc_Index.parent().row());
+      const uint32 u32_ChannelIndex = static_cast<uint32>(orc_Index.row());
 
-   // TODO: load channel data
+      this->mpc_Ui->pc_WiChannelEdit->SetChannel(u32_DomainIndex, u32_ChannelIndex);
+      this->mpc_Ui->pc_PubOverview->setChecked(false); // also triggers update of visible widgets
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot of channel update: Update name or comment in channel tree
+
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcWidget::m_OnChannelUpdate(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex) const
+{
+   // TODO maybe it would be better to hold the tree model here, to avoid having to forward everything...
+
+   this->mpc_Ui->pc_TreeChannels->UpdateChannelText(ou32_DomainIndex, ou32_ChannelIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -241,21 +333,10 @@ void C_SdNdeHalcWidget::m_OnChannelSelected(void) const
 void C_SdNdeHalcWidget::m_LoadNodeData(void) const
 {
    // TODO Reload on change of relevant information
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
-   if (pc_Node != NULL)
-   {
-      std::vector<C_OSCNodeApplication>::const_iterator c_It;
+   // Forward node index
+   this->mpc_Ui->pc_TreeChannels->SetNode(this->mu32_NodeIndex);
+   this->mpc_Ui->pc_WiChannelEdit->SetNode(this->mu32_NodeIndex);
 
-      // clear configuration
-      this->mpc_Ui->pc_CbxOwnerDb->clear(); // TODO no application case
-
-      // add all data blocks to data block relation section
-      for (c_It = pc_Node->c_Applications.begin(); c_It != pc_Node->c_Applications.end(); ++c_It)
-      {
-         const C_OSCNodeApplication & rc_Application = *c_It;
-         this->mpc_Ui->pc_CbxOwnerDb->addItem(rc_Application.c_Name.c_str());
-      }
-      this->m_OnChannelSelected(); // TODO select correct channel
-   }
+   // TODO select last known channel
 }

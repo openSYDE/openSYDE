@@ -37,7 +37,7 @@ public:
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
    C_PuiSdNodeConnectionId c_ConnectionID;
-   std::vector<QPointF> c_UINodeConnectionInteractionPoints; ///< same sequence as ::C_OSCNode::c_BusConnections
+   std::vector<QPointF> c_UINodeConnectionInteractionPoints;
 };
 
 class C_PuiSdNode :

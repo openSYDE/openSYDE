@@ -34,8 +34,8 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     ors32_Type  Item type, warning: only casted enum values accepted
-   \param[in]     oru32_Index Index
+   \param[in]  ors32_Type     Item type, warning: only casted enum values accepted
+   \param[in]  oru32_Index    Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiBsTemporaryDataID::C_PuiBsTemporaryDataID(const sint32 & ors32_Type, const stw_types::uint32 & oru32_Index) :
@@ -47,7 +47,10 @@ C_PuiBsTemporaryDataID::C_PuiBsTemporaryDataID(const sint32 & ors32_Type, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Compare two temporary data items
 
-   \param[in] orc_Other Other element
+   \param[in]  orc_Other   Other element
+
+   \return
+   Comparison result
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_PuiBsTemporaryDataID::operator <(const C_PuiBsTemporaryDataID & orc_Other) const

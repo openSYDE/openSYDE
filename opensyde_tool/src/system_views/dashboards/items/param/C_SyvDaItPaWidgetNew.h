@@ -50,13 +50,11 @@ public:
    void SetDark(const bool oq_Value) const;
 
    void ButtonAddClicked(void);
-   void ButtonDeleteClicked(void);
 
    void ReadSelected(void);
    void WriteSelected(void);
    void ApplySelected(void) const;
    void RecordSelected(void);
-   void RemoveSelected(void);
 
    bool AllowReadAction(void) const;
    QString GetSelectedItemTypeTemplate(void) const;
@@ -94,7 +92,6 @@ private:
    C_SyvDaItPaWidgetNew & operator =(const C_SyvDaItPaWidgetNew &);
 
    void m_ButtonRecordClicked(void);
-   void m_ButtonImportClicked(void);
 
    void m_ReadElements(void);
    void m_WriteElements(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ChangedIds);
@@ -106,8 +103,6 @@ private:
                        const stw_types::uint32 ou32_ValidLayers) const;
    void m_RecordElements(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds);
 
-   stw_types::sint32 m_FillDataFromImport(
-      const std::vector<stw_opensyde_core::C_OSCParamSetInterpretedNode> & orc_NewData);
    stw_types::sint32 m_GetDataFromImport(
       const std::vector<stw_opensyde_core::C_OSCParamSetInterpretedNode> & orc_NewData,
       std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FoundIds,

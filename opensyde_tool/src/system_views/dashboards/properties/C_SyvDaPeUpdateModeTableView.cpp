@@ -132,7 +132,8 @@ void C_SyvDaPeUpdateModeTableView::InitColumns(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adjust widget size to items
 
-   \param[in] orq_Initial Flag if initial call
+   \param[in]  orq_Initial    Flag if initial call
+   \param[in]  oq_Last        Flag if last call
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTableView::AdjustToItems(const bool & orq_Initial, const bool oq_Last)

@@ -255,7 +255,7 @@ void C_SyvDaDashboardWidget::Save(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
-   \param[in]     orc_AllDataDealer    Reference to vector with all data dealer
+   \param[in]     orc_ComDriver    Com driver containing information about all data dealer
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) const

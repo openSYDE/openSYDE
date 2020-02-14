@@ -420,6 +420,7 @@ void C_SdNdeDpListsTreeWidget::Insert(const bool & orq_SetFocus)
          C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Only %1 lists allowed per Datapool.")).arg(
                                         mu32_NODE_DATA_POOL_LIST_MAX));
+         c_MessageBox.SetCustomMinHeight(180, 180);
          c_MessageBox.Execute();
       }
    }
@@ -847,7 +848,7 @@ void C_SdNdeDpListsTreeWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::selectionChanged(const QItemSelection & orc_Selected,
-                                                      const QItemSelection & orc_Deselected)
+                                                const QItemSelection & orc_Deselected)
 {
    bool q_IsTopLevel = true;
    const QModelIndexList c_DeselectedIndexList = orc_Deselected.indexes();
@@ -1014,7 +1015,7 @@ void C_SdNdeDpListsTreeWidget::keyPressEvent(QKeyEvent * const opc_Event)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnExpandRequestedHeader(const C_SdNdeDpListHeaderWidget * const opc_Item,
-                                                               const bool oq_Expand)
+                                                         const bool oq_Expand)
 {
    sint32 s32_It = 0UL;
 
@@ -1060,11 +1061,11 @@ void C_SdNdeDpListsTreeWidget::m_OnExpandRequestedIndex(const sint32 os32_Index,
 void C_SdNdeDpListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * const opc_Item, const sint32 os32_Index)
 {
    C_SdNdeDpListHeaderWidget * const pc_ListItem = new C_SdNdeDpListHeaderWidget(NULL, this,
-                                                                                             &this->mc_UndoManager,
-                                                                                             &this->mc_ModelViewManager,
-                                                                                             this->mu32_NodeIndex,
-                                                                                             this->mu32_DataPoolIndex,
-                                                                                             os32_Index);
+                                                                                 &this->mc_UndoManager,
+                                                                                 &this->mc_ModelViewManager,
+                                                                                 this->mu32_NodeIndex,
+                                                                                 this->mu32_DataPoolIndex,
+                                                                                 os32_Index);
 
    connect(pc_ListItem, &C_SdNdeDpListHeaderWidget::SigSave, this,
            &C_SdNdeDpListsTreeWidget::SigSave);
@@ -1090,8 +1091,8 @@ void C_SdNdeDpListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * const op
       QTreeWidgetItem * const pc_Table =
          new QTreeWidgetItem(opc_Item, static_cast<sintn>(QTreeWidgetItem::ItemType::UserType));
       C_SdNdeDpListTableWidget * const pc_TableWidget = new C_SdNdeDpListTableWidget(NULL, this,
-                                                                                                 &this->mc_UndoManager,
-                                                                                                 false);
+                                                                                     &this->mc_UndoManager,
+                                                                                     false);
 
       //Set the current model view manager!
       pc_TableWidget->SetModelViewManager(&this->mc_ModelViewManager);
@@ -1130,7 +1131,7 @@ void C_SdNdeDpListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * const op
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_Move(const std::vector<uint32> & oru32_SourceIndices,
-                                            const std::vector<uint32> & oru32_TargetIndices)
+                                      const std::vector<uint32> & oru32_TargetIndices)
 {
    this->mc_UndoManager.DoMoveList(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this,
                                    oru32_SourceIndices, oru32_TargetIndices);
@@ -1310,8 +1311,8 @@ void C_SdNdeDpListsTreeWidget::m_OnExpand(const QModelIndex & orc_Index) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_HandleDataSetErrorChange(const uint32 & oru32_NodeIndex,
-                                                                const uint32 & oru32_DataPoolIndex,
-                                                                const uint32 & oru32_ListIndex) const
+                                                          const uint32 & oru32_DataPoolIndex,
+                                                          const uint32 & oru32_ListIndex) const
 {
    QTreeWidgetItem * const pc_HeaderItem = this->topLevelItem(oru32_ListIndex);
 
@@ -1393,9 +1394,9 @@ std::vector<uint32> C_SdNdeDpListsTreeWidget::m_GetSelectedIndices(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
-                                                      const bool & orq_CopyActive, const bool & orq_PasteActive,
-                                                      const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
-                                                      const bool & orq_MoveUpActive)
+                                                const bool & orq_CopyActive, const bool & orq_PasteActive,
+                                                const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
+                                                const bool & orq_MoveUpActive)
 {
    Q_EMIT this->SigButtonChange(orq_AddActive, orq_CutActive, orq_CopyActive, orq_PasteActive, orq_DeleteActive,
                                 orq_MoveDownActive, orq_MoveUpActive);
@@ -1568,8 +1569,8 @@ QTreeWidgetItem * C_SdNdeDpListsTreeWidget::m_GetActiveTableTreeWidget(const boo
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::mh_AdaptDropTargetIndex(const std::vector<uint32> & orc_SelectedIndices,
-                                                             const QAbstractItemView::DropIndicatorPosition & ore_DropIndicatorPosition,
-                                                             sint32 & ors32_TargetPosition)
+                                                       const QAbstractItemView::DropIndicatorPosition & ore_DropIndicatorPosition,
+                                                       sint32 & ors32_TargetPosition)
 {
    sint32 s32_Offset = 0;
    bool q_FirstSelected = false;
@@ -1622,9 +1623,8 @@ void C_SdNdeDpListsTreeWidget::m_HandleChanged(void)
    \param[in] oru32_DataPoolListIndex List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsTreeWidget::m_UpdateDataSetCount(const uint32 & oru32_NodeIndex,
-                                                          const uint32 & oru32_DataPoolIndex,
-                                                          const uint32 & oru32_ListIndex) const
+void C_SdNdeDpListsTreeWidget::m_UpdateDataSetCount(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
+                                                    const uint32 & oru32_ListIndex) const
 {
    if ((this->mu32_NodeIndex == oru32_NodeIndex) && (this->mu32_DataPoolIndex == oru32_DataPoolIndex))
    {
@@ -1634,7 +1634,7 @@ void C_SdNdeDpListsTreeWidget::m_UpdateDataSetCount(const uint32 & oru32_NodeInd
          //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          C_SdNdeDpListHeaderWidget * const pc_HeaderWidget =
             dynamic_cast<C_SdNdeDpListHeaderWidget * const>(this->indexWidget(this->indexFromItem(
-                                                                                       pc_TreeWidgetItem)));
+                                                                                 pc_TreeWidgetItem)));
          if (pc_HeaderWidget != NULL)
          {
             pc_HeaderWidget->UpdateDataSetCount();
@@ -1919,7 +1919,7 @@ void C_SdNdeDpListsTreeWidget::m_RestoreUserSettings(void)
                         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                         C_SdNdeDpListTableWidget * const pc_Table =
                            dynamic_cast<C_SdNdeDpListTableWidget * const>(this->itemWidget(pc_TableWidgetItem,
-                                                                                                 0));
+                                                                                           0));
 
                         //Check table selection
                         if (pc_Table != NULL)

@@ -45,7 +45,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListDataSetDelegate::C_SdNdeDpListDataSetDelegate(QObject * const opc_Parent) :
@@ -61,17 +61,17 @@ C_SdNdeDpListDataSetDelegate::C_SdNdeDpListDataSetDelegate(QObject * const opc_P
 
    Here: Create appropiate editor widget
 
-   \param[in,out] opc_Parent Parent widget
-   \param[in]     orc_Option Style options
-   \param[in]     orc_Index  Correlating index
+   \param[in,out]  opc_Parent    Parent widget
+   \param[in]      orc_Option    Style options
+   \param[in]      orc_Index     Correlating index
 
    \return
    Editor widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDpListDataSetDelegate::createEditor(QWidget * const opc_Parent,
-                                                           const QStyleOptionViewItem & orc_Option,
-                                                           const QModelIndex & orc_Index) const
+                                                     const QStyleOptionViewItem & orc_Option,
+                                                     const QModelIndex & orc_Index) const
 {
    QWidget * pc_Retval = NULL;
 
@@ -107,8 +107,8 @@ QWidget * C_SdNdeDpListDataSetDelegate::createEditor(QWidget * const opc_Parent,
 
    Here: Pass relevant data
 
-   \param[in,out] opc_Editor Editor widget
-   \param[in]     orc_Index  Correlating index
+   \param[in,out]  opc_Editor    Editor widget
+   \param[in]      orc_Index     Correlating index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
@@ -146,13 +146,13 @@ void C_SdNdeDpListDataSetDelegate::setEditorData(QWidget * const opc_Editor, con
 
    Here: Pass relevant data
 
-   \param[in,out] opc_Editor Editor widget
-   \param[in,out] opc_Model  Model object
-   \param[in]     orc_Index  Correlating index
+   \param[in,out]  opc_Editor    Editor widget
+   \param[in,out]  opc_Model     Model object
+   \param[in]      orc_Index     Correlating index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
-                                                      const QModelIndex & orc_Index) const
+                                                const QModelIndex & orc_Index) const
 {
    if (((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true))
    {
@@ -187,13 +187,13 @@ void C_SdNdeDpListDataSetDelegate::setModelData(QWidget * const opc_Editor, QAbs
 
    Here: special handling for boolean & deactivated cells
 
-   \param[in,out] opc_Painter Painter
-   \param[in]     orc_Option  Option
-   \param[in]     orc_Index   Index
+   \param[in,out]  opc_Painter   Painter
+   \param[in]      orc_Option    Option
+   \param[in]      orc_Index     Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
-                                               const QModelIndex & orc_Index) const
+                                         const QModelIndex & orc_Index) const
 {
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
 }
@@ -201,7 +201,7 @@ void C_SdNdeDpListDataSetDelegate::paint(QPainter * const opc_Painter, const QSt
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set hovered row index
 
-   \param[in] orc_Value New hovered row index
+   \param[in]  ors32_Value    New hovered row index
 
    \return
    true  Change
@@ -227,7 +227,7 @@ bool C_SdNdeDpListDataSetDelegate::SetHoveredCol(const stw_types::sint32 & ors32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set model for column look up
 
-   \param[in] opc_Model  Model for column look up
+   \param[in]  opc_Value   Model for column look up
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetDelegate::SetModel(const C_SdNdeDpListDataSetModel * const opc_Value)
@@ -238,7 +238,7 @@ void C_SdNdeDpListDataSetDelegate::SetModel(const C_SdNdeDpListDataSetModel * co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store current index
 
-   \param[in] orc_Index Index
+   \param[in]  orc_Index   Index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetDelegate::m_Store(const QModelIndex & orc_Index)
@@ -249,7 +249,7 @@ void C_SdNdeDpListDataSetDelegate::m_Store(const QModelIndex & orc_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register name change
 
-   \param[in] orc_Text New text
+   \param[in]  orc_Text    New text
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetDelegate::m_OnNameChange(const QString & orc_Text) const

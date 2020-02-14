@@ -38,7 +38,7 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigTableDelegate::C_CamGenSigTableDelegate(QObject * const opc_Parent) :
-   C_TblDelegate(opc_Parent)
+   C_CamTblDelegate(opc_Parent)
 {
    this->mq_InitialSelection = false;
    //Explicit queued connection to invalidate selection
@@ -59,14 +59,14 @@ void C_CamGenSigTableDelegate::setEditorData(QWidget * const opc_Editor, const Q
    C_TblEditLineEditBase * pc_LineEdit;
 
    //Call base for actual functionality
-   C_TblDelegate::setEditorData(opc_Editor, orc_Index);
+   C_CamTblDelegate::setEditorData(opc_Editor, orc_Index);
 
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    pc_LineEdit = dynamic_cast<C_TblEditLineEditBase *>(opc_Editor);
    if (pc_LineEdit != NULL)
    {
       //Delayed selection handling
-      Q_EMIT this->SigAfterSetEditorData(pc_LineEdit);
+      Q_EMIT (this->SigAfterSetEditorData(pc_LineEdit));
    }
 }
 
@@ -93,5 +93,5 @@ C_OgeCbxTableBase * C_CamGenSigTableDelegate::m_CreateComboBox(QWidget * const o
 void C_CamGenSigTableDelegate::m_AfterSetEditorData(QLineEdit * const opc_Widget) const
 {
    //Set selection to line edit end
-   opc_Widget->setSelection(opc_Widget->text().size(), opc_Widget->text().size());
+   opc_Widget->deselect();
 }

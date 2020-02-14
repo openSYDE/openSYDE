@@ -60,7 +60,7 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSelectorTreeWidget::C_SdBueMessageSelectorTreeWidget(QWidget * const opc_Parent) :
@@ -115,8 +115,8 @@ C_SdBueMessageSelectorTreeWidget::~C_SdBueMessageSelectorTreeWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reimplement default size hint
 
-   \param[in] orc_Option Option
-   \param[in] orc_Index  Index
+   \return
+   Current required size
 */
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_SdBueMessageSelectorTreeWidget::sizeHint(void) const
@@ -151,9 +151,9 @@ QSize C_SdBueMessageSelectorTreeWidget::sizeHint(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set active node id
 
-   \param[in] ou32_NodeIndex      Node index
-   \param[in] ou32_InterfaceIndex Interface index
-   \param[in] orc_DatapoolIndexes All Datapool indexes associated to the same protocol
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  orc_DatapoolIndexes  All Datapool indexes associated to the same protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetNodeId(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
@@ -168,7 +168,7 @@ void C_SdBueMessageSelectorTreeWidget::SetNodeId(const uint32 ou32_NodeIndex, co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set active bus id
 
-   \param[in] ou32_BusIndex Bus index
+   \param[in]  ou32_BusIndex  Bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetBusId(const uint32 ou32_BusIndex)
@@ -180,7 +180,7 @@ void C_SdBueMessageSelectorTreeWidget::SetBusId(const uint32 ou32_BusIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current com protocol
 
-   \param[in] ore_Value Com protocol value
+   \param[in]  ore_Value   Com protocol value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value)
@@ -218,7 +218,7 @@ void C_SdBueMessageSelectorTreeWidget::DeselectAllItems(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set undo manager
 
-   \param[in,out] opc_Value Undo manager
+   \param[in,out]  opc_Value  Undo manager
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetUndoManager(stw_opensyde_gui_logic::C_SdBueUnoManager * const opc_Value)
@@ -229,7 +229,7 @@ void C_SdBueMessageSelectorTreeWidget::SetUndoManager(stw_opensyde_gui_logic::C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set message sync manager
 
-   \param[in,out] opc_Value Message sync manager
+   \param[in,out]  opc_Value  Message sync manager
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetMessageSyncManager(
@@ -373,10 +373,10 @@ void C_SdBueMessageSelectorTreeWidget::AddSignal(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new signal
 
-   \param[in] orc_MessageId            Message identification indices
-   \param[in] ou16_StartBit            Start bit for new signal
-   \param[in] oq_MultiplexedSignal     Flag if signal shall be a multiplexed signal
-   \param[in] ou16_MultiplexValue    Concrete multiplexed value if oq_MultiplexedSignal is true
+   \param[in]  orc_MessageId           Message identification indices
+   \param[in]  ou16_StartBit           Start bit for new signal
+   \param[in]  oq_MultiplexedSignal    Flag if signal shall be a multiplexed signal
+   \param[in]  ou16_MultiplexValue     Concrete multiplexed value if oq_MultiplexedSignal is true
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::AddSignalWithStartBit(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -553,8 +553,8 @@ void C_SdBueMessageSelectorTreeWidget::Delete(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete specific signal
 
-   \param[in] orc_MessageId      Message identification indices
-   \param[in] ou32_SignalIndex   Signal index
+   \param[in]  orc_MessageId     Message identification indices
+   \param[in]  ou32_SignalIndex  Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::DeleteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -732,8 +732,8 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy specific signal
 
-   \param[in] orc_MessageId      Message identification indices
-   \param[in] ou32_SignalIndex   Signal index
+   \param[in]  orc_MessageId     Message identification indices
+   \param[in]  ou32_SignalIndex  Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::CopySignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -777,8 +777,8 @@ void C_SdBueMessageSelectorTreeWidget::Cut(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Cut specific signal
 
-   \param[in] orc_MessageId      Message identification indices
-   \param[in] ou32_SignalIndex   Signal index
+   \param[in]  orc_MessageId     Message identification indices
+   \param[in]  ou32_SignalIndex  Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::CutSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -847,6 +847,7 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
                                                                      "At least one of the copied signals is a multiplexer signal,"
                                                                      " the message already contains one multiplexer signal"
                                                                      " and only one multiplexer signal per message is allowed."));
+                     c_Message.SetCustomMinHeight(230, 230);
                      c_Message.Execute();
                   }
                   else
@@ -861,9 +862,11 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
                         c_UISignals.resize(c_Signals.size());
                      }
 
-                     //Deactivate start bit adaptation for now
-                     //C_SdBueMessageSelectorTreeWidget::mh_AdaptSignalStartBits(
-                     //   this->mc_UniqueMessageIds[u32_InternalMessageIndex], c_Signals);
+                     //Auto fix signal restrictions of safety protocols
+                     for (uint32 u32_ItSignal = 0; u32_ItSignal < c_Signals.size(); ++u32_ItSignal)
+                     {
+                        C_SdUtil::h_AdaptSignalToProtocolType(c_Signals[u32_ItSignal], this->me_ProtocolType, NULL);
+                     }
 
                      this->mpc_UndoManager->DoPasteSignals(this->mc_UniqueMessageIds[u32_InternalMessageIndex],
                                                            u32_SignalIndex, c_Signals, c_OSCSignalCommons,
@@ -882,6 +885,7 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
                         if (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE)
                         {
                            C_OSCCanMessage c_Copy = *pc_Message;
+                           c_Copy.u32_CycleTimeMs = 0U;
                            c_Copy.e_TxMethod = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
                            this->mpc_MessageSyncManager->
                            SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
@@ -933,8 +937,8 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Paste copied signal
 
-   \param[in] orc_MessageId      Message identification indices
-   \param[in] ou16_StartBit      Start bit for new signal
+   \param[in]  orc_MessageId  Message identification indices
+   \param[in]  ou16_StartBit  Start bit for new signal
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::PasteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -1009,6 +1013,8 @@ void C_SdBueMessageSelectorTreeWidget::EditName(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up class after internal add message
+
+   \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::InternalAddMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
@@ -1034,6 +1040,8 @@ void C_SdBueMessageSelectorTreeWidget::InternalAddMessage(const C_OSCCanMessageI
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up class after internal delete message
+
+   \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::InternalDeleteMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
@@ -1083,6 +1091,9 @@ void C_SdBueMessageSelectorTreeWidget::InternalDeleteMessage(const C_OSCCanMessa
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up class after internal add signal
+
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::InternalAddSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -1112,6 +1123,9 @@ void C_SdBueMessageSelectorTreeWidget::InternalAddSignal(const C_OSCCanMessageId
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up class after internal delete signal
+
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::InternalDeleteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -1191,7 +1205,7 @@ void C_SdBueMessageSelectorTreeWidget::OnMessageNameChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   The signal name has changed
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::OnSignalNameChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
@@ -1230,8 +1244,8 @@ void C_SdBueMessageSelectorTreeWidget::OnSignalNameChange(const C_OSCCanMessageI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   In case of a disconnected node update of the unique message ids
 
-   \param[in]     ou32_NodeIndex      Node index
-   \param[in]     ou32_InterfaceIndex Interface index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::OnNodeDisconnected(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
@@ -1259,8 +1273,8 @@ void C_SdBueMessageSelectorTreeWidget::OnNodeDisconnected(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Trigger global error check (icons only)
 
-   \param[in] orq_HandleSelection Flag to change selection
-                                   (use-case: message name change -> new position of selected item!)
+   \param[in]  orq_HandleSelection  Flag to change selection
+                                    (use-case: message name change -> new position of selected item!)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::RecheckErrorGlobal(const bool & orq_HandleSelection)
@@ -1283,8 +1297,8 @@ void C_SdBueMessageSelectorTreeWidget::RecheckErrorGlobal(const bool & orq_Handl
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Trigger recheck of error values for tree
 
-   \param[in] orc_MessageId            Message identification indices
-   \param[in] orq_AllowMessageIdUpdate Flag to allow message ID changes using when using this function
+   \param[in]  orc_MessageId              Message identification indices
+   \param[in]  orq_AllowMessageIdUpdate   Flag to allow message ID changes using when using this function
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -1442,8 +1456,8 @@ bool C_SdBueMessageSelectorTreeWidget::CheckIfAnyNodeConnected(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle single message selection change with all aspects
 
-   \param[in] orc_MessageId  Message identification indices
-   \param[in] oq_BlockSignal Optional flag for blocking the signal for changed selection
+   \param[in]  orc_MessageId     Message identification indices
+   \param[in]  oq_BlockSignal    Optional flag for blocking the signal for changed selection
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SelectMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -1470,8 +1484,8 @@ void C_SdBueMessageSelectorTreeWidget::SelectMessage(const C_OSCCanMessageIdenti
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle multi message selection change with all aspects
 
-   \param[in] orc_MessageIds Multiple message identification indices
-   \param[in] oq_BlockSignal Optional flag for blocking the signal for changed selection
+   \param[in]  orc_MessageIds    Multiple message identification indices
+   \param[in]  oq_BlockSignal    Optional flag for blocking the signal for changed selection
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SelectMessages(
@@ -1500,9 +1514,9 @@ void C_SdBueMessageSelectorTreeWidget::SelectMessages(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle selection change with all aspects
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
-   \param[in] oq_BlockSignal    Optional flag for blocking the signal for changed selection
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  oq_BlockSignal       Optional flag for blocking the signal for changed selection
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -1530,7 +1544,7 @@ void C_SdBueMessageSelectorTreeWidget::SelectSignal(const C_OSCCanMessageIdentif
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the level of the item at the position
 
-   \param[in]     orc_Pos   Position of item
+   \param[in]  orc_Pos  Position of item
 
    \return
    0: No level
@@ -1566,7 +1580,7 @@ sint32 C_SdBueMessageSelectorTreeWidget::GetLevelOfPos(const QPoint & orc_Pos) c
 
    Draws the seperator lines
 
-   \param[in,out] opc_Event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::paintEvent(QPaintEvent * const opc_Event)
@@ -1642,7 +1656,7 @@ void C_SdBueMessageSelectorTreeWidget::paintEvent(QPaintEvent * const opc_Event)
 
    Here: Move elements
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::dropEvent(QDropEvent * const opc_Event)
@@ -1743,7 +1757,7 @@ void C_SdBueMessageSelectorTreeWidget::dropEvent(QDropEvent * const opc_Event)
 
    Here: start drag manually (for custom preview)
 
-   \param[in] oc_SupportedActions Supported actions
+   \param[in]  oc_SupportedActions  Supported actions
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::startDrag(const Qt::DropActions oc_SupportedActions)
@@ -1770,7 +1784,7 @@ void C_SdBueMessageSelectorTreeWidget::startDrag(const Qt::DropActions oc_Suppor
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overloaded function for stored mime data
 
-   \param[in] orc_Items Current selected items
+   \param[in]  oc_Items    Current selected items
 
    \return
    Mime data for drag event
@@ -1940,7 +1954,7 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_Mess
          uint32 u32_Counter;
          uint32 u32_SignalDataIndex;
          const QString c_Text = QString("%1 (0x%2)").arg(pc_MessageData->c_Name.c_str()).arg(
-            QString::number(pc_MessageData->u32_CanId, 16));
+            QString::number(pc_MessageData->u32_CanId, 16).toUpper());
 
          this->insertTopLevelItem(oru32_MessageIdIndex, pc_Message);
 
@@ -2146,9 +2160,9 @@ void C_SdBueMessageSelectorTreeWidget::m_ScrollBarRangeChanged(const sintn osn_M
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility function to get current, first connected node
 
-   \param[out] oru32_NodeIndex       Node index
-   \param[out] oru32_InterfaceIndex  Interface index
-   \param[out] oru32_DatapoolIndex   Datapool index
+   \param[out]  oru32_NodeIndex        Node index
+   \param[out]  oru32_InterfaceIndex   Interface index
+   \param[out]  oru32_DatapoolIndex    Datapool index
 
    \return
    C_NO_ERR Valid node
@@ -2199,8 +2213,8 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_GetFirstConnectedNodeAndInterface(uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Map global message indices to internal message index
 
-   \param[in]  orc_MessageId              Message identification indices
-   \param[out] oru32_InternalMessageIndex Internal message index
+   \param[in]   orc_MessageId                Message identification indices
+   \param[out]  oru32_InternalMessageIndex   Internal message index
 
    \return
    C_NO_ERR Operation success
@@ -2236,7 +2250,10 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_MapMessageIdToInternalMessageIndex(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get any valid message id for add operation
 
-   \param[out] orc_MessageId Message identification indices
+   \param[out]  orc_MessageId    Message identification indices
+
+   \retval  C_NO_ERR    at least on valid message id found
+   \retval  C_NO_ACT    no valid message id found
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessageSelectorTreeWidget::GetMessageIdForAdd(C_OSCCanMessageIdentificationIndices & orc_MessageId) const
@@ -2292,6 +2309,8 @@ void C_SdBueMessageSelectorTreeWidget::m_UpdateUniqueMessageIds(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update internal message id signals vector
+
+   \param[in]  oru32_InternalMessageIndex    Internal message index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_UpdateUniqueMessageIdsSignals(const uint32 & oru32_InternalMessageIndex)
@@ -2338,7 +2357,7 @@ void C_SdBueMessageSelectorTreeWidget::m_ReconnectSelection(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal message selection
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_SendMessageSelectionUpdate(
@@ -2353,8 +2372,8 @@ void C_SdBueMessageSelectorTreeWidget::m_SendMessageSelectionUpdate(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal signal selection
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_SendSignalSelectionUpdate(
@@ -2429,6 +2448,8 @@ void C_SdBueMessageSelectorTreeWidget::m_SaveSelection(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Restore last known selection
+
+   \param[in]  oq_AlsoSetCurrent    Flag to set current
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_RestoreSelection(const bool oq_AlsoSetCurrent)
@@ -2554,9 +2575,9 @@ void C_SdBueMessageSelectorTreeWidget::m_RestoreExpand(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Map internal sorted signal index to global signal index
 
-   \param[in]  orc_MessageId              Message identification indices
-   \param[in]  oru32_InternalSignalIndex  Internal signal index
-   \param[out] oru32_SignalDataIndex      Data signal index
+   \param[in]   oru32_InternalMessageIndex   Internal message index
+   \param[in]   oru32_InternalSignalIndex    Internal signal index
+   \param[out]  oru32_SignalDataIndex        Data signal index
 
    \return
    C_NO_ERR Operation success
@@ -2591,9 +2612,9 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_MapSignalInternalIndexToDataIndex(con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Map global signal index to internal signal index
 
-   \param[in]  orc_MessageId             Message identification indices
-   \param[in]  oru32_DataSignalIndex     Internal signal index
-   \param[out] oru32_SignalInternalIndex Data signal index
+   \param[in]   oru32_InternalMessageIndex   Internal message index
+   \param[in]   oru32_DataSignalIndex        Internal signal index
+   \param[out]  oru32_SignalInternalIndex    Data signal index
 
    \return
    C_NO_ERR Operation success
@@ -2720,27 +2741,9 @@ uint16 C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(const C_OSCCanMessage * 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSelectorTreeWidget::mh_AdaptSignalStartBits(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId, std::vector<C_OSCCanSignal> & orc_Signals)
-{
-   // CAN message for "testing" the signals in its positions
-   C_OSCCanMessage c_Message = *C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
-   uint32 u32_Counter;
-
-   for (u32_Counter = 0U; u32_Counter < orc_Signals.size(); ++u32_Counter)
-   {
-      orc_Signals[u32_Counter].u16_ComBitStart = C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(
-         &c_Message, orc_Signals[u32_Counter].u16_ComBitLength, orc_Signals[u32_Counter].e_ComByteOrder);
-
-      // add the signal for getting the position of the next signal
-      c_Message.c_Signals.push_back(orc_Signals[u32_Counter]);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get highest selected model index
 
-   \param[in,out] orc_Index Highest selected, if any
+   \param[in,out]  orc_Index  Highest selected, if any
 
    \return
    true  Success / output valid

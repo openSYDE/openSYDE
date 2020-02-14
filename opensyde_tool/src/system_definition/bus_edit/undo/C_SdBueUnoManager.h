@@ -39,8 +39,6 @@ public:
    void DoDisconnectNodeFromProt(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                                  const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol,
                                  QWidget * const opc_Widget);
-   void DoAddDataPool(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-                      const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget);
    void DoAddMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                      QTreeWidget * const opc_MessageTreeWidget);

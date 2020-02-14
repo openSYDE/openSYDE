@@ -70,7 +70,7 @@ private:
    Ui::C_SdNdeDpViewWidget * mpc_Ui;
    // array for more easy use of sub widgets
    C_SdNdeDpSelectorWidget * mapc_Selectors[static_cast<stw_types::sintn>(stw_opensyde_core::C_OSCNodeDataPool::
-                                                                                eCOM) + 1];
+                                                                          eCOM) + 1];
    stw_types::uint32 mu32_NodeIndex;
    stw_types::uint32 mu32_LastKnownDataPoolIndex;
    stw_opensyde_core::C_OSCNodeDataPool::E_Type me_ActiveDataPoolType;

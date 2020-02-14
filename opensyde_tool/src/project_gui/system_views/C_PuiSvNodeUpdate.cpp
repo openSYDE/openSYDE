@@ -49,12 +49,13 @@ C_PuiSvNodeUpdate::C_PuiSvNodeUpdate(void) :
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::CalcHash(uint32 & oru32_HashValue) const
 {
    const sintn sn_Size = this->mc_DataBlockPaths.size();
+
    stw_scl::C_SCLChecksums::CalcCRC32(&sn_Size, sizeof(sn_Size), oru32_HashValue);
    for (uint32 u32_It = 0; u32_It < this->mc_DataBlockPaths.size(); ++u32_It)
    {
@@ -87,7 +88,7 @@ void C_PuiSvNodeUpdate::ClearParamPaths(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear all paths as appropriate for the type
 
-   \param[in] oe_Type Selector for structure
+   \param[in]  oe_Type  Selector for structure
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::ClearPathsAsAppropriate(const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
@@ -120,7 +121,7 @@ const std::vector<C_PuiSvNodeUpdateParamInfo> & C_PuiSvNodeUpdate::GetParamInfos
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get application paths
 
-   \param[in] oe_Type Selector for structure
+   \param[in]  oe_Type  Selector for structure
 
    \return
    Current application paths
@@ -141,7 +142,7 @@ const std::vector<QString> & C_PuiSvNodeUpdate::GetPaths(const E_GenericFileType
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set parameter set paths
 
-   \param[in] orc_Value New parameter set paths
+   \param[in]  orc_Value   New parameter set paths
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::SetParamInfos(const std::vector<C_PuiSvNodeUpdateParamInfo> & orc_Value)
@@ -152,8 +153,8 @@ void C_PuiSvNodeUpdate::SetParamInfos(const std::vector<C_PuiSvNodeUpdateParamIn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set application paths
 
-   \param[in] orc_Value New application paths
-   \param[in] oe_Type   Selector for structure
+   \param[in]  orc_Value   New application paths
+   \param[in]  oe_Type     Selector for structure
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::SetPaths(const std::vector<QString> & orc_Value, const E_GenericFileType oe_Type)
@@ -171,11 +172,9 @@ void C_PuiSvNodeUpdate::SetPaths(const std::vector<QString> & orc_Value, const E
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information parameter set information
 
-   \param[in] ou32_ViewIndex    View index
-   \param[in] ou32_NodeIndex    Node index
-   \param[in] ou32_Index        Index to access
-   \param[in] orc_FilePath      New path
-   \param[in] ou32_LastKnownCrc Last known CRC for this file
+   \param[in]  ou32_Index           Index to access
+   \param[in]  orc_FilePath         New path
+   \param[in]  ou32_LastKnownCrc    Last known CRC for this file
 
    \return
    C_NO_ERR Operation success
@@ -202,8 +201,8 @@ sint32 C_PuiSvNodeUpdate::SetParamInfoContent(const uint32 ou32_Index, const QSt
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add path to internal structure
 
-   \param[in] orc_Path New path
-   \param[in] oe_Type  Selector for structure
+   \param[in]  orc_Path    New path
+   \param[in]  oe_Type     Selector for structure
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::AddPath(const QString & orc_Path, const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
@@ -221,7 +220,7 @@ void C_PuiSvNodeUpdate::AddPath(const QString & orc_Path, const C_PuiSvNodeUpdat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add node update information for a parameter set
 
-   \param[in] orc_Value New path
+   \param[in]  orc_Value   New path
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::AddParamInfo(const C_PuiSvNodeUpdateParamInfo & orc_Value)
@@ -232,9 +231,9 @@ void C_PuiSvNodeUpdate::AddParamInfo(const C_PuiSvNodeUpdateParamInfo & orc_Valu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information path
 
-   \param[in] ou32_Index Index to access
-   \param[in] orc_Value  New path
-   \param[in] oe_Type    Selector for structure
+   \param[in]  ou32_Index  Index to access
+   \param[in]  orc_Value   New path
+   \param[in]  oe_Type     Selector for structure
 
    \return
    C_NO_ERR Operation success
@@ -274,9 +273,8 @@ sint32 C_PuiSvNodeUpdate::SetPath(const uint32 ou32_Index, const QString & orc_V
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information parameter set information
 
-   \param[in] ou32_Index Index to access
-   \param[in] orc_Value  New path
-   \param[in] oe_Type    Selector for structure
+   \param[in]  ou32_Index  Index to access
+   \param[in]  orc_Value   New path
 
    \return
    C_NO_ERR Operation success
@@ -301,8 +299,8 @@ sint32 C_PuiSvNodeUpdate::SetParamInfo(const uint32 ou32_Index, const C_PuiSvNod
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove node update information path
 
-   \param[in] ou32_Index Index to remove
-   \param[in] oe_Type    Selector for structure
+   \param[in]  ou32_Index  Index to remove
+   \param[in]  oe_Type     Selector for structure
 
    \return
    C_NO_ERR Operation success
@@ -341,8 +339,7 @@ sint32 C_PuiSvNodeUpdate::RemovePath(const uint32 ou32_Index, const C_PuiSvNodeU
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove node update information parameter set information
 
-   \param[in] ou32_Index Index to remove
-   \param[in] oe_Type    Selector for structure
+   \param[in]  ou32_Index  Index to remove
 
    \return
    C_NO_ERR Operation success
@@ -367,7 +364,7 @@ sint32 C_PuiSvNodeUpdate::RemoveParamInfo(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::OnSyncNodeApplicationAdded(const uint32 ou32_ApplicationIndex)
@@ -381,8 +378,8 @@ void C_PuiSvNodeUpdate::OnSyncNodeApplicationAdded(const uint32 ou32_Application
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_ApplicationSourceIndex Application source index
-   \param[in] ou32_ApplicationTargetIndex Application target index
+   \param[in]  ou32_ApplicationSourceIndex   Application source index
+   \param[in]  ou32_ApplicationTargetIndex   Application target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::OnSyncNodeApplicationMoved(const uint32 ou32_ApplicationSourceIndex,
@@ -404,7 +401,7 @@ void C_PuiSvNodeUpdate::OnSyncNodeApplicationMoved(const uint32 ou32_Application
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_ApplicationIndex)

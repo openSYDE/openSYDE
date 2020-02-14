@@ -288,6 +288,7 @@ bool C_GiSvPc::OpenDialog(void) const
          c_Message.SetHeading(C_GtGetText::h_GetText("Ethernet settings"));
          c_Message.SetDescription(C_GtGetText::h_GetText("Setup your Ethernet adapter settings in Windows system "
                                                          "network configuration."));
+         c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
       }
    }
@@ -297,6 +298,7 @@ bool C_GiSvPc::OpenDialog(void) const
       C_OgeWiCustomMessage c_Message(pc_GraphicsView);
       c_Message.SetHeading(C_GtGetText::h_GetText("Configure PC Interface settings"));
       c_Message.SetDescription(C_GtGetText::h_GetText("Not available while being connected."));
+      c_Message.SetCustomMinHeight(180, 180);
       c_Message.Execute();
    }
 
@@ -306,7 +308,7 @@ bool C_GiSvPc::OpenDialog(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connection change
 
-   \param[in] oq_Active Flag if connected
+   \param[in] oq_Connected Flag if connected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::SetConnected(const bool oq_Connected)

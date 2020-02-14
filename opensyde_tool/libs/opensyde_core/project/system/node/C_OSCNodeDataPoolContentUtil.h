@@ -48,6 +48,7 @@ public:
                                                     stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Value,
                                                     C_OSCNodeDataPoolContentUtil::E_ValueChangedTo & ore_ValueChangedTo, const C_OSCNodeDataPoolContentUtil::E_SetValue oe_SetValue =
                                                        C_OSCNodeDataPoolContentUtil::eLEAVE_VALUE);
+   static stw_types::uint32 h_GetDataTypeSizeInByte(const C_OSCNodeDataPoolContent::E_Type oe_Type);
 
 private:
    C_OSCNodeDataPoolContentUtil(void);

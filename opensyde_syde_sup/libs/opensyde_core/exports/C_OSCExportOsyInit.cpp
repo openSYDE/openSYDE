@@ -24,6 +24,7 @@
 #include "C_OSCExportCommunicationStack.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_OSCExportUti.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -72,9 +73,10 @@ C_OSCExportOsyInit::~C_OSCExportOsyInit(void)
 
    \param[in] orc_FilePath             path to file to create
    \param[in] orc_Node                 node definition
-   \param[in] oq_RunsDpd               true: create DPD init code and init code for all local and remote DPs
-                                       false: only create init code for local DPs
+   \param[in] oq_RunsDpd               true: create DPD init code and init code for all local, public and remote DPs
+                                       false: only create init code for local and public DPs
    \param[in] ou16_ApplicationIndex    index of application we create code for (to identify local DPs)
+   \param[in] orc_ExportToolInfo       information about calling executable (name + version)
 
    \return
    C_NO_ERR Operation success
@@ -82,7 +84,8 @@ C_OSCExportOsyInit::~C_OSCExportOsyInit(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, const C_OSCNode & orc_Node,
-                                              const bool oq_RunsDpd, const uint16 ou16_ApplicationIndex)
+                                              const bool oq_RunsDpd, const uint16 ou16_ApplicationIndex,
+                                              const C_SCLString & orc_ExportToolInfo)
 {
    C_SCLStringList c_Lines;
    sint32 s32_Return = C_NO_ERR;
@@ -93,38 +96,34 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
    uint32 u32_BufferSize;
 
    //header file: quite simple (constant only as long as we always create DPD and DPH structures):
-   c_Lines.Add(
-      "//----------------------------------------------------------------------------------------------------------------------");
+   c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
    c_Lines.Add("/*!");
    c_Lines.Add("   \\file");
    c_Lines.Add("   \\brief       Application specific openSYDE initialization (Header file with interface)");
+   c_Lines.Add("");
+   c_Lines.Add(C_OSCExportUti::h_GetCreationToolInfo(orc_ExportToolInfo));
    c_Lines.Add("*/");
-   c_Lines.Add(
-      "//----------------------------------------------------------------------------------------------------------------------");
+   c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
    c_Lines.Add("#ifndef OSY_INITH");
    c_Lines.Add("#define OSY_INITH");
    c_Lines.Add("");
-   c_Lines.Add(
-      "/* -- Includes ------------------------------------------------------------------------------------------------------ */");
+   c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Includes"));
    c_Lines.Add("#include \"stwtypes.h\"");
    if (oq_RunsDpd == true)
    {
       c_Lines.Add("#include \"osy_dpd_driver.h\"");
    }
    c_Lines.Add("#include \"osy_dpa_data_pool.h\"");
-   //includes for the data pool definitions
+   //includes for the Datapool definitions
    //adding them to this central header allows the application to just include one central file and access all data
    // pools
-   c_Lines.Add("//Header files exporting application specific data pools:");
+   c_Lines.Add("//Header files exporting application specific Datapools:");
    for (uint8 u8_DataPool = 0U; u8_DataPool < orc_Node.c_DataPools.size(); u8_DataPool++)
    {
-      const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u8_DataPool];
-
-      //add data pool if application runs DPD or application owns this data pool
-      if ((oq_RunsDpd == true) || (rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex))
+      if (mh_IsDpKnownToApp(u8_DataPool, ou16_ApplicationIndex, orc_Node, oq_RunsDpd) == true)
       {
          C_SCLString c_HeaderName;
-         C_OSCExportDataPool::h_GetFileName(rc_DataPool, c_HeaderName);
+         c_HeaderName = C_OSCExportDataPool::h_GetFileName(orc_Node.c_DataPools[u8_DataPool]);
          c_Lines.Add("#include \"" + c_HeaderName + ".h\"");
          u8_DataPoolsKnownInThisApplication++;
       }
@@ -137,7 +136,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       for (uint32 u32_ItProtocol = 0U; u32_ItProtocol < orc_Node.c_ComProtocols.size(); u32_ItProtocol++)
       {
          const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
-         //logic: C_OSCCanProtocol refers to a data pool; if that data pool is owned by the
+         //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
          // C_OSCNodeApplication then create it
          if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
          {
@@ -157,15 +156,10 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          }
       }
    }
-   c_Lines.Add("");
 
-   c_Lines.Add("#ifdef __cplusplus");
-   c_Lines.Add("extern \"C\"");
-   c_Lines.Add("{");
-   c_Lines.Add("#endif");
    c_Lines.Add("");
-   c_Lines.Add(
-      "/* -- Defines ------------------------------------------------------------------------------------------------------- */");
+   C_OSCExportUti::h_AddExternCStart(c_Lines);
+   c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Defines"));
 
    if (oq_RunsDpd == true)
    {
@@ -213,10 +207,10 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       //get size of greatest element so we know how to set up the buffers
       //add protocol overhead for DPD and NVM access services (greatest overhead: write_memory_by_address)
       u32_BufferSize = mh_GetSizeOfLargestDataPoolElement(orc_Node.c_DataPools) + 11U;
-      //consider minimum for non-DPD services (greatest size for osy server: routine control DP meta data)
-      if (u32_BufferSize < 43U)
+      //consider minimum for non-DP services
+      if (u32_BufferSize < hu8_MIN_SIZE_DPD_BUF_INSTANCE)
       {
-         u32_BufferSize = 43U;
+         u32_BufferSize = hu8_MIN_SIZE_DPD_BUF_INSTANCE;
       }
       //limit to maximum service size; larger access must be segmented by protocol driver
       if (u32_BufferSize > C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE)
@@ -239,14 +233,11 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
    c_Lines.Add("#define OSY_INIT_COM_NUM_PROTOCOL_CONFIGURATIONS    " +
                C_SCLString::IntToStr(u8_CommDefinitionsKnownInThisApplication) + "U");
    c_Lines.Add("");
-   c_Lines.Add(
-      "/* -- Types --------------------------------------------------------------------------------------------------------- */");
+   c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Types"));
    c_Lines.Add("");
-   c_Lines.Add(
-      "/* -- Global Variables ---------------------------------------------------------------------------------------------- */");
+   c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Global Variables"));
    c_Lines.Add("");
-   c_Lines.Add(
-      "/* -- Function Prototypes ------------------------------------------------------------------------------------------- */");
+   c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Function Prototypes"));
    if (oq_RunsDpd == true)
    {
       c_Lines.Add("extern const T_osy_dpd_data * osy_dpd_get_init_config(void);");
@@ -264,13 +255,9 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       c_Lines.Add("");
    }
 
-   c_Lines.Add(
-      "/* -- Implementation ------------------------------------------------------------------------------------------------ */");
+   c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Implementation"));
    c_Lines.Add("");
-   c_Lines.Add("#ifdef __cplusplus");
-   c_Lines.Add("}");
-   c_Lines.Add("#endif");
-   c_Lines.Add("");
+   C_OSCExportUti::h_AddExternCEnd(c_Lines);
    c_Lines.Add("#endif");
 
    try
@@ -290,47 +277,37 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       c_Lines.Clear();
 
       //constant header part:
-      c_Lines.Add(
-         "//----------------------------------------------------------------------------------------------------------------------");
+      c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
       c_Lines.Add("/*!");
       c_Lines.Add("   \\file");
       c_Lines.Add("   \\brief       Application specific openSYDE initialization (Source file with implementation)");
       c_Lines.Add("");
-      c_Lines.Add("   Auto-coded by openSYDE");
+      c_Lines.Add(C_OSCExportUti::h_GetCreationToolInfo(orc_ExportToolInfo));
       c_Lines.Add("*/");
-      c_Lines.Add(
-         "//----------------------------------------------------------------------------------------------------------------------");
+      c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
       c_Lines.Add("");
-      c_Lines.Add(
-         "/* -- Includes ------------------------------------------------------------------------------------------------------ */");
+      c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Includes"));
       c_Lines.Add("#include <stddef.h> //for NULL");
       c_Lines.Add("#include \"stwtypes.h\"");
       c_Lines.Add("#include \"osy_init.h\"");
       c_Lines.Add("#include \"osy_dpa_data_pool.h\"");
       c_Lines.Add("");
-      c_Lines.Add(
-         "/* -- Defines ------------------------------------------------------------------------------------------------------- */");
+      c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Defines"));
       c_Lines.Add("");
-      c_Lines.Add(
-         "/* -- Types --------------------------------------------------------------------------------------------------------- */");
+      c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Types"));
       c_Lines.Add("");
-      c_Lines.Add(
-         "/* -- Global Variables ---------------------------------------------------------------------------------------------- */");
+      c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Global Variables"));
       c_Lines.Add("");
-      c_Lines.Add(
-         "/* -- Module Global Variables --------------------------------------------------------------------------------------- */");
+      c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Module Global Variables"));
       c_Lines.Add("");
-      c_Lines.Add(
-         "/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */");
+      c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Module Global Function Prototypes"));
       c_Lines.Add("");
-      c_Lines.Add(
-         "/* -- Implementation ------------------------------------------------------------------------------------------------ */");
+      c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Implementation"));
 
       if (oq_RunsDpd == true)
       {
          c_Lines.Add("");
-         c_Lines.Add(
-            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
          c_Lines.Add("/*! \\brief   Set up and provide openSYDE protocol driver configuration");
          c_Lines.Add("");
          c_Lines.Add("   Sets up:");
@@ -343,8 +320,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          c_Lines.Add(
             "   pointer to configuration structure (statically available; can be used for the DPD initialization function)");
          c_Lines.Add("*/");
-         c_Lines.Add(
-            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
          c_Lines.Add("const T_osy_dpd_data * osy_dpd_get_init_config(void)");
          c_Lines.Add("{");
 
@@ -475,24 +451,22 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          c_Lines.Add("}");
       }
       c_Lines.Add("");
-      c_Lines.Add(
-         "//----------------------------------------------------------------------------------------------------------------------");
-      c_Lines.Add("/*! \\brief   Set up and provide openSYDE data pool handler configuration");
+      c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
+      c_Lines.Add("/*! \\brief   Set up and provide openSYDE Datapool handler configuration");
       c_Lines.Add("");
       c_Lines.Add("   Sets up:");
-      c_Lines.Add("   * initialization structure listing all data pools in correct sequence");
+      c_Lines.Add("   * initialization structure listing all Datapools in correct sequence");
       c_Lines.Add("");
       c_Lines.Add("   \\return");
       c_Lines.Add(
          "   pointer to initialization structure (statically available; can be used for the DPH initialization function)");
-      c_Lines.Add("   NULL: no data pools defined");
+      c_Lines.Add("   NULL: no Datapools defined");
       c_Lines.Add("*/");
-      c_Lines.Add(
-         "//----------------------------------------------------------------------------------------------------------------------");
+      c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
       c_Lines.Add("const T_osy_dpa_data_pool * const * osy_dph_get_init_config(void)");
       c_Lines.Add("{");
 
-      //add table of data pools
+      //add table of Datapools
       if (u8_DataPoolsKnownInThisApplication == 0U)
       {
          c_Lines.Add("   return NULL;");
@@ -503,9 +477,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          c_Lines.Add("   {");
          for (uint8 u8_DataPool = 0U; u8_DataPool < orc_Node.c_DataPools.size(); u8_DataPool++)
          {
-            //add data pool if application runs DPD or application owns this data pool
-            if ((oq_RunsDpd == true) ||
-                (orc_Node.c_DataPools[u8_DataPool].s32_RelatedDataBlockIndex == ou16_ApplicationIndex))
+            if (mh_IsDpKnownToApp(u8_DataPool, ou16_ApplicationIndex, orc_Node, oq_RunsDpd) == true)
             {
                const C_SCLString c_Text = "      &gt_" + orc_Node.c_DataPools[u8_DataPool].c_Name + "_DataPool,";
                c_Lines.Add(c_Text);
@@ -521,15 +493,13 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       }
       c_Lines.Add("}");
       c_Lines.Add("");
-      c_Lines.Add(
-         "//----------------------------------------------------------------------------------------------------------------------");
-      c_Lines.Add("/*! \\brief   Get number of defined openSYDE data pools");
+      c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
+      c_Lines.Add("/*! \\brief   Get number of defined openSYDE Datapools");
       c_Lines.Add("");
       c_Lines.Add("   \\return");
-      c_Lines.Add("   number of openSYDE data pools");
+      c_Lines.Add("   number of openSYDE Datapools");
       c_Lines.Add("*/");
-      c_Lines.Add(
-         "//----------------------------------------------------------------------------------------------------------------------");
+      c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
       c_Lines.Add("uint8 osy_dph_get_num_data_pools(void)");
       c_Lines.Add("{");
       c_Lines.Add("   return OSY_INIT_DPH_NUM_DATA_POOLS;");
@@ -538,8 +508,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       if (u8_CommDefinitionsKnownInThisApplication > 0)
       {
          c_Lines.Add("");
-         c_Lines.Add(
-            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
          c_Lines.Add("/*! \\brief   Set up and provide a list of openSYDE COMM protocol configurations");
          c_Lines.Add("");
          c_Lines.Add("   Sets up a table with pointers to all defined COMM protocol configurations");
@@ -547,8 +516,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          c_Lines.Add("   \\return");
          c_Lines.Add("   pointer to table of configurations (statically available)");
          c_Lines.Add("*/");
-         c_Lines.Add(
-            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
          c_Lines.Add("const T_osy_com_protocol_configuration * const * osy_com_get_protocol_configs(void)");
          c_Lines.Add("{");
          c_Lines.Add("   static const T_osy_com_protocol_configuration * const");
@@ -558,7 +526,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          for (uint32 u32_Protocol = 0U; u32_Protocol < orc_Node.c_ComProtocols.size(); u32_Protocol++)
          {
             const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_Protocol];
-            //logic: C_OSCCanProtocol refers to a data pool; if that data pool is owned by the
+            //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
             // C_OSCNodeApplication then this node knows about the protocol
             if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
             {
@@ -584,18 +552,16 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          c_Lines.Add("   return &hapt_CommConfigurations[0];");
          c_Lines.Add("}");
          c_Lines.Add("");
-         c_Lines.Add(
-            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
          c_Lines.Add("/*! \\brief   Get number of defined openSYDE COMM protocol configurations");
          c_Lines.Add("");
          c_Lines.Add(
             "   The returned value matches the number of elements in the table returned by osy_com_get_protocol_configs.");
          c_Lines.Add("");
          c_Lines.Add("   \\return");
-         c_Lines.Add("   number of openSYDE data pools");
+         c_Lines.Add("   number of openSYDE Datapools");
          c_Lines.Add("*/");
-         c_Lines.Add(
-            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
          c_Lines.Add("uint8 osy_com_get_num_protocol_configs(void)");
          c_Lines.Add("{");
          c_Lines.Add("   return OSY_INIT_COM_NUM_PROTOCOL_CONFIGURATIONS;");
@@ -642,20 +608,20 @@ bool C_OSCExportOsyInit::mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSetting
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility: get size of greatest data pool element or list
+/*! \brief   Utility: get size of greatest Datapool element or list
 
-   For NVM data pools:
-   *  Go through vector of data pools and check which is the greatest list
-   For other data pools:
-   *  Go through vector of data pools and check which is the greatest element
+   For NVM Datapools:
+   *  Go through vector of Datapools and check which is the greatest list
+   For other Datapools:
+   *  Go through vector of Datapools and check which is the greatest element
 
    This is used for defining the buffer size for the protocol driver. So the function considers local and remote
-    data pools.
+    Datapools.
 
-   \param[in] orc_DataPools            data pools to scan
+   \param[in] orc_DataPools            Datapools to scan
 
    \return
-   size of the greatest data pool element/list in bytes
+   size of the greatest Datapool element/list in bytes
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCExportOsyInit::mh_GetSizeOfLargestDataPoolElement(const std::vector<C_OSCNodeDataPool> & orc_DataPools)
@@ -692,4 +658,57 @@ uint32 C_OSCExportOsyInit::mh_GetSizeOfLargestDataPoolElement(const std::vector<
       }
    }
    return u32_GreatestSize;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Utility: Check if a Datapool is known by a specific application.
+
+   A Datapool is "known" by a specific application if it is
+      - not empty i.e. has at least one list containing at least one element and
+      - Datapool is owned by Application ("local Datapool") or Datapool runs DPD ("remote Datapool") or
+        Datapool is public ("public remote Datapool")
+
+   \param[in]       ou8_DataPoolIndex        datapool index
+   \param[in]       ou16_ApplicationIndex    application index
+   \param[in]       orc_Node                 system definition node
+   \param[in]       oq_RunsDpd               application runs DPD
+
+   \retval  true     Datapool is known to the specified app
+   \retval  false    Datapool is not known to the specified app (e.g. owned by another application)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCExportOsyInit::mh_IsDpKnownToApp(const uint8 ou8_DataPoolIndex, const uint16 ou16_ApplicationIndex,
+                                           const C_OSCNode & orc_Node, const bool oq_RunsDpd)
+{
+   bool q_Return = false;
+
+   if (ou8_DataPoolIndex < orc_Node.c_DataPools.size())
+   {
+      const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[ou8_DataPoolIndex];
+      bool q_AtLeastOneElement = false;
+
+      // check if datapool is non-empty (files only get generated in this case)
+      for (uint16 u16_ListIndex = 0U; u16_ListIndex < rc_DataPool.c_Lists.size(); u16_ListIndex++)
+      {
+         const C_OSCNodeDataPoolList & rc_List = rc_DataPool.c_Lists[u16_ListIndex];
+         if (rc_List.c_Elements.size() != 0)
+         {
+            q_AtLeastOneElement = true;
+            break;
+         }
+      }
+
+      if (q_AtLeastOneElement == true)
+      {
+         // check if application runs DPD or application owns this Datapool or Datapool is public
+         if ((oq_RunsDpd == true) || (rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex) ||
+             ((orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion >= 4U) &&
+              (rc_DataPool.q_ScopeIsPrivate == false)))
+         {
+            q_Return = true;
+         }
+      }
+   }
+
+   return q_Return;
 }

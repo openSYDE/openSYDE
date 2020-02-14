@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Tree model for HALC channels overview.
+   \brief       Tree view for HALC use case configuration.
 
    \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -12,6 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTreeViewToolTipBase.h"
 #include "C_SdNdeHalcConfigTreeModel.h"
+#include "C_SdNdeHalcConfigTreeDelegate.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -25,9 +26,14 @@ class C_SdNdeHalcConfigTreeView :
 {
 public:
    C_SdNdeHalcConfigTreeView(QWidget * const opc_Parent = NULL);
+   void SetNode(const stw_types::uint32 ou32_NodeIndex);
+   void SetHalcChannelUseCase(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
+                              const stw_types::uint32 ou32_UseCaseIndex);
+   void Clear(void);
 
 private:
    stw_opensyde_gui_logic::C_SdNdeHalcConfigTreeModel mc_Model;
+   stw_opensyde_gui_logic::C_SdNdeHalcConfigTreeDelegate mc_Delegate;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -83,7 +83,8 @@ C_SyvDcExistingNodeList::C_SyvDcExistingNodeList(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set view index
 
-   \param[in] ou32_Index New view index
+   \param[in] ou32_Index         New view index
+   \param[in] oq_ShowAssignment  Show assignment flag
 
    \return
    C_NO_ERR    Initialization successful

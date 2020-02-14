@@ -82,7 +82,8 @@ SOURCES += \
     ../libs/osy_core/project/system/node/C_OSCNodeCommFiler.cpp \
     ../libs/osy_core/project/system/node/C_OSCNodeDataPoolId.cpp \
     ../libs/osy_core/project/system/C_OSCTargetSupportPackage.cpp \
-    ../libs/osy_core/project/system/C_OSCTargetSupportPackageFiler.cpp
+    ../libs/osy_core/project/system/C_OSCTargetSupportPackageFiler.cpp \
+    ../libs/osy_core/project/system/node/C_OSCNodeDataPoolContentUtil.cpp
 
 
 
@@ -162,7 +163,8 @@ HEADERS += \
     ../libs/osy_core/project/system/node/C_OSCNodeDataPoolId.h \
     ../libs/osy_core/project/system/C_OSCTargetSupportPackage.h \
     ../libs/osy_core/project/system/C_OSCTargetSupportPackageFiler.h \
-    ../src/C_OSCExportCommunicationStackV2.h
+    ../src/C_OSCExportCommunicationStackV2.h \
+    ../libs/osy_core/project/system/node/C_OSCNodeDataPoolContentUtil.h
 
 #regular (non-library) header paths (also lists the system ones so QtCreator parser sees them)
 INCLUDEPATH += ../src \

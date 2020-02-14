@@ -34,7 +34,7 @@ public:
    virtual ~C_SdManUnoTopologyAddSnapshotCommand(void);
 
 protected:
-   virtual void m_AddNew(void);
+   virtual void m_AddNew(void) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

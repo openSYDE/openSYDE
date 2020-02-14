@@ -150,9 +150,9 @@ C_SdNdeDpListArrayEditView::~C_SdNdeDpListArrayEditView(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListArrayEditView::SetElement(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                                  const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
-                                                  const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                                  const uint32 & oru32_DataSetIndex)
+                                            const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
+                                            const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                            const uint32 & oru32_DataSetIndex)
 {
    if (this->mpc_ModelViewManager != NULL)
    {
@@ -175,6 +175,10 @@ void C_SdNdeDpListArrayEditView::SetElement(const uint32 & oru32_NodeIndex, cons
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
    \param[in] oru32_ListIndex     Node data pool list index
+   \param[in] oru32_ElementIndex  Node data pool list element index
+   \param[in] ore_ArrayEditType   Enum for node data pool list element variable
+   \param[in] oru32_DataSetIndex  If min or max use 0
+                                  Else use data set index
 
    \return
    True  Match
@@ -182,9 +186,9 @@ void C_SdNdeDpListArrayEditView::SetElement(const uint32 & oru32_NodeIndex, cons
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListArrayEditView::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                              const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
-                                              const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                              const uint32 & oru32_DataSetIndex) const
+                                        const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
+                                        const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
+                                        const uint32 & oru32_DataSetIndex) const
 {
    bool q_Retval;
 

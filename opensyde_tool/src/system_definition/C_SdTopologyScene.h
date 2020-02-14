@@ -96,7 +96,7 @@ Q_SIGNALS:
    //lint -restore
    void SigChangeMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
                       const stw_types::uint32 ou32_Index, const QString & orc_Name, const QString & orc_SubSubItemName,
-                      const stw_types::uint32 ou32_Flag);
+                      const stw_types::uint32 ou32_Flag, const bool oq_ChangeUseCase = false);
    void SigNodeDeleted(const stw_types::uint32 ou32_Index);
    void SigBusDeleted(const stw_types::uint32 ou32_Index);
    void SigErrorChange(void);
@@ -238,6 +238,7 @@ private:
    void m_RemoveBusNameLine(void);
    void m_RemoveTemporaryLine(C_GiLiTemporaryLine ** const opc_TemporaryLine);
    void m_RevertOverrideCursor(void);
+   void m_InitNodeData(stw_opensyde_core::C_OSCNode & orc_OSCNode, const QString & orc_NodeType) const;
    void m_InitNodeComIfSettings(stw_opensyde_core::C_OSCNode & orc_OSCNode) const;
 
    C_GiSvgGraphicsItem * mpc_EmptyConnectItem;

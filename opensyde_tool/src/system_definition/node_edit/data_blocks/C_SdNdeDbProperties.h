@@ -65,6 +65,7 @@ private:
    static const stw_types::sintn mhsn_VERSION_INDEX_V1;
    static const stw_types::sintn mhsn_VERSION_INDEX_V2;
    static const stw_types::sintn mhsn_VERSION_INDEX_V3;
+   static const stw_types::sintn mhsn_VERSION_INDEX_V4;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
@@ -82,6 +83,7 @@ private:
    void m_OnClickOutput(void);
    void m_OnClickGenerator(void);
    void m_OnClickGenerate(void);
+   void m_OnClickIDE(void);
    void m_OnClickClearProject(void) const;
 
    void m_OnNameEdited(void) const;

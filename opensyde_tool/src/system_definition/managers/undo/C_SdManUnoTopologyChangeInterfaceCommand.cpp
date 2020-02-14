@@ -101,6 +101,7 @@ void C_SdManUnoTopologyChangeInterfaceCommand::m_ChangeInterface(const uint8 & o
                                                                  const uint8 & oru8_NodeId) const
 {
    const vector<QGraphicsItem *> c_Items = m_GetSceneItems();
+
    for (vector<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
    {
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

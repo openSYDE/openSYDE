@@ -52,7 +52,7 @@ using namespace stw_scl;
    \param[out]    orc_SystemDefinition       Pointer to storage
    \param[in]     orc_PathSystemDefinition   Path to system definition
    \param[in]     orc_PathDeviceDefinitions  Path to device definition description file
-   \param[in]     oq_UseDeviceDefinitions    Flag for using device definitions, if the flag is true
+   \param[in]     oq_UseDeviceDefinitions    Flag for using device definitions, if the flag is false
                                              orc_PathDeviceDefinitions can be an empty string.
                                              It is highly recommended to use the device definitions.
                                              Purpose for not using the device definition is when only read

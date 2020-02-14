@@ -735,11 +735,18 @@ sint32 C_PuiSdHandlerFilerV2::h_LoadCanMessage(C_PuiSdNodeCanMessage & orc_CanMe
    //Attributes
    if (orc_XMLParser.AttributeExists("use-auto-receive-timeout") == true)
    {
-      orc_CanMessage.q_UseAutoReceiveTimeout = orc_XMLParser.GetAttributeBool("use-auto-receive-timeout");
+      if (orc_XMLParser.GetAttributeBool("use-auto-receive-timeout") == true)
+      {
+         orc_CanMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
+      }
+      else
+      {
+         orc_CanMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM;
+      }
    }
    else
    {
-      orc_CanMessage.q_UseAutoReceiveTimeout = true;
+      orc_CanMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
    }
 
    //Signals
@@ -943,7 +950,16 @@ void C_PuiSdHandlerFilerV2::h_SaveCanMessage(const C_PuiSdNodeCanMessage & orc_C
                                              C_OSCXMLParserBase & orc_XMLParser)
 {
    //Attributes
-   orc_XMLParser.SetAttributeBool("use-auto-receive-timeout", orc_CanMessage.q_UseAutoReceiveTimeout);
+   if (orc_CanMessage.e_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM)
+   {
+      orc_XMLParser.SetAttributeBool("use-auto-receive-timeout", false);
+   }
+   else
+   {
+      // eRX_TIMEOUT_MODE_DISABLED is not available in old format
+      orc_XMLParser.SetAttributeBool("use-auto-receive-timeout", true);
+   }
+
    //Signals
    orc_XMLParser.CreateAndSelectNodeChild("com-signals");
    h_SaveCanSignals(orc_CanMessage.c_Signals, orc_XMLParser);
@@ -995,6 +1011,10 @@ void C_PuiSdHandlerFilerV2::h_SaveCanSignal(const C_PuiSdNodeCanSignal & orc_Can
 
    \param[out]     orc_Nodes      UI node data containers
    \param[in,out]  orc_XMLParser  XMLParser with the "current" element set to the "nodes" element
+
+   \return
+   C_NO_ERR    everything ok
+   else        error occured while loading
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerFilerV2::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes, C_OSCXMLParserBase & orc_XMLParser)

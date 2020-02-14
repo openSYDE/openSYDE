@@ -109,8 +109,7 @@ public:
 
    stw_types::sint32 SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const;
    stw_types::sint32 ResetCanStwFlashloaderDevices(void);
-   stw_types::sint32 ResetCanOpenSydeDevices(const bool oq_ToFlashloader) const;
-   stw_types::sint32 ResetEthOpenSydeDevices(const bool oq_ToFlashloader) const;
+   stw_types::sint32 ResetOpenSydeDevices(const bool oq_ToFlashloader) const;
 
    stw_types::sint32 InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bitrate);
 
@@ -232,7 +231,6 @@ private:
    stw_types::sint32 ms32_Result;
 
    static const stw_types::uint32 mhu32_DEFAULT_SCAN_TIME_MS = 5000U;
-   static const stw_types::uint32 mhu32_RESET_WAIT_TIME_MS = 5000U;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

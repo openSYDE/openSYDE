@@ -26,6 +26,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto = 0;
 const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_IndexCustom = 1;
+const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_IndexDisabled = 2;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -43,16 +44,16 @@ const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_IndexCustom = 1;
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent                Reference to parent
-   \param[in] oq_UseAutoReceiveTimeoutFlag  Flag whether to use auto receive timeout or custom
+   \param[in] oe_ReceiveTimeoutMode         Receive timeout mode
+   \param[in] oq_TxMethodOnEvent            Flag if Tx method is on event
    \param[in] ou32_ReceiveTimeoutValue      Receive timeout value
    \param[in] u32_LastKnownCycleTimeValue   Last known cycle time value
+   \param[in] ou32_AutoReceiveTimeoutValue  Calculated default timeout value
+   \param[in] orc_NameForTitle              Dialog title name
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & orc_Parent,
-                                                             const bool oq_UseAutoReceiveTimeoutFlag,
-                                                             const uint32 ou32_ReceiveTimeoutValue,
-                                                             const uint32 ou32_LastKnownCycleTimeValue,
-                                                             const uint32 ou32_AutoReceiveTimeoutValue,
+                                                             const C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode, const bool oq_TxMethodOnEvent, const uint32 ou32_ReceiveTimeoutValue, const uint32 ou32_LastKnownCycleTimeValue, const uint32 ou32_AutoReceiveTimeoutValue,
                                                              const QString & orc_NameForTitle) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageRxTimeoutConfig),
@@ -66,26 +67,44 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
    //Register close
    this->mpc_ParentDialog->SetNotifyAndBlockClose(true);
 
-   this->mpc_Ui->pc_SpinBoxTimeout->SetMinimumCustom(ou32_LastKnownCycleTimeValue);
-   this->mpc_Ui->pc_SpinBoxTimeout->SetMaximumCustom(150010); // 3x maximum cycle time + 10
-
    this->InitStaticNames();
+
+   if (oq_TxMethodOnEvent == true)
+   {
+      // No restriction of a defined timeout time due to not known cycle time
+      this->mpc_Ui->pc_SpinBoxTimeout->SetMinimumCustom(1);
+   }
+   else
+   {
+      // In case of a not on event message, the timeout time can not be disabled
+      //lint -e{1938}  static const is guaranteed preinitialized before main
+      this->mpc_Ui->pc_ComboBoxTimeoutActive->SetItemState(mhs32_IndexDisabled, false);
+      this->mpc_Ui->pc_SpinBoxTimeout->SetMinimumCustom(ou32_LastKnownCycleTimeValue);
+   }
+   this->mpc_Ui->pc_SpinBoxTimeout->SetMaximumCustom(150010); // 3x maximum cycle time + 10
 
    //Title
    this->mpc_ParentDialog->SetTitle(orc_NameForTitle);
    this->mpc_ParentDialog->SetSubTitle(C_GtGetText::h_GetText("Receive Timeout"));
 
-   if (oq_UseAutoReceiveTimeoutFlag == true)
+   if ((oe_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_DISABLED) &&
+       (oq_TxMethodOnEvent == true))
    {
       //lint -e{1938}  static const is guaranteed preinitialized before main
-      this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto);
+      this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_IndexDisabled);
       this->mpc_Ui->pc_SpinBoxTimeout->setValue(ou32_AutoReceiveTimeoutValue);
    }
-   else
+   else if (oe_ReceiveTimeoutMode == C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM)
    {
       //lint -e{1938}  static const is guaranteed preinitialized before main
       this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_IndexCustom);
       this->mpc_Ui->pc_SpinBoxTimeout->setValue(ou32_ReceiveTimeoutValue);
+   }
+   else
+   {
+      //lint -e{1938}  static const is guaranteed preinitialized before main
+      this->mpc_Ui->pc_ComboBoxTimeoutActive->setCurrentIndex(C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto);
+      this->mpc_Ui->pc_SpinBoxTimeout->setValue(ou32_AutoReceiveTimeoutValue);
    }
 
    this->m_HandleInactiveStates();
@@ -99,7 +118,7 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxTimeoutActive,
            static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged), this,
-           &C_SdBueMessageRxTimeoutConfig::m_OnUseReceiveTimeoutChanged);
+           &C_SdBueMessageRxTimeoutConfig::m_OnReceiveTimeoutModeChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -123,6 +142,7 @@ void C_SdBueMessageRxTimeoutConfig::InitStaticNames(void) const
 
    this->mpc_Ui->pc_ComboBoxTimeoutActive->addItem(C_GtGetText::h_GetText("Auto"));
    this->mpc_Ui->pc_ComboBoxTimeoutActive->addItem(C_GtGetText::h_GetText("Custom"));
+   this->mpc_Ui->pc_ComboBoxTimeoutActive->addItem(C_GtGetText::h_GetText("Disabled"));
    this->mpc_Ui->pc_SpinBoxTimeout->setSuffix(C_GtGetText::h_GetText(" ms"));
 
    //Tool tips
@@ -130,7 +150,8 @@ void C_SdBueMessageRxTimeoutConfig::InitStaticNames(void) const
       C_GtGetText::h_GetText("Timeout Mode"),
       C_GtGetText::h_GetText("Available modes for receive timeout: "
                              "\nAuto: Auto calculation of timeout value (3x Cycle Time + 10ms)"
-                             "\nCustom: Manually set timeout value"));
+                             "\nCustom: Manually set timeout value"
+                             "\nDisabled: Timeout monitoring deactivated (only with Tx Method: On Event)"));
 
    this->mpc_Ui->pc_LabelTimeoutValueDescription->SetToolTipInformation(
       C_GtGetText::h_GetText("Timeout Value"),
@@ -141,26 +162,30 @@ void C_SdBueMessageRxTimeoutConfig::InitStaticNames(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns auto receive timeout flag
+/*! \brief   Returns receive timeout mode
 
    \return
-   Auto receive timeout flag
+   Auto receive timeout mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdBueMessageRxTimeoutConfig::GetUseAutoReceiveTimeoutFlag(void) const
+C_PuiSdNodeCanMessage::E_RxTimeoutMode C_SdBueMessageRxTimeoutConfig::GetReceiveTimeoutMode(void) const
 {
-   bool q_Value;
+   C_PuiSdNodeCanMessage::E_RxTimeoutMode e_Value;
 
    if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto)
    {
-      q_Value = true;
+      e_Value = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
+   }
+   else if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_IndexCustom)
+   {
+      e_Value = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM;
    }
    else
    {
-      q_Value = false;
+      e_Value = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_DISABLED;
    }
 
-   return q_Value;
+   return e_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -172,7 +197,19 @@ bool C_SdBueMessageRxTimeoutConfig::GetUseAutoReceiveTimeoutFlag(void) const
 //----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_SdBueMessageRxTimeoutConfig::GetReceiveTimeoutValue(void) const
 {
-   return static_cast<uint32>(this->mpc_Ui->pc_SpinBoxTimeout->value());
+   uint32 u32_Return;
+
+   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() != C_SdBueMessageRxTimeoutConfig::mhs32_IndexDisabled)
+   {
+      u32_Return = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxTimeout->value());
+   }
+   else
+   {
+      // Special case disabled: The zero is used as identification for disabled receive timeout on server side
+      u32_Return = 0U;
+   }
+
+   return u32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -232,22 +269,16 @@ void C_SdBueMessageRxTimeoutConfig::m_CancelClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxTimeoutConfig::m_HandleInactiveStates(void) const
 {
-   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_IndexAuto)
-   {
-      // Concrete timeout value only available in custom mode
-      this->mpc_Ui->pc_SpinBoxTimeout->setEnabled(false);
-   }
-   else
-   {
-      this->mpc_Ui->pc_SpinBoxTimeout->setEnabled(true);
-   }
+   // Concrete timeout value only available in custom mode
+   this->mpc_Ui->pc_SpinBoxTimeout->setEnabled((this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() ==
+                                                C_SdBueMessageRxTimeoutConfig::mhs32_IndexCustom));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle combo box change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxTimeoutConfig::m_OnUseReceiveTimeoutChanged(void) const
+void C_SdBueMessageRxTimeoutConfig::m_OnReceiveTimeoutModeChanged(void) const
 {
    this->m_HandleInactiveStates();
 

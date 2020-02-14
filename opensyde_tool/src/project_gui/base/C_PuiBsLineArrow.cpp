@@ -56,7 +56,7 @@ C_PuiBsLineArrow::C_PuiBsLineArrow() :
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsLineArrow::CalcHash(uint32 & oru32_HashValue) const
@@ -80,9 +80,12 @@ void C_PuiBsLineArrow::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Failsafe arrow head type to string
+/*! \brief   Get arrow head type as string for file save.
 
-   \param[in] ore_Type Arrow head type
+   \param[in]  ore_Type    Arrow head type
+
+   \return
+   Arrow head type as string
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_scl::C_SCLString C_PuiBsLineArrow::ArrowHeadTypeToString(const E_ArrowHeadType & ore_Type)
@@ -114,9 +117,12 @@ stw_scl::C_SCLString C_PuiBsLineArrow::ArrowHeadTypeToString(const E_ArrowHeadTy
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Failsafe line type to string
+/*! \brief   Get line type as string for file save.
 
-   \param[in] ore_Type Line type
+   \param[in]  ore_Type    Line type
+
+   \return
+   Line type as string
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_scl::C_SCLString C_PuiBsLineArrow::LineTypeToString(const E_LineType & ore_Type)
@@ -145,9 +151,12 @@ stw_scl::C_SCLString C_PuiBsLineArrow::LineTypeToString(const E_LineType & ore_T
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Failsafe arrow head type from string
+/*! \brief   Get arrow head type from string for file load.
 
-   \param[in] orc_Str Stringified arrow head type
+   \param[in]  orc_Str  Arrow type as string
+
+   \return
+   Arrow type
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::ArrowHeadTypeFromString(const stw_scl::C_SCLString & orc_Str)
@@ -181,9 +190,12 @@ C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::ArrowHeadTypeFromString(cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Failsafe line type from string
+/*! \brief   Get line head type from string for file load.
 
-   \param[in] orc_Str Stringified line type
+   \param[in]  orc_Str  Line type as string
+
+   \return
+   Line type
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiBsLineArrow::E_LineType C_PuiBsLineArrow::LineTypeFromString(const stw_scl::C_SCLString & orc_Str)

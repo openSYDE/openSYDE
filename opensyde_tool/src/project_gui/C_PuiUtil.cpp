@@ -47,7 +47,7 @@ C_PuiUtil::C_PuiUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Always get absolute path from path relative to openSYDE project.
 
-   \param[in]     orc_Path    Absolute or relative path
+   \param[in]  orc_Path    Absolute or relative path
 
    \return
    Absolute path
@@ -77,8 +77,8 @@ QString C_PuiUtil::h_GetAbsolutePathFromProject(const QString & orc_Path)
    This might result in invalid paths if the placeholder variable is not in front of string
    but an absolute path (which would be a misconfiguration).
 
-   \param[in]       orc_Path             path that probably contains variables
-   \param[in]       orc_DbProjectPath    path for resolving data block project variable
+   \param[in]  orc_DbProjectPath    path for resolving data block project variable and concatenation
+   \param[in]  orc_Path             path that probably contains variables
 
    \return
    Path without Data Block project path dependencies (might still contain placeholder variables or be relative)
@@ -90,10 +90,20 @@ QString C_PuiUtil::h_MakeIndependentOfDbProjectPath(const QString & orc_DbProjec
 
    if (c_Return.contains(mc_PATH_VARIABLE_DATABLOCK_PROJ) == true)
    {
-      // replace Data Block project variable
-      c_Return.replace(mc_PATH_VARIABLE_DATABLOCK_PROJ, orc_DbProjectPath + '/');
+      QString c_DbProjectPath = orc_DbProjectPath;
 
-      // remove double slashes
+      // replace Data Block project variable
+      if (orc_DbProjectPath.endsWith('/') == false)
+      {
+         c_DbProjectPath += "/";
+      }
+      c_Return.replace(mc_PATH_VARIABLE_DATABLOCK_PROJ, orc_DbProjectPath);
+
+      // remove all double slashes but the first (network paths)
+      if (c_Return.startsWith("//"))
+      {
+         c_Return = '/' + c_Return;
+      }
       c_Return.replace("//", "/");
    }
    else
@@ -111,9 +121,9 @@ QString C_PuiUtil::h_MakeIndependentOfDbProjectPath(const QString & orc_DbProjec
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if path contains placeholder variables (e.g. %{OPENSYDE_PROJECT}) and resolve them.
 
-   \param[in]       orc_Path             path that probably contains variables
-   \param[in]       orc_DbProjectPath    path for resolving data block project variable (special case),
-                                         which might contain placeholder variables itself
+   \param[in]  orc_Path             path that probably contains variables
+   \param[in]  orc_DbProjectPath    path for resolving data block project variable (special case),
+                                    which might contain placeholder variables itself
 
    \return
    Resolved path
@@ -153,7 +163,7 @@ QString C_PuiUtil::h_ResolvePlaceholderVariables(const QString & orc_Path, const
    it is meant as relative to openSYDE project, so we make it absolute by concatenating
    with project path.
 
-   \param[in]       orc_Path    path that probably contains path variables and if relative is relative to project
+   \param[in]  orc_Path    path that probably contains path variables and if relative is relative to project
 
    \return
    Absolute and resolved path
@@ -177,7 +187,9 @@ QString C_PuiUtil::h_GetResolvedAbsPathFromProject(const QString & orc_Path)
    it is meant as relative to openSYDE.exe, so we make it absolute by concatenating
    with executable path.
 
-   \param[in]       orc_Path    path that probably contains path variables and if relative is relative to executable
+   \param[in]  orc_Path             path that probably contains path variables and if relative is relative to executable
+   \param[in]  orc_DbProjectPath    path for resolving data block project variable (special case),
+                                    which might contain placeholder variables itself
 
    \return
    Absolute and resolved path
@@ -205,11 +217,10 @@ QString C_PuiUtil::h_GetResolvedAbsPathFromExe(const QString & orc_Path, const Q
 
    For example: C:/.../openSYDE_Project/DataBlockProject/GeneratedCode
 
-   \param[in]  orc_DbProjectPath   path of Data Block project (for replacing mc_PATH_VARIABLE_DATABLOCK_PROJ
-                                   and concatenation!)
-   \param[in]  orc_Path            path that probably contains path variables and if relative is relative to
-                                   Data Block project
-
+   \param[in]  orc_DbProjectPath    path of Data Block project (for replacing mc_PATH_VARIABLE_DATABLOCK_PROJ
+                                    and concatenation!)
+   \param[in]  orc_Path             path that probably contains path variables and if relative is relative to
+                                    Data Block project
 
    \return
    Absolute and resolved path
@@ -217,7 +228,7 @@ QString C_PuiUtil::h_GetResolvedAbsPathFromExe(const QString & orc_Path, const Q
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiUtil::h_GetResolvedAbsPathFromDbProject(const QString & orc_DbProjectPath, const QString & orc_Path)
 {
-   QString c_Return = orc_Path;
+   QString c_Return;
 
    // first resolve Data Block path
    c_Return = C_PuiUtil::h_MakeIndependentOfDbProjectPath(orc_DbProjectPath, orc_Path);

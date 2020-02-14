@@ -48,10 +48,13 @@ public:
 
 private Q_SLOTS:
    void m_ShowStartView(void);
-   void m_ChangeUseCase(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode);
+   void m_ChangeUseCase(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
+                        const bool oq_ChangeUseCase = false);
+   void m_HandleSysDefRequest(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode);
    bool m_ChangeMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
                      const stw_types::uint32 ou32_Index = 0U, const QString & orc_Name = "",
-                     const QString & orc_SubSubName = "", const stw_types::uint32 ou32_Flag = 0U);
+                     const QString & orc_SubSubName = "", const stw_types::uint32 ou32_Flag = 0U,
+                     const bool oq_ChangeUseCase = false);
    void m_OpenDetail(const stw_types::sint32 os32_Index, const stw_types::sint32 os32_SubIndex,
                      const stw_types::sint32 os32_SubSubIndex, const stw_types::sint32 os32_SubSubSubIndex,
                      const stw_types::sint32 os32_Flag);
@@ -80,7 +83,7 @@ private:
    void m_RemoveUseCaseWidget(void);
    void m_AdaptParameter(const stw_types::sint32 os32_Mode, stw_types::sint32 & ors32_SubMode,
                          stw_types::uint32 & oru32_Index, QString & orc_Name, QString & orc_SubItemName,
-                         stw_types::uint32 & oru32_Flag);
+                         stw_types::uint32 & oru32_Flag, const bool oq_ChangeUseCase);
    void m_ShowSysDefItem(const stw_types::sint32 os32_SubMode, const stw_types::uint32 ou32_Index = 0U,
                          const QString & orc_Name = "", const QString & orc_SubName = "",
                          const stw_types::uint32 ou32_Flag = 0U);
@@ -117,7 +120,6 @@ private:
    bool mq_InitialProjectLoaded;
    bool mq_BlockDragAndDrop;
    bool mq_StartView;
-   bool mq_ChangeUseCase;
    stw_types::sint32 ms32_Mode;
    stw_types::sint32 ms32_SubMode;
    stw_types::uint32 mu32_Index;

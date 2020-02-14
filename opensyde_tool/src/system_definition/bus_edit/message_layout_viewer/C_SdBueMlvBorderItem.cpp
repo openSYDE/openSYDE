@@ -36,7 +36,9 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out]   opc_parent           Optional pointer to parent
+   \param[in]      orc_Title     Optional border title
+   \param[in]      ou8_Index     Optional bit index
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvBorderItem::C_SdBueMlvBorderItem(const QString & orc_Title, const stw_types::uint8 ou8_Index,
@@ -66,7 +68,7 @@ C_SdBueMlvBorderItem::~C_SdBueMlvBorderItem()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the index number for the text
 
-   \param[in]     ou8_Index       Index number
+   \param[in]  ou8_Index   Index number
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBorderItem::SetIndex(const stw_types::uint8 ou8_Index)
@@ -80,7 +82,7 @@ void C_SdBueMlvBorderItem::SetIndex(const stw_types::uint8 ou8_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the active state
 
-   \param[in]     oq_Active        Flag if active state is active
+   \param[in]  oq_Active   Flag if active state is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBorderItem::SetActive(const bool oq_Active)

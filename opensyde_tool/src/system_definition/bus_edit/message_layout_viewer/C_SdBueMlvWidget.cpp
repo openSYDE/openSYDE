@@ -49,7 +49,7 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_parent Optional pointer to parent
+   \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvWidget::C_SdBueMlvWidget(QWidget * const opc_Parent) :
@@ -196,6 +196,15 @@ void C_SdBueMlvWidget::SelectSignal(const C_OSCCanMessageIdentificationIndices &
    {
       this->mpc_Scene->SetSignal(ou32_SignalIndex);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reload colors
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMlvWidget::RefreshColors(void)
+{
+   this->mpc_Scene->RefreshColors();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -36,7 +36,7 @@ const stw_types::sintn C_OgeWiBopperle::mhsn_PointDistance = 10;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent        Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiBopperle::C_OgeWiBopperle(QWidget * const opc_Parent) :
@@ -50,7 +50,7 @@ C_OgeWiBopperle::C_OgeWiBopperle(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the maximum count of index points
 
-   \param[in]   os32_Count        Maximum count of index points
+   \param[in]  os32_Count  Maximum count of index points
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::SetCountIndex(const sint32 os32_Count)
@@ -62,7 +62,7 @@ void C_OgeWiBopperle::SetCountIndex(const sint32 os32_Count)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the current index point
 
-   \param[in]   os32_Index        Current index
+   \param[in]  os32_Index  Current index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::SetCurrentIndex(const sint32 os32_Index)
@@ -73,8 +73,8 @@ void C_OgeWiBopperle::SetCurrentIndex(const sint32 os32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the colors of the points
 
-   \param[in]   orc_ColorActive        Color of the active point
-   \param[in]   orc_ColorActive        Color of the inactive point
+   \param[in]  orc_ColorActive      Color of the active point
+   \param[in]  orc_ColorInactive    Color of the inactive point
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::SetColor(const QColor & orc_ColorActive, const QColor & orc_ColorInactive)
@@ -84,11 +84,11 @@ void C_OgeWiBopperle::SetColor(const QColor & orc_ColorActive, const QColor & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overrided paint event
+/*! \brief   Overridden paint event
 
    Draws the background element
 
-   \param[in,out] opc_Event  Pointer to paint event
+   \param[in,out]  opc_Event  Pointer to paint event
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::paintEvent(QPaintEvent * const opc_Event)

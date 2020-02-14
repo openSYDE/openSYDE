@@ -42,8 +42,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     oru32_DashboardIndex Index of dashboard in system view
    \param[in]     ors32_DataIndex      Index of connected data item
    \param[in]     oru64_ID             Unique ID
-   \param[in]     orf64_Width          Width of node
-   \param[in]     orf64_Height         Height of node
+   \param[in]     of64_Width           Width of node
+   \param[in]     of64_Height          Height of node
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------

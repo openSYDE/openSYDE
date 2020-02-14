@@ -100,6 +100,9 @@ void C_SdManUnoTopologyReconnectBaseCommand::redo(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current bus connector
+
+   \return
+   Bus connector
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiLiBusConnector * C_SdManUnoTopologyReconnectBaseCommand::m_GetBusConnector(void) const

@@ -90,7 +90,7 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
    \param[in]     ou32_FilterId           Filter id for all relevant IDs
                                           The MSB is the flag for 11 Bit (= 0) or 29 Bit (= 1)
                                           Bits 29 and 30 are reserved (shall be set to zero)
-   \param[in]     ou32_FilterMask         Mask that is applied to both the received CAN frame identifiers an the
+   \param[in]     ou32_FilterMask         Mask that is applied to both the received CAN frame identifiers and the
                                           FilterId before comparison.
                                           Bits 29, 30 and 31 are reserved (shall be set to zero)
 */
@@ -111,7 +111,7 @@ void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingCha
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -148,7 +148,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
@@ -161,12 +161,16 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Exit(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   short description of function
-
-   long description of function within several lines
+/*! \brief   Resets the current CAN session
 
    \return
-   possible return value(s) and description
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in Tx queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
+   C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
@@ -192,7 +196,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
    C_RANGE    CAN message invalid (RTR bit set; ID out of range; DLC out of range)
-   C_NOACT    could not put request in TX queue ...
+   C_NOACT    could not put request in Tx queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)

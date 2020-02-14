@@ -530,10 +530,10 @@ sint32 C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CIEDataPoolEle
    orc_DbcSignal.unit = orc_Element.c_Unit.c_str();
    float64 f64_MinVal;
    C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Element.c_MinValue, f64_MinVal, 0UL); // raw value
-   orc_DbcSignal.minimumPhysicalValue = orc_DbcSignal.rawToPhysicalValue(f64_MinVal);        // phy value
+   orc_DbcSignal.minimumPhysicalValue = orc_DbcSignal.rawToPhysicalValue(f64_MinVal);  // phy value
    float64 f64_MaxVal;
    C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Element.c_MaxValue, f64_MaxVal, 0UL); // raw value
-   orc_DbcSignal.maximumPhysicalValue = orc_DbcSignal.rawToPhysicalValue(f64_MaxVal);        // phy value
+   orc_DbcSignal.maximumPhysicalValue = orc_DbcSignal.rawToPhysicalValue(f64_MaxVal);  // phy value
 
    // set value type
    // the types of the min, max and init values must be the same!
@@ -602,7 +602,7 @@ sint32 C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CIEDataPoolEle
 
    float64 f64_Value;
    C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Element.c_DataSetValues.at(0), f64_Value, 0UL); // raw value
-   f64_Value = orc_DbcSignal.rawToPhysicalValue(f64_Value);                                            // phy value
+   f64_Value = orc_DbcSignal.rawToPhysicalValue(f64_Value);                                      // phy value
    if ((e_CurrentType == C_OSCNodeDataPoolContent::eFLOAT32) || (e_CurrentType == C_OSCNodeDataPoolContent::eFLOAT64))
    {
       c_Attribute.floatValue = f64_Value;

@@ -43,5 +43,5 @@ using namespace stw_opensyde_gui_elements;
 C_CamOgeWiSpinBoxGroupTable::C_CamOgeWiSpinBoxGroupTable(QWidget * const opc_Parent) :
    C_OgeWiSpinBoxGroup(opc_Parent)
 {
-   this->m_ResizeToDefault(28);
+   this->m_Resize(28);
 }

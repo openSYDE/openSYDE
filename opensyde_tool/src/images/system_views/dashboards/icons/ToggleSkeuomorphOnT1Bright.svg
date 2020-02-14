@@ -41,12 +41,12 @@
 	.st35{fill:url(#SVGID_25_);}
 	.st36{fill:#9C9B9B;}
 	.st37{fill:url(#SVGID_26_);}
-	.st38{fill:#5C5C5C;}
-	.st39{fill:url(#SVGID_27_);}
-	.st40{fill:url(#SVGID_28_);}
-	.st41{fill:url(#SVGID_29_);}
-	.st42{fill:url(#SVGID_30_);}
-	.st43{fill:url(#SVGID_31_);}
+	.st38{fill:url(#SVGID_27_);}
+	.st39{fill:url(#SVGID_28_);}
+	.st40{fill:url(#SVGID_29_);}
+	.st41{fill:url(#SVGID_30_);}
+	.st42{fill:url(#SVGID_31_);}
+	.st43{fill:#5C5C5C;}
 	.st44{fill:url(#SVGID_32_);}
 	.st45{fill:#38396D;}
 	.st46{fill:url(#SVGID_33_);}
@@ -105,43 +105,44 @@
 </g>
 <g id="Text">
 	<g>
-		<text transform="matrix(1 0 0 1 394.9536 181.4883)" class="st7 st22 st23">Off</text>
+		<text transform="matrix(1 0 0 1 119.5088 181.4883)" class="st7 st22 st23">Off</text>
 	</g>
 </g>
 <g id="Ebene_3">
+</g>
+<g id="Ebene_4">
 	<g>
 		<g>
-			<image style="overflow:visible;opacity:0.5;" width="355" height="355" xlink:href="://images/system_views/dashboards/icons/922DD5CF.png" >
+			
+				<image style="overflow:visible;opacity:0.5;" width="355" height="355" xlink:href="://images/system_views/dashboards/icons/D363953D.png"  transform="matrix(1 0 0 1 282 0)">
 			</image>
 			<g>
 				
-					<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="-3409.4297" y1="269.7422" x2="-3409.4297" y2="43.3984" gradientTransform="matrix(-1 0 0 1 -3238.8594 0)">
+					<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="-5131.4302" y1="269.7422" x2="-5131.4302" y2="43.3984" gradientTransform="matrix(-1 0 0 1 -4678.8594 0)">
 					<stop  offset="0" style="stop-color:#D9D9E2"/>
 					<stop  offset="0.1772" style="stop-color:#E2E2E9"/>
 					<stop  offset="0.5033" style="stop-color:#EAEAF0"/>
 					<stop  offset="1" style="stop-color:#EDEDF2"/>
 				</linearGradient>
-				<circle class="st3" cx="170.6" cy="156.6" r="113.2"/>
-				<path class="st36" d="M170.6,46.7c29.3,0,56.9,11.4,77.7,32.2s32.2,48.3,32.2,77.7s-11.4,56.9-32.2,77.7s-48.3,32.2-77.7,32.2
-					s-56.9-11.4-77.7-32.2s-32.2-48.3-32.2-77.7s11.4-56.9,32.2-77.7S141.2,46.7,170.6,46.7 M170.6,40.1
-					c-64.3,0-116.5,52.2-116.5,116.5s52.2,116.5,116.5,116.5s116.5-52.2,116.5-116.5S234.9,40.1,170.6,40.1L170.6,40.1z"/>
+				<circle class="st3" cx="452.6" cy="156.6" r="113.2"/>
+				<path class="st36" d="M452.6,46.7c29.3,0,56.9,11.4,77.7,32.2s32.2,48.3,32.2,77.7s-11.4,56.9-32.2,77.7s-48.3,32.2-77.7,32.2
+					s-56.9-11.4-77.7-32.2c-20.7-20.7-32.2-48.3-32.2-77.7s11.4-56.9,32.2-77.7C395.6,58.2,423.2,46.7,452.6,46.7 M452.6,40.1
+					c-64.3,0-116.5,52.2-116.5,116.5s52.2,116.5,116.5,116.5s116.5-52.2,116.5-116.5S516.9,40.1,452.6,40.1L452.6,40.1z"/>
 			</g>
 		</g>
 		<g>
 			
-				<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="-3583.4297" y1="6789.0703" x2="-3583.4297" y2="6636.0703" gradientTransform="matrix(-1 0 0 -1 -3412.8594 6869.1406)">
+				<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="-5305.4297" y1="6789.0703" x2="-5305.4297" y2="6636.0703" gradientTransform="matrix(-1 0 0 -1 -4852.8594 6869.1406)">
 				<stop  offset="0" style="stop-color:#D9D9E2"/>
 				<stop  offset="0.1772" style="stop-color:#E2E2E9"/>
 				<stop  offset="0.5033" style="stop-color:#EAEAF0"/>
 				<stop  offset="1" style="stop-color:#EDEDF2"/>
 			</linearGradient>
-			<circle class="st4" cx="170.6" cy="156.6" r="76.5"/>
+			<circle class="st4" cx="452.6" cy="156.6" r="76.5"/>
 		</g>
 		<g>
-			<text transform="matrix(1 0 0 1 119.5088 180.4883)" class="st38 st22 st23">On</text>
+			<text transform="matrix(1 0 0 1 396.9536 180.4883)" class="st43 st22 st23">On</text>
 		</g>
 	</g>
-</g>
-<g id="Ebene_4">
 </g>
 </svg>

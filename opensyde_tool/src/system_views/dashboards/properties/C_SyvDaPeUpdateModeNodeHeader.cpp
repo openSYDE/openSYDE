@@ -44,7 +44,10 @@ const uint32 C_SyvDaPeUpdateModeNodeHeader::mhu32_HeaderHeight = 66;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in]      ou32_ViewIndex   View index
+   \param[in]      ou32_NodeIndex   Node index
+   \param[in,out]  opc_Item         Optional pointer to item
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::uint32 ou32_ViewIndex,
@@ -127,8 +130,8 @@ void C_SyvDaPeUpdateModeNodeHeader::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update count value
 
-   \param[in] os32_Count <  0: Actual count is calculated from system view data
-                         >= 0: Valid count assumed
+   \param[in]  os32_Count  <  0: Actual count is calculated from system view data
+                           >= 0: Valid count assumed
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeNodeHeader::UpdateCount(const sint32 os32_Count) const
@@ -155,8 +158,8 @@ void C_SyvDaPeUpdateModeNodeHeader::UpdateCount(const sint32 os32_Count) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register expand or collapse
 
-   \param[in]     orq_Expanded true:  expanded
-                               false: collapsed
+   \param[in]  orq_Expanded   true:  expanded
+                              false: collapsed
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeNodeHeader::RegisterExpandOrCollapse(const bool & orq_Expanded) const
@@ -183,7 +186,7 @@ void C_SyvDaPeUpdateModeNodeHeader::RegisterExpandOrCollapse(const bool & orq_Ex
 
    Here: Trigger manual expand
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeNodeHeader::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
@@ -194,6 +197,8 @@ void C_SyvDaPeUpdateModeNodeHeader::mouseDoubleClickEvent(QMouseEvent * const op
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle event push button expand clicked
+
+   \param[in]  oq_Checked  Buttons new check state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeNodeHeader::m_OnPushButtonExpandClicked(const bool oq_Checked)

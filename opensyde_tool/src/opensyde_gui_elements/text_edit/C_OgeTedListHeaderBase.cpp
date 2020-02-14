@@ -41,7 +41,7 @@ const QFont C_OgeTedListHeaderBase::mhc_Font = mc_STYLE_GUIDE_FONT_REGULAR_12;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTedListHeaderBase::C_OgeTedListHeaderBase(QWidget * const opc_Parent) :
@@ -67,7 +67,7 @@ C_OgeTedListHeaderBase::~C_OgeTedListHeaderBase(void)
 
    Here: Signal, revert text and remember
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedListHeaderBase::focusInEvent(QFocusEvent * const opc_Event)
@@ -83,7 +83,7 @@ void C_OgeTedListHeaderBase::focusInEvent(QFocusEvent * const opc_Event)
 
    Here: Select all if necessary
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedListHeaderBase::mousePressEvent(QMouseEvent * const opc_Event)
@@ -101,7 +101,7 @@ void C_OgeTedListHeaderBase::mousePressEvent(QMouseEvent * const opc_Event)
 
    Here: Signal and reduce text
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedListHeaderBase::focusOutEvent(QFocusEvent * const opc_Event)
@@ -117,7 +117,7 @@ void C_OgeTedListHeaderBase::focusOutEvent(QFocusEvent * const opc_Event)
 
    Here: Handle tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -182,6 +182,8 @@ QString C_OgeTedListHeaderBase::GetFullText(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save complete comment and replace by one line only
+
+   \param[in]  oq_CheckForNewText   Flag if text needs an update
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedListHeaderBase::HideFullText(const bool oq_CheckForNewText)

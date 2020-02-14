@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubOptions::C_OgePubOptions(QWidget * const opc_Parent) :
@@ -47,14 +47,14 @@ C_OgePubOptions::C_OgePubOptions(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set the icon for enabled and disabled mode
 
-   \param[in]     oc_IconPathEnabled      String for Enabled Icon Path
-                  oc_IconPathDisabled     String for Disabled Icon Path
+   \param[in]  orc_IconPathEnabled     String for Enabled Icon Path
+   \param[in]  orc_IconPathDisabled    String for Disabled Icon Path
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubOptions::SetCustomIcon(QString oc_IconPathEnabled, QString oc_IconPathDisabled)
+void C_OgePubOptions::SetCustomIcon(const QString & orc_IconPathEnabled, const QString & orc_IconPathDisabled)
 {
-   mc_IconEnabled.addPixmap(QPixmap(oc_IconPathEnabled));
-   mc_IconDisabled.addPixmap(QPixmap(oc_IconPathDisabled));
+   mc_IconEnabled.addPixmap(QPixmap(orc_IconPathEnabled));
+   mc_IconDisabled.addPixmap(QPixmap(orc_IconPathDisabled));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ void C_OgePubOptions::SetCustomIcon(QString oc_IconPathEnabled, QString oc_IconP
 
    Here: Draw icon
 
-   \param[in,out] opc_Event  Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubOptions::paintEvent(QPaintEvent * const opc_Event)

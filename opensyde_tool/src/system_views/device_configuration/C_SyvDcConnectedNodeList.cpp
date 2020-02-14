@@ -135,7 +135,7 @@ void C_SyvDcConnectedNodeList::DisableSerialNumber(const QString & orc_SerialNum
 
    Here: Start manual drag
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  oc_Actions  Drop actions type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::startDrag(const Qt::DropActions oc_Actions)
@@ -179,6 +179,9 @@ void C_SyvDcConnectedNodeList::startDrag(const Qt::DropActions oc_Actions)
    Here: Add additional information
 
    \param[in] oc_Items Affected items
+
+   \return
+   Mime data for drag event
 */
 //----------------------------------------------------------------------------------------------------------------------
 QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc_Items) const

@@ -35,7 +35,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementSortFilter::C_TblTreDataElementSortFilter(QObject * const opc_Parent) :
@@ -46,7 +46,7 @@ C_TblTreDataElementSortFilter::C_TblTreDataElementSortFilter(QObject * const opc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set filter string
 
-   \param[in] orc_Text Text to filter for
+   \param[in]  orc_Text    Text to filter for
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementSortFilter::SetFilter(const QString & orc_Text)
@@ -59,8 +59,8 @@ void C_TblTreDataElementSortFilter::SetFilter(const QString & orc_Text)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if current row is accepted for filter
 
-   \param[in] osn_SourceRow    Source row
-   \param[in] orc_SourceParent Source parent
+   \param[in]  osn_SourceRow     Source row
+   \param[in]  orc_SourceParent  Source parent
 
    \return
    True  Accepted
@@ -71,7 +71,6 @@ bool C_TblTreDataElementSortFilter::filterAcceptsRow(const sintn osn_SourceRow,
                                                      const QModelIndex & orc_SourceParent) const
 {
    bool q_Retval = false;
-   QString c_Name;
 
    QList<QModelIndex> c_Children;
 
@@ -89,11 +88,59 @@ bool C_TblTreDataElementSortFilter::filterAcceptsRow(const sintn osn_SourceRow,
          q_Retval = filterAcceptsRow(sn_ItSubChild, rc_CurrentIndex);
       }
 
-      //Check current string if leaf element (no other elements are checked)
-      if (sn_RowCount == 0)
+      //Check current string
+      if (q_Retval == false)
       {
-         c_Name = sourceModel()->data(rc_CurrentIndex, static_cast<sintn>(Qt::DisplayRole)).toString();
-         q_Retval = c_Name.contains(filterRegExp());
+         q_Retval = this->m_Contains(rc_CurrentIndex);
+      }
+   }
+
+   //Check parents -> if parent is valid child should appear
+   if (q_Retval == false)
+   {
+      q_Retval = this->m_CheckParents(orc_SourceParent);
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if index contains keyword
+
+   \param[in]  orc_Index   Index
+
+   \return
+   True  Accepted
+   False Not accepted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_TblTreDataElementSortFilter::m_Contains(const QModelIndex & orc_Index) const
+{
+   const QString c_Name = sourceModel()->data(orc_Index, static_cast<sintn>(Qt::DisplayRole)).toString();
+   const bool q_Retval = c_Name.contains(filterRegExp());
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check parents for keyword
+
+   \param[in]  orc_SourceParent  Source parent
+
+   \return
+   True  Accepted
+   False Not accepted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_TblTreDataElementSortFilter::m_CheckParents(const QModelIndex & orc_SourceParent) const
+{
+   bool q_Retval = false;
+
+   if (orc_SourceParent.isValid())
+   {
+      q_Retval = m_Contains(orc_SourceParent);
+      if (q_Retval == false)
+      {
+         q_Retval = m_CheckParents(orc_SourceParent.parent());
       }
    }
    return q_Retval;

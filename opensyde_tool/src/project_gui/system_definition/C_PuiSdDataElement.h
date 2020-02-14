@@ -26,7 +26,7 @@ class C_PuiSdDataElement :
    public C_PuiBsDataElement
 {
 public:
-   enum E_Type
+   enum E_Type ///< Type of data element
    {
       eNODE,             ///< Data element for node
       eBUS,              ///< Data element for bus
@@ -36,7 +36,7 @@ public:
       eTEXT_ELEMENT_BUS, ///< Data element for bus text element
       eIMAGE,            ///< Data element for image element
       eBUS_CONNECTOR,    ///< Data element for bus connector element
-      eUNKNOWN
+      eUNKNOWN           ///< Data element unknown
    };
 
    C_PuiSdDataElement(const stw_types::sint32 & ors32_Index, const E_Type & ore_Type);

@@ -21,7 +21,7 @@ namespace stw_opensyde_core
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-///Code exporter for server code: data pools, comm configuration, DPD and DPH initialization
+///Code exporter for server code: Datapools, comm configuration, DPD and DPH initialization
 class C_OSCExportNode
 {
 public:

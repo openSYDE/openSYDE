@@ -424,9 +424,9 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
                               {
                                  QString c_Value;
                                  C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(rc_Element.c_NvmValue,
-                                                                                               pc_Element->f64_Factor,
-                                                                                               pc_Element->f64_Offset,
-                                                                                               c_Value);
+                                                                                         pc_Element->f64_Factor,
+                                                                                         pc_Element->f64_Offset,
+                                                                                         c_Value);
                                  q_Found = true;
                                  if (pc_Element->GetType() != rc_Element.c_NvmValue.GetType())
                                  {

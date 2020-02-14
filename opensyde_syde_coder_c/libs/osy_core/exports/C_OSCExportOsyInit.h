@@ -43,8 +43,10 @@ public:
 
 private:
    static bool mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSettings & orc_Settings);
-
    static stw_types::uint32 mh_GetSizeOfLargestDataPoolElement(const std::vector<C_OSCNodeDataPool> & orc_DataPools);
+   static bool mh_IsDpKnownToApp(const stw_types::uint8 ou8_DataPoolIndex,
+                                 const stw_types::uint16 ou16_ApplicationIndex, const C_OSCNode & orc_Node,
+                                 bool oq_RunsDpd);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

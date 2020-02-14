@@ -34,6 +34,8 @@ using namespace stw_opensyde_gui;
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
+
+   \param[in,out]  opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardSelectorTabBar::C_SyvDaDashboardSelectorTabBar(QWidget * const opc_Parent) :

@@ -26,7 +26,6 @@
 
 namespace stw_cmon_protocol
 {
-
 //----------------------------------------------------------------------------------------------------------------------
 
 //Base class for all protocol interpretations
@@ -45,6 +44,8 @@ protected:
    static stw_types::uint16 m_BytesToWordLowHigh(const stw_types::uint8 oau8_Bytes[2]);
    static stw_types::uint16 m_BytesToWordHighLow(const stw_types::uint8 oau8_Bytes[2]);
    static stw_types::uint32 m_BytesToDwordHighLow(const stw_types::uint8 oau8_Bytes[4]);
+   static stw_scl::C_SCLString mh_SerialNumberToString(const stw_types::uint8 * const opu8_SerialNumber);
+
 public:
    C_CMONProtocolBase(void);
    virtual ~C_CMONProtocolBase(void);
@@ -66,11 +67,14 @@ public:
 //----------------------------------------------------------------------------------------------------------------------
 //Common base for KEFEX-style variable-based protocols
 ///Adds functionality to link in an opened KEFEX project in order to decode variable indexes from CAN messages.
-class CMONPROTOCOL_PACKAGE C_CMONProtocolKEFEX_IVA : public C_CMONProtocolBase
+class CMONPROTOCOL_PACKAGE C_CMONProtocolKEFEX_IVA :
+   public C_CMONProtocolBase
 {
 private:
-   C_CMONProtocolKEFEX_IVA(const C_CMONProtocolKEFEX_IVA & orc_Souce);              //not implemented -> prevent copying
-   C_CMONProtocolKEFEX_IVA& operator = (const C_CMONProtocolKEFEX_IVA & orc_Souce); //not implemented -> prevent assignment
+   C_CMONProtocolKEFEX_IVA(const C_CMONProtocolKEFEX_IVA & orc_Souce);               //not implemented -> prevent
+                                                                                     // copying
+   C_CMONProtocolKEFEX_IVA & operator = (const C_CMONProtocolKEFEX_IVA & orc_Souce); //not implemented -> prevent
+                                                                                     // assignment
 
 protected:
    stw_types::uint16 mu16_KFXListOffset;
@@ -82,8 +86,8 @@ protected:
    stw_scl::C_SCLString m_KFXIndexToString(const stw_types::uint16 ou16_Index, bool oq_IsKEFEXVarIndex = true) const;
    stw_scl::C_SCLString m_KFXTextAndIndexToString(const stw_types::charn * const opcn_Text,
                                                   const stw_types::uint16 ou16_Index) const;
-public:
 
+public:
    C_CMONProtocolKEFEX_IVA(void);
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
    void SetVariableInfo(const stw_diag_lib::C_KFXVariableLists * const opc_Lists,
@@ -92,7 +96,6 @@ public:
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-
 }
 
 #endif

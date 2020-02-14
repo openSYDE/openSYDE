@@ -354,6 +354,8 @@ bool C_SyvSeScene::IsAnyItemAddable(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is movable on the scene
 
+   \param[in]  opc_Item    Graphics item to check
+
    \return
    true     Item is movable
    false    Item is not movable
@@ -373,6 +375,8 @@ bool C_SyvSeScene::IsItemMovable(const QGraphicsItem * const opc_Item) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checking if the graphics item is selectable on the scene
+
+   \param[in]  opc_Item    Graphics item to check
 
    \return
    true     Item is selectable
@@ -713,6 +717,9 @@ void C_SyvSeScene::m_OnPcBusConnectionStopConnect(void) const
    this->Save();
 
    m_RestoreCursors();
+
+   //Trigger error check!
+   Q_EMIT (this->SigErrorCheck());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -728,9 +735,9 @@ void C_SyvSeScene::m_OnConnectionChanged(void)
 
    static_cast<void>(m_HandlePcReconnectIfNecessary(c_Dummy));
 
-   Q_EMIT this->SigChanged();
+   Q_EMIT (this->SigChanged());
    //Trigger error check!
-   Q_EMIT this->SigErrorCheck();
+   Q_EMIT (this->SigErrorCheck());
    //Trigger connection changed signal
-   Q_EMIT this->SigConnectionChange();
+   Q_EMIT (this->SigConnectionChange());
 }

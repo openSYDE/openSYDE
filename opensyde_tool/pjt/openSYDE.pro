@@ -703,7 +703,6 @@ SOURCES += ../src/main.cpp\
     ../src/table_base/C_TblViewToolTipBase.cpp \
     ../src/opensyde_gui_elements/scroll_area/C_OgeSaMain.cpp \
     ../src/system_definition/node_edit/C_SdNdeProgrammingOptions.cpp \
-    ../libs/opensyde_core/miniz/miniz.c \
     ../libs/opensyde_core/protocol_drivers/system_update/C_OSCSuServiceUpdatePackage.cpp \
     ../src/com_import_export/C_CieImportDbc.cpp \
     ../libs/opensyde_core/imports/C_OSCCanOpenObjectDictionary.cpp \
@@ -717,10 +716,8 @@ SOURCES += ../src/main.cpp\
     ../src/system_definition/bus_edit/C_SdBueNodeSelectorCheckBoxItemWidget.cpp \
     ../src/com_import_export/C_CieDataPoolListAdapter.cpp \
     ../src/com_import_export/C_CieUtil.cpp \
-    ../src/opensyde_gui_elements/label/C_OgeLabToolboxHeadingGroupBold.cpp \
-    ../src/com_import_export/C_CieDBCImportNodeSelectWidget.cpp \
+    ../src/com_import_export/C_CieDcfEdsImportNodeSelectWidget.cpp \
     ../src/com_import_export/C_CieImportReportWidget.cpp \
-    ../src/system_definition/bus_edit/undo/C_SdBueUnoBusProtNodeCreateCommand.cpp \
     ../src/user_settings/C_UsNodeDatapoolList.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedContextMenuBase.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeContextMenuBase.cpp \
@@ -909,16 +906,75 @@ SOURCES += ../src/main.cpp\
     ../src/com_import_export/C_CieImportDatapoolSelectWidget.cpp \
     ../src/graphic_items/style_setup/C_GiSyColorSelectWidget.cpp \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcWidget.cpp \
-    ../src/system_definition/node_edit/halc/C_SdNdeHalcOverviewTreeModel.cpp \
-    ../src/system_definition/node_edit/halc/C_SdNdeHalcOverviewTreeView.cpp \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelTreeModel.cpp \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelTreeView.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.cpp \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeModel.cpp \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeView.cpp \
-    ../src/graphic_items/style_setup/C_ColorPickingEventFilter.cpp \
-    ../src/graphic_items/style_setup/C_ColorOptions.cpp \
-    ../src/graphic_items/style_setup/C_PlatformColorHelper.cpp \
-    ../src/graphic_items/style_setup/C_ColorShower.cpp \
-    ../src/graphic_items/style_setup/C_ColorShowLabel.cpp
+    ../src/graphic_items/style_setup/C_GiSyScreenColorPickingEventFilter.cpp \
+    ../src/graphic_items/style_setup/C_GiSyColorBrightnessPicker.cpp \
+    ../src/graphic_items/style_setup/C_GiSyColorPicker.cpp \
+    ../src/graphic_items/style_setup/C_GiSyColorShower.cpp \
+    ../src/com_import_export/C_CieDbcImportNodeAssignmentWidget.cpp \
+    ../src/com_import_export/C_CieDbcImportNodeAssignmentItemWidget.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubTextOnly.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubColor.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfig.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigChannel.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigDomain.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigFiler.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameter.cpp \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameterStruct.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDef.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelAvailability.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelUseCase.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContent.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContentBitmaskItem.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefDomain.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefElement.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefFiler.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStruct.cpp \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStructFiler.cpp \
+    ../libs/opensyde_core/halc/definition/base/C_OSCHalcDefBase.cpp \
+    ../src/project_gui/system_definition/C_PuiSdHandlerHALC.cpp \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeDelegate.cpp \
+    ../src/table_base/C_TblDelegate.cpp \
+    ../src/table_base/C_TblEditLineEditBase.cpp \
+    ../src/opensyde_gui_elements/combo_box/C_OgeCbxTableBase.cpp \
+    ../src/opensyde_gui_elements/widget/C_OgeWiFixPosition.cpp \
+    ../libs/opensyde_core/exports/C_OSCExportUti.cpp \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelWidget.cpp \
+    ../libs/opensyde_core/halc/magician/C_OSCHALCMagicianGenerator.cpp \
+    ../libs/opensyde_core/halc/magician/C_OSCHALCMagicianUtil.cpp \
+    ../src/opensyde_gui_elements/label/C_OgeLabToolboxHeadingGroupBig.cpp \
+    ../src/opensyde_gui_elements/label/C_OgeLabProgressLogHeading.cpp \
+    ../src/opensyde_gui_elements/label/C_OgeLabProgressLogItem.cpp \
+    ../libs/opensyde_core/exports/C_OSCExportHalc.cpp \
+    ../libs/opensyde_core/halc/magician/C_OSCHALCMagicianDatapoolListHandler.cpp \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLePlaceholderVar.cpp
+
+#using our standard compiler warning switches we will get some (non-critical) warnings in miniz.c
+#we do not want to modify that library (as it is not maintained by us)
+#so we want to suppress those warnings
+#to do that we define an additional compiler named "miniz" and assign miniz.c to be built with that compiler
+#see https://stackoverflow.com/questions/27683777/how-to-specify-compiler-flag-to-a-single-source-file-with-qmake
+# for more information
+win32-g++ {
+   SOURCES_MINIZ = ../libs/opensyde_core/miniz/miniz.c  #define sources to be built with additional compiler
+   miniz.name = miniz
+   miniz.input = SOURCES_MINIZ              #assign sources
+   miniz.dependency_type = TYPE_C
+   miniz.variable_out = OBJECTS
+   miniz.output = ${QMAKE_VAR_OBJECTS_DIR}${QMAKE_FILE_IN_BASE}$${first(QMAKE_EXT_OBJ)}
+   #invoke C compiler (as it's a C file)
+   miniz.commands = $${QMAKE_CC} $(CFLAGS) $(INCPATH) -Wno-strict-aliasing -Wno-extra -c ${QMAKE_FILE_IN} -o ${QMAKE_FILE_OUT}
+   QMAKE_EXTRA_COMPILERS += miniz
+}
+
+#for MSVC: simply add the file to the standard compiler:
+win32-msvc* {
+   SOURCES += ../result/miniz/miniz.c
+}
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/gui/precomp_headers.h
 
@@ -1656,10 +1712,8 @@ HEADERS  += \
     ../src/com_import_export/C_CieDataPoolListAdapter.h \
     ../src/com_import_export/C_CieDataPoolListStructure.h \
     ../src/com_import_export/C_CieUtil.h \
-    ../src/opensyde_gui_elements/label/C_OgeLabToolboxHeadingGroupBold.h \
-    ../src/com_import_export/C_CieDBCImportNodeSelectWidget.h \
+    ../src/com_import_export/C_CieDcfEdsImportNodeSelectWidget.h \
     ../src/com_import_export/C_CieImportReportWidget.h \
-    ../src/system_definition/bus_edit/undo/C_SdBueUnoBusProtNodeCreateCommand.h \
     ../src/user_settings/C_UsNodeDatapoolList.h \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedContextMenuBase.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeContextMenuBase.h \
@@ -1833,16 +1887,52 @@ HEADERS  += \
     ../src/com_import_export/C_CieImportDatapoolSelectWidget.h \
     ../src/graphic_items/style_setup/C_GiSyColorSelectWidget.h \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcWidget.h \
-    ../src/system_definition/node_edit/halc/C_SdNdeHalcOverviewTreeModel.h \
-    ../src/system_definition/node_edit/halc/C_SdNdeHalcOverviewTreeView.h \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelTreeModel.h \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelTreeView.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.h \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeModel.h \
     ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeView.h \
-    ../src/graphic_items/style_setup/C_ColorPickingEventFilter.h \
-    ../src/graphic_items/style_setup/C_ColorOptions.h \
-    ../src/graphic_items/style_setup/C_PlatformColorHelper.h \
-    ../src/graphic_items/style_setup/C_ColorShower.h \
-    ../src/graphic_items/style_setup/C_ColorShowLabel.h
+    ../src/graphic_items/style_setup/C_GiSyScreenColorPickingEventFilter.h \
+    ../src/graphic_items/style_setup/C_GiSyColorBrightnessPicker.h \
+    ../src/graphic_items/style_setup/C_GiSyColorPicker.h \
+    ../src/graphic_items/style_setup/C_GiSyColorShower.h \
+    ../src/com_import_export/C_CieDbcImportNodeAssignmentWidget.h \
+    ../src/com_import_export/C_CieDbcImportNodeAssignmentItemWidget.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubTextOnly.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubColor.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfig.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigChannel.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigDomain.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigFiler.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameter.h \
+    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameterStruct.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDef.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelAvailability.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelUseCase.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContent.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContentBitmaskItem.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefDomain.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefElement.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefFiler.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStruct.h \
+    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStructFiler.h \
+    ../libs/opensyde_core/halc/definition/base/C_OSCHalcDefBase.h \
+    ../src/project_gui/system_definition/C_PuiSdHandlerHALC.h \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcConfigTreeDelegate.h \
+    ../src/table_base/C_TblDelegate.h \
+    ../src/table_base/C_TblEditLineEditBase.h \
+    ../src/opensyde_gui_elements/combo_box/C_OgeCbxTableBase.h \
+    ../src/opensyde_gui_elements/widget/C_OgeWiFixPosition.h \
+    ../libs/opensyde_core/exports/C_OSCExportUti.h \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelWidget.h \
+    ../libs/opensyde_core/halc/magician/C_OSCHALCMagicianGenerator.h \
+    ../libs/opensyde_core/halc/magician/C_OSCHALCMagicianUtil.h \
+    ../src/opensyde_gui_elements/label/C_OgeLabToolboxHeadingGroupBig.h \
+    ../src/opensyde_gui_elements/label/C_OgeLabProgressLogHeading.h \
+    ../src/opensyde_gui_elements/label/C_OgeLabProgressLogItem.h \
+    ../libs/opensyde_core/exports/C_OSCExportHalc.h \
+    ../libs/opensyde_core/halc/magician/C_OSCHALCMagicianDatapoolListHandler.h \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLePlaceholderVar.h
 
 FORMS    += \
     ../src/system_definition/C_SdTopologyWidget.ui \
@@ -1944,7 +2034,7 @@ FORMS    += \
     ../src/system_definition/node_edit/C_SdNdeProgrammingOptions.ui \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.ui \
     ../src/system_definition/bus_edit/C_SdBueNodeSelectorCheckBoxItemWidget.ui \
-    ../src/com_import_export/C_CieDBCImportNodeSelectWidget.ui \
+    ../src/com_import_export/C_CieDcfEdsImportNodeSelectWidget.ui \
     ../src/com_import_export/C_CieImportReportWidget.ui \
     ../src/com_import_export/C_CieExportReportWidget.ui \
     ../src/system_views/system_update/C_SyvUpHexFileView.ui \
@@ -1976,7 +2066,11 @@ FORMS    += \
     ../src/system_definition/bus_edit/C_SdBueMessageRxTimeoutConfig.ui \
     ../src/com_import_export/C_CieImportDatapoolSelectWidget.ui \
     ../src/graphic_items/style_setup/C_GiSyColorSelectWidget.ui \
-    ../src/system_definition/node_edit/halc/C_SdNdeHalcWidget.ui
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcWidget.ui \
+    ../src/com_import_export/C_CieDbcImportNodeAssignmentWidget.ui \
+    ../src/com_import_export/C_CieDbcImportNodeAssignmentItemWidget.ui \
+    ../src/opensyde_gui_elements/widget/C_OgeWiFixPosition.ui \
+    ../src/system_definition/node_edit/halc/C_SdNdeHalcChannelWidget.ui
 
 INCLUDEPATH += ../src \
                ../src/com_import_export \
@@ -2065,6 +2159,11 @@ INCLUDEPATH += ../src \
                ../libs/opensyde_core/data_dealer \
                ../libs/opensyde_core/data_dealer/paramset \
                ../libs/opensyde_core/exports \
+               ../libs/opensyde_core/halc \
+               ../libs/opensyde_core/halc/configuration \
+               ../libs/opensyde_core/halc/definition \
+               ../libs/opensyde_core/halc/definition/base \
+               ../libs/opensyde_core/halc/magician \
                ../libs/opensyde_core/imports \
                ../libs/opensyde_core/logging \
                ../libs/opensyde_core/md5 \

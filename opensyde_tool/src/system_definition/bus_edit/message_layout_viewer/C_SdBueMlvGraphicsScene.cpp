@@ -22,6 +22,7 @@
 #include "constants.h"
 
 #include "TGLUtils.h"
+#include "TGLTime.h"
 #include "C_SdBueMlvGraphicsScene.h"
 
 #include "C_SdBueMlvBaseItem.h"
@@ -228,7 +229,7 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
       if (this->me_Protocol == C_OSCCanProtocol::eECES)
       {
          // special case DLC is always 8, but byte 7 and byte 8 are reserved for message counter and CRC
-         this->mu16_MaximumCountBits = 48U;
+         this->mu16_MaximumCountBits = mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX;
          this->mapc_ECeSHints[0]->setVisible(true);
          this->mapc_ECeSHints[1]->setVisible(true);
       }
@@ -316,7 +317,7 @@ void C_SdBueMlvGraphicsScene::SetMultiplexValue(const uint16 ou16_MultiplexValue
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Select signal
 
-   \param[in] oru32_SignalIndex     Signal index
+   \param[in] ou32_SignalIndex     Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::SetSignal(const uint32 ou32_SignalIndex)
@@ -411,6 +412,30 @@ void C_SdBueMlvGraphicsScene::DisplayToolTip(const QPointF & orc_ScenePos)
          // Nothing to do
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reload colors
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMlvGraphicsScene::RefreshColors(void)
+{
+   QVector<C_SdBueMlvSignalManager *>::iterator pc_ItItem;
+
+   // Remove all colors of all items
+   for (pc_ItItem = this->mc_VecSignals.begin(); pc_ItItem != this->mc_VecSignals.end(); ++pc_ItItem)
+   {
+      this->m_SetColorsUnused((*pc_ItItem)->GetColorConfiguration());
+   }
+
+   // Assign new selected colors again
+   for (pc_ItItem = this->mc_VecSignals.begin(); pc_ItItem != this->mc_VecSignals.end(); ++pc_ItItem)
+   {
+      (*pc_ItItem)->SetColorConfiguration(this->m_GetNextNotUsedColors());
+      (*pc_ItItem)->SaveSignal();
+   }
+
+   this->update(this->sceneRect());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1123,7 +1148,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNo
 
    C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig;
 
-   srand(time(NULL));
+   srand(stw_tgl::TGL_GetTickCount());
 
    // Check for a free color in the already existing sections
    // Use the oldest section, if a free color is available

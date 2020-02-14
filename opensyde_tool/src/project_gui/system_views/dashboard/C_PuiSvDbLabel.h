@@ -34,8 +34,8 @@ public:
 
    C_PuiSvDbLabel(void);
 
-   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
-   virtual bool IsReadElement(void) const;
+   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
+   virtual bool IsReadElement(void) const override;
 
    QString c_Caption;
    E_Type e_Type;

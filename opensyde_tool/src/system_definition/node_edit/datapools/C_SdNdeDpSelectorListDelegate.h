@@ -33,8 +33,7 @@ public:
                       const QModelIndex & orc_Index) const override;
    //lint -restore
 
-   void StartPaint(const stw_types::sint32 s32_Index,
-                   stw_opensyde_gui::C_SdNdeDpSelectorItemWidget * const opc_Widget);
+   void StartPaint(const stw_types::sint32 s32_Index, stw_opensyde_gui::C_SdNdeDpSelectorItemWidget * const opc_Widget);
    void StopPaint(void);
 
 private:

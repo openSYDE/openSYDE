@@ -124,7 +124,7 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
       const C_CamGenTableModel::E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING))
+      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
       {
          QString c_Header;
          switch (e_Col)
@@ -148,7 +148,7 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
             c_Header = C_GtGetText::h_GetText("Cyclic");
             break;
          case eCYCLIC_TIME:
-            c_Header = C_GtGetText::h_GetText("Cyclic Time");
+            c_Header = C_GtGetText::h_GetText("Cycle Time");
             break;
          case eMANUAL_TRIGGER:
             c_Header = C_GtGetText::h_GetText("Manual Trigger");
@@ -161,11 +161,44 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
             break;
          }
          //Add spacing for sorting arrow
-         if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
-         {
-            c_Header += "    ";
-         }
+         c_Header += "    ";
          c_Retval = c_Header;
+      }
+      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      {
+         switch (e_Col)
+         {
+         case eRTR:
+            c_Retval = C_GtGetText::h_GetText("Remote Transmission Request");
+            break;
+         case eNAME:
+            c_Retval = C_GtGetText::h_GetText("Name");
+            break;
+         case eID:
+            c_Retval = C_GtGetText::h_GetText("Identifier");
+            break;
+         case eDLC:
+            c_Retval = C_GtGetText::h_GetText("Data Length Code");
+            break;
+         case eDATA:
+            c_Retval = C_GtGetText::h_GetText("Data");
+            break;
+         case eCYCLIC_TRIGGER:
+            c_Retval = C_GtGetText::h_GetText("Cyclic Trigger");
+            break;
+         case eCYCLIC_TIME:
+            c_Retval = C_GtGetText::h_GetText("Cycle Time");
+            break;
+         case eMANUAL_TRIGGER:
+            c_Retval = C_GtGetText::h_GetText("Manual Trigger");
+            break;
+         case eXTD:
+            c_Retval = C_GtGetText::h_GetText("Extended");
+            break;
+         case eKEY:
+            c_Retval = C_GtGetText::h_GetText("Key");
+            break;
+         }
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
@@ -177,34 +210,34 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
          switch (e_Col)
          {
          case eRTR:
-            c_Header = C_GtGetText::h_GetText("CAN message sent as remote transmission frame");
+            c_Header = C_GtGetText::h_GetText("CAN message sent as remote transmission frame.");
             break;
          case eNAME:
-            c_Header = C_GtGetText::h_GetText("CAN message name.");
+            c_Header = C_GtGetText::h_GetText("Symbolic name of the CAN message.");
             break;
          case eID:
-            c_Header = C_GtGetText::h_GetText("CAN message ID.");
+            c_Header = C_GtGetText::h_GetText("CAN identifier of the message.");
             break;
          case eDLC:
-            c_Header = C_GtGetText::h_GetText("CAN message DLC.");
+            c_Header = C_GtGetText::h_GetText("Number of data bytes in decimal representation.");
             break;
          case eDATA:
-            c_Header = C_GtGetText::h_GetText("CAN message data.");
+            c_Header = C_GtGetText::h_GetText("CAN message data in bytes.");
             break;
          case eCYCLIC_TRIGGER:
-            c_Header = C_GtGetText::h_GetText("CAN message cyclic trigger.");
+            c_Header = C_GtGetText::h_GetText("Send this CAN message cyclic.");
             break;
          case eCYCLIC_TIME:
-            c_Header = C_GtGetText::h_GetText("CAN message cyclic time in ms.");
+            c_Header = C_GtGetText::h_GetText("CAN message cycle time in ms.");
             break;
          case eMANUAL_TRIGGER:
-            c_Header = C_GtGetText::h_GetText("CAN message manual send trigger.");
+            c_Header = C_GtGetText::h_GetText("Trigger the transmission of this CAN message manually.");
             break;
          case eXTD:
             c_Header = C_GtGetText::h_GetText("CAN message ID uses extended format.");
             break;
          case eKEY:
-            c_Header = C_GtGetText::h_GetText("Key to press to trigger sending of message.");
+            c_Header = C_GtGetText::h_GetText("Configure key for triggering transmission of message.");
             break;
          }
          c_Retval = c_Header;

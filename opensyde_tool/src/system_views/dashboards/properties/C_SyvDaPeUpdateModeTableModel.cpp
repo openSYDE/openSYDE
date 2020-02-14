@@ -609,7 +609,7 @@ bool C_SyvDaPeUpdateModeTableModel::setData(const QModelIndex & orc_Index, const
                   break;
                case eTHRESHOLD:
                   C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(orc_Value, rc_CurConfig.c_ChangeThreshold,
-                                                                           0);
+                                                                     0);
                   break;
                default:
                   //No action

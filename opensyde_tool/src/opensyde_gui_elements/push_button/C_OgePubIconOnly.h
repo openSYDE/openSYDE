@@ -28,13 +28,13 @@ class C_OgePubIconOnly :
 
 public:
    explicit C_OgePubIconOnly(QWidget * const opc_Parent = NULL);
-   void SetCustomIcons(QString oc_IconPathNormal, QString oc_IconPathHovered, QString oc_IconPathClicked,
-                       QString oc_IconPathDisabled);
+   void SetCustomIcons(const QString & orc_IconPathNormal, const QString & orc_IconPathHovered,
+                       const QString & orc_IconPathClicked, const QString & orc_IconPathDisabled);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
-   virtual bool event(QEvent * const opc_Event);
+   virtual bool event(QEvent * const opc_Event) override;
    virtual void paintEvent(QPaintEvent * const opc_Event) override;
    //lint -restore
 

@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCCanMessage::C_OSCCanMessage(void) :
@@ -52,11 +52,42 @@ C_OSCCanMessage::C_OSCCanMessage(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates the hash value over all data
+/*! \brief   Check if current not equal to orc_Cmp
+
+   \param[in] orc_Cmp Compared instance
+
+   \return
+   Current not equal to orc_Cmp
+   Else false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanMessage::operator !=(const C_OSCCanMessage & orc_Cmp) const
+{
+   bool q_Return = false;
+
+   if ((this->c_Name          != orc_Cmp.c_Name) ||
+       (this->c_Comment       != orc_Cmp.c_Comment) ||
+       (this->u32_CanId       != orc_Cmp.u32_CanId) ||
+       (this->q_IsExtended    != orc_Cmp.q_IsExtended) ||
+       (this->u16_Dlc         != orc_Cmp.u16_Dlc) ||
+       (this->e_TxMethod      != orc_Cmp.e_TxMethod) ||
+       (this->u32_CycleTimeMs != orc_Cmp.u32_CycleTimeMs) ||
+       (this->u16_DelayTimeMs != orc_Cmp.u16_DelayTimeMs) ||
+       (this->u32_TimeoutMs   != orc_Cmp.u32_TimeoutMs) ||
+       (this->c_Signals       != orc_Cmp.c_Signals))
+   {
+      q_Return = true;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue    Hash value with unit [in] value and result [out] value
+   \param[in,out] oru32_HashValue Hash value with unit [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
@@ -80,12 +111,12 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check error for specified signal
+/*! \brief  Check error for specified signal
 
-   \param[in]  opc_List                             Node data pool list containing signal data
-                                                    (Optional as it is only required by some checks)
-   \param[in]  oru32_SignalIndex                    Signal index
-   \param[in]  ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
+   \param[in] opc_List                             Node data pool list containing signal data
+                                                   (Optional as it is only required by some checks)
+   \param[in] oru32_SignalIndex                    Signal index
+   \param[in] ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
 
    \return
    True  Error
@@ -168,7 +199,7 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check detailed error for specified signal
+/*! \brief  Check detailed error for specified signal
 
    \param[in]  opc_List                             Node data pool list containing signal data
                                                     (Optional as it is only required by some checks)
@@ -357,7 +388,7 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
    A multiplexer signal must be defined to be a multiplexed CAN message.
    This multiplexer must be unique, therefore the first found multiplexer is also the only multiplexer.
 
-   \param[out] u32_MultiplexerIndex    Index of first found multiplexer
+   \param[out] opu32_MultiplexerIndex Multiplexer index
 
    \retval   true    CAN message is multiplexed, has a multiplexer signal
    \retval   false   CAN message is not multiplexed
@@ -371,8 +402,8 @@ bool C_OSCCanMessage::IsMultiplexed(uint32 * const opu32_MultiplexerIndex) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if any of the specified signals is a multiplexer signal
 
-   \param[in]  orc_Signals             Signals to check
-   \param[out] u32_MultiplexerIndex    Index of first (!) found multiplexer
+   \param[in]  orc_Signals            Signals to check
+   \param[out] opu32_MultiplexerIndex Multiplexer index
 
    \retval   true    Contains multiplexer signal
    \retval   false   No multiplexer signal found
@@ -404,7 +435,7 @@ bool C_OSCCanMessage::h_ContainsMultiplexer(const std::vector<C_OSCCanSignal> & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Returns all possible multiplexer values
 
-   \param[out]      orc_Values   All multiplexer values
+   \param[out] orc_Values All multiplexer values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessage::GetMultiplexerValues(std::set<uint16> & orc_Values) const
@@ -422,9 +453,9 @@ void C_OSCCanMessage::GetMultiplexerValues(std::set<uint16> & orc_Values) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get hashes for signal
+/*! \brief  Get hashes for signal
 
-   \param[in]  opc_List         Node data pool list containing signal data
+   \param[in] opc_List          Node data pool list containing signal data
    \param[in] oru32_SignalIndex Signal index
 
    \return

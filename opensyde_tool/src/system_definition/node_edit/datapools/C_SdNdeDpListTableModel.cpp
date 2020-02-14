@@ -53,7 +53,7 @@ using namespace stw_errors;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListTableModel::C_SdNdeDpListTableModel(QObject * const opc_Parent) :
@@ -69,13 +69,13 @@ C_SdNdeDpListTableModel::C_SdNdeDpListTableModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Specify associated list
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::SetList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                            const uint32 & oru32_ListIndex)
+                                      const uint32 & oru32_ListIndex)
 {
    beginResetModel();
    this->mu32_NodeIndex = oru32_NodeIndex;
@@ -88,9 +88,9 @@ void C_SdNdeDpListTableModel::SetList(const uint32 & oru32_NodeIndex, const uint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if equal
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Node data pool index
+   \param[in]  oru32_ListIndex      Node data pool list index
 
    \return
    True  Match
@@ -98,7 +98,7 @@ void C_SdNdeDpListTableModel::SetList(const uint32 & oru32_NodeIndex, const uint
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListTableModel::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                           const uint32 & oru32_ListIndex) const
+                                     const uint32 & oru32_ListIndex) const
 {
    bool q_Retval;
 
@@ -117,16 +117,16 @@ bool C_SdNdeDpListTableModel::Equals(const uint32 & oru32_NodeIndex, const uint3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in] osn_Section    Section
-   \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in]  osn_Section       Section
+   \param[in]  oe_Orientation    Orientation
+   \param[in]  osn_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDpListTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                                   const sintn osn_Role) const
+                                             const sintn osn_Role) const
 {
    QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
 
@@ -341,7 +341,7 @@ QVariant C_SdNdeDpListTableModel::headerData(const sintn osn_Section, const Qt::
             c_Retval = C_GtGetText::h_GetText("Dataset value");
             break;
          case eACCESS:
-            c_Retval = C_GtGetText::h_GetText("Data element access permission. \n"
+            c_Retval = C_GtGetText::h_GetText("Data element access permission via diagnostic protocol. \n"
                                               "RO = Read Only\n"
                                               "RW = Read / Write"
                                               "\nUse case: Data element visualization in Dashboards");
@@ -352,7 +352,8 @@ QVariant C_SdNdeDpListTableModel::headerData(const sintn osn_Section, const Qt::
             break;
          case eADDRESS:
             c_Retval = C_GtGetText::h_GetText("Start address where this data element \n"
-                                              "is stored in non volatile memory (NVM)");
+                                              "is stored in non volatile memory (NVM).\n"
+                                              "<relative>(<absolute>)");
             break;
          case eEVENT_CALL:
             c_Retval = C_GtGetText::h_GetText(
@@ -404,7 +405,7 @@ QVariant C_SdNdeDpListTableModel::headerData(const sintn osn_Section, const Qt::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table row count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Row count
@@ -430,7 +431,7 @@ sintn C_SdNdeDpListTableModel::rowCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get table column count
 
-   \param[in] orc_Parent Parent
+   \param[in]  orc_Parent  Parent
 
    \return
    Column count
@@ -455,8 +456,8 @@ sintn C_SdNdeDpListTableModel::columnCount(const QModelIndex & orc_Parent) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
-   \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  osn_Role    Data role
 
    \return
    Data
@@ -496,20 +497,20 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                   break;
                case eNAME:
                   C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
-                                                                 C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_NAME,
-                                                                 c_Retval, 0, 0);
+                                                           C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_NAME,
+                                                           c_Retval, 0, 0);
                   break;
                case eCOMMENT:
                   C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
-                                                                 C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_COMMENT,
-                                                                 c_Retval, 0, 0);
+                                                           C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_COMMENT,
+                                                           c_Retval, 0, 0);
                   break;
                case eVALUE_TYPE:
                   if (osn_Role == static_cast<sintn>(Qt::ItemDataRole::EditRole))
                   {
                      C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
-                                                                    C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_VALUE_TYPE,
-                                                                    c_Retval, 0, 0);
+                                                              C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_VALUE_TYPE,
+                                                              c_Retval, 0, 0);
                   }
                   else
                   {
@@ -528,8 +529,8 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                   if (osn_Role == static_cast<sintn>(Qt::EditRole))
                   {
                      C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
-                                                                    C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_ARRAY,
-                                                                    c_Retval, 0, 0);
+                                                              C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_ARRAY,
+                                                              c_Retval, 0, 0);
                   }
                   else
                   {
@@ -569,9 +570,9 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                         {
                            QString c_Final;
                            C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(pc_OSCElement->c_MinValue,
-                                                                                         pc_OSCElement->f64_Factor,
-                                                                                         pc_OSCElement->f64_Offset,
-                                                                                         c_Final);
+                                                                                   pc_OSCElement->f64_Factor,
+                                                                                   pc_OSCElement->f64_Offset,
+                                                                                   c_Final);
                            c_Retval = c_Final;
                         }
                      }
@@ -603,9 +604,9 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                         {
                            QString c_Final;
                            C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(pc_OSCElement->c_MaxValue,
-                                                                                         pc_OSCElement->f64_Factor,
-                                                                                         pc_OSCElement->f64_Offset,
-                                                                                         c_Final);
+                                                                                   pc_OSCElement->f64_Factor,
+                                                                                   pc_OSCElement->f64_Offset,
+                                                                                   c_Final);
                            c_Retval = c_Final;
                         }
                      }
@@ -613,18 +614,18 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                   break;
                case eFACTOR:
                   C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
-                                                                 C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_FACTOR,
-                                                                 c_Retval, 0, 0);
+                                                           C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_FACTOR,
+                                                           c_Retval, 0, 0);
                   break;
                case eOFFSET:
                   C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
-                                                                 C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_OFFSET,
-                                                                 c_Retval, 0, 0);
+                                                           C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_OFFSET,
+                                                           c_Retval, 0, 0);
                   break;
                case eUNIT:
                   C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
-                                                                 C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_UNIT,
-                                                                 c_Retval, 0, 0);
+                                                           C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_UNIT,
+                                                           c_Retval, 0, 0);
                   if (c_Retval == "")
                   {
                      c_Retval = "-";
@@ -659,10 +660,10 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                            {
                               c_Retval =
                                  C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OSCElement->c_DataSetValues[
-                                                                                                u32_DataSet],
-                                                                                             pc_OSCElement->f64_Factor,
-                                                                                             pc_OSCElement->f64_Offset,
-                                                                                             0);
+                                                                                          u32_DataSet],
+                                                                                       pc_OSCElement->f64_Factor,
+                                                                                       pc_OSCElement->f64_Offset,
+                                                                                       0);
                            }
                         }
                      }
@@ -697,8 +698,8 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                   if (osn_Role == static_cast<sintn>(Qt::EditRole))
                   {
                      C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
-                                                                    C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_ACCESS,
-                                                                    c_Retval, 0, 0);
+                                                              C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_ACCESS,
+                                                              c_Retval, 0, 0);
                   }
                   else
                   {
@@ -899,8 +900,8 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                   break;
                case eCOMMENT:
                   C_SdNdeDpUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
-                                                                 C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_COMMENT,
-                                                                 c_Retval, 0, 0);
+                                                           C_SdNdeDpUtil::E_ElementDataChangeType::eELEMENT_COMMENT,
+                                                           c_Retval, 0, 0);
                   break;
                case eMIN:
                   if ((pc_OSCElement->GetArray() == false) || (pc_UIElement->q_AutoMinMaxActive == true) ||
@@ -913,9 +914,9 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                      //Special link handling
                      QString c_Final;
                      C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(pc_OSCElement->c_MinValue,
-                                                                                   pc_OSCElement->f64_Factor,
-                                                                                   pc_OSCElement->f64_Offset,
-                                                                                   c_Final);
+                                                                             pc_OSCElement->f64_Factor,
+                                                                             pc_OSCElement->f64_Offset,
+                                                                             c_Final);
                      c_Retval = c_Final;
                   }
                   break;
@@ -930,9 +931,9 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                      //Special link handling
                      QString c_Final;
                      C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(pc_OSCElement->c_MaxValue,
-                                                                                   pc_OSCElement->f64_Factor,
-                                                                                   pc_OSCElement->f64_Offset,
-                                                                                   c_Final);
+                                                                             pc_OSCElement->f64_Factor,
+                                                                             pc_OSCElement->f64_Offset,
+                                                                             c_Final);
                      c_Retval = c_Final;
                   }
 
@@ -1333,17 +1334,16 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data at index
 
-   \param[in] orc_Index Index
-   \param[in] orc_Value New data
-   \param[in] osn_Role  Data role
+   \param[in]  orc_Index   Index
+   \param[in]  orc_Value   New data
+   \param[in]  osn_Role    Data role
 
    \return
    true  success
    false failure
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
-                                            const sintn osn_Role)
+bool C_SdNdeDpListTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
 {
    bool q_Retval = false;
 
@@ -1524,7 +1524,7 @@ bool C_SdNdeDpListTableModel::setData(const QModelIndex & orc_Index, const QVari
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get flags for item
 
-   \param[in] orc_Index Item
+   \param[in]  orc_Index   Item
 
    \return
    Flags for item
@@ -1650,9 +1650,9 @@ Qt::DropActions C_SdNdeDpListTableModel::supportedDropActions(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert rows with content
 
-   \param[in] orc_OSCInsertedElements Inserted elements OSC content
-   \param[in] orc_UIInsertedElements  Inserted elements UI content
-   \param[in] oru32_Row               Starting Row (Expected: Sorted ascending!)
+   \param[in]  orc_OSCInsertedElements    Inserted elements OSC content
+   \param[in]  orc_UIInsertedElements     Inserted elements UI content
+   \param[in]  orc_Rows                   Rows (Expected: Sorted ascending!)
 
    \return
    Continuous sections of new elements
@@ -1701,17 +1701,16 @@ std::vector<std::vector<uint32> > C_SdNdeDpListTableModel::DoInsertRows(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert items into model
 
-   \param[in] osn_Col    Starting column
-   \param[in] osn_Count  Number of inserted items
-   \param[in] orc_Parent Parent
+   \param[in]  osn_Col     Starting column
+   \param[in]  osn_Count   Number of inserted items
+   \param[in]  orc_Parent  Parent
 
    \return
    true  success
    false failure
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListTableModel::insertColumns(const sintn osn_Col, const sintn osn_Count,
-                                                  const QModelIndex & orc_Parent)
+bool C_SdNdeDpListTableModel::insertColumns(const sintn osn_Col, const sintn osn_Count, const QModelIndex & orc_Parent)
 {
    bool q_Retval = false;
 
@@ -1728,7 +1727,7 @@ bool C_SdNdeDpListTableModel::insertColumns(const sintn osn_Col, const sintn osn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle delete items action
 
-   \param[in] orc_Rows Row indices (Expected: unique, ascending)
+   \param[in]  orc_Rows    Row indices (Expected: unique, ascending)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::DoRemoveRows(const std::vector<uint32> & orc_Rows)
@@ -1764,17 +1763,16 @@ void C_SdNdeDpListTableModel::DoRemoveRows(const std::vector<uint32> & orc_Rows)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove columns from model
 
-   \param[in] osn_Col    Starting column
-   \param[in] osn_Count  Number of removed items
-   \param[in] orc_Parent Parent
+   \param[in]  osn_Col     Starting column
+   \param[in]  osn_Count   Number of removed items
+   \param[in]  orc_Parent  Parent
 
    \return
    true  success
    false failure
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListTableModel::removeColumns(const sintn osn_Col, const sintn osn_Count,
-                                                  const QModelIndex & orc_Parent)
+bool C_SdNdeDpListTableModel::removeColumns(const sintn osn_Col, const sintn osn_Count, const QModelIndex & orc_Parent)
 {
    bool q_Retval = false;
 
@@ -1796,15 +1794,15 @@ bool C_SdNdeDpListTableModel::removeColumns(const sintn osn_Col, const sintn osn
    i.e. if you make the selected indices contiguous by resorting the target indices should also become contiguous
    Warning 2: does no boundary check
 
-   \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
-   \param[in] orc_TargetIndices   Target row indices (Expected: unique)
-                                  Example value:
-                                   "move up" -> orc_SelectedIndices - 1
-                                   "move down" -> orc_TargetIndices + 1
+   \param[in]  orc_SelectedIndices  Selected row indices (Expected: unique)
+   \param[in]  orc_TargetIndices    Target row indices (Expected: unique)
+                                    Example value:
+                                    "move up" -> orc_SelectedIndices - 1
+                                    "move down" -> orc_TargetIndices + 1
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::DoMoveRows(const std::vector<uint32> & orc_SelectedIndices,
-                                               const std::vector<uint32> & orc_TargetIndices)
+                                         const std::vector<uint32> & orc_TargetIndices)
 {
    if (orc_SelectedIndices.size() == orc_TargetIndices.size())
    {
@@ -1850,16 +1848,16 @@ void C_SdNdeDpListTableModel::DoMoveRows(const std::vector<uint32> & orc_Selecte
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Column to enum conversion
 
-   \param[in]  ors32_Column     Column
-   \param[out] opc_DataSetIndex Optional: If column is a data set, this contains the data set index
-                                          Else -1
+   \param[in]   ors32_Column        Column
+   \param[out]  opc_DataSetIndex    Optional: If column is a data set, this contains the data set index
+                                    Else -1
 
    \return
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListTableModel::E_Columns C_SdNdeDpListTableModel::ColumnToEnum(const sint32 & ors32_Column,
-                                                                                     sint32 * const opc_DataSetIndex)
+                                                                         sint32 * const opc_DataSetIndex)
 const
 {
    C_SdNdeDpListTableModel::E_Columns e_Retval;
@@ -1942,7 +1940,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Enum to column conversion
 
-   \param[in] ore_Value Enum value
+   \param[in]  ore_Value   Enum value
 
    \return
    Column
@@ -2042,7 +2040,7 @@ QStringList C_SdNdeDpListTableModel::mimeTypes(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get mime data of specified indices
 
-   \param[in] orc_Indices Indices
+   \param[in]  orc_Indices    Indices
 
    \return
    Mime data of specified indices
@@ -2094,7 +2092,7 @@ QMimeData * C_SdNdeDpListTableModel::mimeData(const QModelIndexList & orc_Indice
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get osc node data pool list element
 
-   \param[in] orc_Index Table index
+   \param[in]  orc_Index   Table index
 
    \return
    OSC node data pool list element
@@ -2112,7 +2110,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get ui node data pool list element
 
-   \param[in] orc_Index Table index
+   \param[in]  orc_Index   Table index
 
    \return
    UI node data pool list element
@@ -2129,13 +2127,14 @@ const C_PuiSdNodeDataPoolListElement * C_SdNdeDpListTableModel::GetUIElement(con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal model update
 
-   \param[in] oru32_Row      Changed row
-   \param[in] ore_ChangeType Change type
+   \param[in]  oru32_Row            Changed row
+   \param[in]  ore_ChangeType       Change type
+   \param[in]  ors32_DataSetIndex   Data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::HandleDataChange(const uint32 & oru32_Row,
-                                                     const C_SdNdeDpUtil::E_ElementDataChangeType & ore_ChangeType,
-                                                     const sint32 & ors32_DataSetIndex)
+                                               const C_SdNdeDpUtil::E_ElementDataChangeType & ore_ChangeType,
+                                               const sint32 & ors32_DataSetIndex)
 {
    bool q_ErrorChange = false;
    sint32 s32_Column = -1;
@@ -2213,7 +2212,7 @@ void C_SdNdeDpListTableModel::HandleDataChange(const uint32 & oru32_Row,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update column count after data set insertion
 
-   \param[in] oru32_DataSetIndex Inserted data set
+   \param[in]  oru32_DataSetIndex   Inserted data set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::DoInsertDataSet(const uint32 & oru32_DataSetIndex)
@@ -2230,7 +2229,7 @@ void C_SdNdeDpListTableModel::DoInsertDataSet(const uint32 & oru32_DataSetIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update column count after data set deletion
 
-   \param[in] oru32_DataSetIndex Deleted data set
+   \param[in]  oru32_DataSetIndex   Deleted data set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::DoDeleteDataSet(const uint32 & oru32_DataSetIndex)
@@ -2246,7 +2245,7 @@ void C_SdNdeDpListTableModel::DoDeleteDataSet(const uint32 & oru32_DataSetIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update column name after data set name edit
 
-   \param[in] oru32_DataSetIndex Changed data set
+   \param[in]  oru32_DataSetIndex   Changed data set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::DoEditDataSetName(const uint32 & oru32_DataSetIndex)
@@ -2273,8 +2272,8 @@ void C_SdNdeDpListTableModel::Reset(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check name
 
-   \param[in] oru32_Index Element index
-   \param[in] orc_Name    Name
+   \param[in]  oru32_Index    Element index
+   \param[in]  orc_Name       Name
 
    \return
    true  Available
@@ -2293,7 +2292,7 @@ bool C_SdNdeDpListTableModel::CheckName(const uint32 & oru32_Index, const QStrin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get array size of specified element
 
-   \param[in] oru32_Index Element index
+   \param[in]  oru32_Index    Element index
 
    \return
    0    Invalid
@@ -2316,7 +2315,7 @@ uint32 C_SdNdeDpListTableModel::GetArraySize(const uint32 & oru32_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if row is of type string
 
-   \param[in] orc_Index Model index
+   \param[in]  orc_Index   Model index
 
    \return
    True  Row is of type string
@@ -2336,7 +2335,7 @@ bool C_SdNdeDpListTableModel::IsString(const QModelIndex & orc_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if item needs link
 
-   \param[in] orc_Index Index to check for link
+   \param[in]  orc_Index   Index to check for link
 
    \return
    True  Link
@@ -2382,12 +2381,12 @@ void C_SdNdeDpListTableModel::m_OnErrorChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move items to target index
 
-   \param[in] orc_ContiguousIndices Contiguous section of ascending indices
-   \param[in] ou32_TargetIndex      Target index
+   \param[in]  orc_ContiguousIndices   Contiguous section of ascending indices
+   \param[in]  ou32_TargetIndex        Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::m_MoveItems(const std::vector<uint32> & orc_ContiguousIndices,
-                                                const uint32 ou32_TargetIndex) const
+                                          const uint32 ou32_TargetIndex) const
 {
    if (orc_ContiguousIndices.size() > 0UL)
    {
@@ -2423,8 +2422,8 @@ void C_SdNdeDpListTableModel::m_MoveItems(const std::vector<uint32> & orc_Contig
    For implementation: First delete ou32_SourceIndex then insert ou32_TargetIndex
    Warning: not expected to fail
 
-   \param[in] ou32_SourceIndex Source index
-   \param[in] ou32_TargetIndex Target index
+   \param[in]  ou32_SourceIndex  Source index
+   \param[in]  ou32_TargetIndex  Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex) const

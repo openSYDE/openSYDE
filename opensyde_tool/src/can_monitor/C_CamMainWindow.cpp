@@ -54,7 +54,7 @@ const sint32 C_CamMainWindow::mhs32_MessageGenSplitterMax = 120;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 
    Set up GUI with all elements.
 
@@ -197,7 +197,7 @@ C_CamMainWindow::C_CamMainWindow(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default destructor
+/*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMainWindow::~C_CamMainWindow()
@@ -228,11 +228,11 @@ C_CamMainWindow::~C_CamMainWindow()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten close event slot
+/*! \brief  Overwritten close event slot
 
    Save user settings
 
-   \param[in,out] opc_Event    Event identification and information
+   \param[in,out] opc_Event Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::closeEvent(QCloseEvent * const opc_Event)
@@ -255,7 +255,7 @@ void C_CamMainWindow::closeEvent(QCloseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten key press event slot
+/*! \brief  Overwritten key press event slot
 
    Here: Trigger send-by-keypress, help key handling and save options.
 
@@ -292,11 +292,11 @@ void C_CamMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overridden drag enter event slot
+/*! \brief  Overridden drag enter event slot
 
    Here: Accept external *.syde_cam file. Adopted from openSYDE GUI.
 
-   \param[in,out]    opc_Event   Event identification and information
+   \param[in,out] opc_Event Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::dragEnterEvent(QDragEnterEvent * const opc_Event)
@@ -312,11 +312,11 @@ void C_CamMainWindow::dragEnterEvent(QDragEnterEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overridden drag move event slot
+/*! \brief  Overridden drag move event slot
 
    Here: Accept external *.syde_cam file. Adopted from openSYDE GUI.
 
-   \param[in,out]    opc_Event   Event identification and information
+   \param[in,out] opc_Event Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::dragMoveEvent(QDragMoveEvent * const opc_Event)
@@ -332,11 +332,11 @@ void C_CamMainWindow::dragMoveEvent(QDragMoveEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overridden drop event slot
+/*! \brief  Overridden drop event slot
 
    Here: Handle dropped *.syde_cam file. Adopted from openSYDE GUI.
 
-   \param[in,out]    opc_Event      Event identification and information
+   \param[in,out] opc_Event Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::dropEvent(QDropEvent * const opc_Event)
@@ -373,7 +373,7 @@ void C_CamMainWindow::dropEvent(QDropEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Start the logging
+/*! \brief  Start the logging
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_StartLogging(void)
@@ -433,7 +433,7 @@ void C_CamMainWindow::m_StartLogging(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Pause an active logging
+/*! \brief  Pause an active logging
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_PauseLogging(void)
@@ -444,7 +444,7 @@ void C_CamMainWindow::m_PauseLogging(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Continue of a paused logging
+/*! \brief  Continue of a paused logging
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_ContinueLogging(void)
@@ -454,7 +454,7 @@ void C_CamMainWindow::m_ContinueLogging(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Stop the current logging
+/*! \brief  Stop the current logging
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_StopLogging(void)
@@ -473,9 +473,9 @@ void C_CamMainWindow::m_StopLogging(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Initialization of com driver and CAN DLL
+/*! \brief  Initialization of com driver and CAN DLL
 
-   \param[out]    ors32_Bitrate     Current set bitrate of CAN DLL
+   \param[out] ors32_Bitrate Current set bitrate of CAN DLL
 
    \return
    C_NO_ERR    CAN initialized
@@ -544,7 +544,7 @@ sint32 C_CamMainWindow::m_InitCan(sint32 & ors32_Bitrate)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Stops communication and close DLL
+/*! \brief  Stops communication and close DLL
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_CloseCan(void)
@@ -554,7 +554,7 @@ void C_CamMainWindow::m_CloseCan(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle initial project loading
+/*! \brief  Handle initial project loading
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_LoadInitialProject(void)
@@ -601,7 +601,7 @@ void C_CamMainWindow::m_LoadInitialProject(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load all user settings
+/*! \brief  Load all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_LoadUserSettings(void)
@@ -624,7 +624,7 @@ void C_CamMainWindow::m_LoadUserSettings(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save all user settings
+/*! \brief  Save all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_SaveUserSettings(void)
@@ -661,12 +661,12 @@ void C_CamMainWindow::m_SaveUserSettings(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if mime valid
+/*! \brief  Check if mime valid
 
    Adopted from openSYDE GUI main window implementation.
 
-   \param[in]        opc_Mime       Mime to check
-   \param[in,out]    opc_FilePath   Optional parameter for file path output if valid
+   \param[in]     opc_Mime     Mime to check
+   \param[in,out] opc_FilePath Optional parameter for file path output if valid
 
    \return
    true  Valid
@@ -714,7 +714,7 @@ bool C_CamMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for continuous calling by thread.
+/*! \brief  Function for continuous calling by thread.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::mh_ThreadFunc(void * const opv_Instance)
@@ -730,7 +730,7 @@ void C_CamMainWindow::mh_ThreadFunc(void * const opv_Instance)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Function for continuous calling by thread.
+/*! \brief  Function for continuous calling by thread.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_ThreadFunc(void)
@@ -743,10 +743,10 @@ void C_CamMainWindow::m_ThreadFunc(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Expand or collapse settings.
+/*! \brief  Expand or collapse settings.
 
-   \param[in]     oq_Expand        true: expand settings subsections
-                                   false: collapse settings subsections
+   \param[in] oq_Expand true: expand settings subsections
+                        false: collapse settings subsections
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnExpandSettings(const bool oq_Expand)
@@ -778,7 +778,7 @@ void C_CamMainWindow::m_OnExpandSettings(const bool oq_Expand)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle double click of settings splitter.
+/*! \brief  Handle double click of settings splitter.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnSettingsSplitterHandleDoubleClick(void)
@@ -788,12 +788,12 @@ void C_CamMainWindow::m_OnSettingsSplitterHandleDoubleClick(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for splitter move.
+/*! \brief  Slot function for splitter move.
 
    If settings section gets collapsed, do not really collapse but minimize it.
 
-   \param[in]     ors32_Pos      New position of splitter
-   \param[in]     ors32_Index    Index of splitter widget
+   \param[in] ors32_Pos   New position of splitter
+   \param[in] ors32_Index Index of splitter widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnSettingsSplitterMoved(const sint32 & ors32_Pos, const sint32 & ors32_Index)
@@ -847,10 +847,10 @@ void C_CamMainWindow::m_OnSettingsSplitterMoved(const sint32 & ors32_Pos, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Expand or collapse message generator widget.
+/*! \brief  Expand or collapse message generator widget.
 
-   \param[in]     oq_Expand        true: expand message generator subsections
-                                   false: message generator subsections
+   \param[in] oq_Expand true: expand message generator subsections
+                        false: message generator subsections
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnExpandMessageGen(const bool oq_Expand)
@@ -884,7 +884,7 @@ void C_CamMainWindow::m_OnExpandMessageGen(const bool oq_Expand)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle double click of message generator splitter.
+/*! \brief  Handle double click of message generator splitter.
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnMessageGenSplitterHandleDoubleClick()
@@ -894,12 +894,12 @@ void C_CamMainWindow::m_OnMessageGenSplitterHandleDoubleClick()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot function for splitter move.
+/*! \brief  Slot function for splitter move.
 
    If message generator section gets collapsed, do not really collapse but minimize it.
 
-   \param[in]     ors32_Pos      New position of splitter (distance to left border of widget)
-   \param[in]     ors32_Index    Index of splitter widget
+   \param[in] ors32_Pos   New position of splitter (distance to left border of widget)
+   \param[in] ors32_Index Index of splitter widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnMessageGenSplitterMoved(const sint32 & ors32_Pos, const sint32 & ors32_Index)
@@ -953,7 +953,7 @@ void C_CamMainWindow::m_OnMessageGenSplitterMoved(const sint32 & ors32_Pos, cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Trigger send of cyclic message
+/*! \brief  Trigger send of cyclic message
 
    \param[in] ou32_MessageIndex Message index
    \param[in] oq_Active         Flag if cyclic message is active
@@ -983,7 +983,7 @@ void C_CamMainWindow::m_RegisterCyclicMessage(const uint32 ou32_MessageIndex, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Trigger send of specified message
+/*! \brief  Trigger send of specified message
 
    \param[in] ou32_MessageIndex Message index
    \param[in] ou32_TimeToSend   Time to send this message
@@ -1006,7 +1006,7 @@ void C_CamMainWindow::m_SendMessage(const uint32 ou32_MessageIndex, const stw_ty
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle remove the old configuration
+/*! \brief  Handle remove the old configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnClearOldConfiguration(void)
@@ -1015,7 +1015,7 @@ void C_CamMainWindow::m_OnClearOldConfiguration(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle loading the new configuration
+/*! \brief  Handle loading the new configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnNewConfiguration(void)
@@ -1036,18 +1036,20 @@ void C_CamMainWindow::m_OnNewConfiguration(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle file load start
+/*! \brief  Handle file load start
 
-   \param[in] orc_File Loaded file
+   \param[in] orc_File    Loaded file
+   \param[in] orc_OrgPath Org path
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_OnDatabaseLoadStarted(const QString & orc_File)
+void C_CamMainWindow::m_OnDatabaseLoadStarted(const QString & orc_File, const QString & orc_OrgPath)
 {
    this->mc_CurrentLoadedFile = orc_File;
+   this->mc_CurrentLoadedFileOrg = orc_OrgPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle file load finished
+/*! \brief  Handle file load finished
 
    Actions: Update currently loaded files
 
@@ -1056,7 +1058,7 @@ void C_CamMainWindow::m_OnDatabaseLoadStarted(const QString & orc_File)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Result)
 {
-   if (this->mc_CurrentLoadedFile.isEmpty() == false)
+   if ((this->mc_CurrentLoadedFile.isEmpty() == false) && (this->mc_CurrentLoadedFileOrg.isEmpty() == false))
    {
       //C_NO_ERR -> no err, C_WARN -> no significant error
       if ((os32_Result == C_NO_ERR) || (os32_Result == C_WARN))
@@ -1070,14 +1072,14 @@ void C_CamMainWindow::m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Resu
             if (c_FileInfo.suffix().compare("dbc", Qt::CaseInsensitive) == 0)
             {
                //Check if already known
-               if (C_CamDbHandler::h_GetInstance()->GetContainsDbc(this->mc_CurrentLoadedFile) == false)
+               if (C_CamDbHandler::h_GetInstance()->GetContainsDbc(this->mc_CurrentLoadedFileOrg) == false)
                {
                   C_CieConverter::C_CIECommDefinition c_DbcDefinition;
                   if (pc_MessageMonitor->GetDbcFile(this->mc_CurrentLoadedFile.toStdString().c_str(),
                                                     c_DbcDefinition) == C_NO_ERR)
                   {
                      //Add to currently loaded files
-                     C_CamDbHandler::h_GetInstance()->AddDbcFile(this->mc_CurrentLoadedFile, c_DbcDefinition);
+                     C_CamDbHandler::h_GetInstance()->AddDbcFile(this->mc_CurrentLoadedFileOrg, c_DbcDefinition);
                   }
                   else
                   {
@@ -1088,7 +1090,7 @@ void C_CamMainWindow::m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Resu
             else if (c_FileInfo.suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0)
             {
                //Check if already known
-               if (C_CamDbHandler::h_GetInstance()->GetContainsOsy(this->mc_CurrentLoadedFile) == false)
+               if (C_CamDbHandler::h_GetInstance()->GetContainsOsy(this->mc_CurrentLoadedFileOrg) == false)
                {
                   stw_opensyde_core::C_OSCSystemDefinition c_Tmp;
                   stw_opensyde_core::C_OSCComMessageLoggerOsySysDefConfig c_SystemDefinition(c_Tmp, 0UL);
@@ -1096,7 +1098,7 @@ void C_CamMainWindow::m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Resu
                                                       c_SystemDefinition) == C_NO_ERR)
                   {
                      //Add to currently loaded files
-                     C_CamDbHandler::h_GetInstance()->AddOsyFile(this->mc_CurrentLoadedFile, c_SystemDefinition);
+                     C_CamDbHandler::h_GetInstance()->AddOsyFile(this->mc_CurrentLoadedFileOrg, c_SystemDefinition);
                   }
                   else
                   {
@@ -1116,43 +1118,50 @@ void C_CamMainWindow::m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Resu
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle file removed
+/*! \brief  Handle file removed
 
    Actions: Update currently loaded files
+
+   \param[in] orc_File    File
+   \param[in] orc_OrgPath Org path
+   \param[in] oq_IsUpdate Is update
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_OnDatabaseRemove(const QString & orc_File, const bool oq_IsUpdate)
+void C_CamMainWindow::m_OnDatabaseRemove(const QString & orc_File, const QString & orc_OrgPath, const bool oq_IsUpdate)
 {
+   Q_UNUSED(orc_File)
    //on removal QFileInfo might fail but the file should only be in one database
-   C_CamDbHandler::h_GetInstance()->RemoveOsyFile(orc_File);
-   C_CamDbHandler::h_GetInstance()->RemoveDbcFile(orc_File);
+   C_CamDbHandler::h_GetInstance()->RemoveOsyFile(orc_OrgPath);
+   C_CamDbHandler::h_GetInstance()->RemoveDbcFile(orc_OrgPath);
    //Handle messages
    if (oq_IsUpdate == false)
    {
-      this->mpc_Ui->pc_GeneratorWidget->RemoveMessagesForFile(orc_File);
+      this->mpc_Ui->pc_GeneratorWidget->RemoveMessagesForFile(orc_OrgPath);
    }
    //Notify signal widgets
    this->mpc_Ui->pc_GeneratorWidget->TriggerSignalReload();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle database activation
+/*! \brief  Handle database activation
 
-   \param[in] orc_File  File to change activation for
-   \param[in] oq_Active New activation state
+   \param[in] orc_File    File to change activation for
+   \param[in] orc_OrgPath Org path
+   \param[in] oq_Active   New activation state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_OnActivateDatabase(const QString & orc_File, const bool oq_Active)
+void C_CamMainWindow::m_OnActivateDatabase(const QString & orc_File, const QString & orc_OrgPath, const bool oq_Active)
 {
+   Q_UNUSED(orc_File)
    //the file should only be in one database
-   C_CamDbHandler::h_GetInstance()->SetDBCActive(orc_File, oq_Active);
-   C_CamDbHandler::h_GetInstance()->SetOsyActive(orc_File, oq_Active);
+   C_CamDbHandler::h_GetInstance()->SetDBCActive(orc_OrgPath, oq_Active);
+   C_CamDbHandler::h_GetInstance()->SetOsyActive(orc_OrgPath, oq_Active);
    //Notify signal widgets
    this->mpc_Ui->pc_GeneratorWidget->TriggerSignalReload();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Replace the openSYDE bus index
+/*! \brief  Replace the openSYDE bus index
 
    \param[in] orc_File      File to change bus index for
    \param[in] ou32_BusIndex New bus index
@@ -1173,7 +1182,7 @@ void C_CamMainWindow::m_OnOsyChangeBus(const QString & orc_File, const uint32 ou
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot for a change of the CAN dll configuration
+/*! \brief  Slot for a change of the CAN dll configuration
 
    Check and update of current CAN bitrate
 */

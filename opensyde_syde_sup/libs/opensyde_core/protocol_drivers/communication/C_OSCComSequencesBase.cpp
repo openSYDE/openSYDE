@@ -216,6 +216,59 @@ bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if a specific node must be capable of Ethernet to Ethernet routing
+
+   \param[in]       ou32_RouterNodeIndex     Node to check if node must be capable of Ethernet to Ethernet routing
+                                             for at least one route
+
+   \retval   true     Ethernet to Ethernet Routing must be supported by router node
+   \retval   false    Ethernet to Ethernet Routing must not be supported by router node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCComSequencesBase::IsEthToEthRoutingNecessary(const uint32 ou32_RouterNodeIndex) const
+{
+   return this->mpc_ComDriver->IsEthToEthRoutingNecessary(ou32_RouterNodeIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the minimum Flashloader reset wait time in ms
+
+   Default minimum value is 500 ms independent of the type.
+
+   \param[in]  oe_Type  Type of minimum flashloader reset wait time
+
+   \return
+   Time in ms all nodes needs at least to get from application to the Flashloader
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(
+   const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type) const
+{
+   return this->mpc_ComDriver->GetMinimumFlashloaderResetWaitTime(oe_Type);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the minimum Flashloader reset wait time in ms for a specific node
+
+   Default minimum value is 500 ms independent of the type.
+
+   \param[in]   oe_Type             Type of minimum flashloader reset wait time
+   \param[in]   orc_ServerId        Server id to get the configured wait time
+   \param[out]  oru32_TimeValue     Time in ms the node need at least to get from application to the Flashloader or
+                                    from Flashloader to Flashloader
+
+   \retval   C_NO_ERR   Time returned
+   \retval   C_RANGE    Node with orc_ServerId does not exist or is not active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(
+   const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type,
+   const C_OSCProtocolDriverOsyNode & orc_ServerId, stw_types::uint32 & oru32_TimeValue) const
+{
+   return this->mpc_ComDriver->GetMinimumFlashloaderResetWaitTime(oe_Type, orc_ServerId, oru32_TimeValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks if the node is reachable on the current route
 
    \param[in]     ou32_NodeIndex         Index of current node

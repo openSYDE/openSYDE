@@ -13,7 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblViewToolTipBase.h"
-#include "C_TblDelegate.h"
+#include "C_CamTblDelegate.h"
 #include "C_CamMosFilterTableModel.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -44,7 +44,7 @@ protected:
    //lint -restore
 
 private:
-   C_TblDelegate mc_Delegate;
+   C_CamTblDelegate mc_Delegate;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

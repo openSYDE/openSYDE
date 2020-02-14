@@ -167,6 +167,8 @@ void C_SdBueMessageSignalEditWidget::SelectMessage(const C_OSCCanMessageIdentifi
    this->mpc_Ui->pc_MessageLabel->setVisible(true);
    this->mpc_Ui->pc_SignalLabel->setVisible(false);
    this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(true, orc_MessageId);
+   //also initialize signal properties to have valid indices for everything besides signal index itself
+   this->mpc_Ui->pc_SigPropertiesWidget->SetSignalId(orc_MessageId, 0U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -366,6 +368,15 @@ void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected
          orc_SignalName = pc_Signal->c_Name.c_str();
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reload colors
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalEditWidget::RefreshColors(void) const
+{
+   this->mpc_Ui->pc_MsgLayoutViewerWidget->RefreshColors();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

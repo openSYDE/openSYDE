@@ -31,8 +31,6 @@ using namespace stw_opensyde_gui;
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
-
-   \param[in,out]   opc_parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalResizeItem::C_SdBueMlvSignalResizeItem()

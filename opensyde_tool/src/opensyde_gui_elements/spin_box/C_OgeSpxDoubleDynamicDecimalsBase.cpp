@@ -43,7 +43,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxDoubleDynamicDecimalsBase::C_OgeSpxDoubleDynamicDecimalsBase(QWidget * const opc_Parent) :
@@ -57,6 +57,11 @@ C_OgeSpxDoubleDynamicDecimalsBase::C_OgeSpxDoubleDynamicDecimalsBase(QWidget * c
 
    This virtual function is used by the spin box whenever it needs to display the given value.
    Cut annoying trailing zeros and give the possibility to show 0,00000...0123.
+
+   \param[in]  of64_Value  Value
+
+   \return
+   Spinbox text
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_OgeSpxDoubleDynamicDecimalsBase::textFromValue(const float64 of64_Value) const

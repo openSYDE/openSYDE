@@ -97,6 +97,16 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="pc_PubMagic">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 0, 255);</string>
+       </property>
+       <property name="text">
+        <string>Do the MAGIC!</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pc_PubCleanUp">
        <property name="text">
         <string>-Clean Up</string>
@@ -134,7 +144,7 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui::C_SdNdeHalcOverviewTreeView" name="pc_TreeOverview"/>
+        <widget class="stw_opensyde_gui::C_SdNdeHalcChannelTreeView" name="pc_TreeChannels"/>
        </item>
       </layout>
      </item>
@@ -152,455 +162,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="pc_WiChannelEdit" native="true">
-       <layout class="QVBoxLayout" name="verticalLayout_6">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <layout class="QGridLayout" name="gridLayout">
-          <property name="horizontalSpacing">
-           <number>20</number>
-          </property>
-          <item row="2" column="0">
-           <layout class="QVBoxLayout" name="pc_LayoutProperties">
-            <property name="spacing">
-             <number>12</number>
-            </property>
-            <item>
-             <layout class="QGridLayout" name="pc_LayoutNameAndChannel">
-              <property name="horizontalSpacing">
-               <number>20</number>
-              </property>
-              <item row="2" column="1">
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabChannelCurrent">
-                <property name="minimumSize">
-                 <size>
-                  <width>200</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>-X_CHA</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="stw_opensyde_gui_elements::C_OgeLePropertiesName" name="pc_LeName">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>40</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <layout class="QVBoxLayout" name="verticalLayout_2">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabName">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>-Name</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="pc_FrameSeparatorName">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>1</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>1</height>
-                   </size>
-                  </property>
-                  <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item row="1" column="1">
-               <layout class="QVBoxLayout" name="verticalLayout_3">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabChannelTitle">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>-Channel</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="pc_FrameSeparatorChannel">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>1</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>1</height>
-                   </size>
-                  </property>
-                  <property name="frameShape">
-                   <enum>QFrame::StyledPanel</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabComment">
-              <property name="text">
-               <string>-Comment</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeTedPropertiesComment" name="pc_TedComment">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>85</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QGridLayout" name="pc_LayoutSafetyAndShare">
-              <item row="0" column="0">
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabSafety">
-                <property name="text">
-                 <string>-Safety</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="stw_opensyde_gui_elements::C_OgeChxTristateTransparentToggle" name="pc_ChxSafety">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>66</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>66</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>-Safety</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_CbxShareWith">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>30</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabShareWith">
-                <property name="text">
-                 <string>-Share with</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-          <item row="5" column="0">
-           <layout class="QHBoxLayout" name="pc_LayoutUseCase" stretch="0,0">
-            <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabUseCase">
-              <property name="text">
-               <string>-Use Case</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_CbxUseCase">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>30</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="6" column="0" colspan="2">
-           <widget class="stw_opensyde_gui::C_SdNdeHalcConfigTreeView" name="pc_TreeConfig"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="stw_opensyde_gui_elements::C_OgeChxProperties" name="pc_ChxActive">
-            <property name="text">
-             <string>-Active</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="2">
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabConfig">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>-Config</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="pc_FrameSeparatorConfig">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>1</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>1</height>
-               </size>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="3" column="0">
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>10</width>
-              <height>10</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="2" column="1">
-           <layout class="QVBoxLayout" name="pc_LayoutDbRelation">
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_4">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabDbRelation">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>-Db Relation</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeFrameSeparator" name="pc_FrameSeparatorRelation">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>1</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>1</height>
-                 </size>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
-                </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="pc_LayoutOwnerDb">
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabOwnerDb">
-                <property name="text">
-                 <string>-Owner Db</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_CbxOwnerDb">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>30</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>30</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
+      <widget class="stw_opensyde_gui::C_SdNdeHalcChannelWidget" name="pc_WiChannelEdit" native="true"/>
      </item>
     </layout>
    </item>
@@ -608,45 +170,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>
-   <extends>QFrame</extends>
-   <header>C_OgeFrameSeparator.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupItem.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
-   <extends>QComboBox</extends>
-   <header>C_OgeCbxText.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
-   <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLePropertiesName.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxProperties</class>
-   <extends>QCheckBox</extends>
-   <header>C_OgeChxProperties.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxTristateTransparentToggle</class>
-   <extends>QCheckBox</extends>
-   <header>C_OgeChxTristateTransparentToggle.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItemValue</class>
@@ -654,14 +180,15 @@
    <header>C_OgeLabGroupItemValue.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeHalcOverviewTreeView</class>
+   <class>stw_opensyde_gui::C_SdNdeHalcChannelTreeView</class>
    <extends>QTreeView</extends>
-   <header>C_SdNdeHalcOverviewTreeView.h</header>
+   <header>C_SdNdeHalcChannelTreeView.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeHalcConfigTreeView</class>
-   <extends>QTreeView</extends>
-   <header>C_SdNdeHalcConfigTreeView.h</header>
+   <class>stw_opensyde_gui::C_SdNdeHalcChannelWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeHalcChannelWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

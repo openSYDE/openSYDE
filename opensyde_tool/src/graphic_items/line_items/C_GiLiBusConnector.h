@@ -47,7 +47,7 @@ public:
    virtual ~C_GiLiBusConnector(void);
    virtual stw_types::sintn type(void) const override;
    void DeleteConnection(void);
-   virtual void SetPoints(const std::vector<QPointF> & orc_ScenePos);
+   virtual void SetPoints(const std::vector<QPointF> & orc_ScenePos) override;
 
    const C_GiNode * GetNodeItem(void) const;
    C_GiNode * GetNodeItem(void);
@@ -75,11 +75,12 @@ Q_SIGNALS:
    void SigHintUpdate(void);
 
 protected:
-   virtual void m_OnInteractionPointMove(void);
+   virtual void m_OnInteractionPointMove(void) override;
    virtual void m_OnIterationGenericInteractionPointMove(QGraphicsItem * const opc_HighestParentItem,
-                                                         const QPointF & orc_CurPos, bool & orq_RestoreMouseCursor);
-   virtual bool m_OnGenericInteractionPointMouseRelease(const QPointF & orc_ScenePos);
-   virtual void m_OnBusChange(const QPointF & orc_ScenePos);
+                                                         const QPointF & orc_CurPos,
+                                                         bool & orq_RestoreMouseCursor) override;
+   virtual bool m_OnGenericInteractionPointMouseRelease(const QPointF & orc_ScenePos) override;
+   virtual void m_OnBusChange(const QPointF & orc_ScenePos) override;
 
 private:
    bool mq_OnInteractionPointMoveFoundNode;
@@ -90,8 +91,6 @@ private:
 
    void m_InitConnector(C_GiNode * const opc_NodeItem, const QPointF & orc_Pos);
    void m_UpdatePort(const QPointF & orc_Pos);
-   void m_RestoreLastValidNode(void);
-   void m_AcceptNewPort(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

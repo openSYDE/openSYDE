@@ -43,7 +43,7 @@ public:
    static stw_types::sint32 h_LoadDataPoolListElements(const stw_types::uint16 ou16_XmlFormatVersion,
                                                        std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 h_LoadDataPoolListElementDataSetValues(const stw_types::uint16 ou16_XmlFormatVersion,
-                                                                   const C_OSCNodeDataPoolContent & orc_ContentType,
+                                                                   const C_OSCNodeDataPoolContent & orc_ContType,
                                                                    std::vector<C_OSCNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues, C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 h_LoadDataPoolElementType(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                       C_OSCXMLParserBase & orc_XMLParser);

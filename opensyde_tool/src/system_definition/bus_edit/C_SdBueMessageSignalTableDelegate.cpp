@@ -131,7 +131,7 @@ bool C_SdBueMessageSignalTableDelegate::SetHoveredRow(const stw_types::sint32 & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set model for column look up
 
-   \param[in] opc_Model Model for column look up
+   \param[in] opc_Value Model for column look up
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableDelegate::SetModel(const QAbstractTableModel * const opc_Value)

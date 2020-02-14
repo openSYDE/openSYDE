@@ -36,6 +36,7 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_OSCProjectFiler.h"
 #include "C_Uti.h"
+#include "C_GiSyColorSelectWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -617,7 +618,8 @@ void C_NagMainWidget::m_OnClear(void)
                                   "forget all recent project user settings?"));
    c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Clear"));
    c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
-   c_MessageBox.SetCustomMinWidth(700);
+   c_MessageBox.SetCustomMinHeight(180, 180);
+   //   c_MessageBox.SetCustomMinWidth(700);
 
    if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
    {
@@ -644,4 +646,29 @@ void C_NagMainWidget::m_OnIndexClicked(const QModelIndex & orc_ModelIndex)
          this->mpc_Ui->pc_TableView->scrollToTop();
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open color picker
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWidget::OpenColorPicker(void)
+{
+   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
+
+   //Resize
+   c_Popup->SetSize(QSize(412, 620));
+
+   // open color picker dialog
+   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      pc_ColorWidget->ChooseSelectedColor();
+   }
+
+   if (c_Popup != NULL)
+   {
+      c_Popup->HideOverlay();
+   }
+   //lint -e{429}  no memory leak because of the parent of pc_ColorWidget and the Qt memory management
 }

@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxTextLineEdit::C_OgeCbxTextLineEdit(QWidget * const opc_Parent) :
@@ -50,7 +50,7 @@ C_OgeCbxTextLineEdit::C_OgeCbxTextLineEdit(QWidget * const opc_Parent) :
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxText::C_OgeCbxText(QWidget * const opc_Parent) :
@@ -73,7 +73,8 @@ C_OgeCbxText::C_OgeCbxText(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a temporary text for showing on combo box selection, but not in selection list
 
-   \param[in]     orc_Text        Text for showing
+   \param[in]  orc_Text    Text for showing
+   \param[in]  oq_Error    Error flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxText::SetTemporaryText(const QString & orc_Text, const bool oq_Error)
@@ -204,8 +205,6 @@ void C_OgeCbxText::m_Activated(const QString & orc_Text)
    The combo box interprets a click on the LineEdit as "outside the box" and
    therefore calls hidePopup(). This is not wanted, since the pop up should
    open when the text is clicked.
-
-   \param[out]    mc_SuppressHide true --> next call of hidePopup() is suppressed
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxText::SuppressHide()

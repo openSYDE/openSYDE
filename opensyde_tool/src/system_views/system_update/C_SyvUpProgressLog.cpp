@@ -17,8 +17,9 @@
 #include "stwtypes.h"
 #include "constants.h"
 #include "C_GtGetText.h"
-#include "C_OgeLabGroupItem.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_OgeFrameSeparator.h"
+#include "C_OgeLabProgressLogItem.h"
 
 #include "C_SyvUpProgressLog.h"
 #include "ui_C_SyvUpProgressLog.h"
@@ -55,7 +56,7 @@ C_SyvUpProgressLog::C_SyvUpProgressLog(QWidget * const opc_Parent) :
    mpc_Ui(new Ui::C_SyvUpProgressLog),
    mpc_LogHyperlink(NULL)
 {
-   mpc_Ui->setupUi(this);
+   this->mpc_Ui->setupUi(this);
    this->mpc_Ui->pc_ScrollArea->DeactivateScrollbarResize();
    this->mpc_Ui->pc_ScrollAreaWidget->SetBackgroundColor(-1);
 
@@ -157,7 +158,7 @@ void C_SyvUpProgressLog::SetHeading(const QString & orc_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::AddSubHeading(const QString & orc_Value)
 {
-   QLabel * const pc_Entry = new C_OgeLabGroupItem(this);
+   QLabel * const pc_Entry = new C_OgeLabProgressLogItem(this);
 
    pc_Entry->setText(orc_Value);
 
@@ -276,7 +277,7 @@ void C_SyvUpProgressLog::AddLogHyperlink(void)
       this->AddSpacer();
 
       //Hyperlink
-      this->mpc_LogHyperlink = new C_OgeLabGroupItem(this);
+      this->mpc_LogHyperlink = new C_OgeLabProgressLogItem(this);
 
       //Update log file
       C_OSCLoggingHandler::h_Flush();

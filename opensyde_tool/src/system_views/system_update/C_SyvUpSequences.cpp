@@ -123,6 +123,7 @@ C_SyvUpSequences::~C_SyvUpSequences(void)
    C_COM         CAN initialization failed or no active node
    C_CHECKSUM    Internal buffer overflow detected
    C_RANGE       Routing configuration failed
+   C_BUSY        System view error detected
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)

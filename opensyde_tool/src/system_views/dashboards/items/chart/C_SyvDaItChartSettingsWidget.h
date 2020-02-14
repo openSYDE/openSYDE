@@ -38,10 +38,10 @@ public:
    ~C_SyvDaItChartSettingsWidget(void);
 
    void InitText(void) const;
-
    void SetData(const stw_opensyde_gui_logic::C_PuiSvDbChart & orc_Data) const;
-
    stw_opensyde_gui_logic::C_PuiSvDbChart::E_SettingZoomMode GetSettingZoomMode(void) const;
+   void ApplyDarkMode(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style,
+                      const bool oq_DarkMode) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

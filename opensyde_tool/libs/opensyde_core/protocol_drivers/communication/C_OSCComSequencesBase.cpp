@@ -233,15 +233,39 @@ bool C_OSCComSequencesBase::IsEthToEthRoutingNecessary(const uint32 ou32_RouterN
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Returns the minimum Flashloader reset wait time in ms
 
-   Default minimum value is 500 ms.
+   Default minimum value is 500 ms independent of the type.
+
+   \param[in]  oe_Type  Type of minimum flashloader reset wait time
 
    \return
    Time in ms all nodes needs at least to get from application to the Flashloader
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(void) const
+uint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(
+   const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type) const
 {
-   return this->mpc_ComDriver->GetMinimumFlashloaderResetWaitTime();
+   return this->mpc_ComDriver->GetMinimumFlashloaderResetWaitTime(oe_Type);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the minimum Flashloader reset wait time in ms for a specific node
+
+   Default minimum value is 500 ms independent of the type.
+
+   \param[in]   oe_Type             Type of minimum flashloader reset wait time
+   \param[in]   orc_ServerId        Server id to get the configured wait time
+   \param[out]  oru32_TimeValue     Time in ms the node need at least to get from application to the Flashloader or
+                                    from Flashloader to Flashloader
+
+   \retval   C_NO_ERR   Time returned
+   \retval   C_RANGE    Node with orc_ServerId does not exist or is not active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(
+   const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type,
+   const C_OSCProtocolDriverOsyNode & orc_ServerId, stw_types::uint32 & oru32_TimeValue) const
+{
+   return this->mpc_ComDriver->GetMinimumFlashloaderResetWaitTime(oe_Type, orc_ServerId, oru32_TimeValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

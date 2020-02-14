@@ -58,8 +58,7 @@ C_PuiSvHandler * C_PuiSvHandler::mhpc_Singleton = NULL;
 
    Load system views and store in information in our instance data.
 
-   \param[in] orc_Path     Path to system views file
-   \param[in] orc_OSCNodes OSC node information (Necessary for update information)
+   \param[in]  orc_Path    Path to system views file
 
    \return
    C_NO_ERR   data read and placed into instance data
@@ -82,8 +81,8 @@ sint32 C_PuiSvHandler::LoadFromFile(const QString & orc_Path)
 
    Save UI data part of system views to XML file.
 
-   \param[in] orc_Path                 Path to system views file
-   \param[in] oq_UseDeprecatedV1Format Optional flag to save in deprecated V1 format
+   \param[in]  orc_Path                   Path to system views file
+   \param[in]  oq_UseDeprecatedV1Format   Optional flag to save in deprecated V1 format
 
    \return
    C_NO_ERR   data saved
@@ -171,7 +170,7 @@ bool C_PuiSvHandler::HasHashChanged(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get view
 
-   \param[in] ou32_Index View index
+   \param[in]  ou32_Index  View index
 
    \return
    NULL View not found
@@ -208,8 +207,8 @@ uint32 C_PuiSvHandler::GetViewCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set view name
 
-   \param[in] ou32_Index View index
-   \param[in] orc_Name   View name
+   \param[in]  ou32_Index  View index
+   \param[in]  orc_Name    View name
 
    \return
    C_NO_ERR Operation success
@@ -235,9 +234,9 @@ sint32 C_PuiSvHandler::SetViewName(const uint32 ou32_Index, const QString & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set checked flag for node in view
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
-   \param[in] oq_Checked     Checked flag
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  oq_Checked        Checked flag
 
    \return
    C_NO_ERR Operation success
@@ -264,8 +263,8 @@ sint32 C_PuiSvHandler::SetViewNodeCheckedState(const uint32 ou32_ViewIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set View PC UI box
 
-   \param[in] ou32_Index View index
-   \param[in] orc_Box    New PC UI box
+   \param[in]  ou32_Index  View index
+   \param[in]  orc_Box     New PC UI box
 
    \return
    C_NO_ERR Operation success
@@ -291,8 +290,8 @@ sint32 C_PuiSvHandler::SetViewPCBox(const uint32 ou32_Index, const C_PuiBsBox & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set View PC connection UI data
 
-   \param[in] ou32_Index View index
-   \param[in] orc_Line   New View PC connection UI data
+   \param[in]  ou32_Index  View index
+   \param[in]  orc_Line    New View PC connection UI data
 
    \return
    C_NO_ERR Operation success
@@ -318,9 +317,9 @@ sint32 C_PuiSvHandler::SetViewPCConnection(const uint32 ou32_Index, const C_PuiB
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connected state of pc in view
 
-   \param[in] ou32_Index    View index
-   \param[in] oq_Connected  Flag if pc is connected
-   \param[in] ou32_BusIndex Bus index PC is connected to
+   \param[in]  ou32_Index     View index
+   \param[in]  oq_Connected   Flag if pc is connected
+   \param[in]  ou32_BusIndex  Bus index PC is connected to
 
    \return
    C_NO_ERR Operation success
@@ -346,8 +345,9 @@ sint32 C_PuiSvHandler::SetViewPCConnected(const uint32 ou32_Index, const bool oq
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set path for the CAN DLL
 
-   \param[in]     ou32_Index    View index
-   \param[in]     orc_DllPath   Path for the CAN DLL
+   \param[in]  ou32_Index     View index
+   \param[in]  oe_Type        CAN DLL Type
+   \param[in]  orc_DllPath    Path for the CAN DLL
 
    \return
    C_NO_ERR Operation success
@@ -374,9 +374,9 @@ sint32 C_PuiSvHandler::SetViewPCCANDll(const uint32 ou32_Index, const C_PuiSvPc:
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard name
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] orc_Name            New dashboard name
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  orc_Name             New dashboard name
 
    \return
    C_NO_ERR Operation success
@@ -403,9 +403,9 @@ sint32 C_PuiSvHandler::SetDashboardName(const uint32 ou32_ViewIndex, const uint3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard comment
 
-   \param[in] ou32_ViewIndex        View index
-   \param[in] ou32_DashboardIndex   Dashboard index
-   \param[in] orc_Comment           New dashboard comment
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  orc_Comment          New dashboard comment
 
    \return
    C_NO_ERR Operation success
@@ -432,9 +432,9 @@ sint32 C_PuiSvHandler::SetDashboardComment(const uint32 ou32_ViewIndex, const ui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard active flag
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oq_Active           New active flag
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oq_Active            New active flag
 
    \return
    C_NO_ERR Operation success
@@ -461,9 +461,9 @@ sint32 C_PuiSvHandler::SetDashboardActive(const uint32 ou32_ViewIndex, const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard current tab index
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oq_Value            New current tab index
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  os32_Value           New current tab index
 
    \return
    C_NO_ERR Operation success
@@ -490,11 +490,11 @@ sint32 C_PuiSvHandler::SetDashboardTabIndex(const uint32 ou32_ViewIndex, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dashboard widget box
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] ou32_WidgetIndex    Widget index
-   \param[in] opc_Box             New widget value
-   \param[in] oe_Type             New widget type
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  ou32_WidgetIndex     Widget index
+   \param[in]  opc_Box              New widget value
+   \param[in]  oe_Type              New widget type
 
    \return
    C_NO_ERR Operation success
@@ -522,10 +522,10 @@ sint32 C_PuiSvHandler::SetDashboardWidget(const uint32 ou32_ViewIndex, const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set item
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -552,10 +552,10 @@ sint32 C_PuiSvHandler::SetDashboardBoundary(const uint32 ou32_ViewIndex, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set item
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -582,10 +582,10 @@ sint32 C_PuiSvHandler::SetDashboardImage(const uint32 ou32_ViewIndex, const uint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set item
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -612,10 +612,10 @@ sint32 C_PuiSvHandler::SetDashboardLineArrow(const uint32 ou32_ViewIndex, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set item
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -642,8 +642,8 @@ sint32 C_PuiSvHandler::SetDashboardTextElement(const uint32 ou32_ViewIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set fast update rate
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou16_Value     New fast update rate
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou16_Value        New fast update rate
 
    \return
    C_NO_ERR Operation success
@@ -669,8 +669,8 @@ sint32 C_PuiSvHandler::SetViewUpdateRateFast(const uint32 ou32_ViewIndex, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set medium update rate
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou16_Value     New medium update rate
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou16_Value        New medium update rate
 
    \return
    C_NO_ERR Operation success
@@ -696,8 +696,8 @@ sint32 C_PuiSvHandler::SetViewUpdateRateMedium(const uint32 ou32_ViewIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set slow update rate
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou16_Value     New slow update rate
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou16_Value        New slow update rate
 
    \return
    C_NO_ERR Operation success
@@ -723,8 +723,8 @@ sint32 C_PuiSvHandler::SetViewUpdateRateSlow(const uint32 ou32_ViewIndex, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set view device config screen selected bit rate
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_Value     New device config screen selected bit rate in kbit/s
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_Value        New device config screen selected bit rate in kbit/s
 
    \return
    C_NO_ERR Operation success
@@ -750,8 +750,8 @@ sint32 C_PuiSvHandler::SetViewDeviceConfigSelectedBitRate(const uint32 ou32_View
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set view device config selected mode
 
-   \param[in] ou32_ViewIndex View index (identifier)
-   \param[in] ou32_Value     New device config screen selected mode
+   \param[in]  ou32_ViewIndex    View index (identifier)
+   \param[in]  oe_Value          New device config screen selected mode
 
    \return
    C_NO_ERR Operation success
@@ -778,8 +778,8 @@ sint32 C_PuiSvHandler::SetViewDeviceConfigMode(const uint32 ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set dark mode active flag
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou16_Value     New dark mode active flag
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  oq_Value          New dark mode active flag
 
    \return
    C_NO_ERR Operation success
@@ -805,9 +805,9 @@ sint32 C_PuiSvHandler::SetViewDarkModeActive(const uint32 ou32_ViewIndex, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set view read rail assignment
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] orc_Id         ID
-   \param[in] orc_Config     Config
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  orc_Id            ID
+   \param[in]  orc_Config        Config
 
    \return
    C_NO_ERR Operation success
@@ -835,8 +835,8 @@ sint32 C_PuiSvHandler::SetViewReadRailAssignment(const uint32 ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information
 
-   \param[in] ou32_ViewIndex            View index
-   \param[in] orc_NodeUpdateInformation New node update information
+   \param[in]  ou32_ViewIndex             View index
+   \param[in]  orc_NodeUpdateInformation  New node update information
 
    \return
    C_NO_ERR Operation success
@@ -863,9 +863,9 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformation(const uint32 ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information
 
-   \param[in] ou32_ViewIndex              View index
-   \param[in] ou32_Index                  Node index
-   \param[in] orc_NodeUpdateInformation   New node update information
+   \param[in]  ou32_ViewIndex             View index
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  orc_NodeUpdateInformation  New node update information
 
    \return
    C_NO_ERR    No error
@@ -892,11 +892,11 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformation(const uint32 ou32_ViewIndex, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information path
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
-   \param[in] ou32_Index     Index to access
-   \param[in] orc_Value      New path
-   \param[in] oe_Type        Selector for structure
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_Index        Index to access
+   \param[in]  orc_Value         New path
+   \param[in]  oe_Type           Selector for structure
 
    \return
    C_NO_ERR Operation success
@@ -924,11 +924,10 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationPath(const uint32 ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information parameter set information
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
-   \param[in] ou32_Index     Index to access
-   \param[in] orc_Value      New path
-   \param[in] oe_Type        Selector for structure
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_Index        Index to access
+   \param[in]  orc_Value         New path
 
    \return
    C_NO_ERR Operation success
@@ -956,11 +955,11 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationParamInfo(const uint32 ou32_ViewI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set node update information parameter set information
 
-   \param[in] ou32_ViewIndex    View index
-   \param[in] ou32_NodeIndex    Node index
-   \param[in] ou32_Index        Index to access
-   \param[in] orc_FilePath      New path
-   \param[in] ou32_LastKnownCrc Last known CRC for this file
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_Index           Index to access
+   \param[in]  orc_FilePath         New path
+   \param[in]  ou32_LastKnownCrc    Last known CRC for this file
 
    \return
    C_NO_ERR Operation success
@@ -990,9 +989,9 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationParamInfoContent(const uint32 ou3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add view
 
-   \param[in] orc_View            View item
-   \param[in] oq_AutoAdaptName    Optional flag to allow or block automatic adaption of input name
-   \param[in] oq_AutoAdaptContent Optional flag to allow or block automatic adaption of input content
+   \param[in]  orc_View             View item
+   \param[in]  oq_AutoAdaptName     Optional flag to allow or block automatic adaption of input name
+   \param[in]  oq_AutoAdaptContent  Optional flag to allow or block automatic adaption of input content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::AddView(const C_PuiSvData & orc_View, const bool oq_AutoAdaptName, const bool oq_AutoAdaptContent)
@@ -1005,8 +1004,8 @@ void C_PuiSvHandler::AddView(const C_PuiSvData & orc_View, const bool oq_AutoAda
 
    The previous view will be overwritten
 
-   \param[in] ou32_Index   View index
-   \param[in] orc_View     View item
+   \param[in]  ou32_Index  View index
+   \param[in]  orc_View    View item
 
    \return
    C_NO_ERR Operation success
@@ -1030,10 +1029,10 @@ sint32 C_PuiSvHandler::SetView(const uint32 ou32_Index, const C_PuiSvData & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert view
 
-   \param[in] ou32_Index          View index
-   \param[in] orc_View            View item
-   \param[in] oq_AutoAdaptName    Optional flag to allow or block automatic adaption of input name
-   \param[in] oq_AutoAdaptContent Optional flag to allow or block automatic adaption of input content
+   \param[in]  ou32_Index           View index
+   \param[in]  orc_View             View item
+   \param[in]  oq_AutoAdaptName     Optional flag to allow or block automatic adaption of input name
+   \param[in]  oq_AutoAdaptContent  Optional flag to allow or block automatic adaption of input content
 
    \return
    C_NO_ERR Operation success
@@ -1069,9 +1068,9 @@ sint32 C_PuiSvHandler::InsertView(const uint32 ou32_Index, const C_PuiSvData & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new read rail item to configuration
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] orc_Id         ID
-   \param[in] orc_Config     Configuration
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  orc_Id            ID
+   \param[in]  orc_Config        Configuration
 
    \return
    C_NO_ERR Operation success
@@ -1099,10 +1098,10 @@ sint32 C_PuiSvHandler::AddViewReadRailItem(const uint32 ou32_ViewIndex, const C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add node update information path
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
-   \param[in] orc_Value      New path
-   \param[in] oe_Type        Selector for structure
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_Value         New path
+   \param[in]  oe_Type           Selector for structure
 
    \return
    C_NO_ERR Operation success
@@ -1130,9 +1129,9 @@ sint32 C_PuiSvHandler::AddNodeUpdateInformationPath(const uint32 ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add node update information for a parameter set
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
-   \param[in] orc_Value      New path
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_Value         New path
 
    \return
    C_NO_ERR Operation success
@@ -1159,9 +1158,9 @@ sint32 C_PuiSvHandler::AddNodeUpdateInformationParamInfo(const uint32 ou32_ViewI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add dashboard to view
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] orc_Dashboard  Dashboard data
-   \param[in] oq_AutoAdapt   Auto adapt name flag
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  orc_Dashboard     Dashboard data
+   \param[in]  oq_AutoAdapt      Auto adapt name flag
 
    \return
    C_NO_ERR Operation success
@@ -1188,10 +1187,10 @@ sint32 C_PuiSvHandler::AddDashboard(const uint32 ou32_ViewIndex, const C_PuiSvDa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert dashboard to view
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] orc_Dashboard       Dashboard data
-   \param[in] oq_AutoAdapt        Auto adapt name flag
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  orc_Dashboard        Dashboard data
+   \param[in]  oq_AutoAdapt         Auto adapt name flag
 
    \return
    C_NO_ERR Operation success
@@ -1218,10 +1217,10 @@ sint32 C_PuiSvHandler::InsertDashboard(const uint32 ou32_ViewIndex, const uint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add widget to view dashboard
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] opc_Box             New widget value
-   \param[in] oe_Type             New widget type
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  opc_Box              New widget value
+   \param[in]  oe_Type              New widget type
 
    \return
    C_NO_ERR Operation success
@@ -1249,11 +1248,11 @@ sint32 C_PuiSvHandler::AddDashboardWidget(const uint32 ou32_ViewIndex, const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert widget to view dashboard
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] ou32_WidgetIndex    Widget index
-   \param[in] opc_Box             New widget value
-   \param[in] oe_Type             New widget type
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  ou32_WidgetIndex     Widget index
+   \param[in]  opc_Box              New widget value
+   \param[in]  oe_Type              New widget type
 
    \return
    C_NO_ERR Operation success
@@ -1281,9 +1280,9 @@ sint32 C_PuiSvHandler::InsertDashboardWidget(const uint32 ou32_ViewIndex, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new item
 
-   \param[in] ou32_Index          View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -1310,10 +1309,10 @@ sint32 C_PuiSvHandler::AddDashboardBoundary(const uint32 ou32_ViewIndex, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert new item
 
-   \param[in] ou32_Index          View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -1340,9 +1339,9 @@ sint32 C_PuiSvHandler::InsertDashboardBoundary(const uint32 ou32_ViewIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new item
 
-   \param[in] ou32_Index          View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -1369,10 +1368,10 @@ sint32 C_PuiSvHandler::AddDashboardImage(const uint32 ou32_ViewIndex, const uint
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert new item
 
-   \param[in] ou32_Index          View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -1399,9 +1398,9 @@ sint32 C_PuiSvHandler::InsertDashboardImage(const uint32 ou32_ViewIndex, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new item
 
-   \param[in] ou32_Index          View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -1428,10 +1427,10 @@ sint32 C_PuiSvHandler::AddDashboardLineArrow(const uint32 ou32_ViewIndex, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert new item
 
-   \param[in] ou32_Index          View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -1458,9 +1457,9 @@ sint32 C_PuiSvHandler::InsertDashboardLineArrow(const uint32 ou32_ViewIndex, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new item
 
-   \param[in] ou32_Index          View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -1487,10 +1486,10 @@ sint32 C_PuiSvHandler::AddDashboardTextElement(const uint32 ou32_ViewIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert new item
 
-   \param[in] ou32_Index          View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
-   \param[in] orc_Data            New value
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
+   \param[in]  orc_Data             New value
 
    \return
    C_NO_ERR Operation success
@@ -1517,7 +1516,7 @@ sint32 C_PuiSvHandler::InsertDashboardTextElement(const uint32 ou32_ViewIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete view
 
-   \param[in] ou32_Index View index
+   \param[in]  ou32_Index  View index
 
    \return
    C_NO_ERR Operation success
@@ -1544,8 +1543,8 @@ sint32 C_PuiSvHandler::DeleteView(const uint32 ou32_Index)
 
    WARNING: No check if still in use
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] orc_Id         ID
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  orc_Id            ID
 
    \return
    C_NO_ERR Operation success
@@ -1572,10 +1571,10 @@ sint32 C_PuiSvHandler::RemoveViewReadRailItem(const uint32 ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove node update information path
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
-   \param[in] ou32_Index     Index to remove
-   \param[in] oe_Type        Selector for structure
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_Index        Index to remove
+   \param[in]  oe_Type           Selector for structure
 
    \return
    C_NO_ERR Operation success
@@ -1603,10 +1602,9 @@ sint32 C_PuiSvHandler::RemoveNodeUpdateInformationPath(const uint32 ou32_ViewInd
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove node update information parameter set information
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
-   \param[in] ou32_Index     Index to remove
-   \param[in] oe_Type        Selector for structure
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  ou32_Index        Index to remove
 
    \return
    C_NO_ERR Operation success
@@ -1633,9 +1631,9 @@ sint32 C_PuiSvHandler::RemoveNodeUpdateInformationParamInfo(const uint32 ou32_Vi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear all node update information paths as appropriate for the type
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
-   \param[in] oe_Type        Selector for structure
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  oe_Type           Selector for structure
 
    \return
    C_NO_ERR Operation success
@@ -1662,8 +1660,8 @@ sint32 C_PuiSvHandler::ClearNodeUpdateInformationAsAppropriate(const uint32 ou32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear all node update information parameter set paths for this node
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_NodeIndex Node index
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_NodeIndex    Node index
 
    \return
    C_NO_ERR Operation success
@@ -1689,8 +1687,8 @@ sint32 C_PuiSvHandler::ClearNodeUpdateInformationParamPaths(const uint32 ou32_Vi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete dashboard from view
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
 
    \return
    C_NO_ERR Operation success
@@ -1716,10 +1714,10 @@ sint32 C_PuiSvHandler::DeleteDashboard(const uint32 ou32_ViewIndex, const uint32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete widget from view dashboard
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] ou32_WidgetIndex    Widget index
-   \param[in] oe_Type             New widget type
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  ou32_WidgetIndex     Widget index
+   \param[in]  oe_Type              New widget type
 
    \return
    C_NO_ERR Operation success
@@ -1746,9 +1744,9 @@ sint32 C_PuiSvHandler::DeleteDashboardWidget(const uint32 ou32_ViewIndex, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete item
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
 
    \return
    C_NO_ERR Operation success
@@ -1775,9 +1773,9 @@ sint32 C_PuiSvHandler::DeleteDashboardBoundary(const uint32 ou32_ViewIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete item
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
 
    \return
    C_NO_ERR Operation success
@@ -1804,9 +1802,9 @@ sint32 C_PuiSvHandler::DeleteDashboardImage(const uint32 ou32_ViewIndex, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete item
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
 
    \return
    C_NO_ERR Operation success
@@ -1833,9 +1831,9 @@ sint32 C_PuiSvHandler::DeleteDashboardLineArrow(const uint32 ou32_ViewIndex, con
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete item
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
-   \param[in] oru32_Index         Item index
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
+   \param[in]  oru32_Index          Item index
 
    \return
    C_NO_ERR Operation success
@@ -1873,8 +1871,8 @@ void C_PuiSvHandler::Clear(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move view
 
-   \param[in] ou32_StartIndex  Start index
-   \param[in] ou32_TargetIndex Target index
+   \param[in]  ou32_StartIndex   Start index
+   \param[in]  ou32_TargetIndex  Target index
 
    \return
    C_NO_ERR Operation success
@@ -1905,8 +1903,8 @@ sint32 C_PuiSvHandler::MoveView(const uint32 ou32_StartIndex, const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Synchronise internally stored scaling information with current system definition
 
-   \param[in] ou32_ViewIndex      View index
-   \param[in] ou32_DashboardIndex Dashboard index
+   \param[in]  ou32_ViewIndex       View index
+   \param[in]  ou32_DashboardIndex  Dashboard index
 
    \return
    C_NO_ERR Operation success
@@ -1964,7 +1962,7 @@ void C_PuiSvHandler::UpdateSystemDefintionErrors(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get buffered error for node
 
-   \param[in] ou32_Index Index
+   \param[in]  ou32_Index  Index
 
    \return
    Buffered error for node
@@ -1984,7 +1982,7 @@ bool C_PuiSvHandler::GetErrorNode(const uint32 ou32_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get buffered error for bus
 
-   \param[in] ou32_Index Index
+   \param[in]  ou32_Index  Index
 
    \return
    Buffered error for bus
@@ -2004,15 +2002,15 @@ bool C_PuiSvHandler::GetErrorBus(const uint32 ou32_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check view error
 
-   \param[in]     ou32_Index                        View index
-   \param[in,out] opq_NameInvalid                   Name conflict
-   \param[in,out] opq_PCNotConnected                PC not connected
-   \param[in,out] opq_RoutingInvalid                Routing invalid
-   \param[in,out] opq_UpdateDisabledButDataBlocks   No interface supports update but there are data blocks
-   \param[in,out] opq_SysDefInvalid                 System definition invalid
-   \param[in,out] opq_NoNodesActive                 No nodes active
-   \param[in,out] opc_RoutingErrorDetails           Error details for routing error if any
-                                                     Warning: only set if routing error checked
+   \param[in]      ou32_Index                         View index
+   \param[in,out]  opq_NameInvalid                    Name conflict
+   \param[in,out]  opq_PCNotConnected                 PC not connected
+   \param[in,out]  opq_RoutingInvalid                 Routing invalid
+   \param[in,out]  opq_UpdateDisabledButDataBlocks    No interface supports update but there are data blocks
+   \param[in,out]  opq_SysDefInvalid                  System definition invalid
+   \param[in,out]  opq_NoNodesActive                  No nodes active
+   \param[in,out]  opc_RoutingErrorDetails            Error details for routing error if any
+                                                      Warning: only set if routing error checked
 
    \return
    C_NO_ERR Operation success
@@ -2137,9 +2135,9 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check update possible
 
-   \param[in]  ou32_ViewIndex                  View index (identifier)
-   \param[out] orq_UpdateDisabledButDataBlocks Data blocks but no interface updateable
-   \param[out] orc_ErrorMessage                Error details (affected nodes)
+   \param[in]   ou32_ViewIndex                     View index (identifier)
+   \param[out]  orq_UpdateDisabledButDataBlocks    Data blocks but no interface updateable
+   \param[out]  orc_ErrorMessage                   Error details (affected nodes)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::CheckUpdateEnabledForDataBlocks(const uint32 ou32_ViewIndex,
@@ -2201,9 +2199,9 @@ void C_PuiSvHandler::CheckUpdateEnabledForDataBlocks(const uint32 ou32_ViewIndex
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check routing error
 
-   \param[in]  ou32_ViewIndex   View index
-   \param[out] orq_RoutingError Routing error
-   \param[out] orc_Message      Error message
+   \param[in]   ou32_ViewIndex      View index
+   \param[out]  orq_RoutingError    Routing error
+   \param[out]  orc_ErrorMessage    Error message
 
    \return
    C_NO_ERR Operation success
@@ -2242,22 +2240,52 @@ sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_Rout
                const C_SyvRoRouteCalculation c_RouteCalcDiag(ou32_ViewIndex, u32_Counter,
                                                              stw_opensyde_core::C_OSCRoutingCalculation::eDIAGNOSTIC);
 
-               if ((c_RouteCalcUpdate.WasPcAvailable() == false) ||
-                   ((c_RouteCalcUpdate.GetState() != C_NO_ERR) &&
-                    (c_RouteCalcUpdate.GetState() != C_NOACT)))
+               // Normally both variants must fail in this case on the same way
+               if ((c_RouteCalcUpdate.GetState() == C_CONFIG) ||
+                   (c_RouteCalcDiag.GetState() == C_CONFIG))
                {
                   orq_RoutingError = true;
-                  orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) + " (Update)";
+                  orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) +
+                                      C_GtGetText::h_GetText(" (CAN to Ethernet routing not supported)");
                   c_Space = ", ";
                }
-
-               if ((c_RouteCalcDiag.WasPcAvailable() == false) ||
-                   ((c_RouteCalcDiag.GetState() != C_NO_ERR) &&
-                    (c_RouteCalcDiag.GetState() != C_NOACT)))
+               else
                {
-                  orq_RoutingError = true;
-                  orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) + " (Diagnostic)";
-                  c_Space = ", ";
+                  //Error check
+                  const bool q_RoutingUpdateError = ((c_RouteCalcUpdate.WasPcAvailable() == false) ||
+                                                     ((c_RouteCalcUpdate.GetState() != C_NO_ERR) &&
+                                                      (c_RouteCalcUpdate.GetState() != C_NOACT)));
+                  const bool q_RoutingDiagnosticError = ((c_RouteCalcDiag.WasPcAvailable() == false) ||
+                                                         ((c_RouteCalcDiag.GetState() != C_NO_ERR) &&
+                                                          (c_RouteCalcDiag.GetState() != C_NOACT)));
+                  if (q_RoutingUpdateError == true)
+                  {
+                     orq_RoutingError = true;
+                     if (q_RoutingDiagnosticError == true)
+                     {
+                        //Combined error
+                        orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) +
+                                            C_GtGetText::h_GetText(" (Update + Diagnostic)");
+                     }
+                     else
+                     {
+                        //Update error
+                        orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) +
+                                            C_GtGetText::h_GetText(" (Update)");
+                     }
+                     c_Space = ", ";
+                  }
+                  else
+                  {
+                     if (q_RoutingDiagnosticError == true)
+                     {
+                        //Diagnostic error
+                        orq_RoutingError = true;
+                        orc_ErrorMessage += c_Space + QString(pc_Node->c_Properties.c_Name.c_str()) +
+                                            C_GtGetText::h_GetText(" (Diagnostic)");
+                        c_Space = ", ";
+                     }
+                  }
                }
             }
             else
@@ -2278,8 +2306,8 @@ sint32 C_PuiSvHandler::CheckRouting(const uint32 ou32_ViewIndex, bool & orq_Rout
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check view reconnect necessary
 
-   \param[in]  ou32_ViewIndex         View index
-   \param[out] orq_ReconnectNecessary Flag if reconnect necessary
+   \param[in]   ou32_ViewIndex            View index
+   \param[out]  orq_ReconnectNecessary    Flag if reconnect necessary
 
    \return
    C_NO_ERR Operation success
@@ -2333,7 +2361,7 @@ sint32 C_PuiSvHandler::CheckViewReconnectNecessary(const uint32 ou32_ViewIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get namespace for ID
 
-   \param[in] orc_Id ID
+   \param[in]  orc_Id   ID
 
    \return
    Namespace
@@ -2358,8 +2386,8 @@ QString C_PuiSvHandler::h_GetNamespace(const C_PuiSvDbNodeDataPoolListElementId 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check bus for disabled look
 
-   \param[in] ou32_ViewIndex View index
-   \param[in] ou32_BusIndex  Bus index
+   \param[in]  ou32_ViewIndex    View index
+   \param[in]  ou32_BusIndex     Bus index
 
    \return
    True  Disabled
@@ -2399,9 +2427,9 @@ bool C_PuiSvHandler::CheckBusDisabled(const uint32 ou32_ViewIndex, const uint32 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   View dashboard param widget clear all data pool elements
 
-   \param[in] ou32_ViewIndex        View index
-   \param[in] ou32_DashboardIndex   Dashboard index
-   \param[in] ou32_ParamWidgetIndex Param index
+   \param[in]  ou32_ViewIndex          View index
+   \param[in]  ou32_DashboardIndex     Dashboard index
+   \param[in]  ou32_ParamWidgetIndex   Param index
 
    \return
    C_NO_ERR Operation success
@@ -2429,11 +2457,11 @@ sint32 C_PuiSvHandler::ClearViewDashboardParamDataPoolElements(const uint32 ou32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   View dashboard param widget add new data pool element
 
-   \param[in] ou32_ViewIndex        View index
-   \param[in] ou32_DashboardIndex   Dashboard index
-   \param[in] ou32_ParamWidgetIndex Param index
-   \param[in] orc_NewId             New ID
-   \param[in] opc_Content           Optional init value
+   \param[in]  ou32_ViewIndex          View index
+   \param[in]  ou32_DashboardIndex     Dashboard index
+   \param[in]  ou32_ParamWidgetIndex   Param index
+   \param[in]  orc_NewId               New ID
+   \param[in]  opc_Content             Optional init value
 
    \return
    C_NO_ERR Operation success
@@ -2464,7 +2492,7 @@ sint32 C_PuiSvHandler::AddViewDashboardParamNewDataPoolElement(const uint32 ou32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get hash for view
 
-   \param[in] ou32_ViewIndex Index
+   \param[in]  ou32_ViewIndex    Index
 
    \return
    Hash for view
@@ -2597,7 +2625,7 @@ sint32 C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvHandler::C_PuiSvHandler(QObject * const opc_Parent) :
@@ -2681,7 +2709,7 @@ C_PuiSvHandler::~C_PuiSvHandler(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sync view node indices to added node index
 
-   \param[in] ou32_Index Added node index
+   \param[in]  ou32_Index  Added node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeAdded(const uint32 ou32_Index)
@@ -2696,7 +2724,7 @@ void C_PuiSvHandler::m_OnSyncNodeAdded(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sync view node indices to deleted node index
 
-   \param[in] ou32_Index Deleted node index
+   \param[in]  ou32_Index  Deleted node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
@@ -2711,7 +2739,7 @@ void C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sync view bus index to added bus index
 
-   \param[in] ou32_Index Added bus index
+   \param[in]  ou32_Index  Added bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncBusAdded(const uint32 ou32_Index)
@@ -2726,7 +2754,7 @@ void C_PuiSvHandler::m_OnSyncBusAdded(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sync view bus index to deleted bus index
 
-   \param[in] ou32_Index Deleted bus index
+   \param[in]  ou32_Index  Deleted bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncBusDeleted(const uint32 ou32_Index)
@@ -2741,8 +2769,8 @@ void C_PuiSvHandler::m_OnSyncBusDeleted(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
@@ -2757,9 +2785,9 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex           Node index
-   \param[in] ou32_DataPoolSourceIndex Source data pool index
-   \param[in] ou32_DataPoolTargetIndex Target data pool index
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataPoolSourceIndex   Source data pool index
+   \param[in]  ou32_DataPoolTargetIndex   Target data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolSourceIndex,
@@ -2775,8 +2803,8 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
@@ -2791,8 +2819,8 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex        Node index
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeApplicationAdded(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
@@ -2807,9 +2835,9 @@ void C_PuiSvHandler::m_OnSyncNodeApplicationAdded(const uint32 ou32_NodeIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex              Node index
-   \param[in] ou32_ApplicationSourceIndex Application source index
-   \param[in] ou32_ApplicationTargetIndex Application target index
+   \param[in]  ou32_NodeIndex                Node index
+   \param[in]  ou32_ApplicationSourceIndex   Application source index
+   \param[in]  ou32_ApplicationTargetIndex   Application target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeApplicationMoved(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationSourceIndex,
@@ -2825,8 +2853,8 @@ void C_PuiSvHandler::m_OnSyncNodeApplicationMoved(const uint32 ou32_NodeIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex        Node index
-   \param[in] ou32_ApplicationIndex Application index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_NodeIndex,
@@ -2842,9 +2870,9 @@ void C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_N
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -2860,10 +2888,10 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex       Node index
-   \param[in] ou32_DataPoolIndex   Data pool index
-   \param[in] ou32_ListSourceIndex Source list index
-   \param[in] ou32_ListTargetIndex Target list index
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou32_DataPoolIndex      Data pool index
+   \param[in]  ou32_ListSourceIndex    Source list index
+   \param[in]  ou32_ListTargetIndex    Target list index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -2880,9 +2908,9 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_NodeIndex,
@@ -2899,10 +2927,10 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_DataSetIndex  Data set index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_DataSetIndex    Data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -2918,11 +2946,11 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAdded(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex          Node index
-   \param[in] ou32_DataPoolIndex      Data pool index
-   \param[in] ou32_ListIndex          List index
-   \param[in] ou32_DataSetSourceIndex Source data set index
-   \param[in] ou32_DataSetTargetIndex Target data set index
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataPoolIndex         Data pool index
+   \param[in]  ou32_ListIndex             List index
+   \param[in]  ou32_DataSetSourceIndex    Source data set index
+   \param[in]  ou32_DataSetTargetIndex    Target data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -2941,10 +2969,10 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetMoved(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_DataSetIndex  Data set index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_DataSetIndex    Data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint32 ou32_NodeIndex,
@@ -2963,10 +2991,10 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint3
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -2982,11 +3010,11 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAdded(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex          Node index
-   \param[in] ou32_DataPoolIndex      Data pool index
-   \param[in] ou32_ListIndex          List index
-   \param[in] ou32_ElementSourceIndex Source element index
-   \param[in] ou32_ElementTargetIndex Target element index
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DataPoolIndex         Data pool index
+   \param[in]  ou32_ListIndex             List index
+   \param[in]  ou32_ElementSourceIndex    Source element index
+   \param[in]  ou32_ElementTargetIndex    Target element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -3005,14 +3033,14 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementMoved(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
-   \param[in] oe_Type            New element type
-   \param[in] oq_IsArray         New array type
-   \param[in] ou32_ArraySize     New array size
-   \param[in] oq_IsString        Flag if new type is string
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oe_Type              New element type
+   \param[in]  oq_IsArray           New array type
+   \param[in]  ou32_ArraySize       New array size
+   \param[in]  oq_IsString          Flag if new type is string
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou32_NodeIndex,
@@ -3035,11 +3063,11 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
-   \param[in] oe_Access          New access type
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oe_Access            New access type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAccessChanged(const uint32 ou32_NodeIndex,
@@ -3059,10 +3087,10 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAccessChanged(const uint32 o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou32_DataPoolIndex Data pool index
-   \param[in] ou32_ListIndex     List index
-   \param[in] ou32_ElementIndex  Element index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
+   \param[in]  ou32_ListIndex       List index
+   \param[in]  ou32_ElementIndex    Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32 ou32_NodeIndex,
@@ -3142,16 +3170,15 @@ std::map<stw_scl::C_SCLString, bool> C_PuiSvHandler::m_GetExistingViewNames(void
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   short description of function
+/*! \brief   Get error detail result.
 
-   long description of function within several lines
-
-   \param[in]     ou8_Aa         input parameter description
-   \param[out]    opu32_Bb       output parameter description
-   \param[in,out] opu16_Cc       input/output parameter description
-
-   \return
-   possible return value(s) and description
+   \param[out]     opq_NameInvalid                    Name invalid
+   \param[out]     opq_PCNotConnected                 PC not connected
+   \param[out]     opq_RoutingInvalid                 Routing invalid
+   \param[out]     opq_UpdateDisabledButDataBlocks    Update disabled though Data Block exists
+   \param[out]     opq_SysDefInvalid                  System definition invalid
+   \param[out]     opq_NoNodesActive                  No nodes active
+   \param[in,out]  opc_RoutingErrorDetails            Routing error details
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::C_PuiSvViewErrorDetails::GetResults(bool * const opq_NameInvalid, bool * const opq_PCNotConnected,

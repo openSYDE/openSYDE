@@ -45,15 +45,14 @@ using namespace stw_errors;
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent         Optional pointer to parent
-   \param[in,out] opc_TreeWidgetItem Tree widget item
+   \param[in,out] opc_TreeWidget     Tree widget
    \param[in,out] opc_UndoStack      Undo stack
    \param[in]     oq_PopUp           optional flag for "in pop up" state
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListTableWidget::C_SdNdeDpListTableWidget(QWidget * const opc_Parent,
-                                                               QTreeWidget * const opc_TreeWidget,
-                                                               C_SdNdeUnoDataPoolManager * const opc_UndoStack,
-                                                               const bool oq_PopUp) :
+C_SdNdeDpListTableWidget::C_SdNdeDpListTableWidget(QWidget * const opc_Parent, QTreeWidget * const opc_TreeWidget,
+                                                   C_SdNdeUnoDataPoolManager * const opc_UndoStack,
+                                                   const bool oq_PopUp) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListTableWidget),
    mpc_TreeWidget(opc_TreeWidget),
@@ -117,7 +116,7 @@ void C_SdNdeDpListTableWidget::InitStaticNames(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableWidget::SetTreeWidgetAndUndoManager(QTreeWidget * const opc_TreeWidget,
-                                                                 C_SdNdeUnoDataPoolManager * const opc_UndoStack)
+                                                           C_SdNdeUnoDataPoolManager * const opc_UndoStack)
 {
    this->mpc_TreeWidget = opc_TreeWidget;
    this->mpc_UndoStack = opc_UndoStack;
@@ -133,8 +132,8 @@ void C_SdNdeDpListTableWidget::SetTreeWidgetAndUndoManager(QTreeWidget * const o
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableWidget::SetList(const stw_types::uint32 & oru32_NodeIndex,
-                                             const stw_types::uint32 & oru32_DataPoolIndex,
-                                             const stw_types::uint32 & oru32_ListIndex)
+                                       const stw_types::uint32 & oru32_DataPoolIndex,
+                                       const stw_types::uint32 & oru32_ListIndex)
 {
    //Internal
    this->mu32_NodeIndex = oru32_NodeIndex;
@@ -347,9 +346,9 @@ void C_SdNdeDpListTableWidget::m_OnSelectionChanged(const uint32 & oru32_Count)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableWidget::m_OnButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
-                                                      const bool & orq_CopyActive, const bool & orq_PasteActive,
-                                                      const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
-                                                      const bool & orq_MoveUpActive)
+                                                const bool & orq_CopyActive, const bool & orq_PasteActive,
+                                                const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
+                                                const bool & orq_MoveUpActive)
 {
    Q_EMIT this->SigButtonChange(orq_AddActive, orq_CutActive, orq_CopyActive, orq_PasteActive, orq_DeleteActive,
                                 orq_MoveDownActive, orq_MoveUpActive);
@@ -369,7 +368,7 @@ void C_SdNdeDpListTableWidget::m_OnCRCOptionChange(const bool & orq_Value)
       this->mpc_UndoStack->DoChangeListData(this->mu32_NodeIndex,
                                             this->mu32_DataPoolIndex,
                                             dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
-                                                                                                 mpc_TreeWidget),
+                                                                                           mpc_TreeWidget),
                                             this->mu32_ListIndex, QVariant(orq_Value), C_SdNdeDpUtil::eLIST_CRC);
    }
 }
@@ -440,8 +439,8 @@ void C_SdNdeDpListTableWidget::m_AdjustToItems(const bool & orq_Initial)
    {
       //Configure
       const sint32 s32_Height = C_SdNdeDpUtil::h_GetTableSize(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                                    this->mu32_ListIndex,
-                                                                    this->mpc_TreeWidget->height());
+                                                              this->mu32_ListIndex,
+                                                              this->mpc_TreeWidget->height());
       //Change size (necessary to reach minimum!)
       this->setMinimumHeight(s32_Height);
       this->setMaximumHeight(s32_Height);

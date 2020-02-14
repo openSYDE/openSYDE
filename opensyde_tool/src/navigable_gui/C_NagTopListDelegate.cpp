@@ -68,7 +68,7 @@ void C_NagTopListDelegate::SetSelectedIndex(const stw_types::sint32 os32_Selecte
 
    \param[in,out] opc_Painter Painter (default interface)
    \param[in]     orc_Option  Option (default interface)
-   \param[in]     orc_index   Index (default interface)
+   \param[in]     orc_Index   Index (default interface)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagTopListDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,

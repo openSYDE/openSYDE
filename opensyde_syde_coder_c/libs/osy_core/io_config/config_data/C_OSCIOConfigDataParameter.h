@@ -26,8 +26,8 @@ public:
    C_OSCIOConfigDataParameter();
    virtual ~C_OSCIOConfigDataParameter();
 
-   C_OSCIOFileDataContent c_Value;             ///< Value configured by user for this parameter
-   stw_scl::C_SCLString c_Comment;             ///< User comment for this parameter
+   C_OSCIOFileDataContent c_Value; ///< Value configured by user for this parameter
+   stw_scl::C_SCLString c_Comment; ///< User comment for this parameter
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

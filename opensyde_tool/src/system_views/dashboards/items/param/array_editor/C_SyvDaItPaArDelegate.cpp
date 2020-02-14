@@ -112,7 +112,7 @@ void C_SyvDaItPaArDelegate::setModelData(QWidget * const opc_Editor, QAbstractIt
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set model for column look up
 
-   \param[in] opc_Model  Model for column look up
+   \param[in] opc_Value  Model for column look up
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArDelegate::SetModel(const C_SyvDaItPaArModel * const opc_Value)
@@ -144,9 +144,9 @@ QWidget * C_SyvDaItPaArDelegate::m_CreateEditor(QWidget * const opc_Parent, cons
          if (pc_Element != NULL)
          {
             pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
-                                                                   pc_Element->c_MaxValue, pc_Element->f64_Factor,
-                                                                   pc_Element->f64_Offset,
-                                                                   static_cast<uint32>(orc_Index.column()), false);
+                                                             pc_Element->c_MaxValue, pc_Element->f64_Factor,
+                                                             pc_Element->f64_Offset,
+                                                             static_cast<uint32>(orc_Index.column()), false);
          }
       }
    }

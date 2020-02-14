@@ -86,6 +86,8 @@ sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & o
          //Parse ini
          C_SCLIniFile c_Ini(orc_Path.toStdString().c_str());
          mh_SaveLanguages(orc_UserSettings, c_Ini);
+         mh_SaveColors(orc_UserSettings, c_Ini);
+         mh_SaveNextRecentColorButtonNumber(orc_UserSettings, c_Ini);
          mh_SaveRecentProjects(orc_UserSettings, c_Ini);
          mh_SaveProjectIndependentSection(orc_UserSettings, c_Ini);
          mh_SaveProjectDependentSection(orc_UserSettings, c_Ini, orc_ActiveProject);
@@ -132,6 +134,8 @@ sint32 C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Pat
          orc_UserSettings.SetDefault();
 
          mh_LoadLanguages(orc_UserSettings, c_Ini);
+         mh_LoadColors(orc_UserSettings, c_Ini);
+         mh_LoadNextRecentColorButtonNumber(orc_UserSettings, c_Ini);
          if (orc_ActiveProject == "")
          {
             // load recent projects only if no active project is given
@@ -761,6 +765,49 @@ void C_UsFiler::mh_SaveLanguages(const C_UsHandler & orc_UserSettings, C_SCLIniF
    //Save As
    orc_Ini.WriteString("Common", "SaveAsLocation",
                        orc_UserSettings.GetCurrentSaveAsPath().toStdString().c_str());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save recent colors part of user settings
+
+   \param[in]     orc_UserSettings User settings
+   \param[in,out] orc_Ini          Ini handler
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_SaveColors(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
+{
+   // Colors
+   sintn sn_Counter = 0;
+
+   QVector<QColor> c_RecentColors = orc_UserSettings.GetRecentColors();
+   QVector<QColor>::const_iterator cp_ItColor;
+   for (cp_ItColor = c_RecentColors.begin(); cp_ItColor != c_RecentColors.end(); ++cp_ItColor)
+   {
+      ++sn_Counter;
+
+      orc_Ini.WriteInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
+                           C_SCLString("_Red"), cp_ItColor->red());
+      orc_Ini.WriteInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
+                           C_SCLString("_Green"), cp_ItColor->green());
+      orc_Ini.WriteInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
+                           C_SCLString("_Blue"), cp_ItColor->blue());
+      orc_Ini.WriteInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
+                           C_SCLString("_Alpha"), cp_ItColor->alpha());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save next recent color button number part of user settings
+
+   \param[in]     orc_UserSettings User settings
+   \param[in,out] orc_Ini          Ini handler
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_SaveNextRecentColorButtonNumber(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
+{
+   // Next recent color button number
+   orc_Ini.WriteInteger("RecentColors", "NextRecentColorButtonNumber",
+                        orc_UserSettings.GetNextRecentColorButtonNumber());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1519,7 +1566,6 @@ void C_UsFiler::mh_LoadViewNode(C_SCLIniFile & orc_Ini, const QString & orc_Sect
    if (c_ViewNodeName.compare("") != 0)
    {
       QMap<uint32, bool> c_ExpandedFlags;
-      bool q_Value;
       std::vector<uint32> c_Types;
 
       c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK);
@@ -1529,9 +1575,9 @@ void C_UsFiler::mh_LoadViewNode(C_SCLIniFile & orc_Ini, const QString & orc_Sect
       //Section expanded flags
       for (std::vector<uint32>::const_iterator c_It = c_Types.begin(); c_It != c_Types.end(); ++c_It)
       {
-         q_Value = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
-                                    QString("%1Section%2").arg(orc_ViewNodeIdBase).arg(*c_It).toStdString().c_str(),
-                                    true);
+         const bool q_Value =
+            orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                             QString("%1Section%2").arg(orc_ViewNodeIdBase).arg(*c_It).toStdString().c_str(), true);
          c_ExpandedFlags[*c_It] = q_Value;
       }
 
@@ -1638,6 +1684,49 @@ void C_UsFiler::mh_LoadLanguages(C_UsHandler & orc_UserSettings, C_SCLIniFile & 
    orc_UserSettings.SetLanguage(c_Tmp);
    //Save As
    orc_UserSettings.SetCurrentSaveAsPath(orc_Ini.ReadString("Common", "SaveAsLocation", "").c_str());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI recent colors section
+
+   \param[in,out] orc_UserSettings User settings
+   \param[in,out] orc_Ini          Current ini
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_LoadColors(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
+{
+   QVector<QColor> c_RecentColorsVector;
+
+   //Colors
+   for (sintn sn_Counter = 1; sn_Counter <= 6; sn_Counter++)
+   {
+      QColor c_Color;
+      c_Color.setRed(orc_Ini.ReadInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
+                                         C_SCLString("_Red"), 255));
+      c_Color.setGreen(orc_Ini.ReadInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
+                                           C_SCLString("_Green"), 255));
+      c_Color.setBlue(orc_Ini.ReadInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
+                                          C_SCLString("_Blue"), 255));
+      c_Color.setAlpha(orc_Ini.ReadInteger("RecentColors", C_SCLString("ColorNr") + C_SCLString::IntToStr(sn_Counter) +
+                                           C_SCLString("_Alpha"), 255));
+      c_RecentColorsVector.push_back(c_Color);
+   }
+
+   orc_UserSettings.SetRecentColors(c_RecentColorsVector);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI recent colors section
+
+   \param[in,out] orc_UserSettings User settings
+   \param[in,out] orc_Ini          Current ini
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_LoadNextRecentColorButtonNumber(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
+{
+   //Next recent color button
+   orc_UserSettings.SetNextRecentColorButtonNumber(orc_Ini.ReadInteger("RecentColors",
+                                                                       "NextRecentColorButtonNumber", 1));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

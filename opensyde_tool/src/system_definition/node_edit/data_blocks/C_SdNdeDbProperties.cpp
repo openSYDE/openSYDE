@@ -42,6 +42,7 @@ using namespace stw_opensyde_gui_elements;
 const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V1 = 0;
 const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V2 = 1;
 const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V3 = 2;
+const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V4 = 3;
 // when adding new versions do not forget to update mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -85,10 +86,11 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    this->mpc_Ui->pc_ScrollAreaDataPools->DeactivateScrollbarResize();
    this->mpc_Ui->pc_PushButtonRevertToDefault->setIcon(QIcon("://images/IconRevert.svg"));
    this->mpc_Ui->pc_PushButtonRevertToDefault->setMenu(NULL); // remove menu (we only need the style of button class)
-   // Provide data block project as placeholder variable for output, code generate and code generator
+   // Provide data block project as placeholder variable for output, code generate, code generator and IDE call
    this->mpc_Ui->pc_PubMenuOutputFile->AddDatablockSection();
    this->mpc_Ui->pc_PubMenuCodeGenerate->AddDatablockSection();
    this->mpc_Ui->pc_PubMenuCodeGenerator->AddDatablockSection();
+   this->mpc_Ui->pc_PubMenuIDE->AddDatablockSection();
 
    //Remove debug labels
    this->mpc_Ui->pc_GroupBoxDataPoolsEmpty->setTitle("");
@@ -97,10 +99,12 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    this->mpc_Ui->pc_PushButtonOutputFile->setText("");
    this->mpc_Ui->pc_PushButtonCodeGenerate->setText("");
    this->mpc_Ui->pc_PushButtonCodeGenerator->setText("");
+   this->mpc_Ui->pc_PushButtonIDE->setText("");
    this->mpc_Ui->pc_PubMenuProject->setText("");
    this->mpc_Ui->pc_PubMenuOutputFile->setText("");
    this->mpc_Ui->pc_PubMenuCodeGenerate->setText("");
    this->mpc_Ui->pc_PubMenuCodeGenerator->setText("");
+   this->mpc_Ui->pc_PubMenuIDE->setText("");
    this->mpc_Ui->pc_PushButtonRevertToDefault->setText("");
 
    InitStaticNames();
@@ -133,6 +137,7 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    connect(this->mpc_Ui->pc_PushButtonCodeGenerator, &QPushButton::clicked,
            this, &C_SdNdeDbProperties::m_OnClickGenerator);
    connect(this->mpc_Ui->pc_PushButtonOutputFile, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_OnClickOutput);
+   connect(this->mpc_Ui->pc_PushButtonIDE, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_OnClickIDE);
 
    // path variables actions
    connect(this->mpc_Ui->pc_PubMenuProject, &C_OgePubPathVariables::SigVariableSelected,
@@ -145,6 +150,8 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
            this->mpc_Ui->pc_LineEditCodeGenerate, &C_OgeLeFilePath::InsertVariable);
    connect(this->mpc_Ui->pc_PubMenuCodeGenerator, &C_OgePubPathVariables::SigVariableSelected,
            this->mpc_Ui->pc_LineEditCodeGenerator, &C_OgeLeFilePath::InsertVariable);
+   connect(this->mpc_Ui->pc_PubMenuIDE, &C_OgePubPathVariables::SigVariableSelected,
+           this->mpc_Ui->pc_LineEditIDE, &C_OgeLePlaceholderVar::InsertVariable);
 
    // connect for updating paths that are relative to project path
    connect(this->mpc_Ui->pc_LineEditProject, &C_OgeLeFilePath::editingFinished,
@@ -207,9 +214,11 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
+   this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V1, C_GtGetText::h_GetText("Version 1"));
    this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V2, C_GtGetText::h_GetText("Version 2"));
    this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V3, C_GtGetText::h_GetText("Version 3"));
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V4, C_GtGetText::h_GetText("Version 4"));
    this->mpc_Ui->pc_LabelHeadingDatapools->setText(C_GtGetText::h_GetText("Owned Datapools"));
    this->mpc_Ui->pc_LabelDataPoolsEmpty->setText("No assigned Datapools, \nadd any via the '+' button");
    this->mpc_Ui->pc_CommentText->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
@@ -269,10 +278,12 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
                                      " - %1: Compatibility mode for previous versions of provided tools \n"
                                      "   (might not take all supported project properties into account)\n"
                                      " - %2: Support of COMM messages with multiplexing\n"
-                                     " - %3: Support for flexible placement of embedded RAM variables"))
+                                     " - %3: Support for flexible placement of embedded RAM variables\n"
+                                     " - %4: Support for public scope of Datapool content"))
       .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V1))
       .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V2))
-      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V3)));
+      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V3))
+      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V4)));
    this->mpc_Ui->pc_LabelIDE->SetToolTipInformation(
       C_GtGetText::h_GetText("IDE Call"),
       C_GtGetText::h_GetText("Command line IDE call. Absolute or relative to working directory. Make sure to escape "
@@ -294,6 +305,9 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonCodeGenerator->SetToolTipInformation(
       C_GtGetText::h_GetText("Browse"),
       C_GtGetText::h_GetText("Browse for code generator of this Data Block."));
+   this->mpc_Ui->pc_PushButtonIDE->SetToolTipInformation(
+      C_GtGetText::h_GetText("Browse"),
+      C_GtGetText::h_GetText("Browse for IDE executable."));
 }
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Init from application
@@ -339,8 +353,11 @@ void C_SdNdeDbProperties::ApplyNewData(C_OSCNodeApplication & orc_Application) c
    case mhsn_VERSION_INDEX_V3:
       orc_Application.u16_GenCodeVersion = 3U;
       break;
+   case mhsn_VERSION_INDEX_V4:
+      orc_Application.u16_GenCodeVersion = 4U;
+      break;
    default:
-      orc_Application.u16_GenCodeVersion = 3U;
+      orc_Application.u16_GenCodeVersion = 4U;
       tgl_assert(false); // combo box has unknown index should never happen
       break;
    }
@@ -477,6 +494,7 @@ void C_SdNdeDbProperties::m_OkClicked(void)
       c_Message.SetHeading(c_Heading);
       c_Message.SetDescription(c_MessageText);
       c_Message.SetDetails(c_Details);
+      c_Message.SetCustomMinHeight(180, 270);
       c_Message.Execute();
    }
 }
@@ -660,7 +678,6 @@ QString C_SdNdeDbProperties::m_CheckPath(const QString & orc_Path) const
 
       // use resolve engine to check resulting path
       if (C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == false)
-
       {
          c_Return = orc_Path;
          if (orc_Path != c_ResolvedPath)
@@ -845,6 +862,7 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
    this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(orc_Application.c_CodeGeneratorPath.c_str(), C_Uti::h_GetExePath());
    this->mpc_Ui->pc_LineEditCodeGenerate->SetDbProjectPath(c_ProjectPath);
    this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(orc_Application.c_GeneratePath.c_str(), c_ProjectPath);
+   this->mpc_Ui->pc_LineEditIDE->SetDbProjectPath(c_ProjectPath);
    switch (orc_Application.u16_GenCodeVersion)
    {
    case 1U:
@@ -856,9 +874,12 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
    case 3U:
       this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V3);
       break;
+   case 4U:
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V4);
+      break;
    default:
       // latest is greatest
-      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V3);
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V4);
       break;
    }
 
@@ -1040,6 +1061,56 @@ void C_SdNdeDbProperties::m_OnClickGenerate(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle click on browse button for "IDE Call" section.
+
+   Replaces current IDE call with selected executable path. It is ok to eventually forget flags.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_OnClickIDE(void)
+{
+   const QString c_ProjectPath =
+      C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
+   const QString c_FilterName = QString(C_GtGetText::h_GetText("Executable (*.exe);;Others (*.*)"));
+   QString c_IDECall =
+      QString(C_PuiUtil::h_ResolvePlaceholderVariables(this->mpc_Ui->pc_LineEditIDE->text(), c_ProjectPath));
+   QString c_Path;
+   QString c_FolderName;
+   QStringList c_SplittedString;
+
+   // get path from command line call for browse location start
+   if (c_IDECall.startsWith('\"'))
+   {
+      c_SplittedString = c_IDECall.split('\"', QString::SkipEmptyParts);
+      if (c_SplittedString.size() > 0)
+      {
+         c_IDECall = c_SplittedString[0];
+      }
+   }
+   else
+   {
+      c_SplittedString = c_IDECall.split(' ');
+      if (c_SplittedString.size() > 0)
+      {
+         c_IDECall = c_SplittedString[0];
+      }
+   }
+
+   c_FolderName = this->m_GetDialogPath(c_IDECall);
+   c_Path = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Select IDE Executable"), c_FolderName,
+                                         c_FilterName, NULL);
+
+   if (c_Path != "")
+   {
+      // put quotation marks around path for command line call handling of blanks in paths
+      if (c_Path.contains(' '))
+      {
+         c_Path = "\"" + c_Path + "\"";
+      }
+      this->mpc_Ui->pc_LineEditIDE->setText(c_Path);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle click on button "Clear project"
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1049,9 +1120,10 @@ void C_SdNdeDbProperties::m_OnClickClearProject(void) const
    this->mpc_Ui->pc_SpinBoxProcessID->setValue(0);
    this->mpc_Ui->pc_LineEditOutputFile->SetPath("", "");
    this->mpc_Ui->pc_LineEditIDE->setText("");
+   this->mpc_Ui->pc_LineEditIDE->SetDbProjectPath("");
    this->mpc_Ui->pc_LineEditCodeGenerator->SetPath("", "");
    this->mpc_Ui->pc_LineEditCodeGenerate->SetPath("", "");
-   this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V3); // latest is greatest
+   this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V4); // latest is greatest
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1064,7 +1136,7 @@ void C_SdNdeDbProperties::m_OnNameEdited(void) const
    const bool q_Error = (c_ErrorText == "");
 
    //set valid text property flag
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditName, "Valid", q_Error);
+   //   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditName, "Valid", q_Error);
 
    if (q_Error)
    {
@@ -1135,7 +1207,7 @@ void C_SdNdeDbProperties::m_UpdateOwnedDpsCount(void) const
    Slot for project path editing finished signal.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_UpdatePathsRelativeToProject() const
+void C_SdNdeDbProperties::m_UpdatePathsRelativeToProject(void) const
 {
    const QString c_ProjectPath =
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
@@ -1155,6 +1227,9 @@ void C_SdNdeDbProperties::m_UpdatePathsRelativeToProject() const
    c_Temp = this->mpc_Ui->pc_LineEditCodeGenerator->GetPath();
    this->mpc_Ui->pc_LineEditCodeGenerator->SetDbProjectPath(c_ProjectPath);
    this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(c_Temp, C_Uti::h_GetExePath());
+
+   // IDE call path (for resolving only)
+   this->mpc_Ui->pc_LineEditIDE->SetDbProjectPath(c_ProjectPath);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

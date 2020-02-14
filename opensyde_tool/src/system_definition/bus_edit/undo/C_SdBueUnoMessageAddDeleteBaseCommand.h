@@ -50,8 +50,6 @@ protected:
 private:
    void m_Store(void);
    void m_Remove(void);
-
-   static stw_types::sint32 mh_CheckSync(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

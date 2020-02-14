@@ -40,7 +40,7 @@ using namespace stw_tgl;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
+/*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolFiler::C_OSCNodeDataPoolFiler(void)
@@ -48,10 +48,10 @@ C_OSCNodeDataPoolFiler::C_OSCNodeDataPoolFiler(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load datapool file
+/*! \brief  Load datapool file
 
-   \param[out]    orc_NodeDataPool Data storage
-   \param[in]     orc_FilePath     File path
+   \param[out] orc_NodeDataPool Data storage
+   \param[in]  orc_FilePath     File path
 
    \return
    C_NO_ERR   data read
@@ -86,7 +86,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pool
+/*! \brief  Load node data pool
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "data-pool"
@@ -114,6 +114,14 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPo
       orc_NodeDataPool.s32_RelatedDataBlockIndex = -1;
    }
    orc_NodeDataPool.q_IsSafety = orc_XMLParser.GetAttributeBool("is-safety");
+   if (orc_XMLParser.AttributeExists("scope-is-private") == true)
+   {
+      orc_NodeDataPool.q_ScopeIsPrivate = orc_XMLParser.GetAttributeBool("scope-is-private");
+   }
+   else
+   {
+      orc_NodeDataPool.q_ScopeIsPrivate = true;
+   }
    orc_NodeDataPool.u32_NvMStartAddress = orc_XMLParser.GetAttributeUint32("nvm-start-address");
    orc_NodeDataPool.u32_NvMSize = orc_XMLParser.GetAttributeUint32("nvm-size");
    if (orc_XMLParser.SelectNodeChild("type") == "type")
@@ -185,7 +193,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pool
+/*! \brief  Save node data pool
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "data-pool"
@@ -200,6 +208,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDa
 {
    orc_XMLParser.SetAttributeSint32("related-application-index", orc_NodeDataPool.s32_RelatedDataBlockIndex);
    orc_XMLParser.SetAttributeBool("is-safety", orc_NodeDataPool.q_IsSafety);
+   orc_XMLParser.SetAttributeBool("scope-is-private", orc_NodeDataPool.q_ScopeIsPrivate);
    orc_XMLParser.SetAttributeUint32("nvm-start-address", orc_NodeDataPool.u32_NvMStartAddress);
    orc_XMLParser.SetAttributeUint32("nvm-size", orc_NodeDataPool.u32_NvMSize);
    orc_XMLParser.CreateNodeChild("type", h_DataPoolToString(orc_NodeDataPool.e_Type));
@@ -221,14 +230,14 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pool list
+/*! \brief  Load node data pool list
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "list"
    post-condition: the passed XML parser has the active node set to the same "list"
 
-   \param[out]    orc_NodeDataPoolList        data storage
-   \param[in,out] orc_XMLParser               XML with data-pool active
+   \param[out]    orc_NodeDataPoolList data storage
+   \param[in,out] orc_XMLParser        XML with data-pool active
 
    \return
    C_NO_ERR   data read
@@ -303,7 +312,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_No
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pool list
+/*! \brief  Save node data pool list
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "list"
@@ -335,13 +344,12 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolList(const C_OSCNodeDataPoolList & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pool element
+/*! \brief  Load node data pool element
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "data-element"
    post-condition: the passed XML parser has the active node set to the same "data-element"
 
-   \param[in]     ou16_XmlFormatVersion       version of XML format
    \param[out]    orc_NodeDataPoolListElement data storage
    \param[in,out] orc_XMLParser               XML with list active
 
@@ -480,7 +488,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pool element
+/*! \brief  Save node data pool element
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "data-element"
@@ -511,14 +519,14 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElement(const C_OSCNodeDataPoolListEl
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pool lists
+/*! \brief  Load node data pool lists
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "lists"
    post-condition: the passed XML parser has the active node set to the same "lists"
 
-   \param[out]    orc_NodeDataPoolLists   data storage
-   \param[in,out] orc_XMLParser           XML with data-pool active
+   \param[out]    orc_NodeDataPoolLists data storage
+   \param[in,out] orc_XMLParser         XML with data-pool active
 
    \return
    C_NO_ERR   data read
@@ -582,14 +590,14 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OSCNodeDataPool
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pool lists
+/*! \brief  Save node data pool lists
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "data-pool"
    post-condition: the passed XML parser has the active node set to the same "data-pool"
 
-   \param[in]     orc_NodeDataPoolLists   data storage
-   \param[in,out] orc_XMLParser           XML with data-pool active
+   \param[in]     orc_NodeDataPoolLists data storage
+   \param[in,out] orc_XMLParser         XML with data-pool active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
@@ -606,14 +614,14 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeData
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pool elements
+/*! \brief  Load node data pool elements
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "data-elements"
    post-condition: the passed XML parser has the active node set to the same "data-elements"
 
-   \param[out]    orc_NodeDataPoolListElements  data storage
-   \param[in,out] orc_XMLParser                 XML with list active
+   \param[out]    orc_NodeDataPoolListElements data storage
+   \param[in,out] orc_XMLParser                XML with list active
 
    \return
    C_NO_ERR   data read
@@ -675,7 +683,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pool elements
+/*! \brief  Save node data pool elements
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "data-elements"
@@ -700,7 +708,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pool list element data set values
+/*! \brief  Load node data pool list element data set values
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "data-set-values"
@@ -708,9 +716,9 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
 
    All returned elements will be of the type defined by orc_ContentType.
 
-   \param[in]     orc_ContentType                           type reference (see description)
-   \param[out]    orc_NodeDataPoolListElementDataSetValues  data storage
-   \param[in,out] orc_XMLParser                             XML with list active
+   \param[in]     orc_ContentType                          type reference (see description)
+   \param[out]    orc_NodeDataPoolListElementDataSetValues data storage
+   \param[in,out] orc_XMLParser                            XML with list active
 
    \return
    C_NO_ERR   data read
@@ -749,7 +757,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElementDataSetValues(const C_OS
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pool list element data set values
+/*! \brief  Save node data pool list element data set values
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "data-set-values"
@@ -773,14 +781,14 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElementDataSetValues(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pool list data sets
+/*! \brief  Load node data pool list data sets
 
    Load node data from XML file
    pre-condition: the passed XML parser has the active node set to "data-sets"
    post-condition: the passed XML parser has the active node set to the same "data-sets"
 
-   \param[out]    orc_NodeDataPoolListDataSets  data storage
-   \param[in,out] orc_XMLParser                 XML with list active
+   \param[out]    orc_NodeDataPoolListDataSets data storage
+   \param[in,out] orc_XMLParser                XML with list active
 
    \return
    C_NO_ERR   data read
@@ -836,7 +844,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListDataSets(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pool list data sets
+/*! \brief  Save node data pool list data sets
 
    Save node to XML file
    pre-condition: the passed XML parser has the active node set to "data-sets"
@@ -862,7 +870,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListDataSets(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform data pool type to string
+/*! \brief  Transform data pool type to string
 
    \param[in] ore_DataPool Data pool type
 
@@ -885,6 +893,9 @@ C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::
    case C_OSCNodeDataPool::eNVM:
       c_Retval = "nvm";
       break;
+   case C_OSCNodeDataPool::eHALC:
+      c_Retval = "halc";
+      break;
    default:
       c_Retval = "invalid";
       break;
@@ -893,7 +904,7 @@ C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform string to data pool type
+/*! \brief  Transform string to data pool type
 
    \param[in]  orc_String String to interpret
    \param[out] ore_Type   Data pool type
@@ -919,6 +930,10 @@ sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String
    {
       ore_Type = C_OSCNodeDataPool::eDIAG;
    }
+   else if (orc_String == "halc")
+   {
+      ore_Type = C_OSCNodeDataPool::eHALC;
+   }
    else
    {
       osc_write_log_error("Loading Datapool", "Invalid Datapool type:" + orc_String);
@@ -929,7 +944,7 @@ sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load data pool element type
+/*! \brief  Load data pool element type
 
    Load element type from the node "type"
    pre-condition: the passed XML parser has the active node set to the parent node of the "type" node
@@ -973,14 +988,14 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(C_OSCNodeDataPoolConten
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save data pool element type
+/*! \brief  Save data pool element type
 
    Save data pool element type,isarray,arraysize to XML parser
    Will create a node and write the value there.
    Does not modify the active node.
 
-   \param[in]      orc_NodeDataPoolContent  data storage
-   \param[in,out]  orc_XMLParser            XML parser
+   \param[in]     orc_NodeDataPoolContent data storage
+   \param[in,out] orc_XMLParser           XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
@@ -998,7 +1013,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolCo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load data pool element value
+/*! \brief  Load data pool element value
 
    Load node data from XML file
    pre-conditions:
@@ -1132,15 +1147,15 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save data pool element value
+/*! \brief  Save data pool element value
 
    Save data pool element value to XML parser
    Will create a node and write the value there.
    Does not modify the active node.
 
-   \param[in]      orc_NodeName            name of node to create value in
-   \param[in]      orc_NodeDataPoolContent data storage
-   \param[in,out]  orc_XMLParser           XML parser
+   \param[in]     orc_NodeName            name of node to create value in
+   \param[in]     orc_NodeDataPoolContent data storage
+   \param[in,out] orc_XMLParser           XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLString & orc_NodeName,
@@ -1241,7 +1256,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLStri
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save node data pool content
+/*! \brief  Save node data pool content
 
    Save node to XML file in V1 format.
    Not used by core. But may be of some use to applications.
@@ -1353,7 +1368,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCont
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get automatically generated file name
+/*! \brief  Get automatically generated file name
 
    \param[in] orc_DatapoolName Datapool name
 
@@ -1367,7 +1382,7 @@ C_SCLString C_OSCNodeDataPoolFiler::h_GetFileName(const C_SCLString & orc_Datapo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load node data pool content
+/*! \brief  Load node data pool content
 
    Load node data from XML file in V1 format.
    pre-condition: the passed XML parser has the active node set to unknown (Node to store data pool variable)
@@ -1483,7 +1498,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save datapool
+/*! \brief  Save datapool
 
    Save node to XML file
 
@@ -1525,7 +1540,7 @@ sint32 C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(const C_OSCNodeDataPool & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform node data pool content type to string
+/*! \brief  Transform node data pool content type to string
 
    \param[in] ore_NodeDataPoolContent Node data pool content type
 
@@ -1578,7 +1593,7 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolContentToString(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform string to node data pool content type
+/*! \brief  Transform string to node data pool content type
 
    \param[in]  orc_String String to interpret
    \param[out] ore_Type   Node data pool content type
@@ -1643,7 +1658,7 @@ sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolContent(const C_SCLString 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform node data pool element access type to string
+/*! \brief  Transform node data pool element access type to string
 
    \param[in] ore_NodeDataPoolElementAccess Node data pool element access type
 
@@ -1672,7 +1687,7 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolElementAccessToString(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Transform string to node data pool element access type
+/*! \brief  Transform string to node data pool element access type
 
    \param[in]  orc_String String to interpret
    \param[out] ore_Type   Node data pool element access type
@@ -1706,7 +1721,7 @@ sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolElementAccess(const C_SCLS
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set unit64 attribute
+/*! \brief  Set unit64 attribute
 
    \param[in,out] orc_XMLParser XML
    \param[in]     orc_String    Attribute
@@ -1723,7 +1738,7 @@ void C_OSCNodeDataPoolFiler::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLP
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get unit64 attribute
+/*! \brief  Get unit64 attribute
 
    \param[in] orc_XMLParser XML
    \param[in] orc_String    Attribute

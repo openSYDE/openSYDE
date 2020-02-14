@@ -30,7 +30,7 @@ class C_PuiBsBoundary :
 public:
    C_PuiBsBoundary();
 
-   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
 
    QColor c_UIBorderColorBright;        ///< color of border line in bright mode
    QColor c_UIBorderColorDark;          ///< color of border line in dark mode

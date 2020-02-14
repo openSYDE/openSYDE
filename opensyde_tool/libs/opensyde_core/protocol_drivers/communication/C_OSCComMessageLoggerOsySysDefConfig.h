@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Configuration of a openSYDE system definition for C_OSCComMessageLogger (header)
+   \brief       Configuration of an openSYDE system definition for C_OSCComMessageLogger (header)
 
    See cpp file for detailed description
 

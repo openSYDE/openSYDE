@@ -360,6 +360,7 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
    \param[in] ou32_ViewIndex Current view index
    \param[in] orc_Id         ID to get details for
    \param[in] oq_ReadItem    Read widget?
+   \param[in] oe_WriteMode   Write mode
 
    \return
    Common dashboard item tool tip

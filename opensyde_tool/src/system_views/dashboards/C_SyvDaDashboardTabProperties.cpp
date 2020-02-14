@@ -214,6 +214,7 @@ void C_SyvDaDashboardTabProperties::m_OkClicked(void)
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard rename"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                      "This Dashboard name already exists. Choose another name."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
    }
 }

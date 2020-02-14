@@ -84,7 +84,7 @@ void C_CamDbDbc::FindAllMessages(void)
          const C_CieConverter::C_CIENode & rc_Node = this->mc_Data.c_Nodes[u32_ItNode];
          //Id
          c_Id.u32_NodeIndex = u32_ItNode;
-         //Each RX message
+         //Each Rx message
          for (uint32 u32_ItMessage = 0UL; u32_ItMessage < rc_Node.c_RxMessages.size(); ++u32_ItMessage)
          {
             const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_RxMessages[u32_ItMessage];
@@ -94,7 +94,7 @@ void C_CamDbDbc::FindAllMessages(void)
             //Remember for future access
             this->mc_FoundMessagesNodes.insert(rc_Message.c_CanMessage.c_Name.c_str(), c_Id);
          }
-         //Each TX message
+         //Each Tx message
          for (uint32 u32_ItMessage = 0UL; u32_ItMessage < rc_Node.c_TxMessages.size(); ++u32_ItMessage)
          {
             const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_TxMessages[u32_ItMessage];
@@ -136,7 +136,7 @@ sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
         ++u32_ItNode)
    {
       const C_CieConverter::C_CIENode & rc_Node = this->mc_Data.c_Nodes[u32_ItNode];
-      //Each RX message
+      //Each Rx message
       for (uint32 u32_ItMessage = 0UL; (u32_ItMessage < rc_Node.c_RxMessages.size()) && (s32_Retval == C_NOACT);
            ++u32_ItMessage)
       {
@@ -148,7 +148,7 @@ sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
             s32_Retval = C_NO_ERR;
          }
       }
-      //Each TX message
+      //Each Tx message
       for (uint32 u32_ItMessage = 0UL; (u32_ItMessage < rc_Node.c_TxMessages.size()) && (s32_Retval == C_NOACT);
            ++u32_ItMessage)
       {
@@ -206,7 +206,7 @@ sint32 C_CamDbDbc::FindMessage(const QString & orc_Message)
          const C_CieConverter::C_CIENode & rc_Node = this->mc_Data.c_Nodes[u32_ItNode];
          //Id
          c_Id.u32_NodeIndex = u32_ItNode;
-         //Each RX message
+         //Each Rx message
          for (uint32 u32_ItMessage = 0UL; u32_ItMessage < rc_Node.c_RxMessages.size(); ++u32_ItMessage)
          {
             const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_RxMessages[u32_ItMessage];
@@ -220,7 +220,7 @@ sint32 C_CamDbDbc::FindMessage(const QString & orc_Message)
                break;
             }
          }
-         //Each TX message
+         //Each Tx message
          for (uint32 u32_ItMessage = 0UL; (u32_ItMessage < rc_Node.c_TxMessages.size()) && (s32_Retval == C_NOACT);
               ++u32_ItMessage)
          {

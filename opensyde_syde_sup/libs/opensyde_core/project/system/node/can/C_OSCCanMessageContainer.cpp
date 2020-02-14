@@ -67,7 +67,7 @@ void C_OSCCanMessageContainer::CalcHash(uint32 & oru32_HashValue) const
       this->c_TxMessages[u32_Counter].CalcHash(oru32_HashValue);
    }
 
-   //Force CRC change if single RX message is moved to empty TX (previously no change in CRC calculation)
+   //Force CRC change if single Rx message is moved to empty Tx (previously no change in CRC calculation)
    u32_Tmp = this->c_RxMessages.size();
    stw_scl::C_SCLChecksums::CalcCRC32(&u32_Tmp, sizeof(u32_Tmp), oru32_HashValue);
    u32_Tmp = this->c_TxMessages.size();
@@ -388,8 +388,8 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
    \param[in]     orc_ListTx                           Node data pool list containing tx signal data
    \param[in]     orc_ListRx                           Node data pool list containing rx signal data
    \param[in]     ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
-   \param[in,out] opc_InvalidTxMessages                Optional vector of invalid TX CAN message names
-   \param[in,out] opc_InvalidRxMessages                Optional vector of invalid RX CAN message names
+   \param[in,out] opc_InvalidTxMessages                Optional vector of invalid Tx CAN message names
+   \param[in,out] opc_InvalidRxMessages                Optional vector of invalid Rx CAN message names
 
    \return
    true  Error
@@ -452,10 +452,10 @@ bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check whether container contains at least one TX or RX message
+/*! \brief   Check whether container contains at least one Tx or Rx message
 
    \return
-   true   at least one TX or RX message is defined
+   true   at least one Tx or Rx message is defined
    false  else
 */
 //----------------------------------------------------------------------------------------------------------------------
