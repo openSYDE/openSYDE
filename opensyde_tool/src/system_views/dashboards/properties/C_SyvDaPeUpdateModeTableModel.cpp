@@ -455,6 +455,10 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                      {
                         c_Tmp.push_back(":/images/system_definition/IconVariable.svg");
                      }
+                     else if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eCOM)
+                     {
+                        c_Tmp.push_back(":/images/system_definition/IconSignal.svg");
+                     }
                      else
                      {
                         c_Tmp.push_back(":/images/system_definition/IconParameter.svg");
@@ -582,12 +586,12 @@ bool C_SyvDaPeUpdateModeTableModel::setData(const QModelIndex & orc_Index, const
          const uint32 u32_Index = orc_Index.row();
          if (u32_Index < this->mc_DataElementConfigurations.size())
          {
-            C_PuiSvReadDataConfiguration & rc_CurConfig = this->mc_DataElementConfigurations[u32_Index];
             const C_SyvDaPeUpdateModeTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
             if (osn_Role == static_cast<sintn>(Qt::EditRole))
             {
                sint32 s32_Count = 0;
                QVector<sintn> c_Roles;
+               C_PuiSvReadDataConfiguration & rc_CurConfig = this->mc_DataElementConfigurations[u32_Index];
                switch (e_Col)
                {
                case eTRANSMISSION_MODE:

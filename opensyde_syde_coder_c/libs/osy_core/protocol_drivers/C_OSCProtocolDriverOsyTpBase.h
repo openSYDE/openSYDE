@@ -77,8 +77,8 @@ private:
    stw_types::uint16 mu16_MaxServiceQueueSize;
    std::deque<C_OSCProtocolDriverOsyService> mc_TxQueue;
    std::deque<C_OSCProtocolDriverOsyService> mc_RxQueue;
-   stw_tgl::C_TGLCriticalSection mc_CsTxQueue; ///critical section protecting TX Queue
-   stw_tgl::C_TGLCriticalSection mc_CsRxQueue; ///critical section protecting RX Queue
+   stw_tgl::C_TGLCriticalSection mc_CsTxQueue; ///critical section protecting Tx Queue
+   stw_tgl::C_TGLCriticalSection mc_CsRxQueue; ///critical section protecting Rx Queue
 
 protected:
    C_OSCProtocolDriverOsyNode mc_ClientId;    ///< our own client ID
@@ -114,8 +114,8 @@ public:
       \brief   Perform cyclic communication tasks
 
       Perform cyclic communication tasks.
-      - send services from TX queue
-      - read incoming services and place in RX queue
+      - send services from Tx queue
+      - read incoming services and place in Rx queue
 
       Configuration problems will be reported via the function return value.
       Ongoing communication problems will be written to the class's log text.

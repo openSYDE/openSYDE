@@ -52,12 +52,12 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in]       ou32_ViewIndex       Index of system view
-   \param[in]       ors32_NodeIndex      Index of data element in system view
-   \param[in]       oru64_ID             Unique ID
-   \param[in]       orf64_Width          Width of node
-   \param[in]       orf64_Height         Height of node
-   \param[in,out]   opc_Parent           Optional pointer to parent
+   \param[in]      ou32_ViewIndex   Index of system view
+   \param[in]      ors32_NodeIndex  Index of data element in system view
+   \param[in]      oru64_ID         Unique ID
+   \param[in]      orf64_Width      Width of node
+   \param[in]      orf64_Height     Height of node
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvNodeSyvUpdate::C_GiSvNodeSyvUpdate(const uint32 ou32_ViewIndex, const sint32 & ors32_NodeIndex,
@@ -72,6 +72,7 @@ C_GiSvNodeSyvUpdate::C_GiSvNodeSyvUpdate(const uint32 ou32_ViewIndex, const sint
    mq_UpdateFailed(false),
    mq_UpdateSuccess(false),
    mq_ValidStatus(false),
+   mq_Discarded(false),
    mu32_FailedApplicationIndex(0),
    mpc_STWDevice(NULL),
    mpc_OSYDevice(NULL),
@@ -116,7 +117,7 @@ C_GiSvNodeSyvUpdate::~C_GiSvNodeSyvUpdate()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the node connected state
 
-   \param[in]     oq_Connected   Flag if connected or not
+   \param[in]  oq_Connected   Flag if connected or not
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetViewConnected(const bool oq_Connected)
@@ -128,7 +129,7 @@ void C_GiSvNodeSyvUpdate::SetViewConnected(const bool oq_Connected)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connection change
 
-   \param[in] oq_Active Flag if connected
+   \param[in]  oq_Active   Flag if connected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetConnected(const bool oq_Active)
@@ -168,13 +169,14 @@ void C_GiSvNodeSyvUpdate::SetConnected(const bool oq_Active)
       //Always reset known status information flag
       this->mq_ValidStatus = false;
       this->mq_UpdateSuccess = false;
+      this->mq_Discarded = false;
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal if update in progress
 
-   \param[in] oq_Active Flag if update in progress
+   \param[in]  oq_Active   Flag if update in progress
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetUpdating(const bool oq_Active)
@@ -194,6 +196,7 @@ void C_GiSvNodeSyvUpdate::SetUpdating(const bool oq_Active)
             {
                this->me_InitialStatus = C_SyvUtil::eI_APPLICATION_MATCH;
             }
+            this->mq_Discarded = false;
             this->me_UpdateStatus = eU_UP_TO_DATE;
             //Update dialog if necessary
             this->m_RefreshDialog();
@@ -210,9 +213,9 @@ void C_GiSvNodeSyvUpdate::SetUpdating(const bool oq_Active)
    True: In progress
    False after true once: Update success
 
-   \param[in] oq_Active                   Flag if update in progress
-   \param[in] oq_Aborted                  Flag if action was aborted
-   \param[in] ou32_FailedApplicationIndex If aborted and currently updating this is the currently updated application
+   \param[in]  oq_Active                     Flag if update in progress
+   \param[in]  oq_Aborted                    Flag if action was aborted
+   \param[in]  ou32_FailedApplicationIndex   If aborted and currently updating this is the currently updated application
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bool oq_Aborted,
@@ -238,6 +241,7 @@ void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bo
             //If user aborted we assume the application has to be updated, else the application should be finished
             if (oq_Aborted == false)
             {
+               this->mq_Discarded = false;
                this->me_InitialStatus = C_SyvUtil::eI_APPLICATION_MATCH;
                this->me_UpdateStatus = eU_UPDATE_SUCCESS;
                //Update dialog if necessary
@@ -348,7 +352,8 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
       //Check if valid infos
       if (this->mc_HexFileInfos.size() > 0UL)
       {
-         if (this->mpc_InfoDialog->GetDiscardedStatus() == true)
+         this->mq_Discarded = this->mpc_InfoDialog->GetDiscardedStatus();
+         if (this->mq_Discarded == true)
          {
             Q_EMIT (this->SigDiscardInfo(static_cast<uint32>(this->ms32_Index)));
          }
@@ -379,12 +384,13 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update package status
 
-   \param[in] orc_DeviceApplicationInfos Device application information
+   \param[in]  orc_DeviceApplicationInfos    Device application information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & orc_DeviceApplicationInfos)
 {
    //Validate current status
+   this->mq_Discarded = false;
    this->mq_ValidStatus = true;
    if (this->m_CheckUpdateDisabledState() == false)
 
@@ -950,7 +956,7 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal for update of current scaling
 
-   \param[in] orc_Transform Current scaling
+   \param[in]  orc_Transform  Current scaling
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::UpdateTransform(const QTransform & orc_Transform)
@@ -1092,7 +1098,7 @@ bool C_GiSvNodeSyvUpdate::m_CheckAlwaysUpdate(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if node should be in connected but update disabled state
 
-   \param[in] opc_TooltipText Tooltip text
+   \param[in]  opc_TooltipText   Tooltip text
 
    \retval   True    Update disabled check result
    \retval   False   Update disabled check result
@@ -1201,6 +1207,7 @@ void C_GiSvNodeSyvUpdate::m_RefreshDialog()
    {
       this->mpc_InfoDialog->SetStatus(this->me_InitialStatus, &this->mc_HexFileInfos, &this->mc_HexAppInfoAmiguous,
                                       &this->mc_ParamFileInfos, &this->mc_FileInfos, this->mpc_STWDevice,
-                                      this->mpc_OSYDevice, this->mq_UpdateSuccess, this->mq_ValidStatus);
+                                      this->mpc_OSYDevice, this->mq_UpdateSuccess, this->mq_ValidStatus,
+                                      this->mq_Discarded);
    }
 }

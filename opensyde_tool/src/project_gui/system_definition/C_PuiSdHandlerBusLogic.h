@@ -181,6 +181,8 @@ public:
                                        bool & orq_IsMatch, const bool oq_IgnoreMessageDirection = false) const;
 
    //Misc util
+   stw_types::sint32 MapBusNameToIndex(const QString & orc_BusName, stw_types::uint32 & oru32_BusIndex) const;
+   stw_types::sint32 MapBusIndexToName(const stw_types::uint32 ou32_BusIndex, QString & orc_BusName) const;
    QString GetCanSignalDisplayName(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                    const stw_types::uint32 & oru32_SignalIndex) const;
    QString GetNamespace(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id) const;

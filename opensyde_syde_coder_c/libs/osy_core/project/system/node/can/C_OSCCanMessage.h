@@ -72,9 +72,7 @@ public:
    stw_types::uint16 u16_DelayTimeMs; ///< Minimum time between transmission in ms. (aka not earlier than)
    ///< ONLY used if tx method is eTX_METHOD_ON_CHANGE
    stw_types::uint32 u32_TimeoutMs; ///< Maximum time between reception of two messages.
-   ///< Format is in milli seconds
-   ///< ONLY used if transmission trigger is eTX_METHOD_CYCLIC
-   ///< or eTX_METHOD_ON_CHANGE.
+   ///< Format is in milli seconds. If value is set to 0, monitoring is disabled.
    std::vector<C_OSCCanSignal> c_Signals; ///< Communication signals
 
 private:

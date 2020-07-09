@@ -37,7 +37,7 @@ using namespace stw_tgl;
 //Purpose: the definitions in the Windows header violate a lot of coding rules.
 //So we can relocate the required suppressions here at a central spot ...
 //The violations do not cause problems in the application as long as we are on a Windows platform.
-static uintn m_WsInvalidSocket(void)
+static SOCKET m_WsInvalidSocket(void)
 {
    return INVALID_SOCKET; //lint !e1960
 }
@@ -151,7 +151,7 @@ C_OSCIpDispatcherWinSock::C_OSCIpDispatcherWinSock(void) :
    WSADATA t_Data;
    const stw_types::sintn sn_Result = WSAStartup(0x0201U, &t_Data); //Request version 2.1
 
-   this->mc_PreferredInterfaceName = "";
+   this->mc_PreferredInterfaceNames.Clear();
 
    if (sn_Result != 0)
    {
@@ -226,7 +226,7 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
    sint32 s32_Return = C_NOACT;
    PIP_ADAPTER_ADDRESSES pt_Addresses;
    uint32 u32_RetVal;
-   uint32 u32_AddressesBufLen = 0U;
+   ULONG u32_AddressesBufLen = 0U;
 
    mc_LocalInterfaceIps.resize(0);
 
@@ -249,8 +249,8 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
 
             while (pt_Address != NULL)
             {
-               if ((this->mc_PreferredInterfaceName == "") ||
-                   (pt_Adapter->FriendlyName == this->mc_PreferredInterfaceName))
+               if ((this->mc_PreferredInterfaceNames.GetCount() == 0) ||
+                   (this->mc_PreferredInterfaceNames.IndexOf(pt_Adapter->FriendlyName) != -1))
                {
                   // sockaddr is the generic descriptor and sockaddr_in is IPV4 specific
                   // https://stackoverflow.com/questions/21099041/why-do-we-cast-sockaddr-in-to-sockaddr-when-calling-bind/21099196
@@ -331,7 +331,7 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
    if (q_Error == false)
    {
       //make socket non-blocking:
-      uint32 u32_Mode = 1U;
+      u_long u32_Mode = 1U;
       if (ioctlsocket(orc_Connection.un_Socket, m_WsFionBio(), &u32_Mode) == SOCKET_ERROR)
       {
          osc_write_log_error("openSYDE IP-TP",
@@ -516,7 +516,7 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
    if (q_Error == false)
    {
       //make socket non-blocking:
-      uint32 u32_Mode = 1U;
+      u_long u32_Mode = 1U;
       if (ioctlsocket(orun_Socket, m_WsFionBio(), &u32_Mode) == SOCKET_ERROR)
       {
          osc_write_log_error("openSYDE IP-TP", "TCP socket ioctlsocket() failed. Error: " + C_SCLString::IntToStr(
@@ -903,7 +903,7 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<u
       else
       {
          sintn sn_Return;
-         uint32 u32_SizeInBuffer;
+         u_long u32_SizeInBuffer;
          //do we have enough bytes in Rx buffer ?
          sn_Return = ioctlsocket(this->mc_SocketsTcp[ou32_Handle].un_Socket, m_WsFionRead(), &u32_SizeInBuffer);
          if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= orc_Data.size()))
@@ -1185,7 +1185,7 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
          if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
          {
             //do we have a package in Rx buffer ?
-            uint32 u32_SizeInBuffer;
+            u_long u32_SizeInBuffer;
             sintn sn_Return = ioctlsocket(mc_SocketsUdpServer[u32_Interface], m_WsFionRead(), &u32_SizeInBuffer);
             if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= 1U))
             {
@@ -1265,10 +1265,12 @@ void C_OSCIpDispatcherWinSock::LoadConfigFile(const C_SCLString & orc_FileLocati
    if (TGL_FileExists(orc_FileLocation) == true)
    {
       C_SCLIniFile c_Ini(orc_FileLocation);
-      this->mc_PreferredInterfaceName = c_Ini.ReadString("ETH_CONFIG", "ETH_INTERFACE_NAME", "");
+      C_SCLString c_Help = c_Ini.ReadString("ETH_CONFIG", "ETH_INTERFACE_NAME", "");
+
+      c_Help.Tokenize(",", this->mc_PreferredInterfaceNames.Strings);
    }
    else
    {
-      this->mc_PreferredInterfaceName = "";
+      this->mc_PreferredInterfaceNames.Clear();
    }
 }

@@ -102,7 +102,7 @@ void TGL_PACKAGE stw_tgl::TGL_ReportAssertionDetail(const charn * const opcn_Det
 bool TGL_PACKAGE stw_tgl::TGL_GetSystemUserName(C_SCLString & orc_UserName)
 {
    charn acn_WinUserName[UNLEN + 1];
-   uint32 u32_Size = sizeof(acn_WinUserName);
+   DWORD u32_Size = sizeof(acn_WinUserName);
    bool q_Return;
 
    q_Return = (GetUserNameA(acn_WinUserName, &u32_Size) == 0) ? false : true;

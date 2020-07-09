@@ -412,11 +412,8 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
       c_MessageBox.SetDescription(c_Message);
       m_CleanUpScan();
       c_MessageBox.Execute();
-   }
 
-   //Simplify return value
-   if (s32_Retval != C_NO_ERR)
-   {
+      // Simplify return value
       s32_Retval = C_CONFIG;
    }
 
@@ -835,6 +832,10 @@ void C_SyvDcWidget::m_ShowConfigResult(void)
    uint32 u32_DeviceCounter = 1UL;
    uint32 u32_ConfigCounter;
    QString c_Text;
+
+   // In the event queue could be some emitted signals from thread left.
+   // We need all information for showing the configuration result
+   QApplication::processEvents();
 
    // Show configuration for all STW flashloader devices
    for (u32_ConfigCounter = 0U; u32_ConfigCounter < this->mc_StwFlashloaderDeviceConfigurations.size();
@@ -2214,9 +2215,6 @@ void C_SyvDcWidget::m_Timer(void)
 
                for (uint32 u32_SnCounter = 0U; u32_SnCounter < c_DeviceInfo.size(); ++u32_SnCounter)
                {
-                  c_Text += "Device " + QString(c_DeviceInfo[u32_SnCounter].c_DeviceName.c_str()) + ": " +
-                            QString(C_OSCUtils::h_SerialNumberToString(
-                                       &c_DeviceInfo[u32_SnCounter].au8_SerialNumber[0]).c_str()) + "\n";
                   this->mc_FoundDevices.push_back(c_DeviceInfo[u32_SnCounter]);
                }
 
@@ -2270,11 +2268,6 @@ void C_SyvDcWidget::m_Timer(void)
 
                for (uint32 u32_SnCounter = 0U; u32_SnCounter < c_DeviceInfo.size(); ++u32_SnCounter)
                {
-                  c_Text += "Device " + QString(c_DeviceInfo[u32_SnCounter].c_DeviceName.c_str()) + ": " +
-                            QString(C_OSCUtils::h_SerialNumberToString(&c_DeviceInfo[u32_SnCounter].
-                                                                       au8_SerialNumber[0]).c_str()) +
-                            "\n";
-
                   this->mc_FoundDevices.push_back(c_DeviceInfo[u32_SnCounter]);
                }
 
@@ -2317,9 +2310,6 @@ void C_SyvDcWidget::m_Timer(void)
                else
                {
                   // No openSYDE devices. Finished
-                  // In the event queue could be some emitted signals from thread left.
-                  // We need all information for showing the configuration result
-                  QApplication::processEvents();
                   this->m_ShowConfigResult();
                   // Finish the process. No waiting for reset necessary.
                   this->m_ResetFlashloaderAfterConfig(this->mq_SameBitrates);
@@ -2327,6 +2317,8 @@ void C_SyvDcWidget::m_Timer(void)
             }
             else
             {
+               this->m_ShowConfigResult();
+
                q_ShowFinalErrorMessage = true;
                c_ErrorDescription =
                   C_GtGetText::h_GetText("Error occurred during STW Flashloader device configuration.");
@@ -2334,13 +2326,11 @@ void C_SyvDcWidget::m_Timer(void)
             break;
          case eCONFCANOPENSYDEDEVICES: // Same result
          case eCONFETHOPENSYDEDEVICES: // Same result
+            this->m_ShowConfigResult();
+
             if ((s32_SequenceResult == C_NO_ERR) ||
                 (s32_SequenceResult == C_NOACT)) // No openSYDE devices to configure
             {
-               // In the event queue could be some emitted signals from thread left.
-               // We need all information for showing the configuration result
-               QApplication::processEvents();
-               this->m_ShowConfigResult();
                // Finish the process. No waiting for reset necessary.
                this->m_ResetFlashloaderAfterConfig(this->mq_SameBitrates);
             }
@@ -2357,7 +2347,6 @@ void C_SyvDcWidget::m_Timer(void)
                          arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                          arg(C_GtGetText::h_GetText("log file"));
                c_Text += "<br/>";
-
                c_Text += "<br/><br/><br/>" + mhc_REPORT_HIGHLIGHT_TAG_START;
                c_Text += QString(C_GtGetText::h_GetText(
                                     "Errors occurred during device configuration. Check report for details."));

@@ -31,24 +31,6 @@ using namespace stw_opensyde_gui_logic;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Init item font family
-
-   \param[in,out] opc_Label Label to init font family
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItUtil::h_InitFontFamily(QLabel * const opc_Label)
-{
-   if (opc_Label != NULL)
-   {
-      QFont c_Font;
-
-      c_Font = opc_Label->font();
-      c_Font.setFamily("Segoe UI");
-      opc_Label->setFont(c_Font);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy font size of one label to another
 
    \param[in]     opc_SourceLabel Source label

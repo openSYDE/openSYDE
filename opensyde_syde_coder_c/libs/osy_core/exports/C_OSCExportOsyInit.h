@@ -32,6 +32,7 @@ public:
    C_OSCExportOsyInit(void);
    virtual ~C_OSCExportOsyInit(void);
 
+   static stw_scl::C_SCLString h_GetFileName(void);
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_FilePath, const C_OSCNode & orc_Node,
                                                const bool oq_RunsDpd, const stw_types::uint16 ou16_ApplicationIndex,
                                                const stw_scl::C_SCLString & orc_ExportToolInfo = "");
@@ -46,7 +47,7 @@ private:
    static stw_types::uint32 mh_GetSizeOfLargestDataPoolElement(const std::vector<C_OSCNodeDataPool> & orc_DataPools);
    static bool mh_IsDpKnownToApp(const stw_types::uint8 ou8_DataPoolIndex,
                                  const stw_types::uint16 ou16_ApplicationIndex, const C_OSCNode & orc_Node,
-                                 bool oq_RunsDpd);
+                                 const bool oq_RunsDpd);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

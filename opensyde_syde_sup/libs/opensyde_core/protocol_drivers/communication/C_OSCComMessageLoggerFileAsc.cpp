@@ -140,7 +140,7 @@ void C_OSCComMessageLoggerFileAsc::AddMessageToFile(const C_OSCComMessageLoggerD
       }
       else
       {
-         c_LogEntry += mh_AdaptTimeStamp(orc_MessageData.u64_TimeStampAbsolute);
+         c_LogEntry += mh_AdaptTimeStamp(orc_MessageData.u64_TimeStampAbsoluteStart);
       }
 
       // Channel

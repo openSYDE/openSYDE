@@ -408,33 +408,6 @@ sint32 C_GiSvDaParam::SetParamItem(const C_PuiSvDbParam & orc_Content) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   View dashboard param widget clear all data pool elements
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaParam::ClearParamItemDataElement(void)
-{
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (this->ms32_Index >= 0)
-   {
-      this->ClearDataPoolElements();
-      s32_Retval = C_PuiSvHandler::h_GetInstance()->ClearViewDashboardParamDataPoolElements(this->mu32_ViewIndex,
-                                                                                            this->mu32_DashboardIndex,
-                                                                                            static_cast<uint32>(this->
-                                                                                                                ms32_Index));
-   }
-   else
-   {
-      s32_Retval = C_RANGE;
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   View dashboard param widget add new data pool element
 
    \param[in]  orc_Id         New ID
@@ -477,30 +450,6 @@ sint32 C_GiSvDaParam::AddParamItemDataElement(const C_OSCNodeDataPoolListElement
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Accept external data element changes
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaParam::HandleNewDataElement(void)
-{
-   const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
-
-   if (pc_Dashboard != NULL)
-   {
-      const C_PuiSvDbParam * const pc_Box = pc_Dashboard->GetParam(static_cast<uint32>(this->ms32_Index));
-      tgl_assert(pc_Box != NULL);
-      if (pc_Box != NULL)
-      {
-         this->ClearDataPoolElements();
-         for (uint32 u32_It = 0; u32_It < pc_Box->c_DataPoolElementsConfig.size(); ++u32_It)
-         {
-            this->RegisterDataPoolElement(pc_Box->c_DataPoolElementsConfig[u32_It].c_ElementId,
-                                          pc_Box->c_DataPoolElementsConfig[u32_It].c_ElementScaling);
-         }
-      }
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

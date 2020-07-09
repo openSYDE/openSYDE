@@ -47,10 +47,10 @@ using namespace stw_opensyde_core;
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
    post-condition: the passed XML parser has the active node set to the same "opensyde-parameter-sets"
 
-   \param[out]    orc_Node                   data storage
-   \param[in,out] orc_XMLParser              XML with specified node active
-   \param[in,out] orq_MissingOptionalContent Flag for indication of optional content missing
-                                             Warning: flag is never set to false if optional content is present
+   \param[out]     orc_Node                     data storage
+   \param[in,out]  orc_XMLParser                XML with specified node active
+   \param[in,out]  orq_MissingOptionalContent   Flag for indication of optional content missing
+                                                Warning: flag is never set to false if optional content is present
 
    \return
    C_NO_ERR   data read
@@ -83,8 +83,8 @@ stw_types::sint32 C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(C_OSC
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
    post-condition: the passed XML parser has the active node set to the same "opensyde-parameter-sets"
 
-   \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in]      orc_Node         data storage
+   \param[in,out]  orc_XMLParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::h_SaveInterpretedNode(const C_OSCParamSetInterpretedNode & orc_Node,
@@ -118,9 +118,9 @@ C_OSCParamSetInterpretedNodeFiler::C_OSCParamSetInterpretedNodeFiler(void)
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[out]    orc_DataPools     data storage
-   \param[in]     orc_DataPoolInfos Loaded data pool infos
-   \param[in,out] orc_XMLParser     XML with specified node active
+   \param[out]     orc_DataPools       data storage
+   \param[in]      orc_DataPoolInfos   Loaded data pool infos
+   \param[in,out]  orc_XMLParser       XML with specified node active
 
    \return
    C_NO_ERR   data read
@@ -199,8 +199,8 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in]      orc_DataPools    Data pools
+   \param[in,out]  orc_XMLParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPools(
@@ -225,8 +225,8 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPools(
    pre-condition: the passed XML parser has the active node set to "datapool"
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
-   \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in,out]  orc_DataPool     Data pool
+   \param[in,out]  orc_XMLParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
@@ -248,8 +248,8 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPool(C_OSCParamSetInterpret
    pre-condition: the passed XML parser has the active node set to "datapool"
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
-   \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in]      orc_DataPool     Data pool
+   \param[in,out]  orc_XMLParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPool(const C_OSCParamSetInterpretedDataPool & orc_DataPool,
@@ -265,8 +265,8 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPool(const C_OSCParamSetInter
    pre-condition: the passed XML parser has the active node set to "datapool"
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
-   \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in,out]  orc_Lists        Lists
+   \param[in,out]  orc_XMLParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
@@ -326,8 +326,8 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OSCParamSet
    pre-condition: the passed XML parser has the active node set to "datapool"
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
-   \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in]      orc_Lists        Lists
+   \param[in,out]  orc_XMLParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveLists(const std::vector<C_OSCParamSetInterpretedList> & orc_Lists,
@@ -352,8 +352,8 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveLists(const std::vector<C_OSCPara
    pre-condition: the passed XML parser has the active node set to "list"
    post-condition: the passed XML parser has the active node set to the same "list"
 
-   \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in,out]  orc_List         List
+   \param[in,out]  orc_XMLParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
@@ -391,8 +391,8 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadList(C_OSCParamSetInterpretedLi
    pre-condition: the passed XML parser has the active node set to "list"
    post-condition: the passed XML parser has the active node set to the same "list"
 
-   \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in]      orc_List         List
+   \param[in,out]  orc_XMLParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveList(const C_OSCParamSetInterpretedList & orc_List,
@@ -409,8 +409,8 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveList(const C_OSCParamSetInterpret
    pre-condition: the passed XML parser has the active node set to "list"
    post-condition: the passed XML parser has the active node set to the same "list"
 
-   \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in,out]  orc_Elements     Elements
+   \param[in,out]  orc_XMLParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
@@ -468,8 +468,8 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElements(std::vector<C_OSCParam
    pre-condition: the passed XML parser has the active node set to "list"
    post-condition: the passed XML parser has the active node set to the same "list"
 
-   \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in]      orc_Elements     Elements
+   \param[in,out]  orc_XMLParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveElements(
@@ -494,9 +494,8 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveElements(
    pre-condition: the passed XML parser has the active node set to "element"
    post-condition: the passed XML parser has the active node set to the same "element"
 
-   \param[in]     ou16_FileVersion  version of XML structure to be expected
-   \param[out]    orc_Element       data storage
-   \param[in,out] orc_XMLParser     XML with specified node active
+   \param[out]     orc_Element      data storage
+   \param[in,out]  orc_XMLParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
@@ -525,13 +524,23 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterprete
       s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(orc_Element.c_NvmValue, orc_XMLParser);
       if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("value") == "value"))
       {
-         s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(orc_Element.c_NvmValue, orc_XMLParser);
+         stw_scl::C_SCLString c_Error;
+         s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(orc_Element.c_NvmValue, orc_XMLParser, true,
+                                                                         &c_Error);
+         if (s32_Retval != C_NO_ERR)
+         {
+            osc_write_log_error("Loading Dataset data",
+                                stw_scl::C_SCLString(stw_scl::C_SCLString(
+                                                        "Invalid content of \"element\".\"value\" node: ") +
+                                                     c_Error).c_str());
+            s32_Retval = C_CONFIG;
+         }
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "element");
       }
       else
       {
-         osc_write_log_error("Loading Dataset data", "Could not find \"element\".\"type\" node.");
+         osc_write_log_error("Loading Dataset data", "Could not find \"element\".\"value\" node.");
          s32_Retval = C_CONFIG;
       }
    }
@@ -546,8 +555,8 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterprete
    pre-condition: the passed XML parser has the active node set to "element"
    post-condition: the passed XML parser has the active node set to the same "element"
 
-   \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in]      orc_Element      Element
+   \param[in,out]  orc_XMLParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveElement(const C_OSCParamSetInterpretedElement & orc_Element,

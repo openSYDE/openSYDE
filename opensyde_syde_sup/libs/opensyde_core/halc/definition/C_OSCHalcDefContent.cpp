@@ -12,12 +12,14 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "TGLUtils.h"
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "CSCLChecksums.h"
 #include "C_OSCHalcDefContent.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
@@ -46,7 +48,7 @@ C_OSCHalcDefContent::C_OSCHalcDefContent(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set complex type
 
-   \param[in] oe_Type Type
+   \param[in]  oe_Type  Type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCHalcDefContent::SetComplexType(const C_OSCHalcDefContent::E_ComplexType oe_Type)
@@ -69,8 +71,8 @@ C_OSCHalcDefContent::E_ComplexType C_OSCHalcDefContent::GetComplexType() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add new enum item entry
 
-   \param[in] orc_DisplayName Enum display value
-   \param[in] orc_Value       Enum internal value
+   \param[in]  orc_DisplayName   Enum display value
+   \param[in]  orc_Value         Enum internal value
 
    \return
    C_NO_ERR Added successfully
@@ -104,7 +106,7 @@ sint32 C_OSCHalcDefContent::AddEnumItem(const stw_scl::C_SCLString & orc_Display
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set enum based on display value
 
-   \param[in] orc_DisplayName Enum display value
+   \param[in]  orc_DisplayName   Enum display value
 
    \return
    C_NO_ERR Value set
@@ -223,7 +225,7 @@ const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & C_OSCHalcDefCon
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add bitmask item
 
-   \param[in] orc_Value New bitmask item
+   \param[in]  orc_Value   New bitmask item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCHalcDefContent::AddBitmaskItem(const C_OSCHalcDefContentBitmaskItem & orc_Value)
@@ -244,11 +246,145 @@ const std::vector<C_OSCHalcDefContentBitmaskItem> & C_OSCHalcDefContent::GetBitm
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get bitmask
+
+   \param[in]   orc_DisplayName  Display name
+   \param[out]  orq_Value        Value
+
+   \return
+   C_NO_ERR Value set
+   C_RANGE  Display value does not exist
+   C_CONFIG Type invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcDefContent::GetBitmask(const stw_scl::C_SCLString & orc_DisplayName, bool & orq_Value) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if ((this->GetArray() == false) && (this->GetComplexType() == C_OSCHalcDefContent::eCT_BIT_MASK))
+   {
+      bool q_Found = false;
+
+      for (std::vector<C_OSCHalcDefContentBitmaskItem>::const_iterator c_ItBitmask = this->mc_BitmaskItems.begin();
+           c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
+      {
+         if (orc_DisplayName == c_ItBitmask->c_Display)
+         {
+            q_Found = true;
+            orq_Value = c_ItBitmask->q_ApplyValueSetting;
+         }
+      }
+      if (q_Found == false)
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set bitmask
+
+   \param[in]  orc_DisplayName   Display name
+   \param[in]  oq_Value          Value
+
+   \return
+   C_NO_ERR Value set
+   C_RANGE  Display value does not exist
+   C_CONFIG Type invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayName, const bool oq_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if ((this->GetArray() == false) && (this->GetComplexType() == C_OSCHalcDefContent::eCT_BIT_MASK))
+   {
+      bool q_Found = false;
+
+      for (std::vector<C_OSCHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
+           c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
+      {
+         if (orc_DisplayName == c_ItBitmask->c_Display)
+         {
+            uint64 u64_CurrentValue = 0ULL;
+            q_Found = true;
+            //Current value
+            switch (this->GetType())
+            {
+            case C_OSCNodeDataPoolContent::eUINT8:
+               u64_CurrentValue = static_cast<uint64>(this->GetValueU8());
+               break;
+            case C_OSCNodeDataPoolContent::eUINT16:
+               u64_CurrentValue = static_cast<uint64>(this->GetValueU16());
+               break;
+            case C_OSCNodeDataPoolContent::eUINT32:
+               u64_CurrentValue = static_cast<uint64>(this->GetValueU32());
+               break;
+            case C_OSCNodeDataPoolContent::eUINT64:
+               u64_CurrentValue = this->GetValueU64();
+               break;
+            default:
+               s32_Retval = C_CONFIG;
+               break;
+            }
+            if (s32_Retval == C_NO_ERR)
+            {
+               //Update value
+               //Step 1 - mask current value
+               u64_CurrentValue = u64_CurrentValue & (~(c_ItBitmask->u64_Value));
+               //Step 2 - add new value
+               if (oq_Value)
+               {
+                  u64_CurrentValue += c_ItBitmask->u64_Value;
+               }
+               //Update flag
+               c_ItBitmask->q_ApplyValueSetting = oq_Value;
+               //Set value
+               switch (this->GetType())
+               {
+               case C_OSCNodeDataPoolContent::eUINT8:
+                  this->SetValueU8(static_cast<uint8>(u64_CurrentValue));
+                  break;
+               case C_OSCNodeDataPoolContent::eUINT16:
+                  this->SetValueU16(static_cast<uint16>(u64_CurrentValue));
+                  break;
+               case C_OSCNodeDataPoolContent::eUINT32:
+                  this->SetValueU32(static_cast<uint32>(u64_CurrentValue));
+                  break;
+               case C_OSCNodeDataPoolContent::eUINT64:
+                  this->SetValueU64(static_cast<uint64>(u64_CurrentValue));
+                  break;
+               default:
+                  //Should not happen
+                  tgl_assert(false);
+                  break;
+               }
+            }
+         }
+      }
+      if (q_Found == false)
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCHalcDefContent::CalcHash(uint32 & oru32_HashValue) const

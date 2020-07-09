@@ -53,8 +53,8 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComProtocolFile(C_OSCCanProtocol & orc_Node
                                                      const std::vector<C_OSCNodeDataPool> & orc_NodeDataPools)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForExistingFile(c_XMLParser, orc_FilePath,
-                                                                         "opensyde-comm-core-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser, orc_FilePath,
+                                                                        "opensyde-comm-core-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -173,8 +173,8 @@ sint32 C_OSCNodeCommFiler::h_SaveNodeComProtocolFile(const C_OSCCanProtocol & or
                                                      const C_SCLString & orc_DatapoolName)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForNewFile(c_XMLParser, orc_FilePath,
-                                                                    "opensyde-comm-core-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForNewFile(c_XMLParser, orc_FilePath,
+                                                                   "opensyde-comm-core-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -861,7 +861,7 @@ sint32 C_OSCNodeCommFiler::h_StringToCommunicationProtocol(const C_SCLString & o
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeCommFiler::h_GetFileName(const C_SCLString & orc_DatapoolName)
 {
-   return "comm_" + C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(orc_DatapoolName) + "_core.xml";
+   return "comm_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(orc_DatapoolName) + "_core.xml";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

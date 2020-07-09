@@ -44,7 +44,7 @@ C_OSCHalcDefChannelUseCase::C_OSCHalcDefChannelUseCase(void)
 
    The hash value is a 32 bit CRC value.
 
-   \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCHalcDefChannelUseCase::CalcHash(stw_types::uint32 & oru32_HashValue) const
@@ -58,5 +58,11 @@ void C_OSCHalcDefChannelUseCase::CalcHash(stw_types::uint32 & oru32_HashValue) c
    for (uint32 u32_It = 0UL; u32_It < this->c_Availability.size(); ++u32_It)
    {
       this->c_Availability[u32_It].CalcHash(oru32_HashValue);
+   }
+
+   for (uint32 u32_It = 0UL; u32_It < this->c_DefaultChannels.size(); ++u32_It)
+   {
+      stw_scl::C_SCLChecksums::CalcCRC32(&this->c_DefaultChannels[u32_It], sizeof(uint32),
+                                         oru32_HashValue);
    }
 }

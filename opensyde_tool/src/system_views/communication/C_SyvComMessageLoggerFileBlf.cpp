@@ -144,7 +144,7 @@ void C_SyvComMessageLoggerFileBlf::AddMessageToFile(const C_OSCComMessageLoggerD
       // Timestamp in ns
       c_CanObj.objectFlags = ObjectHeader::TimeOneNans;
       // us into ns
-      c_CanObj.objectTimeStamp = orc_MessageData.u64_TimeStampAbsolute * 1000U;
+      c_CanObj.objectTimeStamp = orc_MessageData.u64_TimeStampAbsoluteStart * 1000U;
 
       this->mc_File.write(&c_CanObj);
    }

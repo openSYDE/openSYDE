@@ -422,9 +422,9 @@ void C_OgeWiHover::m_UpdateParentSize(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OgeWiHover::mhu32_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_Size, const bool oq_Maximized)
+uint32 C_OgeWiHover::mh_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_Size, const bool oq_Maximized)
 {
-   uint32 u32_ResizeMode = mu32_RESIZE_NONE;
+   uint32 u32_ResizeMode;
 
    // check the different border areas for the different resize modes
    if (orc_Pos.x() < msn_SCROLL_AREA_SIZE)
@@ -517,7 +517,7 @@ void C_OgeWiHover::mh_AdaptMouseRangePos(QPoint & orc_Pos, const QSize & orc_Ran
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_HandleBasicCursorState(const QPoint & orc_Pos)
 {
-   const uint32 u32_ResizeMode = mhu32_GetResizeMode(orc_Pos, this->size(), this->mq_Maximized);
+   const uint32 u32_ResizeMode = mh_GetResizeMode(orc_Pos, this->size(), this->mq_Maximized);
 
    // adapt cursor
    switch (u32_ResizeMode)
@@ -572,7 +572,7 @@ void C_OgeWiHover::mousePressEvent(QMouseEvent * const opc_Event)
    // check what the intention of the mouse click was
    if (opc_Event->button() == Qt::LeftButton)
    {
-      this->mu32_ResizeMode = mhu32_GetResizeMode(opc_Event->pos(), this->size(), this->mq_Maximized);
+      this->mu32_ResizeMode = mh_GetResizeMode(opc_Event->pos(), this->size(), this->mq_Maximized);
 
       if (this->mu32_ResizeMode == mu32_RESIZE_NONE)
       {

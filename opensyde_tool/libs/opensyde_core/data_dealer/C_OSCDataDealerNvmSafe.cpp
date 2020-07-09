@@ -827,8 +827,6 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
                               if (c_AlreadyUsedDataPoolIndices[u32_ItCurrentDataPool] ==
                                   rc_DataPoolListId.u32_DataPoolIndex)
                               {
-                                 C_OSCParamSetInterpretedDataPool & rc_InterpretedDataPool =
-                                    c_InterpretedNode.c_DataPools[u32_ItCurrentDataPool];
                                  bool q_ListFound = false;
                                  q_DataPoolFound = true;
                                  //Interpreted
@@ -847,6 +845,8 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
                                  if (q_ListFound == false)
                                  {
                                     //List
+                                    C_OSCParamSetInterpretedDataPool & rc_InterpretedDataPool =
+                                       c_InterpretedNode.c_DataPools[u32_ItCurrentDataPool];
                                     C_OSCParamSetInterpretedList c_NewList;
                                     mh_CreateInterpretedList(rc_List, c_NewList);
                                     rc_InterpretedDataPool.c_Lists.push_back(c_NewList);
@@ -1209,7 +1209,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeUpdateCRCForFile(const C_SCLString & orc_P
    {
       if (this->mc_ParameterSetFilePath == orc_Path)
       {
-         s32_Retval = this->mc_ImageFileHandler.UpdateCRCForFile(orc_Path);
+         s32_Retval = C_OSCParamSetHandler::h_UpdateCRCForFile(orc_Path);
          if (s32_Retval == C_NO_ERR)
          {
             //Update state

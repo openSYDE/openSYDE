@@ -109,9 +109,9 @@ protected:
    virtual void m_AddPointAt(const stw_types::sint32 & ors32_Index, const QPointF & orc_Pos);
    virtual void m_RemovePointAt(const stw_types::sint32 & ors32_Index);
 
-   void LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data);
-   void UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data) const;
-   void Init(const std::vector<QPointF> & orc_Points);
+   void m_LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data);
+   void m_UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data) const;
+   void m_Init(const std::vector<QPointF> & orc_Points);
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
@@ -142,7 +142,7 @@ private:
    void m_SetInteractionVisibility(const bool & orq_Visible);
    void m_HideInteraction(const bool & orq_Invisible);
    void m_CheckLineGrid(const QPointF & orc_MouseScenePos);
-   static bool m_Near(const stw_types::float64 of64_Exact, const stw_types::float64 of64_Eval);
+   static bool mh_Near(const stw_types::float64 of64_Exact, const stw_types::float64 of64_Eval);
 
    QPointF mc_LastKnownPosition;
    bool mq_BlockChangeSignal;

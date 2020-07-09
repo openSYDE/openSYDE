@@ -35,20 +35,22 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHALCMagicianUtil::C_OSCHALCMagicianUtil()
+C_OSCHALCMagicianUtil::C_OSCHALCMagicianUtil(void)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get datapool name
 
+   \param[in]  oq_IsSafe   Safe Datapool flag
+
    \return
    Datapool name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolName()
+stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolName(const bool oq_IsSafe)
 {
-   const stw_scl::C_SCLString c_Retval = "HAL";
+   const stw_scl::C_SCLString c_Retval = (oq_IsSafe == true) ? "HAL_SAFE" : "HAL_NON_SAFE";
 
    return c_Retval;
 }

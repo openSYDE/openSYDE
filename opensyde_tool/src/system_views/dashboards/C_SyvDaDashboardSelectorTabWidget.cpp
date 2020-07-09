@@ -10,13 +10,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <iostream>
-
-#include <QElapsedTimer>
-
 #include "stwerrors.h"
 #include "TGLUtils.h"
-#include "constants.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_SyvDaDashboardSelectorTabWidget.h"
 #include "C_OgeWiUtil.h"
 #include "C_PuiSvHandler.h"
@@ -966,12 +962,8 @@ sint32 C_SyvDaDashboardSelectorTabWidget::m_MapDataIndexToTabIndex(const uint32 
 void C_SyvDaDashboardSelectorTabWidget::m_AddSpecificTab(const uint32 ou32_DataIndex, const sint32 os32_TabIndex,
                                                          C_SyvDaDashboardWidget * const opc_Widget)
 {
-   QElapsedTimer c_Timer;
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if (pc_View != NULL)
@@ -992,17 +984,9 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddSpecificTab(const uint32 ou32_DataI
                                                    pc_Dashboard->GetName(), /* pc_Dashboard->GetComment(),*/ false,
                                                    this);
          }
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "Load dashboards step 1: " << c_Timer.restart() << " ms" << &std::endl;
-         }
 
          pc_Widget->SetEditMode(this->mq_EditMode);
          pc_Widget->SetDarkMode(pc_View->GetDarkModeActive());
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "Load dashboards step 2: " << c_Timer.restart() << " ms" << &std::endl;
-         }
 
          //Check for insert vs add action
          if ((os32_TabIndex >= 0) && (os32_TabIndex <= this->count()))
@@ -1022,6 +1006,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_AddSpecificTab(const uint32 ou32_DataI
          //lint -e{429}  no memory leak because of the parent of pc_Widget and the Qt memory management
       }
    }
+
+   osc_write_log_performance_stop(u16_TimerId, "Load dashboard");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

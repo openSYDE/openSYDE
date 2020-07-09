@@ -41,7 +41,6 @@ public:
 
    stw_types::uint32 SetUsage(const stw_types::uint32 ou32_Size, const stw_types::uint32 ou32_Used);
 
-   void SetToolTipActive(const bool oq_Active);
    void SetToolTipWidgetName(const QString & orc_Value);
    void SetErrorToolTip(const QString & orc_Heading, const QString & orc_Content);
 

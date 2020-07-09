@@ -50,9 +50,32 @@ public:
    C_CMONProtocolBase(void);
    virtual ~C_CMONProtocolBase(void);
 
-   ///actual conversion routine to be overloaded by inheriting class
+   //-----------------------------------------------------------------------------
+   /*!
+      \brief    Return CAN message in string interpretation
+
+      Actual conversion routine to be overloaded by inheriting class
+
+      \param[in]       orc_Msg    CAN message to convert to string
+
+      \return
+      CAN message in string representation
+   */
+   //-----------------------------------------------------------------------------
    virtual stw_scl::C_SCLString MessageToString(const stw_can::T_STWCAN_Msg_RX & orc_Msg) const = 0;
-   ///return string representation of protocol name
+
+   //-----------------------------------------------------------------------------
+   /*!
+      \brief    Return string representation of protocol name
+
+      To be overloaded by inheriting class.
+
+      \param[in]       orc_Msg    CAN message to convert to string
+
+      \return
+      string representation of protocol name
+   */
+   //-----------------------------------------------------------------------------
    virtual stw_scl::C_SCLString GetProtocolName(void) const = 0;
 
    virtual void SetDecimal(const bool oq_Decimal);

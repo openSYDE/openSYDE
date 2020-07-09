@@ -74,6 +74,8 @@ C_CamGenWidget::C_CamGenWidget(QWidget * const opc_Parent) :
            this, &C_CamGenWidget::SigSendMessage);
    connect(this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::SigRegisterCyclicMessage,
            this, &C_CamGenWidget::SigRegisterCyclicMessage);
+   connect(this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::SigRemoveAllCyclicMessages,
+           this, &C_CamGenWidget::SigRemoveAllCyclicMessages);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -144,20 +146,13 @@ void C_CamGenWidget::RemoveMessagesForFile(const QString & orc_File) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Signal communication start
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamGenWidget::SetCommunicationStarted(void) const
-{
-   this->mpc_Ui->pc_WidgetMessages->SetCommunicationStarted();
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Signal communication stop
+   \param[in]  oq_Online    Online/offline flag of trace
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenWidget::SetCommunicationStopped(void) const
+void C_CamGenWidget::SetCommunicationStarted(const bool oq_Online) const
 {
-   this->mpc_Ui->pc_WidgetMessages->SetCommunicationStopped();
+   this->mpc_Ui->pc_WidgetMessages->SetCommunicationStarted(oq_Online);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

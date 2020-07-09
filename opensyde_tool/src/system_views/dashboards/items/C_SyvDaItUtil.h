@@ -25,7 +25,6 @@ namespace stw_opensyde_gui_logic
 class C_SyvDaItUtil
 {
 public:
-   static void h_InitFontFamily(QLabel * const opc_Label);
    static void h_CopyFontSize(const QLabel * const opc_SourceLabel, QLabel * const opc_TargetLabel,
                               const stw_types::float32 of32_Factor = 1.0F);
    static void h_SyncFontSize(QLabel * const opc_Label1, QLabel * const opc_Label2, QLabel * const opc_Label3 = NULL,

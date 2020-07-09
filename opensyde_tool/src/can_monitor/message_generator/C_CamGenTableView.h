@@ -51,8 +51,8 @@ public:
    void LoadUserSettings(void);
 
    void RemoveMessagesForFile(const QString & orc_File);
-   void SetCommunicationStarted(void);
-   void SetCommunicationStopped(void);
+   void SetCommunicationStarted(const bool oq_Active);
+   void SetCyclicActive(const bool oq_Active);
    void UpdateMessageData(const stw_types::uint32 ou32_MessageIndex);
    void TriggerModelUpdateCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
    bool CheckAndHandleKey(const QString & orc_Input);
@@ -79,7 +79,8 @@ protected:
    //lint -restore
 
 private:
-   bool mq_CommunicationActive;
+   bool mq_CommunicationActive; ///< True if message trace is currently running
+   bool mq_CyclicTransmissionActive;
    C_CamGenTableDelegate mc_Delegate;
    QSortFilterProxyModel mc_SortProxyModel;
    stw_opensyde_gui_logic::C_CamGenTableModel mc_Model;
@@ -107,6 +108,7 @@ private:
    void m_SetSelectedMessages(const std::vector<stw_types::sint32> & orc_SelectedIndices);
    void m_SelectRow(const stw_types::sint32 os32_Row, const QItemSelectionModel::SelectionFlags & orc_Flags);
    void m_HandleCheckChange(const QModelIndex & orc_Index);
+   void m_RegisterAllCyclicMessages(void);
 
    //Avoid call
    C_CamGenTableView(const C_CamGenTableView &);

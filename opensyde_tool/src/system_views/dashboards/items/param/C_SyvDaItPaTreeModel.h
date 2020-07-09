@@ -68,8 +68,6 @@ public:
    void Init(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DataWidget);
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetAllListIds(void) const;
    bool CheckListsRead(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds) const;
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetListIdsForIndex(const QModelIndex & orc_Index)
-   const;
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetChangedListElementIds(void) const;
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> GetInvalidListIds(void) const;
    void UpdateECUValues(void);

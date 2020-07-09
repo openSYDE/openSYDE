@@ -60,6 +60,7 @@ private:
                                                C_CieConverter::C_CIENodeMessage & orc_Message);
    static stw_types::sint32 mh_CheckRange(stw_types::float64 of64_Value,
                                           stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type oe_Datatype);
+   static stw_scl::C_SCLString mh_ReEscapeCriticalSymbols(const stw_scl::C_SCLString & orc_String);
 
 public:
    static stw_types::sint32 h_ImportNetwork(const stw_scl::C_SCLString & orc_File,

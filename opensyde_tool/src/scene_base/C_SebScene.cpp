@@ -1202,6 +1202,7 @@ void C_SebScene::m_AddImageWithFileDialog(const QPointF & orc_Pos)
    // convert coordinates
    tgl_assert(rc_Views.size() > 0);
 
+   // no file path check necessary here, because image load can handle crazy characters
    c_File = QFileDialog::getOpenFileName(rc_Views[0], C_GtGetText::h_GetText("Load Image"), c_Dir, c_Filter);
 
    if (c_File.compare("") != 0)

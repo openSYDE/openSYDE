@@ -17,6 +17,7 @@
 #include "constants.h"
 #include "C_GtGetText.h"
 #include "C_OgeWiError.h"
+#include "C_Uti.h"
 #include "C_OgePopUpDialog.h"
 #include "C_PopErrorHandling.h"
 #include "C_OSCLoggingHandler.h"
@@ -58,63 +59,56 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
 {
    if (ors32_Err != C_NO_ERR)
    {
+      QString c_Details;
       C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Project load"));
-      c_Message.SetDescription(orc_Path);
+      c_Message.SetDescription(C_GtGetText::h_GetText("Failed to load project: ") + orc_Path);
       switch (ors32_Err)
       {
       case C_RD_WR:
-         c_Message.SetDetails(C_GtGetText::h_GetText("There are problems accessing the file system.\n"
-                                                     "For example, there may be no read access to the file."));
+         c_Details = C_GtGetText::h_GetText("There are problems accessing the file system.\n"
+                                            "For example, there may be no read access to the file.");
          c_Message.SetCustomMinHeight(200, 250);
-         c_Message.Execute();
          break;
       case C_RANGE:
-         c_Message.SetDetails(C_GtGetText::h_GetText("At least one project file is missing."));
+         c_Details = C_GtGetText::h_GetText("At least one project file is missing.");
          c_Message.SetCustomMinHeight(200, 250);
-         c_Message.Execute();
          break;
       case C_NOACT:
-         c_Message.SetDetails(C_GtGetText::h_GetText("A project file is present but its structure is invalid.\n"
-                                                     "For example this can be caused by an invalid XML file."));
+         c_Details = C_GtGetText::h_GetText("A project file is present but its structure is invalid.\n"
+                                            "For example this can be caused by an invalid XML file.");
          c_Message.SetCustomMinHeight(200, 250);
-         c_Message.Execute();
          break;
       case C_CONFIG:
-         c_Message.SetDetails(C_GtGetText::h_GetText("The content of a project file is invalid or incomplete."));
+         c_Details = C_GtGetText::h_GetText("The content of a project file is invalid or incomplete.");
          c_Message.SetCustomMinHeight(230, 250);
-         c_Message.Execute();
          break;
       case C_CHECKSUM:
          //Update log file
          C_OSCLoggingHandler::h_Flush();
-         c_Message.SetDetails(QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
-                              arg(C_GtGetText::h_GetText(
-                                     "The verification of the project failed. For more information see ")).
-                              arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
-                              arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                              arg(C_GtGetText::h_GetText("log file")));
+         c_Details = C_GtGetText::h_GetText("The verification of the project failed.");
          c_Message.SetCustomMinHeight(200, 300);
-         c_Message.Execute();
          break;
       case C_COM:
-         //Update log file
-         C_OSCLoggingHandler::h_Flush();
-         c_Message.SetDetails(QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
-                              arg(C_GtGetText::h_GetText(
-                                     "The device definition for the project was not found. For more information see ")).
-                              arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
-                              arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                              arg(C_GtGetText::h_GetText("log file")));
+         c_Details = C_GtGetText::h_GetText("The device definition for the project was not found.");
          c_Message.SetCustomMinHeight(200, 300);
-         c_Message.Execute();
          break;
       default:
-         c_Message.SetDetails(C_GtGetText::h_GetText("Unknown cause."));
+         c_Details = C_GtGetText::h_GetText("Unknown cause.");
          c_Message.SetCustomMinHeight(200, 250);
-         c_Message.Execute();
          break;
       }
+
+      //Update log file
+      C_OSCLoggingHandler::h_Flush();
+
+      // Show error message
+      c_Details += C_GtGetText::h_GetText("<br/>For more information see ");
+      c_Details += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
+                                    C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+      c_Details += ".";
+      c_Message.SetDetails(c_Details);
+      c_Message.Execute();
    }
    else
    {
@@ -124,8 +118,8 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
          //Handle version update
          C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eINFORMATION);
          c_Message.SetHeading(C_GtGetText::h_GetText("Project load"));
-         c_Message.SetDescription(C_GtGetText::h_GetText(
-                                     "Loading an older project version. On the next save the project is updated to the new project version."));
+         c_Message.SetDescription(C_GtGetText::h_GetText("Loading an older project version. On the next save the "
+                                                         "project is updated to the new project version."));
          c_Message.SetCustomMinHeight(180, 180);
          c_Message.Execute();
       }

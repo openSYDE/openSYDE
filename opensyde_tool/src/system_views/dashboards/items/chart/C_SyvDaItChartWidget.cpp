@@ -577,26 +577,6 @@ void C_SyvDaItChartWidget::SetWidthOfDataSeriesSelector(const sintn osn_Width) c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the width of the data series selector widget left of the splitter
-
-   \return
-   Width of the selector widget
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sintn C_SyvDaItChartWidget::GetWidthOfDataSeriesSelector(void) const
-{
-   sintn sn_Width = 250;
-   const QList<sintn> & rc_List = this->mpc_Ui->pc_Splitter->sizes();
-
-   if (rc_List.size() > 0)
-   {
-      sn_Width = rc_List.at(0);
-   }
-
-   return sn_Width;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the current id of the selected data element
 
    \param[out]     oru32_DataPoolElementConfigIndex         Datapool element configuration index

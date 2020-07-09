@@ -56,12 +56,17 @@ sintn main(sintn osn_Argc, charn * oapcn_Argv[])
 
    QApplication c_Appl(osn_Argc, oapcn_Argv);
    {
+      QString c_BinaryHash = stw_opensyde_gui_logic::C_Uti::h_GetHashValueAsQString();
       const QString c_FilePath = stw_opensyde_gui_logic::C_Uti::h_GetCompleteLogFileLocation(".syde_cam_log");
+
       //Set up logging (FIRST)
       stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToConsoleActive(false);
       stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToFileActive(true);
       stw_opensyde_core::C_OSCLoggingHandler::h_SetCompleteLogFileLocation(c_FilePath.toStdString().c_str());
-      osc_write_log_info("Startup", "Starting openSYDE CAN Monitor");
+
+      osc_write_log_info("Startup", QString("Starting openSYDE CAN Monitor(MD5-Checksum: " +
+                                            c_BinaryHash +
+                                            ")").toStdString().c_str());
    }
    {
       //Set stylesheet (SECOND)

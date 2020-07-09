@@ -614,11 +614,8 @@ sint32 C_SyvUpUpdateWidget::m_InitSequence(void)
       c_MessageBox.SetDescription(c_Message);
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Enter update mode"));
       c_MessageBox.Execute();
-   }
 
-   //Simplify return value
-   if (s32_Retval != C_NO_ERR)
-   {
+      // Simplify return value
       s32_Retval = C_CONFIG;
    }
 
@@ -650,9 +647,15 @@ void C_SyvUpUpdateWidget::m_CleanUpSequence(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the state of the buttons depending on the update package and the view error state
+
+   \param[in]       os32_State     State of update package
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_UpdatePackageState(const sint32 os32_State)
 {
-   if (os32_State == C_NO_ERR)
+   if ((os32_State == C_NO_ERR) &&
+       (this->mpc_Ui->pc_GroupBoxErrorContent->isVisible() == false))
    {
       this->mpc_Ui->pc_PbConnect->setEnabled(true);
       this->mpc_Ui->pc_PbUpdate->setEnabled(true);
@@ -743,7 +746,7 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
       }
       else if (C_SyvUpUpdateWidget::mh_IsUpdateNodeStart(e_Step) == true)
       {
-         const C_PuiSdNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetUINode(u32_NodeIndex);
+         const C_PuiSdNode * const pc_UINode = C_PuiSdHandler::h_GetInstance()->GetUINode(u32_NodeIndex);
          this->mu32_ApplicationIndex = 0;
          //Signal progress
          this->mpc_Ui->pc_WiUpdateInformation->SetUpdateNodeStarted(u32_NodeIndex);
@@ -755,10 +758,10 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
             this->mpc_Scene->StartProgressAnimation(u32_NodeIndex);
          }
          //Scroll scene
-         if (pc_Node != NULL)
+         if (pc_UINode != NULL)
          {
-            this->mpc_Ui->pc_GraphicsView->ScrollTo(pc_Node->c_UIPosition,
-                                                    QSizeF(pc_Node->f64_Width, pc_Node->f64_Height));
+            this->mpc_Ui->pc_GraphicsView->ScrollTo(pc_UINode->c_UIPosition,
+                                                    QSizeF(pc_UINode->f64_Width, pc_UINode->f64_Height));
          }
          //Signal progress log
          if (this->mpc_ProgressLogContent != NULL)
@@ -1753,8 +1756,8 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                   // Error for NVM writing
                   if (this->mc_NodesPreconditionNvmWriteError.size() > 0)
                   {
-                     C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-                     c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
+                     C_OgeWiCustomMessage c_MessageNoWriPa(this, C_OgeWiCustomMessage::E_Type::eERROR);
+                     c_MessageNoWriPa.SetHeading(C_GtGetText::h_GetText("System Update"));
                      QString c_Details = C_GtGetText::h_GetText(
                         "Following node(s) do not support writing parameter set image files:\n");
                      uint32 u32_NodeCounter;
@@ -1774,19 +1777,19 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                      }
 
                      // Nodes precondition error
-                     c_Message.SetDescription(C_GtGetText::h_GetText(
-                                                 "There are nodes, which do not support writing"
-                                                 " parameter set image files."));
-                     c_Message.SetDetails(c_Details);
-                     c_Message.SetCustomMinHeight(230, 300);
-                     c_Message.Execute();
+                     c_MessageNoWriPa.SetDescription(C_GtGetText::h_GetText(
+                                                        "There are nodes, which do not support writing"
+                                                        " parameter set image files."));
+                     c_MessageNoWriPa.SetDetails(c_Details);
+                     c_MessageNoWriPa.SetCustomMinHeight(230, 300);
+                     c_MessageNoWriPa.Execute();
                   }
 
                   // Error for Ethernet to Ethernet routing
                   if (this->mc_NodesPreconditionEthToEthError.size() > 0)
                   {
-                     C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-                     c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
+                     C_OgeWiCustomMessage c_MessageNoEthernet(this, C_OgeWiCustomMessage::E_Type::eERROR);
+                     c_MessageNoEthernet.SetHeading(C_GtGetText::h_GetText("System Update"));
                      QString c_Details = C_GtGetText::h_GetText(
                         "Following node(s) do not support Ethernet to Ethernet routing:\n");
                      uint32 u32_NodeCounter;
@@ -1806,12 +1809,12 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                      }
 
                      // Nodes precondition error
-                     c_Message.SetDescription(C_GtGetText::h_GetText(
-                                                 "There are nodes, which do not support Ethernet"
-                                                 " to Ethernet routing."));
-                     c_Message.SetDetails(c_Details);
-                     c_Message.SetCustomMinHeight(230, 300);
-                     c_Message.Execute();
+                     c_MessageNoEthernet.SetDescription(C_GtGetText::h_GetText(
+                                                           "There are nodes, which do not support Ethernet"
+                                                           " to Ethernet routing."));
+                     c_MessageNoEthernet.SetDetails(c_Details);
+                     c_MessageNoEthernet.SetCustomMinHeight(230, 300);
+                     c_MessageNoEthernet.Execute();
                   }
                }
             }
@@ -1856,6 +1859,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
          case C_RANGE:
             c_Message = C_GtGetText::h_GetText(
                "At least one necessary feature of the openSYDE Flashloader is not available for NVM writing.");
+            break;
          default:
             c_Message = C_GtGetText::h_GetText("Unknown error occurred.");
             break;

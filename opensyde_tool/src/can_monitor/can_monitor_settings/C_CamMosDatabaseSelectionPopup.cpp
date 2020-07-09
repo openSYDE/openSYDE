@@ -123,7 +123,7 @@ void C_CamMosDatabaseSelectionPopup::InitStaticNames(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Message"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Selection"));
-   this->mpc_Ui->pc_LabelHeadingPreview->setText(C_GtGetText::h_GetText("Select message"));
+   this->mpc_Ui->pc_LabelHeadingPreview->setText(C_GtGetText::h_GetText("Select Message"));
 
    this->mpc_Ui->pc_LineEditSearch->setPlaceholderText(C_GtGetText::h_GetText("Filter"));
    this->mpc_Ui->pc_LabelSearchNoElementsFound->setText(C_GtGetText::h_GetText("No messages found."));

@@ -140,6 +140,18 @@ bool C_SyvUpPackageListNodeItemParamSetWidget::IsViewFileInfoPossible(void) cons
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the flag if it is possible to show the user hint label
+
+   \retval   true   The user hint label can be shown
+   \retval   false  The user hint label can not be shown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpPackageListNodeItemParamSetWidget::IsUserHintPossible(void) const
+{
+   return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load application information.
 
    \param[out]    orq_FileExists          true: file exists  false: file not found

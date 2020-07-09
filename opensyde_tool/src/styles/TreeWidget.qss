@@ -4,6 +4,7 @@ stw_opensyde_gui--C_SdNdeDpListsTreeWidget,
 stw_opensyde_gui--C_SyvDaItPaListTreeWidget,
 stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch,
 stw_opensyde_gui--C_TblTreDataElementView,
+stw_opensyde_gui--C_SdNdeHalcConfigImportView,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget
 {
 border-style: none;
@@ -19,12 +20,14 @@ stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:!has-children,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:!has-children,
 stw_opensyde_gui--C_SdNdeDpListsTreeWidget::item:!has-children,
 stw_opensyde_gui--C_TblTreDataElementView::item,
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::item,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::item
 {
 border-style: none;
 }
 
 stw_opensyde_gui--C_TblTreDataElementView::item,
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::item,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::item
 {
 margin-top: 3px;
@@ -61,6 +64,8 @@ stw_opensyde_gui--C_SyvDaItPaTreeView::branch:has-children:!has-siblings:closed,
 stw_opensyde_gui--C_SyvDaItPaTreeView::branch:closed:has-children:has-siblings,
 stw_opensyde_gui--C_TblTreDataElementView::branch:has-children:!has-siblings:closed,
 stw_opensyde_gui--C_TblTreDataElementView::branch:closed:has-children:has-siblings,
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch:has-children:!has-siblings:closed,
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch:closed:has-children:has-siblings,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:closed:selected,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:closed:has-children:has-siblings:selected
 {
@@ -74,6 +79,8 @@ stw_opensyde_gui--C_SyvDaItPaTreeView::branch:open:has-children:!has-siblings,
 stw_opensyde_gui--C_SyvDaItPaTreeView::branch:open:has-children:has-siblings,
 stw_opensyde_gui--C_TblTreDataElementView::branch:open:has-children:!has-siblings,
 stw_opensyde_gui--C_TblTreDataElementView::branch:open:has-children:has-siblings,
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch:open:has-children:!has-siblings,
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch:open:has-children:has-siblings,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:open:selected,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:open:has-children:has-siblings:selected
 {
@@ -90,7 +97,8 @@ border-image: none;
 image:url(:/images/IconArrowSmallCloseGray.png);
 }
 
-stw_opensyde_gui--C_TblTreDataElementView::branch
+stw_opensyde_gui--C_TblTreDataElementView::branch,
+stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch
 {
 margin-top: 3px;
 margin-bottom: 3px;

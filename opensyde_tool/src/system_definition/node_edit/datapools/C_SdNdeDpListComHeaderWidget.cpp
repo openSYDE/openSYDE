@@ -367,14 +367,14 @@ void C_SdNdeDpListComHeaderWidget::m_UpdateBusLink(void)
                   if (pc_Bus != NULL)
                   {
                      this->mpc_Ui->pc_LabelBusLink->setText(C_Uti::h_GetLink(pc_Bus->c_Name.c_str()));
+                     //Dynamic tool tip
+                     this->mpc_Ui->pc_LabelBusLink->SetToolTipInformation(QString(C_GtGetText::h_GetText(
+                                                                                     "Navigate to %1")).arg(
+                                                                             pc_Bus->c_Name.c_str()),
+                                                                          C_GtGetText::h_GetText(
+                                                                             "Edit COMM interface description on bus level"));
                   }
                   this->mpc_Ui->pc_PushButtonEdit->setEnabled(false);
-                  //Dynamic tool tip
-                  this->mpc_Ui->pc_LabelBusLink->SetToolTipInformation(QString(C_GtGetText::h_GetText(
-                                                                                  "Navigate to %1")).arg(
-                                                                          pc_Bus->c_Name.c_str()),
-                                                                       C_GtGetText::h_GetText(
-                                                                          "Edit COMM interface description on bus level"));
                   this->mpc_Ui->pc_PushButtonEdit->SetToolTipInformation(C_GtGetText::h_GetText("Edit"),
                                                                          C_GtGetText::h_GetText(
                                                                             "The option \"Edit\" is disabled for the "

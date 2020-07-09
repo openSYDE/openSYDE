@@ -14,6 +14,7 @@
 
 #include "TGLFile.h"
 #include "stwerrors.h"
+#include "C_OSCExportUti.h"
 #include "C_OSCExportNode.h"
 #include "C_OSCExportDataPool.h"
 #include "C_OSCExportCommunicationStack.h"
@@ -70,12 +71,13 @@ C_OSCExportNode::C_OSCExportNode(void)
 
    \return
    C_NO_ERR  Operation success
-   C_RD_WR   Operation failure: cannot store files
+   C_RD_WR   Cannot store files
    C_NOACT   Application is not of type ePROGRAMMABLE_APPLICATION or has unknown/invalid code structure version
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
              Datapool does not provide information about owning application or refers to an invalid application
              ApplicationIndex references invalid application
-   C_CONFIG  Protocol or Datapool not available in node for interface
+   C_CONFIG  Protocol or Datapool not available in node for interface or
+             Input data not suitable for code generation. Details will be written to OSC Log.
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw_types::uint16 ou16_ApplicationIndex,
@@ -106,6 +108,8 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
          //check if the code structure version is unknown
          (rc_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION))
       {
+         osc_write_log_error("Creating source code", "Code format version of application \"" +
+                             rc_Application.c_Name + "\" unknown.");
          s32_Retval = C_NOACT;
       }
    }
@@ -170,10 +174,6 @@ sint32 C_OSCExportNode::mh_CreateOsyInitCode(const C_OSCNode & orc_Node, const u
 
    bool q_CreateDpdInit;
 
-   const C_SCLString c_FileBase = TGL_FileIncludeTrailingDelimiter(orc_Path) + "osy_init";
-
-   orc_Files.push_back(c_FileBase + ".c");
-   orc_Files.push_back(c_FileBase + ".h");
    if (ou16_ApplicationIndex == orc_Node.c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex)
    {
       //create DPD and DPH init functions
@@ -185,12 +185,13 @@ sint32 C_OSCExportNode::mh_CreateOsyInitCode(const C_OSCNode & orc_Node, const u
       q_CreateDpdInit = false;
    }
 
-   s32_Retval = C_OSCExportOsyInit::h_CreateSourceCode(c_FileBase + ".c", orc_Node, q_CreateDpdInit,
+   s32_Retval = C_OSCExportOsyInit::h_CreateSourceCode(orc_Path, orc_Node, q_CreateDpdInit,
                                                        ou16_ApplicationIndex, orc_ExportToolInfo);
-   if (s32_Retval != C_NO_ERR)
+
+   //Handle file names
+   if (s32_Retval == C_NO_ERR)
    {
-      osc_write_log_error("Creating source code",
-                          "Could not write osy_init file to target directory \"" + orc_Path + "\".");
+      C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path, C_OSCExportOsyInit::h_GetFileName());
    }
 
    return s32_Retval;
@@ -207,7 +208,8 @@ sint32 C_OSCExportNode::mh_CreateOsyInitCode(const C_OSCNode & orc_Node, const u
 
    \return
    C_NO_ERR Operation success
-   C_RD_WR  Operation failure: cannot store files
+   C_RD_WR  Cannot store files
+   C_CONFIG Input data not suitable for code generation. Details will be written to OSC Log.
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_CreateDatapoolCode(const C_OSCNode & orc_Node, const uint16 ou16_ApplicationIndex,
@@ -312,7 +314,9 @@ sint32 C_OSCExportNode::mh_CreateDatapoolCode(const C_OSCNode & orc_Node, const 
             tgl_assert(s32_Retval == C_NO_ERR);
 
             //Export
-            s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, c_DataPool,
+            s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion,
+                                                                 orc_Node.c_Properties.c_CodeExportSettings.
+                                                                 e_ScalingSupport, c_DataPool,
                                                                  u8_DataPoolIndexWithinApplication,
                                                                  e_Relation, u8_DataPoolIndexRemote,
                                                                  u8_ProcessId, orc_ExportToolInfo);
@@ -320,7 +324,9 @@ sint32 C_OSCExportNode::mh_CreateDatapoolCode(const C_OSCNode & orc_Node, const 
          else
          {
             //Export
-            s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion, rc_DataPool,
+            s32_Retval = C_OSCExportDataPool::h_CreateSourceCode(orc_Path, u16_GenCodeVersion,
+                                                                 orc_Node.c_Properties.c_CodeExportSettings.
+                                                                 e_ScalingSupport, rc_DataPool,
                                                                  u8_DataPoolIndexWithinApplication,
                                                                  e_Relation, u8_DataPoolIndexRemote,
                                                                  u8_ProcessId, orc_ExportToolInfo);
@@ -328,17 +334,7 @@ sint32 C_OSCExportNode::mh_CreateDatapoolCode(const C_OSCNode & orc_Node, const 
          //Handle file names
          if (s32_Retval == C_NO_ERR)
          {
-            C_SCLString c_FileName = C_OSCExportDataPool::h_GetFileName(rc_DataPool);
-            c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + c_FileName;
-            orc_Files.push_back(c_FileName + ".c");
-            orc_Files.push_back(c_FileName + ".h");
-         }
-         else
-         {
-            osc_write_log_error("Creating source code",
-                                "Could not write Datapool file to target directory \"" + orc_Path +
-                                "\".");
-            break;
+            C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path, C_OSCExportDataPool::h_GetFileName(rc_DataPool));
          }
          u8_DataPoolIndexWithinApplication++;
       }
@@ -357,8 +353,11 @@ sint32 C_OSCExportNode::mh_CreateDatapoolCode(const C_OSCNode & orc_Node, const 
    \param[in]   orc_ExportToolInfo     Information about calling executable (name + version)
 
    \return
-   C_NO_ERR Operation success
-   C_RD_WR  Operation failure: cannot store files
+   C_NO_ERR    Operation success
+   C_NOACT     Application is not of type ePROGRAMMABLE_APPLICATION or has unknown code structure version
+   C_RD_WR     Cannot store files
+   C_CONFIG    Protocol or Datapool not available in node for interface or application index out of range
+   C_RANGE     Application index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const uint16 ou16_ApplicationIndex,
@@ -367,8 +366,7 @@ sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   for (uint32 u32_ItProtocol = 0U;
-        (u32_ItProtocol < orc_Node.c_ComProtocols.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItProtocol = 0U; (u32_ItProtocol < orc_Node.c_ComProtocols.size()) && (s32_Retval == C_NO_ERR);
         ++u32_ItProtocol)
    {
       const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
@@ -391,19 +389,9 @@ sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const
                //Handle file names
                if (s32_Retval == C_NO_ERR)
                {
-                  C_SCLString c_FileName;
-                  c_FileName = C_OSCExportCommunicationStack::h_GetFileName(static_cast<uint8>(u32_ItInterface),
-                                                                            rc_Protocol.e_Type);
-                  c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + c_FileName;
-                  orc_Files.push_back(c_FileName + ".h");
-                  orc_Files.push_back(c_FileName + ".c");
-               }
-               else
-               {
-                  osc_write_log_error("Creating source code",
-                                      "Could not write COMM definition file to target directory \"" +
-                                      orc_Path + "\".");
-                  break;
+                  C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path,
+                                                     C_OSCExportCommunicationStack::h_GetFileName(
+                                                        static_cast<uint8>(u32_ItInterface), rc_Protocol.e_Type));
                }
             }
          }
@@ -423,7 +411,8 @@ sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const
 
    \return
    C_NO_ERR Operation success
-   C_RD_WR  Operation failure: cannot store files
+   C_RD_WR  Cannot store files
+   C_NOACT  Datapool is not of type HALC
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_CreateHALConfigCode(const C_OSCNode & orc_Node, const uint16 ou16_ApplicationIndex,
@@ -442,22 +431,14 @@ sint32 C_OSCExportNode::mh_CreateHALConfigCode(const C_OSCNode & orc_Node, const
       if ((rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex) &&
           (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC))
       {
+         //Create configuration code associated with this Datapool
          s32_Retval = C_OSCExportHalc::h_CreateSourceCode(orc_Path, orc_Node.c_HALCConfig, rc_DataPool,
                                                           orc_ExportToolInfo);
          //Handle file names
          if (s32_Retval == C_NO_ERR)
          {
-            C_SCLString c_FileName = C_OSCExportHalc::h_GetFileName();
-            c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + c_FileName;
-            orc_Files.push_back(c_FileName + ".c");
-            orc_Files.push_back(c_FileName + ".h");
-         }
-         else
-         {
-            osc_write_log_error("Creating source code",
-                                "Could not write HALC file to target directory \"" + orc_Path +
-                                "\".");
-            break;
+            C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path,
+                                               C_OSCExportHalc::h_GetFileName(rc_DataPool.q_IsSafety));
          }
       }
    }

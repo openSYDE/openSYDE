@@ -45,7 +45,8 @@ public:
    static stw_types::sint32 h_LoadDataPoolElementType(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                       C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 h_LoadDataPoolElementValue(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                       C_OSCXMLParserBase & orc_XMLParser);
+                                                       C_OSCXMLParserBase & orc_XMLParser, const bool oq_CheckDataType,
+                                                       stw_scl::C_SCLString * const opc_CheckDataTypeErrorDetails = NULL);
    static stw_types::sint32 h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                     C_OSCXMLParserBase & orc_XMLParser);
 
@@ -80,7 +81,12 @@ public:
                                           C_OSCXMLParserBase & orc_XMLParser);
    static void h_SaveDataPoolContentV1(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                        C_OSCXMLParserBase & orc_XMLParser);
+
+   //Misc
    static stw_scl::C_SCLString h_GetFileName(const stw_scl::C_SCLString & orc_DatapoolName);
+   static stw_types::sint32 h_CheckDataPoolElementValueType(const C_OSCNodeDataPoolContent::E_Type & orc_ContentType,
+                                                            const C_OSCXMLParserBase & orc_XMLParser,
+                                                            stw_scl::C_SCLString * const opc_CheckDataTypeErrorDetails = NULL);
 
 private:
    static stw_scl::C_SCLString mh_NodeDataPoolContentToString(

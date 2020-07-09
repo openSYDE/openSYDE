@@ -65,9 +65,10 @@ void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeAvailability(const C_OSCXMLPars
 
    The parent "opensyde" in "protocols-flashloader" must be selected
 
-   \param[in]     orc_Parser                    XML Parser
-   \param[out]    orc_RequestDownloadTimeout    Parameter for Request Download Timeout
-   \param[out]    orc_TransferDataTimeout       Parameter for Transfer Data Timeout
+   \param[in]   orc_Parser                      XML Parser
+   \param[out]  oru32_RequestDownloadTimeout    Parameter for Request Download Timeout
+   \param[out]  oru32_TransferDataTimeout       Parameter for Transfer Data Timeout
+   \param[out]  orq_IsFileBased                 Flag if file based
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeFlashloaderParameter(const C_OSCXMLParser & orc_Parser,
@@ -120,8 +121,8 @@ void C_OSCDeviceDefinitionFiler::mh_ParseSTWFlashloaderAvailability(const C_OSCX
 
    Load data from specified file and place it in device definition instance
 
-   \param[out]    orc_DeviceDefinition    device definition information read from file
-   \param[in]     orc_Path                path to file
+   \param[out]  orc_DeviceDefinition   device definition information read from file
+   \param[in]   orc_Path               path to file
 
    \return
    C_NO_ERR   data read and placed into device definition instance
@@ -189,6 +190,22 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
             if (c_XML.SelectNodeChild("device-name-alias") == "device-name-alias")
             {
                orc_DeviceDefinition.c_DeviceNameAlias = c_XML.GetNodeContent();
+               c_XML.SelectNodeParent(); //back to parent ...
+            }
+            if (c_XML.SelectNodeChild("other-accepted-names") == "other-accepted-names")
+            {
+               c_Text = c_XML.SelectNodeChild("other-accepted-name");
+               if (c_Text == "other-accepted-name")
+               {
+                  do
+                  {
+                     const stw_scl::C_SCLString c_Tmp = c_XML.GetNodeContent();
+                     orc_DeviceDefinition.c_OtherAcceptedNames.push_back(c_Tmp);
+                     c_Text = c_XML.SelectNodeNext("other-accepted-name");
+                  }
+                  while (c_Text == "other-accepted-name");
+                  c_XML.SelectNodeParent(); //back to parent of parent ...
+               }
                c_XML.SelectNodeParent(); //back to parent ...
             }
             c_Text = c_XML.SelectNodeChild("device-description");
@@ -358,9 +375,7 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                c_Text = c_XML.SelectNodeParent(); //back to parent of parent ...
                tgl_assert(c_Text == "opensyde-device-definition");
             }
-         }
-         if (s32_Return == C_NO_ERR)
-         {
+
             c_Text = c_XML.SelectNodeChild("protocols-flashloader");
             if (c_Text != "protocols-flashloader")
             {
@@ -369,17 +384,172 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
             else
             {
                //get sub-node
-               c_Text = c_XML.SelectNodeChild("flashloader-reset-wait-time");
-               if (c_Text != "flashloader-reset-wait-time")
+               c_Text = c_XML.SelectNodeChild("flashloader-reset-wait-times");
+               if (c_Text != "flashloader-reset-wait-times")
                {
-                  //Optional: Use default values
+                  //check due to compatibility for the old variant
+                  //get sub-node
+                  c_Text = c_XML.SelectNodeChild("flashloader-reset-wait-time");
+                  if (c_Text != "flashloader-reset-wait-time")
+                  {
+                     //Optional: Use default values
+                     osc_write_log_info("Loading device definition",
+                                        C_SCLString("Default values for flashloader reset wait times"
+                                                    " for XML file \"") + orc_Path + "\" were used.");
+                  }
+                  else
+                  {
+                     u32_Value = c_XML.GetAttributeUint32("value");
+
+                     // Due to compatibility use the value of the old format for all Flashloader reset wait times
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoChangesCan = u32_Value;
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoChangesEthernet = u32_Value;
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoFundamentalChangesCan = u32_Value;
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet = u32_Value;
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeFundamentalChangesCan = u32_Value;
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeFundamentalChangesEthernet = u32_Value;
+
+                     osc_write_log_info("Loading device definition",
+                                        C_SCLString("Due to compatibility all flashloader reset wait times set to the"
+                                                    " same configuration value (") + C_SCLString::IntToStr(u32_Value) +
+                                        " ms) for XML file \"" + orc_Path + "\".");
+
+                     c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                     tgl_assert(c_Text == "protocols-flashloader");
+                  }
                }
                else
                {
-                  orc_DeviceDefinition.u32_FlashloaderResetWaitTime = c_XML.GetAttributeUint32("value");
+                  // If elements were not found, the default value is used
+                  c_Text = c_XML.SelectNodeChild("no-changes-can");
+                  if (c_Text == "no-changes-can")
+                  {
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoChangesCan = c_XML.GetAttributeUint32("value");
+                     c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                     tgl_assert(c_Text == "flashloader-reset-wait-times");
+                  }
+                  else
+                  {
+                     if (orc_DeviceDefinition.u8_NumCanBusses > 0U)
+                     {
+                        osc_write_log_info("Loading device definition",
+                                           C_SCLString("Default value for flashloader reset wait time "
+                                                       "u32_FlashloaderResetWaitTimeNoChangesCan (") +
+                                           C_SCLString::IntToStr(orc_DeviceDefinition.
+                                                                 u32_FlashloaderResetWaitTimeNoChangesCan) +
+                                           " ms) for XML file \"" + orc_Path + "\" used.");
+                     }
+                  }
+
+                  c_Text = c_XML.SelectNodeChild("no-changes-ethernet");
+                  if (c_Text == "no-changes-ethernet")
+                  {
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoChangesEthernet = c_XML.GetAttributeUint32(
+                        "value");
+                     c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                     tgl_assert(c_Text == "flashloader-reset-wait-times");
+                  }
+                  else
+                  {
+                     if (orc_DeviceDefinition.u8_NumEthernetBusses > 0U)
+                     {
+                        osc_write_log_info("Loading device definition",
+                                           C_SCLString("Default value for flashloader reset wait time "
+                                                       "u32_FlashloaderResetWaitTimeNoChangesEthernet (") +
+                                           C_SCLString::IntToStr(orc_DeviceDefinition.
+                                                                 u32_FlashloaderResetWaitTimeNoChangesEthernet) +
+                                           " ms) for XML file \"" + orc_Path + "\" used.");
+                     }
+                  }
+
+                  c_Text = c_XML.SelectNodeChild("no-fundamental-com-changes-can");
+                  if (c_Text == "no-fundamental-com-changes-can")
+                  {
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoFundamentalChangesCan =
+                        c_XML.GetAttributeUint32("value");
+                     c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                     tgl_assert(c_Text == "flashloader-reset-wait-times");
+                  }
+                  else
+                  {
+                     if (orc_DeviceDefinition.u8_NumCanBusses > 0U)
+                     {
+                        osc_write_log_info("Loading device definition",
+                                           C_SCLString("Default value for flashloader reset wait time "
+                                                       "u32_FlashloaderResetWaitTimeNoFundamentalChangesCan (") +
+                                           C_SCLString::IntToStr(orc_DeviceDefinition.
+                                                                 u32_FlashloaderResetWaitTimeNoFundamentalChangesCan) +
+                                           " ms) for XML file \"" + orc_Path + "\" used.");
+                     }
+                  }
+
+                  c_Text = c_XML.SelectNodeChild("no-fundamental-com-changes-ethernet");
+                  if (c_Text == "no-fundamental-com-changes-ethernet")
+                  {
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet =
+                        c_XML.GetAttributeUint32("value");
+                     c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                     tgl_assert(c_Text == "flashloader-reset-wait-times");
+                  }
+                  else
+                  {
+                     if (orc_DeviceDefinition.u8_NumEthernetBusses > 0U)
+                     {
+                        osc_write_log_info("Loading device definition",
+                                           C_SCLString("Default value for flashloader reset wait time "
+                                                       "u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet (") +
+                                           C_SCLString::IntToStr(orc_DeviceDefinition.
+                                                                 u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet) +
+                                           " ms) for XML file \"" + orc_Path + "\" used.");
+                     }
+                  }
+
+                  c_Text = c_XML.SelectNodeChild("fundamental-com-changes-can");
+                  if (c_Text == "fundamental-com-changes-can")
+                  {
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeFundamentalChangesCan = c_XML.GetAttributeUint32(
+                        "value");
+                     c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                     tgl_assert(c_Text == "flashloader-reset-wait-times");
+                  }
+                  else
+                  {
+                     if (orc_DeviceDefinition.u8_NumCanBusses > 0U)
+                     {
+                        osc_write_log_info("Loading device definition",
+                                           C_SCLString("Default value for flashloader reset wait time "
+                                                       "u32_FlashloaderResetWaitTimeFundamentalChangesCan (") +
+                                           C_SCLString::IntToStr(orc_DeviceDefinition.
+                                                                 u32_FlashloaderResetWaitTimeFundamentalChangesCan) +
+                                           " ms) for XML file \"" + orc_Path + "\" used.");
+                     }
+                  }
+
+                  c_Text = c_XML.SelectNodeChild("fundamental-com-changes-ethernet");
+                  if (c_Text == "fundamental-com-changes-ethernet")
+                  {
+                     orc_DeviceDefinition.u32_FlashloaderResetWaitTimeFundamentalChangesEthernet =
+                        c_XML.GetAttributeUint32("value");
+                     c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                     tgl_assert(c_Text == "flashloader-reset-wait-times");
+                  }
+                  else
+                  {
+                     if (orc_DeviceDefinition.u8_NumEthernetBusses > 0U)
+                     {
+                        osc_write_log_info("Loading device definition",
+                                           C_SCLString("Default value for flashloader reset wait time "
+                                                       "u32_FlashloaderResetWaitTimeFundamentalChangesEthernet (") +
+                                           C_SCLString::IntToStr(orc_DeviceDefinition.
+                                                                 u32_FlashloaderResetWaitTimeFundamentalChangesEthernet) +
+                                           " ms) for XML file \"" + orc_Path + "\" used.");
+                     }
+                  }
+
                   c_Text = c_XML.SelectNodeParent(); //back to parent ...
                   tgl_assert(c_Text == "protocols-flashloader");
                }
+
                //get sub-node
                c_Text = c_XML.SelectNodeChild("stw-flashloader");
                if (c_Text != "stw-flashloader")
@@ -413,9 +583,7 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                c_Text = c_XML.SelectNodeParent(); //back to parent of parent ...
                tgl_assert(c_Text == "opensyde-device-definition");
             }
-         }
-         if (s32_Return == C_NO_ERR)
-         {
+
             c_Text = c_XML.SelectNodeChild("memory");
             if (c_Text != "memory")
             {
@@ -450,8 +618,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
    Save device definition data into specified file.
    Will overwrite the file if it already exists.
 
-   \param[in]    orc_DeviceDefinition    device definition information to write to file
-   \param[in]    orc_Path                path to file
+   \param[in]  orc_DeviceDefinition    device definition information to write to file
+   \param[in]  orc_Path                path to file
 
    \return
    C_NO_ERR   data written to file
@@ -484,6 +652,12 @@ sint32 C_OSCDeviceDefinitionFiler::h_Save(const C_OSCDeviceDefinition & orc_Devi
       c_XML.CreateNodeChild("file-version", "0x" + C_SCLString::IntToHex(mhu16_FILE_VERSION, 4U));
       c_XML.CreateNodeChild("device-name", orc_DeviceDefinition.c_DeviceName);
       c_XML.CreateNodeChild("device-name-alias", orc_DeviceDefinition.c_DeviceNameAlias);
+      c_XML.CreateAndSelectNodeChild("other-accepted-names");
+      for (uint32 u32_It = 0UL; u32_It < orc_DeviceDefinition.c_OtherAcceptedNames.size(); ++u32_It)
+      {
+         c_XML.CreateNodeChild("other-accepted-name", orc_DeviceDefinition.c_OtherAcceptedNames[u32_It]);
+      }
+      c_XML.SelectNodeParent();
       c_XML.CreateNodeChild("device-description", orc_DeviceDefinition.c_DeviceDescription);
       c_XML.CreateAndSelectNodeChild("programming-properties");
       c_XML.SetAttributeBool("is-programmable", orc_DeviceDefinition.q_ProgrammingSupport);
@@ -515,8 +689,25 @@ sint32 C_OSCDeviceDefinitionFiler::h_Save(const C_OSCDeviceDefinition & orc_Devi
       c_XML.SelectNodeParent();
 
       c_XML.CreateAndSelectNodeChild("protocols-flashloader");
-      c_XML.CreateAndSelectNodeChild("flashloader-reset-wait-time");
-      c_XML.SetAttributeUint32("value", orc_DeviceDefinition.u32_FlashloaderResetWaitTime);
+      c_XML.CreateAndSelectNodeChild("flashloader-reset-wait-times");
+      c_XML.CreateAndSelectNodeChild("no-changes-can");
+      c_XML.SetAttributeUint32("value", orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoChangesCan);
+      c_XML.SelectNodeParent();
+      c_XML.CreateAndSelectNodeChild("no-changes-ethernet");
+      c_XML.SetAttributeUint32("value", orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoChangesEthernet);
+      c_XML.SelectNodeParent();
+      c_XML.CreateAndSelectNodeChild("no-fundamental-com-changes-can");
+      c_XML.SetAttributeUint32("value", orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoFundamentalChangesCan);
+      c_XML.SelectNodeParent();
+      c_XML.CreateAndSelectNodeChild("no-fundamental-com-changes-ethernet");
+      c_XML.SetAttributeUint32("value", orc_DeviceDefinition.u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet);
+      c_XML.SelectNodeParent();
+      c_XML.CreateAndSelectNodeChild("fundamental-com-changes-can");
+      c_XML.SetAttributeUint32("value", orc_DeviceDefinition.u32_FlashloaderResetWaitTimeFundamentalChangesCan);
+      c_XML.SelectNodeParent();
+      c_XML.CreateAndSelectNodeChild("fundamental-com-changes-ethernet");
+      c_XML.SetAttributeUint32("value", orc_DeviceDefinition.u32_FlashloaderResetWaitTimeFundamentalChangesEthernet);
+      c_XML.SelectNodeParent();
       c_XML.SelectNodeParent();
       c_XML.CreateAndSelectNodeChild("stw-flashloader");
       c_XML.SetAttributeBool("support", orc_DeviceDefinition.q_FlashloaderStwCan);

@@ -52,21 +52,6 @@ C_OgeWiProgressBopperle::C_OgeWiProgressBopperle(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the color of the outer circle of the progress bopperle
-
-   \param[in]  orc_BorderColor   Color of the pen
-   \param[in]  orc_InnerColor    Color of the brush
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiProgressBopperle::SetOuterBopperleColor(const QColor & orc_BorderColor, const QColor & orc_InnerColor)
-{
-   this->mc_BrushOuterCircle.setColor(orc_InnerColor);
-   this->mc_PenOuterCircle.setColor(orc_BorderColor);
-
-   this->update();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the color of the inner circle of the progress bopperle
 
    \param[in]  orc_BorderColor   Color of the pen

@@ -12,13 +12,10 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QElapsedTimer>
-
 #include "C_Uti.h"
 #include "TGLFile.h"
 #include "TGLUtils.h"
 #include "stwerrors.h"
-#include "constants.h"
 #include "C_OSCUtils.h"
 #include "C_SdBueSortHelper.h"
 #include "C_PuiSdHandlerData.h"
@@ -69,13 +66,9 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerData::LoadFromFile(const stw_scl::C_SCLString & orc_Path, uint16 * const opu16_FileVersion)
 {
-   QElapsedTimer c_Timer;
    sint32 s32_Return = C_NO_ERR;
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
    if (TGL_FileExists(orc_Path) == true)
    {
@@ -216,10 +209,8 @@ sint32 C_PuiSdHandlerData::LoadFromFile(const stw_scl::C_SCLString & orc_Path, u
       s32_Return = m_VerifyLoadedSystemDefintion();
    }
 
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Load " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+   osc_write_log_performance_stop(u16_TimerId, "Load system definition");
+
    return s32_Return;
 }
 
@@ -239,13 +230,9 @@ sint32 C_PuiSdHandlerData::LoadFromFile(const stw_scl::C_SCLString & orc_Path, u
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerData::SaveToFile(const stw_scl::C_SCLString & orc_Path, const bool oq_UseDeprecatedFileFormatV2)
 {
-   QElapsedTimer c_Timer;
    sint32 s32_Return = C_NO_ERR;
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
    //Sort first
    tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
@@ -356,10 +343,8 @@ sint32 C_PuiSdHandlerData::SaveToFile(const stw_scl::C_SCLString & orc_Path, con
    {
       s32_Return = C_COM;
    }
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Save " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
+   osc_write_log_performance_stop(u16_TimerId, "Save system definition");
 
    return s32_Return;
 }
@@ -501,21 +486,18 @@ const C_OSCSystemDefinition & C_PuiSdHandlerData::GetOSCSystemDefinitionConst(vo
 /*! \brief   Adapt given string to fulfill c variable name requirements
 
    \param[in] orc_Input               String to process
-   \param[in] oq_ReplaceAllCharacters Flag to replace all not allowed characters by '_'
 
    \return
    String fulfilling c variable name requirements
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdHandlerData::h_AutomaticCStringAdaptation(const QString & orc_Input, const bool oq_ReplaceAllCharacters)
+QString C_PuiSdHandlerData::h_AutomaticCStringAdaptation(const QString & orc_Input)
 {
    QString c_Retval;
 
    for (sintn sn_It = 0; sn_It < orc_Input.length(); ++sn_It)
    {
-      if (((oq_ReplaceAllCharacters == false) && ((orc_Input.at(sn_It) == '-') || (orc_Input.at(sn_It) == ' '))) ||
-          ((oq_ReplaceAllCharacters == true) &&
-           (C_OSCUtils::h_CheckValidCName(orc_Input.at(sn_It).toLatin1()) == false)))
+      if (C_OSCUtils::h_CheckValidCName(orc_Input.at(sn_It).toLatin1()) == false)
       {
          c_Retval += "_";
       }
@@ -566,7 +548,6 @@ sint32 C_PuiSdHandlerData::mh_SortMessagesByName(C_OSCNode & orc_OSCNode, C_PuiS
            (u32_ItProtocol < orc_OSCNode.c_ComProtocols.size()) && (s32_Retval == C_NO_ERR); ++u32_ItProtocol)
       {
          C_OSCCanProtocol & rc_OSCProtocol = orc_OSCNode.c_ComProtocols[u32_ItProtocol];
-         C_PuiSdNodeCanProtocol & rc_UiProtocol = orc_UiNode.c_UICanProtocols[u32_ItProtocol];
 
          //Data pools
          //----------
@@ -575,8 +556,7 @@ sint32 C_PuiSdHandlerData::mh_SortMessagesByName(C_OSCNode & orc_OSCNode, C_PuiS
          if ((rc_OSCProtocol.u32_DataPoolIndex < orc_OSCNode.c_DataPools.size()) &&
              (rc_OSCProtocol.u32_DataPoolIndex < orc_UiNode.c_UIDataPools.size()))
          {
-            C_OSCNodeDataPool & rc_OSCDataPool = orc_OSCNode.c_DataPools[rc_OSCProtocol.u32_DataPoolIndex];
-            C_PuiSdNodeDataPool & rc_UiDataPool = orc_UiNode.c_UIDataPools[rc_OSCProtocol.u32_DataPoolIndex];
+            C_PuiSdNodeCanProtocol & rc_UiProtocol = orc_UiNode.c_UICanProtocols[u32_ItProtocol];
 
             //Message containers
             //------------------
@@ -601,12 +581,14 @@ sint32 C_PuiSdHandlerData::mh_SortMessagesByName(C_OSCNode & orc_OSCNode, C_PuiS
                      //Lists
                      //-----
                      //Container index -> interface index
+                     C_OSCNodeDataPool & rc_OSCDataPool = orc_OSCNode.c_DataPools[rc_OSCProtocol.u32_DataPoolIndex];
                      const sint32 s32_TxListIndex = C_OSCCanProtocol::h_GetListIndex(rc_OSCDataPool,
                                                                                      u32_ItContainer,
                                                                                      true);
                      const sint32 s32_RxListIndex = C_OSCCanProtocol::h_GetListIndex(rc_OSCDataPool,
                                                                                      u32_ItContainer,
                                                                                      false);
+                     C_PuiSdNodeDataPool & rc_UiDataPool = orc_UiNode.c_UIDataPools[rc_OSCProtocol.u32_DataPoolIndex];
                      tgl_assert(((((s32_TxListIndex >= 0) && (s32_RxListIndex >= 0)) &&
                                   (rc_OSCDataPool.c_Lists.size() == rc_UiDataPool.c_DataPoolLists.size())) &&
                                  (static_cast<uint32>(s32_TxListIndex) < rc_OSCDataPool.c_Lists.size())) &&
@@ -618,13 +600,8 @@ sint32 C_PuiSdHandlerData::mh_SortMessagesByName(C_OSCNode & orc_OSCNode, C_PuiS
                      {
                         C_OSCNodeDataPoolList & rc_OSCTxList =
                            rc_OSCDataPool.c_Lists[static_cast<uint32>(s32_TxListIndex)];
-                        C_OSCNodeDataPoolList & rc_OSCRxList =
-                           rc_OSCDataPool.c_Lists[static_cast<uint32>(s32_RxListIndex)];
                         C_PuiSdNodeDataPoolList & rc_UiTxList =
                            rc_UiDataPool.c_DataPoolLists[static_cast<uint32>(s32_TxListIndex)];
-                        C_PuiSdNodeDataPoolList & rc_UiRxList =
-                           rc_UiDataPool.c_DataPoolLists[static_cast<uint32>(s32_RxListIndex)];
-
                         //Start sorting
                         //-------------
                         s32_Retval = C_SdBueSortHelper::h_SortOneMessageVector(rc_OSCContainer.c_TxMessages,
@@ -633,6 +610,12 @@ sint32 C_PuiSdHandlerData::mh_SortMessagesByName(C_OSCNode & orc_OSCNode, C_PuiS
                                                                                rc_UiTxList);
                         if (s32_Retval == C_NO_ERR)
                         {
+                           C_OSCNodeDataPoolList & rc_OSCRxList =
+                              rc_OSCDataPool.c_Lists[static_cast<uint32>(s32_RxListIndex)];
+                           C_PuiSdNodeDataPoolList & rc_UiRxList =
+                              rc_UiDataPool.c_DataPoolLists[static_cast<uint32>(s32_RxListIndex)];
+                           //Start sorting
+                           //-------------
                            s32_Retval = C_SdBueSortHelper::h_SortOneMessageVector(rc_OSCContainer.c_RxMessages,
                                                                                   rc_UiContainer.c_RxMessages,
                                                                                   rc_OSCRxList,
@@ -722,7 +705,7 @@ void C_PuiSdHandlerData::m_FixNameIssues(void)
    {
       C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[u32_ItNode];
       rc_OSCNode.c_Properties.c_Name = C_PuiSdHandlerData::h_AutomaticCStringAdaptation(
-         rc_OSCNode.c_Properties.c_Name.c_str(), false).toStdString().c_str();
+         rc_OSCNode.c_Properties.c_Name.c_str()).toStdString().c_str();
    }
 }
 

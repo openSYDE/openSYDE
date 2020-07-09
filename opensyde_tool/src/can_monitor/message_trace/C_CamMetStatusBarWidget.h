@@ -42,6 +42,7 @@ public:
 
    void SetBusLoad(const stw_types::uint8 ou8_BusLoad, const stw_types::sint32 os32_CANBitrate);
    void SetTxErrors(const stw_types::uint32 ou32_TxErrors);
+   void SetTransmittedMessages(const stw_types::uint32 ou32_NumTxMessages);
    void SetFilteredMessages(const stw_types::uint32 ou32_FilteredMessages);
    void SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters);
 
@@ -53,9 +54,12 @@ private:
    C_CamMetStatusBarWidget & operator =(const C_CamMetStatusBarWidget &);
 
    void m_UpdateFilterLabel(void) const;
+   void m_UpdateTxLabel(void);
 
    bool mq_BusLoadWarning;
    bool mq_TxError;
+   stw_types::uint32 mu32_TxErrors;
+   stw_types::uint32 mu32_TransmittedMessages;
    stw_types::uint32 mu32_FilteredMessages;
    stw_types::uint32 mu32_ActiveFilters;
 };

@@ -165,7 +165,7 @@ bool C_SebUnoTopBaseManager::m_CheckBusConnectorChange(const QList<QGraphicsItem
          uint64 u64_ID;
          C_SebUnoTopBusConnectorMoveCommand * pc_MoveCommand;
 
-         m_MapItemToID(pc_BusConnector, u64_ID);
+         mh_MapItemToID(pc_BusConnector, u64_ID);
          c_IDs.push_back(u64_ID);
          q_Retval = true;
          pc_MoveCommand = new C_SebUnoTopBusConnectorMoveCommand(this->mpc_Scene, c_IDs,

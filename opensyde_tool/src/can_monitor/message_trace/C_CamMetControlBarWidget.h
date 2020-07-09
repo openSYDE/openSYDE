@@ -42,10 +42,13 @@ public:
 
    void InitStaticNames(void) const;
 
-   void LoadUserSettings(void) const;
+   void LoadUserSettings(void);
    void SaveUserSettings(void) const;
 
    void StopLogging(void);
+
+   void SearchNext(void) const;
+   void SearchPrev(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -59,13 +62,22 @@ Q_SIGNALS:
    void SigClearData(void);
    void SigDisplayAsHex(const bool oq_Value);
    void SigDisplayTimestampRelative(const bool oq_Value);
+   void SigDisplayTimestampTimeOfDay(const bool oq_Value);
+   void SigTraceBufferSize(const stw_types::uint32 ou32_Value);
    void SigChangeProtocol(const stw_cmon_protocol::e_CMONL7Protocols oe_Protocol);
    void SigDisplayTree(const bool oq_Show);
    void SigDisplayUniqueMessages(const bool oq_Unique);
+   void SigSearchTrace(const QString & orc_SearchString, const bool oq_Next) const;
    //lint -restore
 
 private:
    Ui::C_CamMetControlBarWidget * mpc_Ui;
+
+   // Trace settings
+   bool mq_DisplayTimestampAbsoluteTimeOfDay;
+   stw_types::uint32 mu32_TraceBufferSize;
+
+   static const stw_types::sintn mhsn_MAX_COUNT_COMBO_BOX;
 
    //Avoid call
    C_CamMetControlBarWidget(const C_CamMetControlBarWidget &);
@@ -79,6 +91,11 @@ private:
 
    void m_HandleTreeVisibility(void);
    void m_HandleToggleDisplayMode(const bool oq_Active);
+
+   void m_SearchComboBoxChanged(void) const;
+   void m_UpdateSearchComboBox(void) const;
+
+   void m_OpenTraceSettings(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

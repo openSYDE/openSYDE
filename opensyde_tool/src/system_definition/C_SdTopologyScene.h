@@ -67,7 +67,9 @@ public:
    void AddImage(const QString & orc_FilePath, const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID);
    void AddBusConnector(C_GiNode * const opc_Node, const C_GiLiBus * const opc_Bus,
                         const stw_types::uint8 & oru8_InterfaceNumber, const stw_types::uint8 & oru8_NodeId,
-                        const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID = NULL);
+                        const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
+                        const bool oq_ActivateDatapoolECoS, const QPointF & orc_Pos,
+                        const stw_types::uint64 * const opu64_UniqueID = NULL);
 
    virtual void UpdateTransform(const QTransform & orc_Transform) override;
    //lint -e{1735} Suppression, because default parameters are identical
@@ -171,9 +173,12 @@ private:
    void m_SyncIndex(const stw_opensyde_gui_logic::C_PuiSdDataElement::E_Type & ore_Type,
                     const stw_types::sint32 & ors32_Index,
                     const stw_opensyde_gui_logic::C_PuiSdDataElement::E_Action & ore_Action) const;
-   void m_ConnectNodeToBus(const stw_types::uint8 &  oru8_InterfaceNumber, const stw_types::uint8 & oru8_NodeId);
+   void m_ConnectNodeToBus(const stw_types::uint8 &  oru8_InterfaceNumber, const stw_types::uint8 & oru8_NodeId,
+                           const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
+                           const bool oq_ActivateDatapoolECoS);
    void m_ChangeInterface(const stw_types::uint8 & oru8_InterfaceNumber, const stw_types::uint8 & oru8_NodeId,
-                          C_GiLiBusConnector * const opc_Connector);
+                          const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
+                          const bool oq_ActivateDatapoolECoS, C_GiLiBusConnector * const opc_Connector);
    void m_RestoreToolTips(void) const;
    void m_RemoveNodeOfScene(C_GiNode * const opc_NodeGraphicsItem);
    void m_RemoveBusOfScene(C_GiLiBus * const opc_BusGraphicsItem);
@@ -194,12 +199,6 @@ private:
                                  const stw_types::sint32 & ors32_SpecialInterface,
                                  C_GiLiBusConnector * const opc_Connector);
    void m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * const opc_Node1, const C_GiNode * const opc_Node2);
-   void m_ConfiugreComDatapools(const C_GiNode * const opc_Node, const stw_types::uint32 ou32_InterfaceIndex,
-                                const bool oq_ComProtocolL2, const bool oq_ComProtocolECeS,
-                                const bool oq_ComProtocolECoS) const;
-   void m_ConfiugreComDatapool(const C_GiNode * const opc_Node, const stw_types::uint32 ou32_InterfaceIndex,
-                               const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType,
-                               const bool oq_Active) const;
    void m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Item);
    void m_LoadSnapshot(const QVector<stw_types::uint32> & orc_NodeIndices,
                        const QVector<stw_types::uint32> & orc_BusIndices,
@@ -224,7 +223,8 @@ private:
    void m_ReconnectBusConnectorNode(const C_GiLiBusConnector * const opc_BusConnector,
                                     const C_GiNode * const opc_StartingNode, const C_GiNode * const opc_LastNode,
                                     const QPointF & orc_ConnectionPos, const stw_types::sint32 & ors32_Interface,
-                                    const stw_types::uint8 & oru8_NodeId);
+                                    const stw_types::uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
+                                    const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS);
    void m_RevertBusConnectorBus(C_GiLiBusConnector * const opc_BusConnector,
                                 const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                 const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
@@ -233,7 +233,8 @@ private:
                                    const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                    const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
                                    const QPointF & orc_ConnectionPos, const stw_types::sint32 & ors32_Interface,
-                                   const stw_types::uint8 & oru8_NodeId);
+                                   const stw_types::uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
+                                   const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS);
    void m_RemoveConnectorLine(void);
    void m_RemoveBusNameLine(void);
    void m_RemoveTemporaryLine(C_GiLiTemporaryLine ** const opc_TemporaryLine);

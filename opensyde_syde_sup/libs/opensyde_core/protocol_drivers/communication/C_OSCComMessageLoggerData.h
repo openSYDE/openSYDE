@@ -54,9 +54,11 @@ public:
    static stw_scl::C_SCLString h_GetTimestampAsString(const stw_types::uint64 ou64_TimeStamp);
 
    stw_types::uint64 u64_TimeStampRelative;
-   stw_types::uint64 u64_TimeStampAbsolute;
+   stw_types::uint64 u64_TimeStampAbsoluteStart;
+   stw_types::uint64 u64_TimeStampAbsoluteTimeOfDay;
    stw_scl::C_SCLString c_TimeStampRelative;
-   stw_scl::C_SCLString c_TimeStampAbsolute;
+   stw_scl::C_SCLString c_TimeStampAbsoluteStart;
+   stw_scl::C_SCLString c_TimeStampAbsoluteTimeOfDay;
    stw_scl::C_SCLString c_CanIdDec;
    stw_scl::C_SCLString c_CanIdHex;
    stw_scl::C_SCLString c_CanDlc;

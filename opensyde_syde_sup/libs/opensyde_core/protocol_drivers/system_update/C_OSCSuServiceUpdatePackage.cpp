@@ -257,11 +257,8 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
             c_DeviceDefinitionFiles.insert(c_DevDefPath);
          }
       }
-   }
 
-   // * device.ini file
-   if (s32_Return == C_NO_ERR)
-   {
+      // * device.ini file
       // create and store specific devices.ini
       s32_Return = h_CreateDeviceIniFile(c_PackagePathTmp, c_DeviceDefinitionFiles);
    }
@@ -388,7 +385,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
 {
    sint32 s32_Return = C_NO_ERR;
 
-   C_SCLString c_TargetUnzipPath = orc_TargetUnzipPath;
+   C_SCLString c_TargetUnzipPath;
 
    mhc_WarningMessages.Clear(); // clear old warning messages
    mhc_ErrorMessage = "";       // clear old error message

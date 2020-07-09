@@ -29,15 +29,20 @@ typedef HWND (WINAPI * PR_HtmlHelp)(HWND, LPCSTR, UINT, DWORD);
 class C_HeHandler
 {
 public:
-   static C_HeHandler & GetInstance(void);
+   static C_HeHandler & h_GetInstance(void);
    void CallSpecificHelpPage(const QString & orc_ClassName);
-   static bool CheckHelpKey(const QKeyEvent * const opc_KeyEvent);
+   static bool h_CheckHelpKey(const QKeyEvent * const opc_KeyEvent);
    void SetHelpFileRelPath(const QString & orc_RelPath);
 
 private:
    C_HeHandler();
    virtual ~C_HeHandler();
-   void InitSpecialHelpPages(void);
+
+   //Avoid call
+   C_HeHandler(const C_HeHandler &);
+   C_HeHandler & operator =(const C_HeHandler &);
+
+   void m_InitSpecialHelpPages(void);
    QString m_GetHelpLocation(void) const;
    static C_HeHandler mhc_Instance;
    QMap<QString, QString> mc_LookUpHelpPageName;

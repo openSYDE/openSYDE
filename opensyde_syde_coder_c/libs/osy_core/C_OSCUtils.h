@@ -42,6 +42,7 @@ public:
                                                 const stw_types::float64 of64_Factor,
                                                 const stw_types::float64 of64_Offset);
    static stw_scl::C_SCLString h_SerialNumberToString(const stw_types::uint8 * const opu8_SerialNumber);
+   static void h_FileToString(const stw_scl::C_SCLString & orc_FilePath, stw_scl::C_SCLString & orc_OutputString);
 
 private:
    static const stw_types::float64 mhf64_Epsilon;

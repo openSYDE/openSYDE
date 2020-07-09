@@ -68,6 +68,14 @@ C_SdNdeProgrammingOptions::C_SdNdeProgrammingOptions(stw_opensyde_gui_elements::
    this->mpc_Ui->pc_SpinBoxParallelTransmissions->SetMinimumCustom(0);
    this->mpc_Ui->pc_SpinBoxParallelTransmissions->SetMaximumCustom(255);
 
+   //Scaling combobox
+   this->mpc_Ui->pc_ComboBoxScaling->insertItem(0, "Float32",
+                                                static_cast<sintn>(C_OSCNodeCodeExportSettings::eFLOAT32));
+   this->mpc_Ui->pc_ComboBoxScaling->insertItem(1, "Float64",
+                                                static_cast<sintn>(C_OSCNodeCodeExportSettings::eFLOAT64));
+   this->mpc_Ui->pc_ComboBoxScaling->insertItem(2, C_GtGetText::h_GetText("Disabled"),
+                                                static_cast<sintn>(C_OSCNodeCodeExportSettings::eNONE));
+
    //Load AFTER ranges are valid
    m_Load();
 
@@ -103,36 +111,46 @@ void C_SdNdeProgrammingOptions::InitStaticNames(void) const
    this->mpc_Ui->pc_BushButtonOk->setText(C_GtGetText::h_GetText("OK"));
    this->mpc_Ui->pc_BushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
 
+   this->mpc_Ui->pc_LabelGeneral->setText(C_GtGetText::h_GetText("General"));
+   this->mpc_Ui->pc_LabelScaling->setText(C_GtGetText::h_GetText("Scaling values data type"));
+
    this->mpc_Ui->pc_LabelDPDHeading->setText(C_GtGetText::h_GetText("Diagnostic Protocol Driver"));
    this->mpc_Ui->pc_LabelDPD->setText(C_GtGetText::h_GetText("Diagnostic protocol driver is implemented by"));
    this->mpc_Ui->pc_LabelNBT->setText(C_GtGetText::h_GetText("Number of buffered CAN Tx messages"));
    this->mpc_Ui->pc_LabelNBR->setText(C_GtGetText::h_GetText("Number of buffered CAN Rx routing messages"));
-   this->mpc_Ui->pc_LabelMNO->setText(C_GtGetText::h_GetText(
-                                         "Max number of cyclic/event driven transmissions in parallel"));
+   this->mpc_Ui->pc_LabelMNO->setText(C_GtGetText::h_GetText("Maximum number of cyclic/event driven transmissions "
+                                                             "in parallel"));
 
    //Tool tips
-   this->mpc_Ui->pc_LabelDPDHeading->SetToolTipInformation(C_GtGetText::h_GetText("Diagnostic Protocol Driver"),
-                                                           C_GtGetText::h_GetText(
-                                                              "The diagnostic protocol driver provides access to Datapool content via the openSYDE communication protocol."));
-   this->mpc_Ui->pc_LabelDPD->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                       "Diagnostic protocol driver is implemented by"),
-                                                    C_GtGetText::h_GetText(
-                                                       "To which application should the diagnostic protocol driver be added?"));
-   this->mpc_Ui->pc_LabelNBT->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                       "Number of buffered CAN Tx messages"),
-                                                    C_GtGetText::h_GetText(
-                                                       "Maximum number of CAN Tx messages the server can buffer. (Used for all transferred CAN messages)"
-                                                       "\nDefault value: 585"));
-   this->mpc_Ui->pc_LabelNBR->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                       "Number of buffered CAN Rx routing messages"),
-                                                    C_GtGetText::h_GetText(
-                                                       "Maximum number of CAN Rx routing messages the server can buffer before the client has to wait for an acknowledge."
-                                                       "\nDefault value: 585"));
-   this->mpc_Ui->pc_LabelMNO->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                       "Max number of cyclic/event driven transmissions in parallel"),
-                                                    C_GtGetText::h_GetText(
-                                                       "This refers to the maximum number of parallel cyclic and event driven diagnostic transmissions you are allowed to configure for this server.\n"
-                                                       "\nDefault value: 64"));
+   this->mpc_Ui->pc_LabelScaling->SetToolTipInformation(
+      C_GtGetText::h_GetText("Scaling Values"),
+      C_GtGetText::h_GetText("Choose data type for offset and factor constants or disable scaling support.\n"
+                             "Options:\n"
+                             " - Float32: Offset and factor constants are generated as single-precision float, e.g. 1.23F\n"
+                             " - Float64: Offset and factor constants are generated as double-precision float, e.g. 1.23\n"
+                             " - Disabled: Offset, factor and scaling macros are not generated at all"));
+   this->mpc_Ui->pc_LabelDPDHeading->SetToolTipInformation(
+      C_GtGetText::h_GetText("Diagnostic Protocol Driver"),
+      C_GtGetText::h_GetText("The diagnostic protocol driver provides access to Datapool content via the openSYDE "
+                             "communication protocol."));
+   this->mpc_Ui->pc_LabelDPD->SetToolTipInformation(
+      C_GtGetText::h_GetText("Diagnostic protocol driver is implemented by"),
+      C_GtGetText::h_GetText("To which application should the diagnostic protocol driver be added?"));
+   this->mpc_Ui->pc_LabelNBT->SetToolTipInformation(
+      C_GtGetText::h_GetText("Number of buffered CAN Tx messages"),
+      C_GtGetText::h_GetText("Maximum number of CAN Tx messages the server can buffer "
+                             "(used for all transferred CAN messages).\n"
+                             "\nDefault value: 585"));
+   this->mpc_Ui->pc_LabelNBR->SetToolTipInformation(
+      C_GtGetText::h_GetText("Number of buffered CAN Rx routing messages"),
+      C_GtGetText::h_GetText("Maximum number of CAN Rx routing messages the server can buffer before the client has "
+                             "to wait for an acknowledge.\n"
+                             "\nDefault value: 585"));
+   this->mpc_Ui->pc_LabelMNO->SetToolTipInformation(
+      C_GtGetText::h_GetText("Max number of cyclic/event driven transmissions in parallel"),
+      C_GtGetText::h_GetText("This refers to the maximum number of parallel cyclic and event driven diagnostic "
+                             "transmissions you are allowed to configure for this server.\n"
+                             "\nDefault value: 64"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -141,7 +159,14 @@ void C_SdNdeProgrammingOptions::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeProgrammingOptions::Save(void) const
 {
-   C_OSCNodeOpenSYDEServerSettings c_Settings;
+   C_OSCNodeOpenSYDEServerSettings c_DPDSettings;
+   C_OSCNodeCodeExportSettings c_GeneralSettings;
+
+   // Scaling
+   c_GeneralSettings.e_ScalingSupport =
+      static_cast<C_OSCNodeCodeExportSettings::E_Scaling>(this->mpc_Ui->pc_ComboBoxScaling->currentData().toInt());
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->SetNodeCodeExportSettings(this->mu32_NodeIndex,
+                                                                         c_GeneralSettings) == C_NO_ERR);
 
    //DPD
    if (this->mpc_Ui->pc_ComboBoxDPD->currentIndex() >= 0)
@@ -165,21 +190,22 @@ void C_SdNdeProgrammingOptions::Save(void) const
                ++s16_Counter;
             }
          }
-         c_Settings.s16_DPDDataBlockIndex = s16_ApplicationIndex;
+         c_DPDSettings.s16_DPDDataBlockIndex = s16_ApplicationIndex;
       }
    }
    else
    {
       //Invalid application
-      c_Settings.s16_DPDDataBlockIndex = -1;
+      c_DPDSettings.s16_DPDDataBlockIndex = -1;
    }
 
    //Spin boxes
-   c_Settings.u16_MaxMessageBufferTx = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxNBT->value());
-   c_Settings.u16_MaxRoutingMessageBufferRx = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxNBR->value());
-   c_Settings.u8_MaxParallelTransmissions = static_cast<uint8>(this->mpc_Ui->pc_SpinBoxParallelTransmissions->value());
+   c_DPDSettings.u16_MaxMessageBufferTx = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxNBT->value());
+   c_DPDSettings.u16_MaxRoutingMessageBufferRx = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxNBR->value());
+   c_DPDSettings.u8_MaxParallelTransmissions =
+      static_cast<uint8>(this->mpc_Ui->pc_SpinBoxParallelTransmissions->value());
    tgl_assert(C_PuiSdHandler::h_GetInstance()->SetNodeOpenSYDEServerSettings(this->mu32_NodeIndex,
-                                                                             c_Settings) == C_NO_ERR);
+                                                                             c_DPDSettings) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -202,7 +228,7 @@ void C_SdNdeProgrammingOptions::keyPressEvent(QKeyEvent * const opc_KeyEvent)
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
           (opc_KeyEvent->modifiers().testFlag(Qt::ShiftModifier) == false))
       {
-         this->mrc_ParentDialog.accept();
+         this->m_OkClicked();
       }
       else
       {
@@ -227,6 +253,11 @@ void C_SdNdeProgrammingOptions::m_Load(void) const
    {
       sint32 s32_Counter = 0;
       sint32 s32_DataBlockIndex = -1;
+
+      //Scaling
+      this->mpc_Ui->pc_ComboBoxScaling->setCurrentIndex(
+         this->mpc_Ui->pc_ComboBoxScaling->findData(
+            static_cast<sintn>(pc_Node->c_Properties.c_CodeExportSettings.e_ScalingSupport)));
 
       //DPD
       //Add all programmable applications and map data block index to combo box index
@@ -258,9 +289,9 @@ void C_SdNdeProgrammingOptions::m_Load(void) const
       this->mpc_Ui->pc_ComboBoxDPD->setCurrentIndex(s32_DataBlockIndex);
 
       //Spin boxes
-      this->mpc_Ui->pc_SpinBoxNBR->setValue(pc_Node->c_Properties.c_OpenSYDEServerSettings.u16_MaxRoutingMessageBufferRx);
-      this->mpc_Ui->pc_SpinBoxNBT->setValue(
-         pc_Node->c_Properties.c_OpenSYDEServerSettings.u16_MaxMessageBufferTx);
+      this->mpc_Ui->pc_SpinBoxNBR->setValue(
+         pc_Node->c_Properties.c_OpenSYDEServerSettings.u16_MaxRoutingMessageBufferRx);
+      this->mpc_Ui->pc_SpinBoxNBT->setValue(pc_Node->c_Properties.c_OpenSYDEServerSettings.u16_MaxMessageBufferTx);
       this->mpc_Ui->pc_SpinBoxParallelTransmissions->setValue(
          pc_Node->c_Properties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions);
    }

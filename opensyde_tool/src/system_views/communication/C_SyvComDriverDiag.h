@@ -40,7 +40,7 @@ class C_SyvComDriverDiag :
    Q_OBJECT
 
 public:
-   C_SyvComDriverDiag(const stw_types::uint32 ou32_ViewIndex);
+   C_SyvComDriverDiag(const stw_types::uint32 ou32_ViewIndex = 0);
    ~C_SyvComDriverDiag(void);
 
    stw_types::sint32 InitDiag(void);

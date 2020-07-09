@@ -483,7 +483,6 @@ void C_SdBueMessageSelectorTreeWidget::Delete(void)
             for (u32_ItGroup = 0; u32_ItGroup < c_Groups.size(); ++u32_ItGroup)
             {
                const C_OSCCanMessageIdentificationIndices & rc_CurGroup = c_Groups[u32_ItGroup];
-               std::vector<uint32> & rc_CurGroupMessages = c_GroupMessages[u32_ItGroup];
 
                //Compare everything except message id
                if ((((rc_CurMessage.u32_NodeIndex == rc_CurGroup.u32_NodeIndex) &&
@@ -491,7 +490,7 @@ void C_SdBueMessageSelectorTreeWidget::Delete(void)
                     (rc_CurMessage.u32_InterfaceIndex == rc_CurGroup.u32_InterfaceIndex)) &&
                    (rc_CurMessage.q_MessageIsTx == rc_CurGroup.q_MessageIsTx))
                {
-                  rc_CurGroupMessages.push_back(rc_CurMessage.u32_MessageIndex);
+                  c_GroupMessages[u32_ItGroup].push_back(rc_CurMessage.u32_MessageIndex);
                   break;
                }
             }
@@ -915,7 +914,7 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
             //Auto fix messages
             for (uint32 u32_ItMessage = 0; u32_ItMessage < c_Messages.size(); ++u32_ItMessage)
             {
-               C_SdUtil::h_AdaptMessageToProtocolType(c_Messages[u32_ItMessage], this->me_ProtocolType, NULL);
+               C_SdUtil::h_AdaptMessageToProtocolType(c_Messages[u32_ItMessage], NULL, this->me_ProtocolType, NULL);
             }
             //Valid messages
             if (GetMessageIdForAdd(c_MessageId) == C_NO_ERR)

@@ -28,7 +28,7 @@ class C_GiImage :
    public C_GiBiSizeableItem
 {
 public:
-   C_GiImage(const QString & orc_ImagePath, QGraphicsItem * const opc_Parent = NULL);
+   C_GiImage(const QString & orc_ImagePath = "", QGraphicsItem * const opc_Parent = NULL);
    C_GiImage(const QPixmap & orc_Pixmap, const stw_types::float64 of64_Width, const stw_types::float64 of64_Height,
              QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiImage();

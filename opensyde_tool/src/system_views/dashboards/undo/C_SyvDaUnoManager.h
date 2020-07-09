@@ -33,7 +33,7 @@ class C_SyvDaUnoManager :
    public C_SebUnoBaseManager
 {
 public:
-   C_SyvDaUnoManager(QGraphicsScene * const opc_Scene, QObject * const opc_Parent = NULL);
+   C_SyvDaUnoManager(QGraphicsScene * const opc_Scene = NULL, QObject * const opc_Parent = NULL);
    virtual ~C_SyvDaUnoManager(void);
 
    virtual void DoDelete(const QList<QGraphicsItem *> & orc_Items) override;

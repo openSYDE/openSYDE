@@ -84,6 +84,8 @@ private:
    void m_AdaptParameter(const stw_types::sint32 os32_Mode, stw_types::sint32 & ors32_SubMode,
                          stw_types::uint32 & oru32_Index, QString & orc_Name, QString & orc_SubItemName,
                          stw_types::uint32 & oru32_Flag, const bool oq_ChangeUseCase);
+   static void h_GetHeadingNames(const stw_types::sint32 os32_Mode, const stw_types::sint32 & ors32_SubMode,
+                                 const stw_types::uint32 ou32_Index, QString & orc_SubMode, QString & orc_SubSubMode);
    void m_ShowSysDefItem(const stw_types::sint32 os32_SubMode, const stw_types::uint32 ou32_Index = 0U,
                          const QString & orc_Name = "", const QString & orc_SubName = "",
                          const stw_types::uint32 ou32_Flag = 0U);

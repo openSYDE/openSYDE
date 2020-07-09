@@ -65,7 +65,8 @@ const stw_types::sintn C_CamGenTableView::mhsn_COL_WIDTH_DATA = 170;
 //----------------------------------------------------------------------------------------------------------------------
 C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
    C_TblViewInteraction(opc_Parent),
-   mq_CommunicationActive(false)
+   mq_CommunicationActive(false),
+   mq_CyclicTransmissionActive(true)
 {
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
@@ -330,36 +331,26 @@ void C_CamGenTableView::RemoveMessagesForFile(const QString & orc_File)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Signal communication start
+
+   \param[in]  oq_Active    Online/offline flag of trace
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::SetCommunicationStarted(void)
+void C_CamGenTableView::SetCommunicationStarted(const bool oq_Active)
 {
-   this->mq_CommunicationActive = true;
-
-   //Start cyclic
-   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < C_CamProHandler::h_GetInstance()->GetMessages().size();
-        ++u32_ItMessage)
-   {
-      const C_CamProMessageData * const pc_Message =
-         C_CamProHandler::h_GetInstance()->GetMessageConst(u32_ItMessage);
-      if (pc_Message != NULL)
-      {
-         if (pc_Message->q_DoCyclicTrigger == true)
-         {
-            //Trigger sending
-            Q_EMIT (this->SigRegisterCyclicMessage(u32_ItMessage, true));
-         }
-      }
-   }
+   this->mq_CommunicationActive = oq_Active;
+   this->m_RegisterAllCyclicMessages();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Signal communication stop
+/*! \brief  Set cyclic message transmission active
+
+   \param[in]  oq_Active   true: transmit messages; false: block message transmitting
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::SetCommunicationStopped(void)
+void C_CamGenTableView::SetCyclicActive(const bool oq_Active)
 {
-   this->mq_CommunicationActive = false;
+   this->mq_CyclicTransmissionActive = oq_Active;
+   this->m_RegisterAllCyclicMessages();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -421,7 +412,7 @@ bool C_CamGenTableView::CheckAndHandleKey(const QString & orc_Input)
                   //Don't stop here as multiple messages can have the same key
                   q_Retval = true;
                   //Trigger sending
-                  Q_EMIT this->SigSendMessage(u32_ItMessage, TGL_GetTickCount() + pc_Message->u32_KeyPressOffset);
+                  Q_EMIT (this->SigSendMessage(u32_ItMessage, TGL_GetTickCount() + pc_Message->u32_KeyPressOffset));
                }
             }
          }
@@ -598,11 +589,11 @@ void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, co
    if (c_Selection.size() == 1UL)
    {
       const uint32 u32_Size = c_Selection.size();
-      Q_EMIT this->SigSelected(u32_Size, c_Selection[0UL]);
+      Q_EMIT (this->SigSelected(u32_Size, c_Selection[0UL]));
    }
    else
    {
-      Q_EMIT this->SigSelected(c_Selection.size(), 0UL);
+      Q_EMIT (this->SigSelected(c_Selection.size(), 0UL));
    }
 }
 
@@ -806,15 +797,16 @@ void C_CamGenTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
       {
          if (this->mq_CommunicationActive)
          {
-            Q_EMIT this->SigSendMessage(static_cast<uint32>(s32_Row), TGL_GetTickCount());
+            Q_EMIT (this->SigSendMessage(static_cast<uint32>(s32_Row), TGL_GetTickCount()));
          }
+
          else
          {
             C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eINFORMATION);
             c_Message.SetHeading(C_GtGetText::h_GetText("Measurement not started"));
-            c_Message.SetDescription(C_GtGetText::h_GetText(
-                                        "The transmission of messages is only allowed as long as the measurement is running. "
-                                        "\nClick the play button in trace to start measurement."));
+            c_Message.SetDescription(C_GtGetText::h_GetText("The transmission of messages is only allowed as long "
+                                                            "as the measurement is running. \nClick the play button "
+                                                            "in trace to start measurement."));
             c_Message.Execute();
          }
       }
@@ -856,7 +848,7 @@ void C_CamGenTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 void C_CamGenTableView::m_StopCyclicCommunication(const std::vector<uint32> & orc_Items)
 {
    //only relevant if communication active
-   if (this->mq_CommunicationActive)
+   if ((this->mq_CommunicationActive == true) && (this->mq_CyclicTransmissionActive == true))
    {
       //Each item
       for (uint32 u32_It = 0UL; u32_It < orc_Items.size(); ++u32_It)
@@ -868,7 +860,7 @@ void C_CamGenTableView::m_StopCyclicCommunication(const std::vector<uint32> & or
             //Only deactivate if currently active
             if (pc_Message->q_DoCyclicTrigger == true)
             {
-               Q_EMIT this->SigRegisterCyclicMessage(orc_Items[u32_It], false);
+               Q_EMIT (this->SigRegisterCyclicMessage(orc_Items[u32_It], false));
             }
          }
       }
@@ -887,7 +879,7 @@ void C_CamGenTableView::m_StopCyclicCommunication(const std::vector<uint32> & or
 void C_CamGenTableView::m_ModelRegisterCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
 {
    //only relevant if communication active or while paused
-   if (this->mq_CommunicationActive == true)
+   if ((this->mq_CommunicationActive == true) && (this->mq_CyclicTransmissionActive == true))
    {
       Q_EMIT (this->SigRegisterCyclicMessage(ou32_MessageIndex, oq_Active));
    }
@@ -1055,7 +1047,7 @@ void C_CamGenTableView::m_HandleNewItemScrollingAndSelection(const std::vector<u
       this->scrollTo(c_Index);
    }
    //only relevant if communication active or while paused
-   if (this->mq_CommunicationActive)
+   if ((this->mq_CommunicationActive == true) && (this->mq_CyclicTransmissionActive == true))
    {
       //Activate all copied cyclic items
       for (uint32 u32_It = 0UL; u32_It < c_Items.size(); ++u32_It)
@@ -1067,7 +1059,7 @@ void C_CamGenTableView::m_HandleNewItemScrollingAndSelection(const std::vector<u
             //Only activate if it should be active
             if (pc_Message->q_DoCyclicTrigger == true)
             {
-               Q_EMIT this->SigRegisterCyclicMessage(c_Items[u32_It], true);
+               Q_EMIT (this->SigRegisterCyclicMessage(c_Items[u32_It], true));
             }
          }
       }
@@ -1138,4 +1130,34 @@ void C_CamGenTableView::m_HandleCheckChange(const QModelIndex & orc_Index)
    {
       m_SelectRow(orc_Index.row(), QItemSelectionModel::ClearAndSelect);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Decide if to start or stop cyclic message transmission.
+
+   Combine the two flags "message transmission active" and "trace running"
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenTableView::m_RegisterAllCyclicMessages(void)
+{
+   if ((this->mq_CyclicTransmissionActive == true) && (this->mq_CommunicationActive == true))
+   {
+      // register all cyclic messages
+      for (uint32 u32_ItMessage = 0UL; u32_ItMessage < C_CamProHandler::h_GetInstance()->GetMessages().size();
+           ++u32_ItMessage)
+      {
+         const C_CamProMessageData * const pc_Message =
+            C_CamProHandler::h_GetInstance()->GetMessageConst(u32_ItMessage);
+         if (pc_Message != NULL)
+         {
+            if (pc_Message->q_DoCyclicTrigger == true)
+            {
+               //Trigger sending
+               Q_EMIT (this->SigRegisterCyclicMessage(u32_ItMessage, true));
+            }
+         }
+      }
+   }
+
+   // remove of all current cyclic messages is handled by main window (start/stop) resp. by messages widget (toggle)
 }

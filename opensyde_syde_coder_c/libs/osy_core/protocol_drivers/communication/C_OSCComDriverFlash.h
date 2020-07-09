@@ -50,6 +50,17 @@ public:
       stw_types::uint16 u16_MaxNumberOfBlockLength;                 ///< maximum size of service the server can handle
    };
 
+   //Description of types see C_OSCDeviceDefinition::u32_FlashloaderResetWaitTimeXXX
+   enum E_MinimumFlashloaderResetWaitTimeType
+   {
+      eNO_CHANGES_CAN = 0,
+      eNO_CHANGES_ETHERNET,
+      eNO_FUNDAMENTAL_COM_CHANGES_CAN,
+      eNO_FUNDAMENTAL_COM_CHANGES_ETHERNET,
+      eFUNDAMENTAL_COM_CHANGES_CAN,
+      eFUNDAMENTAL_COM_CHANGES_ETHERNET
+   };
+
    C_OSCFlashProtocolStwFlashloader::PR_ReportProgress mpr_XflReportProgress;
    void * mpv_XflReportProgressInstance;
 
@@ -71,7 +82,10 @@ public:
                                           const stw_types::uint32 ou32_TimeoutMs) const;
    stw_types::sint32 OsyResetPollingTimeout(const C_OSCProtocolDriverOsyNode & orc_ServerId) const;
 
-   stw_types::uint32 GetMinimumFlashloaderResetWaitTime(void) const;
+   stw_types::uint32 GetMinimumFlashloaderResetWaitTime(const E_MinimumFlashloaderResetWaitTimeType oe_Type) const;
+   stw_types::sint32 GetMinimumFlashloaderResetWaitTime(const E_MinimumFlashloaderResetWaitTimeType oe_Type,
+                                                        const C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                                        stw_types::uint32 & oru32_TimeValue) const;
 
    // openSYDE Services
    stw_types::sint32 SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const;
@@ -98,8 +112,8 @@ public:
                                            stw_scl::C_SCLString & orc_DeviceName,
                                            stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 SendOsyReadSerialNumber(const C_OSCProtocolDriverOsyNode &orc_ServerId,
-                                             stw_types::uint8(
-                                                &orau8_SerialNumber)[6], stw_types::uint8 * const opu8_NrCode = NULL);
+                                             stw_types::uint8(&orau8_SerialNumber)[6],
+                                             stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 SendOsyReadActiveDiagnosticSession(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                         stw_types::uint8 & oru8_SessionId,
                                                         stw_types::uint8 * const opu8_NrCode = NULL) const;
@@ -234,6 +248,9 @@ private:
                                                    stw_opensyde_core::C_OSCProtocolDriverOsyTpCan & orc_CanTransportProtocol);
    stw_types::sint32 m_GetStwResetMessage(const stw_types::uint32 ou32_NodeIndex,
                                           stw_can::T_STWCAN_Msg_TX & orc_Message) const;
+   stw_types::sint32 m_GetMinimumFlashloaderResetWaitTime(const E_MinimumFlashloaderResetWaitTimeType oe_Type,
+                                                          const stw_types::uint32 ou32_NodeIndex,
+                                                          stw_types::uint32 & oru32_TimeValue) const;
 
    static void mh_HandleWaitTime(void * const opv_Instance);
    void m_HandleWaitTime(void);

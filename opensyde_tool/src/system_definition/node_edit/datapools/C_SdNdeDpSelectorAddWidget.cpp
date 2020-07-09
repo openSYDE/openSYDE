@@ -330,9 +330,9 @@ void C_SdNdeDpSelectorAddWidget::m_OnSharedDataPoolChanged(void) const
       std::vector<QString> c_SharedDatapoolGroup;
       uint32 u32_DatapoolCounter;
 
-      tgl_assert(C_SdNdeDpUtil::GetSharedDatapoolGroup(u32_SharedGroup, c_SelectedDatapoolId,
-                                                       this->mu32_NodeIndex,
-                                                       c_SharedDatapoolGroup) == C_NO_ERR);
+      tgl_assert(C_SdNdeDpUtil::h_GetSharedDatapoolGroup(u32_SharedGroup, c_SelectedDatapoolId,
+                                                         this->mu32_NodeIndex,
+                                                         c_SharedDatapoolGroup) == C_NO_ERR);
 
       for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < c_SharedDatapoolGroup.size(); ++u32_DatapoolCounter)
       {

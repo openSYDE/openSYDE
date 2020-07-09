@@ -35,14 +35,23 @@ public:
    //lint -restore
 
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
-   void UpdateChannelText(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex);
+   void UpdateChannelText(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
+                          const bool oq_UseChannelIndex);
    void Clear(void);
+   void Copy(const QModelIndex & orc_CurrentChannel) const;
+   void Paste(QWidget * const opc_Parent, const QModelIndexList & orc_TargetIndexes);
+
+   static void h_GetIndexesFromModelIndex(const QModelIndex & orc_ModelIndex, stw_types::uint32 & oru32_DomainIndex,
+                                          stw_types::uint32 & oru32_ChannelIndex, bool & orq_ChannelCase);
 
 private:
    C_SdNdeHalcChannelTreeModel(const C_SdNdeHalcChannelTreeModel &);
    C_SdNdeHalcChannelTreeModel & operator =(const C_SdNdeHalcChannelTreeModel &);
 
    stw_types::uint32 mu32_NodeIndex;
+
+   QModelIndex m_GetModelIndexFromIndexes(const stw_types::uint32 ou32_DomainIndex,
+                                          const stw_types::uint32 ou32_ChannelIndex, const bool oq_ChannelCase) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

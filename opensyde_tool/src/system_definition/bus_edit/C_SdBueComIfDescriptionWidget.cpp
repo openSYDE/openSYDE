@@ -135,6 +135,8 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
            &C_SdBueComIfDescriptionWidget::m_OnMessageCountChanged);
    connect(this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SigSignalNameChanged, this,
            &C_SdBueComIfDescriptionWidget::m_OnSignalNameChange);
+   connect(this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SigSignalStartBitChanged, this,
+           &C_SdBueComIfDescriptionWidget::m_OnSignalStartBitChange);
    connect(this->mpc_Ui->pc_MessageSelectorWidget, &C_SdBueMessageSelectorWidget::SigSelectName,
            this->mpc_Ui->pc_MsgSigEditWidget, &C_SdBueMessageSignalEditWidget::SelectName);
    //Error
@@ -412,14 +414,13 @@ void C_SdBueComIfDescriptionWidget::SelectSignalSearch(const uint32 ou32_NodeInd
    if (pc_Messages != NULL)
    {
       uint32 u32_Counter;
-      uint32 u32_SignalIndex = 0U;
 
       // search the signal in all messages
       for (u32_Counter = 0U; u32_Counter < pc_Messages->size(); ++u32_Counter)
       {
          const C_OSCCanMessage & rc_Message = (*pc_Messages)[u32_Counter];
 
-         for (u32_SignalIndex = 0U; u32_SignalIndex < rc_Message.c_Signals.size(); ++u32_SignalIndex)
+         for (uint32 u32_SignalIndex = 0U; u32_SignalIndex < rc_Message.c_Signals.size(); ++u32_SignalIndex)
          {
             if (ou32_ElementIndex == rc_Message.c_Signals[u32_SignalIndex].u32_ComDataElementIndex)
             {
@@ -524,9 +525,10 @@ void C_SdBueComIfDescriptionWidget::ImportMessages(void)
 {
    std::vector<uint32> c_NodeIndexes;
    std::vector<uint32> c_InterfaceIndexes;
+   const C_OSCCanProtocol::E_Type e_Protocol = this->GetActProtocol();
 
-   sint32 s32_Return = C_CieUtil::h_ImportFile(this->mu32_BusIndex,
-                                               this->GetActProtocol(), this, c_NodeIndexes, c_InterfaceIndexes);
+   sint32 s32_Return =
+      C_CieUtil::h_ImportFile(this->mu32_BusIndex, e_Protocol, this, c_NodeIndexes, c_InterfaceIndexes);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -536,12 +538,20 @@ void C_SdBueComIfDescriptionWidget::ImportMessages(void)
       {
          for (uint32 u32_ItIndex = 0; u32_ItIndex < c_NodeIndexes.size(); u32_ItIndex++)
          {
+            const sint32 s32_NumMessageContainers =
+               C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainers(c_NodeIndexes[u32_ItIndex], e_Protocol,
+                                                                                c_InterfaceIndexes[u32_ItIndex]).size();
+            const sint32 s32_NumComDataPools =
+               C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPools(c_NodeIndexes[u32_ItIndex], e_Protocol).size();
+
             // on import a Datapool was created if necessary - just to make sure
-            tgl_assert(C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPools(c_NodeIndexes[u32_ItIndex],
-                                                                           this->GetActProtocol()).size() > 0);
-            C_PuiSdHandler::h_GetInstance()->
-            SetCanProtocolMessageContainerConnected(c_NodeIndexes[u32_ItIndex], this->GetActProtocol(),
-                                                    c_InterfaceIndexes[u32_ItIndex], true);
+            tgl_assert(s32_NumComDataPools == s32_NumMessageContainers);
+            if (s32_NumComDataPools > 0)
+            {
+               C_PuiSdHandler::h_GetInstance()->
+               SetCanProtocolMessageContainerConnected(c_NodeIndexes[u32_ItIndex], e_Protocol,
+                                                       c_InterfaceIndexes[u32_ItIndex], true);
+            }
          }
       }
 
@@ -911,6 +921,18 @@ void C_SdBueComIfDescriptionWidget::m_OnSignalNameChange(const C_OSCCanMessageId
 const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->OnSignalNameChange(orc_MessageId);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The signal start bit has changed
+
+   \param[in] orc_MessageId Message identification indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueComIfDescriptionWidget::m_OnSignalStartBitChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+const
+{
+   this->mpc_Ui->pc_MessageSelectorWidget->OnSignalStartBitChange(orc_MessageId);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

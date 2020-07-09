@@ -63,23 +63,20 @@ const uint32 C_SyvDaItTaModel::hu32_MaxElements = static_cast<uint32>(std::numer
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTaModel::C_SyvDaItTaModel(C_PuiSvDbDataElementHandler * const opc_Data, QObject * const opc_Parent) :
    C_TblModelAction(opc_Parent),
-   mpc_Data(opc_Data)
-{
+   mpc_Data(opc_Data),
    // Default icons
-   mc_IconParameter = ":/images/system_definition/IconParameter.svg";
-   mc_IconSignal = ":/images/system_definition/IconSignal.svg";
-   mc_IconVariable = ":/images/system_definition/IconVariable.svg";
-
+   mc_IconParameter(":/images/system_definition/IconParameter.svg"),
+   mc_IconSignal(":/images/system_definition/IconSignal.svg"),
+   mc_IconVariable(":/images/system_definition/IconVariable.svg"),
    // Warning icons
-   mc_IconParameterWarning =  "://images/system_definition/IconParameterWarning.svg";
-   mc_IconSignalWarning = "://images/system_definition/IconSignalWarning.svg";
-   mc_IconVariableWarning = "://images/system_definition/IconVariableWarning.svg";
-
+   mc_IconParameterWarning("://images/system_definition/IconParameterWarning.svg"),
+   mc_IconSignalWarning("://images/system_definition/IconSignalWarning.svg"),
+   mc_IconVariableWarning("://images/system_definition/IconVariableWarning.svg"),
    // Error icons
-   mc_IconParameterError = "://images/system_definition/IconParameterError.svg";
-   mc_IconSignalError = "://images/system_definition/IconSignalError.svg";
-   mc_IconVariableError = "://images/system_definition/IconVariableError.svg";
-
+   mc_IconParameterError("://images/system_definition/IconParameterError.svg"),
+   mc_IconSignalError("://images/system_definition/IconSignalError.svg"),
+   mc_IconVariableError("://images/system_definition/IconVariableError.svg")
+{
    //Register to allow data changed signal
    qRegisterMetaType<QVector<sintn> >();
 }

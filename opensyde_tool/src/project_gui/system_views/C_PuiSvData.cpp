@@ -22,15 +22,15 @@
 #include "C_PuiSvData.h"
 #include "C_PuiSdUtil.h"
 #include "CSCLChecksums.h"
-#include "C_OSCLoggingHandler.h"
 #include "C_PuiSdHandler.h"
+#include "C_OSCLoggingHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
+using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -111,7 +111,7 @@ void C_PuiSvData::CalcHash(uint32 & oru32_HashValue) const
    Hash value
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSvData::CalcSetupHash(void) const
+uint32 C_PuiSvData::CalcUpdateHash(void) const
 {
    uint32 u32_Retval = 0;
 

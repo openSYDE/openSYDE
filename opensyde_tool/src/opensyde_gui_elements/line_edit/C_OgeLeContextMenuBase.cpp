@@ -106,7 +106,6 @@ void C_OgeLeContextMenuBase::m_SetupContextMenu(void)
 
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Delete"),
                                        this,
-  //                                       &C_OgeLeContextMenuBase::m_Delete,
                                        &C_OgeLeContextMenuBase::del,
                                        static_cast<sintn>(Qt::Key_Delete));
    }

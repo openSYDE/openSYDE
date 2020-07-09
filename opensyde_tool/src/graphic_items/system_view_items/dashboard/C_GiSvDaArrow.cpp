@@ -67,7 +67,7 @@ C_GiSvDaArrow::C_GiSvDaArrow(const uint32 & oru32_ViewIndex, const uint32 & oru3
                   pc_Dashboard->GetLineArrow(static_cast<uint32>(this->ms32_Index));
                if (pc_Item != NULL)
                {
-                  Init(pc_Item->c_UIInteractionPoints);
+                  m_Init(pc_Item->c_UIInteractionPoints);
                   this->LoadData();
                }
             }

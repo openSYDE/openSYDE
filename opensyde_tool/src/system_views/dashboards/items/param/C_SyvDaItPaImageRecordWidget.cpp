@@ -60,7 +60,10 @@ const QString C_SyvDaItPaImageRecordWidget::mhc_FILE_EXTENSION = ".syde_psi";
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  orc_Parent       Parent
+   \param[in,out]  orc_ComDriver    Com driver
+   \param[in]      orc_ListItemIds  List item ids
+   \param[in]      orc_ViewName     View name
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
@@ -195,11 +198,40 @@ void C_SyvDaItPaImageRecordWidget::SaveUserSettings(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get file info
+
+   \param[in]  orc_Comment    User comment for file
+
+   \return
+   File info
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCParamSetInterpretedFileInfoData C_SyvDaItPaImageRecordWidget::h_GetFileInfoData(const QString & orc_Comment)
+{
+   C_OSCParamSetInterpretedFileInfoData c_Retval;
+   QString c_Name = qgetenv("USER");
+
+   if (c_Name.isEmpty())
+   {
+      c_Name = qgetenv("USERNAME");
+   }
+   c_Retval.c_Creator = c_Name.toStdString().c_str();
+   c_Retval.c_DateTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss").toStdString().c_str();
+   c_Retval.c_ToolName = "openSYDE";
+   //lint -e{40} Defined by project file
+   c_Retval.c_ToolVersion = C_Uti::h_GetApplicationVersion().toStdString().c_str();
+   c_Retval.c_ProjectName = C_PuiProject::h_GetInstance()->GetName().toStdString().c_str();
+   c_Retval.c_ProjectVersion = C_PuiProject::h_GetInstance()->c_Version;
+   c_Retval.c_UserComment = orc_Comment.toStdString().c_str();
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten key press event slot
 
    Here: handle escape key
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::keyPressEvent(QKeyEvent * const opc_Event)
@@ -238,9 +270,9 @@ void C_SyvDaItPaImageRecordWidget::m_OnBrowse(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Split the full path of a file into path and name.
 
-   \param[in]     orc_FullPath   full path to file
-   \param[out]    orc_Name       file name
-   \param[out]    orc_Path       path without file name
+   \param[in]   orc_FullPath  full path to file
+   \param[out]  orc_Name      file name
+   \param[out]  orc_Path      path without file name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_SplitNameAndPath(const QString & orc_FullPath, QString & orc_Name,
@@ -517,7 +549,7 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareVariablesForParametrization(void)
 
    Implemented steps: 2
 
-   \param[in] orc_Comment User comment for file
+   \param[in]  orc_Comment    User comment for file
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comment)
@@ -624,7 +656,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comm
 
    Implemented steps: 3
 
-   \param[in] orc_Comment User comment for file
+   \param[in]  orc_Comment    User comment for file
 
    \return
    C_NO_ERR   data saved
@@ -636,7 +668,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comm
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(const QString & orc_Comment)
 {
-   const C_OSCParamSetInterpretedFileInfoData c_FileInfo = this->m_GetFileInfoData(orc_Comment);
+   const C_OSCParamSetInterpretedFileInfoData c_FileInfo = C_SyvDaItPaImageRecordWidget::h_GetFileInfoData(orc_Comment);
    sint32 s32_Return = C_NO_ERR;
 
    for (uint32 u32_ItNode = 0U; (u32_ItNode < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR); ++u32_ItNode)
@@ -768,8 +800,8 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get text to display for a step
 
-   \param[in] orc_DataPoolListsForEachNode Read infos
-   \param[in] oq_IsConfirm                 Flag if confirm step
+   \param[in]  orc_DataPoolListsForEachNode  Read infos
+   \param[in]  oq_IsConfirm                  Flag if confirm step
 
    \return
    Text to display
@@ -898,7 +930,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
 
    Implemented steps: 6
 
-   \param[in]  orc_DataPoolListsForEachNode   Result of step 5
+   \param[in]  orc_DataPoolListsForEachNode  Result of step 5
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
@@ -914,13 +946,6 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
 /*! \brief   Writes the CRC of relevant lists
 
    Implemented steps: 8
-
-   \return
-   C_NO_ERR   CRC updated
-   C_OVERFLOW Wrong sequence of function calls
-   C_RANGE    Path does not match the path of the preceding function calls
-   C_RD_WR    specified file does not exist
-              specified file is present but structure is invalid (e.g. invalid XML file)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
@@ -1144,7 +1169,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportError(const QString & orc_FunctionNam
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle error for function "NvmSafeReadParameterValues"
 
-   \param[in] os32_ErrorCode Function result
+   \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const sint32 os32_ErrorCode)
@@ -1237,39 +1262,10 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get file info
-
-   \param[in] orc_Comment User comment for file
-
-   \return
-   File info
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OSCParamSetInterpretedFileInfoData C_SyvDaItPaImageRecordWidget::m_GetFileInfoData(const QString & orc_Comment) const
-{
-   C_OSCParamSetInterpretedFileInfoData c_Retval;
-   QString c_Name = qgetenv("USER");
-
-   if (c_Name.isEmpty())
-   {
-      c_Name = qgetenv("USERNAME");
-   }
-   c_Retval.c_Creator = c_Name.toStdString().c_str();
-   c_Retval.c_DateTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss").toStdString().c_str();
-   c_Retval.c_ToolName = "openSYDE";
-   //lint -e{40} Defined by project file
-   c_Retval.c_ToolVersion = C_Uti::h_GetApplicationVersion().toStdString().c_str();
-   c_Retval.c_ProjectName = C_PuiProject::h_GetInstance()->GetName().toStdString().c_str();
-   c_Retval.c_ProjectVersion = C_PuiProject::h_GetInstance()->c_Version;
-   c_Retval.c_UserComment = orc_Comment.toStdString().c_str();
-   return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Adapt the base path for this node as necessary
 
-   \param[in] ou32_NodeIndex Node index (which node is this file for)
-   \param[in] orc_Path       Base path to use as base and fallback in special cases
+   \param[in]  ou32_NodeIndex    Node index (which node is this file for)
+   \param[in]  orc_Path          Base path to use as base and fallback in special cases
 
    \return
    The adapted path
@@ -1287,7 +1283,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetPathForNode(const uint32 ou32_NodeInd
       {
          const QFileInfo c_FileInfo(orc_Path);
          const QDir c_Dir(c_FileInfo.absoluteDir());
-         const QString c_NodeFileNameBase = C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(
+         const QString c_NodeFileNameBase = C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(
             pc_Node->c_Properties.c_Name).c_str();
          const QString c_NodeFileName = c_FileInfo.completeBaseName() + "_" + c_NodeFileNameBase + "." +
                                         c_FileInfo.suffix();

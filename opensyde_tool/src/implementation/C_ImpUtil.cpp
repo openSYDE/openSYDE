@@ -28,7 +28,6 @@
 #include "C_UsHandler.h"
 #include "C_PuiProject.h"
 #include "C_PuiSdHandler.h"
-#include "C_OSCExportNode.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_OgeWiUtil.h"
@@ -181,7 +180,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       // Ask user to continue although there are system definition errors
       if (q_SysDefInvalid == true)
       {
-         C_OgeWiCustomMessage c_Question(opc_Parent, C_OgeWiCustomMessage::E_Type::eQUESTION);
+         C_OgeWiCustomMessage c_Question(opc_Parent, C_OgeWiCustomMessage::E_Type::eWARNING);
          c_Question.SetHeading("CONFIRM CODE GENERATION");
          c_Question.SetDescription(C_GtGetText::h_GetText("There are SYSTEM DEFINITION errors. "
                                                           "Do you really want to generate code?"));
@@ -837,6 +836,50 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
    }
 
    return c_Return;
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Assemble source file information for HTML report.
+
+   Output is a HTML table which looks something like this:
+   Path:         <orc_FilePath>
+   Read Content: <orc_ReadContent>
+
+   \param[in]       orc_FilePath     File path of source file
+   \param[in]       orc_ReadContent  Summary of read content
+
+   \return
+   HTML table formatted string
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_ImpUtil::h_FormatSourceFileInfoForReport(const QString & orc_FilePath, const QString & orc_ReadContent)
+{
+   QString c_Text = "";
+
+   const QString c_HtmlTableDataStart =
+      "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 5px 0px;white-space:pre;\">";
+
+   //File
+   c_Text += "<h3>";
+   c_Text += C_GtGetText::h_GetText("Source File Information");
+   c_Text += "</h3>";
+   c_Text += "<table><tr>";
+   c_Text += c_HtmlTableDataStart;
+   c_Text += C_GtGetText::h_GetText("Path:");
+   c_Text += "</td>";
+   c_Text += c_HtmlTableDataStart;
+   c_Text += C_Uti::h_GetLink(orc_FilePath, mc_STYLE_GUIDE_COLOR_LINK, orc_FilePath);
+   c_Text += "</td></tr><tr>";
+
+   //Content
+   c_Text += c_HtmlTableDataStart;
+   c_Text += C_GtGetText::h_GetText("Read Content:");
+   c_Text += "</td>";
+   c_Text += c_HtmlTableDataStart;
+   c_Text += orc_ReadContent;
+   c_Text += "</td></tr></table>";
+
+   return c_Text;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

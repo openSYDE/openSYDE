@@ -47,7 +47,7 @@ C_SdNdeHalcConfigTreeDelegate::C_SdNdeHalcConfigTreeDelegate(QObject * const opc
    \param[in,out] opc_Parent Parent
 
    \return
-   CAN monitor spin box interaction element
+   HALC spin box interaction element
    TODO return correctly styled spin box
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ C_OgeWiSpinBoxGroup * C_SdNdeHalcConfigTreeDelegate::m_CreateSpinBox(QWidget * c
    \param[in,out] opc_Parent Parent
 
    \return
-   CAN monitor line edit interaction element
+   HALC line edit interaction element
    TODO return correctly styled spin box
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ C_TblEditLineEditBase * C_SdNdeHalcConfigTreeDelegate::m_CreateLineEdit(QWidget 
    \param[in,out] opc_Parent Parent
 
    \return
-   CAN monitor combo box interaction element
+   HALC combo box interaction element
    TODO return correctly styled spin box
 */
 //----------------------------------------------------------------------------------------------------------------------

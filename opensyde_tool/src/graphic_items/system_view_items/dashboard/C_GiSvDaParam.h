@@ -62,10 +62,8 @@ public:
    stw_types::uint32 GetViewIndex(void) const;
    const stw_opensyde_gui_logic::C_PuiSvDbParam * GetParamItem(void) const;
    stw_types::sint32 SetParamItem(const stw_opensyde_gui_logic::C_PuiSvDbParam & orc_Content) const;
-   stw_types::sint32 ClearParamItemDataElement(void);
    stw_types::sint32 AddParamItemDataElement(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
                                              const stw_opensyde_core::C_OSCNodeDataPoolContent * const opc_Content);
-   void HandleNewDataElement(void);
    stw_types::sint32 DeleteLists(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds);
    QWidget * GetPopUpParent(void) const;
 

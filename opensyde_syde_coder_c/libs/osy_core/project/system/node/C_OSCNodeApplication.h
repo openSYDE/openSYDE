@@ -49,13 +49,16 @@ public:
    bool q_Active;                            ///< Application active flag
    stw_types::uint8 u8_ProcessId;            ///< Unique process ID
    stw_scl::C_SCLString c_ProjectPath;       ///< Path to data block project
+                                             //(if relative it is meant as relative to *.syde file)
    stw_scl::C_SCLString c_IDECall;           ///< Complete IDE command line call string
    stw_scl::C_SCLString c_CodeGeneratorPath; ///< Path to code generator
+                                             //(if relative it is meant as relative to openSYDE.exe)
    stw_scl::C_SCLString c_GeneratePath;      ///< Path to generate sources for this application in
-                                             //(can be relative to data block project)
+                                             //(if relative it is meant as relative to data block project)
    stw_types::uint16 u16_GenCodeVersion;     ///< Version of structure of generated code
    stw_scl::C_SCLString c_ResultPath;        ///< Path to result file of this application
-                                             //(can be relative to data block project)
+                                             //(if relative it is meant as relative to data block project)
+   //Note: all paths and the IDE call can contain placeholder variables!
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

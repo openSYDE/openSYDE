@@ -79,7 +79,8 @@ padding-bottom: 5px;
 /* --------------------------------------------------------------------- */
 stw_opensyde_gui_elements--C_OgeCbxFontProperties,
 stw_opensyde_gui_elements--C_OgeCbxTable,
-stw_opensyde_gui_elements--C_OgeCbxText
+stw_opensyde_gui_elements--C_OgeCbxText,
+stw_opensyde_gui_elements--C_OgeCbxMultiSelect
 {
 padding-right: 0px;
 padding-left: 8px;
@@ -110,7 +111,8 @@ max-height: 30px;
 stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView,
 stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView,
 stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView,
-stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView
+stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView,
+stw_opensyde_gui_elements--C_OgeCbxMultiSelect QAbstractItemView
 {
 margin-left: 0px;
 margin-right: 0px;
@@ -118,7 +120,8 @@ margin-right: 0px;
 
 stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView::item,
 stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView::item,
-stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item
+stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item,
+stw_opensyde_gui_elements--C_OgeCbxMultiSelect QAbstractItemView::item
 {
 padding-top: 5px;
 padding-bottom: 5px;

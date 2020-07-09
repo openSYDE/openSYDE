@@ -603,7 +603,6 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorListWidget::Paste(void)
 {
-   sint32 s32_LastIndex = 0;
    C_OSCNodeDataPool c_OSCContent;
    C_PuiSdNodeDataPool c_UIContent;
    sint32 s32_Return;
@@ -663,6 +662,7 @@ void C_SdNdeDpSelectorListWidget::Paste(void)
       {
          if (c_OSCContent.e_Type == this->me_DataPoolType)
          {
+            sint32 s32_LastIndex = 0;
             if (this->currentIndex().isValid() == true)
             {
                //Add after current index

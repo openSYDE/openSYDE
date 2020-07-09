@@ -253,11 +253,8 @@ void C_OSCCanUtil::h_SetSignalValue(uint8 (&orau8_CanDb)[8], const C_OSCCanSigna
    {
       // Round up
       ++u8_LengthByte;
-   }
 
-   // Handle a signal with not standard length first
-   if (u8_LengthBitOffset != 0U)
-   {
+      // Handle a signal with not standard length first
       // The byte of the signal in the Datapool data which has the bit for the signed value
       // It is not always the same as the byte length of the signal
       const uint16 u16_LastDataTypeByte =

@@ -77,7 +77,7 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
             c_UIBus.c_UIInteractionPoints.push_back(QPointF(0.0, 0.0));
             c_UIBus.c_UIInteractionPoints.push_back(QPointF(25.0, 25.0));
          }
-         Init(c_UIBus.c_UIInteractionPoints);
+         m_Init(c_UIBus.c_UIInteractionPoints);
          C_PuiSdHandler::h_GetInstance()->SetUIBus(ms32_Index, c_UIBus);
          this->LoadData();
       }
@@ -194,7 +194,7 @@ void C_GiLiBus::LoadData(void)
 
    if (pc_UIBus != NULL)
    {
-      this->LoadBasicData(*pc_UIBus);
+      this->m_LoadBasicData(*pc_UIBus);
       this->SetMiddleLineColor(pc_UIBus->c_UIColorMiddleLine);
    }
    //Object name for test
@@ -215,7 +215,7 @@ void C_GiLiBus::UpdateData(void)
    if (pc_UIBus != NULL)
    {
       stw_opensyde_gui_logic::C_PuiSdBus c_UIBus = *pc_UIBus;
-      this->UpdateBasicData(c_UIBus);
+      this->m_UpdateBasicData(c_UIBus);
       c_UIBus.c_UIColorMiddleLine = this->GetMiddleLineColor();
       C_PuiSdHandler::h_GetInstance()->SetUIBus(ms32_Index, c_UIBus);
    }

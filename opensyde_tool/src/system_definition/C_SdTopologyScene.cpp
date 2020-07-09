@@ -37,14 +37,12 @@
 #include "C_PuiProject.h"
 #include "C_PuiSdHandler.h"
 #include "C_SebUtil.h"
+#include "C_SdUtil.h"
 #include "TGLUtils.h"
 #include "C_OgePopUpDialog.h"
 #include "C_SdNodeComIfSetupWidget.h"
 #include "C_SdNodeToNodeConnectionSetupWidget.h"
 #include "C_SdManTopologyBusConnectorReconnectManager.h"
-#include "C_SdBueUnoBusProtNodeConnectCommand.h"
-#include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.h"
-#include "C_SdBueUnoBusProtNodeDisconnectCommand.h"
 #include "C_OgeWiCustomMessage.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -115,8 +113,10 @@ C_SdTopologyScene::C_SdTopologyScene(const bool & orq_LoadSystemDefintion, QObje
    //Reconnection manager
    connect(&(this->mc_BusConnectorReconnectManager), &C_SdManTopologyBusConnectorReconnectManager::SigCleanUpPorts,
            this, &C_SdTopologyScene::m_CleanUpPorts);
+   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(&(this->mc_BusConnectorReconnectManager), &C_SdManTopologyBusConnectorReconnectManager::SigReconnectNode,
            this, &C_SdTopologyScene::m_ReconnectBusConnectorNode);
+   //lint -e{64, 918, 1025, 1703}  false positive because of C++11 use of Qt
    connect(&(this->mc_BusConnectorReconnectManager), &C_SdManTopologyBusConnectorReconnectManager::SigReconnectBus,
            this, &C_SdTopologyScene::m_ReconnectBusConnectorBus);
    connect(&(this->mc_BusConnectorReconnectManager), &C_SdManTopologyBusConnectorReconnectManager::SigRevertNode,
@@ -503,18 +503,22 @@ void C_SdTopologyScene::AddLine(const QPointF & orc_Pos, const stw_types::uint64
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adds a new bus connector
 
-   \param[in,out]  opc_Node               Node to connect to
-   \param[in]      opc_Bus                Bus to connect to
-   \param[in]      oru8_InterfaceNumber   Number of interface to use
-   \param[in]      oru8_NodeId            New node id
-   \param[in]      orc_Pos                Position to place item at
-   \param[in]      opu64_UniqueID         Optional pointer to unique ID to use for new item
+   \param[in,out]  opc_Node                  Node to connect to
+   \param[in]      opc_Bus                   Bus to connect to
+   \param[in]      oru8_InterfaceNumber      Number of interface to use
+   \param[in]      oru8_NodeId               New node id
+   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
+   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
+   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
+   \param[in]      orc_Pos                   Position to place item at
+   \param[in]      opu64_UniqueID            Optional pointer to unique ID to use for new item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddBusConnector(C_GiNode * const opc_Node, const C_GiLiBus * const opc_Bus,
                                         const stw_types::uint8 & oru8_InterfaceNumber,
-                                        const stw_types::uint8 & oru8_NodeId, const QPointF & orc_Pos,
-                                        const stw_types::uint64 * const opu64_UniqueID)
+                                        const stw_types::uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
+                                        const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS,
+                                        const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID)
 {
    if ((opc_Node != NULL) &&
        (opc_Bus != NULL))
@@ -531,9 +535,19 @@ void C_SdTopologyScene::AddBusConnector(C_GiNode * const opc_Node, const C_GiLiB
       {
          u64_UniqueID = m_GetNewUniqueID();
       }
+
+      //Set up connection
       C_PuiSdHandler::h_GetInstance()->AddConnection(
          static_cast<uint32>(opc_Node->GetIndex()), oru8_InterfaceNumber, oru8_NodeId,
          static_cast<uint32>(opc_Bus->GetIndex()));
+
+      //Configure DP
+      if (opc_Bus->GetType() == C_OSCSystemBus::eCAN)
+      {
+         C_SdUtil::h_ConfigureComDatapools(
+            opc_Node->GetIndex(), oru8_InterfaceNumber, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
+            oq_ActivateDatapoolECoS);
+      }
 
       {
          //Start
@@ -2209,19 +2223,24 @@ void C_SdTopologyScene::m_SyncIndex(const stw_opensyde_gui_logic::C_PuiSdDataEle
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new connection
 
-   \param[in]  oru8_InterfaceNumber    Number of interface on bus
-   \param[in]  oru8_NodeId             Node id
+   \param[in]  oru8_InterfaceNumber       Number of interface on bus
+   \param[in]  oru8_NodeId                Node id
+   \param[in]  oq_ActivateDatapoolL2      Activate datapool L2
+   \param[in]  oq_ActivateDatapoolECeS    Activate datapool ECeS
+   \param[in]  oq_ActivateDatapoolECoS    Activate datapool ECoS
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ConnectNodeToBus(const stw_types::uint8 & oru8_InterfaceNumber,
-                                           const stw_types::uint8 & oru8_NodeId)
+                                           const stw_types::uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
+                                           const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS)
 {
    if ((this->mpc_NodeConnectItem != NULL) &&
        (this->mpc_BusConnectItem != NULL))
    {
       this->mc_UndoManager.DoAddBusConnector(
          m_GetNewUniqueID(),  this->mc_ConnectEndPoint, this->mpc_NodeConnectItem,
-         this->mpc_BusConnectItem, oru8_InterfaceNumber, oru8_NodeId);
+         this->mpc_BusConnectItem, oru8_InterfaceNumber, oru8_NodeId, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
+         oq_ActivateDatapoolECoS);
 
       //Reset pointers
       this->mpc_NodeConnectItem = NULL;
@@ -2232,13 +2251,17 @@ void C_SdTopologyScene::m_ConnectNodeToBus(const stw_types::uint8 & oru8_Interfa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change existing connection
 
-   \param[in]  oru8_InterfaceNumber    Number of interface on bus
-   \param[in]  oru8_NodeId             New node id
-   \param[in]  opc_Connector           Current bus connector for change of interface
+   \param[in]  oru8_InterfaceNumber       Number of interface on bus
+   \param[in]  oru8_NodeId                New node id
+   \param[in]  oq_ActivateDatapoolL2      Activate datapool L2
+   \param[in]  oq_ActivateDatapoolECeS    Activate datapool ECeS
+   \param[in]  oq_ActivateDatapoolECoS    Activate datapool ECoS
+   \param[in]  opc_Connector              Current bus connector for change of interface
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ChangeInterface(const uint8 & oru8_InterfaceNumber, const uint8 & oru8_NodeId,
-                                          C_GiLiBusConnector * const opc_Connector)
+                                          const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
+                                          const bool oq_ActivateDatapoolECoS, C_GiLiBusConnector * const opc_Connector)
 {
    if (opc_Connector != NULL)
    {
@@ -2263,7 +2286,8 @@ void C_SdTopologyScene::m_ChangeInterface(const uint8 & oru8_InterfaceNumber, co
                   {
                      this->mc_UndoManager.DoChangeInterface(opc_Connector, pc_Conn->u8_InterfaceNumber,
                                                             oru8_InterfaceNumber, rc_ComInterface.u8_NodeID,
-                                                            oru8_NodeId);
+                                                            oru8_NodeId, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
+                                                            oq_ActivateDatapoolECoS);
                   }
                }
             }
@@ -2848,40 +2872,32 @@ void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node
       {
          if (c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
          {
+            bool q_DatapoolL2;
+            bool q_DatapoolECeS;
+            bool q_DatapoolECoS;
             const uint32 u32_SelectedInterface = pc_ComIfWidget->GetSelectedInterface();
-            const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(opc_Bus->GetIndex());
+
+            pc_ComIfWidget->GetComDataPoolConfiguration(q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
 
             if (orq_ChangeInterface == true)
             {
                m_ChangeInterface(static_cast<uint8>(u32_SelectedInterface),
-                                 pc_ComIfWidget->GetNodeId(), opc_Connector);
+                                 pc_ComIfWidget->GetNodeId(), q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS,
+                                 opc_Connector);
             }
             else
             {
                if (orq_Reconnect == true)
                {
                   this->mc_BusConnectorReconnectManager.ContextMenuAccepted(
-                     u32_SelectedInterface, pc_ComIfWidget->GetNodeId());
+                     u32_SelectedInterface, pc_ComIfWidget->GetNodeId(), q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
                }
                else
                {
                   m_ConnectNodeToBus(
-                     static_cast<uint8>(u32_SelectedInterface), pc_ComIfWidget->GetNodeId());
+                     static_cast<uint8>(u32_SelectedInterface),
+                     pc_ComIfWidget->GetNodeId(), q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
                }
-            }
-
-            // Only for CAN relevant
-            if ((pc_Bus != NULL) &&
-                (pc_Bus->e_Type == C_OSCSystemBus::eCAN))
-            {
-               bool q_DatapoolL2;
-               bool q_DatapoolECeS;
-               bool q_DatapoolECoS;
-
-               // Adapt the COM datapool configuration
-               pc_ComIfWidget->GetComDataPoolConfiguration(q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
-               this->m_ConfiugreComDatapools(opc_Node, u32_SelectedInterface, q_DatapoolL2, q_DatapoolECeS,
-                                             q_DatapoolECoS);
             }
          }
       }
@@ -2924,6 +2940,20 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
          if (c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
          {
             std::vector<uint64> c_Ids;
+            bool q_Node1DatapoolL2;
+            bool q_Node1DatapoolECeS;
+            bool q_Node1DatapoolECoS;
+            bool q_Node2DatapoolL2;
+            bool q_Node2DatapoolECeS;
+            bool q_Node2DatapoolECoS;
+
+            // Adapt the COM datapool configuration for the first node
+            pc_ComIfWidget->GetComDataPoolConfigurationNode1(q_Node1DatapoolL2, q_Node1DatapoolECeS,
+                                                             q_Node1DatapoolECoS);
+
+            // Adapt the COM datapool configuration for the second node
+            pc_ComIfWidget->GetComDataPoolConfigurationNode2(q_Node2DatapoolL2, q_Node2DatapoolECeS,
+                                                             q_Node2DatapoolECoS);
 
             if (pc_ComIfWidget->CheckIfCreateNew() == true)
             {
@@ -2946,7 +2976,10 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
                                                                              static_cast<uint8>(
                                                                                 pc_ComIfWidget->GetSelectedInterface2()),
                                                                              pc_ComIfWidget->GetNodeId1(),
-                                                                             pc_ComIfWidget->GetNodeId2());
+                                                                             pc_ComIfWidget->GetNodeId2(),
+                                                                             q_Node1DatapoolL2, q_Node1DatapoolECeS, q_Node1DatapoolECoS,
+                                                                             q_Node2DatapoolL2, q_Node2DatapoolECeS,
+                                                                             q_Node2DatapoolECoS);
             }
             else
             {
@@ -2987,29 +3020,10 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
                                                                               static_cast<uint8>(
                                                                                  pc_ComIfWidget->GetSelectedInterface2()),
                                                                               pc_ComIfWidget->GetNodeId1(),
-                                                                              pc_ComIfWidget->GetNodeId2());
-            }
-
-            // Only for CAN relevant
-            if (pc_ComIfWidget->GetBusType() ==  C_OSCSystemBus::eCAN)
-            {
-               bool q_DatapoolL2;
-               bool q_DatapoolECeS;
-               bool q_DatapoolECoS;
-
-               // Adapt the COM datapool configuration for the first node
-               pc_ComIfWidget->GetComDataPoolConfigurationNode1(q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
-               this->m_ConfiugreComDatapools(opc_Node1, pc_ComIfWidget->GetSelectedInterface1(),
-                                             q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
-
-               // Adapt the COM datapool configuration for the second node
-               pc_ComIfWidget->GetComDataPoolConfigurationNode2(q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
-               this->m_ConfiugreComDatapools(opc_Node2, pc_ComIfWidget->GetSelectedInterface2(),
-                                             q_DatapoolL2, q_DatapoolECeS, q_DatapoolECoS);
-
-               //Trigger error check as this circumvents the undo redo engine
-               this->CheckAllItemsForChanges();
-               Q_EMIT (this->SigErrorChange());
+                                                                              pc_ComIfWidget->GetNodeId2(),
+                                                                              q_Node1DatapoolL2, q_Node1DatapoolECeS, q_Node1DatapoolECoS,
+                                                                              q_Node2DatapoolL2, q_Node2DatapoolECeS,
+                                                                              q_Node2DatapoolECoS);
             }
          }
       }
@@ -3019,95 +3033,6 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
          c_Dialog->HideOverlay();
       }
       //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adapts the state of the COM datapools
-
-   If a specific COM datapool does not exist, it will be created
-
-   \param[in]  opc_Node             Current node
-   \param[in]  ou32_InterfaceIndex  Changed interface
-   \param[in]  oq_ComProtocolL2     Flag if Layer 2 COM datapool exist
-   \param[in]  oq_ComProtocolECeS   Flag if ECeS COM datapool exist
-   \param[in]  oq_ComProtocolECoS   Flag if ECoS COM datapool exist
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_ConfiugreComDatapools(const C_GiNode * const opc_Node, const uint32 ou32_InterfaceIndex,
-                                                const bool oq_ComProtocolL2, const bool oq_ComProtocolECeS,
-                                                const bool oq_ComProtocolECoS) const
-{
-   this->m_ConfiugreComDatapool(opc_Node, ou32_InterfaceIndex, C_OSCCanProtocol::eLAYER2, oq_ComProtocolL2);
-   this->m_ConfiugreComDatapool(opc_Node, ou32_InterfaceIndex, C_OSCCanProtocol::eECES, oq_ComProtocolECeS);
-   this->m_ConfiugreComDatapool(opc_Node, ou32_InterfaceIndex, C_OSCCanProtocol::eCAN_OPEN_SAFETY, oq_ComProtocolECoS);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyScene::m_ConfiugreComDatapool(const C_GiNode * const opc_Node, const uint32 ou32_InterfaceIndex,
-                                               const C_OSCCanProtocol::E_Type oe_ProtocolType,
-                                               const bool oq_Active) const
-{
-   uint32 u32_Counter;
-   const uint32 u32_NodeIndex = opc_Node->GetIndex();
-   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
-   bool q_ProtocolFound = false;
-   bool q_ActiveForInterface = false;
-
-   if (pc_OscNode != NULL)
-   {
-      for (u32_Counter = 0U; u32_Counter < pc_OscNode->c_ComProtocols.size(); ++u32_Counter)
-      {
-         const C_OSCCanProtocol & rc_Protocol = pc_OscNode->c_ComProtocols[u32_Counter];
-         if (rc_Protocol.e_Type == oe_ProtocolType)
-         {
-            // Protocol found
-            q_ProtocolFound = true;
-
-            tgl_assert(ou32_InterfaceIndex < rc_Protocol.c_ComMessages.size());
-            if (ou32_InterfaceIndex < rc_Protocol.c_ComMessages.size())
-            {
-               // State of the protocol for the interface
-               q_ActiveForInterface = rc_Protocol.c_ComMessages[ou32_InterfaceIndex].q_IsComProtocolUsedByInterface;
-            }
-            break;
-         }
-      }
-   }
-
-   // Using the implemented undo/redo commands of bus edit for handling the COM protocols.
-   // Only to prevent copied code, not using undo/redo here really.
-   if ((q_ProtocolFound == false) &&
-       (oq_Active == true))
-   {
-      // New COM datapool necessary
-      C_SdBueUnoBusProtNodeConnectAndCreateCommand c_Cmd(u32_NodeIndex, ou32_InterfaceIndex, oe_ProtocolType, NULL);
-      c_Cmd.redo();
-   }
-   else if (q_ProtocolFound == true)
-   {
-      if ((q_ActiveForInterface == true) &&
-          (oq_Active == false))
-      {
-         // Deactivate the COM protocol for this interface
-         C_SdBueUnoBusProtNodeDisconnectCommand c_Cmd(u32_NodeIndex, ou32_InterfaceIndex, oe_ProtocolType, NULL);
-         c_Cmd.redo();
-      }
-      else if ((q_ActiveForInterface == false) &&
-               (oq_Active == true))
-      {
-         // Activate the COM protocol for this interface
-         C_SdBueUnoBusProtNodeConnectCommand c_Cmd(u32_NodeIndex, ou32_InterfaceIndex, oe_ProtocolType, NULL);
-         c_Cmd.redo();
-      }
-      else
-      {
-         // Nothing to do
-      }
-   }
-   else
-   {
-      // Nothing to do
    }
 }
 
@@ -3307,23 +3232,29 @@ void C_SdTopologyScene::m_RevertBusConnectorNode(stw_opensyde_gui::C_GiLiBusConn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Connect bus connector to new node
 
-   \param[in,out]  opc_BusConnector    Current bus connector
-   \param[in,out]  opc_StartingNode    Previously connected node
-   \param[in,out]  opc_LastNode        New node
-   \param[in]      orc_ConnectionPos   Position of connection event
-   \param[in]      ors32_Interface     Newly used interface
-   \param[in]      oru8_NodeId         New node id
+   \param[in,out]  opc_BusConnector          Current bus connector
+   \param[in,out]  opc_StartingNode          Previously connected node
+   \param[in,out]  opc_LastNode              New node
+   \param[in]      orc_ConnectionPos         Position of connection event
+   \param[in]      ors32_Interface           Newly used interface
+   \param[in]      oru8_NodeId               New node id
+   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
+   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
+   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ReconnectBusConnectorNode(const stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                                                     const C_GiNode * const opc_StartingNode,
                                                     const C_GiNode * const opc_LastNode,
                                                     const QPointF & orc_ConnectionPos, const sint32 & ors32_Interface,
-                                                    const uint8 & oru8_NodeId)
+                                                    const uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
+                                                    const bool oq_ActivateDatapoolECeS,
+                                                    const bool oq_ActivateDatapoolECoS)
 {
    this->mc_UndoManager.DoReconnectNode(opc_BusConnector, opc_StartingNode, opc_LastNode,
                                         orc_ConnectionPos,
-                                        ors32_Interface, oru8_NodeId);
+                                        ors32_Interface, oru8_NodeId, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
+                                        oq_ActivateDatapoolECoS);
    m_UpdateHints();
 }
 
@@ -3350,23 +3281,29 @@ void C_SdTopologyScene::m_RevertBusConnectorBus(stw_opensyde_gui::C_GiLiBusConne
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Connect bus connector to new bus
 
-   \param[in,out]  opc_BusConnector    Current bus connector
-   \param[in,out]  opc_StartingBus     Previously connected bus
-   \param[in,out]  opc_LastBus         New bus
-   \param[in]      orc_ConnectionPos   Position of connection event
-   \param[in]      ors32_Interface     Newly used interface
-   \param[in]      oru8_NodeId         New node id
+   \param[in,out]  opc_BusConnector          Current bus connector
+   \param[in,out]  opc_StartingBus           Previously connected bus
+   \param[in,out]  opc_LastBus               New bus
+   \param[in]      orc_ConnectionPos         Position of connection event
+   \param[in]      ors32_Interface           Newly used interface
+   \param[in]      oru8_NodeId               New node id
+   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
+   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
+   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ReconnectBusConnectorBus(const stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                                                    const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                                    const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
                                                    const QPointF & orc_ConnectionPos, const sint32 & ors32_Interface,
-                                                   const uint8 & oru8_NodeId)
+                                                   const uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
+                                                   const bool oq_ActivateDatapoolECeS,
+                                                   const bool oq_ActivateDatapoolECoS)
 {
    this->mc_UndoManager.DoReconnectBus(opc_BusConnector, opc_StartingBus, opc_LastBus,
                                        orc_ConnectionPos,
-                                       ors32_Interface, oru8_NodeId);
+                                       ors32_Interface, oru8_NodeId, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
+                                       oq_ActivateDatapoolECoS);
    m_UpdateHints();
 }
 
@@ -3436,9 +3373,9 @@ void C_SdTopologyScene::m_InitNodeData(C_OSCNode & orc_OSCNode, const QString & 
    orc_OSCNode.pc_DeviceDefinition =
       C_OSCSystemDefinition::hc_Devices.LookForDevice(orc_NodeType.toStdString().c_str());
    tgl_assert(orc_OSCNode.pc_DeviceDefinition != NULL);
+   //default name: same as device type
    orc_OSCNode.c_Properties.c_Name = C_PuiSdHandler::h_AutomaticCStringAdaptation(
-      orc_OSCNode.pc_DeviceDefinition->GetDisplayName().c_str(), false).toStdString().c_str(); //default name: same as
-                                                                                               // device type
+      orc_OSCNode.pc_DeviceDefinition->GetDisplayName().c_str()).toStdString().c_str();
    orc_OSCNode.c_DeviceType = orc_NodeType.toStdString().c_str();
    //---Init COM IF Settings (BEFORE initial datablock)
    this->m_InitNodeComIfSettings(orc_OSCNode);

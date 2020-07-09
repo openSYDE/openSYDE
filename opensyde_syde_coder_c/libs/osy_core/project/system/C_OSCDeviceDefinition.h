@@ -38,13 +38,14 @@ public:
    bool IsDiagnosisAvailable(const C_OSCSystemBus::E_Type oe_Type) const;
    stw_scl::C_SCLString GetDisplayName(void) const;
 
-   stw_scl::C_SCLString c_DeviceName;        ///< full device name used for checks
-   stw_scl::C_SCLString c_DeviceNameAlias;   ///< full displayed name of device
-   stw_scl::C_SCLString c_DeviceDescription; ///< text describing device
-   stw_scl::C_SCLString c_ImagePath;         ///< path to file with image of device (e.g. JPG)
-   stw_scl::C_SCLString c_FilePath;          ///< used for service update package (#24474)
-   stw_types::uint8 u8_NumCanBusses;         ///< number of CAN busses present on device
-   stw_types::uint8 u8_NumEthernetBusses;    ///< number of ethernet interfaces present on device
+   stw_scl::C_SCLString c_DeviceName;                      ///< full device name used for checks
+   stw_scl::C_SCLString c_DeviceNameAlias;                 ///< full displayed name of device
+   std::vector<stw_scl::C_SCLString> c_OtherAcceptedNames; ///< Other compatible names for this device
+   stw_scl::C_SCLString c_DeviceDescription;               ///< text describing device
+   stw_scl::C_SCLString c_ImagePath;                       ///< path to file with image of device (e.g. JPG)
+   stw_scl::C_SCLString c_FilePath;                        ///< used for service update package (#24474)
+   stw_types::uint8 u8_NumCanBusses;                       ///< number of CAN busses present on device
+   stw_types::uint8 u8_NumEthernetBusses;                  ///< number of ethernet interfaces present on device
 
    ///is programming supported enabled?
    bool q_ProgrammingSupport;
@@ -66,8 +67,23 @@ public:
    bool q_FlashloaderOpenSydeEthernet;
    ///is the device file based or address based?
    bool q_FlashloaderOpenSydeIsFileBased;
-   ///the minimum time in ms the node needs to restart from application to the Flashloader. Default is 500ms.
-   stw_types::uint32 u32_FlashloaderResetWaitTime;
+
+   ///minimal times in ms to reset from the application to the Flashloader or reset the Flashloader itself.
+   ///possible scenario: Reset from Application to Flashloader or from Flashloader to Flashloader
+   ///no communication relevant configuration was changed.
+   stw_types::uint32 u32_FlashloaderResetWaitTimeNoChangesCan;      ///<CAN is used. default time is 1000ms
+   stw_types::uint32 u32_FlashloaderResetWaitTimeNoChangesEthernet; ///<Eth is used. default time is 5500ms
+
+   ///Single scenario: From Flashloader to Flashloader
+   ///no fundamental communication relevant configuration was changed (Bus-Id or Node Id).
+   stw_types::uint32 u32_FlashloaderResetWaitTimeNoFundamentalChangesCan;      ///<CAN is used. default time is 1000ms
+   stw_types::uint32 u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet; ///<Eth is used. default time is 5500ms
+
+   /// Single scenario: From Flashloader to Flashloader
+   ///fundamental communication relevant configuration was changed (CAN bitrate or IP address).
+   stw_types::uint32 u32_FlashloaderResetWaitTimeFundamentalChangesCan;      ///<CAN is used. default time is 1000ms
+   stw_types::uint32 u32_FlashloaderResetWaitTimeFundamentalChangesEthernet; ///<Eth is used. default time is 5500ms
+
    ///the maximum time in ms it can take to erase one continuous area in flash
    stw_types::uint32 u32_FlashloaderOpenSydeRequestDownloadTimeout;
    ///the maximum time in ms it can take to write up to 4kB of data to flash

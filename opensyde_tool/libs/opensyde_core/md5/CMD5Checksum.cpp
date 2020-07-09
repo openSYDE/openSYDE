@@ -1,206 +1,326 @@
-// MD5Checksum.cpp: implementation of the MD5Checksum class.
-//
-//////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       MD5 hashing class
 
+   ANSI C++ MD5 hashing class.
+   For details see documentation in .h file.
 
-/****************************************************************************************
-This software is derived from the RSA Data Security, Inc. MD5 Message-Digest Algorithm. 
-Incorporation of this statement is a condition of use; please see the RSA
-Data Security Inc copyright notice below:-
-
-Copyright (C) 1990-2, RSA Data Security, Inc. Created 1990. All
-rights reserved.
-
-RSA Data Security, Inc. makes no representations concerning either
-the merchantability of this software or the suitability of this
-software for any particular purpose. It is provided "as is"
-without express or implied warranty of any kind.
-
-These notices must be retained in any copies of any part of this
-documentation and/or software.
-
-Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
-rights reserved.
-License to copy and use this software is granted provided that it
-is identified as the "RSA Data Security, Inc. MD5 Message-Digest
-Algorithm" in all material mentioning or referencing this software
-or this function.
-License is also granted to make and use derivative works provided
-that such works are identified as "derived from the RSA Data
-Security, Inc. MD5 Message-Digest Algorithm" in all material
-mentioning or referencing the derived work.
-RSA Data Security, Inc. makes no representations concerning either
-the merchantability of this software or the suitability of this
-software for any particular purpose. It is provided "as is"
-without express or implied warranty of any kind.
-
-These notices must be retained in any copies of any part of this
-documentation and/or software.
-*****************************************************************************************/
-
-/****************************************************************************************
-This implementation of the RSA MD5 Algorithm was written by Langfine Ltd 
-(www.langfine.com).
-
-Langfine Ltd makes no representations concerning either
-the merchantability of this software or the suitability of this
-software for any particular purpose. It is provided "as is"
-without express or implied warranty of any kind.
-
-In addition to the above, Langfine make no warrant or assurances regarding the 
-accuracy of this implementation of the MD5 checksum algorithm nor any assurances regarding
-its suitability for any purposes.
-
-This implementation may be used freely provided that Langfine is credited
-in a copyright or similar notices (eg, RSA MD5 Algorithm implemented by Langfine
-Ltd.) and provided that the RSA Data Security notices are complied with.
+   \copyright   Copyright 2020 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
+//----------------------------------------------------------------------------------------------------------------------
 
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
 
 #include <cstring>
 #include "stwtypes.h"
+#include "stwerrors.h"
 #include "CMD5Checksum.h"
 #include "CSCLString.h"
 
-using namespace stw_md5;
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
+using namespace stw_errors;
+using namespace stw_md5;
 using namespace stw_scl;
 
-//STW: moved constants here as they are not needed globally
-//MD5ChecksumDefines.h : MD5 Checksum constants
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-//Magic initialization constants
-#define MD5_INIT_STATE_0 0x67452301
-#define MD5_INIT_STATE_1 0xefcdab89
-#define MD5_INIT_STATE_2 0x98badcfe
-#define MD5_INIT_STATE_3 0x10325476
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-//Constants for Transform routine.
-#define MD5_S11  7
-#define MD5_S12 12
-#define MD5_S13 17
-#define MD5_S14 22
-#define MD5_S21  5
-#define MD5_S22  9
-#define MD5_S23 14
-#define MD5_S24 20
-#define MD5_S31  4
-#define MD5_S32 11
-#define MD5_S33 16
-#define MD5_S34 23
-#define MD5_S41  6
-#define MD5_S42 10
-#define MD5_S43 15
-#define MD5_S44 21
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-//Transformation Constants - Round 1
-#define MD5_T01  0xd76aa478 //Transformation Constant 1 
-#define MD5_T02  0xe8c7b756 //Transformation Constant 2
-#define MD5_T03  0x242070db //Transformation Constant 3
-#define MD5_T04  0xc1bdceee //Transformation Constant 4
-#define MD5_T05  0xf57c0faf //Transformation Constant 5
-#define MD5_T06  0x4787c62a //Transformation Constant 6
-#define MD5_T07  0xa8304613 //Transformation Constant 7
-#define MD5_T08  0xfd469501 //Transformation Constant 8
-#define MD5_T09  0x698098d8 //Transformation Constant 9
-#define MD5_T10  0x8b44f7af //Transformation Constant 10
-#define MD5_T11  0xffff5bb1 //Transformation Constant 11
-#define MD5_T12  0x895cd7be //Transformation Constant 12
-#define MD5_T13  0x6b901122 //Transformation Constant 13
-#define MD5_T14  0xfd987193 //Transformation Constant 14
-#define MD5_T15  0xa679438e //Transformation Constant 15
-#define MD5_T16  0x49b40821 //Transformation Constant 16
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-//Transformation Constants - Round 2
-#define MD5_T17  0xf61e2562 //Transformation Constant 17
-#define MD5_T18  0xc040b340 //Transformation Constant 18
-#define MD5_T19  0x265e5a51 //Transformation Constant 19
-#define MD5_T20  0xe9b6c7aa //Transformation Constant 20
-#define MD5_T21  0xd62f105d //Transformation Constant 21
-#define MD5_T22  0x02441453 //Transformation Constant 22
-#define MD5_T23  0xd8a1e681 //Transformation Constant 23
-#define MD5_T24  0xe7d3fbc8 //Transformation Constant 24
-#define MD5_T25  0x21e1cde6 //Transformation Constant 25
-#define MD5_T26  0xc33707d6 //Transformation Constant 26
-#define MD5_T27  0xf4d50d87 //Transformation Constant 27
-#define MD5_T28  0x455a14ed //Transformation Constant 28
-#define MD5_T29  0xa9e3e905 //Transformation Constant 29
-#define MD5_T30  0xfcefa3f8 //Transformation Constant 30
-#define MD5_T31  0x676f02d9 //Transformation Constant 31
-#define MD5_T32  0x8d2a4c8a //Transformation Constant 32
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-//Transformation Constants - Round 3
-#define MD5_T33  0xfffa3942 //Transformation Constant 33
-#define MD5_T34  0x8771f681 //Transformation Constant 34
-#define MD5_T35  0x6d9d6122 //Transformation Constant 35
-#define MD5_T36  0xfde5380c //Transformation Constant 36
-#define MD5_T37  0xa4beea44 //Transformation Constant 37
-#define MD5_T38  0x4bdecfa9 //Transformation Constant 38
-#define MD5_T39  0xf6bb4b60 //Transformation Constant 39
-#define MD5_T40  0xbebfbc70 //Transformation Constant 40
-#define MD5_T41  0x289b7ec6 //Transformation Constant 41
-#define MD5_T42  0xeaa127fa //Transformation Constant 42
-#define MD5_T43  0xd4ef3085 //Transformation Constant 43
-#define MD5_T44  0x04881d05 //Transformation Constant 44
-#define MD5_T45  0xd9d4d039 //Transformation Constant 45
-#define MD5_T46  0xe6db99e5 //Transformation Constant 46
-#define MD5_T47  0x1fa27cf8 //Transformation Constant 47
-#define MD5_T48  0xc4ac5665 //Transformation Constant 48
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//Transformation Constants - Round 4
-#define MD5_T49  0xf4292244 //Transformation Constant 49
-#define MD5_T50  0x432aff97 //Transformation Constant 50
-#define MD5_T51  0xab9423a7 //Transformation Constant 51
-#define MD5_T52  0xfc93a039 //Transformation Constant 52
-#define MD5_T53  0x655b59c3 //Transformation Constant 53
-#define MD5_T54  0x8f0ccc92 //Transformation Constant 54
-#define MD5_T55  0xffeff47d //Transformation Constant 55
-#define MD5_T56  0x85845dd1 //Transformation Constant 56
-#define MD5_T57  0x6fa87e4f //Transformation Constant 57
-#define MD5_T58  0xfe2ce6e0 //Transformation Constant 58
-#define MD5_T59  0xa3014314 //Transformation Constant 59
-#define MD5_T60  0x4e0811a1 //Transformation Constant 60
-#define MD5_T61  0xf7537e82 //Transformation Constant 61
-#define MD5_T62  0xbd3af235 //Transformation Constant 62
-#define MD5_T63  0x2ad7d2bb //Transformation Constant 63
-#define MD5_T64  0xeb86d391 //Transformation Constant 64
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Preform MD5 compression
 
-
-//Null data (except for first BYTE) used to finalise the checksum calculation
-static const unsigned char PADDING[64] =
+   \param[in,out]  opc_HashState   hash engine state
+   \param[in]      opu8_Buffer     input buffer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void CMD5Checksum::mh_md5_compress(C_HashState * const opc_HashState, const uint8 * opu8_Buffer)
 {
-  0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+#define LOAD32L(x, y)                            \
+   x = ((uint32)((y)[3] & 255) << 24) | \
+       ((uint32)((y)[2] & 255) << 16) | \
+       ((uint32)((y)[1] & 255) << 8)  | \
+       ((uint32)((y)[0] & 255));
 
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::GetMD5
-DETAILS:		static, public
-DESCRIPTION:	Gets the MD5 checksum for a specified file
-RETURNS:		CString : the hexadecimal MD5 checksum for the specified file
-ARGUMENTS:		CString& strFilePath : the full pathname of the specified file
-NOTES:			Provides an interface to the CMD5Checksum class. 'strFilePath' name should 
-				hold the full pathname of the file, eg C:\My Documents\Arcticle.txt.
-				NB.
-                STW: if there are any problems the function will return an empty string.
-*****************************************************************************************/
-C_SCLString CMD5Checksum::GetMD5(const C_SCLString & strFilePath)
+#define F(x, y, z)  (z ^ (x & (y ^ z)))
+#define G(x, y, z)  (y ^ (z & (y ^ x)))
+#define H(x, y, z)  (x ^ y ^ z)
+#define I(x, y, z)  (y ^ (x | (~z)))
+
+#define ROLc(x, y) ((((uint32)(x) << (uint32)((y) & 31)) | \
+                     (((uint32)(x) & 0xFFFFFFFFUL) >> (uint32)((32 - ((y) & 31)) & 31))) & \
+                    0xFFFFFFFFUL)
+
+#define FF(a, b, c, d, M, s, t) \
+   a = (a + F(b, c, d) + M + t); a = ROLc(a, s) + b;
+
+#define GG(a, b, c, d, M, s, t) \
+   a = (a + G(b, c, d) + M + t); a = ROLc(a, s) + b;
+
+#define HH(a, b, c, d, M, s, t) \
+   a = (a + H(b, c, d) + M + t); a = ROLc(a, s) + b;
+
+#define II(a, b, c, d, M, s, t) \
+   a = (a + I(b, c, d) + M + t); a = ROLc(a, s) + b;
+
+   uint32 au32_W[16];
+   uint32 u32_A;
+   uint32 u32_B;
+   uint32 u32_C;
+   uint32 u32_D;
+
+   /* copy the state into 512-bits into W[0..15] */
+   for (uint32 u32_I = 0; u32_I < 16; u32_I++)
+   {
+      LOAD32L(au32_W[u32_I], &opu8_Buffer[4 * u32_I]);
+   }
+
+   /* copy state */
+   u32_A = opc_HashState->au32_State[0];
+   u32_B = opc_HashState->au32_State[1];
+   u32_C = opc_HashState->au32_State[2];
+   u32_D = opc_HashState->au32_State[3];
+
+   FF(u32_A, u32_B, u32_C, u32_D, au32_W[0], 7, 0xd76aa478UL)
+   FF(u32_D, u32_A, u32_B, u32_C, au32_W[1], 12, 0xe8c7b756UL)
+   FF(u32_C, u32_D, u32_A, u32_B, au32_W[2], 17, 0x242070dbUL)
+   FF(u32_B, u32_C, u32_D, u32_A, au32_W[3], 22, 0xc1bdceeeUL)
+   FF(u32_A, u32_B, u32_C, u32_D, au32_W[4], 7, 0xf57c0fafUL)
+   FF(u32_D, u32_A, u32_B, u32_C, au32_W[5], 12, 0x4787c62aUL)
+   FF(u32_C, u32_D, u32_A, u32_B, au32_W[6], 17, 0xa8304613UL)
+   FF(u32_B, u32_C, u32_D, u32_A, au32_W[7], 22, 0xfd469501UL)
+   FF(u32_A, u32_B, u32_C, u32_D, au32_W[8], 7, 0x698098d8UL)
+   FF(u32_D, u32_A, u32_B, u32_C, au32_W[9], 12, 0x8b44f7afUL)
+   FF(u32_C, u32_D, u32_A, u32_B, au32_W[10], 17, 0xffff5bb1UL)
+   FF(u32_B, u32_C, u32_D, u32_A, au32_W[11], 22, 0x895cd7beUL)
+   FF(u32_A, u32_B, u32_C, u32_D, au32_W[12], 7, 0x6b901122UL)
+   FF(u32_D, u32_A, u32_B, u32_C, au32_W[13], 12, 0xfd987193UL)
+   FF(u32_C, u32_D, u32_A, u32_B, au32_W[14], 17, 0xa679438eUL)
+   FF(u32_B, u32_C, u32_D, u32_A, au32_W[15], 22, 0x49b40821UL)
+   GG(u32_A, u32_B, u32_C, u32_D, au32_W[1], 5, 0xf61e2562UL)
+   GG(u32_D, u32_A, u32_B, u32_C, au32_W[6], 9, 0xc040b340UL)
+   GG(u32_C, u32_D, u32_A, u32_B, au32_W[11], 14, 0x265e5a51UL)
+   GG(u32_B, u32_C, u32_D, u32_A, au32_W[0], 20, 0xe9b6c7aaUL)
+   GG(u32_A, u32_B, u32_C, u32_D, au32_W[5], 5, 0xd62f105dUL)
+   GG(u32_D, u32_A, u32_B, u32_C, au32_W[10], 9, 0x02441453UL)
+   GG(u32_C, u32_D, u32_A, u32_B, au32_W[15], 14, 0xd8a1e681UL)
+   GG(u32_B, u32_C, u32_D, u32_A, au32_W[4], 20, 0xe7d3fbc8UL)
+   GG(u32_A, u32_B, u32_C, u32_D, au32_W[9], 5, 0x21e1cde6UL)
+   GG(u32_D, u32_A, u32_B, u32_C, au32_W[14], 9, 0xc33707d6UL)
+   GG(u32_C, u32_D, u32_A, u32_B, au32_W[3], 14, 0xf4d50d87UL)
+   GG(u32_B, u32_C, u32_D, u32_A, au32_W[8], 20, 0x455a14edUL)
+   GG(u32_A, u32_B, u32_C, u32_D, au32_W[13], 5, 0xa9e3e905UL)
+   GG(u32_D, u32_A, u32_B, u32_C, au32_W[2], 9, 0xfcefa3f8UL)
+   GG(u32_C, u32_D, u32_A, u32_B, au32_W[7], 14, 0x676f02d9UL)
+   GG(u32_B, u32_C, u32_D, u32_A, au32_W[12], 20, 0x8d2a4c8aUL)
+   HH(u32_A, u32_B, u32_C, u32_D, au32_W[5], 4, 0xfffa3942UL)
+   HH(u32_D, u32_A, u32_B, u32_C, au32_W[8], 11, 0x8771f681UL)
+   HH(u32_C, u32_D, u32_A, u32_B, au32_W[11], 16, 0x6d9d6122UL)
+   HH(u32_B, u32_C, u32_D, u32_A, au32_W[14], 23, 0xfde5380cUL)
+   HH(u32_A, u32_B, u32_C, u32_D, au32_W[1], 4, 0xa4beea44UL)
+   HH(u32_D, u32_A, u32_B, u32_C, au32_W[4], 11, 0x4bdecfa9UL)
+   HH(u32_C, u32_D, u32_A, u32_B, au32_W[7], 16, 0xf6bb4b60UL)
+   HH(u32_B, u32_C, u32_D, u32_A, au32_W[10], 23, 0xbebfbc70UL)
+   HH(u32_A, u32_B, u32_C, u32_D, au32_W[13], 4, 0x289b7ec6UL)
+   HH(u32_D, u32_A, u32_B, u32_C, au32_W[0], 11, 0xeaa127faUL)
+   HH(u32_C, u32_D, u32_A, u32_B, au32_W[3], 16, 0xd4ef3085UL)
+   HH(u32_B, u32_C, u32_D, u32_A, au32_W[6], 23, 0x04881d05UL)
+   HH(u32_A, u32_B, u32_C, u32_D, au32_W[9], 4, 0xd9d4d039UL)
+   HH(u32_D, u32_A, u32_B, u32_C, au32_W[12], 11, 0xe6db99e5UL)
+   HH(u32_C, u32_D, u32_A, u32_B, au32_W[15], 16, 0x1fa27cf8UL)
+   HH(u32_B, u32_C, u32_D, u32_A, au32_W[2], 23, 0xc4ac5665UL)
+   II(u32_A, u32_B, u32_C, u32_D, au32_W[0], 6, 0xf4292244UL)
+   II(u32_D, u32_A, u32_B, u32_C, au32_W[7], 10, 0x432aff97UL)
+   II(u32_C, u32_D, u32_A, u32_B, au32_W[14], 15, 0xab9423a7UL)
+   II(u32_B, u32_C, u32_D, u32_A, au32_W[5], 21, 0xfc93a039UL)
+   II(u32_A, u32_B, u32_C, u32_D, au32_W[12], 6, 0x655b59c3UL)
+   II(u32_D, u32_A, u32_B, u32_C, au32_W[3], 10, 0x8f0ccc92UL)
+   II(u32_C, u32_D, u32_A, u32_B, au32_W[10], 15, 0xffeff47dUL)
+   II(u32_B, u32_C, u32_D, u32_A, au32_W[1], 21, 0x85845dd1UL)
+   II(u32_A, u32_B, u32_C, u32_D, au32_W[8], 6, 0x6fa87e4fUL)
+   II(u32_D, u32_A, u32_B, u32_C, au32_W[15], 10, 0xfe2ce6e0UL)
+   II(u32_C, u32_D, u32_A, u32_B, au32_W[6], 15, 0xa3014314UL)
+   II(u32_B, u32_C, u32_D, u32_A, au32_W[13], 21, 0x4e0811a1UL)
+   II(u32_A, u32_B, u32_C, u32_D, au32_W[4], 6, 0xf7537e82UL)
+   II(u32_D, u32_A, u32_B, u32_C, au32_W[11], 10, 0xbd3af235UL)
+   II(u32_C, u32_D, u32_A, u32_B, au32_W[2], 15, 0x2ad7d2bbUL)
+   II(u32_B, u32_C, u32_D, u32_A, au32_W[9], 21, 0xeb86d391UL)
+
+   opc_HashState->au32_State[0] = opc_HashState->au32_State[0] + u32_A;
+   opc_HashState->au32_State[1] = opc_HashState->au32_State[1] + u32_B;
+   opc_HashState->au32_State[2] = opc_HashState->au32_State[2] + u32_C;
+   opc_HashState->au32_State[3] = opc_HashState->au32_State[3] + u32_D;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize the hash state
+
+   \param[in,out]  opc_HashState   hash engine state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void CMD5Checksum::mh_md5_init(C_HashState * const opc_HashState)
 {
-	//open the file as a binary file in readonly mode, denying write access
-    FILE * pt_File;
-    C_SCLString c_Return;
+   opc_HashState->au32_State[0] = 0x67452301UL;
+   opc_HashState->au32_State[1] = 0xefcdab89UL;
+   opc_HashState->au32_State[2] = 0x98badcfeUL;
+   opc_HashState->au32_State[3] = 0x10325476UL;
+   opc_HashState->u32_CurLen = 0;
+   opc_HashState->u64_Length = 0;
+}
 
-    pt_File = fopen(strFilePath.c_str(), "rb");
-    if (pt_File == NULL)
-    {
-       return "";
-    }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Process a block of memory though the hash
+
+   \param[in,out]  opc_HashState   hash engine state
+   \param[in]    opu8_Input        The data to hash
+   \param[in]    ou32_InputLength  The length of the data (bytes)
+
+   \return
+   C_NO_ERR  successful
+   C_CONFIG  inconsistent hash engine status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 CMD5Checksum::mh_md5_process(C_HashState * const opc_HashState, const uint8 * opu8_Input,
+                                    uint32 ou32_InputLength)
+{
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+   if (opc_HashState->u32_CurLen > sizeof(opc_HashState->au8_Buffer))
+   {
+      return C_CONFIG;
+   }
+   if ((opc_HashState->u64_Length + ou32_InputLength) < opc_HashState->u64_Length)
+   {
+      return C_CONFIG;
+   }
+   while (ou32_InputLength > 0)
+   {
+      if ((opc_HashState->u32_CurLen == 0) && (ou32_InputLength >= 64))
+      {
+         mh_md5_compress(opc_HashState, opu8_Input);
+         opc_HashState->u64_Length += (64 * 8);
+         opu8_Input             += 64;
+         ou32_InputLength       -= 64;
+      }
+      else
+      {
+         uint32 u32_CurrentSize;
+         u32_CurrentSize = MIN(ou32_InputLength, (64 - opc_HashState->u32_CurLen));
+         memcpy(&opc_HashState->au8_Buffer[opc_HashState->u32_CurLen], opu8_Input, (size_t)u32_CurrentSize);
+         opc_HashState->u32_CurLen += u32_CurrentSize;
+         opu8_Input             += u32_CurrentSize;
+         ou32_InputLength       -= u32_CurrentSize;
+         if (opc_HashState->u32_CurLen == 64)
+         {
+            mh_md5_compress(opc_HashState, &opc_HashState->au8_Buffer[0]);
+            opc_HashState->u64_Length += (8 * 64);
+            opc_HashState->u32_CurLen = 0;
+         }
+      }
+   }
+   return C_NO_ERR;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Terminate the hash to get the digest
+
+   \param[in,out]  opc_HashState   hash engine state
+   \param[out]     opu8_Output     The destination of the hash (16 bytes)
+
+   \return
+   C_NO_ERR  successful
+   C_CONFIG  inconsistent hash engine status
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 CMD5Checksum::mh_md5_done(C_HashState * const opc_HashState, uint8 * const opu8_Output)
+{
+#define STORE32L(x, y)                                                                     \
+   (y)[3] = static_cast<uint8>(((x) >> 24) & 255); (y)[2] = static_cast<uint8>(((x) >> 16) & 255);   \
+   (y)[1] = static_cast<uint8>(((x) >> 8) & 255); (y)[0] = static_cast<uint8>((x) & 255);
+
+#define STORE64L(x, y)                                                                     \
+   (y)[7] = static_cast<uint8>(((x) >> 56) & 255); (y)[6] = static_cast<uint8>(((x) >> 48) & 255);   \
+   (y)[5] = static_cast<uint8>(((x) >> 40) & 255); (y)[4] = static_cast<uint8>(((x) >> 32) & 255);   \
+   (y)[3] = static_cast<uint8>(((x) >> 24) & 255); (y)[2] = static_cast<uint8>(((x) >> 16) & 255);   \
+   (y)[1] = static_cast<uint8>(((x) >> 8) & 255); (y)[0] = static_cast<uint8>((x) & 255);
+
+   if (opc_HashState->u32_CurLen >= sizeof(opc_HashState->au8_Buffer))
+   {
+      return C_CONFIG;
+   }
+
+   /* increase the length of the message */
+   opc_HashState->u64_Length += opc_HashState->u32_CurLen * 8;
+
+   /* append the '1' bit */
+   opc_HashState->au8_Buffer[opc_HashState->u32_CurLen++] = (unsigned char)0x80;
+
+   /* if the length is currently above 56 bytes we append zeros
+    * then compress.  Then we can fall back to padding zeros and length
+    * encoding like normal.
+    */
+   if (opc_HashState->u32_CurLen > 56)
+   {
+      while (opc_HashState->u32_CurLen < 64)
+      {
+         opc_HashState->au8_Buffer[opc_HashState->u32_CurLen++] = 0;
+      }
+      mh_md5_compress(opc_HashState, opc_HashState->au8_Buffer);
+      opc_HashState->u32_CurLen = 0;
+   }
+
+   /* pad upto 56 bytes of zeroes */
+   while (opc_HashState->u32_CurLen < 56)
+   {
+      opc_HashState->au8_Buffer[opc_HashState->u32_CurLen++] = 0;
+   }
+
+   /* store length */
+   STORE64L(opc_HashState->u64_Length, opc_HashState->au8_Buffer + 56);
+   mh_md5_compress(opc_HashState, opc_HashState->au8_Buffer);
+
+   /* copy output */
+   for (uint8 u8_Word = 0; u8_Word < 4; u8_Word++)
+   {
+      STORE32L(opc_HashState->au32_State[u8_Word], &opu8_Output[4 * u8_Word]);
+   }
+   return C_NO_ERR;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Get MD5 of file.
+
+   \param[in]  orc_FilePath   absolute or relative path of file
+
+   \return
+   Calculated MD5 (empty string if there are problems)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString CMD5Checksum::GetMD5(const C_SCLString & orc_FilePath)
+{
+   //open the file as a binary file in readonly mode, denying write access
+   FILE * pt_File;
+   C_SCLString c_Return;
+
+   pt_File = fopen(orc_FilePath.c_str(), "rb");
+   if (pt_File == NULL)
+   {
+      return "";
+   }
 
    //the file has been successfully opened, so now get and return its checksum
    c_Return = GetMD5(pt_File);
@@ -208,432 +328,82 @@ C_SCLString CMD5Checksum::GetMD5(const C_SCLString & strFilePath)
    return c_Return;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Get MD5 of file.
 
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::GetMD5
-DETAILS:		static, public
-DESCRIPTION:	Gets the MD5 checksum for a specified file
-RETURNS:		CString : the hexadecimal MD5 checksum for the specified file
-ARGUMENTS:		CFile& File : the specified file
-NOTES:			Provides an interface to the CMD5Checksum class. 'File' should be open in 
-				binary readonly mode before calling this function. 
-                STW: if there are any problems the function will return an empty string.
-*****************************************************************************************/
-C_SCLString CMD5Checksum::GetMD5(FILE * const opt_File)
+   \param[in]  opt_File   C style file handle of file
+
+   \return
+   Calculated MD5 (empty string if there are problems)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString CMD5Checksum::GetMD5(std::FILE * const opt_File)
 {
-   CMD5Checksum MD5Checksum;		//checksum object
-   int nLength;				//number of bytes read from the file
-   const int nBufferSize = 1024;	//checksum the file in blocks of 1024 bytes
-   uint8 Buffer[nBufferSize];		//buffer for data read from the file
+   sintn sn_BlockSize;
+   const uintn un_BufferSize = 4096; //checksum the file in blocks of 4096 bytes
+   uint8 au8_Data[un_BufferSize];    //buffer for data read from the file
+   C_SCLString c_StrMD5;
+   C_HashState c_Hash;
+   uint8 au8_Result[16];
 
    if (opt_File == NULL)
    {
       return "";
    }
 
-   //checksum the file in blocks of 1024 bytes
+   mh_md5_init(&c_Hash);
 
-   while ((nLength = fread(Buffer, 1, nBufferSize, opt_File)) > 0)
+   //checksum the file in individual blocks
+   while (1)
    {
-      MD5Checksum.Update( Buffer, nLength );
+      sn_BlockSize = fread(&au8_Data[0], 1, un_BufferSize, opt_File);
+      if (sn_BlockSize <= 0)
+      {
+         break;
+      }
+      //we have data: process it
+      mh_md5_process(&c_Hash, &au8_Data[0], sn_BlockSize);
    }
 
-   //finalise the checksum and return it
-   return MD5Checksum.Final();
-}
+   mh_md5_done(&c_Hash, au8_Result);
 
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::GetMD5
-DETAILS:		static, public
-DESCRIPTION:	Gets the MD5 checksum for data in a BYTE array
-RETURNS:		CString : the hexadecimal MD5 checksum for the specified data
-ARGUMENTS:		BYTE* pBuf  :	pointer to the BYTE array
-				UINT nLength :	number of BYTEs of data to be checksumed
-NOTES:			Provides an interface to the CMD5Checksum class. Any data that can
-				be cast to a BYTE array of known length can be checksummed by this
-				function. Typically, CString and char arrays will be checksumed, 
-				although this function can be used to check the integrity of any BYTE array. 
-				A buffer of zero length can be checksummed; all buffers of zero length 
-				will return the same checksum. 
-*****************************************************************************************/
-C_SCLString CMD5Checksum::GetMD5(const uint8 * const pBuf, const uint32 nLength)
-{
-	//entry invariants
-//	AfxIsValidAddress(pBuf,nLength,FALSE);
-
-	//calculate and return the checksum
-	CMD5Checksum MD5Checksum;
-	MD5Checksum.Update( pBuf, nLength );
-	return MD5Checksum.Final();
-}
-
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::RotateLeft
-DETAILS:		private
-DESCRIPTION:	Rotates the bits in a 32 bit DWORD left by a specified amount
-RETURNS:		The rotated DWORD 
-ARGUMENTS:		DWORD x : the value to be rotated
-				int n   : the number of bits to rotate by
-*****************************************************************************************/
-uint32 CMD5Checksum::RotateLeft(uint32 x, sint32 n)
-{
-	//rotate and return x
-	return (x << n) | (x >> (32-n));
-}
-
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::FF
-DETAILS:		protected
-DESCRIPTION:	Implementation of basic MD5 transformation algorithm
-RETURNS:		none
-ARGUMENTS:		DWORD &A, B, C, D : Current (partial) checksum
-				DWORD X           : Input data
-				DWORD S			  : MD5_SXX Transformation constant
-				DWORD T			  :	MD5_TXX Transformation constant
-NOTES:			None
-*****************************************************************************************/
-void CMD5Checksum::FF(uint32& A, uint32 B, uint32 C, uint32 D, uint32 X, uint32 S, uint32 T)
-{
-	uint32 F = (B & C) | (~B & D);
-	A += F + X + T;
-	A = RotateLeft(A, S);
-	A += B;
-}
-
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::GG
-DETAILS:		protected
-DESCRIPTION:	Implementation of basic MD5 transformation algorithm
-RETURNS:		none
-ARGUMENTS:		DWORD &A, B, C, D : Current (partial) checksum
-				DWORD X           : Input data
-				DWORD S			  : MD5_SXX Transformation constant
-				DWORD T			  :	MD5_TXX Transformation constant
-NOTES:			None
-*****************************************************************************************/
-void CMD5Checksum::GG( uint32& A, uint32 B, uint32 C, uint32 D, uint32 X, uint32 S, uint32 T)
-{
-	uint32 G = (B & D) | (C & ~D);
-	A += G + X + T;
-	A = RotateLeft(A, S);
-	A += B;
-}
-
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::HH
-DETAILS:		protected
-DESCRIPTION:	Implementation of basic MD5 transformation algorithm
-RETURNS:		none
-ARGUMENTS:		DWORD &A, B, C, D : Current (partial) checksum
-				DWORD X           : Input data
-				DWORD S			  : MD5_SXX Transformation constant
-				DWORD T			  :	MD5_TXX Transformation constant
-NOTES:			None
-*****************************************************************************************/
-void CMD5Checksum::HH( uint32& A, uint32 B, uint32 C, uint32 D, uint32 X, uint32 S, uint32 T)
-{
-	uint32 H = (B ^ C ^ D);
-	A += H + X + T;
-	A = RotateLeft(A, S);
-	A += B;
-}
-
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::II
-DETAILS:		protected
-DESCRIPTION:	Implementation of basic MD5 transformation algorithm
-RETURNS:		none
-ARGUMENTS:		DWORD &A, B, C, D : Current (partial) checksum
-				DWORD X           : Input data
-				DWORD S			  : MD5_SXX Transformation constant
-				DWORD T			  :	MD5_TXX Transformation constant
-NOTES:			None
-*****************************************************************************************/
-void CMD5Checksum::II( uint32& A, uint32 B, uint32 C, uint32 D, uint32 X, uint32 S, uint32 T)
-{
-	uint32 I = (C ^ (B | ~D));
-	A += I + X + T;
-	A = RotateLeft(A, S);
-	A += B;
-}
-
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::ByteToDWord
-DETAILS:		private
-DESCRIPTION:	Transfers the data in an 8 bit array to a 32 bit array
-RETURNS:		void
-ARGUMENTS:		DWORD* Output : the 32 bit (unsigned long) destination array 
-				BYTE* Input	  : the 8 bit (unsigned char) source array
-				UINT nLength  : the number of 8 bit data items in the source array
-NOTES:			Four BYTES from the input array are transferred to each DWORD entry
-				of the output array. The first BYTE is transferred to the bits (0-7) 
-				of the output DWORD, the second BYTE to bits 8-15 etc.
-				The algorithm assumes that the input array is a multiple of 4 bytes long
-				so that there is a perfect fit into the array of 32 bit words.
-*****************************************************************************************/
-void CMD5Checksum::ByteToDWord(uint32* Output, const uint8* Input, uint32 nLength)
-{
-	//initialisations
-	uint32 i=0;	//index to Output array
-	uint32 j=0;	//index to Input array
-
-	//transfer the data by shifting and copying
-	for ( ; j < nLength; i++, j += 4)
-	{
-		Output[i] = ((uint32)Input[j])			|
-					(((uint32)Input[j+1]) << 8)	|
-					(((uint32)Input[j+2]) << 16) |
-					(((uint32)Input[j+3]) << 24);
-	}
-}
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::Transform
-DETAILS:		protected
-DESCRIPTION:	MD5 basic transformation algorithm;  transforms 'm_lMD5'
-RETURNS:		void
-ARGUMENTS:		BYTE Block[64]
-NOTES:			An MD5 checksum is calculated by four rounds of 'Transformation'.
-				The MD5 checksum currently held in m_lMD5 is merged by the 
-				transformation process with data passed in 'Block'.  
-*****************************************************************************************/
-void CMD5Checksum::Transform(const uint8 Block[64])
-{
-	//initialise local data with current checksum
-	uint32 a = m_lMD5[0];
-	uint32 b = m_lMD5[1];
-	uint32 c = m_lMD5[2];
-	uint32 d = m_lMD5[3];
-
-	//copy BYTES from input 'Block' to an array of ULONGS 'X'
-	uint32 X[16];
-	ByteToDWord( X, Block, 64 );
-
-	//Perform Round 1 of the transformation
-	FF (a, b, c, d, X[ 0], MD5_S11, MD5_T01); 
-	FF (d, a, b, c, X[ 1], MD5_S12, MD5_T02); 
-	FF (c, d, a, b, X[ 2], MD5_S13, MD5_T03); 
-	FF (b, c, d, a, X[ 3], MD5_S14, MD5_T04); 
-	FF (a, b, c, d, X[ 4], MD5_S11, MD5_T05); 
-	FF (d, a, b, c, X[ 5], MD5_S12, MD5_T06); 
-	FF (c, d, a, b, X[ 6], MD5_S13, MD5_T07); 
-	FF (b, c, d, a, X[ 7], MD5_S14, MD5_T08); 
-	FF (a, b, c, d, X[ 8], MD5_S11, MD5_T09); 
-	FF (d, a, b, c, X[ 9], MD5_S12, MD5_T10); 
-	FF (c, d, a, b, X[10], MD5_S13, MD5_T11); 
-	FF (b, c, d, a, X[11], MD5_S14, MD5_T12); 
-	FF (a, b, c, d, X[12], MD5_S11, MD5_T13); 
-	FF (d, a, b, c, X[13], MD5_S12, MD5_T14); 
-	FF (c, d, a, b, X[14], MD5_S13, MD5_T15); 
-	FF (b, c, d, a, X[15], MD5_S14, MD5_T16); 
-
-	//Perform Round 2 of the transformation
-	GG (a, b, c, d, X[ 1], MD5_S21, MD5_T17); 
-	GG (d, a, b, c, X[ 6], MD5_S22, MD5_T18); 
-	GG (c, d, a, b, X[11], MD5_S23, MD5_T19); 
-	GG (b, c, d, a, X[ 0], MD5_S24, MD5_T20); 
-	GG (a, b, c, d, X[ 5], MD5_S21, MD5_T21); 
-	GG (d, a, b, c, X[10], MD5_S22, MD5_T22); 
-	GG (c, d, a, b, X[15], MD5_S23, MD5_T23); 
-	GG (b, c, d, a, X[ 4], MD5_S24, MD5_T24); 
-	GG (a, b, c, d, X[ 9], MD5_S21, MD5_T25); 
-	GG (d, a, b, c, X[14], MD5_S22, MD5_T26); 
-	GG (c, d, a, b, X[ 3], MD5_S23, MD5_T27); 
-	GG (b, c, d, a, X[ 8], MD5_S24, MD5_T28); 
-	GG (a, b, c, d, X[13], MD5_S21, MD5_T29); 
-	GG (d, a, b, c, X[ 2], MD5_S22, MD5_T30); 
-	GG (c, d, a, b, X[ 7], MD5_S23, MD5_T31); 
-	GG (b, c, d, a, X[12], MD5_S24, MD5_T32); 
-
-	//Perform Round 3 of the transformation
-	HH (a, b, c, d, X[ 5], MD5_S31, MD5_T33); 
-	HH (d, a, b, c, X[ 8], MD5_S32, MD5_T34); 
-	HH (c, d, a, b, X[11], MD5_S33, MD5_T35); 
-	HH (b, c, d, a, X[14], MD5_S34, MD5_T36); 
-	HH (a, b, c, d, X[ 1], MD5_S31, MD5_T37); 
-	HH (d, a, b, c, X[ 4], MD5_S32, MD5_T38); 
-	HH (c, d, a, b, X[ 7], MD5_S33, MD5_T39); 
-	HH (b, c, d, a, X[10], MD5_S34, MD5_T40); 
-	HH (a, b, c, d, X[13], MD5_S31, MD5_T41); 
-	HH (d, a, b, c, X[ 0], MD5_S32, MD5_T42); 
-	HH (c, d, a, b, X[ 3], MD5_S33, MD5_T43); 
-	HH (b, c, d, a, X[ 6], MD5_S34, MD5_T44); 
-	HH (a, b, c, d, X[ 9], MD5_S31, MD5_T45); 
-	HH (d, a, b, c, X[12], MD5_S32, MD5_T46); 
-	HH (c, d, a, b, X[15], MD5_S33, MD5_T47); 
-	HH (b, c, d, a, X[ 2], MD5_S34, MD5_T48); 
-
-	//Perform Round 4 of the transformation
-	II (a, b, c, d, X[ 0], MD5_S41, MD5_T49); 
-	II (d, a, b, c, X[ 7], MD5_S42, MD5_T50); 
-	II (c, d, a, b, X[14], MD5_S43, MD5_T51); 
-	II (b, c, d, a, X[ 5], MD5_S44, MD5_T52); 
-	II (a, b, c, d, X[12], MD5_S41, MD5_T53); 
-	II (d, a, b, c, X[ 3], MD5_S42, MD5_T54); 
-	II (c, d, a, b, X[10], MD5_S43, MD5_T55); 
-	II (b, c, d, a, X[ 1], MD5_S44, MD5_T56); 
-	II (a, b, c, d, X[ 8], MD5_S41, MD5_T57); 
-	II (d, a, b, c, X[15], MD5_S42, MD5_T58); 
-	II (c, d, a, b, X[ 6], MD5_S43, MD5_T59); 
-	II (b, c, d, a, X[13], MD5_S44, MD5_T60); 
-	II (a, b, c, d, X[ 4], MD5_S41, MD5_T61); 
-	II (d, a, b, c, X[11], MD5_S42, MD5_T62); 
-	II (c, d, a, b, X[ 2], MD5_S43, MD5_T63); 
-	II (b, c, d, a, X[ 9], MD5_S44, MD5_T64); 
-
-	//add the transformed values to the current checksum
-	m_lMD5[0] += a;
-	m_lMD5[1] += b;
-	m_lMD5[2] += c;
-	m_lMD5[3] += d;
-}
-
-
-/*****************************************************************************************
-CONSTRUCTOR:	CMD5Checksum
-DESCRIPTION:	Initialises member data
-ARGUMENTS:		None
-NOTES:			None
-*****************************************************************************************/
-CMD5Checksum::CMD5Checksum()
-{
-	// zero members
-	(void)std::memset(m_lpszBuffer, 0, 64);
-	m_nCount[0] = m_nCount[1] = 0;
-
-	// Load magic state initialization constants
-	m_lMD5[0] = MD5_INIT_STATE_0;
-	m_lMD5[1] = MD5_INIT_STATE_1;
-	m_lMD5[2] = MD5_INIT_STATE_2;
-	m_lMD5[3] = MD5_INIT_STATE_3;
-}
-
-CMD5Checksum::~CMD5Checksum()
-{
-}
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::DWordToByte
-DETAILS:		private
-DESCRIPTION:	Transfers the data in an 32 bit array to a 8 bit array
-RETURNS:		void
-ARGUMENTS:		BYTE* Output  : the 8 bit destination array 
-				DWORD* Input  : the 32 bit source array
-				UINT nLength  : the number of 8 bit data items in the source array
-NOTES:			One DWORD from the input array is transferred into four BYTES 
-				in the output array. The first (0-7) bits of the first DWORD are 
-				transferred to the first output BYTE, bits bits 8-15 are transferred from
-				the second BYTE etc. 
-				
-				The algorithm assumes that the output array is a multiple of 4 bytes long
-				so that there is a perfect fit of 8 bit BYTES into the 32 bit DWORDs.
-*****************************************************************************************/
-void CMD5Checksum::DWordToByte(uint8* Output, const uint32* Input, uint32 nLength )
-{
-	//transfer the data by shifting and copying
-	uint32 i = 0;
-	uint32 j = 0;
-	for ( ; j < nLength; i++, j += 4) 
-	{
-		Output[j] =   (uint8)(Input[i] & 0xff);
-		Output[j+1] = (uint8)((Input[i] >> 8) & 0xff);
-		Output[j+2] = (uint8)((Input[i] >> 16) & 0xff);
-		Output[j+3] = (uint8)((Input[i] >> 24) & 0xff);
-	}
-}
-
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::Final
-DETAILS:		protected
-DESCRIPTION:	Implementation of main MD5 checksum algorithm; ends the checksum calculation.
-RETURNS:		CString : the final hexadecimal MD5 checksum result 
-ARGUMENTS:		None
-NOTES:			Performs the final MD5 checksum calculation ('Update' does most of the work,
-				this function just finishes the calculation.) 
-*****************************************************************************************/
-C_SCLString CMD5Checksum::Final()
-{
-	//Save number of bits
-	uint8 Bits[8];
-	DWordToByte( Bits, m_nCount, 8 );
-
-	//Pad out to 56 mod 64.
-	uint32 nIndex = (uint32)((m_nCount[0] >> 3) & 0x3f);
-	uint32 nPadLen = (nIndex < 56) ? (56 - nIndex) : (120 - nIndex);
-	Update( PADDING, nPadLen );
-
-	//Append length (before padding)
-	Update( Bits, 8 );
-
-	//Store final state in 'lpszMD5'
-	const int nMD5Size = 16;
-	unsigned char lpszMD5[ nMD5Size ];
-	DWordToByte( lpszMD5, m_lMD5, nMD5Size );
-
-	//Convert the hexadecimal checksum to a C_SCLString
-   C_SCLString strMD5;
-   C_SCLString Str;
-	for ( int i=0; i < nMD5Size; i++)
-	{
-        Str.PrintFormatted("%02x", lpszMD5[i]);
-        strMD5 += Str;
-	}
-	return strMD5;
-}
-
-
-/*****************************************************************************************
-FUNCTION:		CMD5Checksum::Update
-DETAILS:		protected
-DESCRIPTION:	Implementation of main MD5 checksum algorithm
-RETURNS:		void
-ARGUMENTS:		BYTE* Input    : input block
-				UINT nInputLen : length of input block
-NOTES:			Computes the partial MD5 checksum for 'nInputLen' bytes of data in 'Input'
-*****************************************************************************************/
-void CMD5Checksum::Update(const uint8* Input,	uint32 nInputLen )
-{
-	//Compute number of bytes mod 64
-	uint32 nIndex = (uint32)((m_nCount[0] >> 3) & 0x3F);
-
-	//Update number of bits
-	if ((m_nCount[0] += nInputLen << 3)  <  ( nInputLen << 3))
-	{
-		m_nCount[1]++;
-	}
-	m_nCount[1] += (nInputLen >> 29);
-
-	//Transform as many times as possible.
-	uint32 i;
-	uint32 nPartLen = 64 - nIndex;
-	if (nInputLen >= nPartLen) 	
-	{
-		(void)std::memcpy(&m_lpszBuffer[nIndex], Input, nPartLen);
-		Transform( m_lpszBuffer );
-		for (i = nPartLen; i + 63 < nInputLen; i += 64) 
-		{
-			Transform( &Input[i] );
-		}
-		nIndex = 0;
-	} 
-	else 
-	{
-		i = 0;
-	}
-
-	// Buffer remaining input
-   if ((nInputLen - i) > 0) //prevent Borland CodeGuard from reporting pointer unterrun
+   //Convert the hexadecimal checksum to a C_SCLString
+   for (uint8 u8_Byte = 0U; u8_Byte < 16U; u8_Byte++)
    {
-   	(void)std::memcpy(&m_lpszBuffer[nIndex], &Input[i], nInputLen - i);
+      C_SCLString c_Str;
+      c_Str.PrintFormatted("%02x", au8_Result[u8_Byte]);
+      c_StrMD5 += c_Str;
    }
+   return c_StrMD5;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Get MD5 over data
 
+   \param[in]  opu8_Data    data to calculate MD5 for
+   \param[in]  ou32_Length  number of bytes referenced by opu8_Data
+
+   \return
+   Calculated MD5 (empty string if there are problems)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString CMD5Checksum::GetMD5(const uint8 * const opu8_Data, const uint32 ou32_Length)
+{
+   //calculate and return the checksum
+   C_SCLString c_StrMD5;
+   C_HashState c_Hash;
+   uint8 au8_Result[16];
+
+   mh_md5_init(&c_Hash);
+   mh_md5_process(&c_Hash, opu8_Data, ou32_Length);
+   mh_md5_done(&c_Hash, au8_Result);
+
+   //Convert the hexadecimal checksum to a C_SCLString
+   for (uint8 u8_Byte = 0U; u8_Byte < 16U; u8_Byte++)
+   {
+      C_SCLString c_Str;
+      c_Str.PrintFormatted("%02x", au8_Result[u8_Byte]);
+      c_StrMD5 += c_Str;
+   }
+   return c_StrMD5;
+}

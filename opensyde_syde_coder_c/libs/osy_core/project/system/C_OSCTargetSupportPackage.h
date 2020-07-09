@@ -48,10 +48,10 @@ public:
    stw_types::uint8 u8_ApplicationIndex; ///< Which application is Diagnostic Protocol Driver assigned to?
    ///< zero based
    stw_types::uint8 u8_MaxParallelTransmissions; ///< Maximum number of parallel cyclic/event driven transmissions
-   stw_types::uint16 u16_MaxMessageBufferTx;     ///< CAN TX routing FIFO size
-   ///< (number of messages that can be buffered by in TX direction)
-   stw_types::uint16 u16_MaxRoutingMessageBufferRx; ///< CAN RX routing FIFO size
-   ///< (number of messages that can be buffered by in RX direction)
+   stw_types::uint16 u16_MaxMessageBufferTx;     ///< CAN Tx routing FIFO size
+   ///< (number of messages that can be buffered by in Tx direction)
+   stw_types::uint16 u16_MaxRoutingMessageBufferRx; ///< CAN Rx routing FIFO size
+   ///< (number of messages that can be buffered by in Rx direction)
 
    stw_scl::C_SCLString c_TemplatePath; ///< path to template package archive
    void Clear(void);

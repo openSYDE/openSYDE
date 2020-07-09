@@ -13,18 +13,25 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <QLineEdit>
+
 #include "C_CamMetControlBarWidget.h"
 #include "ui_C_CamMetControlBarWidget.h"
 
 #include "C_UsHandler.h"
 #include "C_GtGetText.h"
 
+#include "C_OgePopUpDialog.h"
+#include "C_CamMetSettingsPopup.h"
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
+using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const stw_types::sintn C_CamMetControlBarWidget::mhsn_MAX_COUNT_COMBO_BOX = 7;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -46,11 +53,19 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   mpc_Ui(new Ui::C_CamMetControlBarWidget)
+   mpc_Ui(new Ui::C_CamMetControlBarWidget),
+   mq_DisplayTimestampAbsoluteTimeOfDay(false),
+   mu32_TraceBufferSize(1000U)
 {
    this->mpc_Ui->setupUi(this);
 
    this->InitStaticNames();
+
+   // Set maximum + 1, so the user can add a new element although the combo box is full. The last element will
+   // be removed manually in the slot functions.
+   //lint -e{1938}  static const is guaranteed preinitialized before main
+   this->mpc_Ui->pc_ComboBoxSearch->setMaxCount(mhsn_MAX_COUNT_COMBO_BOX + 1);
+   this->mpc_Ui->pc_ComboBoxSearch->setInsertPolicy(QComboBox::InsertAtTop);
 
    this->mpc_Ui->pc_PushButtonTogglePlay->setCheckable(true);
    this->mpc_Ui->pc_PushButtonToggleHex->setCheckable(true);
@@ -66,9 +81,21 @@ C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_PushButtonStop->SetSvg("://images/IconStopEnabled.svg", "://images/IconStopDisabled.svg",
                                            "://images/IconStopEnabledHover.svg", "", "", "",
                                            "://images/IconStopEnabledPressed.svg");
+   this->mpc_Ui->pc_PushButtoneSearchNext->SetSvg("://images/IconSearchDownEnabled.svg", "",
+                                                  "://images/IconSearchDownHover.svg",
+                                                  "", "", "",
+                                                  "://images/IconSearchDownPressed.svg");
+   this->mpc_Ui->pc_PushButtoneSearchPrev->SetSvg("://images/IconSearchUpEnabled.svg", "",
+                                                  "://images/IconSearchUpHover.svg",
+                                                  "", "", "",
+                                                  "://images/IconSearchUpPressed.svg");
    this->mpc_Ui->pc_PushButtonClear->SetSvg("://images/IconWipeAwayEnabled.svg", "", "://images/IconWipeAwayHover.svg",
                                             "", "", "",
                                             "://images/IconWipeAwayPressed.svg");
+   this->mpc_Ui->pc_PushButtonTraceSettings->SetSvg("://images/IconSettingsEnabled.svg", "",
+                                                    "://images/IconSettingsHover.svg",
+                                                    "", "", "",
+                                                    "://images/IconSettingsPressed.svg");
    this->mpc_Ui->pc_PushButtonToggleHex->SetSvg("://images/IconNumberFormatDec.svg", "",
                                                 "://images/IconNumberFormatDecHover.svg",
                                                 "://images/IconNumberFormatHex.svg", "",
@@ -104,6 +131,17 @@ C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
            this, &C_CamMetControlBarWidget::SigDisplayAsHex);
    connect(this->mpc_Ui->pc_PushButtonToggleTimeMode, &QPushButton::toggled,
            this, &C_CamMetControlBarWidget::SigDisplayTimestampRelative);
+
+   connect(this->mpc_Ui->pc_PushButtoneSearchNext, &QPushButton::clicked,
+           this, &C_CamMetControlBarWidget::SearchNext);
+   connect(this->mpc_Ui->pc_PushButtoneSearchPrev, &QPushButton::clicked,
+           this, &C_CamMetControlBarWidget::SearchPrev);
+
+   connect(this->mpc_Ui->pc_ComboBoxSearch->lineEdit(), &QLineEdit::returnPressed,
+           this, &C_CamMetControlBarWidget::m_SearchComboBoxChanged);
+
+   connect(this->mpc_Ui->pc_PushButtonTraceSettings, &QPushButton::clicked,
+           this, &C_CamMetControlBarWidget::m_OpenTraceSettings);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -168,13 +206,32 @@ void C_CamMetControlBarWidget::InitStaticNames() const
    this->mpc_Ui->pc_PushButtonClear->SetToolTipInformation(
       C_GtGetText::h_GetText("Clear Trace"),
       C_GtGetText::h_GetText("Clear trace window content."));
+
+   this->mpc_Ui->pc_PushButtonTraceSettings->SetToolTipInformation(
+      C_GtGetText::h_GetText("Trace Settings"),
+      C_GtGetText::h_GetText("Show and edit trace settings."));
+
+   this->mpc_Ui->pc_ComboBoxSearch->lineEdit()->setPlaceholderText(C_GtGetText::h_GetText("Search..."));
+
+   this->mpc_Ui->pc_ComboBoxSearch->SetToolTipInformation(
+      C_GtGetText::h_GetText("Trace Search"),
+      C_GtGetText::h_GetText("Search quickly and simply for text within the Trace.\n"
+                             "Available only when Trace is paused or stopped."));
+
+   this->mpc_Ui->pc_PushButtoneSearchNext->SetToolTipInformation(
+      C_GtGetText::h_GetText("Trace Search"),
+      C_GtGetText::h_GetText("Find next (F3)."));
+
+   this->mpc_Ui->pc_PushButtoneSearchPrev->SetToolTipInformation(
+      C_GtGetText::h_GetText("Trace Search"),
+      C_GtGetText::h_GetText("Find previous (Shift + F3)."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load all user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetControlBarWidget::LoadUserSettings(void) const
+void C_CamMetControlBarWidget::LoadUserSettings(void)
 {
    //Buttons
    this->mpc_Ui->pc_PushButtonToggleHex->setChecked(C_UsHandler::h_GetInstance()->GetButtonHexActive());
@@ -182,6 +239,14 @@ void C_CamMetControlBarWidget::LoadUserSettings(void) const
       C_UsHandler::h_GetInstance()->GetButtonRelativeTimeStampActive());
    this->mpc_Ui->pc_PushButtonToggleDisplayMode->setChecked(C_UsHandler::h_GetInstance()->GetButtonUniqueViewActive());
    this->mpc_Ui->pc_ComboBoxProtocol->setCurrentIndex(C_UsHandler::h_GetInstance()->GetSelectedProtocolIndex());
+
+   // Trace settings
+   this->mq_DisplayTimestampAbsoluteTimeOfDay =
+      C_UsHandler::h_GetInstance()->GetTraceSettingDisplayTimestampAbsoluteTimeOfDay();
+   this->mu32_TraceBufferSize = C_UsHandler::h_GetInstance()->GetTraceSettingBufferSize();
+
+   Q_EMIT (this->SigDisplayTimestampTimeOfDay(this->mq_DisplayTimestampAbsoluteTimeOfDay));
+   Q_EMIT (this->SigTraceBufferSize(this->mu32_TraceBufferSize));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -195,6 +260,11 @@ void C_CamMetControlBarWidget::SaveUserSettings(void) const
    C_UsHandler::h_GetInstance()->SetButtonRelativeTimeStampActive(this->mpc_Ui->pc_PushButtonToggleTimeMode->isChecked());
    C_UsHandler::h_GetInstance()->SetButtonUniqueViewActive(this->mpc_Ui->pc_PushButtonToggleDisplayMode->isChecked());
    C_UsHandler::h_GetInstance()->SetSelectedProtocolIndex(this->mpc_Ui->pc_ComboBoxProtocol->currentIndex());
+
+   // Trace settings
+   C_UsHandler::h_GetInstance()->SetTraceSettingDisplayTimestampAbsoluteTimeOfDay(
+      this->mq_DisplayTimestampAbsoluteTimeOfDay);
+   C_UsHandler::h_GetInstance()->SetTraceSettingBufferSize(this->mu32_TraceBufferSize);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -204,6 +274,36 @@ void C_CamMetControlBarWidget::SaveUserSettings(void) const
 void C_CamMetControlBarWidget::StopLogging(void)
 {
    this->m_HandleStop();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Triggers searching the next match
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetControlBarWidget::SearchNext(void) const
+{
+   if ((this->mpc_Ui->pc_PushButtonStop->isEnabled() == false) ||
+       (this->mpc_Ui->pc_PushButtonTogglePlay->isChecked() == false))
+   {
+      Q_EMIT (this->SigSearchTrace(this->mpc_Ui->pc_ComboBoxSearch->currentText(), true));
+
+      this->m_UpdateSearchComboBox();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Triggers searching the previous match
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetControlBarWidget::SearchPrev(void) const
+{
+   if ((this->mpc_Ui->pc_PushButtonStop->isEnabled() == false) ||
+       (this->mpc_Ui->pc_PushButtonTogglePlay->isChecked() == false))
+   {
+      Q_EMIT (this->SigSearchTrace(this->mpc_Ui->pc_ComboBoxSearch->currentText(), false));
+
+      this->m_UpdateSearchComboBox();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -317,12 +417,12 @@ void C_CamMetControlBarWidget::m_HandleTreeVisibility(void)
        (this->mpc_Ui->pc_PushButtonToggleDisplayMode->isChecked() == true))
    {
       //Display tree in these cases
-      Q_EMIT this->SigDisplayTree(true);
+      Q_EMIT (this->SigDisplayTree(true));
    }
    else
    {
       //Default: tree not visible
-      Q_EMIT this->SigDisplayTree(false);
+      Q_EMIT (this->SigDisplayTree(false));
    }
 }
 
@@ -334,7 +434,90 @@ void C_CamMetControlBarWidget::m_HandleTreeVisibility(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_HandleToggleDisplayMode(const bool oq_Active)
 {
-   Q_EMIT this->SigDisplayUniqueMessages(oq_Active);
+   Q_EMIT (this->SigDisplayUniqueMessages(oq_Active));
    //In all cases handle tree visibility
    this->m_HandleTreeVisibility();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The text
+
+   \param[in]       orc_Text    Current text of combo box
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetControlBarWidget::m_SearchComboBoxChanged(void) const
+{
+   if ((this->mpc_Ui->pc_PushButtonStop->isEnabled() == false) ||
+       (this->mpc_Ui->pc_PushButtonTogglePlay->isChecked() == false))
+   {
+      if (this->mpc_Ui->pc_ComboBoxSearch->count() > mhsn_MAX_COUNT_COMBO_BOX)
+      {
+         this->mpc_Ui->pc_ComboBoxSearch->removeItem(mhsn_MAX_COUNT_COMBO_BOX);
+      }
+
+      Q_EMIT (this->SigSearchTrace(this->mpc_Ui->pc_ComboBoxSearch->currentText(), true));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds the searched string, if it is not already in the list
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetControlBarWidget::m_UpdateSearchComboBox(void) const
+{
+   sintn sn_Index;
+   const QString c_CurrentText = this->mpc_Ui->pc_ComboBoxSearch->currentText();
+   bool q_Found = false;
+
+   for (sn_Index = 0U; sn_Index < this->mpc_Ui->pc_ComboBoxSearch->count(); ++sn_Index)
+   {
+      if (this->mpc_Ui->pc_ComboBoxSearch->itemText(sn_Index) == c_CurrentText)
+      {
+         q_Found = true;
+      }
+   }
+
+   if (q_Found == false)
+   {
+      this->mpc_Ui->pc_ComboBoxSearch->insertItem(0, c_CurrentText);
+
+      // Remove the last item if there are to many entries
+      if (this->mpc_Ui->pc_ComboBoxSearch->count() > mhsn_MAX_COUNT_COMBO_BOX)
+      {
+         this->mpc_Ui->pc_ComboBoxSearch->removeItem(mhsn_MAX_COUNT_COMBO_BOX);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Opens the trace settings dialog, saves and activates the changed configurations
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetControlBarWidget::m_OpenTraceSettings(void)
+{
+   //Set parent for better hierarchy handling via window manager
+   QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
+   C_CamMetSettingsPopup * pc_Dialog = new C_CamMetSettingsPopup(*c_New);
+
+   //Resize
+   c_New->SetSize(QSize(600, 350));
+
+   pc_Dialog->SetValues(this->mq_DisplayTimestampAbsoluteTimeOfDay, this->mu32_TraceBufferSize);
+
+   // Update settings on accept
+   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      this->mq_DisplayTimestampAbsoluteTimeOfDay = pc_Dialog->GetDisplayTimestampAbsoluteTimeOfDay();
+      this->mu32_TraceBufferSize = pc_Dialog->GetTraceBufferSize();
+
+      Q_EMIT (this->SigDisplayTimestampTimeOfDay(this->mq_DisplayTimestampAbsoluteTimeOfDay));
+      Q_EMIT (this->SigTraceBufferSize(this->mu32_TraceBufferSize));
+   }
+
+   if (c_New != NULL)
+   {
+      c_New->HideOverlay();
+   }
+
+   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }

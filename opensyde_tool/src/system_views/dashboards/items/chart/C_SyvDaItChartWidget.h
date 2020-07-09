@@ -58,7 +58,6 @@ public:
    void SetDrawingActive(const bool oq_Active);
    void SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode);
    void SetWidthOfDataSeriesSelector(const stw_types::sintn osn_Width) const;
-   stw_types::sintn GetWidthOfDataSeriesSelector(void) const;
    bool GetCurrentDataSerie(stw_types::uint32 & oru32_DataPoolElementConfigIndex) const;
 
    void ConnectionActiveChanged(const bool oq_Active);

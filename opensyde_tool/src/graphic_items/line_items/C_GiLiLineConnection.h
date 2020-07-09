@@ -34,7 +34,7 @@ class C_GiLiLineConnection :
    Q_OBJECT
 
 public:
-   C_GiLiLineConnection(const stw_types::sint32 & ors32_LineIndex, QGraphicsItem * const opc_Parent = NULL);
+   C_GiLiLineConnection(const stw_types::sint32 & ors32_LineIndex = 0, QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiLiLineConnection();
    void AdaptLine(const QLineF & orc_Line);
    void SetLineIndex(const stw_types::sint32 & ors32_LineIndex);

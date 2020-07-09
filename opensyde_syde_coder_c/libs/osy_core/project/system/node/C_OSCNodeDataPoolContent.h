@@ -35,7 +35,7 @@ public:
    C_OSCNodeDataPoolContent & operator = (const C_OSCNodeDataPoolContent & orc_Source);
    virtual ~C_OSCNodeDataPoolContent(void);
 
-   void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
    enum E_Type ///< Data type
    {

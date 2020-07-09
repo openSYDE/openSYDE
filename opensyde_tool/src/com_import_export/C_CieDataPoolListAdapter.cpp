@@ -25,6 +25,7 @@
 #include "C_OSCCanProtocol.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "stwerrors.h"
 #include "C_OSCLoggingHandler.h"
 
@@ -204,7 +205,7 @@ void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
 
       if (c_CanMessage.e_TxMethod != C_OSCCanMessage::eTX_METHOD_ON_EVENT)
       {
-         c_CanMessage.u32_TimeoutMs = mh_GetAutoTimeoutTime(c_CanMessage.u32_CycleTimeMs);
+         c_CanMessage.u32_TimeoutMs = C_PuiSdUtil::h_GetMessageAutoTimeoutTime(c_CanMessage.u32_CycleTimeMs);
       }
       else
       {
@@ -300,7 +301,7 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
       else
       {
          if ((c_MessageIter->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT) ||
-             (c_MessageIter->u32_TimeoutMs != mh_GetAutoTimeoutTime(c_MessageIter->u32_CycleTimeMs)))
+             (c_MessageIter->u32_TimeoutMs != C_PuiSdUtil::h_GetMessageAutoTimeoutTime(c_MessageIter->u32_CycleTimeMs)))
          {
             // Using the specific value as custom value
             c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM;
@@ -395,13 +396,12 @@ sint32 C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(const uint32 ou32_B
          c_CurrentCIESignal.u16_MultiplexValue = rc_CurrentOSCCanSignal.u16_MultiplexValue;
 
          // fill up data pool list elements of signal
-         C_CieConverter::C_CIEDataPoolElement & rc_CieElement = c_CurrentCIESignal.c_Element;
          const C_OSCNodeDataPoolListElement * const pc_OscElement = C_PuiSdHandler::h_GetInstance()->
                                                                     GetOSCCanDataPoolListElement(c_MessageId,
                                                                                                  u32_PosSignal);
-
          if (pc_OscElement != NULL)
          {
+            C_CieConverter::C_CIEDataPoolElement & rc_CieElement = c_CurrentCIESignal.c_Element;
             rc_CieElement.c_Comment = pc_OscElement->c_Comment;
             rc_CieElement.c_MaxValue.SetType(pc_OscElement->GetType());
             rc_CieElement.c_MaxValue = pc_OscElement->c_MaxValue;
@@ -438,20 +438,4 @@ sint32 C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(const uint32 ou32_B
    }
 
    return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates the automatic timeout time of a CAN message depending of the cylce time
-
-   The time is (3 * cycle time) + 10
-
-   \param[in]       ou32_CycleTime     Cycle time of CAN message
-
-   \return
-   Calculated timeout time
-*/
-//----------------------------------------------------------------------------------------------------------------------
-uint32 C_CieDataPoolListAdapter::mh_GetAutoTimeoutTime(const uint32 ou32_CycleTime)
-{
-   return (ou32_CycleTime * 3U) + 10U;
 }

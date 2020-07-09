@@ -187,7 +187,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckCrcs(const C_OSCNode & orc_Node) cons
    C_OVERFLOW  At least one value lies outside of the defined minimum and maximum range. (checked by client side)
    C_BUSY      No changed value found and no additional lists specified (checked by client side)
    C_TIMEOUT   Expected server response not received within timeout
-   C_NOACT     Could not send request (e.g. TX buffer full)
+   C_NOACT     Could not send request (e.g. Tx buffer full)
    C_WARN      server sent error response
    C_RD_WR     unexpected content in server response
    C_COM       expected server response not received because of communication error
@@ -409,7 +409,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
    C_RANGE     At least one index of a datapool or a list of changed lists is invalid or
                datapool element size configuration does not match with count of read bytes
    C_TIMEOUT   Expected server response not received within timeout
-   C_NOACT     Could not send request (e.g. TX buffer full)
+   C_NOACT     Could not send request (e.g. Tx buffer full)
    C_WARN      Server sent error response
    C_COM       expected server response not received because of communication error
 */
@@ -451,7 +451,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCo
                // Reset of all valid flags
                for (u32_ElementCounter = 0U; u32_ElementCounter < rc_List.c_Elements.size(); ++u32_ElementCounter)
                {
-                  rc_List.c_Elements[u32_ElementCounter].q_IsValid = false;
+                  rc_List.c_Elements[u32_ElementCounter].q_NvmValueIsValid = false;
                }
 
                s32_Return = this->m_NvmReadListRaw(rc_List, c_Values, opu8_NrCode);
@@ -515,7 +515,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCo
    C_OVERFLOW  At least one changed list has no elements.
    C_DEFAULT   At least one element of the changed lists has the flag q_IsValid set to false.
    C_TIMEOUT   Expected server response not received within timeout
-   C_NOACT     Could not send request (e.g. TX buffer full)
+   C_NOACT     Could not send request (e.g. Tx buffer full)
    C_WARN      Server sent error response
    C_RD_WR     unexpected content in server response
    C_COM       expected server response not received because of communication error
@@ -615,7 +615,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteCrcs(uint8 * const opu8_NrCode)
                        ++u32_ElementCounter)
                   {
                      if (this->mc_NodeCopy.c_DataPools[u32_DataPoolCounter].c_Lists[u32_ListCounter].c_Elements[
-                            u32_ElementCounter].q_IsValid == false)
+                            u32_ElementCounter].q_NvmValueIsValid == false)
                      {
                         // Element was not read from ECU
                         s32_Return = C_BUSY;
@@ -827,8 +827,6 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
                               if (c_AlreadyUsedDataPoolIndices[u32_ItCurrentDataPool] ==
                                   rc_DataPoolListId.u32_DataPoolIndex)
                               {
-                                 C_OSCParamSetInterpretedDataPool & rc_InterpretedDataPool =
-                                    c_InterpretedNode.c_DataPools[u32_ItCurrentDataPool];
                                  bool q_ListFound = false;
                                  q_DataPoolFound = true;
                                  //Interpreted
@@ -847,6 +845,8 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
                                  if (q_ListFound == false)
                                  {
                                     //List
+                                    C_OSCParamSetInterpretedDataPool & rc_InterpretedDataPool =
+                                       c_InterpretedNode.c_DataPools[u32_ItCurrentDataPool];
                                     C_OSCParamSetInterpretedList c_NewList;
                                     mh_CreateInterpretedList(rc_List, c_NewList);
                                     rc_InterpretedDataPool.c_Lists.push_back(c_NewList);
@@ -1209,7 +1209,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeUpdateCRCForFile(const C_SCLString & orc_P
    {
       if (this->mc_ParameterSetFilePath == orc_Path)
       {
-         s32_Retval = this->mc_ImageFileHandler.UpdateCRCForFile(orc_Path);
+         s32_Retval = C_OSCParamSetHandler::h_UpdateCRCForFile(orc_Path);
          if (s32_Retval == C_NO_ERR)
          {
             //Update state
@@ -1500,7 +1500,7 @@ sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRa
    C_RANGE    List has no elements. Nothing to read.
               Datapool element size configuration does not match with count of read bytes
    C_TIMEOUT  Expected response not received within timeout
-   C_NOACT    Could not send request (e.g. TX buffer full)
+   C_NOACT    Could not send request (e.g. Tx buffer full)
    C_WARN     Error response or malformed protocol response
    C_CONFIG   Pre-requisites not correct; e.g. driver not initialized or
               parameter out of range (checked by client side)

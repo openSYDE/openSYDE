@@ -201,6 +201,11 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
    orc_Ini.WriteBool("Buttons", "TimeStamp", orc_UserSettings.GetButtonRelativeTimeStampActive());
    orc_Ini.WriteBool("Buttons", "Unique", orc_UserSettings.GetButtonUniqueViewActive());
 
+   //Trace settings
+   orc_Ini.WriteBool("Trace_Settings", "TimeStampAbsoluteTimeOfDay",
+                     orc_UserSettings.GetTraceSettingDisplayTimestampAbsoluteTimeOfDay());
+   orc_Ini.WriteInteger("Trace_Settings", "TraceBufferSize", orc_UserSettings.GetTraceSettingBufferSize());
+
    //Protocol
    orc_Ini.WriteInteger("Protocol", "Value", orc_UserSettings.GetSelectedProtocolIndex());
 
@@ -278,7 +283,7 @@ void C_UsFiler::mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, C_SCLIniFi
 
    //Recent projects
    c_List.clear();
-   for (uint8 u8_It = 0; u8_It < C_UsHandler::GetMaxRecentProjects(); ++u8_It)
+   for (uint8 u8_It = 0; u8_It < C_UsHandler::h_GetMaxRecentProjects(); ++u8_It)
    {
       c_Cur =
          orc_Ini.ReadString("RecentProjects", C_SCLString::IntToStr(u8_It), "").c_str();
@@ -337,6 +342,12 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    orc_UserSettings.SetButtonRelativeTimeStampActive(q_Flag);
    q_Flag = orc_Ini.ReadBool("Buttons", "Unique", true);
    orc_UserSettings.SetButtonUniqueViewActive(q_Flag);
+
+   //Trace settings
+   q_Flag = orc_Ini.ReadBool("Trace_Settings", "TimeStampAbsoluteTimeOfDay", false);
+   orc_UserSettings.SetTraceSettingDisplayTimestampAbsoluteTimeOfDay(q_Flag);
+   s32_Value = orc_Ini.ReadInteger("Trace_Settings", "TraceBufferSize", 1000);
+   orc_UserSettings.SetTraceSettingBufferSize(static_cast<uint32>(s32_Value));
 
    // Protocol
    s32_Value = orc_Ini.ReadInteger("Protocol", "Value", 0);

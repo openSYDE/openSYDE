@@ -22,6 +22,7 @@
 #include "C_OSCExportCommunicationStack.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCExportUti.h"
+#include "C_OSCExportDataPool.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -172,6 +173,8 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
    }
    else
    {
+      osc_write_log_error("Creating source code", "Application index " + C_SCLString::IntToStr(ou16_ApplicationIndex) +
+                          " out of range.");
       s32_Retval = C_RANGE;
    }
 
@@ -181,6 +184,9 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
       if ((c_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION) ||
           (c_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION))
       {
+         osc_write_log_error("Creating source code",
+                             "Did not generate code for application \"" + c_Application.c_Name +
+                             "\" because code format version is unknown or application is not programmable.");
          s32_Retval = C_NOACT;
       }
    }
@@ -331,7 +337,7 @@ sint32 C_OSCExportCommunicationStack::mh_CreateImplementationFile(const C_SCLStr
       mh_AddHeader(orc_ExportToolInfo, c_Data, ou8_InterfaceIndex, orc_ComProtocol.e_Type, mhq_IS_IMPLEMENTATION_FILE);
 
       // add includes
-      mh_AddCIncludes(c_Data, orc_DataPool.c_Name, ou8_InterfaceIndex, orc_ComProtocol.e_Type,
+      mh_AddCIncludes(c_Data, orc_DataPool, ou8_InterfaceIndex, orc_ComProtocol.e_Type,
                       ((q_RxMessagesPresent == false) || (q_TxMessagesPresent == false)));
 
       // add defines
@@ -397,6 +403,7 @@ void C_OSCExportCommunicationStack::mh_AddHeader(const C_SCLString & orc_ExportT
       orc_Data.Append("   Defines the communication configuration for protocol type " +
                       mh_GetProtocolNameByType(ore_Protocol) + " on CAN interface " +
                       C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + ".");
+      orc_Data.Append("");
       orc_Data.Append(C_OSCExportUti::h_GetCreationToolInfo(orc_ExportToolInfo));
    }
    else
@@ -411,8 +418,7 @@ void C_OSCExportCommunicationStack::mh_AddHeader(const C_SCLString & orc_ExportT
 
    if (oq_FileType == mhq_IS_HEADER_FILE)
    {
-      const C_SCLString c_HeaderGuard = "COMM_" + mh_GetProtocolNameByType(ore_Protocol).UpperCase() + "_CAN" +
-                                        C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "H";
+      const C_SCLString c_HeaderGuard = h_GetFileName(ou8_InterfaceIndex, ore_Protocol).UpperCase() + "H";
       orc_Data.Append("#ifndef " + c_HeaderGuard);
       orc_Data.Append("#define " + c_HeaderGuard);
    }
@@ -422,13 +428,13 @@ void C_OSCExportCommunicationStack::mh_AddHeader(const C_SCLString & orc_ExportT
 /*! \brief   Add includes into C file
 
    \param[in,out]  orc_Data            converted data to string list
-   \param[in]      orc_DataPoolName    name of Datapool
+   \param[in]      orc_DataPool        name of Datapool
    \param[in]      ou8_InterfaceIndex  index of interface
    \param[in]      ore_Protocol        protocol type (CL2, ECeS, ECoS)
    \param[in]      oq_NullRequired     true: definition of NULL required in .c file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCExportCommunicationStack::mh_AddCIncludes(C_SCLStringList & orc_Data, const C_SCLString & orc_DataPoolName,
+void C_OSCExportCommunicationStack::mh_AddCIncludes(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                                     const uint8 ou8_InterfaceIndex,
                                                     const C_OSCCanProtocol::E_Type & ore_Protocol,
                                                     const bool oq_NullRequired)
@@ -444,12 +450,11 @@ void C_OSCExportCommunicationStack::mh_AddCIncludes(C_SCLStringList & orc_Data, 
       orc_Data.Append("");
    }
 
-   orc_Data.Append("#include \"comm_" + c_ProtocolName + "_can" + C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) +
-                   ".h\"");
+   orc_Data.Append("#include \"" + h_GetFileName(ou8_InterfaceIndex, ore_Protocol) + ".h\"");
    orc_Data.Append("");
    orc_Data.Append("#include \"osy_com_" + c_ProtocolName + "_driver.h\"");
    orc_Data.Append("");
-   orc_Data.Append("#include \"" + orc_DataPoolName.LowerCase() + "_data_pool.h\"");
+   orc_Data.Append("#include \"" + C_OSCExportDataPool::h_GetFileName(orc_DataPool) + ".h\"");
    orc_Data.Append("");
 }
 
@@ -590,9 +595,9 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
       {
          orc_Data.Append("///check for correct version of structure definitions");
          orc_Data.Append(
-            "#if OSY_COM_CONFIG_DEFINITION_VERSION != 0x000" +
-            C_SCLString::IntToStr(static_cast<sint32>(C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(
-                                                         ou16_GenCodeVersion))) + "U");
+            "#if OSY_COM_CONFIG_DEFINITION_VERSION != 0x" +
+            C_SCLString::IntToHex(static_cast<sint64>(C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(
+                                                         ou16_GenCodeVersion)), 4U) + "U");
          orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
                          "generated code");
          orc_Data.Append("static T_osy_non_existing_type_" + orc_ProjectId + " mt_Variable;");
@@ -687,14 +692,14 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
       if  (orc_ComMessage.c_TxMessages.size() > 0)
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_mux_status mat_StatusMuxTxMessages[" +
-                         mh_CountMuxMessages(orc_ComMessage.c_TxMessages) + "];");
+                         C_SCLString::IntToStr(mh_CountMuxMessages(orc_ComMessage.c_TxMessages)) + "];");
       }
 
       // Rx mux messages
       if (orc_ComMessage.c_RxMessages.size() > 0)
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_mux_status mat_StatusMuxRxMessages[" +
-                         mh_CountMuxMessages(orc_ComMessage.c_RxMessages) + "];");
+                         C_SCLString::IntToStr(mh_CountMuxMessages(orc_ComMessage.c_RxMessages)) + "];");
       }
    }
    orc_Data.Append("");

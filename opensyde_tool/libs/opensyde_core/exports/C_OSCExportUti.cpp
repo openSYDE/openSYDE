@@ -14,6 +14,7 @@
 
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "TGLFile.h"
 #include "C_OSCExportUti.h"
 
 #include "C_OSCLoggingHandler.h"
@@ -22,6 +23,7 @@
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
+using namespace stw_tgl;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -40,7 +42,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCExportUti::C_OSCExportUti()
+C_OSCExportUti::C_OSCExportUti(void)
 {
 }
 
@@ -216,6 +218,24 @@ sint32 C_OSCExportUti::h_SaveToFile(stw_scl::C_SCLStringList & orc_Data, const s
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add .c and .h file paths to file paths list.
+
+   \param[in,out]    orc_FilePaths     List of file paths
+   \param[in]        orc_Path          Base path of files to add
+   \param[in]        orc_FileName      File base name of files to add
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCExportUti::h_CollectFilePaths(std::vector<C_SCLString> & orc_FilePaths, const C_SCLString & orc_Path,
+                                        const C_SCLString & orc_FileName)
+{
+   C_SCLString c_FileName;
+
+   c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + orc_FileName;
+   orc_FilePaths.push_back(c_FileName + ".h");
+   orc_FilePaths.push_back(c_FileName + ".c");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get type prefix according to data type
 
    \param[in]  oe_Type     data type (uint8, sint8, ...)
@@ -301,4 +321,61 @@ C_SCLString C_OSCExportUti::h_GetElementCName(const C_SCLString & orc_Name, cons
    }
 
    return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Utility wrapper for C_SCLString::FloatToStr that cuts trailing zeroes.
+
+   Call C_SCLString::FloatToStr and cut all trailing zeroes.
+
+   If oq_MakePrecise is false (default), the standard version is used that returns 6 digits after the decimal point.
+   If oq_MakePrecise is true, the conversion uses a variant of C_SCLString::FloatToStr where the number of
+   decimals can be specified. Using a large number it returns more precise representations of the float values.
+
+   \param[in]  of64_Value        Value to convert
+   \param[in]  oq_MakePrecise    Flag if to use more than 6 digits after decimal point
+
+   \return
+   Value converted to string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCExportUti::h_FloatToStrCutZeroes(const float64 of64_Value, const bool oq_MakePrecise)
+{
+   C_SCLString c_Return;
+
+   if (oq_MakePrecise == true)
+   {
+      c_Return = C_SCLString::FloatToStr(of64_Value, 100);
+   }
+   else
+   {
+      c_Return = C_SCLString::FloatToStr(of64_Value);
+   }
+
+   // defensive check
+   if (c_Return.Pos('.') > 0)
+   {
+      // cut trailing zeros
+      while ((c_Return.IsEmpty() == false) && (c_Return[c_Return.Length()] == '0') &&
+             (c_Return.Pos('.') != (c_Return.Length() - 1)))
+      {
+         c_Return.Delete(c_Return.Length(), 1);
+      }
+   }
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Float32 version of C_OSCExportDataPool::h_FloatToStringCutZeroes
+
+   \param[in]  of32_Value        Value to convert
+   \param[in]  oq_MakePrecise    Flag if to use more than 6 digits after decimal point
+
+   \return
+   Value converted to string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCExportUti::h_FloatToStrCutZeroes(const float32 of32_Value, const bool oq_MakePrecise)
+{
+   return h_FloatToStrCutZeroes(static_cast<float64>(of32_Value), oq_MakePrecise);
 }

@@ -45,6 +45,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SdBueMessageTableView",
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView",
    "stw_opensyde_gui--C_SdNdeDpListTableView",
+   "stw_opensyde_gui--C_SdNdeHalcConfigImportView",
    "stw_opensyde_gui--C_TblTreDataElementView",
    "stw_opensyde_gui--C_SyvDaItTaView",
    "stw_opensyde_gui--C_SyvDaItPaTreeView",
@@ -167,6 +168,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui--C_SdNdeDpComListWidget QScrollBar",
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QScrollBar",
    "stw_opensyde_gui--C_SdNdeDpListTableView QScrollBar",
+   "stw_opensyde_gui--C_SdNdeHalcConfigImportView QScrollBar",
    "stw_opensyde_gui--C_TblTreDataElementView QScrollBar",
    "stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget QScrollBar",
    "stw_opensyde_gui_elements--C_OgeTableWidgetComIF QScrollBar",
@@ -329,24 +331,6 @@ QString C_UtiStyleSheets::h_GetStylesheet(void)
    mh_AppendDynamicStylesheet(c_Stylesheet);
 
    return c_Stylesheet;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Apply stylesheet for HTML
-
-   \param[in]  orc_Html    Text in HTML
-
-   \return
-   Text in HTML string with style
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_UtiStyleSheets::h_ToStyledHtml(const QString & orc_Html)
-{
-   QTextDocument c_Converter;
-
-   c_Converter.setDefaultStyleSheet(C_UtiStyleSheets::h_GetStylesheet());
-   c_Converter.setHtml(orc_Html);
-   return c_Converter.toHtml();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

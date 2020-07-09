@@ -392,7 +392,7 @@ void C_GiSvDaChartBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
       if (mpc_RemoveDataElement == NULL)
       {
          mpc_RemoveDataElement =
-            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Remove selected data element"));
+            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Remove selected data element(s)"));
          // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
          this->mpc_RemoveDataElement->setVisible(false);
       }

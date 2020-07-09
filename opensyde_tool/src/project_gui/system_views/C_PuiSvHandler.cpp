@@ -15,15 +15,14 @@
 #include <iostream>
 
 #include <QFileInfo>
-#include <QElapsedTimer>
 
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_Uti.h"
 #include "TGLFile.h"
 #include "TGLUtils.h"
-#include "constants.h"
 #include "C_GtGetText.h"
+#include "CSCLChecksums.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSvHandlerFiler.h"
 #include "C_PuiSvHandlerFilerV1.h"
@@ -2023,12 +2022,6 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
                                       bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails)
 {
    sint32 s32_Retval = C_NO_ERR;
-   QElapsedTimer c_Timer;
-
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
 
    if (ou32_Index < this->mc_Views.size())
    {
@@ -2122,11 +2115,6 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
    else
    {
       s32_Retval = C_RANGE;
-   }
-
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "CheckView " << c_Timer.elapsed() << " ms" << &std::endl;
    }
 
    return s32_Retval;
@@ -2349,6 +2337,181 @@ sint32 C_PuiSvHandler::CheckViewReconnectNecessary(const uint32 ou32_ViewIndex, 
                orq_ReconnectNecessary = true;
             }
          }
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calc view routing crc name
+
+   \param[in]   ou32_ViewIndex   View index
+   \param[in]   orc_NodeName     Node name
+   \param[out]  oru32_Crc        Crc
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::CalcViewRoutingCrcName(const uint32 ou32_ViewIndex, const QString & orc_NodeName,
+                                              uint32 & oru32_Crc) const
+{
+   uint32 u32_NodeIndex;
+   sint32 s32_Retval = C_PuiSdHandler::h_GetInstance()->MapNodeNameToIndex(orc_NodeName, u32_NodeIndex);
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = this->CalcViewRoutingCrcIndex(ou32_ViewIndex, u32_NodeIndex, oru32_Crc);
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calc view routing crc index
+
+   \param[in]   ou32_ViewIndex   View index
+   \param[in]   ou32_NodeIndex   Node index
+   \param[out]  oru32_Crc        Crc
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
+                                               uint32 & oru32_Crc) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   const C_PuiSvData * const pc_View = this->GetView(ou32_ViewIndex);
+
+   if (pc_View != NULL)
+   {
+      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
+      if (ou32_NodeIndex < rc_ActiveNodes.size())
+      {
+         if (rc_ActiveNodes[ou32_NodeIndex] == true)
+         {
+            const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+               ou32_NodeIndex);
+
+            if (pc_Node != NULL)
+            {
+               // Check update routes
+               const C_SyvRoRouteCalculation c_RouteCalcUpdate(ou32_ViewIndex, ou32_NodeIndex,
+                                                               stw_opensyde_core::C_OSCRoutingCalculation::eUPDATE);
+               if (c_RouteCalcUpdate.GetState() == C_NO_ERR)
+               {
+                  const C_OSCRoutingRoute * const pc_Route = c_RouteCalcUpdate.GetBestRoute();
+                  if (pc_Route != NULL)
+                  {
+                     QString c_Name;
+
+                     //Calc CRC
+
+                     //Init
+                     oru32_Crc = 0xFFFFFFFFUL;
+
+                     if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(pc_View->GetPcData().GetBusIndex(),
+                                                                            c_Name) == C_NO_ERR)
+                     {
+                        stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
+                        if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(pc_Route->u32_TargetNodeIndex,
+                                                                                c_Name) == C_NO_ERR)
+                        {
+                           stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
+
+                           for (uint32 u32_ItRoute = 0UL;
+                                (u32_ItRoute < pc_Route->c_VecRoutePoints.size()) && (s32_Retval == C_NO_ERR);
+                                ++u32_ItRoute)
+                           {
+                              const C_OSCRoutingRoutePoint & rc_Route = pc_Route->c_VecRoutePoints[u32_ItRoute];
+
+                              //Others
+                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.e_InInterfaceType,
+                                                                 sizeof(rc_Route.e_InInterfaceType), oru32_Crc);
+                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.e_OutInterfaceType,
+                                                                 sizeof(rc_Route.e_OutInterfaceType), oru32_Crc);
+                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_InInterfaceNumber,
+                                                                 sizeof(rc_Route.u8_InInterfaceNumber), oru32_Crc);
+                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_OutInterfaceNumber,
+                                                                 sizeof(rc_Route.u8_OutInterfaceNumber), oru32_Crc);
+                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_InNodeID,
+                                                                 sizeof(rc_Route.u8_InNodeID), oru32_Crc);
+                              stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_OutNodeID,
+                                                                 sizeof(rc_Route.u8_OutNodeID), oru32_Crc);
+
+                              //Names
+                              if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(rc_Route.u32_InBusIndex,
+                                                                                     c_Name) == C_NO_ERR)
+                              {
+                                 stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
+                                                                    c_Name.length(), oru32_Crc);
+                              }
+                              else
+                              {
+                                 s32_Retval = C_RANGE;
+                              }
+                              if (s32_Retval == C_NO_ERR)
+                              {
+                                 if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(rc_Route.u32_OutBusIndex,
+                                                                                        c_Name) == C_NO_ERR)
+                                 {
+                                    stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
+                                                                       c_Name.length(), oru32_Crc);
+                                    if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(rc_Route.u32_NodeIndex,
+                                                                                            c_Name) == C_NO_ERR)
+                                    {
+                                       stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
+                                                                          c_Name.length(), oru32_Crc);
+                                    }
+                                    else
+                                    {
+                                       s32_Retval = C_RANGE;
+                                    }
+                                 }
+                                 else
+                                 {
+                                    s32_Retval = C_RANGE;
+                                 }
+                              }
+                           }
+                        }
+                        else
+                        {
+                           s32_Retval = C_RANGE;
+                        }
+                     }
+                     else
+                     {
+                        s32_Retval = C_RANGE;
+                     }
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
+                  }
+               }
+               else
+               {
+                  s32_Retval = C_RANGE;
+               }
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
       }
    }
    else

@@ -43,7 +43,7 @@ public:
    stw_opensyde_core::C_OSCSystemDefinition & GetOSCSystemDefinition(void);
    const stw_opensyde_core::C_OSCSystemDefinition & GetOSCSystemDefinitionConst(void) const;
 
-   static QString h_AutomaticCStringAdaptation(const QString & orc_Input, const bool oq_ReplaceAllCharacters);
+   static QString h_AutomaticCStringAdaptation(const QString & orc_Input);
 
    C_PuiBsElements c_Elements;
    std::vector<C_PuiSdTextElementBus> c_BusTextElements; ///< UI information for bus text elements

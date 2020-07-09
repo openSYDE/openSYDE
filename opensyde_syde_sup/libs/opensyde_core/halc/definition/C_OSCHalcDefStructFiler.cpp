@@ -166,7 +166,7 @@ sint32 C_OSCHalcDefStructFiler::h_SaveStructs(const std::vector<C_OSCHalcDefStru
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Parse simplest data type values
 
-   \param[in]      orc_TypeStr        Original type string
+   \param[in]      orc_TypeStr         Original type string
    \param[in,out]  orc_Content         Content to set
    \param[in,out]  orc_XMLParser       XML with default state
    \param[in]      orc_AttributeName   Attribute to look for value
@@ -234,7 +234,7 @@ void C_OSCHalcDefStructFiler::h_ParseSimplestTypeValue(const stw_scl::C_SCLStrin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Parse simplest data type values
 
-   \param[in]   orc_TypeStr  Original type string
+   \param[in]   orc_TypeStr   Original type string
    \param[out]  ore_Type      Type value
 
    \return
@@ -735,6 +735,11 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
                }
             }
             while ((c_BitmaskItemNode == "bitmask-selection") && (s32_Retval == C_NO_ERR));
+            //Check bitmask content
+            if (C_OSCHalcDefStructFiler::mh_CheckInitialBitmaskContentValid(orc_Content) == false)
+            {
+               s32_Retval = C_CONFIG;
+            }
          }
          if (s32_Retval == C_NO_ERR)
          {
@@ -1291,12 +1296,11 @@ sint32 C_OSCHalcDefStructFiler::mh_SaveDataElement(const C_OSCHalcDefElement & o
          for (uint32 u32_It = 0UL; (u32_It < rc_BitmaskItems.size()) && (s32_Retval == C_NO_ERR); ++u32_It)
          {
             const C_OSCHalcDefContentBitmaskItem & rc_Bitmask = rc_BitmaskItems[u32_It];
-            std::stringstream c_Mask;
             tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("bitmask-selection") == "bitmask-selection");
             orc_XMLParser.SetAttributeString("display", rc_Bitmask.c_Display);
             orc_XMLParser.SetAttributeBool("initial-apply-value-setting", rc_Bitmask.q_ApplyValueSetting);
-            c_Mask << "0x" << &std::hex << rc_Bitmask.u64_Value;
-            orc_XMLParser.SetAttributeString("value", c_Mask.str().c_str());
+            orc_XMLParser.SetAttributeString("value", C_OSCHalcDefStructFiler::mh_ConvertToHex(
+                                                rc_Bitmask.u64_Value).c_str());
             tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("comment") == "comment");
             orc_XMLParser.SetNodeContent(rc_Bitmask.c_Comment);
             tgl_assert(orc_XMLParser.SelectNodeParent() == "bitmask-selection");
@@ -1566,4 +1570,99 @@ void C_OSCHalcDefStructFiler::mh_SetMinValForType(const stw_scl::C_SCLString & o
    {
       //Unexpected
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check initial bitmask content valid
+
+   \param[in]  orc_Content    Content
+
+   \return
+   true  valid
+   false invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCHalcDefStructFiler::mh_CheckInitialBitmaskContentValid(const C_OSCHalcDefContent & orc_Content)
+{
+   bool q_Retval = true;
+
+   if (orc_Content.GetComplexType() == C_OSCHalcDefContent::eCT_BIT_MASK)
+   {
+      stw_scl::C_SCLString c_Is = "invalid";
+      stw_scl::C_SCLString c_Should = "invalid";
+      C_OSCHalcDefContent c_Copy = orc_Content;
+      const std::vector<C_OSCHalcDefContentBitmaskItem> & rc_Bitmasks = c_Copy.GetBitmaskItems();
+      for (std::vector<C_OSCHalcDefContentBitmaskItem>::const_iterator c_ItBitmask = rc_Bitmasks.begin();
+           c_ItBitmask != rc_Bitmasks.end(); ++c_ItBitmask)
+      {
+         c_Copy.SetBitmask(c_ItBitmask->c_Display, c_ItBitmask->q_ApplyValueSetting);
+      }
+      switch (orc_Content.GetType())
+      {
+      case C_OSCNodeDataPoolContent::eUINT8:
+         if (orc_Content.GetValueU8() != c_Copy.GetValueU8())
+         {
+            q_Retval = false;
+            c_Is = C_OSCHalcDefStructFiler::mh_ConvertToHex(static_cast<uint64>(orc_Content.GetValueU8()));
+            c_Should = C_OSCHalcDefStructFiler::mh_ConvertToHex(static_cast<uint64>(c_Copy.GetValueU8()));
+         }
+         break;
+      case C_OSCNodeDataPoolContent::eUINT16:
+         if (orc_Content.GetValueU16() != c_Copy.GetValueU16())
+         {
+            q_Retval = false;
+            c_Is = C_OSCHalcDefStructFiler::mh_ConvertToHex(static_cast<uint64>(orc_Content.GetValueU16()));
+            c_Should = C_OSCHalcDefStructFiler::mh_ConvertToHex(static_cast<uint64>(c_Copy.GetValueU16()));
+         }
+         break;
+      case C_OSCNodeDataPoolContent::eUINT32:
+         if (orc_Content.GetValueU32() != c_Copy.GetValueU32())
+         {
+            q_Retval = false;
+            c_Is = C_OSCHalcDefStructFiler::mh_ConvertToHex(static_cast<uint64>(orc_Content.GetValueU32()));
+            c_Should = C_OSCHalcDefStructFiler::mh_ConvertToHex(static_cast<uint64>(c_Copy.GetValueU32()));
+         }
+         break;
+      case C_OSCNodeDataPoolContent::eUINT64:
+         if (orc_Content.GetValueU64() != c_Copy.GetValueU64())
+         {
+            q_Retval = false;
+            c_Is = C_OSCHalcDefStructFiler::mh_ConvertToHex(orc_Content.GetValueU64());
+            c_Should = C_OSCHalcDefStructFiler::mh_ConvertToHex(c_Copy.GetValueU64());
+         }
+         break;
+      default:
+         //invalid
+         osc_write_log_warning("Loading HALC definition", "bitmask initial value check failed");
+         break;
+      }
+      if (q_Retval == false)
+      {
+         osc_write_log_error("Loading HALC definition",
+                             stw_scl::C_SCLString(stw_scl::C_SCLString(
+                                                     "\"value\" attribute content for bitmask has invalid initial value \"")
+                                                  +
+                                                  c_Is + "\" which should be \"" + c_Should + "\"").c_str());
+      }
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert to hex
+
+   \param[in]  ou64_Value  Value
+
+   \return
+   Value in hex
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_scl::C_SCLString C_OSCHalcDefStructFiler::mh_ConvertToHex(const uint64 ou64_Value)
+{
+   stw_scl::C_SCLString c_Retval;
+   std::stringstream c_Mask;
+   c_Mask << "0x" << &std::hex << ou64_Value;
+   c_Retval = c_Mask.str().c_str();
+   return c_Retval;
 }

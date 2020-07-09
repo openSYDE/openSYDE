@@ -28,6 +28,7 @@
 #include "TGLTime.h"
 #include "TGLFile.h"
 #include "C_SUPSuSequences.h"
+#include "C_OSCBinaryHash.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -86,6 +87,7 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    bool q_ParseError = false;
    bool q_ShowHelp = false;
    const C_SCLString c_Version = h_GetApplicationVersion(oapcn_Argv[0]);
+   const C_SCLString c_BinaryHash = stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash();
 
    mq_Quiet = false;
 
@@ -160,7 +162,7 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    if (q_ShowHelp == true)
    {
       //print directly to console; no need for logging this user feedback
-      this->m_PrintInformation(c_Version);
+      this->m_PrintInformation(c_Version, c_BinaryHash);
       std::cout << "SYDEsup is a console application for updating your system with a Service Update Package created "
          "with openSYDE, the toolset and framework by STW (Sensor-Technik Wiedemann GmbH). "
          "For further information take a look at openSYDE user manual.\n" << &std::endl;
@@ -169,7 +171,7 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    else if ((mc_SUPFilePath == "") || (q_ParseError == true))
    {
       //print directly to console; no need for logging this user feedback
-      this->m_PrintInformation(c_Version);
+      this->m_PrintInformation(c_Version, c_BinaryHash);
       std::cout << "Error: Invalid or missing command line parameters.\n" << &std::endl;
       e_Return = eERR_PARSE_COMMAND_LINE;
    }
@@ -181,13 +183,13 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
 
       if (e_Return != eOK)
       {
-         this->m_PrintInformation(c_Version);
+         this->m_PrintInformation(c_Version, c_BinaryHash);
          std::cout << "Error: " << this->mc_UnzipPath.c_str() << " is no existing directory.\n" << &std::endl;
       }
       else
       {
          // log version
-         h_WriteLog("SYDEsup Version", "Version: " + c_Version);
+         h_WriteLog("SYDEsup Version", "Version: " + c_Version + ", MD5-Checksum: " + c_BinaryHash);
       }
    }
 
@@ -604,13 +606,14 @@ C_SCLString C_SYDEsup::h_GetApplicationVersion(const C_SCLString & orc_FileName)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Print information about command line parameters and application version to console.
+/*! \brief   Print information about command line parameters, application version and the MD5-Checksum to console.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SYDEsup::m_PrintInformation(const C_SCLString & orc_Version) const
+void C_SYDEsup::m_PrintInformation(const C_SCLString & orc_Version, const C_SCLString &orc_BinaryHash) const
 {
-   // show version
-   std::cout << "Version: " << orc_Version.c_str() << "\n" << &std::endl;
+   // show version and MD5-Checksum
+   std::cout << "Version: " << orc_Version.c_str() << &std::endl;
+   std::cout << "MD5-Checksum: " << orc_BinaryHash.c_str() << "\n" << &std::endl;
 
    // show parameter help
    std::cout << "Command line parameters:\n\n"

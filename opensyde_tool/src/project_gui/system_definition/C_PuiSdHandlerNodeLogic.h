@@ -41,11 +41,18 @@ public:
                                                const stw_opensyde_core::C_OSCNodeStwFlashloaderSettings & orc_Settings);
    stw_types::sint32 SetNodeOpenSYDEServerSettings(const stw_types::uint32 ou32_Index,
                                                    const stw_opensyde_core::C_OSCNodeOpenSYDEServerSettings & orc_Settings);
+   stw_types::sint32 SetNodeCodeExportSettings(const stw_types::uint32 ou32_Index,
+                                               const stw_opensyde_core::C_OSCNodeCodeExportSettings & orc_Settings);
    void SetOSCNodeProperties(const stw_types::uint32 ou32_NodeIndex,
                              const stw_opensyde_core::C_OSCNodeProperties & orc_Properties);
    void SetOSCNodePropertiesDetailed(const stw_types::uint32 ou32_NodeIndex, const QString & orc_Name,
-                                     const QString & orc_Comment,
-                                     const stw_opensyde_core::C_OSCNodeProperties::E_DiagnosticServerProtocol oe_DiagnosticServer, const stw_opensyde_core::C_OSCNodeProperties::E_FlashLoaderProtocol oe_FlashLoader, const std::vector<stw_types::uint8> & orc_NodeIds, const std::vector<bool> & orc_UpdateFlags, const std::vector<bool> & orc_RoutingFlags, const std::vector<bool> & orc_DiagnosisFlags);
+                                     const QString & orc_Comment, const stw_opensyde_core::C_OSCNodeProperties::E_DiagnosticServerProtocol
+                                     oe_DiagnosticServer,
+                                     const stw_opensyde_core::C_OSCNodeProperties::E_FlashLoaderProtocol oe_FlashLoader,
+                                     const std::vector<stw_types::uint8> & orc_NodeIds,
+                                     const std::vector<bool> & orc_UpdateFlags,
+                                     const std::vector<bool> & orc_RoutingFlags,
+                                     const std::vector<bool> & orc_DiagnosisFlags);
    void SetUINodeBox(const stw_types::uint32 ou32_NodeIndex, const C_PuiBsBox & orc_Box);
    stw_types::uint32 AddNodeAndSort(stw_opensyde_core::C_OSCNode & orc_OSCNode, const C_PuiSdNode & orc_UINode);
    void RemoveNode(const stw_types::uint32 ou32_NodeIndex);
@@ -56,6 +63,8 @@ public:
    bool CheckCriticalNameConflict(std::vector<QString> * const opc_CriticalNodeNames,
                                   std::vector<QString> * const opc_CriticalBusNames,
                                   std::vector<QString> * const opc_CriticalDatapoolNamespaceNames) const;
+   stw_types::sint32 MapNodeNameToIndex(const QString & orc_NodeName, stw_types::uint32 & oru32_NodeIndex) const;
+   stw_types::sint32 MapNodeIndexToName(const stw_types::uint32 ou32_NodeIndex, QString & orc_NodeName) const;
 
    //Datapool
    stw_types::sint32 AddDataPool(const stw_types::uint32 & oru32_NodeIndex,
@@ -231,8 +240,8 @@ public:
    bool CheckNodeDataPoolListDataSetNameAvailable(const stw_types::uint32 & oru32_NodeIndex,
                                                   const stw_types::uint32 & oru32_DataPoolIndex,
                                                   const stw_types::uint32 & oru32_ListIndex,
-                                                  const stw_scl::C_SCLString & orc_Name, const stw_types::uint32 * const opu32_DataPoolListDataSetIndexToSkip =
-                                                     NULL) const;
+                                                  const stw_scl::C_SCLString & orc_Name, const stw_types::uint32 *
+                                                  const opu32_DataPoolListDataSetIndexToSkip = NULL) const;
 
    //Datapool list element
    stw_types::sint32 ReserveDataPoolListElements(const stw_types::uint32 & oru32_NodeIndex,

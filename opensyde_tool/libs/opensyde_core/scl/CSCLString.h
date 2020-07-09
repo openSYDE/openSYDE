@@ -77,8 +77,8 @@ class SCL_PACKAGE C_SCLString
 {
 private:
    void m_ThrowIfOutOfRange(const stw_types::sint32 os32_Index) const;
-   static stw_types::sint64 m_StrTos64(const stw_types::charn * const opcn_String, const bool oq_Hex);
-   static stw_types::sint32 m_StrTos32(const stw_types::charn * const opcn_String, const bool oq_Hex);
+   static stw_types::sint64 mh_StrTos64(const stw_types::charn * const opcn_String, const bool oq_Hex);
+   static stw_types::sint32 mh_StrTos32(const stw_types::charn * const opcn_String, const bool oq_Hex);
 
    std::string c_String; ///< actual string data wrapped by C_SCLString
 

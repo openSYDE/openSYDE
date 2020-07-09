@@ -115,7 +115,6 @@ public:
                          const stw_types::sint32 & ors32_DataSetIndex);
    void DoInsertDataSet(const stw_types::uint32 & oru32_DataSetIndex);
    void DoDeleteDataSet(const stw_types::uint32 & oru32_DataSetIndex);
-   void DoEditDataSetName(const stw_types::uint32 & oru32_DataSetIndex);
    void Reset(void);
    bool CheckName(const stw_types::uint32 & oru32_Index, const QString & orc_Name) const;
    stw_types::uint32 GetArraySize(const stw_types::uint32 & oru32_Index) const;

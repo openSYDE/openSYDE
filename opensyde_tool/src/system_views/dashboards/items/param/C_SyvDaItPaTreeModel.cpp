@@ -813,29 +813,6 @@ bool C_SyvDaItPaTreeModel::CheckListsRead(const std::vector<C_OSCNodeDataPoolLis
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all list IDs for the specified model index
-
-   \param[in]  orc_Index   Model index to evaluate
-
-   \return
-   All list IDs for the specified model index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForIndex(const QModelIndex & orc_Index)
-const
-{
-   std::vector<C_OSCNodeDataPoolListElementId> c_Retval;
-   if (orc_Index.isValid() == true)
-   {
-      C_OSCNodeDataPoolListElementId c_Id;
-      uint32 u32_ValidLayers;
-      C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
-      c_Retval = GetListIdsForId(c_Id, u32_ValidLayers);
-   }
-   return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get all changed list IDs
 
    \return

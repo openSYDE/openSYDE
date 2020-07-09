@@ -141,6 +141,7 @@ void C_SyvUpNodePropertiesDialog::InitStaticNames(void) const
    \param[in]  opc_OSYDevice              OSY device information
    \param[in]  oq_UpdateSuccessful        Flag if update was successful
    \param[in]  oq_ValidStatus             Flag if status is valid
+   \param[in]  oq_Discarded               Discarded flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::SetStatus(const C_SyvUtil::E_NodeUpdateInitialStatus oe_Status,
@@ -150,7 +151,8 @@ void C_SyvUpNodePropertiesDialog::SetStatus(const C_SyvUtil::E_NodeUpdateInitial
                                             const std::vector<QString> * const opc_FileInfos,
                                             const C_OSCSuSequences::C_XflDeviceInformation * const opc_STWDevice,
                                             const C_OSCSuSequences::C_OsyDeviceInformation * const opc_OSYDevice,
-                                            const bool oq_UpdateSuccessful, const bool oq_ValidStatus)
+                                            const bool oq_UpdateSuccessful, const bool oq_ValidStatus,
+                                            const bool oq_Discarded)
 {
    this->me_Status = oe_Status;
    this->mpc_HexFileInfos = opc_HexFileInfos;
@@ -161,6 +163,8 @@ void C_SyvUpNodePropertiesDialog::SetStatus(const C_SyvUtil::E_NodeUpdateInitial
    this->mpc_OSYDevice = opc_OSYDevice;
    this->mq_UpdateSuccessful = oq_UpdateSuccessful;
    this->mq_ValidStatus = oq_ValidStatus;
+   this->mq_Discarded = oq_Discarded;
+
    //Handle initial no info state
    if ((this->mpc_HexFileInfos != NULL) && (this->mpc_HexFileInfos->size() > 0UL))
    {
@@ -355,9 +359,9 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                      //If update successfull all applications have to be up to date
                      //If no node information is available skip this as this probably means: discarded information
                      //If error happend also skip this
-                     if ((((this->me_Status == C_SyvUtil::eI_APPLICATION_MATCH) || (this->mq_UpdateSuccessful)) &&
-                          ((this->mpc_OSYDevice != NULL) || (this->mpc_STWDevice != NULL))) &&
-                         (this->mq_UpdateFailed == false))
+                     if (((((this->me_Status == C_SyvUtil::eI_APPLICATION_MATCH) || (this->mq_UpdateSuccessful)) &&
+                           ((this->mpc_OSYDevice != NULL) || (this->mpc_STWDevice != NULL))) &&
+                          (this->mq_UpdateFailed == false)) && (this->mq_Discarded == false))
                      {
                         //Assuming known application status
                         c_DeviceProjectName = c_FileProjectName;
@@ -373,7 +377,8 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                         }
                         q_Missing = false;
                      }
-                     else if ((this->mq_UpdateFailed == true) && (u32_ItFile < this->mu32_FailedApplicationIndex))
+                     else if (((this->mq_UpdateFailed == true) && (u32_ItFile < this->mu32_FailedApplicationIndex)) &&
+                              (this->mq_Discarded == false))
                      {
                         //Assuming known application status
                         c_DeviceProjectName = c_FileProjectName;
@@ -389,7 +394,8 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
                         }
                         q_Missing = false;
                      }
-                     else if ((this->mq_UpdateFailed == true) && (u32_ItFile == this->mu32_FailedApplicationIndex))
+                     else if (((this->mq_UpdateFailed == true) && (u32_ItFile == this->mu32_FailedApplicationIndex)) ||
+                              (this->mq_Discarded == true))
                      {
                         //Assuming known application status
                         q_Missing = true;
@@ -654,8 +660,6 @@ void C_SyvUpNodePropertiesDialog::m_OnDiscard(void)
 {
    //Trigger changes
    this->me_Status = C_SyvUtil::eI_TO_BE_UPDATED;
-   this->mpc_STWDevice = NULL;
-   this->mpc_OSYDevice = NULL;
    this->mq_Discarded = true;
    m_ReInitStatus();
 }

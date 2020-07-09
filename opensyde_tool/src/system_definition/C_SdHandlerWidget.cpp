@@ -964,17 +964,17 @@ void C_SdHandlerWidget::CallHelp(void)
       //TabIndex == Datapools
       if (this->mpc_ActNodeEdit->GetTabIndex() == 1)
       {
-         stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdNdeDbViewWidget");
       }
       else if (this->mpc_ActNodeEdit->GetTabIndex() == 2) //TabIndex == COMM
       {
-         stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdBueComIfDescriptionWidget");
       }
       else //properties
       {
-         stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdNdeNodeEditWidget");
       }
    }
@@ -983,19 +983,19 @@ void C_SdHandlerWidget::CallHelp(void)
       //TabIndex == COMM
       if (this->mpc_ActBusEdit->GetTabIndex() == 1)
       {
-         stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdBueComIfDescriptionWidget");
       }
       else //properties
       {
-         stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdBueBusEditWidget");
       }
    }
    else
    {
       //ms32_SUBMODE_SYSDEF_TOPOLOGY and others call stw_opensyde_gui::C_SdHandlerWidget
-      stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
          "stw_opensyde_gui::C_SdHandlerWidget");
    }
 }

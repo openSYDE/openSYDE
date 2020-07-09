@@ -369,15 +369,8 @@ void C_SyvDaPeDataElementBrowse::m_UpdateSelection(const sintn osn_SelectionCoun
       this->mpc_Ui->pc_LabelSelection->setVisible(true);
       if (osn_SelectionCount > 0)
       {
-         if (osn_SelectionCount > 1)
-         {
-            this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("%1 selected data elements")).arg(
-                                                        osn_SelectionCount));
-         }
-         else
-         {
-            this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("1 selected data element")));
-         }
+         this->mpc_Ui->pc_LabelSelection->setText(QString(C_GtGetText::h_GetText("%1 selected data element(s)")).
+                                                  arg(osn_SelectionCount));
       }
       else
       {

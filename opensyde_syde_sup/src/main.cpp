@@ -45,7 +45,6 @@ using namespace stw_errors;
    else                                            see C_SYDEsup::Update for precise error descriptions
 */
 //----------------------------------------------------------------------------------------------------------------------
-
 sintn main(const sintn osn_Argc, charn * const oapcn_Argv[])
 {
    C_SYDEsup::E_Result e_Return;

@@ -83,54 +83,28 @@ C_UsSystemView::C_UsSystemView(const sintn osn_SetupViewZoom, const QPoint & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get update data rate
-
-   \return
-   Current update data rate
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const QMap<uint32, uint64> & C_UsSystemView::GetUpdateDataRateHistory(void) const
-{
-   return this->mc_UpdateDataRateHistory;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get update data rate per node
-
-   \return
-   Current update data rate per node
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const QMap<uint32, QMap<uint32, float64> > & C_UsSystemView::GetUpdateDataRateHistoryPerNode() const
-{
-   return this->mc_UpdateDataRateHistoryPerNode;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add update data rate
-
-   \param[in]  ou32_Checksum           System setup checksum
-   \param[in]  ou64_DataRateBytesPerS  Data bytes per milli seconds
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemView::AddUpdateDataRate(const uint32 ou32_Checksum, const uint64 ou64_DataRateBytesPerS)
-{
-   //Replace existing/insert new one
-   this->mc_UpdateDataRateHistory.insert(ou32_Checksum, ou64_DataRateBytesPerS);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add update data rates per node
 
-   \param[in]  ou32_Checksum           System setup checksum
-   \param[in]  orc_DataRateBytesPerMs  Data bytes per milli seconds per node
+   \param[in]  orc_NodeName               Node name
+   \param[in]  ou32_Checksum              Checksum
+   \param[in]  of64_DataRateBytesPerMs    Data rate bytes per ms
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemView::AddUpdateDataRatePerNode(const uint32 ou32_Checksum, const QMap<uint32,
-                                                                                     float64> & orc_DataRateBytesPerMs)
+void C_UsSystemView::AddNodeUpdateDataRate(const QString & orc_NodeName, const uint32 ou32_Checksum,
+                                           const float64 of64_DataRateBytesPerMs)
 {
-   //Replace existing/insert new one
-   this->mc_UpdateDataRateHistoryPerNode.insert(ou32_Checksum, orc_DataRateBytesPerMs);
+   if (this->mc_Nodes.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      C_UsSystemViewNode & rc_Node = this->mc_Nodes.operator [](orc_NodeName);
+      rc_Node.AddUpdateDataRate(ou32_Checksum, of64_DataRateBytesPerMs);
+   }
+   else
+   {
+      C_UsSystemViewNode c_Node;
+      c_Node.AddUpdateDataRate(ou32_Checksum, of64_DataRateBytesPerMs);
+      this->mc_Nodes.insert(orc_NodeName, c_Node);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

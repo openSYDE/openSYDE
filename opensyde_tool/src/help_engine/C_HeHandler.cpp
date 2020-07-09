@@ -47,7 +47,7 @@ C_HeHandler C_HeHandler::mhc_Instance;
    Current help engine instance
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_HeHandler & C_HeHandler::GetInstance(void)
+C_HeHandler & C_HeHandler::h_GetInstance(void)
 {
    return mhc_Instance;
 }
@@ -120,7 +120,7 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
    false: No help key press detected
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_HeHandler::CheckHelpKey(const QKeyEvent * const opc_KeyEvent)
+bool C_HeHandler::h_CheckHelpKey(const QKeyEvent * const opc_KeyEvent)
 {
    bool q_Retval;
 
@@ -151,12 +151,11 @@ void C_HeHandler::SetHelpFileRelPath(const QString & orc_RelPath)
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_HeHandler::C_HeHandler()
-{
+C_HeHandler::C_HeHandler() :
    //set default path
-   mc_HelpFileRelPath = "/Help/openSYDE PC Tool.chm";
-
-   InitSpecialHelpPages();
+   mc_HelpFileRelPath("/Help/openSYDE PC Tool.chm")
+{
+   m_InitSpecialHelpPages();
 
    //Load DLL
    this->mpv_InstHtmlHelp = LoadLibraryA("HHCtrl.ocx");
@@ -190,7 +189,7 @@ C_HeHandler::~C_HeHandler()
 /*! \brief   Init static map for specific help pages
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_HeHandler::InitSpecialHelpPages(void)
+void C_HeHandler::m_InitSpecialHelpPages(void)
 {
    //System Definition
 

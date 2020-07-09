@@ -30,8 +30,12 @@ public:
    const QMap<stw_types::uint32, bool> & GetSectionsExpanded(void) const;
    void SetSectionsExpanded(const QMap<stw_types::uint32, bool> & orc_SectionsExpanded);
 
+   const QMap<stw_types::uint32, stw_types::float64> & GetUpdateDataRateHistory() const;
+   void AddUpdateDataRate(const stw_types::uint32 ou32_Checksum, const stw_types::float64 of64_Value);
+
 private:
    QMap<stw_types::uint32, bool> mc_SectionsExpanded;
+   QMap<stw_types::uint32, stw_types::float64 > mc_UpdateDataRateHistory;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

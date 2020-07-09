@@ -56,10 +56,12 @@ sint32 C_OSCZipData::h_Zip(uint8 * const opu8_Destination, uint32 & oru32_Destin
                            const uint8 * const opu8_Source, const uint32 ou32_SourceLength)
 {
    sint32 s32_Return;
+   mz_ulong u32_DestinationLength = oru32_DestinationLength;
 
-   s32_Return = mz_compress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
+   s32_Return = mz_compress(opu8_Destination, &u32_DestinationLength, opu8_Source, ou32_SourceLength);
    if (s32_Return == MZ_OK)
    {
+      oru32_DestinationLength = u32_DestinationLength;
       return C_NO_ERR;
    }
    return C_NOACT;
@@ -88,10 +90,12 @@ sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_Dest
                              const uint8 * const opu8_Source, const uint32 ou32_SourceLength)
 {
    sint32 s32_Return;
+   mz_ulong u32_DestinationLength = oru32_DestinationLength;
 
-   s32_Return = mz_uncompress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
+   s32_Return = mz_uncompress(opu8_Destination, &u32_DestinationLength, opu8_Source, ou32_SourceLength);
    if (s32_Return == MZ_OK)
    {
+      oru32_DestinationLength = u32_DestinationLength;
       return C_NO_ERR;
    }
    return C_NOACT;

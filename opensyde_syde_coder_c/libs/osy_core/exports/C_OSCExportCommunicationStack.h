@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Export communication stack settings of a openSYDE node.
+   \brief       Export communication stack settings of an openSYDE node.
 
    See cpp file for detailed description
 
@@ -66,16 +66,13 @@ protected:
    static void mh_AddHeader(const stw_scl::C_SCLString & orc_ExportToolInfo, stw_scl::C_SCLStringList & orc_Data,
                             const stw_types::uint8 ou8_InterfaceIndex, const C_OSCCanProtocol::E_Type & ore_Protocol,
                             const bool oq_FileType);
-   static void mh_AddCIncludes(stw_scl::C_SCLStringList & orc_Data, const stw_scl::C_SCLString & orc_DataPoolName,
+   static void mh_AddCIncludes(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                const stw_types::uint8 ou8_InterfaceIndex, const C_OSCCanProtocol::E_Type & ore_Protocol,
                                const bool oq_NullRequired);
    static void mh_AddDefines(stw_scl::C_SCLStringList & orc_Data, const C_OSCCanMessageContainer & orc_ComMessage,
                              const stw_types::uint8 ou8_InterfaceIndex, const C_OSCCanProtocol::E_Type & ore_Protocol,
                              const stw_scl::C_SCLString & orc_ProjectId, const stw_types::uint16 ou16_GenCodeVersion,
                              const bool oq_FileType);
-   static void mh_AddFunctionPrototypes(stw_scl::C_SCLStringList & orc_Data, const stw_types::uint8 ou8_InterfaceIndex,
-                                        const C_OSCCanProtocol::E_Type & ore_Protocol,
-                                        const stw_scl::C_SCLString & orc_ProjectId);
    static void mh_AddCModuleGlobal(stw_scl::C_SCLStringList & orc_Data, const bool oq_SafeData,
                                    const C_OSCCanMessageContainer & orc_ComMessage,
                                    const stw_types::uint8 ou8_InterfaceIndex,
@@ -108,9 +105,9 @@ protected:
    static stw_scl::C_SCLString mh_GetProtocolNameByType(const C_OSCCanProtocol::E_Type & ore_Protocol);
    static stw_scl::C_SCLString mh_GetByteOrderNameByType(const C_OSCCanSignal::E_ByteOrderType & ore_ByteOrder);
    static stw_scl::C_SCLString mh_GetTransmissionTriggerNameByType(const C_OSCCanMessage::E_TxMethodType & ore_Trigger);
-   static stw_types::sint32 mh_SaveToFile(stw_scl::C_SCLStringList & orc_Data, const stw_scl::C_SCLString & orc_Path,
-                                          const stw_types::uint8 ou8_InterfaceIndex,
-                                          const C_OSCCanProtocol::E_Type & ore_Protocol, const bool oq_FileType);
+   static stw_scl::C_SCLString mh_GetMagicName(const stw_scl::C_SCLString & orc_ProjectId,
+                                               const stw_types::uint8 ou8_InterfaceIndex,
+                                               const C_OSCCanProtocol::E_Type & ore_Protocol);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

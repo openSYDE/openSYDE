@@ -50,10 +50,8 @@ public:
 
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
    void SetHalcChannelUseCase(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
-                              const stw_types::uint32 ou32_UseCaseIndex);
+                              const stw_types::uint32 ou32_UseCaseIndex, const bool oq_UseChannelIndex);
    void Clear(void);
-
-   static bool h_IsParentIndex(const QModelIndex & orc_Index);
 
    static E_Columns h_ColumnToEnum(const stw_types::sint32 & ors32_Column);
    static stw_types::sint32 h_EnumToColumn(const C_SdNdeHalcConfigTreeModel::E_Columns & ore_Value);
@@ -64,11 +62,15 @@ private:
 
    stw_types::uint32 mu32_NodeIndex;
    stw_types::uint32 mu32_DomainIndex;
-   stw_types::uint32 mu32_ChannelIndex;
-   stw_types::uint32 mu32_UseCaseIndex;
+   stw_types::uint32 mu32_ChannelIndex; ///< Only valid if mq_ChannelCase is true
+   stw_types::uint32 mu32_UseCaseIndex; ///< Only valid if mq_ChannelCase is true
+   bool mq_ChannelCase;                 ///< Flag to distinguish between domain only case and channel & use case case
 
-   bool m_GetParameterElementIndexe(const QModelIndex & orc_Index, stw_types::uint32 & oru32_ParameterIndex,
-                                    stw_types::uint32 & oru32_ParameterElementIndex) const;
+   static bool mh_GetParameterElementIndexe(const QModelIndex & orc_Index, stw_types::uint32 & oru32_ParameterIndex,
+                                            stw_types::uint32 & oru32_ParameterElementIndex);
+   const stw_opensyde_core::C_OSCHalcConfigParameter * m_GetParameterElement(const QModelIndex & orc_Index) const;
+   const stw_opensyde_core::C_OSCHalcDefElement * m_GetDefParameterElement(const QModelIndex & orc_Index) const;
+   static QStringList mh_ConvertEnumsToStringList(const stw_opensyde_core::C_OSCHalcDefContent & orc_Value);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -509,8 +509,7 @@ sint32 TGL_PACKAGE stw_tgl::TGL_CreateDirectory(const C_SCLString & orc_Director
    -1    could not remove directory
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 TGL_PACKAGE stw_tgl::TGL_RemoveDirectory(const C_SCLString & orc_Directory,
-                                                const bool oq_ContentOnly)
+sint32 TGL_PACKAGE stw_tgl::TGL_RemoveDirectory(const C_SCLString & orc_Directory, const bool oq_ContentOnly)
 {
    C_SCLString c_FilePath; // Filepath
    C_SCLString c_Pattern;  // Pattern
@@ -629,4 +628,25 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExpandFileName(const C_SCLString & orc_Rela
       }
    }
    return c_FullPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Retrieves .exe-path of the current running process
+
+   \return  full path including "/filename.exe"; empty string on error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString TGL_PACKAGE stw_tgl::TGL_GetExePath(void)
+{
+   uint32 u32_Return;
+   charn acn_Path[MAX_PATH];
+   C_SCLString c_Path = "";
+
+   u32_Return = GetModuleFileNameA(NULL, acn_Path, MAX_PATH);
+   if (u32_Return != 0)
+   {
+      //we got a path ...
+      c_Path = acn_Path;
+   }
+   return c_Path;
 }

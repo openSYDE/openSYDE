@@ -40,18 +40,18 @@ private:
       enum E_ServiceStatus
       {
          eIDLE,
-         eWAITING_FOR_FLOW_CONTROL,       //TX only
-         eWAITING_FOR_CONSECUTIVE_FRAME,  //RX only
-         eMORE_CONSECUTIVE_FRAMES_TO_SEND //TX only
+         eWAITING_FOR_FLOW_CONTROL,       //Tx only
+         eWAITING_FOR_CONSECUTIVE_FRAME,  //Rx only
+         eMORE_CONSECUTIVE_FRAMES_TO_SEND //Tx only
       };
 
       C_OSCProtocolDriverOsyService c_ServiceData;
       stw_types::uint16 u16_TransmissionIndex; ///< read resp. write index in service data
       stw_types::uint8 u8_SequenceNumber;      ///< next sequence number to send or expect
       E_ServiceStatus e_Status;                ///< status of service
-      stw_types::uint32 u32_StartTimeMs;       ///< TX: time the transmission was started; used for checking for "N_Bs"
+      stw_types::uint32 u32_StartTimeMs;       ///< Tx: time the transmission was started; used for checking for "N_Bs"
                                                // timeout
-      stw_types::uint32 u32_SendCfTimeout;     ///< TX:time at which sending all CFs should have been finished; set upon
+      stw_types::uint32 u32_SendCfTimeout;     ///< Tx:time at which sending all CFs should have been finished; set upon
       ///< reception of FC
    };
 
@@ -87,8 +87,8 @@ private:
    stw_can::C_CAN_Dispatcher * mpc_CanDispatcher; ///< CAN dispatcher to use for communication
    stw_types::uint16 mu16_DispatcherClientHandle; ///< our handle for dispatcher interaction
 
-   C_ServiceState mc_TxService; ///< status of TX service currently ongoing
-   C_ServiceState mc_RxService; ///< status of RX service currently ongoing
+   C_ServiceState mc_TxService; ///< status of Tx service currently ongoing
+   C_ServiceState mc_RxService; ///< status of Rx service currently ongoing
 
    stw_types::sint32 m_SetRxFilter(const bool oq_ForBroadcast);
    stw_types::uint32 m_GetTxIdentifier(void) const;

@@ -2243,23 +2243,6 @@ void C_SdNdeDpListTableModel::DoDeleteDataSet(const uint32 & oru32_DataSetIndex)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update column name after data set name edit
-
-   \param[in]  oru32_DataSetIndex   Changed data set
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableModel::DoEditDataSetName(const uint32 & oru32_DataSetIndex)
-{
-   sint32 s32_Index = this->EnumToColumn(eDATA_SET);
-
-   if (s32_Index >= 0)
-   {
-      const uint32 u32_Index = static_cast<uint32>(s32_Index) + oru32_DataSetIndex;
-      Q_EMIT this->headerDataChanged(Qt::Horizontal, u32_Index, u32_Index);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register model data reset
 */
 //----------------------------------------------------------------------------------------------------------------------

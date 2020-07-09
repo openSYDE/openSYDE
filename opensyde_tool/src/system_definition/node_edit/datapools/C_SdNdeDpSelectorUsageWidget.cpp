@@ -147,7 +147,6 @@ uint32 C_SdNdeDpSelectorUsageWidget::SetUsage(const uint32 ou32_Size, const std:
       if (this->mc_Percentages.size() > 1)
       {
          // more than one color necessary
-         QColor c_Color = mc_STYLE_GUIDE_COLOR_7;
          uint32 u32_DeltaColorScale;
          uint32 u32_ActualColorScale;
 
@@ -157,7 +156,7 @@ uint32 C_SdNdeDpSelectorUsageWidget::SetUsage(const uint32 ou32_Size, const std:
          for (c_ItUsed = this->mc_Percentages.begin(); c_ItUsed != this->mc_Percentages.end(); ++c_ItUsed)
          {
             // update the scaling
-            c_Color = stw_opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, u32_ActualColorScale);
+            QColor c_Color = stw_opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, u32_ActualColorScale);
             // for the next scaling
             u32_ActualColorScale -= u32_DeltaColorScale;
 

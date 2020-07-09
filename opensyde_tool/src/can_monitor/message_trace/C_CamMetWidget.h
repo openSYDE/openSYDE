@@ -48,6 +48,9 @@ public:
 
    void StopLogging(void);
 
+   void SearchNext(void) const;
+   void SearchPrev(void) const;
+
    void ClearData(void);
 
    // Filter configuration

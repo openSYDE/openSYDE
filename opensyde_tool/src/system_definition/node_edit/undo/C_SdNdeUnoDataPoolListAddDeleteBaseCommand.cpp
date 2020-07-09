@@ -12,11 +12,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QElapsedTimer>
-
 #include "stwtypes.h"
 #include "stwerrors.h"
-#include "constants.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdUtil.h"
 #include "TGLUtils.h"
@@ -70,12 +68,7 @@ C_SdNdeUnoDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDataPoolListAddDeleteBaseC
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Add(void)
 {
-   QElapsedTimer c_Timer;
-
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
    m_SortAscending();
    for (uint32 u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
@@ -107,10 +100,8 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Add(void)
          }
       }
    }
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "List add " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
+   osc_write_log_performance_stop(u16_TimerId, "Add list");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -119,12 +110,7 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Add(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Delete(void)
 {
-   QElapsedTimer c_Timer;
-
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
    this->mc_OSCContent.resize(this->mc_Indices.size());
    this->mc_UIContent.resize(this->mc_Indices.size());
@@ -175,10 +161,8 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Delete(void)
          }
       }
    }
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "List delete " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
+   osc_write_log_performance_stop(u16_TimerId, "Delete list");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

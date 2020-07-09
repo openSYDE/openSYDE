@@ -94,6 +94,8 @@ private:
                                                      stw_scl::C_SCLString & orc_Output);
    static void mh_SetMaxValForType(const stw_scl::C_SCLString & orc_TypeStr, C_OSCNodeDataPoolContent & orc_Content);
    static void mh_SetMinValForType(const stw_scl::C_SCLString & orc_TypeStr, C_OSCNodeDataPoolContent & orc_Content);
+   static bool mh_CheckInitialBitmaskContentValid(const C_OSCHalcDefContent & orc_Content);
+   static stw_scl::C_SCLString mh_ConvertToHex(const stw_types::uint64 ou64_Value);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

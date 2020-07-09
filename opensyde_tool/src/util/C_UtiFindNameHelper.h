@@ -24,7 +24,7 @@ namespace stw_opensyde_gui_logic
 class C_UtiFindNameHelper
 {
 public:
-   C_UtiFindNameHelper(const stw_scl::C_SCLString & orc_Cmp);
+   C_UtiFindNameHelper(const stw_scl::C_SCLString & orc_Cmp = "");
    bool operator ()(const stw_scl::C_SCLString * const opc_Cur) const;
 
 private:

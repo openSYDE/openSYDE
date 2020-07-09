@@ -1073,11 +1073,10 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
 void C_SdNdeNodePropertiesWidget::m_CheckNodeName(void)
 {
    //check
-   const QString c_Text = this->mpc_Ui->pc_LineEditNodeName->text();
-   const bool q_NameIsUnique = C_PuiSdHandler::h_GetInstance()->CheckNodeNameAvailable(
-      c_Text.toStdString().c_str(), &this->mu32_NodeIndex, NULL);
-   const bool q_NameIsValid = C_OSCUtils::h_CheckValidCName(
-      this->mpc_Ui->pc_LineEditNodeName->text().toStdString().c_str());
+   const C_SCLString c_Text = this->mpc_Ui->pc_LineEditNodeName->text().toStdString().c_str();
+   const bool q_NameIsUnique = C_PuiSdHandler::h_GetInstance()->CheckNodeNameAvailable(c_Text, &this->mu32_NodeIndex,
+                                                                                       NULL);
+   const bool q_NameIsValid = C_OSCUtils::h_CheckValidCName(c_Text);
 
    //set invalid text property
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditNodeName, "Valid", q_NameIsUnique && q_NameIsValid);
@@ -1160,7 +1159,7 @@ void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
             c_Details.append(QString("\"%1\"\n").arg(rc_Name.c_str()));
          }
          c_Message.SetDetails(c_Details);
-         c_Message.SetCustomMinHeight(180, 350);
+         c_Message.SetCustomMinHeight(220, 350);
          c_Message.Execute();
          //Restore previous name
          {

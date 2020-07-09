@@ -26,7 +26,7 @@ class C_SdBusMessageSelectorTreeWidgetItem :
    public QTreeWidgetItem
 {
 public:
-   C_SdBusMessageSelectorTreeWidgetItem(const bool & orq_IsMessage);
+   C_SdBusMessageSelectorTreeWidgetItem(const bool & orq_IsMessage = false);
 
    void SetError(const bool & orq_Value);
    void SetAlwaysActive(const bool & orq_Value);

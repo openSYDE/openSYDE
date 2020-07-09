@@ -30,7 +30,7 @@ public:
                                       const std::vector<QPointF> & orc_InitialPoints,
                                       const std::vector<QPointF> & orc_FinalPoints,
                                       QUndoCommand * const opc_Parent = NULL);
-   C_SebUnoTopBusConnectorMoveCommand(const C_SebUnoTopBusConnectorMoveCommand * const opc_Prev,
+   C_SebUnoTopBusConnectorMoveCommand(const C_SebUnoTopBusConnectorMoveCommand * const opc_Prev = NULL,
                                       QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SebUnoTopBusConnectorMoveCommand(void);
    virtual void undo(void) override;

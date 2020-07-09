@@ -50,8 +50,8 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Draw background for widget (once)
 
-   \param[in,out] opc_Widget  Widget to draw background for
-   \param[in,out] opc_Painter Optional painter
+   \param[in,out]  opc_Widget    Widget to draw background for
+   \param[in,out]  opc_Painter   Optional painter
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_DrawBackground(QWidget * const opc_Widget, QPainter * const opc_Painter)
@@ -78,9 +78,9 @@ void C_OgeWiUtil::h_DrawBackground(QWidget * const opc_Widget, QPainter * const 
    Apply stylesheet property and force update of style
    For more information see: https://wiki.qt.io/Dynamic_Properties_and_Stylesheets
 
-   \param[in,out] opc_Widget  Widget where to set property
-   \param[in,out] opcn_Name   Property name
-   \param[in,out] orc_Value   Property value
+   \param[in,out]  opc_Widget    Widget where to set property
+   \param[in,out]  opcn_Name     Property name
+   \param[in,out]  orc_Value     Property value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_ApplyStylesheetProperty(QWidget * const opc_Widget, const stw_types::charn * const opcn_Name,
@@ -97,9 +97,9 @@ void C_OgeWiUtil::h_ApplyStylesheetProperty(QWidget * const opc_Widget, const st
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply stylesheet property to widget AND all children (recursive)
 
-   \param[in,out] opc_Widget  Widget where to set property
-   \param[in,out] opcn_Name   Property name
-   \param[in,out] orc_Value   Property value
+   \param[in,out]  opc_Widget    Widget where to set property
+   \param[in,out]  opcn_Name     Property name
+   \param[in,out]  orc_Value     Property value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(QWidget * const opc_Widget,
@@ -122,7 +122,7 @@ void C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(QWidget * cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set window icon
 
-   \param[in,out] opc_Widget Widget to set icon for
+   \param[in,out]  opc_Widget    Widget to set icon for
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_SetWindowIcon(QWidget * const opc_Widget)
@@ -136,10 +136,10 @@ void C_OgeWiUtil::h_SetWindowIcon(QWidget * const opc_Widget)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility function to check if widget inside allowed area
 
-   \param[in,out] orc_GlobalPosition          Global position of top left corner (Set to default if necessary)
-   \param[in,out] orc_Size                    Size of widget (Set to default if necessary)
-   \param[in]     orc_DefaultSize             Default size of widget
-   \param[in]     oq_AddLogEntryForWindowSize Optional flag to add log entry for window size
+   \param[in,out]  orc_GlobalPosition           Global position of top left corner (Set to default if necessary)
+   \param[in,out]  orc_Size                     Size of widget (Set to default if necessary)
+   \param[in]      orc_DefaultSize              Default size of widget
+   \param[in]      oq_AddLogEntryForWindowSize  Optional flag to add log entry for window size
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition, QSize & orc_Size,
@@ -178,11 +178,11 @@ void C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update font depending on size
 
-   \param[in] opc_Widget              Widget to adapt
-   \param[in] orc_Text                Current text
-   \param[in] of32_HeightScaling      Scaling factor for widget height
-   \param[in] oq_IgnoreContentMargins Optional flag to ignore content margins
-   \param[in] opc_ImprovedSize        Optional size to use for the widget (does ignore content margins!)
+   \param[in]  opc_Widget                 Widget to adapt
+   \param[in]  orc_Text                   Current text
+   \param[in]  of32_HeightScaling         Scaling factor for widget height
+   \param[in]  oq_IgnoreContentMargins    Optional flag to ignore content margins
+   \param[in]  opc_ImprovedSize           Optional size to use for the widget (does ignore content margins!)
 
    \return
    -1   Error
@@ -234,10 +234,10 @@ sintn C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get optimal point size based on parameters
 
-   \param[in] orc_Font           Current font
-   \param[in] orc_Size           New size
-   \param[in] orc_Text           Current text
-   \param[in] of32_HeightScaling Scaling factor for widget height
+   \param[in]  orc_Font             Current font
+   \param[in]  orc_Size             New size
+   \param[in]  orc_Text             Current text
+   \param[in]  of32_HeightScaling   Scaling factor for widget height
 
    \return
    Font point size
@@ -313,7 +313,7 @@ sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Logic to get the next widget to gray out
 
-   \param[in] opc_Input Widget to search the parent hierarchy for
+   \param[in]  opc_Input   Widget to search the parent hierarchy for
 
    \return
    Either highest parent or the one child below the next pop up which is also parent of the input widget
@@ -362,7 +362,7 @@ QWidget * C_OgeWiUtil::h_GetWidgetUnderNextPopUp(QWidget * const opc_Input)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility function to check if the requested key is part of the global key handling
 
-   \param[in] opc_Event Event information
+   \param[in]  opc_Event   Event information
 
    \return
    True  Global key handling requested
@@ -399,30 +399,102 @@ bool C_OgeWiUtil::h_CheckGlobalKey(const QKeyEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get open file name via QFileDialog
+
+   Do not use QFileDialog::getOpenFileName because it does not support default suffix,
+   that we want to be added automatically (e.g. if typing "project" instead of "project.syde": load project.syde)
+   Furthermore we have to forbid some characters, like German umlauts. The reason for that is that our file base
+   classes like the XML parser cannot handle such characters.
+
+
+   \param[in,out]  opc_Parent          Parent widget
+   \param[in]      orc_Heading         QFileDialog heading
+   \param[in]      orc_StartingFolder  QFileDialog starting folder
+   \param[in]      orc_Filter          QFileDialog filter
+   \param[in]      orc_DefaultSuffix   QFile Dialog default suffix
+   \param[in]      orc_Option          QFileDialog option
+
+   \return
+   File name for opening (empty if aborted)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeWiUtil::h_GetOpenFileName(QWidget * const opc_Parent, const QString & orc_Heading,
+                                       const QString & orc_StartingFolder, const QString & orc_Filter,
+                                       const QString & orc_DefaultSuffix, const QFileDialog::Options & orc_Option)
+{
+   return mh_GetFileName(opc_Parent, orc_Heading, orc_StartingFolder, orc_Filter, "", orc_DefaultSuffix,
+                         QFileDialog::AcceptOpen, orc_Option);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get save file name via QFileDialog
 
-   \param[in,out] opc_Parent          Parent widget
-   \param[in]     orc_Heading         QFileDialog heading
-   \param[in]     orc_StartingFolder  QFileDialog starting folder
-   \param[in]     orc_Filter          QFileDialog filter
-   \param[in]     orc_DefaultFileName QFileDialog default file name
-   \param[in]     oc_Option           QFileDialog option
+   \param[in,out]  opc_Parent             Parent widget
+   \param[in]      orc_Heading            QFileDialog heading
+   \param[in]      orc_StartingFolder     QFileDialog starting folder
+   \param[in]      orc_Filter             QFileDialog filter
+   \param[in]      orc_DefaultFileName    QFileDialog default file name
+   \param[in]      orc_Option             QFileDialog option
+
+   \return
+   file name for saving (empty if aborted)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
+                                       const QString & orc_StartingFolder, const QString & orc_Filter,
+                                       const QString & orc_DefaultFileName, const QFileDialog::Options & orc_Option)
+{
+   return mh_GetFileName(opc_Parent, orc_Heading, orc_StartingFolder, orc_Filter, orc_DefaultFileName, "",
+                         QFileDialog::AcceptSave, orc_Option);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Show error popup for information about invalid paths.
+
+   \param[in]  opc_Parent        parent widget (for parent of message box)
+   \param[in]  orc_InvalidPaths  Paths that contain invalid characters
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiUtil::h_ShowPathInvalidError(QWidget * const opc_Parent, const QString & orc_InvalidPaths)
+{
+   C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Path"));
+   c_Message.SetDescription(C_GtGetText::h_GetText("Path contains invalid characters."));
+   c_Message.SetDetails(QString(C_GtGetText::h_GetText("Path(s):\n%1")).arg(orc_InvalidPaths));
+   c_Message.SetCustomMinHeight(180, 250);
+   c_Message.Execute();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get save file name via QFileDialog
+
+   \param[in,out]  opc_Parent             Parent widget
+   \param[in]      orc_Heading            QFileDialog heading
+   \param[in]      orc_StartingFolder     QFileDialog starting folder
+   \param[in]      orc_Filter             QFileDialog filter
+   \param[in]      orc_DefaultFileName    QFileDialog default file name
+   \param[in]      orc_SaveOrOpen         Save or open
+   \param[in]      orc_Option             QFileDialog option
 
    \return
    Get save file name (empty if aborted)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
-                                       const QString & orc_StartingFolder, const QString & orc_Filter,
-                                       const QString & orc_DefaultFileName, const QFileDialog::Options oc_Option)
+QString C_OgeWiUtil::mh_GetFileName(QWidget * const opc_Parent, const QString & orc_Heading,
+                                    const QString & orc_StartingFolder, const QString & orc_Filter,
+                                    const QString & orc_DefaultFileName, const QString & orc_DefaultSuffix,
+                                    const QFileDialog::AcceptMode & orc_SaveOrOpen,
+                                    const QFileDialog::Options & orc_Option)
 {
    QString c_Retval = "";
    bool q_Stop = false;
    QFileDialog c_FileDialog(opc_Parent, orc_Heading, orc_StartingFolder, orc_Filter);
 
    c_FileDialog.setFileMode(QFileDialog::AnyFile);
-   c_FileDialog.setAcceptMode(QFileDialog::AcceptSave);
-   c_FileDialog.setOptions(oc_Option);
+   c_FileDialog.setAcceptMode(orc_SaveOrOpen);
+   c_FileDialog.setOptions(orc_Option);
+   c_FileDialog.setDefaultSuffix(orc_DefaultSuffix);
    c_FileDialog.selectFile(orc_DefaultFileName);
    while (q_Stop == false)
    {
@@ -443,6 +515,8 @@ QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString
             else
             {
                C_OgeWiUtil::h_ShowPathInvalidError(opc_Parent, c_FullFilePath);
+               // update file path (open dialog on last "failed" location, not on startup location)
+               c_FileDialog.setDirectory(QFileInfo(c_FullFilePath).dir());
             }
          }
          else
@@ -458,30 +532,4 @@ QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString
    }
    return c_Retval;
    //lint -e{1746} Necessary because needs default parameter and is not recognized as const
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Show error popup for information about invalid paths.
-
-   \param[in]       opc_Parent         parent widget (for parent of message box)
-   \param[in]       orc_InvalidPaths   Paths that contain invalid characters
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiUtil::h_ShowPathInvalidError(QWidget * const opc_Parent, const QString & orc_InvalidPaths)
-{
-   C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
-
-   c_Message.SetHeading(C_GtGetText::h_GetText("Invalid Path"));
-   c_Message.SetDescription(C_GtGetText::h_GetText("Path contains invalid characters."));
-   c_Message.SetDetails(QString(C_GtGetText::h_GetText("Path(s):\n%1")).arg(orc_InvalidPaths));
-   c_Message.SetCustomMinHeight(180, 250);
-   c_Message.Execute();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Default constructor
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_OgeWiUtil::C_OgeWiUtil(void)
-{
 }

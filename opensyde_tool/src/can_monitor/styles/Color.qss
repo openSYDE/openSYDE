@@ -24,6 +24,7 @@ stw_opensyde_gui--C_CamMetTreeView::item:hover,
 stw_opensyde_gui_elements--C_OgeLabPopUpTitle,
 stw_opensyde_gui_elements--C_OgeGbxTransparent,
 stw_opensyde_gui--C_CamMosFilterPopup,
+stw_opensyde_gui--C_CamMetSettingsPopup,
 stw_opensyde_gui--C_CamMosDatabaseSelectionView QHeaderView,
 stw_opensyde_gui--C_CamMosDatabaseSelectionPopup,
 stw_opensyde_gui--C_CamMosDatabaseBusSelectionPopup,
@@ -190,6 +191,7 @@ border-color:rgb(42, 42, 91);
 stw_opensyde_gui_elements--C_OgeLeDark,
 stw_opensyde_gui_elements--C_CamOgeLeFilePath,
 stw_opensyde_gui_elements--C_CamOgeCbxTable,
+stw_opensyde_gui_elements--C_CamOgeCbxWhite,
 stw_opensyde_gui_elements--C_CamOgeLeTableEdit,
 stw_opensyde_gui_elements--C_CamOgeLeIDPopUp,
 stw_opensyde_gui_elements--C_CamOgeCbxTableSmall,
@@ -315,7 +317,9 @@ border-color:rgb(130, 130, 143);
 
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_COLOR_9 */
+stw_opensyde_gui--C_CamMetControlBarWidget QFrame[frameShape="5"],
 stw_opensyde_gui--C_CamMetStatusBarWidget QFrame[frameShape="5"],
+stw_opensyde_gui--C_CamGenMessagesWidget QFrame[frameShape="5"],
 stw_opensyde_gui_elements--C_OgeContextMenu::item:disabled
 {
 color:rgb(155, 155, 170);
@@ -560,6 +564,7 @@ background-color:rgb(195, 186, 221);
 stw_opensyde_gui_elements--C_OgeLeDark,
 stw_opensyde_gui_elements--C_CamOgeLeFilePath,
 stw_opensyde_gui_elements--C_CamOgeCbxTable,
+stw_opensyde_gui_elements--C_CamOgeCbxWhite,
 stw_opensyde_gui_elements--C_CamOgeLeTableEdit,
 stw_opensyde_gui_elements--C_CamOgeLeIDPopUp,
 stw_opensyde_gui_elements--C_CamOgeCbxTableSmall,

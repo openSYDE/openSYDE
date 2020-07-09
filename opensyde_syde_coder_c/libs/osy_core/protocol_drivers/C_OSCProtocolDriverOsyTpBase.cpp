@@ -141,9 +141,9 @@ bool C_OSCProtocolDriverOsyNode::operator <(const C_OSCProtocolDriverOsyNode & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   add new service to TX queue
+/*! \brief   add new service to Tx queue
 
-   Add specified service to TX queue for outgoing requests.
+   Add specified service to Tx queue for outgoing requests.
    During the operation the queue will be locked by a critical section.
 
    \param[in] orc_Service         service to add to queue
@@ -151,7 +151,7 @@ bool C_OSCProtocolDriverOsyNode::operator <(const C_OSCProtocolDriverOsyNode & o
    \return
    C_NO_ERR    service added
    C_RANGE     service size out of range (maximum: 4095 bytes)
-   C_OVERFLOW  TX queue is already full
+   C_OVERFLOW  Tx queue is already full
    C_NOACT     could not add to queue (out of memory; should not happen in real life)
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,9 +187,9 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToTxQueue(const C_OSCProtocolDriverOsy
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   add new service to RX queue
+/*! \brief   add new service to Rx queue
 
-   Add specified service to RX queue for incoming responses.
+   Add specified service to Rx queue for incoming responses.
    During the operation the queue will be locked by a critical section.
 
    \param[in] orc_Service         service to add to queue
@@ -197,7 +197,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToTxQueue(const C_OSCProtocolDriverOsy
    \return
    C_NO_ERR    service added
    C_RANGE     service size out of range
-   C_OVERFLOW  RX queue is already full
+   C_OVERFLOW  Rx queue is already full
    C_NOACT     could not add to queue (out of memory; should not happen in real life)
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -233,9 +233,9 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToRxQueue(const C_OSCProtocolDriverOsy
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   get "oldest" entry from TX queue
+/*! \brief   get "oldest" entry from Tx queue
 
-   Get service from TX queue for outgoing requests.
+   Get service from Tx queue for outgoing requests.
    During the operation the queue will be locked by a critical section.
 
    \param[out] orc_Service         read service
@@ -264,9 +264,9 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromTxQueue(C_OSCProtocolDriverOsyServ
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   get "oldest" entry from RX queue
+/*! \brief   get "oldest" entry from Rx queue
 
-   Get service from RX queue for incoming responses.
+   Get service from Rx queue for incoming responses.
    During the operation the queue will be locked by a critical section.
 
    \param[out] orc_Service         read service
@@ -295,9 +295,9 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromRxQueue(C_OSCProtocolDriverOsyServ
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clear RX and TX service queues
+/*! \brief   Clear Rx and Tx service queues
 
-   Remove all elements from TX and TX service queues
+   Remove all elements from Tx and Tx service queues
    During the operation each of the queues will be locked by a critical section.
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -329,7 +329,7 @@ void C_OSCProtocolDriverOsyTpBase::SetBroadcastTimeout(const uint32 ou32_Timeout
 
    Initialize class fields
 
-   \param[in]  ou16_MaxServiceQueueSize  maximum number of service queue entries for TX and RX queue
+   \param[in]  ou16_MaxServiceQueueSize  maximum number of service queue entries for Tx and Rx queue
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpBase::C_OSCProtocolDriverOsyTpBase(const uint16 ou16_MaxServiceQueueSize) :
@@ -394,7 +394,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::Disconnect(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send service request
 
-   Add service request to TX queue for sending.
+   Add service request to Tx queue for sending.
    Actual sending will not be performed here (use C_OSCProtocolDriverOsyTpBase::Cycle).
 
    \param[in]     orc_Request      service request to add to queue
@@ -402,7 +402,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::Disconnect(void)
    \return
    C_NO_ERR    service added
    C_RANGE     service size out of range
-   C_OVERFLOW  TX queue is already full
+   C_OVERFLOW  Tx queue is already full
    C_NOACT     could not add to queue (out of memory; should not happen in real life)
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -412,9 +412,9 @@ sint32 C_OSCProtocolDriverOsyTpBase::SendRequest(const C_OSCProtocolDriverOsySer
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Read service response from RX queue
+/*! \brief   Read service response from Rx queue
 
-   Get "oldest" incoming service request from RX queue.
+   Get "oldest" incoming service request from Rx queue.
    The function does not perform to actual reception from the CAN bus (use C_OSCProtocolDriverOsyTpBase::Cycle).
 
    \param[out]     orc_Response      incoming service response

@@ -390,7 +390,9 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
             {
                e_Return = m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application), orc_OutputPath,
                                                   c_CreatedFiles);
-               this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application, true, c_CreatedFiles);
+
+               this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application,
+                                                    e_Return == eRESULT_OK, c_CreatedFiles);
             }
             q_Found = true;
             break;

@@ -80,7 +80,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
       //Acquire data via special user role to not have a conflict with the default drawing engine
       const QString c_Data = orc_Index.data(msn_USER_ROLE_MARKER_TEXT).toString();
       //Separate data bytes
-      const QStringList c_List = mhc_CreateAndStandardizeStringList(c_Data, q_IsHex);
+      const QStringList c_List = mh_CreateAndStandardizeStringList(c_Data, q_IsHex);
       //GreyOutValues
       const QByteArray c_TransparencyValues = orc_Index.data(msn_USER_ROLE_MARKER_TRANSPARENCY).toByteArray();
       //Check if expected size (Number of bytes and flags to highlight should match)
@@ -362,7 +362,7 @@ sint32 C_TblDelegateUtil::mh_GetSegmentWidth(const QPoint & orc_TopLeft, const Q
    Segmented and standardized string parts
 */
 //----------------------------------------------------------------------------------------------------------------------
-QStringList C_TblDelegateUtil::mhc_CreateAndStandardizeStringList(const QString & orc_Input, bool & orq_IsHex)
+QStringList C_TblDelegateUtil::mh_CreateAndStandardizeStringList(const QString & orc_Input, bool & orq_IsHex)
 {
    QStringList c_Retval = orc_Input.split(" ", QString::SkipEmptyParts);
 

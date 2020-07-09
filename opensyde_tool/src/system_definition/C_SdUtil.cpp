@@ -15,10 +15,7 @@
 #include <set>
 #include <limits>
 
-#include <QElapsedTimer>
-
 #include "stwerrors.h"
-#include "constants.h"
 #include "C_SdUtil.h"
 #include "TGLUtils.h"
 #include "C_OSCUtils.h"
@@ -32,6 +29,9 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_SdNdeDpContentUtil.h"
 #include "C_SdNdeDpUtil.h"
+#include "C_SdBueUnoBusProtNodeConnectCommand.h"
+#include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.h"
+#include "C_SdBueUnoBusProtNodeDisconnectCommand.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
@@ -334,7 +334,7 @@ QString C_SdUtil::h_ConvertByteOrderToName(const C_OSCCanSignal::E_ByteOrderType
 void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std::vector<uint32> & orc_Indices,
                                           const bool oq_NvmSizeInvalid, QString & orc_Heading, QString & orc_Content)
 {
-   orc_Heading = C_GtGetText::h_GetText("Datapools with invalid content");
+   orc_Heading = C_GtGetText::h_GetText("Datapools with invalid content:");
    orc_Content = "";
    if (oq_NvmSizeInvalid == true)
    {
@@ -745,11 +745,13 @@ std::vector<uint32> C_SdUtil::h_GetUsedBusIdsUniqueAndSortedAscending(const sint
 /*! \brief   Adapt message to protocol restrictions
 
    \param[in,out]  orc_Message            Message to adapt
+   \param[in,out]  opc_UiMessage          Optional Ui Message to adapt
    \param[in]      oe_Type                Protocol type
    \param[in,out]  opc_AdaptationInfos    Optional report about adaptations
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message,  const C_OSCCanProtocol::E_Type oe_Type,
+void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message, C_PuiSdNodeCanMessage * const opc_UiMessage,
+                                            const C_OSCCanProtocol::E_Type oe_Type,
                                             QStringList * const opc_AdaptationInfos)
 {
    QStringList c_Info;
@@ -766,6 +768,19 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message,  cons
                           arg(C_SdUtil::h_ConvertTxMethodToName(orc_Message.e_TxMethod)).
                           arg(C_SdUtil::h_ConvertTxMethodToName(C_OSCCanMessage::eTX_METHOD_CYCLIC)));
          orc_Message.e_TxMethod = C_OSCCanMessage::eTX_METHOD_CYCLIC;
+
+         // Adapt the necessary cyclic information
+         if ((orc_Message.u32_CycleTimeMs == 0U) ||
+             (orc_Message.u32_TimeoutMs == 0U))
+         {
+            orc_Message.u32_CycleTimeMs = C_PuiSdUtil::h_GetDefaultMessageCycleTime();
+            orc_Message.u32_TimeoutMs = C_PuiSdUtil::h_GetMessageAutoTimeoutTime(orc_Message.u32_CycleTimeMs);
+
+            if (opc_UiMessage != NULL)
+            {
+               opc_UiMessage->e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_AUTO;
+            }
+         }
       }
 
       // specific changes
@@ -1129,27 +1144,26 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
    bool q_NameConflict;
    bool q_NameEmpty;
    bool q_NodeIdInvalid;
-   QElapsedTimer c_Timer;
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
    bool q_DataPoolsSizeConflict =
       C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
    bool q_DataPoolsInvalid;
    bool q_ApplicationsInvalid;
+   bool q_DomainsInvalid;
 
    std::vector<uint32> c_InvalidInterfaceIndices;
    std::vector<uint32> c_InvalidDataPoolIndices;
    std::vector<uint32> c_InvalidApplicationIndices;
+   std::vector<uint32> c_InvalidDomainIndices;
    sint32 s32_Retval = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorNode(
       oru32_NodeIndex, &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid, &q_DataPoolsInvalid, &q_ApplicationsInvalid,
-      true, &c_InvalidInterfaceIndices, &c_InvalidDataPoolIndices, &c_InvalidApplicationIndices);
+      &q_DomainsInvalid, true, &c_InvalidInterfaceIndices, &c_InvalidDataPoolIndices, &c_InvalidApplicationIndices,
+      &c_InvalidDomainIndices);
    if (s32_Retval == C_NO_ERR)
    {
-      if ((((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
-            (q_ApplicationsInvalid == true)) || (q_DataPoolsSizeConflict == true)) || (q_NameEmpty == true))
+      if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
+             (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_DataPoolsSizeConflict == true)) ||
+          (q_NameEmpty == true))
       {
          orq_ErrorDetected = true;
          if (((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_NameEmpty == true))
@@ -1209,6 +1223,27 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
             orc_Text += c_Content;
             orc_Text += "\n";
          }
+         if (q_DomainsInvalid == true)
+         {
+            orc_Text += C_GtGetText::h_GetText("Invalid HALC Domains:\n");
+            for (uint32 u32_ItDomains = 0;
+                 (u32_ItDomains < c_InvalidDomainIndices.size()) && (u32_ItDomains < mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                 ++u32_ItDomains)
+            {
+               const C_OSCHalcConfigDomain * const pc_Domain =
+                  C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(oru32_NodeIndex,
+                                                                                c_InvalidDomainIndices[u32_ItDomains]);
+               if (pc_Domain != NULL)
+               {
+                  orc_Text += QString("%1\n").arg(pc_Domain->c_Name.c_str());
+               }
+            }
+            if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDomainIndices.size())
+            {
+               orc_Text += QString("+%1\n").arg(c_InvalidDomainIndices.size() - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+            }
+            orc_Text += "\n";
+         }
       }
       else
       {
@@ -1221,10 +1256,7 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
       orq_ErrorDetected = true;
       orc_Text = C_GtGetText::h_GetText("Unknown");
    }
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Node tooltip error check " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
    return s32_Retval;
 }
 
@@ -1364,7 +1396,6 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
                                                    const QString & orc_AdditionalInformation)
 {
    QString c_ToolTipContent = "";
-   QString c_HelpString = "";
 
    std::vector<QString> c_HelpVector;
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
@@ -1468,7 +1499,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
             C_SdNdeDpContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_MinValue,
                                                             pc_DpListElement->f64_Factor,
                                                             pc_DpListElement->f64_Offset, c_HelpVector);
-            c_HelpString = "";
+            QString c_HelpString = "";
             for (uint32 u32_Pos = 0; u32_Pos < c_HelpVector.size(); u32_Pos++)
             {
                c_HelpString.append(c_HelpVector[u32_Pos]);
@@ -1536,7 +1567,7 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
                C_SdNdeDpContentUtil::h_GetValuesAsScaledString(pc_DpListElement->c_DataSetValues[u32_PosDataset],
                                                                pc_DpListElement->f64_Factor,
                                                                pc_DpListElement->f64_Offset, c_HelpVector);
-               c_HelpString = "";
+               QString c_HelpString = "";
                for (uint32 u32_PosArray = 0; u32_PosArray < c_HelpVector.size(); u32_PosArray++)
                {
                   c_HelpString.append(c_HelpVector[u32_PosArray]);
@@ -1673,6 +1704,12 @@ QString C_SdUtil::h_GetToolTipContentSignal(const C_OSCCanMessageIdentificationI
    \param[in,out]  orc_IndicesTmp      Unsorted indices
    \param[in,out]  orc_OSCContentTmp   Unsorted OSC content
    \param[in,out]  orc_UIContentTmp    Unsorted UI content
+
+   \return
+   Type of return values, e.g. STW error codes
+
+   \retval   Return value 1   Detailed description of 1st return value
+   \retval   Return value 2   Detailed description of 2nd return value
 */
 //----------------------------------------------------------------------------------------------------------------------
 template <typename T, typename U>
@@ -1737,6 +1774,12 @@ void C_SdUtil::h_SortIndicesDescendingAndSync<C_OSCNodeDataPoolListElement, C_Pu
    \param[in,out]  orc_IndicesTmp      Unsorted indices
    \param[in,out]  orc_OSCContentTmp   Unsorted OSC content
    \param[in,out]  orc_UIContentTmp    Unsorted UI content
+
+   \return
+   Type of return values, e.g. STW error codes
+
+   \retval   Return value 1   Detailed description of 1st return value
+   \retval   Return value 2   Detailed description of 2nd return value
 */
 //----------------------------------------------------------------------------------------------------------------------
 template <typename T, typename U>
@@ -1790,3 +1833,115 @@ template
 void C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
    std::vector<stw_types::uint32> & orc_IndicesTmp, std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContentTmp,
    std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContentTmp);
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the state of the COM datapools
+
+   If a specific COM datapool does not exist, it will be created
+
+   \param[in]  ou32_NodeIndex       Current node index
+   \param[in]  ou8_InterfaceNumber  Interface number
+   \param[in]  oq_ComProtocolL2     Flag if Layer 2 COM datapool exist
+   \param[in]  oq_ComProtocolECeS   Flag if ECeS COM datapool exist
+   \param[in]  oq_ComProtocolECoS   Flag if ECoS COM datapool exist
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdUtil::h_ConfigureComDatapools(const uint32 ou32_NodeIndex, const uint8 ou8_InterfaceNumber,
+                                       const bool oq_ComProtocolL2, const bool oq_ComProtocolECeS,
+                                       const bool oq_ComProtocolECoS)
+{
+   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+
+   if (pc_OscNode != NULL)
+   {
+      uint32 u32_InterfaceIndex = 0UL;
+      bool q_Found = false;
+      for (uint32 u32_Counter = 0U; u32_Counter < pc_OscNode->c_Properties.c_ComInterfaces.size(); ++u32_Counter)
+      {
+         const C_OSCNodeComInterfaceSettings & rc_Interface = pc_OscNode->c_Properties.c_ComInterfaces[u32_Counter];
+         if (rc_Interface.u8_InterfaceNumber == ou8_InterfaceNumber)
+         {
+            u32_InterfaceIndex = u32_Counter;
+            q_Found = true;
+            break;
+         }
+      }
+      if (q_Found == true)
+      {
+         C_SdUtil::mh_ConfigureComDatapool(ou32_NodeIndex, u32_InterfaceIndex, C_OSCCanProtocol::eLAYER2,
+                                           oq_ComProtocolL2);
+         C_SdUtil::mh_ConfigureComDatapool(ou32_NodeIndex, u32_InterfaceIndex, C_OSCCanProtocol::eECES,
+                                           oq_ComProtocolECeS);
+         C_SdUtil::mh_ConfigureComDatapool(ou32_NodeIndex, u32_InterfaceIndex,
+                                           C_OSCCanProtocol::eCAN_OPEN_SAFETY,
+                                           oq_ComProtocolECoS);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdUtil::mh_ConfigureComDatapool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
+                                       const C_OSCCanProtocol::E_Type oe_ProtocolType, const bool oq_Active)
+{
+   uint32 u32_Counter;
+   const uint32 u32_NodeIndex = ou32_NodeIndex;
+   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+   bool q_ProtocolFound = false;
+   bool q_ActiveForInterface = false;
+
+   if (pc_OscNode != NULL)
+   {
+      for (u32_Counter = 0U; u32_Counter < pc_OscNode->c_ComProtocols.size(); ++u32_Counter)
+      {
+         const C_OSCCanProtocol & rc_Protocol = pc_OscNode->c_ComProtocols[u32_Counter];
+         if (rc_Protocol.e_Type == oe_ProtocolType)
+         {
+            // Protocol found
+            q_ProtocolFound = true;
+
+            tgl_assert(ou32_InterfaceIndex < rc_Protocol.c_ComMessages.size());
+            if (ou32_InterfaceIndex < rc_Protocol.c_ComMessages.size())
+            {
+               // State of the protocol for the interface
+               q_ActiveForInterface = rc_Protocol.c_ComMessages[ou32_InterfaceIndex].q_IsComProtocolUsedByInterface;
+            }
+            break;
+         }
+      }
+   }
+
+   // Using the implemented undo/redo commands of bus edit for handling the COM protocols.
+   // Only to prevent copied code, not using undo/redo here really.
+   if ((q_ProtocolFound == false) &&
+       (oq_Active == true))
+   {
+      // New COM datapool necessary
+      C_SdBueUnoBusProtNodeConnectAndCreateCommand c_Cmd(u32_NodeIndex, ou32_InterfaceIndex, oe_ProtocolType, NULL);
+      c_Cmd.redo();
+   }
+   else if (q_ProtocolFound == true)
+   {
+      if ((q_ActiveForInterface == true) &&
+          (oq_Active == false))
+      {
+         // Deactivate the COM protocol for this interface
+         C_SdBueUnoBusProtNodeDisconnectCommand c_Cmd(u32_NodeIndex, ou32_InterfaceIndex, oe_ProtocolType, NULL);
+         c_Cmd.redo();
+      }
+      else if ((q_ActiveForInterface == false) &&
+               (oq_Active == true))
+      {
+         // Activate the COM protocol for this interface
+         C_SdBueUnoBusProtNodeConnectCommand c_Cmd(u32_NodeIndex, ou32_InterfaceIndex, oe_ProtocolType, NULL);
+         c_Cmd.redo();
+      }
+      else
+      {
+         // Nothing to do
+      }
+   }
+   else
+   {
+      // Nothing to do
+   }
+}

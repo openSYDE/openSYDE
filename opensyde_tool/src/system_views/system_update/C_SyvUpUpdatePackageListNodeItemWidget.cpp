@@ -107,6 +107,11 @@ C_SyvUpUpdatePackageListNodeItemWidget::C_SyvUpUpdatePackageListNodeItemWidget(c
       this->mpc_Ui->pc_LabelVersion->setText("");
    }
 
+   this->mpc_Ui->pc_LabelUserHint->setText(C_GtGetText::h_GetText("User"));
+   this->mpc_Ui->pc_LabelUserHint->SetFontPixel(10);
+   this->mpc_Ui->pc_LabelUserHint->SetForegroundColor(0);
+   this->mpc_Ui->pc_LabelUserHint->SetBackgroundColor(9);
+
    this->mpc_Ui->pc_LabelPath->setText(C_GtGetText::h_GetText("<Add File>"));
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -239,6 +244,7 @@ void C_SyvUpUpdatePackageListNodeItemWidget::SetAppNumber(const stw_types::uint3
 void C_SyvUpUpdatePackageListNodeItemWidget::SetAppFile(const QString & orc_File, const bool oq_DefaultFile)
 {
    const QFileInfo c_FileInfo(orc_File);
+   bool q_ShowUserHint;
 
    if ((orc_File.isEmpty() == false) && (c_FileInfo.isDir() == false))
    {
@@ -251,8 +257,15 @@ void C_SyvUpUpdatePackageListNodeItemWidget::SetAppFile(const QString & orc_File
 
    this->mq_DefaultFilePath = oq_DefaultFile;
 
+   // Update the state of user (system view specific configuration over system definition) hint
+   q_ShowUserHint = (!this->mq_DefaultFilePath) && this->IsUserHintPossible();
+   this->mpc_Ui->pc_LabelUserHint->setVisible(q_ShowUserHint);
+   this->mpc_Ui->pc_HorizontalSpacerUserHint->changeSize(((q_ShowUserHint == true) ? 15 : 0),
+                                                         0, QSizePolicy::Fixed);
+
    this->m_UpdateAbsolutePath();
    this->m_UpateFilePathLabel();
+   this->m_UpdateToolTip();
 
    // Reset timestamp to a null (invalid) timestamp value for check
    this->mc_FileTimestamp = QDateTime();
@@ -363,39 +376,6 @@ QString C_SyvUpUpdatePackageListNodeItemWidget::GetAppAbsoluteFilePath(void) con
 QString C_SyvUpUpdatePackageListNodeItemWidget::GetAppDeviceType(void) const
 {
    return this->mc_AppDeviceType;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns if the default path is used
-
-   \return
-   true        Default path is used
-   false       View path is used
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdatePackageListNodeItemWidget::IsDefaultPathActive(void) const
-{
-   return this->mq_DefaultFilePath;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Checks if the application file is missing
-
-   \return
-   true        Application file is missing
-   false       Application file exists
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdatePackageListNodeItemWidget::IsAppFileMissing(void) const
-{
-   bool q_Return = false;
-
-   if (this->mpc_Ui->pc_LabelVersion->text() == C_GtGetText::h_GetText("Missing"))
-   {
-      q_Return = true;
-   }
-
-   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -695,8 +675,17 @@ void C_SyvUpUpdatePackageListNodeItemWidget::m_UpateFilePathLabel(void) const
    if ((this->mc_AbsoluteFilePath != "") &&
        (this->mc_AbsoluteFilePath != C_GtGetText::h_GetText("<Add File>")))
    {
-      const sintn sn_Width = this->width() - mhsn_PathOffset;
-      const QString c_AdaptedString =
+      sintn sn_Width = this->parentWidget()->width() - mhsn_PathOffset;
+      QString c_AdaptedString;
+
+      if (this->mpc_Ui->pc_LabelUserHint->isVisible() == true)
+      {
+         // In this case the label for the path does not have so much space to use
+         sn_Width -= this->mpc_Ui->pc_LabelUserHint->width();
+         sn_Width -= this->mpc_Ui->pc_HorizontalSpacerUserHint->geometry().width();
+      }
+
+      c_AdaptedString =
          C_Uti::h_MinimizePath(this->mc_FilePath,
                                this->mpc_Ui->pc_LabelPath->font(), static_cast<uint32>(sn_Width), 0U);
       this->mpc_Ui->pc_LabelPath->setText(c_AdaptedString);
@@ -740,6 +729,19 @@ void C_SyvUpUpdatePackageListNodeItemWidget::m_UpdateToolTip(void)
    QString c_Content = this->m_CreateToolTipContent();
 
    // Default tool tip part
+
+   if (this->IsUserHintPossible() == true)
+   {
+      if (this->mq_DefaultFilePath == false)
+      {
+         c_Content += C_GtGetText::h_GetText("\nFile path origin: Defined by User");
+      }
+      else
+      {
+         c_Content += C_GtGetText::h_GetText("\nFile path origin: Default, defined in Data Block properties");
+      }
+   }
+
    if (this->mc_FilePath == this->mc_AbsoluteFilePath)
    {
       c_Content += C_GtGetText::h_GetText("\nFile path: ");

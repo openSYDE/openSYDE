@@ -35,7 +35,7 @@ class C_GiBiTextElement :
 public:
    C_GiBiTextElement(const stw_types::uint64 & oru64_ID, const bool oq_Editable,
                      QGraphicsItem * const opc_Parent = NULL);
-   C_GiBiTextElement(const stw_types::uint64 & oru64_ID, QGraphicsItem * const opc_Parent = NULL);
+   C_GiBiTextElement(const stw_types::uint64 & oru64_ID = 0, QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiBiTextElement();
 
    virtual stw_types::sintn type() const override;

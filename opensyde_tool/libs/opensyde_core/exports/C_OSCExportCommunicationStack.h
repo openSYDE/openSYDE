@@ -66,7 +66,7 @@ protected:
    static void mh_AddHeader(const stw_scl::C_SCLString & orc_ExportToolInfo, stw_scl::C_SCLStringList & orc_Data,
                             const stw_types::uint8 ou8_InterfaceIndex, const C_OSCCanProtocol::E_Type & ore_Protocol,
                             const bool oq_FileType);
-   static void mh_AddCIncludes(stw_scl::C_SCLStringList & orc_Data, const stw_scl::C_SCLString & orc_DataPoolName,
+   static void mh_AddCIncludes(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                const stw_types::uint8 ou8_InterfaceIndex, const C_OSCCanProtocol::E_Type & ore_Protocol,
                                const bool oq_NullRequired);
    static void mh_AddDefines(stw_scl::C_SCLStringList & orc_Data, const C_OSCCanMessageContainer & orc_ComMessage,

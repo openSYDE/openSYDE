@@ -453,11 +453,8 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
 
       // create config xml file for DocuCreator
       m_CreateConfigXml(c_SclStringDocuCreatorConfigPath, c_ConfigXml);
-   }
 
-   // call external 'DocuCreator' tool
-   if (s32_Return == C_NO_ERR)
-   {
+      // call external 'DocuCreator' tool
       osc_write_log_info("RTF File Export", "Content ready, call DocuCreator ...");
 
       QStringList c_Arguments;
@@ -522,12 +519,9 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       }
       pc_Process->close();
       pc_Process->deleteLater(); // not necessary but does also no harm
-      //lint -e{429}  no memory leak because of the Qt memory management
-   }
 
-   if (s32_Return == C_NO_ERR)
-   {
       osc_write_log_info("RTF File Export", "RTF document created, export successful.");
+      //lint -e{429}  no memory leak because of the Qt memory management
    }
 
    orc_WarningMessages = this->mc_Warnings; // give user feedback
@@ -706,7 +700,7 @@ void C_RtfExportWidget::m_RtfPathClicked(void)
    const QString c_FilterName = QString(C_GtGetText::h_GetText("RTF file (*.rtf)"));
    const QString c_FullRtfFilePath = C_OgeWiUtil::h_GetSaveFileName(
       this, C_GtGetText::h_GetText("Save File for RTF Export"), c_Folder, c_FilterName, c_DefaultFilename,
-      QFileDialog::DontConfirmOverwrite);
+      QFileDialog::DontConfirmOverwrite); // overwrite is handled later
 
    if (c_FullRtfFilePath != "")
    {
@@ -720,6 +714,7 @@ void C_RtfExportWidget::m_RtfPathClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::m_LogoPathClicked(void) const
 {
+   const QString c_Filter = QString(C_GtGetText::h_GetText("Image file (*.jpg *.png)"));
    QString c_Folder; // for default folder
 
    C_SCLString c_Tmp =
@@ -734,24 +729,13 @@ void C_RtfExportWidget::m_LogoPathClicked(void) const
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
 
-   const QString c_Filter = QString(C_GtGetText::h_GetText("Image file (*.jpg *.png)"));
-
-   QFileDialog c_Dialog(this->parentWidget(), C_GtGetText::h_GetText("Select Company Logo"), c_Folder, c_Filter);
-   c_Dialog.setDefaultSuffix("*.jpg");
-
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   const QString c_FullLogoFilePath = C_OgeWiUtil::h_GetOpenFileName(this->parentWidget(),
+                                                                     C_GtGetText::h_GetText("Select Company Logo"),
+                                                                     c_Folder, c_Filter, "*.jpg");
+   if (c_FullLogoFilePath.isEmpty() == false)
    {
-      const QString c_FullLogoFilePath = c_Dialog.selectedFiles().at(0);
-
-      if (c_FullLogoFilePath != "")
-      {
-         this->SetCompanyLogoPath(c_FullLogoFilePath.toStdString().c_str());
-      }
+      this->SetCompanyLogoPath(c_FullLogoFilePath.toStdString().c_str());
    }
-
-   //   const QString c_FullLogoFilePath =
-   //      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Company Logo"),
-   //                                     c_Folder, c_Filter, "",  QFileDialog::DontConfirmOverwrite);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -465,7 +465,7 @@ void C_PuiSvHandlerFiler::h_SaveReadRails(const QMap<C_OSCNodeDataPoolListElemen
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvHandlerFiler::h_GetViewFileName(const QString & orc_ViewName)
 {
-   return C_SCLString("view_" + C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(
+   return C_SCLString("view_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(
                          orc_ViewName.toStdString().c_str()) +
                       ".xml").c_str();
 }
@@ -855,9 +855,9 @@ sint32 C_PuiSvHandlerFiler::mh_LoadViewFile(C_PuiSvData & orc_View, const QStrin
                                             const std::vector<C_OSCNode> & orc_OSCNodes)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForExistingFile(c_XMLParser,
-                                                                         orc_FilePath.toStdString().c_str(),
-                                                                         "opensyde-view-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser,
+                                                                        orc_FilePath.toStdString().c_str(),
+                                                                        "opensyde-view-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -2764,8 +2764,8 @@ void C_PuiSvHandlerFiler::mh_SaveDashboards(const std::vector<C_PuiSvDashboard> 
 sint32 C_PuiSvHandlerFiler::mh_SaveViewFile(const C_PuiSvData & orc_View, const QString & orc_FilePath)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForNewFile(c_XMLParser, orc_FilePath.toStdString().c_str(),
-                                                                    "opensyde-view-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForNewFile(c_XMLParser, orc_FilePath.toStdString().c_str(),
+                                                                   "opensyde-view-definition");
 
    if (s32_Retval == C_NO_ERR)
    {

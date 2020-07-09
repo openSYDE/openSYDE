@@ -12,13 +12,10 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QElapsedTimer>
-
-#include "C_Uti.h"
 #include "stwtypes.h"
-#include "TGLUtils.h"
-#include "constants.h"
 #include "stwerrors.h"
+#include "TGLUtils.h"
+#include "C_Uti.h"
 #include "C_PuiSdUtil.h"
 #include "C_PuiSdHandlerBusLogic.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
@@ -280,7 +277,6 @@ void C_PuiSdHandlerBusLogic::RemoveBus(const uint32 ou32_BusIndex)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
 {
-   QElapsedTimer c_Timer;
    bool q_NameConflict;
    bool q_IdInvalid;
    static QMap<std::vector<uint32>, bool> hc_PreviousResults;
@@ -290,11 +286,6 @@ bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
    std::vector<uint32> c_NodeIndexes;
    std::vector<uint32> c_InterfaceIndexes;
    bool q_Retval;
-
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
 
    //get all required hashes
    this->mc_CoreDefinition.GetNodeIndexesOfBus(ou32_BusIndex, c_NodeIndexes, c_InterfaceIndexes);
@@ -314,10 +305,7 @@ bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
 
       std::vector<QString> c_InvalidNodesForBitRate;
       std::vector<C_OSCCanProtocol::E_Type> c_InvalidProtocols;
-      if (mq_TIMING_OUTPUT)
-      {
-         std::cout << "Bus " << ou32_BusIndex << " recheck" << &std::endl;
-      }
+
       //Do all checks
       if (this->CheckBusConflictDetailed(ou32_BusIndex, &q_NameConflict, &q_NameEmpty, &q_IdInvalid,
                                          &c_InvalidNodesForBitRate, &c_InvalidProtocols) == C_NO_ERR)
@@ -349,10 +337,6 @@ bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
    }
    else
    {
-      if (mq_TIMING_OUTPUT)
-      {
-         std::cout << "Bus " << ou32_BusIndex << " skip" << &std::endl;
-      }
       //rely on hash and do name & id conflict check
       if (this->CheckBusConflictDetailed(ou32_BusIndex, &q_NameConflict, NULL, &q_IdInvalid, NULL, NULL) == C_NO_ERR)
       {
@@ -370,10 +354,7 @@ bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
          q_Retval = true;
       }
    }
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Bus " << ou32_BusIndex << " check: " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
    return q_Retval;
 }
 
@@ -1611,12 +1592,13 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignal(const C_OSCCanMessageIdentificationI
                      C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
                      if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
                      {
-                        C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
                         uint32 u32_ListIndex;
                         if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
                                                                 orc_MessageId.q_MessageIsTx,
                                                                 u32_ListIndex) == C_NO_ERR)
                         {
+                           C_PuiSdNodeDataPool & rc_UIDataPool =
+                              rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
                            if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
                            {
                               const C_OSCCanSignal & rc_Signal = rc_Message.c_Signals[oru32_SignalIndex];
@@ -2178,7 +2160,7 @@ void C_PuiSdHandlerBusLogic::ConvertElementIndexToSignalIndex(
                                                                       orc_NodeDatapoolListElementId.u32_DataPoolIndex);
 
    C_OSCCanProtocol::E_Type e_ComProtocol = C_OSCCanProtocol::eLAYER2;
-   uint32 u32_InterfaceIndex = 0;
+   uint32 u32_InterfaceIndex;
    uint32 u32_MessageIndex = 0;
 
    if ((pc_Node != NULL) && (pc_Datapool != NULL))
@@ -2356,6 +2338,66 @@ sint32 C_PuiSdHandlerBusLogic::CheckMessageMatch(const C_OSCCanMessageIdentifica
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Map bus name to index
+
+   \param[in]   orc_BusName      Bus name
+   \param[out]  oru32_BusIndex   Bus index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerBusLogic::MapBusNameToIndex(const QString & orc_BusName, uint32 & oru32_BusIndex) const
+{
+   sint32 s32_Retval = C_RANGE;
+
+   for (uint32 u32_ItBus = 0UL; u32_ItBus < this->GetOSCBusesSize(); ++u32_ItBus)
+   {
+      const C_OSCSystemBus * const pc_Bus = this->GetOSCBus(u32_ItBus);
+      tgl_assert(pc_Bus != NULL);
+      if (pc_Bus != NULL)
+      {
+         if (orc_BusName.compare(pc_Bus->c_Name.c_str()) == 0)
+         {
+            s32_Retval = C_NO_ERR;
+            oru32_BusIndex = u32_ItBus;
+         }
+      }
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Map bus index to name
+
+   \param[in]      ou32_BusIndex    Bus index
+   \param[in,out]  orc_BusName      Bus name
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerBusLogic::MapBusIndexToName(const uint32 ou32_BusIndex, QString & orc_BusName) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+   const C_OSCSystemBus * const pc_Bus = this->GetOSCBus(ou32_BusIndex);
+
+   if (pc_Bus != NULL)
+   {
+      orc_BusName = pc_Bus->c_Name.c_str();
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get signal display name
 
    \param[in]  orc_MessageId        Message identification indices
@@ -2496,11 +2538,11 @@ C_PuiSdHandlerBusLogic::C_PuiSdHandlerBusLogic(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get pointers to all currently registered message names contained in the specified node interface & protocol
 
-   \param[in]      oru32_NodeIndex        Node index
-   \param[in]      ore_ComType            Protocol type
-   \param[in]      oru32_InterfaceIndex   Index of interface of node
-   \param[out]     orc_ExistingNames      Vector of pointers to all currently registered message names contained in the
-                                          specified node interface & protocol
+   \param[in]   oru32_NodeIndex        Node index
+   \param[in]   ore_ComType            Protocol type
+   \param[in]   oru32_InterfaceIndex   Index of interface of node
+   \param[out]  orc_ExistingNames      Vector of pointers to all currently registered message names contained in the
+                                       specified node interface & protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::m_GetExistingMessageNamesProtocol(const uint32 & oru32_NodeIndex,
@@ -2728,12 +2770,12 @@ sint32 C_PuiSdHandlerBusLogic::m_InsertUiCanMessage(const C_OSCCanMessageIdentif
 
                if (pc_OSCDataPool != NULL)
                {
-                  C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
                   uint32 u32_ListIndex;
                   if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
                                                           orc_MessageId.q_MessageIsTx,
                                                           u32_ListIndex) == C_NO_ERR)
                   {
+                     C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
                      if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
                      {
                         C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
@@ -2856,12 +2898,12 @@ sint32 C_PuiSdHandlerBusLogic::m_DeleteUiCanMessage(const C_OSCCanMessageIdentif
 
                if (pc_OSCDataPool != NULL)
                {
-                  C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
                   uint32 u32_ListIndex;
                   if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
                                                           orc_MessageId.q_MessageIsTx,
                                                           u32_ListIndex) == C_NO_ERR)
                   {
+                     C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
                      if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
                      {
                         C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];

@@ -74,12 +74,19 @@ C_CamMetWidget::C_CamMetWidget(QWidget * const opc_Parent) :
            &C_CamMetTreeView::SetDisplayAsHex);
    connect(this->mpc_Ui->pc_ControlWidget, &C_CamMetControlBarWidget::SigDisplayTimestampRelative,
            this->mpc_Ui->pc_TraceView, &C_CamMetTreeView::SetDisplayTimestampRelative);
+   connect(this->mpc_Ui->pc_ControlWidget, &C_CamMetControlBarWidget::SigDisplayTimestampTimeOfDay,
+           this->mpc_Ui->pc_TraceView, &C_CamMetTreeView::SetDisplayTimestampAbsoluteTimeOfDay);
+   connect(this->mpc_Ui->pc_ControlWidget, &C_CamMetControlBarWidget::SigTraceBufferSize,
+           this->mpc_Ui->pc_TraceView, &C_CamMetTreeView::SetTraceBufferSize);
    connect(this->mpc_Ui->pc_ControlWidget, &C_CamMetControlBarWidget::SigChangeProtocol,
            this->mpc_Ui->pc_TraceView, &C_CamMetTreeView::SetProtocol);
    connect(this->mpc_Ui->pc_ControlWidget, &C_CamMetControlBarWidget::SigDisplayTree,
            this->mpc_Ui->pc_TraceView, &C_CamMetTreeView::SetDisplayTree);
    connect(this->mpc_Ui->pc_ControlWidget, &C_CamMetControlBarWidget::SigDisplayUniqueMessages,
            this->mpc_Ui->pc_TraceView, &C_CamMetTreeView::SetDisplayUniqueMessages);
+
+   connect(this->mpc_Ui->pc_ControlWidget, &C_CamMetControlBarWidget::SigSearchTrace,
+           this->mpc_Ui->pc_TraceView, &C_CamMetTreeView::SearchTrace);
 
    // File loading
    connect(&this->mc_DatabaseTimer, &QTimer::timeout, this, &C_CamMetWidget::m_DatabaseTimer);
@@ -128,6 +135,24 @@ void C_CamMetWidget::StopLogging(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Triggers searching the next match on trace
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetWidget::SearchNext(void) const
+{
+   this->mpc_Ui->pc_ControlWidget->SearchNext();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Triggers searching the previous match on trace
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetWidget::SearchPrev(void) const
+{
+   this->mpc_Ui->pc_ControlWidget->SearchPrev();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Clears the previous communication
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,6 +161,8 @@ void C_CamMetWidget::ClearData(void)
    this->mpc_Ui->pc_TraceView->ActionClearData();
    this->mpc_Ui->pc_StatusWidget->SetBusLoad(0U, this->ms32_CANBitrate);
    this->mpc_Ui->pc_StatusWidget->SetFilteredMessages(0U);
+
+   // transmit information is resetted by data reset (C_OSCComDriverBase::StopLogging)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -359,6 +386,7 @@ void C_CamMetWidget::m_StartLogging(void)
 void C_CamMetWidget::m_StatusBarTimer(void)
 {
    this->mpc_Ui->pc_StatusWidget->SetBusLoad(this->mpc_Ui->pc_TraceView->GetBusLoad(), this->ms32_CANBitrate);
+   this->mpc_Ui->pc_StatusWidget->SetTransmittedMessages(this->mpc_Ui->pc_TraceView->GetTxCount());
    this->mpc_Ui->pc_StatusWidget->SetTxErrors(this->mpc_Ui->pc_TraceView->GetTxErrors());
    this->mpc_Ui->pc_StatusWidget->SetFilteredMessages(this->mpc_Ui->pc_TraceView->GetFilteredMessages());
 }

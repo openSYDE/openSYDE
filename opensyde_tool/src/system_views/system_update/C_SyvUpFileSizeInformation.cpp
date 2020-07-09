@@ -11,10 +11,15 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
+#include "stwerrors.h"
+#include "C_UsHandler.h"
+#include "C_PuiSdHandler.h"
+#include "C_PuiSvHandler.h"
 #include "C_SyvUpFileSizeInformation.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
+using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -52,7 +57,7 @@ void C_SyvUpFileSizeInformation::Reset(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get estimated wait time in seconds
 
-   \param[in,out] opq_Ok Optional flag to see if estimated wait time caluclation was successful)
+   \param[in,out]  opq_Ok  Optional flag to see if estimated wait time caluclation was successful)
 
    \return
    Estimated wait time in seconds (only valid if opq_Ok was set to true)
@@ -105,7 +110,7 @@ uint64 C_SyvUpFileSizeInformation::GetOverallFilesSize(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Reserve vector space
 
-   \param[in] ou32_NumNodes Number of expected nodes
+   \param[in]  ou32_NumNodes  Number of expected nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpFileSizeInformation::ReserveSpace(const uint32 ou32_NumNodes)
@@ -117,9 +122,9 @@ void C_SyvUpFileSizeInformation::ReserveSpace(const uint32 ou32_NumNodes)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Append files to storage
 
-   \param[in] ou32_NodeIndex Node index
-   \param[in] orc_OtherFiles Other file sizes to append
-   \param[in] orc_ParamFiles Param file sizes to append
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_OtherFiles    Other file sizes to append
+   \param[in]  orc_ParamFiles    Param file sizes to append
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpFileSizeInformation::AppendFiles(const uint32 ou32_NodeIndex, const std::vector<uint64> & orc_OtherFiles,
@@ -171,7 +176,7 @@ uint32 C_SyvUpFileSizeInformation::GetNumOtherFiles(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get number of parameter files for this device
 
-   \param[in] ou32_DeviceOrder Place number of device in flash order
+   \param[in]  ou32_DeviceOrder  Place number of device in flash order
 
    \return
    Number of parameter files for this device
@@ -195,7 +200,7 @@ uint32 C_SyvUpFileSizeInformation::GetNumParamFilesForDevice(const uint32 ou32_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get number of other files for this device
 
-   \param[in] ou32_DeviceOrder Place number of device in flash order
+   \param[in]  ou32_DeviceOrder  Place number of device in flash order
 
    \return
    Number of other files for this device
@@ -219,8 +224,8 @@ uint32 C_SyvUpFileSizeInformation::GetNumOtherFilesForDevice(const uint32 ou32_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get parameter file size for this device
 
-   \param[in] ou32_DeviceOrder Place number of device in flash order
-   \param[in] ou32_FileIndex   File index
+   \param[in]  ou32_DeviceOrder  Place number of device in flash order
+   \param[in]  ou32_FileIndex    File index
 
    \return
    Parameter file size for this device
@@ -253,8 +258,8 @@ uint64 C_SyvUpFileSizeInformation::GetParamFileSizeForDevice(const uint32 ou32_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get other file size for this device
 
-   \param[in] ou32_DeviceOrder Place number of device in flash order
-   \param[in] ou32_FileIndex   File index
+   \param[in]  ou32_DeviceOrder  Place number of device in flash order
+   \param[in]  ou32_FileIndex    File index
 
    \return
    Other file size for this device
@@ -287,8 +292,8 @@ uint64 C_SyvUpFileSizeInformation::GetOtherFileSizeForDevice(const uint32 ou32_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update known elapsed time for node index
 
-   \param[in] ou32_NodeIndex     Node index
-   \param[in] ou64_ElapsedTimeMs Elapsed time in ms
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou64_ElapsedTimeMs   Elapsed time in ms
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpFileSizeInformation::SetElapsedTimeForNode(const uint32 ou32_NodeIndex, const uint64 ou64_ElapsedTimeMs)
@@ -304,25 +309,78 @@ void C_SyvUpFileSizeInformation::SetElapsedTimeForNode(const uint32 ou32_NodeInd
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get map for bytes per milli second grouped by node index
+/*! \brief  Load user settings
 
-   \return
-   Map for bytes per milli second grouped by node index
+   \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QMap<uint32, float64> & C_SyvUpFileSizeInformation::GetBytesPerMsMapPerNode(void) const
+void C_SyvUpFileSizeInformation::LoadUserSettings(const uint32 ou32_ViewIndex)
 {
-   return mc_BytesPerMsMapPerNode;
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
+
+   this->mc_BytesPerMsMapPerNode.clear();
+   // restore configuration of the view
+   if (pc_View != NULL)
+   {
+      const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
+      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
+      for (uint32 u32_ItNode = 0UL; u32_ItNode < rc_ActiveNodes.size(); ++u32_ItNode)
+      {
+         QString c_Name;
+         if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(u32_ItNode, c_Name) == C_NO_ERR)
+         {
+            uint32 u32_Crc;
+            if (C_PuiSvHandler::h_GetInstance()->CalcViewRoutingCrcIndex(ou32_ViewIndex, u32_ItNode,
+                                                                         u32_Crc) == C_NO_ERR)
+            {
+               const C_UsSystemViewNode c_Node = c_UserView.GetSvNode(c_Name);
+               const QMap<uint32, float64> & rc_UpdateDataRateHistory = c_Node.GetUpdateDataRateHistory();
+               const QMap<uint32, float64>::const_iterator c_It = rc_UpdateDataRateHistory.find(u32_Crc);
+               if (c_It != rc_UpdateDataRateHistory.end())
+               {
+                  this->mc_BytesPerMsMapPerNode.insert(u32_ItNode, c_It.value());
+               }
+            }
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set map for bytes per milli second grouped by node index
+/*! \brief  Save user settings
 
-   \param[in] orc_Value Map for bytes per milli second grouped by node index
+   \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpFileSizeInformation::SetFileSizesByteMapPerNode(const QMap<stw_types::uint32,
-                                                                       stw_types::float64> & orc_Value)
+void C_SyvUpFileSizeInformation::SaveUserSettings(const uint32 ou32_ViewIndex) const
 {
-   mc_FileSizesByteMapPerNode = orc_Value;
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
+
+   // restore configuration of the view
+   if (pc_View != NULL)
+   {
+      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
+      for (uint32 u32_ItNode = 0UL; u32_ItNode < rc_ActiveNodes.size(); ++u32_ItNode)
+      {
+         if (rc_ActiveNodes[u32_ItNode] == true)
+         {
+            const QMap<stw_types::uint32, stw_types::float64>::const_iterator c_It = this->mc_BytesPerMsMapPerNode.find(
+               u32_ItNode);
+            if (c_It != this->mc_BytesPerMsMapPerNode.end())
+            {
+               QString c_Name;
+               if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(u32_ItNode, c_Name) == C_NO_ERR)
+               {
+                  uint32 u32_Crc;
+                  if (C_PuiSvHandler::h_GetInstance()->CalcViewRoutingCrcIndex(ou32_ViewIndex, u32_ItNode,
+                                                                               u32_Crc) == C_NO_ERR)
+                  {
+                     C_UsHandler::h_GetInstance()->AddProjSvNodeUpdateDataRate(pc_View->GetName(), c_Name, u32_Crc,
+                                                                               c_It.value());
+                  }
+               }
+            }
+         }
+      }
+   }
 }

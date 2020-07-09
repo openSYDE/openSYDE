@@ -89,7 +89,7 @@ private:
    stw_scl::C_SCLString mc_UnzipPath;
    bool mq_Quiet;
 
-   void m_PrintInformation(const stw_scl::C_SCLString & orc_Version) const;
+   void m_PrintInformation(const stw_scl::C_SCLString & orc_Version, const stw_scl::C_SCLString & orc_BinaryHash) const;
    stw_scl::C_SCLString m_GetLogFileLocation(void) const;
    C_SYDEsup::E_Result m_InitOptionalParameters(void);
    void m_PrintStringFromError(const C_SYDEsup::E_Result & ore_Result) const;

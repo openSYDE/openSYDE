@@ -384,33 +384,25 @@ const
 
                if (orc_DeviceInformation.pc_OSYDevice != NULL)
                {
-                  c_AppName =
-                     orc_DeviceInformation.pc_OSYDevice->c_Applications[u32_AppCounter].c_ApplicationName.c_str();
-                  c_AppVersion =
-                     orc_DeviceInformation.pc_OSYDevice->c_Applications[u32_AppCounter].c_ApplicationVersion.c_str();
-                  c_AppBuildTime =
-                     orc_DeviceInformation.pc_OSYDevice->c_Applications[u32_AppCounter].c_BuildTime.c_str();
-                  c_AppBuildDate =
-                     orc_DeviceInformation.pc_OSYDevice->c_Applications[u32_AppCounter].c_BuildDate.c_str();
+                  const C_OSCProtocolDriverOsy::C_FlashBlockInfo & rc_FlashBlockInfo =
+                     orc_DeviceInformation.pc_OSYDevice->c_Applications[u32_AppCounter];
 
-                  q_Valid =
-                     (orc_DeviceInformation.pc_OSYDevice->c_Applications[u32_AppCounter].u8_SignatureValid == 0U);
+                  c_AppName = rc_FlashBlockInfo.c_ApplicationName.c_str();
+                  c_AppVersion = rc_FlashBlockInfo.c_ApplicationVersion.c_str();
+                  c_AppBuildTime = rc_FlashBlockInfo.c_BuildTime.c_str();
+                  c_AppBuildDate = rc_FlashBlockInfo.c_BuildDate.c_str();
+
+                  q_Valid = (rc_FlashBlockInfo.u8_SignatureValid == 0U);
                }
                else
                {
                   //STW flashloader device
-                  c_AppName =
-                     orc_DeviceInformation.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks[u32_AppCounter].
-                     GetProjectName().c_str();
-                  c_AppVersion =
-                     orc_DeviceInformation.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks[u32_AppCounter].
-                     GetProjectVersion().c_str();
-                  c_AppBuildTime =
-                     orc_DeviceInformation.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks[u32_AppCounter].GetTime()
-                     .c_str();
-                  c_AppBuildDate =
-                     orc_DeviceInformation.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks[u32_AppCounter].GetDate()
-                     .c_str();
+                  const stw_diag_lib::C_XFLECUInformation & rc_DeviceInfoBlock =
+                     orc_DeviceInformation.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks[u32_AppCounter];
+                  c_AppName = rc_DeviceInfoBlock.acn_ProjectName;
+                  c_AppVersion = rc_DeviceInfoBlock.acn_ProjectVersion;
+                  c_AppBuildTime = rc_DeviceInfoBlock.acn_Time;
+                  c_AppBuildDate = rc_DeviceInfoBlock.acn_Date;
 
                   // No application valid flag
                   q_Valid = true;

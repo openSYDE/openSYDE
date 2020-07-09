@@ -64,6 +64,17 @@ C_OSCExportOsyInit::~C_OSCExportOsyInit(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Return filename (without extension)
+
+   \return filename
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCExportOsyInit::h_GetFileName(void)
+{
+   return "osy_init";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create source files
 
    Create .c and .h files with DPD / DPH initialization.
@@ -88,7 +99,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
                                               const C_SCLString & orc_ExportToolInfo)
 {
    C_SCLStringList c_Lines;
-   sint32 s32_Return = C_NO_ERR;
+   sint32 s32_Return;
    uint8 u8_DataPoolsKnownInThisApplication = 0U;
    uint8 u8_CommDefinitionsKnownInThisApplication = 0U;
    uint8 u8_NumCanChannels = 0U;
@@ -104,8 +115,8 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
    c_Lines.Add(C_OSCExportUti::h_GetCreationToolInfo(orc_ExportToolInfo));
    c_Lines.Add("*/");
    c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
-   c_Lines.Add("#ifndef OSY_INITH");
-   c_Lines.Add("#define OSY_INITH");
+   c_Lines.Add("#ifndef " + h_GetFileName().UpperCase() + "H");
+   c_Lines.Add("#define " + h_GetFileName().UpperCase() + "H");
    c_Lines.Add("");
    c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Includes"));
    c_Lines.Add("#include \"stwtypes.h\"");
@@ -260,16 +271,8 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
    C_OSCExportUti::h_AddExternCEnd(c_Lines);
    c_Lines.Add("#endif");
 
-   try
-   {
-      c_Lines.SaveToFile(TGL_ChangeFileExtension(orc_FilePath, ".h"));
-   }
-   catch (...)
-   {
-      osc_write_log_error("Creating source code",
-                          "Could not write to file \"" + TGL_ChangeFileExtension(orc_FilePath, ".h") + "\"");
-      s32_Return = C_RD_WR;
-   }
+   // finally save all stuff into the file
+   s32_Return = C_OSCExportUti::h_SaveToFile(c_Lines, orc_FilePath, h_GetFileName(), true);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -289,7 +292,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Includes"));
       c_Lines.Add("#include <stddef.h> //for NULL");
       c_Lines.Add("#include \"stwtypes.h\"");
-      c_Lines.Add("#include \"osy_init.h\"");
+      c_Lines.Add("#include \"" + h_GetFileName() + ".h\"");
       c_Lines.Add("#include \"osy_dpa_data_pool.h\"");
       c_Lines.Add("");
       c_Lines.Add(C_OSCExportUti::h_GetSectionSeparator("Defines"));
@@ -568,15 +571,8 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          c_Lines.Add("}");
       }
 
-      try
-      {
-         c_Lines.SaveToFile(orc_FilePath);
-      }
-      catch (...)
-      {
-         osc_write_log_error("Creating source code", "Could not write to file \"" + orc_FilePath + "\"");
-         s32_Return = C_RD_WR;
-      }
+      // finally save all stuff into the file
+      s32_Return = C_OSCExportUti::h_SaveToFile(c_Lines, orc_FilePath, h_GetFileName(), false);
    }
 
    return s32_Return;

@@ -20,8 +20,6 @@
 namespace stw_opensyde_gui
 {
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
-//Timing output
-const bool mq_TIMING_OUTPUT = false;
 //Modes and Submodes
 const stw_types::sint32 ms32_MODE_NONE = -1;
 const stw_types::sint32 ms32_MODE_SYSDEF = 0;

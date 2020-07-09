@@ -27,6 +27,7 @@
 #include "TGLTime.h"
 #include "C_OSCUtils.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_OSCBinaryHash.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
@@ -1245,6 +1246,17 @@ QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_
    }
 
    return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Casting the MD5-Checksum from C_SCLString to QString
+
+   \return  MD5-Checksum
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_Uti::h_GetHashValueAsQString()
+{
+   return QString::fromStdString(stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash().c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

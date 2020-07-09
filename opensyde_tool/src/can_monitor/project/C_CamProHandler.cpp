@@ -82,6 +82,18 @@ const C_CamProMessageData * C_CamProHandler::GetMessageConst(const uint32 ou32_I
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get state of message transmission of message generator.
+
+   \retval true   transmit messages
+   \retval false  block message transmitting
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const bool & C_CamProHandler::GetCyclicMessageTransmitActive(void) const
+{
+   return this->mq_CyclicMessageTransmitActive;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get CAN DLL Path
 
    \return CAN DLL Path string (Peak/Vector/Custom)
@@ -331,6 +343,17 @@ sint32 C_CamProHandler::SetMessageDataBytes(const uint32 ou32_Index, const std::
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set message transmit active/inactive.
+
+   \param[in]  oq_Active   true: transmit messages; false: block message transmitting
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamProHandler::SetCyclicMessageTransmitActive(const bool oq_Active)
+{
+   this->mq_CyclicMessageTransmitActive = oq_Active;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1021,6 +1044,7 @@ void C_CamProHandler::Clear(const bool oq_UpdateUserSettings)
    Q_EMIT (this->SigClearOldConfiguration());
 
    this->mc_Messages.clear();
+   this->mq_CyclicMessageTransmitActive = true;
    this->mc_Filters.clear();
    this->mq_FiltersActive = false;
    this->mc_Databases.clear();
@@ -1057,6 +1081,7 @@ C_CamProHandler * C_CamProHandler::h_GetInstance(void)
 //----------------------------------------------------------------------------------------------------------------------
 C_CamProHandler::C_CamProHandler(void) :
    mu32_FileHash(0UL),
+   mq_CyclicMessageTransmitActive(true),
    mq_FiltersActive(false),
    me_CANDllType(ePEAK)
 {
@@ -1090,6 +1115,9 @@ uint32 C_CamProHandler::m_GetHash(void) const
 void C_CamProHandler::m_CalcHash(uint32 & oru32_HashValue) const
 {
    // messages
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_CyclicMessageTransmitActive,
+                                      sizeof(this->mq_CyclicMessageTransmitActive),
+                                      oru32_HashValue);
    for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
    {
       this->mc_Messages[u32_ItMessage].CalcHash(oru32_HashValue);
@@ -1102,6 +1130,7 @@ void C_CamProHandler::m_CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&this->me_CANDllType, sizeof(this->me_CANDllType), oru32_HashValue);
 
    // filters
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_FiltersActive, sizeof(this->mq_FiltersActive), oru32_HashValue);
    for (uint32 u32_ItFilters = 0UL; u32_ItFilters < this->mc_Filters.size(); ++u32_ItFilters)
    {
       this->mc_Filters[u32_ItFilters].CalcHash(oru32_HashValue);

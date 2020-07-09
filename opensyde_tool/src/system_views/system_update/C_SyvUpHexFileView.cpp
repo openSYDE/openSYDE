@@ -337,7 +337,7 @@ void C_SyvUpHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexFile
       orc_Content += C_SyvUpHexFileView::mhc_ContinueTD;
       if (rc_CurInfo.ContainsDateAndTime() == true)
       {
-         orc_Content += rc_CurInfo.GetDate().c_str();
+         orc_Content += rc_CurInfo.acn_Date;
       }
       else
       {
@@ -352,7 +352,7 @@ void C_SyvUpHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexFile
       orc_Content += C_SyvUpHexFileView::mhc_ContinueTD;
       if (rc_CurInfo.ContainsDateAndTime() == true)
       {
-         orc_Content += rc_CurInfo.GetTime().c_str();
+         orc_Content += rc_CurInfo.acn_Time;
       }
       else
       {
@@ -367,7 +367,7 @@ void C_SyvUpHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexFile
       orc_Content += C_SyvUpHexFileView::mhc_ContinueTD;
       if (rc_CurInfo.ContainsProjectName() == true)
       {
-         orc_Content += rc_CurInfo.GetProjectName().c_str();
+         orc_Content += rc_CurInfo.acn_ProjectName;
       }
       else
       {
@@ -382,7 +382,7 @@ void C_SyvUpHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexFile
       orc_Content += C_SyvUpHexFileView::mhc_ContinueTD;
       if (rc_CurInfo.ContainsProjectVersion() == true)
       {
-         orc_Content += rc_CurInfo.GetProjectVersion().c_str();
+         orc_Content += rc_CurInfo.acn_ProjectVersion;
       }
       else
       {

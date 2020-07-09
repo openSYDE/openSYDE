@@ -243,8 +243,8 @@ void C_GiLiLine::m_ApplyOffset(QPolygonF & orc_Polygon) const
          c_LineStart = orc_Polygon[0];
          c_LineEnd = orc_Polygon[1];
          c_LineDiff = c_LineEnd - c_LineStart;
-         c_AdaptedLineDiff = stw_opensyde_gui_logic::C_GiBiLineBounding::AdaptVecToWidth(c_LineDiff,
-                                                                                         this->mf64_OffsetStart);
+         c_AdaptedLineDiff = stw_opensyde_gui_logic::C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff,
+                                                                                           this->mf64_OffsetStart);
          orc_Polygon[0] = c_LineStart + c_AdaptedLineDiff;
       }
 
@@ -254,8 +254,8 @@ void C_GiLiLine::m_ApplyOffset(QPolygonF & orc_Polygon) const
          c_LineStart = orc_Polygon[orc_Polygon.size() - 2];
          c_LineEnd = orc_Polygon[orc_Polygon.size() - 1];
          c_LineDiff = c_LineStart - c_LineEnd;
-         c_AdaptedLineDiff = stw_opensyde_gui_logic::C_GiBiLineBounding::AdaptVecToWidth(c_LineDiff,
-                                                                                         this->mf64_OffsetEnd);
+         c_AdaptedLineDiff = stw_opensyde_gui_logic::C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff,
+                                                                                           this->mf64_OffsetEnd);
          orc_Polygon[orc_Polygon.size() - 1] = c_LineEnd + c_AdaptedLineDiff;
       }
    }

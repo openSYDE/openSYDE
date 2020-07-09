@@ -49,14 +49,22 @@ public:
                                                      const stw_types::float32 of32_HeightScaling = 1.0F);
    static QWidget * h_GetWidgetUnderNextPopUp(QWidget * const opc_Input);
    static bool h_CheckGlobalKey(const QKeyEvent * const opc_Event);
+   static QString h_GetOpenFileName(QWidget * const opc_Parent, const QString & orc_Heading,
+                                    const QString & orc_StartingFolder, const QString & orc_Filter,
+                                    const QString & orc_DefaultSuffix,
+                                    const QFileDialog::Options & orc_Option = QFileDialog::Options());
    static QString h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
                                     const QString & orc_StartingFolder, const QString & orc_Filter,
                                     const QString & orc_DefaultFileName,
-                                    const QFileDialog::Options oc_Option = QFileDialog::Options());
+                                    const QFileDialog::Options & orc_Option = QFileDialog::Options());
    static void h_ShowPathInvalidError(QWidget * const opc_Parent, const QString & orc_InvalidPaths);
 
 private:
-   C_OgeWiUtil(void);
+   static QString mh_GetFileName(QWidget * const opc_Parent, const QString & orc_Heading,
+                                 const QString & orc_StartingFolder, const QString & orc_Filter,
+                                 const QString & orc_DefaultFileName, const QString & orc_DefaultSuffix,
+                                 const QFileDialog::AcceptMode & orc_SaveOrOpen,
+                                 const QFileDialog::Options & orc_Option);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

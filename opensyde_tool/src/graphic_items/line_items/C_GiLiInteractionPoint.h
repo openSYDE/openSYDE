@@ -34,7 +34,7 @@ class C_GiLiInteractionPoint :
    Q_OBJECT
 
 public:
-   C_GiLiInteractionPoint(const stw_types::sint32 & ors32_PointIndex, QGraphicsItem * const opc_Parent = NULL);
+   C_GiLiInteractionPoint(const stw_types::sint32 & ors32_PointIndex = 0, QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiLiInteractionPoint();
    virtual stw_types::sintn type() const override;
 

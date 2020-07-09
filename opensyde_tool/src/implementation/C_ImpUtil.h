@@ -45,6 +45,7 @@ public:
                                               const QString & orc_AbsoluteReferenceDir);
    static QStringList h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QStringList & orc_Paths,
                                                   const QString & orc_AbsoluteReferenceDir);
+   static QString h_FormatSourceFileInfoForReport(const QString & orc_FilePath, const QString & orc_ReadContent);
 
 private:
    struct T_HandleData

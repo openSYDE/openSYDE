@@ -58,10 +58,34 @@ const QMap<uint32, bool> & C_UsSystemViewNode::GetSectionsExpanded(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set expanded flags of sections
 
-   \param[in] orc_SectionsExpanded  Last known expanded flags of sections
+   \param[in]  orc_SectionsExpanded    Last known expanded flags of sections
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemViewNode::SetSectionsExpanded(const QMap<uint32, bool> & orc_SectionsExpanded)
 {
    this->mc_SectionsExpanded = orc_SectionsExpanded;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get update data rate history
+
+   \return
+   Update data rate history
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const QMap<uint32, float64> & C_UsSystemViewNode::GetUpdateDataRateHistory() const
+{
+   return this->mc_UpdateDataRateHistory;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add update data rate
+
+   \param[in]  ou32_Checksum  Checksum
+   \param[in]  of64_Value     Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsSystemViewNode::AddUpdateDataRate(const uint32 ou32_Checksum, const float64 of64_Value)
+{
+   this->mc_UpdateDataRateHistory.insert(ou32_Checksum, of64_Value);
 }

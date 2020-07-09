@@ -116,6 +116,9 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    // register the widget for showing
    this->mrc_ParentDialog.SetWidget(this);
 
+   // name restriction
+   this->mpc_Ui->pc_LineEditName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
+
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_CancelClicked);
    connect(this->mpc_Ui->pc_PushButtonClearProject, &QPushButton::clicked,
@@ -986,7 +989,8 @@ void C_SdNdeDbProperties::m_OnClickOutput(void)
       C_PuiUtil::h_GetResolvedAbsPathFromDbProject(c_ProjectPath, this->mpc_Ui->pc_LineEditOutputFile->GetPath()));
    const QString c_FilterName = QString(C_GtGetText::h_GetText("HEX file (*.hex);;Others (*.*)"));
 
-   // do not use QFileDialog::getOpenFileName because it does not support default suffix
+   // Do not use QFileDialog::getOpenFileName because it does not support default suffix
+   // File path check is done by h_AskUserToSaveRelativePath(), so no need to use C_OgeWiUtil::h_GetOpenFileName()
    QFileDialog c_Dialog(this,  C_GtGetText::h_GetText("Select Output File"), c_FolderName, c_FilterName);
 
    c_Dialog.setDefaultSuffix("hex");
@@ -1018,6 +1022,8 @@ void C_SdNdeDbProperties::m_OnClickGenerator(void)
    // if code generator line edit is empty this results in executable path - we use this as feature
 
    const QString c_FilterName = QString(C_GtGetText::h_GetText("Executable (*.exe *.bat);;Others (*.*)"));
+
+   // File path check is done by h_AskUserToSaveRelativePath(), so no need to use C_OgeWiUtil::h_GetOpenFileName()
    QString c_FilePath = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Select Code Generator"),
                                                      c_FolderName, c_FilterName, NULL);
 
@@ -1096,6 +1102,7 @@ void C_SdNdeDbProperties::m_OnClickIDE(void)
    }
 
    c_FolderName = this->m_GetDialogPath(c_IDECall);
+   // File path check is done by h_AskUserToSaveRelativePath(), so no need to use C_OgeWiUtil::h_GetOpenFileName()
    c_Path = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Select IDE Executable"), c_FolderName,
                                          c_FilterName, NULL);
 

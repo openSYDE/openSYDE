@@ -1256,7 +1256,7 @@ C_OSCNodeDataPoolContent::E_Type C_SdNdeDpContentUtil::h_GetMinimumTypeForRange(
                                                                                 const float64 of64_Max,
                                                                                 const uint64 ou64_Steps)
 {
-   C_OSCNodeDataPoolContent::E_Type e_Retval = C_OSCNodeDataPoolContent::eFLOAT64;
+   C_OSCNodeDataPoolContent::E_Type e_Retval;
    //There is no point for this function if there are no steps
    //If min is over the maximum it's just invalid so also no point
    //If either min or max is no integer then probably a double is required

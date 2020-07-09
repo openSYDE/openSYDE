@@ -33,7 +33,7 @@ class C_SyvSeScene :
    Q_OBJECT
 
 public:
-   C_SyvSeScene(const stw_types::uint32 ou32_ViewIndex, QObject * const opc_Parent = NULL);
+   C_SyvSeScene(const stw_types::uint32 ou32_ViewIndex = 0, QObject * const opc_Parent = NULL);
    virtual ~C_SyvSeScene(void);
 
    void PrepareToClose(void);

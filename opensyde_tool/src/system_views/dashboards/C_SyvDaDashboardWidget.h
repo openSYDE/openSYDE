@@ -12,6 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
+#include <QTimer>
 
 #include "stwtypes.h"
 
@@ -74,11 +75,15 @@ Q_SIGNALS:
    void SigDataPoolRead(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Index);
    void SigNvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id);
 
+protected:
+   virtual void showEvent(QShowEvent * const opc_Event) override;
+
 private:
    //Avoid call
    C_SyvDaDashboardWidget(const C_SyvDaDashboardWidget &);
    C_SyvDaDashboardWidget & operator =(const C_SyvDaDashboardWidget &);
 
+   QTimer mc_UpdateTimer;
    Ui::C_SyvDaDashboardWidget * mpc_Ui;
    C_SyvDaDashboardScene * mpc_Scene;
    const stw_types::uint32 mu32_ViewIndex;

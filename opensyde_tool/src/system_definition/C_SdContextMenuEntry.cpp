@@ -34,10 +34,10 @@ using namespace stw_opensyde_gui;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdContextMenuEntry::C_SdContextMenuEntry()
+C_SdContextMenuEntry::C_SdContextMenuEntry() :
+   c_Name(""),
+   s32_Index(-1)
 {
-   c_Name = "";
    q_Active = true;
    q_Heading = false;
-   s32_Index = -1;
 }

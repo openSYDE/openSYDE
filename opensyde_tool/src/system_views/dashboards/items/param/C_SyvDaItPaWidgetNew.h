@@ -51,12 +51,6 @@ public:
 
    void ButtonAddClicked(void);
 
-   void ReadSelected(void);
-   void WriteSelected(void);
-   void ApplySelected(void) const;
-   void RecordSelected(void);
-
-   bool AllowReadAction(void) const;
    QString GetSelectedItemTypeTemplate(void) const;
    stw_types::uint32 GetSelectedItemCount(void) const;
    std::vector<stw_types::sint32> GetCurrentColumnWidths(void) const;
@@ -68,9 +62,6 @@ public:
       const std::vector<stw_opensyde_gui_logic::C_PuiSvDbExpandedTreeIndex> & orc_Items) const;
 
    void SetEditModeActive(const bool oq_Active);
-
-   void ButtonReadClicked(void);
-   void ButtonWriteClicked(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -91,8 +82,6 @@ private:
    C_SyvDaItPaWidgetNew(const C_SyvDaItPaWidgetNew &);
    C_SyvDaItPaWidgetNew & operator =(const C_SyvDaItPaWidgetNew &);
 
-   void m_ButtonRecordClicked(void);
-
    void m_ReadElements(void);
    void m_WriteElements(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ChangedIds);
    void m_LoadElements(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ElementIds,
@@ -107,8 +96,6 @@ private:
       const std::vector<stw_opensyde_core::C_OSCParamSetInterpretedNode> & orc_NewData,
       std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FoundIds,
       std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> & orc_FoundContent);
-
-   void m_ButtonApplyClicked(void) const;
 
    void m_UpdateButtons(void);
    void m_UpdateButtonToolTips(void) const;

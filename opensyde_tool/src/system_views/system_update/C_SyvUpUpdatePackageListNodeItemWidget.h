@@ -63,8 +63,6 @@ public:
    QString GetAppFilePath(void) const;
    QString GetAppAbsoluteFilePath(void) const;
    QString GetAppDeviceType(void) const;
-   bool IsDefaultPathActive(void) const;
-   bool IsAppFileMissing(void) const;
    bool IsAppInfoAmbiguous(void) const;
 
    void PrepareExportConfig(stw_opensyde_gui_logic::C_SyvUpUpdatePackageConfigNodeApp & orc_AppConfig) const;
@@ -76,6 +74,7 @@ public:
                                 const QString & orc_AppBuildTime, const QString & orc_AppBuildDate) const;
    virtual void ViewFileInfo(void);
    virtual bool IsViewFileInfoPossible(void) const = 0;
+   virtual bool IsUserHintPossible(void) const = 0;
 
    static const stw_types::uint32 hu32_STATE_DEFAULT = 0U;
    static const stw_types::uint32 hu32_STATE_ERROR = 1U;

@@ -32,8 +32,9 @@ public:
                                           const stw_types::uint64 & oru64_StartingItemID,
                                           const stw_types::uint64 & oru64_LastItemID, const QPointF & orc_ConnectionPos,
                                           const stw_types::sint32 & ors32_Interface,
-                                          const stw_types::uint8 & oru8_NodeId, const QString & orc_Description,
-                                          QUndoCommand * const opc_Parent = NULL);
+                                          const stw_types::uint8 & oru8_NodeId, const bool oq_ActivateDatapoolL2,
+                                          const bool oq_ActivateDatapoolECeS, const bool oq_ActivateDatapoolECoS,
+                                          const QString & orc_Description, QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SdManUnoTopologyReconnectBaseCommand(void);
    virtual void undo(void) override;
    virtual void redo(void) override;
@@ -47,10 +48,15 @@ protected:
    stw_types::uint8 mu8_InitialInterface;
    const stw_types::uint8 mu8_NodeId;
    stw_types::uint8 mu8_InitialNodeId;
+   bool mq_ActivateDatapoolL2;
+   bool mq_ActivateDatapoolECeS;
+   bool mq_ActivateDatapoolECoS;
 
    stw_opensyde_gui::C_GiLiBusConnector * m_GetBusConnector(void) const;
    virtual void m_Reconnect(const stw_types::uint64 & oru64_StartingID, const stw_types::uint64 & oru64_LastID,
-                            const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId) = 0;
+                            const stw_types::sint32 & ors32_Interface, const stw_types::uint8 & oru8_NodeId,
+                            const bool oq_ActivateDatapoolL2, const bool oq_ActivateDatapoolECeS,
+                            const bool oq_ActivateDatapoolECoS) = 0;
 
 private:
    bool mq_Merged;

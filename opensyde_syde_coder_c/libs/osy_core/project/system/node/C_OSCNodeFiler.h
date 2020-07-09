@@ -54,6 +54,10 @@ private:
                                                          C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderSettings & orc_StwFlashloaderSettings,
                                             C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadComInterface(std::vector<C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
+                                                C_OSCXMLParserBase & orc_XMLParser);
+   static void mh_SaveComInterface(const std::vector<C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
+                                   C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadApplications(std::vector<C_OSCNodeApplication> & orc_NodeApplications,
                                                 C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveApplications(const std::vector<C_OSCNodeApplication> & orc_NodeApplications,
@@ -64,14 +68,23 @@ private:
                                              C_OSCXMLParserBase & orc_XMLParser,
                                              const stw_scl::C_SCLString & orc_BasePath,
                                              std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles);
-   static stw_scl::C_SCLString mh_DiagnosticServerToString(
-      const C_OSCNodeProperties::E_DiagnosticServerProtocol & ore_DiagnosticProtocol);
+   static stw_types::sint32 mh_LoadHALC(C_OSCHalcConfig & orc_Config, C_OSCXMLParserBase & orc_XMLParser,
+                                        const stw_scl::C_SCLString & orc_BasePath);
+   static stw_types::sint32 mh_SaveHALC(const C_OSCHalcConfig & orc_Config, C_OSCXMLParserBase & orc_XMLParser,
+                                        const stw_scl::C_SCLString & orc_BasePath,
+                                        std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles);
+   static stw_scl::C_SCLString mh_DiagnosticServerToString(const C_OSCNodeProperties::E_DiagnosticServerProtocol &
+                                                           ore_DiagnosticProtocol);
    static stw_types::sint32 mh_StringToDiagnosticServer(const stw_scl::C_SCLString & orc_String,
                                                         C_OSCNodeProperties::E_DiagnosticServerProtocol & ore_Type);
-   static stw_scl::C_SCLString mh_FlashLoaderToString(
-      const C_OSCNodeProperties::E_FlashLoaderProtocol & ore_FlashLoader);
+   static stw_scl::C_SCLString mh_FlashLoaderToString(const C_OSCNodeProperties::E_FlashLoaderProtocol &
+                                                      ore_FlashLoader);
    static stw_types::sint32 mh_StringToFlashLoader(const stw_scl::C_SCLString & orc_String,
                                                    C_OSCNodeProperties::E_FlashLoaderProtocol & ore_Type);
+   static stw_scl::C_SCLString mh_CodeExportScalingTypeToString(const C_OSCNodeCodeExportSettings::E_Scaling &
+                                                                ore_Scaling);
+   static stw_types::sint32 mh_StringToCodeExportScalingType(const stw_scl::C_SCLString & orc_String,
+                                                             C_OSCNodeCodeExportSettings::E_Scaling & ore_Scaling);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

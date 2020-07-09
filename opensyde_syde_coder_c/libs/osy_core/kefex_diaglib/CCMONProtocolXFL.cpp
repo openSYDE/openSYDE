@@ -1,20 +1,14 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal   (todo: remove this line for header files)
    \file
-   \brief       short description (note: main module description should be in .cpp file)
+   \brief       CAN message to text conversion class for the STW Flashloader protocol
 
-   detailed description
+   Converts a CAN message structure to text. The interpretation is based on
+   the STW Flashloader CAN protocol specification.
 
-   \implementation
-   project     project name
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     dd.mm.yyyy  STW/J.Doe
-   \endimplementation
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop

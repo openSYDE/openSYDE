@@ -30,7 +30,7 @@ class C_SyvDaPeUpdateModeTableView :
    Q_OBJECT
 
 public:
-   C_SyvDaPeUpdateModeTableView(const stw_types::uint32 ou32_ViewIndex, QTreeWidget * const opc_TreeWidget = NULL,
+   C_SyvDaPeUpdateModeTableView(const stw_types::uint32 ou32_ViewIndex = 0, QTreeWidget * const opc_TreeWidget = NULL,
                                 QTreeWidgetItem * const opc_TreeWidgetItem = NULL);
    ~C_SyvDaPeUpdateModeTableView(void);
    void InitColumns(void);

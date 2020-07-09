@@ -116,7 +116,7 @@ uint64 stw_tgl::TGL_GetTickCountUS(void)
 /*! \brief   Get system time in milliseconds
 
    Return elapsed time since system start in micro-seconds as precise as possible.
-   As we return ms this will overflow after 47 days (just like the Win32 GetTickCount)
+   As we return an uint32 milliseconds value it will overflow after 49.7 days (just like the Win32 GetTickCount)
 
    \return
    System time in milliseconds.

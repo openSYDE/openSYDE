@@ -113,31 +113,8 @@ sint32 C_OSCHalcConfigFiler::h_SaveFile(const C_OSCHalcConfig & orc_IOData, cons
                                         const stw_scl::C_SCLString & orc_BasePath,
                                         std::vector<stw_scl::C_SCLString> * const opc_CreatedFiles)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_OSCHalcConfigFiler::h_PrepareForFile(orc_Path);
 
-   if (TGL_FileExists(orc_Path) == true)
-   {
-      //erase it:
-      sintn sn_Return;
-      sn_Return = std::remove(orc_Path.c_str());
-      if (sn_Return != 0)
-      {
-         osc_write_log_error("Saving IO data", "Could not erase pre-existing file \"" + orc_Path + "\".");
-         s32_Retval = C_RD_WR;
-      }
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      const stw_scl::C_SCLString c_Folder = TGL_ExtractFilePath(orc_Path);
-      if (TGL_DirectoryExists(c_Folder) == false)
-      {
-         if (TGL_CreateDirectory(c_Folder) != 0)
-         {
-            osc_write_log_error("Saving IO data", "Could not create folder \"" + c_Folder + "\".");
-            s32_Retval = C_RD_WR;
-         }
-      }
-   }
    if (s32_Retval == C_NO_ERR)
    {
       C_OSCXMLParser c_XMLParser;
@@ -219,6 +196,64 @@ sint32 C_OSCHalcConfigFiler::h_LoadData(C_OSCHalcConfig & orc_IOData, C_OSCXMLPa
       }
       if (s32_Retval == C_NO_ERR)
       {
+         if (orc_XMLParser.SelectNodeChild("general") == "general")
+         {
+            if (orc_XMLParser.AttributeExists("is-safe-datablock-set"))
+            {
+               if (orc_XMLParser.AttributeExists("safe-datablock-index"))
+               {
+                  const bool q_Tmp = orc_XMLParser.GetAttributeBool("is-safe-datablock-set");
+                  const uint32 u32_Tmp = orc_XMLParser.GetAttributeUint32("safe-datablock-index");
+                  orc_IOData.SetSafeDatablockAssigned(q_Tmp, u32_Tmp);
+               }
+               else
+               {
+                  osc_write_log_error("Loading IO description",
+                                      "Missing attribute \"safe-datablock-index\" of \"general\" node.");
+                  s32_Retval = C_CONFIG;
+               }
+            }
+            else
+            {
+               osc_write_log_error("Loading IO description",
+                                   "Missing attribute \"is-safe-datablock-set\" of \"general\" node.");
+               s32_Retval = C_CONFIG;
+            }
+            if (orc_XMLParser.AttributeExists("is-unsafe-datablock-set"))
+            {
+               if (orc_XMLParser.AttributeExists("unsafe-datablock-index"))
+               {
+                  const bool q_Tmp = orc_XMLParser.GetAttributeBool("is-unsafe-datablock-set");
+                  const uint32 u32_Tmp = orc_XMLParser.GetAttributeUint32("unsafe-datablock-index");
+                  orc_IOData.SetUnsafeDatablockAssigned(q_Tmp, u32_Tmp);
+               }
+               else
+               {
+                  osc_write_log_error("Loading IO description",
+                                      "Missing attribute \"unsafe-datablock-index\" of \"general\" node.");
+                  s32_Retval = C_CONFIG;
+               }
+            }
+            else
+            {
+               osc_write_log_error("Loading IO description",
+                                   "Missing attribute \"is-unsafe-datablock-set\" of \"general\" node.");
+               s32_Retval = C_CONFIG;
+            }
+            if (s32_Retval == C_NO_ERR)
+            {
+               //Return
+               orc_XMLParser.SelectNodeParent();
+            }
+         }
+         else
+         {
+            osc_write_log_error("Loading IO description", "Could not find \"general\" node.");
+            s32_Retval = C_CONFIG;
+         }
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
          s32_Retval = mh_LoadIODomains(orc_IOData, orc_XMLParser);
       }
    }
@@ -258,8 +293,177 @@ sint32 C_OSCHalcConfigFiler::h_SaveData(const C_OSCHalcConfig & orc_IOData, C_OS
    s32_Retval = mh_SaveIODataBase(orc_IOData, orc_XMLParser, orc_BasePath, opc_CreatedFiles);
    if (s32_Retval == C_NO_ERR)
    {
+      {
+         //General
+         tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("general") == "general");
+         orc_XMLParser.SetAttributeBool("is-safe-datablock-set", orc_IOData.GetSafeDatablockAssigned());
+         orc_XMLParser.SetAttributeUint32("safe-datablock-index", orc_IOData.GetSafeDatablockIndex());
+         orc_XMLParser.SetAttributeBool("is-unsafe-datablock-set", orc_IOData.GetUnsafeDatablockAssigned());
+         orc_XMLParser.SetAttributeUint32("unsafe-datablock-index", orc_IOData.GetUnsafeDatablockIndex());
+         //Return
+         orc_XMLParser.SelectNodeParent();
+      }
+
       //Domains
       s32_Retval = mh_SaveIODomains(orc_IOData, orc_XMLParser);
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Make preparations for file
+
+   - Removing an already existing file
+   - Creating the directory if it does not exist
+
+   \param[in]  orc_Path    Path of file
+
+   \return
+   C_RD_WR    could not erase pre-existing file before saving
+   C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::sint32 C_OSCHalcConfigFiler::h_PrepareForFile(const stw_scl::C_SCLString & orc_Path)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (TGL_FileExists(orc_Path) == true)
+   {
+      //erase it:
+      sintn sn_Return;
+      sn_Return = std::remove(orc_Path.c_str());
+      if (sn_Return != 0)
+      {
+         osc_write_log_error("Saving IO data", "Could not erase pre-existing file \"" + orc_Path + "\".");
+         s32_Retval = C_RD_WR;
+      }
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      const stw_scl::C_SCLString c_Folder = TGL_ExtractFilePath(orc_Path);
+      if (TGL_DirectoryExists(c_Folder) == false)
+      {
+         if (TGL_CreateDirectory(c_Folder) != 0)
+         {
+            osc_write_log_error("Saving IO data", "Could not create folder \"" + c_Folder + "\".");
+            s32_Retval = C_RD_WR;
+         }
+      }
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save IO domain
+
+   \param[in]      orc_IODomain     IO data
+   \param[in,out]  orc_XMLParser    XML parser
+
+   \return
+   C_NO_ERR   data saved
+   C_CONFIG   data invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfigFiler::h_SaveIODomain(const C_OSCHalcConfigDomain & orc_IODomain,
+                                            C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval;
+
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("domain") == "domain");
+   //Config
+   s32_Retval = mh_SaveIOChannel(orc_IODomain.c_DomainConfig, orc_XMLParser, "config", "domain");
+   //Channels
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_SaveIOChannels(orc_IODomain.c_ChannelConfigs, orc_XMLParser);
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load IO domain
+
+   \param[in,out]  orc_IODomain     IO domain
+   \param[in,out]  orc_XMLParser    XML parser
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    HALC configuration content is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfigFiler::h_LoadIODomain(C_OSCHalcConfigDomain & orc_IODomain, C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_XMLParser.SelectNodeChild("config") == "config")
+   {
+      s32_Retval = mh_LoadIOChannel(orc_IODomain.c_DomainConfig, orc_XMLParser, "config");
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "domain");
+      }
+   }
+   else
+   {
+      osc_write_log_error("Loading IO data", "Could not find \"config\" node.");
+      s32_Retval = C_CONFIG;
+   }
+   if (orc_XMLParser.SelectNodeChild("channels") == "channels")
+   {
+      if (orc_XMLParser.AttributeExists("length"))
+      {
+         const uint32 u32_ExpectedCount = orc_XMLParser.GetAttributeUint32("length");
+         uint32 u32_ActualCount = 0UL;
+         stw_scl::C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild("channel");
+         //Clear any existing configuration
+         orc_IODomain.c_ChannelConfigs.clear();
+         if (c_NodeChannel == "channel")
+         {
+            do
+            {
+               C_OSCHalcConfigChannel c_Channel;
+               s32_Retval = mh_LoadIOChannel(c_Channel, orc_XMLParser, "channel");
+               if (s32_Retval == C_NO_ERR)
+               {
+                  orc_IODomain.c_ChannelConfigs.push_back(c_Channel);
+                  //Count
+                  ++u32_ActualCount;
+                  //Iterate
+                  c_NodeChannel = orc_XMLParser.SelectNodeNext("channel");
+               }
+            }
+            while ((c_NodeChannel == "channel") && (s32_Retval == C_NO_ERR));
+            if (s32_Retval == C_NO_ERR)
+            {
+               //Return
+               tgl_assert(orc_XMLParser.SelectNodeParent() == "channels");
+            }
+         }
+         if (u32_ExpectedCount != u32_ActualCount)
+         {
+            stw_scl::C_SCLString c_Tmp;
+            c_Tmp.PrintFormatted("Unexpected channel count, expected: %i, got %i", u32_ExpectedCount, u32_ActualCount);
+            osc_write_log_warning("Loading IO data", c_Tmp.c_str());
+         }
+      }
+      else
+      {
+         osc_write_log_error("Loading IO data", "Could not find \"length\" attribute.");
+         s32_Retval = C_CONFIG;
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "domain");
+      }
+   }
+   else
+   {
+      osc_write_log_error("Loading IO data", "Could not find \"channels\" node.");
+      s32_Retval = C_CONFIG;
    }
    return s32_Retval;
 }
@@ -300,8 +504,8 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIODataBase(const C_OSCHalcDefBase & orc_IODa
    else
    {
       const stw_scl::C_SCLString c_IODataFileName = "halc_definition_file.xml";
-      const stw_scl::C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath,
-                                                                                            c_IODataFileName);
+      const stw_scl::C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                           c_IODataFileName);
       s32_Retval = C_OSCHalcDefFiler::h_SaveFile(orc_IOData, c_CombinedFileName);
       if (s32_Retval != C_NO_ERR)
       {
@@ -348,9 +552,8 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIODomains(const C_OSCHalcConfig & orc_IOData
       const C_OSCHalcConfigDomain * const pc_Domain = orc_IOData.GetDomainConfigDataConst(u32_ItDomain);
       if (pc_Domain != NULL)
       {
-         tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("domain") == "domain");
-         //Channels
-         s32_Retval = mh_SaveIOChannels(pc_Domain->c_ChannelConfigs, orc_XMLParser);
+         s32_Retval = C_OSCHalcConfigFiler::h_SaveIODomain(*pc_Domain, orc_XMLParser);
+
          if (s32_Retval == C_NO_ERR)
          {
             //Return
@@ -393,7 +596,7 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIOChannels(const std::vector<C_OSCHalcConfig
    orc_XMLParser.SetAttributeUint32("length", orc_Channels.size());
    for (uint32 u32_ItChannel = 0UL; (u32_ItChannel < orc_Channels.size()) && (s32_Retval == C_NO_ERR); ++u32_ItChannel)
    {
-      s32_Retval = mh_SaveIOChannel(orc_Channels[u32_ItChannel], orc_XMLParser);
+      s32_Retval = mh_SaveIOChannel(orc_Channels[u32_ItChannel], orc_XMLParser, "channel", "channels");
    }
    if (s32_Retval == C_NO_ERR)
    {
@@ -406,8 +609,10 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIOChannels(const std::vector<C_OSCHalcConfig
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Save IO channel
 
-   \param[in]      orc_Channel      Channel
-   \param[in,out]  orc_XMLParser    XML parser
+   \param[in]      orc_Channel         Channel
+   \param[in,out]  orc_XMLParser       XML parser
+   \param[in]      orc_NodeName        Node name
+   \param[in]      orc_NodeParentName  Node parent name
 
    \return
    C_NO_ERR   data saved
@@ -415,33 +620,22 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIOChannels(const std::vector<C_OSCHalcConfig
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfigFiler::mh_SaveIOChannel(const C_OSCHalcConfigChannel & orc_Channel,
-                                              C_OSCXMLParserBase & orc_XMLParser)
+                                              C_OSCXMLParserBase & orc_XMLParser,
+                                              const stw_scl::C_SCLString & orc_NodeName,
+                                              const stw_scl::C_SCLString & orc_NodeParentName)
 {
    sint32 s32_Retval;
 
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("channel") == "channel");
-   orc_XMLParser.SetAttributeBool("active", orc_Channel.q_Active);
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild(orc_NodeName) == orc_NodeName);
    orc_XMLParser.SetAttributeBool("safety-relevant", orc_Channel.q_SafetyRelevant);
-   orc_XMLParser.SetAttributeBool("datablock-set", orc_Channel.q_DatablockSet);
-   orc_XMLParser.SetAttributeUint32("datablock-index", orc_Channel.u32_DatablockIndex);
-   orc_XMLParser.SetAttributeBool("use-case-set", orc_Channel.q_UseCaseSet);
    orc_XMLParser.SetAttributeUint32("use-case-index", orc_Channel.u32_UseCaseIndex);
    orc_XMLParser.CreateNodeChild("name", orc_Channel.c_Name.c_str());
    orc_XMLParser.CreateNodeChild("comment", orc_Channel.c_Comment.c_str());
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("datablock-configs") == "datablock-configs");
-   orc_XMLParser.SetAttributeUint32("length", orc_Channel.c_DatablockConfig.size());
-   for (uint32 u32_ItDb = 0UL; u32_ItDb < orc_Channel.c_DatablockConfig.size(); ++u32_ItDb)
-   {
-      orc_XMLParser.CreateNodeChild("datablock-config",
-                                    mh_GetStringForDbConfig(orc_Channel.c_DatablockConfig[u32_ItDb]));
-   }
-   //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "channel");
-   s32_Retval = mh_SaveIOParameterStructs(orc_Channel.c_Parameters, orc_XMLParser);
+   s32_Retval = mh_SaveIOParameterStructs(orc_Channel.c_Parameters, orc_XMLParser, orc_NodeName);
    if (s32_Retval == C_NO_ERR)
    {
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "channels");
+      tgl_assert(orc_XMLParser.SelectNodeParent() == orc_NodeParentName);
    }
    return s32_Retval;
 }
@@ -451,6 +645,7 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIOChannel(const C_OSCHalcConfigChannel & orc
 
    \param[in]      orc_ParameterStructs   Parameter structs
    \param[in,out]  orc_XMLParser          XML parser
+   \param[in]      orc_NodeName           Node name
 
    \return
    C_NO_ERR   data saved
@@ -458,7 +653,8 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIOChannel(const C_OSCHalcConfigChannel & orc
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfigFiler::mh_SaveIOParameterStructs(
-   const std::vector<C_OSCHalcConfigParameterStruct> & orc_ParameterStructs, C_OSCXMLParserBase & orc_XMLParser)
+   const std::vector<C_OSCHalcConfigParameterStruct> & orc_ParameterStructs, C_OSCXMLParserBase & orc_XMLParser,
+   const stw_scl::C_SCLString & orc_NodeName)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -478,7 +674,7 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIOParameterStructs(
    if (s32_Retval == C_NO_ERR)
    {
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "channel");
+      tgl_assert(orc_XMLParser.SelectNodeParent() == orc_NodeName);
    }
    return s32_Retval;
 }
@@ -625,82 +821,9 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIOParameter(const C_OSCHalcConfigParameter &
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "value");
       }
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == orc_BaseNode);
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
       orc_XMLParser.CreateNodeChild("comment", orc_Parameter.c_Comment);
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get string for db config
-
-   \param[in]  oe_Config   Config
-
-   \return
-   String for db config
-*/
-//----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHalcConfigFiler::mh_GetStringForDbConfig(
-   const C_OSCHalcConfigChannel::E_DataBlockConfig oe_Config)
-{
-   stw_scl::C_SCLString c_Retval;
-   switch (oe_Config)
-   {
-   case C_OSCHalcConfigChannel::eDC_READ_WRITE:
-      c_Retval = "read-write";
-      break;
-   case C_OSCHalcConfigChannel::eDC_READ_ONLY:
-      c_Retval = "read-only";
-      break;
-   case C_OSCHalcConfigChannel::eDC_NONE:
-      c_Retval = "none";
-      break;
-   }
-   return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get db config for string
-
-   \param[in]   orc_Str       Str
-   \param[out]  ore_Config    Config
-
-   \return
-   C_NO_ERR    data read
-   C_CONFIG    HALC configuration content is invalid or incomplete
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcConfigFiler::mh_GetDbConfigForString(const stw_scl::C_SCLString & orc_Str,
-                                                     C_OSCHalcConfigChannel::E_DataBlockConfig & ore_Config)
-{
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (orc_Str == "read-write")
-   {
-      ore_Config = C_OSCHalcConfigChannel::eDC_READ_WRITE;
-   }
-   else if (orc_Str == "read-only")
-   {
-      ore_Config = C_OSCHalcConfigChannel::eDC_READ_ONLY;
-   }
-   else if (orc_Str == "none")
-   {
-      ore_Config = C_OSCHalcConfigChannel::eDC_NONE;
-   }
-   else
-   {
-      osc_write_log_error("Loading IO description",
-                          stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                  "Invalid content \"") + orc_Str +
-                                               "\" of  \"datablock-config\" node.").c_str());
-      s32_Retval = C_CONFIG;
    }
    return s32_Retval;
 }
@@ -733,9 +856,8 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODataBase(C_OSCHalcDefBase & orc_IOData, C_
       {
          s32_Retval =
             C_OSCHalcDefFiler::h_LoadFile(orc_IOData,
-                                          C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath,
-                                                                                orc_XMLParser.
-                                                                                GetNodeContent()));
+                                          C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                               orc_XMLParser.GetNodeContent()));
       }
       if (s32_Retval == C_NO_ERR)
       {
@@ -786,7 +908,7 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODomains(C_OSCHalcConfig & orc_IOData, C_OS
                if (pc_Domain != NULL)
                {
                   C_OSCHalcConfigDomain c_DomainCopy = *pc_Domain;
-                  s32_Retval = mh_LoadIODomain(c_DomainCopy, orc_XMLParser);
+                  s32_Retval = h_LoadIODomain(c_DomainCopy, orc_XMLParser);
                   if (s32_Retval == C_NO_ERR)
                   {
                      tgl_assert(orc_IOData.SetDomainConfig(u32_ActualCount, c_DomainCopy) == C_NO_ERR);
@@ -836,82 +958,11 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODomains(C_OSCHalcConfig & orc_IOData, C_OS
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Load IO domain
-
-   \param[in,out]  orc_IODomain     IO domain
-   \param[in,out]  orc_XMLParser    XML parser
-
-   \return
-   C_NO_ERR    data read
-   C_CONFIG    HALC configuration content is invalid or incomplete
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcConfigFiler::mh_LoadIODomain(C_OSCHalcConfigDomain & orc_IODomain, C_OSCXMLParserBase & orc_XMLParser)
-{
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (orc_XMLParser.SelectNodeChild("channels") == "channels")
-   {
-      if (orc_XMLParser.AttributeExists("length"))
-      {
-         const uint32 u32_ExpectedCount = orc_XMLParser.GetAttributeUint32("length");
-         uint32 u32_ActualCount = 0UL;
-         stw_scl::C_SCLString c_NodeChannel = orc_XMLParser.SelectNodeChild("channel");
-         //Clear any existing configuration
-         orc_IODomain.c_ChannelConfigs.clear();
-         if (c_NodeChannel == "channel")
-         {
-            do
-            {
-               C_OSCHalcConfigChannel c_Channel;
-               s32_Retval = mh_LoadIOChannel(c_Channel, orc_XMLParser);
-               if (s32_Retval == C_NO_ERR)
-               {
-                  orc_IODomain.c_ChannelConfigs.push_back(c_Channel);
-                  //Count
-                  ++u32_ActualCount;
-                  //Iterate
-                  c_NodeChannel = orc_XMLParser.SelectNodeNext("channel");
-               }
-            }
-            while ((c_NodeChannel == "channel") && (s32_Retval == C_NO_ERR));
-            if (s32_Retval == C_NO_ERR)
-            {
-               //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "channels");
-            }
-         }
-         if (u32_ExpectedCount != u32_ActualCount)
-         {
-            stw_scl::C_SCLString c_Tmp;
-            c_Tmp.PrintFormatted("Unexpected channel count, expected: %i, got %i", u32_ExpectedCount, u32_ActualCount);
-            osc_write_log_warning("Loading IO data", c_Tmp.c_str());
-         }
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"length\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
-      if (s32_Retval == C_NO_ERR)
-      {
-         //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "domain");
-      }
-   }
-   else
-   {
-      osc_write_log_error("Loading IO data", "Could not find \"channels\" node.");
-      s32_Retval = C_CONFIG;
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load IO channel
 
    \param[in,out]  orc_IOChannel    IO channel
    \param[in,out]  orc_XMLParser    XML parser
+   \param[in]      orc_NodeName     Node name
 
    \return
    C_NO_ERR    data read
@@ -919,67 +970,21 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODomain(C_OSCHalcConfigDomain & orc_IODomai
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfigFiler::mh_LoadIOChannel(C_OSCHalcConfigChannel & orc_IOChannel,
-                                              C_OSCXMLParserBase & orc_XMLParser)
+                                              C_OSCXMLParserBase & orc_XMLParser,
+                                              const stw_scl::C_SCLString & orc_NodeName)
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   if (orc_XMLParser.AttributeExists("active"))
+   if (orc_XMLParser.AttributeExists("safety-relevant"))
    {
-      orc_IOChannel.q_Active = orc_XMLParser.GetAttributeBool("active");
+      orc_IOChannel.q_SafetyRelevant = orc_XMLParser.GetAttributeBool("safety-relevant");
    }
    else
    {
-      osc_write_log_error("Loading IO data", "Could not find \"active\" attribute.");
+      osc_write_log_error("Loading IO data", "Could not find \"safety-relevant\" attribute.");
       s32_Retval = C_CONFIG;
    }
-   if (s32_Retval == C_NO_ERR)
-   {
-      if (orc_XMLParser.AttributeExists("safety-relevant"))
-      {
-         orc_IOChannel.q_SafetyRelevant = orc_XMLParser.GetAttributeBool("safety-relevant");
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"safety-relevant\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      if (orc_XMLParser.AttributeExists("datablock-set"))
-      {
-         orc_IOChannel.q_DatablockSet = orc_XMLParser.GetAttributeBool("datablock-set");
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"datablock-set\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      if (orc_XMLParser.AttributeExists("datablock-index"))
-      {
-         orc_IOChannel.u32_DatablockIndex = orc_XMLParser.GetAttributeUint32("datablock-index");
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"datablock-index\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      if (orc_XMLParser.AttributeExists("use-case-set"))
-      {
-         orc_IOChannel.q_UseCaseSet = orc_XMLParser.GetAttributeBool("use-case-set");
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"use-case-set\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
-   }
+
    if (s32_Retval == C_NO_ERR)
    {
       if (orc_XMLParser.AttributeExists("use-case-index"))
@@ -998,7 +1003,7 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOChannel(C_OSCHalcConfigChannel & orc_IOCha
       {
          orc_IOChannel.c_Name = orc_XMLParser.GetNodeContent();
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "channel");
+         tgl_assert(orc_XMLParser.SelectNodeParent() == orc_NodeName);
       }
       else
       {
@@ -1012,7 +1017,7 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOChannel(C_OSCHalcConfigChannel & orc_IOCha
       {
          orc_IOChannel.c_Comment = orc_XMLParser.GetNodeContent();
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "channel");
+         tgl_assert(orc_XMLParser.SelectNodeParent() == orc_NodeName);
       }
       else
       {
@@ -1022,94 +1027,7 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOChannel(C_OSCHalcConfigChannel & orc_IOCha
    }
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = mh_LoadIODatablockConfigs(orc_IOChannel.c_DatablockConfig, orc_XMLParser);
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      s32_Retval = mh_LoadIOParameterStructs(orc_IOChannel.c_Parameters, orc_XMLParser);
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Load IO datablock configs
-
-   \param[in,out]  orc_DatablockConfigs   Datablock configs
-   \param[in,out]  orc_XMLParser          XML parser
-
-   \return
-   C_NO_ERR    data read
-   C_CONFIG    HALC configuration content is invalid or incomplete
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcConfigFiler::mh_LoadIODatablockConfigs(
-   std::vector<C_OSCHalcConfigChannel::E_DataBlockConfig> & orc_DatablockConfigs, C_OSCXMLParserBase & orc_XMLParser)
-{
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (orc_XMLParser.SelectNodeChild("datablock-configs") == "datablock-configs")
-   {
-      uint32 u32_ExpectedLength = 0UL;
-      orc_DatablockConfigs.clear();
-      //Reserve
-      if (orc_XMLParser.AttributeExists("length"))
-      {
-         u32_ExpectedLength = orc_XMLParser.GetAttributeUint32("length");
-         orc_DatablockConfigs.reserve(u32_ExpectedLength);
-      }
-      else
-      {
-         osc_write_log_error("Loading IO data", "Could not find \"length\" attribute.");
-         s32_Retval = C_CONFIG;
-      }
-      if (s32_Retval == C_NO_ERR)
-      {
-         stw_scl::C_SCLString c_CurrentDbNode = orc_XMLParser.SelectNodeChild("datablock-config");
-         if (c_CurrentDbNode == "datablock-config")
-         {
-            do
-            {
-               C_OSCHalcConfigChannel::E_DataBlockConfig e_Config;
-               s32_Retval = mh_GetDbConfigForString(orc_XMLParser.GetNodeContent(), e_Config);
-               if (s32_Retval == C_NO_ERR)
-               {
-                  orc_DatablockConfigs.push_back(e_Config);
-                  //Iterate
-                  c_CurrentDbNode = orc_XMLParser.SelectNodeNext("datablock-config");
-               }
-            }
-            while ((c_CurrentDbNode == "datablock-config") && (s32_Retval == C_NO_ERR));
-            if (s32_Retval == C_NO_ERR)
-            {
-               //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "datablock-configs");
-            }
-         }
-         if (s32_Retval == C_NO_ERR)
-         {
-            //Check length
-            if (u32_ExpectedLength != orc_DatablockConfigs.size())
-            {
-               osc_write_log_error("Loading IO data",
-                                   stw_scl::C_SCLString(stw_scl::C_SCLString("Content of \"length\" attribute (") +
-                                                        stw_scl::C_SCLString::IntToStr(u32_ExpectedLength) +
-                                                        ") mismatches with the number of found data blocks (" +
-                                                        stw_scl::C_SCLString::IntToStr(
-                                                           orc_DatablockConfigs.size()) + ").").c_str());
-               s32_Retval = C_CONFIG;
-            }
-         }
-      }
-      if (s32_Retval == C_NO_ERR)
-      {
-         //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "channel");
-      }
-   }
-   else
-   {
-      osc_write_log_error("Loading IO data", "Could not find \"datablock-configs\" node.");
-      s32_Retval = C_CONFIG;
+      s32_Retval = mh_LoadIOParameterStructs(orc_IOChannel.c_Parameters, orc_XMLParser, orc_NodeName);
    }
    return s32_Retval;
 }
@@ -1119,6 +1037,7 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODatablockConfigs(
 
    \param[in,out]  orc_ParameterStructs   Parameter structs
    \param[in,out]  orc_XMLParser          XML parser
+   \param[in]      orc_NodeName           Node name
 
    \return
    C_NO_ERR    data read
@@ -1126,7 +1045,8 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIODatablockConfigs(
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfigFiler::mh_LoadIOParameterStructs(
-   std::vector<C_OSCHalcConfigParameterStruct> & orc_ParameterStructs, C_OSCXMLParserBase & orc_XMLParser)
+   std::vector<C_OSCHalcConfigParameterStruct> & orc_ParameterStructs, C_OSCXMLParserBase & orc_XMLParser,
+   const stw_scl::C_SCLString & orc_NodeName)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -1187,7 +1107,7 @@ sint32 C_OSCHalcConfigFiler::mh_LoadIOParameterStructs(
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "channel");
+         tgl_assert(orc_XMLParser.SelectNodeParent() == orc_NodeName);
       }
    }
    else

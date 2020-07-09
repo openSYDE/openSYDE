@@ -167,5 +167,16 @@
         <file>images/IconArrowUpDisabled.svg</file>
         <file>images/IconPathVariables.svg</file>
         <file>images/IconPathVariablesDisabled.svg</file>
+        <file>images/ToggleOnMsgTransmission.svg</file>
+        <file>images/ToggleOffMsgTransmission.svg</file>
+        <file>images/IconSettingsEnabled.svg</file>
+        <file>images/IconSettingsHover.svg</file>
+        <file>images/IconSettingsPressed.svg</file>
+        <file>images/IconSearchDownEnabled.svg</file>
+        <file>images/IconSearchUpEnabled.svg</file>
+        <file>images/IconSearchDownHover.svg</file>
+        <file>images/IconSearchDownPressed.svg</file>
+        <file>images/IconSearchUpHover.svg</file>
+        <file>images/IconSearchUpPressed.svg</file>
     </qresource>
 </RCC>

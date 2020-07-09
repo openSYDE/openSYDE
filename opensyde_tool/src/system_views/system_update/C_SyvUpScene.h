@@ -33,7 +33,7 @@ class C_SyvUpScene :
    Q_OBJECT
 
 public:
-   C_SyvUpScene(const stw_types::uint32 ou32_ViewIndex, QObject * const opc_Parent = NULL);
+   C_SyvUpScene(const stw_types::uint32 ou32_ViewIndex = 0, QObject * const opc_Parent = NULL);
    virtual ~C_SyvUpScene();
 
    void SetConnected(const bool oq_Active, const bool oq_SignalNodes) const;

@@ -44,22 +44,28 @@ private:
    Ui::C_SdNdeHalcWidget * mpc_Ui;
    stw_types::uint32 mu32_NodeIndex;
 
+   static const QString mhc_CONFIG_FILE_TYPE;
+
    //Avoid call
    C_SdNdeHalcWidget(const C_SdNdeHalcWidget &);
    C_SdNdeHalcWidget & operator =(const C_SdNdeHalcWidget &);
 
-   void m_OnImportConfigClicked(void) const;
-   void m_OnExportConfigClicked (void) const;
-   void m_OnSettingsClicked(void) const;
+   void m_DisableButtons(const bool oq_Active) const;
+   void m_OnImportConfigClicked(void);
+   void m_OnExportConfigClicked (void);
+   void m_OnSettingsClicked(void);
    void m_OnCleanUpClicked(void) const;
    void m_OnLoadClicked(void);
    void m_OnViewDetailsClicked(void) const;
    void m_OnMagicRequested(void); // TODO remove - development only
    void m_OnOverviewToggled(const bool oq_Checked) const;
    void m_OnChannelSelected(const QModelIndex & orc_Index) const;
-   void m_OnChannelUpdate(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex) const;
+   void m_OnChannelUpdate(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
+                          const bool oq_UseChannelIndex) const;
 
-   void m_LoadNodeData(void) const;
+   void m_UpdateNodeData(void) const;
+
+   static QString mh_GetDialogPath(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

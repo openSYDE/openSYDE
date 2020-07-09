@@ -218,6 +218,11 @@ public:
    stw_types::sint32 CheckViewReconnectNecessary(const stw_types::uint32 ou32_ViewIndex, bool & orq_ReconnectNecessary);
 
    //Misc
+   stw_types::sint32 CalcViewRoutingCrcName(const stw_types::uint32 ou32_ViewIndex, const QString & orc_NodeName,
+                                            stw_types::uint32 & oru32_Crc) const;
+   stw_types::sint32 CalcViewRoutingCrcIndex(const stw_types::uint32 ou32_ViewIndex,
+                                             const stw_types::uint32 ou32_NodeIndex,
+                                             stw_types::uint32 & oru32_Crc) const;
    static QString h_GetNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id);
    bool CheckBusDisabled(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_BusIndex) const;
    stw_types::sint32 ClearViewDashboardParamDataPoolElements(const stw_types::uint32 ou32_ViewIndex,

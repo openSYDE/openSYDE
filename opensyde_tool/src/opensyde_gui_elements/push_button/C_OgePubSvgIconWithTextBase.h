@@ -63,7 +63,6 @@ private:
    stw_types::sint32 ms32_MarginInBetween;
    bool mq_Dark;
 
-   QRect GetInnerRect(void) const;
    static void h_DrawRectBorders(const QRect & orc_RectOuter, QPainter & orc_Painter,
                                  const stw_types::sintn osn_LeftBorderWidth, const stw_types::sintn osn_TopBorderWidth,
                                  const stw_types::sintn osn_RightBorderWidth,

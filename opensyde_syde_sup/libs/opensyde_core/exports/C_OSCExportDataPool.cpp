@@ -117,6 +117,7 @@ uint16 C_OSCExportDataPool::h_ConvertOverallCodeVersion(const uint16 ou16_GenCod
    \param[in] orc_Path                 storage path for created files
    \param[in] orc_DataPool             Datapool configuration
    \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
+   \param[in] oe_ScalingSupport        Flag for data type and existence of factor, offset and scaling macros
    \param[in] ou8_DataPoolIndex        index of Datapool within local process
    \param[in] oe_Linkage               flag for linkage context
    \param[in] ou8_DataPoolIndexRemote  index of Datapool within remote process
@@ -124,13 +125,17 @@ uint16 C_OSCExportDataPool::h_ConvertOverallCodeVersion(const uint16 ou16_GenCod
    \param[in] orc_ExportToolInfo       information about calling executable (name + version)
 
    \return
-   C_NO_ERR Operation success
-   C_RD_WR  Operation failure: cannot store files
-   C_NOACT  Application has unknown code structure version or invalid linkage configuration
-
+   C_NO_ERR  Operation success
+   C_RD_WR   Operation failure: cannot store files
+   C_NOACT   Application has unknown code structure version or invalid linkage configuration
+   C_CONFIG  Input data not suitable for code generation. Details will be written to OSC Log.
+             Possible reasons:
+             * Datapool list element factor negative or would be generated as zero
+             * A list contains more than 255 Datasets
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, const uint16 ou16_GenCodeVersion,
+                                               const C_OSCNodeCodeExportSettings::E_Scaling oe_ScalingSupport,
                                                const C_OSCNodeDataPool & orc_DataPool, const uint8 ou8_DataPoolIndex,
                                                const E_Linkage oe_Linkage, const uint8 ou8_DataPoolIndexRemote,
                                                const uint8 ou8_ProcessId, const C_SCLString & orc_ExportToolInfo)
@@ -146,27 +151,49 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
    if (ou16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
    {
       s32_Retval = C_NOACT;
+      osc_write_log_error("Creating source code",
+                          "Did not generate code for Datapool \"" + orc_DataPool.c_Name +
+                          "\" because code format version is unknown.");
    }
 
    // make sure linkage is not eREMOTEPUBLIC if code format does not support this feature
    if ((s32_Retval == C_NO_ERR) && (ou16_GenCodeVersion < 4U) && (oe_Linkage == eREMOTEPUBLIC))
    {
       s32_Retval = C_NOACT;
+      osc_write_log_error("Creating source code",
+                          "Did not generate code for Datapool \"" + orc_DataPool.c_Name +
+                          "\" because code format version does not support public Datapools.");
+   }
+
+   // defensive checks agains data that we cannot handle:
+   // number of data sets must by <= 255:
+   if (s32_Retval == C_NO_ERR)
+   {
+      for (uint32 u32_ListIndex = 0U; u32_ListIndex < orc_DataPool.c_Lists.size(); u32_ListIndex++)
+      {
+         if (orc_DataPool.c_Lists[u32_ListIndex].c_DataSets.size() > 255U)
+         {
+            s32_Retval = C_CONFIG;
+            osc_write_log_error("Creating source code",
+                                "Did not generate code for Datapool \"" + orc_DataPool.c_Name +
+                                "\" because list \"" + orc_DataPool.c_Lists[u32_ListIndex].c_Name + "\"" +
+                                " has more than 255 Datasets defined.");
+         }
+      }
    }
 
    if (s32_Retval == C_NO_ERR)
    {
       // create header file
       s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, orc_DataPool, ou8_DataPoolIndex, c_ProjectId,
-                                       ou16_GenCodeVersion, oe_Linkage);
+                                       ou16_GenCodeVersion, oe_Linkage, oe_ScalingSupport);
    }
 
    // create implementation file
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, orc_DataPool, ou8_DataPoolIndex,
-                                               c_ProjectId, ou16_GenCodeVersion, ou8_DataPoolIndexRemote, ou8_ProcessId,
-                                               oe_Linkage);
+      s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, orc_DataPool, c_ProjectId,
+                                               ou16_GenCodeVersion, ou8_DataPoolIndexRemote, ou8_ProcessId, oe_Linkage);
    }
 
    return s32_Retval;
@@ -182,16 +209,19 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
    \param[in] orc_ProjectId            project id for consistency check
    \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in] oe_Linkage               flag for linkage context
+   \param[in] oe_ScalingSupport        Flag for data type and existence of factor, offset and scaling macros
 
    \return
    C_NO_ERR Operation success
-   C_RD_WR  Operation failure: cannot store file
+   C_RD_WR  Cannot store file
+   C_CONFIG Datapool list element factor negative or would be generated as zero
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportToolInfo, const C_SCLString & orc_Path,
                                                 const C_OSCNodeDataPool & orc_DataPool, const uint8 ou8_DataPoolIndex,
                                                 const C_SCLString & orc_ProjectId, const uint16 ou16_GenCodeVersion,
-                                                const E_Linkage oe_Linkage)
+                                                const E_Linkage oe_Linkage,
+                                                const C_OSCNodeCodeExportSettings::E_Scaling oe_ScalingSupport)
 {
    sint32 s32_Retval;
    C_SCLStringList c_Data;
@@ -203,23 +233,26 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportTo
    mh_AddIncludes(c_Data, orc_DataPool, mhq_IS_HEADER_FILE);
 
    // add defines
-   mh_AddDefines(c_Data, orc_DataPool, ou8_DataPoolIndex, orc_ProjectId, ou16_GenCodeVersion, mhq_IS_HEADER_FILE,
-                 oe_Linkage);
+   s32_Retval = mh_AddDefinesHeader(c_Data, orc_DataPool, ou8_DataPoolIndex, orc_ProjectId, ou16_GenCodeVersion,
+                                    oe_Linkage, oe_ScalingSupport);
 
-   // add types
-   mh_AddTypes(c_Data, orc_DataPool, mhq_IS_HEADER_FILE, oe_Linkage);
+   if (s32_Retval == C_NO_ERR)
+   {
+      // add types
+      mh_AddTypes(c_Data, orc_DataPool, mhq_IS_HEADER_FILE, oe_Linkage);
 
-   // add global variables
-   mh_AddGlobalVariables(c_Data, orc_DataPool, ou16_GenCodeVersion, mhq_IS_HEADER_FILE, oe_Linkage);
+      // add global variables
+      mh_AddGlobalVariables(c_Data, orc_DataPool, ou16_GenCodeVersion, mhq_IS_HEADER_FILE, oe_Linkage);
 
-   // add function prototypes
-   C_OSCExportUti::h_AddProjIdFunctionPrototype(c_Data, mh_GetMagicName(orc_ProjectId, orc_DataPool));
+      // add function prototypes
+      C_OSCExportUti::h_AddProjIdFunctionPrototype(c_Data, mh_GetMagicName(orc_ProjectId, orc_DataPool));
 
-   // add implementation
-   mh_AddImplementation(c_Data, mhq_IS_HEADER_FILE);
+      // add implementation
+      mh_AddImplementation(c_Data, mhq_IS_HEADER_FILE);
 
-   // finally save all stuff into the file
-   s32_Retval = C_OSCExportUti::h_SaveToFile(c_Data, orc_Path, h_GetFileName(orc_DataPool), true);
+      // finally save all stuff into the file
+      s32_Retval = C_OSCExportUti::h_SaveToFile(c_Data, orc_Path, h_GetFileName(orc_DataPool), true);
+   }
 
    return s32_Retval;
 }
@@ -230,7 +263,6 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportTo
    \param[in] orc_ExportToolInfo       information about calling executable (name + version)
    \param[in] orc_Path                 storage path for created file
    \param[in] orc_DataPool             Datapool configuration
-   \param[in] ou8_DataPoolIndex        index of Datapool
    \param[in] orc_ProjectId            project id for consistency check
    \param[in] ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in] ou8_DataPoolIndexRemote  index of Datapool within remote process
@@ -246,7 +278,6 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_ExportTo
 sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_ExportToolInfo,
                                                         const C_SCLString & orc_Path,
                                                         const C_OSCNodeDataPool & orc_DataPool,
-                                                        const uint8 ou8_DataPoolIndex,
                                                         const C_SCLString & orc_ProjectId,
                                                         const uint16 ou16_GenCodeVersion,
                                                         const uint8 ou8_DataPoolIndexRemote, const uint8 ou8_ProcessId,
@@ -262,8 +293,7 @@ sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_
    mh_AddIncludes(c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE);
 
    // add defines
-   mh_AddDefines(c_Data, orc_DataPool, ou8_DataPoolIndex, orc_ProjectId, ou16_GenCodeVersion,
-                 mhq_IS_IMPLEMENTATION_FILE, oe_Linkage);
+   mh_AddDefinesImpl(c_Data, orc_DataPool, orc_ProjectId, ou16_GenCodeVersion);
 
    // add types
    mh_AddTypes(c_Data, orc_DataPool, mhq_IS_IMPLEMENTATION_FILE, oe_Linkage);
@@ -325,9 +355,9 @@ void C_OSCExportDataPool::mh_AddHeader(const C_SCLString & orc_ExportToolInfo, C
 
    if (oq_FileType == mhq_IS_HEADER_FILE)
    {
-      const C_SCLString c_DataPoolName = orc_DataPool.c_Name.UpperCase();
-      orc_Data.Append("#ifndef " + c_DataPoolName + "_DATA_POOLH");
-      orc_Data.Append("#define " + c_DataPoolName + "_DATA_POOLH");
+      const C_SCLString c_HeaderGuard = h_GetFileName(orc_DataPool).UpperCase() + "H";
+      orc_Data.Append("#ifndef " + c_HeaderGuard);
+      orc_Data.Append("#define " + c_HeaderGuard);
    }
 }
 
@@ -354,15 +384,14 @@ void C_OSCExportDataPool::mh_AddIncludes(C_SCLStringList & orc_Data, const C_OSC
    }
    else
    {
-      const C_SCLString c_DataPoolName = orc_DataPool.c_Name.LowerCase();
       orc_Data.Append("#include <stddef.h>");
-      orc_Data.Append("#include \"" + c_DataPoolName + "_data_pool.h\"");
+      orc_Data.Append("#include \"" + h_GetFileName(orc_DataPool) + ".h\"");
       orc_Data.Append("");
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add defines
+/*! \brief   Add defines for header file
 
    \param[out] orc_Data                 converted data to string list
    \param[in]  orc_DataPool             Datapool configuration
@@ -370,99 +399,224 @@ void C_OSCExportDataPool::mh_AddIncludes(C_SCLStringList & orc_Data, const C_OSC
    \param[in]  orc_ProjectId            project id for consistency check
    \param[in]  ou16_GenCodeVersion      version of structure (generate code as specified for this version)
    \param[in]  oq_FileType              .c or .h file selected
-   \param[in] oe_Linkage               flag for linkage context
+   \param[in]  oe_Linkage               flag for linkage context
+   \param[in]  oe_ScalingSupport        Flag for data type and existence of factor, offset and scaling macros
+
+   \return
+   C_NO_ERR Operation success
+   C_CONFIG Datapool list element factor negative or would be generated as zero
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
-                                        const uint8 ou8_DataPoolIndex, const C_SCLString & orc_ProjectId,
-                                        const uint16 ou16_GenCodeVersion, const bool oq_FileType,
-                                        const E_Linkage oe_Linkage)
+sint32 C_OSCExportDataPool::mh_AddDefinesHeader(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
+                                                const uint8 ou8_DataPoolIndex, const C_SCLString & orc_ProjectId,
+                                                const uint16 ou16_GenCodeVersion, const E_Linkage oe_Linkage,
+                                                const C_OSCNodeCodeExportSettings::E_Scaling oe_ScalingSupport)
 {
+   sint32 s32_Retval = C_NO_ERR;
+
    const C_SCLString c_DataPoolName = orc_DataPool.c_Name.UpperCase();
    const C_SCLString c_MagicName = mh_GetMagicName(orc_ProjectId, orc_DataPool);
    uint16 u16_ListIndex;
 
    orc_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Defines"));
 
-   if (oq_FileType == mhq_IS_HEADER_FILE)
+   C_OSCExportUti::h_AddProjectIdDef(orc_Data, c_MagicName, true);
+   orc_Data.Append("///Index of this Datapool");
+   orc_Data.Append("#define " + c_DataPoolName + "_DATA_POOL_INDEX (" + C_SCLString::IntToStr(ou8_DataPoolIndex) +
+                   "U)");
+   orc_Data.Append("");
+
+   if ((oe_Linkage == eLOCAL) || ((ou16_GenCodeVersion >= 4U) && (oe_Linkage == eREMOTEPUBLIC)))
    {
-      C_OSCExportUti::h_AddProjectIdDef(orc_Data, c_MagicName, true);
-      orc_Data.Append("///Index of this Datapool");
-      orc_Data.Append("#define " + c_DataPoolName + "_DATA_POOL_INDEX (" + C_SCLString::IntToStr(ou8_DataPoolIndex) +
-                      "U)");
+      orc_Data.Append("///Index of lists");
+      for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
+      {
+         const C_SCLString c_ListName = orc_DataPool.c_Lists[u16_ListIndex].c_Name.UpperCase();
+         orc_Data.Append("#define " + c_DataPoolName + "_LIST_INDEX_" + c_ListName + " (" +
+                         C_SCLString::IntToStr(u16_ListIndex) + "U)");
+      }
+      orc_Data.Append("#define " + c_DataPoolName + "_NUMBER_OF_LISTS " + "(" + C_SCLString::IntToStr(
+                         u16_ListIndex) + "U)");
       orc_Data.Append("");
 
-      if ((oe_Linkage == eLOCAL) || ((ou16_GenCodeVersion >= 4U) && (oe_Linkage == eREMOTEPUBLIC)))
+      orc_Data.Append("///Index of elements");
+      for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
       {
-         orc_Data.Append("///Index of lists");
-         for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
+         const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u16_ListIndex];
+         const C_SCLString c_ListName = rc_List.c_Name.UpperCase();
+         for (uint16 u16_ElementIndex = 0U; u16_ElementIndex < rc_List.c_Elements.size(); u16_ElementIndex++)
          {
-            const C_SCLString c_ListName = orc_DataPool.c_Lists[u16_ListIndex].c_Name.UpperCase();
-            orc_Data.Append("#define " + c_DataPoolName + "_LIST_INDEX_" + c_ListName + " (" +
-                            C_SCLString::IntToStr(u16_ListIndex) + "U)");
+            const C_SCLString c_ElementName = rc_List.c_Elements[u16_ElementIndex].c_Name.UpperCase();
+            orc_Data.Append("#define " + c_DataPoolName + "_ELEM_INDEX_" + c_ListName + "_" + c_ElementName +
+                            " (" + C_SCLString::IntToStr(u16_ElementIndex) + "U)");
          }
-         orc_Data.Append("#define " + c_DataPoolName + "_NUMBER_OF_LISTS " + "(" + C_SCLString::IntToStr(
-                            u16_ListIndex) + "U)");
+         orc_Data.Append("#define " + c_DataPoolName + "_" + c_ListName + "_NUMBER_OF_ELEMENTS " + "(" +
+                         C_SCLString::IntToStr(rc_List.c_Elements.size()) + "U)");
          orc_Data.Append("");
+      }
 
-         orc_Data.Append("///Index of elements");
+      orc_Data.Append("///Index of Datasets");
+      for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
+      {
+         const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u16_ListIndex];
+         const C_SCLString c_ListName = rc_List.c_Name.UpperCase();
+         if (rc_List.c_Elements.size() > 0)
+         {
+            for (uint16 u16_DataSetIndex = 0U; u16_DataSetIndex < rc_List.c_DataSets.size(); u16_DataSetIndex++)
+            {
+               const C_SCLString c_DataSetName = rc_List.c_DataSets[u16_DataSetIndex].c_Name.UpperCase();
+               orc_Data.Append("#define " + c_DataPoolName + "_DATA_SET_INDEX_" + c_ListName + "_" + c_DataSetName +
+                               " (" + C_SCLString::IntToStr(u16_DataSetIndex) + "U)");
+            }
+            orc_Data.Append("#define " + c_DataPoolName + "_" + c_ListName + "_NUMBER_OF_DATA_SETS " + "(" +
+                            C_SCLString::IntToStr(rc_List.c_DataSets.size()) + "U)");
+         }
+         else
+         {
+            orc_Data.Append("#define " + c_DataPoolName + "_" + c_ListName + "_NUMBER_OF_DATA_SETS " + "(0U)");
+         }
+         orc_Data.Append("");
+      }
+
+      if (oe_ScalingSupport != C_OSCNodeCodeExportSettings::eNONE)
+      {
+         orc_Data.Append("///Scaling values");
+         for (u16_ListIndex = 0U; (u16_ListIndex < orc_DataPool.c_Lists.size()) && (s32_Retval == C_NO_ERR);
+              u16_ListIndex++)
+         {
+            const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u16_ListIndex];
+            const C_SCLString c_ListName = rc_List.c_Name.UpperCase();
+            const C_SCLString c_FloatType = (oe_ScalingSupport == C_OSCNodeCodeExportSettings::eFLOAT64) ? "" : "F";
+            for (uint16 u16_ElementIndex = 0U; u16_ElementIndex < rc_List.c_Elements.size(); u16_ElementIndex++)
+            {
+               const C_SCLString c_ElementName = rc_List.c_Elements[u16_ElementIndex].c_Name.UpperCase();
+               const C_SCLString c_Factor =
+                  C_OSCExportUti::h_FloatToStrCutZeroes(rc_List.c_Elements[u16_ElementIndex].f64_Factor);
+
+               if ((rc_List.c_Elements[u16_ElementIndex].f64_Factor <= 0.0) || (c_Factor == "0.0"))
+               {
+                  osc_write_log_error("Creating source code",
+                                      "Did not generate code because factor of element \"" + orc_DataPool.c_Name +
+                                      "::" + rc_List.c_Name + "::" + rc_List.c_Elements[u16_ElementIndex].c_Name +
+                                      "\" is negative or would be generated as 0.0.");
+                  s32_Retval = C_CONFIG;
+               }
+
+               orc_Data.Append("#define " +
+                               mh_GetElementScaleDefine(c_DataPoolName, c_ListName, c_ElementName, true) +
+                               " (" + c_Factor + c_FloatType + ")");
+
+               orc_Data.Append("#define " +
+                               mh_GetElementScaleDefine(c_DataPoolName, c_ListName, c_ElementName, false) + " (" +
+                               C_OSCExportUti::h_FloatToStrCutZeroes(rc_List.c_Elements[u16_ElementIndex].f64_Offset) +
+                               c_FloatType + ")");
+            }
+            if (rc_List.c_Elements.size() > 0)
+            {
+               orc_Data.Append("");
+            }
+         }
+
+         orc_Data.Append("///Scaling utilities");
          for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
          {
             const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u16_ListIndex];
             const C_SCLString c_ListName = rc_List.c_Name.UpperCase();
             for (uint16 u16_ElementIndex = 0U; u16_ElementIndex < rc_List.c_Elements.size(); u16_ElementIndex++)
             {
-               const C_SCLString c_ElementName = rc_List.c_Elements[u16_ElementIndex].c_Name.UpperCase();
-               orc_Data.Append("#define " + c_DataPoolName + "_ELEM_INDEX_" + c_ListName + "_" + c_ElementName +
-                               " (" + C_SCLString::IntToStr(u16_ElementIndex) + "U)");
-            }
-            orc_Data.Append("#define " + c_DataPoolName + "_" + c_ListName + "_NUMBER_OF_ELEMENTS " + "(" +
-                            C_SCLString::IntToStr(rc_List.c_Elements.size()) + "U)");
-            orc_Data.Append("");
-         }
+               const C_OSCNodeDataPoolListElement & rc_Element = rc_List.c_Elements[u16_ElementIndex];
+               const C_SCLString c_ElementName = rc_Element.c_Name.UpperCase();
+               C_SCLString c_ElementStruct;
+               C_SCLString c_Makro;
 
-         orc_Data.Append("///Index of Datasets");
-         for (u16_ListIndex = 0U; u16_ListIndex < orc_DataPool.c_Lists.size(); u16_ListIndex++)
-         {
-            const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u16_ListIndex];
-            const C_SCLString c_ListName = rc_List.c_Name.UpperCase();
+               if ((ou16_GenCodeVersion >= 4U) && (oe_Linkage == eREMOTEPUBLIC))
+               {
+                  c_ElementStruct = "gpt_" + orc_DataPool.c_Name + "_DataPoolValues->";
+               }
+               else
+               {
+                  c_ElementStruct = "gt_" + orc_DataPool.c_Name + "_DataPoolValues.";
+               }
+
+               c_ElementStruct += "t_" + rc_List.c_Name + "Values." +
+                                  C_OSCExportUti::h_GetTypePrefix(rc_Element.GetType(), rc_Element.GetArray()) +
+                                  "_" + rc_Element.c_Name;
+
+               if (rc_Element.GetArray() == true)
+               {
+                  c_ElementStruct += "[INDEX]";
+               }
+
+               // setter
+               c_Makro = "#define " + c_DataPoolName + "_SET_VALUE_FROM_SCALED_" + c_ListName + "_" +
+                         c_ElementName + "(";
+               if (rc_Element.GetArray() == true)
+               {
+                  c_Makro += "INDEX, ";
+               }
+               c_Makro += "SCALED_VALUE) (" + c_ElementStruct + " = (SCALED_VALUE - " +
+                          mh_GetElementScaleDefine(c_DataPoolName, c_ListName, c_ElementName, false) +
+                          ") / " + mh_GetElementScaleDefine(c_DataPoolName, c_ListName, c_ElementName, true) +
+                          ")";
+
+               orc_Data.Append(c_Makro);
+
+               // getter
+               c_Makro = "#define " + c_DataPoolName + "_GET_SCALED_VALUE_" + c_ListName + "_" +
+                         c_ElementName + "(";
+
+               if (rc_Element.GetArray() == true)
+               {
+                  c_Makro += "INDEX";
+               }
+               c_Makro += ") ((" + c_ElementStruct +
+                          " * " + mh_GetElementScaleDefine(c_DataPoolName, c_ListName, c_ElementName, true) +
+                          ") + " + mh_GetElementScaleDefine(c_DataPoolName, c_ListName, c_ElementName, false) +
+                          ")";
+               orc_Data.Append(c_Makro);
+            }
+
             if (rc_List.c_Elements.size() > 0)
             {
-               for (uint16 u16_DataSetIndex = 0U; u16_DataSetIndex < rc_List.c_DataSets.size(); u16_DataSetIndex++)
-               {
-                  const C_SCLString c_DataSetName = rc_List.c_DataSets[u16_DataSetIndex].c_Name.UpperCase();
-                  orc_Data.Append("#define " + c_DataPoolName + "_DATA_SET_INDEX_" + c_ListName + "_" + c_DataSetName +
-                                  " (" + C_SCLString::IntToStr(u16_DataSetIndex) + "U)");
-               }
-               orc_Data.Append("#define " + c_DataPoolName + "_" + c_ListName + "_NUMBER_OF_DATA_SETS " + "(" +
-                               C_SCLString::IntToStr(rc_List.c_DataSets.size()) + "U)");
+               orc_Data.Append("");
             }
-            else
-            {
-               orc_Data.Append("#define " + c_DataPoolName + "_" + c_ListName + "_NUMBER_OF_DATA_SETS " + "(0U)");
-            }
-            orc_Data.Append("");
          }
       }
    }
-   else
-   {
-      if (ou16_GenCodeVersion >= 3U)
-      {
-         orc_Data.Append("///check for correct version of structure definitions");
-         orc_Data.Append("#if OSY_DPA_DATA_POOL_DEFINITION_VERSION != 0x000" +
-                         C_SCLString::IntToStr(static_cast<sint32>(C_OSCExportDataPool::h_ConvertOverallCodeVersion(
-                                                                      ou16_GenCodeVersion))) + "U");
-         // datapool export version is one less than over all code structure version (no changes from version 1 to 2)
-         orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
-                         "generated code");
-         orc_Data.Append("static T_osy_non_existing_type_" + orc_ProjectId + " mt_Variable;");
-         orc_Data.Append("#endif");
-         orc_Data.Append("");
-      }
+   return s32_Retval;
+}
 
-      C_OSCExportUti::h_AddProjectIdDef(orc_Data, c_MagicName, false);
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief Add defines for implementation file
+
+   \param[out] orc_Data                 converted data to string list
+   \param[in]  orc_DataPool             Datapool configuration
+   \param[in]  orc_ProjectId            project id for consistency check
+   \param[in]  ou16_GenCodeVersion      version of structure (generate code as specified for this version)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCExportDataPool::mh_AddDefinesImpl(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
+                                            const C_SCLString & orc_ProjectId, const uint16 ou16_GenCodeVersion)
+{
+   const C_SCLString c_MagicName = mh_GetMagicName(orc_ProjectId, orc_DataPool);
+
+   orc_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Defines"));
+
+   if (ou16_GenCodeVersion >= 3U)
+   {
+      orc_Data.Append("///check for correct version of structure definitions");
+      orc_Data.Append("#if OSY_DPA_DATA_POOL_DEFINITION_VERSION != 0x" +
+                      C_SCLString::IntToHex(static_cast<sint32>(C_OSCExportDataPool::h_ConvertOverallCodeVersion(
+                                                                   ou16_GenCodeVersion)), 4U) + "U");
+      // datapool export version is one less than over all code structure version (no changes from version 1 to 2)
+      orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
+                      "generated code");
+      orc_Data.Append("static T_osy_non_existing_type_" + orc_ProjectId + " mt_Variable;");
+      orc_Data.Append("#endif");
+      orc_Data.Append("");
    }
+
+   C_OSCExportUti::h_AddProjectIdDef(orc_Data, c_MagicName, false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1195,12 +1349,12 @@ C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoo
          }
          break;
       case C_OSCNodeDataPoolContent::eFLOAT32: ///< Data type 32 bit floating point
-         c_String += C_SCLString::FloatToStr(orc_Value.GetValueF32()) + "F";
+         c_String += C_OSCExportUti::h_FloatToStrCutZeroes(orc_Value.GetValueF32()) + "F";
          break;
       case C_OSCNodeDataPoolContent::eFLOAT64: ///< Data type 64 bit floating point
          //depending on the value this could result in a very long string
-         //but with other approaches (e.g. "printf formatter %g" we might lose precision
-         c_String += C_SCLString::FloatToStr(orc_Value.GetValueF64());
+         //but with other approaches (e.g. "printf formatter %g" we might lose precision)
+         c_String += C_OSCExportUti::h_FloatToStrCutZeroes(orc_Value.GetValueF64());
          break;
       default:
          break;
@@ -1257,10 +1411,10 @@ C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoo
             }
             break;
          case C_OSCNodeDataPoolContent::eFLOAT32: ///< Data type 32 bit floating point
-            c_String += C_SCLString::FloatToStr(orc_Value.GetValueAF32Element(u32_ArrayIndex)) + "F";
+            c_String += C_OSCExportUti::h_FloatToStrCutZeroes(orc_Value.GetValueAF32Element(u32_ArrayIndex)) + "F";
             break;
          case C_OSCNodeDataPoolContent::eFLOAT64: ///< Data type 64 bit floating point
-            c_String += C_SCLString::FloatToStr(orc_Value.GetValueAF64Element(u32_ArrayIndex));
+            c_String += C_OSCExportUti::h_FloatToStrCutZeroes(orc_Value.GetValueAF64Element(u32_ArrayIndex));
             break;
          default:
             break;
@@ -1389,4 +1543,24 @@ C_SCLString C_OSCExportDataPool::mh_GetMagicName(const C_SCLString & orc_Project
    const C_SCLString c_MagicName = orc_DataPool.c_Name.UpperCase() + "_PROJECT_ID_" + orc_ProjectId;
 
    return c_MagicName;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Utility for getting define string of factor value constant.
+
+   \param[in]       orc_Element     Datapool element
+
+   \return
+   scale value string, e.g. MY_NVM_SCALING_FACTOR_LIST1_U8VAR
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCExportDataPool::mh_GetElementScaleDefine(const C_SCLString & orc_DataPoolName,
+                                                          const C_SCLString & orc_ListName,
+                                                          const C_SCLString & orc_ElementName, const bool oq_Factor)
+{
+   const C_SCLString c_Type = (oq_Factor == true) ? "FACTOR" : "OFFSET";
+   const C_SCLString c_Return = orc_DataPoolName + "_SCALING_" + c_Type + "_" + orc_ListName + "_" +
+                                orc_ElementName;
+
+   return c_Return;
 }

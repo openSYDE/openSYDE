@@ -65,10 +65,6 @@ private:
    C_SyvDaItDashboardProgressBarWidget(const C_SyvDaItDashboardProgressBarWidget &);
    C_SyvDaItDashboardProgressBarWidget & operator =(const C_SyvDaItDashboardProgressBarWidget &);
 
-   void m_AdjustWidgetSize(void) const;
-
-   static void mh_SetAutomatedWidthScaling(QWidget * const opc_Widget);
-   static void mh_SetAutomatedHeightScaling(QWidget * const opc_Widget);
    static void mh_DrawArrow(QPainter & orc_Painter, const QPointF & orc_P1, const QPointF & orc_P2,
                             const QPointF & orc_P3, const QPen & orc_Pen);
    static QPolygonF mh_GetOuterRect(const QPointF & orc_P1, const QPointF & orc_P2, const QPointF & orc_POpposite,

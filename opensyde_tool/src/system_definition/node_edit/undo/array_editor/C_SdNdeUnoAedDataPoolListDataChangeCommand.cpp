@@ -247,10 +247,8 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
                                                                    this->me_ArrayEditType,
                                                                    this->mu32_DataSetIndex)->HandleDataChange(
             this->mu32_ItemIndex);
-      }
-      //Error change
-      if (this->mpc_DataPoolListModelViewManager != NULL)
-      {
+
+         //Error change
          this->mpc_DataPoolListModelViewManager->GetElementModel(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_ListIndex)->HandleDataChange(
             this->mu32_ElementIndex, C_SdNdeDpUtil::eELEMENT_DATA_SET, this->mu32_DataSetIndex);

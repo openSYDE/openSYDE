@@ -42,8 +42,7 @@ using namespace stw_can;
 // for all possible L7 protocols.
 
 //IVA protocol constants
-/// \name  Defines of the jobs low byte for IVA functions (command low byte of the CAN messages)
-// \group_begin
+//Defines of the jobs low byte for IVA functions (command low byte of the CAN messages)
 #define JOB_LB_IVA_LOGON                 (static_cast<uint8>(0x01U)) ///< Command low byte for Job "Log On"
 #define JOB_LB_IVA_LOGOFF                (static_cast<uint8>(0x02U)) ///< Command low byte for Job "Log Off"
 #define JOB_LB_IVA_SERVICE_READ          (static_cast<uint8>(0x03U)) ///< Command low byte for Job "Service Read Funktionen"
@@ -64,10 +63,7 @@ using namespace stw_can;
 #define JOB_LB_IVA_CHECK_LIST_CHECKSUM   (static_cast<uint8>(0x51U)) ///< Command low byte for Job "Check Checksum"
 #define JOB_LB_IVA_WRITE_LIST_DEFAULT    (static_cast<uint8>(0x60U)) ///< Command low byte for Job "Write List Default"
 
-// \group_end
-
-/// \name  IVA Numbers for services
-/// \group_begin
+//IVA Numbers for services
 #define IVA_SERVICE_PROT_VER      (static_cast<uint16>(0x0000U)) ///< Service: Protocol Version
 #define IVA_SERVICE_IMPL_VER      (static_cast<uint16>(0x0001U)) ///< Service: Driver Version (Inplemented Version)
 #define IVA_SERVICE_DEVICE_TYPE1  (static_cast<uint16>(0x0003U)) ///< Service: Device Name 1. Part
@@ -79,7 +75,6 @@ using namespace stw_can;
 #define IVA_SERVICE_STMIN_SERVER  (static_cast<uint16>(0x0009U)) ///< Service: Min. time beween the CAN messages for segmented write access
 #define IVA_SERVICE_BSMAX_CLIENT  (static_cast<uint16>(0x000AU)) ///< Service: Max. Numbers of Blocks for segmented read access
 #define IVA_SERVICE_STMIN_CLIENT  (static_cast<uint16>(0x000BU)) ///< Service: Min. time beween the CAN messages for segmented read access
-/// \group_end
 
 #define CA_NO_ERR        (0)
 #define CA_UNKNOWN_ERR   (1)

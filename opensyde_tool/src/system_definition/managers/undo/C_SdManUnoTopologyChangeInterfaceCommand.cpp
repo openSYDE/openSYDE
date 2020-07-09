@@ -13,6 +13,7 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
+#include "C_SdUtil.h"
 #include "C_SdManUnoTopologyChangeInterfaceCommand.h"
 #include "C_GiLiBusConnector.h"
 
@@ -38,13 +39,16 @@ using namespace std;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Scene              Pointer to currently active scene
-   \param[in]     orc_IDs                Affected unique IDs
-   \param[in]     oru8_PreviousInterface Previous interface number
-   \param[in]     oru8_NewInterface      New interface number to use
-   \param[in]     oru8_PreviousNodeId    Previous node id
-   \param[in]     oru8_NewNodeId         New node id
-   \param[in,out] opc_Parent             Optional pointer to parent
+   \param[in,out]  opc_Scene                 Pointer to currently active scene
+   \param[in]      orc_IDs                   Affected unique IDs
+   \param[in]      oru8_PreviousInterface    Previous interface number
+   \param[in]      oru8_NewInterface         New interface number to use
+   \param[in]      oru8_PreviousNodeId       Previous node id
+   \param[in]      oru8_NewNodeId            New node id
+   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
+   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
+   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
+   \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyChangeInterfaceCommand::C_SdManUnoTopologyChangeInterfaceCommand(QGraphicsScene * const opc_Scene,
@@ -53,12 +57,18 @@ C_SdManUnoTopologyChangeInterfaceCommand::C_SdManUnoTopologyChangeInterfaceComma
                                                                                    const uint8 & oru8_NewInterface,
                                                                                    const uint8 & oru8_PreviousNodeId,
                                                                                    const uint8 & oru8_NewNodeId,
+                                                                                   const bool oq_ActivateDatapoolL2,
+                                                                                   const bool oq_ActivateDatapoolECeS,
+                                                                                   const bool oq_ActivateDatapoolECoS,
                                                                                    QUndoCommand * const opc_Parent) :
    C_SebUnoBaseCommand(opc_Scene, orc_IDs, "Change interface of bus connection(s)", opc_Parent),
    mu8_PreviousInterface(oru8_PreviousInterface),
    mu8_NewInterface(oru8_NewInterface),
    mu8_PreviousNodeId(oru8_PreviousNodeId),
-   mu8_NewNodeId(oru8_NewNodeId)
+   mu8_NewNodeId(oru8_NewNodeId),
+   mq_ActivateDatapoolL2(oq_ActivateDatapoolL2),
+   mq_ActivateDatapoolECeS(oq_ActivateDatapoolECeS),
+   mq_ActivateDatapoolECoS(oq_ActivateDatapoolECoS)
 {
 }
 
@@ -93,8 +103,8 @@ void C_SdManUnoTopologyChangeInterfaceCommand::redo(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change interface of all bus connectors to specified one
 
-   \param[in] oru8_NewInterface New interface to change to
-   \param[in] oru8_NodeId       New node id
+   \param[in]  oru8_NewInterface    New interface to change to
+   \param[in]  oru8_NodeId          New node id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyChangeInterfaceCommand::m_ChangeInterface(const uint8 & oru8_NewInterface,
@@ -109,6 +119,13 @@ void C_SdManUnoTopologyChangeInterfaceCommand::m_ChangeInterface(const uint8 & o
       if (pc_CurConn != NULL)
       {
          pc_CurConn->ChangeInterface(oru8_NewInterface, oru8_NodeId);
+         if ((pc_CurConn->GetNodeItem() != NULL) && (pc_CurConn->GetNodeItem()->GetIndex() >= 0L))
+         {
+            C_SdUtil::h_ConfigureComDatapools(
+               static_cast<uint32>(pc_CurConn->GetNodeItem()->GetIndex()), oru8_NewInterface,
+               this->mq_ActivateDatapoolL2, this->mq_ActivateDatapoolECeS,
+               this->mq_ActivateDatapoolECoS);
+         }
       }
    }
 }

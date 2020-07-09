@@ -74,8 +74,8 @@ Q_SIGNALS:
    void SigErrorChanged(void);
 
 protected:
-   static void m_MapItemToID(const QList<QGraphicsItem *> & orc_Items, std::vector<stw_types::uint64> & orc_IDs);
-   static void m_MapItemToID(const QGraphicsItem * const opc_Item, stw_types::uint64 & oru64_ID);
+   static void mh_MapItemToID(const QList<QGraphicsItem *> & orc_Items, std::vector<stw_types::uint64> & orc_IDs);
+   static void mh_MapItemToID(const QGraphicsItem * const opc_Item, stw_types::uint64 & oru64_ID);
    virtual C_SebUnoSetupStyleCommand * m_GetNewStyleCommand(const std::vector<stw_types::uint64> & orc_Items,
                                                             const bool oq_DarkMode);
 

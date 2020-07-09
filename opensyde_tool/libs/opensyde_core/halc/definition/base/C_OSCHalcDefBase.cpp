@@ -78,16 +78,8 @@ bool C_OSCHalcDefBase::CheckIdsUnique(std::vector<stw_scl::C_SCLString> & orc_Du
             const C_OSCHalcDefChannelUseCase & rc_Channel = pc_Domain->c_ChannelUseCases[u32_ItChannel];
             c_AllIds.push_back(rc_Channel.c_Id);
          }
-         for (uint32 u32_ItParam = 0UL; u32_ItParam < pc_Domain->c_Parameters.size(); ++u32_ItParam)
-         {
-            const C_OSCHalcDefStruct & rc_Param = pc_Domain->c_Parameters[u32_ItParam];
-            c_AllIds.push_back(rc_Param.c_Id);
-            for (uint32 u32_ItParamElem = 0UL; u32_ItParamElem < rc_Param.c_StructElements.size(); ++u32_ItParamElem)
-            {
-               const C_OSCHalcDefElement & rc_ParamElem = rc_Param.c_StructElements[u32_ItParamElem];
-               c_AllIds.push_back(rc_ParamElem.c_Id);
-            }
-         }
+         C_OSCHalcDefBase::mh_AggregateIds(pc_Domain->c_ChannelValues.c_Parameters, c_AllIds);
+         C_OSCHalcDefBase::mh_AggregateIds(pc_Domain->c_DomainValues.c_Parameters, c_AllIds);
       }
    }
 
@@ -133,6 +125,26 @@ void C_OSCHalcDefBase::Clear()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Checks if the HALC configuration is clear or if it has a loaded definition
+
+   \retval   true    Definition is cleared. No definition is loaded.
+   \retval   false   The definition is not cleared. A concrete definition is loaded.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCHalcDefBase::IsClear(void) const
+{
+   bool q_Return = false;
+
+   if ((this->u32_ContentVersion == 0UL) &&
+       (this->c_DeviceName == "") &&
+       (this->c_FileString == ""))
+   {
+      q_Return = true;
+   }
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
@@ -146,4 +158,26 @@ void C_OSCHalcDefBase::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_ContentVersion, sizeof(this->u32_ContentVersion), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_DeviceName.c_str(), this->c_DeviceName.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_FileString.c_str(), this->c_FileString.Length(), oru32_HashValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Aggregate ids
+
+   \param[in]      orc_Items           Items
+   \param[in,out]  orc_DuplicateIds    Duplicate ids
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcDefBase::mh_AggregateIds(const std::vector<C_OSCHalcDefStruct> & orc_Items,
+                                       std::vector<stw_scl::C_SCLString> & orc_DuplicateIds)
+{
+   for (uint32 u32_ItItem = 0UL; u32_ItItem < orc_Items.size(); ++u32_ItItem)
+   {
+      const C_OSCHalcDefStruct & rc_Item = orc_Items[u32_ItItem];
+      orc_DuplicateIds.push_back(rc_Item.c_Id);
+      for (uint32 u32_ItItemElem = 0UL; u32_ItItemElem < rc_Item.c_StructElements.size(); ++u32_ItItemElem)
+      {
+         const C_OSCHalcDefElement & rc_ItemElem = rc_Item.c_StructElements[u32_ItItemElem];
+         orc_DuplicateIds.push_back(rc_ItemElem.c_Id);
+      }
+   }
 }

@@ -25,6 +25,7 @@
 #include "C_PuiSdNodeCanSignal.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
 #include "C_SdTopologyDataSnapshot.h"
+#include "C_OSCHalcConfigStandalone.h"
 #include "C_UtiClipBoardHelper.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -107,6 +108,9 @@ public:
                                                          std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageIds);
    static void h_StoreDataSnapShotToClipboard(const C_SdTopologyDataSnapshot & orc_Data);
    static stw_types::sint32 h_LoadDataSnapShotFromClipboard(C_SdTopologyDataSnapshot & orc_Data);
+
+   static void h_StoreHalcItemConfigToClipboard(const stw_opensyde_core::C_OSCHalcConfigStandalone & orc_Data);
+   static stw_types::sint32 h_LoadHalcItemConfigFromClipboard(stw_opensyde_core::C_OSCHalcConfigStandalone & orc_Data);
 
 private:
    C_SdClipBoardHelper(void);

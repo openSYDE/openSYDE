@@ -192,6 +192,30 @@ bool C_UsHandler::GetButtonUniqueViewActive(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known timestamp absolute mode
+
+   \return
+   Last known setting "timestamp absolute time of day" state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_UsHandler::GetTraceSettingDisplayTimestampAbsoluteTimeOfDay(void) const
+{
+   return this->mq_TraceSettingDisplayTimestampAbsoluteTimeOfDay;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known trace buffer size
+
+   \return
+   Last known setting "trace buffer size" state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_UsHandler::GetTraceSettingBufferSize(void) const
+{
+   return this->mu32_TraceSettingBufferSize;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get last known selected protocol
 
    \return
@@ -210,7 +234,7 @@ sint32 C_UsHandler::GetSelectedProtocolIndex(void) const
    Maximum number of recent projects entries
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint8 C_UsHandler::GetMaxRecentProjects(void)
+stw_types::uint8 C_UsHandler::h_GetMaxRecentProjects(void)
 {
    return C_UsHandler::mhu8_MaxRecentProjects;
 }
@@ -569,6 +593,28 @@ void C_UsHandler::SetButtonUniqueViewActive(const bool oq_New)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known timestamp absolute mode
+
+   \param[in] oq_New New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetTraceSettingDisplayTimestampAbsoluteTimeOfDay(const bool oq_New)
+{
+   this->mq_TraceSettingDisplayTimestampAbsoluteTimeOfDay = oq_New;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known trace buffer size
+
+   \param[in] ou32_New New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetTraceSettingBufferSize(const uint32 ou32_New)
+{
+   this->mu32_TraceSettingBufferSize = ou32_New;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set last known selected protocol index
 
    \param[in] os32_New New value
@@ -888,6 +934,8 @@ C_UsHandler::C_UsHandler(void) :
    mq_ButtonHexActive(false),
    mq_ButtonRelativeTimeStampActive(false),
    mq_ButtonUniqueViewActive(false),
+   mq_TraceSettingDisplayTimestampAbsoluteTimeOfDay(false),
+   mu32_TraceSettingBufferSize(1000U),
    ms32_SelectedProtocolIndex(0),
    ms32_SplitterSettingsX(0),
    ms32_SplitterMessageGenY(0),

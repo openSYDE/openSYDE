@@ -21,6 +21,7 @@
 #include "stwerrors.h"
 #include "C_ImpUtil.h"
 #include "C_PuiUtil.h"
+#include "C_OgeWiUtil.h"
 #include "C_OSCUtils.h"
 #include "C_GtGetText.h"
 #include "C_OSCZipFile.h"
@@ -241,14 +242,16 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OS
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::HandleCodeGenerationConfig(void) const
 {
-   C_OSCNodeOpenSYDEServerSettings c_Settings;
+   C_OSCNodeOpenSYDEServerSettings c_DPDSettings;
+   const C_OSCNodeCodeExportSettings c_GeneralSettings = this->mc_Package.c_CodeExportSettings;
 
-   c_Settings.s16_DPDDataBlockIndex = static_cast<uint16>(this->mc_Package.u8_ApplicationIndex);
-   c_Settings.u16_MaxMessageBufferTx = this->mc_Package.u16_MaxMessageBufferTx;
-   c_Settings.u16_MaxRoutingMessageBufferRx = this->mc_Package.u16_MaxRoutingMessageBufferRx;
-   c_Settings.u8_MaxParallelTransmissions = this->mc_Package.u8_MaxParallelTransmissions;
+   c_DPDSettings.s16_DPDDataBlockIndex = static_cast<uint16>(this->mc_Package.u8_ApplicationIndex);
+   c_DPDSettings.u16_MaxMessageBufferTx = this->mc_Package.u16_MaxMessageBufferTx;
+   c_DPDSettings.u16_MaxRoutingMessageBufferRx = this->mc_Package.u16_MaxRoutingMessageBufferRx;
+   c_DPDSettings.u8_MaxParallelTransmissions = this->mc_Package.u8_MaxParallelTransmissions;
 
-   C_PuiSdHandler::h_GetInstance()->SetNodeOpenSYDEServerSettings(this->mu32_NodeIndex, c_Settings);
+   C_PuiSdHandler::h_GetInstance()->SetNodeOpenSYDEServerSettings(this->mu32_NodeIndex, c_DPDSettings);
+   C_PuiSdHandler::h_GetInstance()->SetNodeCodeExportSettings(this->mu32_NodeIndex, c_GeneralSettings);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -465,16 +468,9 @@ void C_SdNdeDbAddNewProject::m_TSPButtonClicked(void)
       c_FolderName = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
 
-   // do not use QFileDialog::getOpenFileName because it does not support default suffix
-   QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select openSYDE Target Support Package File"),
-                        c_FolderName, c_FilterName);
-   c_Dialog.setDefaultSuffix(c_Suffix);
-
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
-   {
-      c_FilePath = c_Dialog.selectedFiles().at(0); // multi-selection is not possible
-   }
-
+   c_FilePath =
+      C_OgeWiUtil::h_GetOpenFileName(this, C_GtGetText::h_GetText("Select openSYDE Target Support Package File"),
+                                     c_FolderName, c_FilterName, c_Suffix);
    if (c_FilePath != "")
    {
       this->SetTSPPath(c_FilePath);

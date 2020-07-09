@@ -29,7 +29,7 @@ class C_SdBueMlvEmptyItem :
    public C_SdBueMlvBaseItem
 {
 public:
-   C_SdBueMlvEmptyItem(const stw_types::uint8 ou8_Index, QGraphicsItem * const opc_Parent = NULL);
+   C_SdBueMlvEmptyItem(const stw_types::uint8 ou8_Index = 0, QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_SdBueMlvEmptyItem();
 
    void SetIndex(const stw_types::uint8 ou8_Index);

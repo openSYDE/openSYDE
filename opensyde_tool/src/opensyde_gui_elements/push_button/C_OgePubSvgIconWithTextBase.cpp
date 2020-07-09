@@ -209,34 +209,6 @@ void C_OgePubSvgIconWithTextBase::SetDarkMode(const bool oq_Active)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get the inner rectangle (rectangle to paint in minus all of the borders)
-
-   Depending on enabled or disabled state
-
-   \return
-   The inner rectangle (rectangle to paint in minus all of the borders)
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QRect C_OgePubSvgIconWithTextBase::GetInnerRect(void) const
-{
-   QRect c_Retval;
-
-   if (this->isEnabled())
-   {
-      c_Retval = this->rect().adjusted(this->msn_LeftBorderEnabledWidth, this->msn_TopBorderEnabledWidth,
-                                       -this->msn_RightBorderEnabledWidth,
-                                       -this->msn_BottomBorderEnabledWidth);
-   }
-   else
-   {
-      c_Retval = this->rect().adjusted(this->msn_LeftBorderDisabledWidth, this->msn_TopBorderDisabledWidth,
-                                       -this->msn_RightBorderDisabledWidth,
-                                       -this->msn_BottomBorderDisabledWidth);
-   }
-   return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Draw rectangle borders
 
    \param[in]     orc_RectOuter          Outer rectangle to draw borders at/in

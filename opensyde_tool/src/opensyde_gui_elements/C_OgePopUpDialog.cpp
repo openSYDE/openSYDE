@@ -321,9 +321,9 @@ void C_OgePopUpDialog::SetNotifyAndBlockClose(const bool oq_NotifyAndBlockClose)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
-   if (stw_opensyde_gui_logic::C_HeHandler::CheckHelpKey(opc_KeyEvent) == true)
+   if (stw_opensyde_gui_logic::C_HeHandler::h_CheckHelpKey(opc_KeyEvent) == true)
    {
-      stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(this->mc_WidgetClassName);
+      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->mc_WidgetClassName);
    }
    QDialog::keyPressEvent(opc_KeyEvent);
 }

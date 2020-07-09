@@ -137,10 +137,8 @@ void C_SdNdeUnoDasDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
                                                                  this->mu32_DataPoolListIndex)->HandleDataChange(
             this->mu32_DataPoolListDataSetIndex,
             this->me_DataChangeType);
-      }
-      //Register error change
-      if (this->mpc_DataPoolListModelViewManager != NULL)
-      {
+
+         //Register error change
          this->mpc_DataPoolListModelViewManager->GetDataSetModel(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_DataPoolListIndex)->HandleErrorChange();
       }

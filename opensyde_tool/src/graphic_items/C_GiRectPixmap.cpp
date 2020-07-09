@@ -72,20 +72,6 @@ void C_GiRectPixmap::SetBackgroundColor(const QColor & orc_Color)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the icon as pixmap
-
-   \param[in]     orc_Pixmap      New Icon
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiRectPixmap::SetPixmap(const QPixmap & orc_Pixmap)
-{
-   this->mc_Pixmap = orc_Pixmap;
-   this->mc_PixmapScaled = this->mc_Pixmap.scaledToWidth(
-      static_cast<sintn>(this->rect().width()), Qt::SmoothTransformation);
-   this->mq_DrawPixmap = true;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set svg
 
    \param[in] orc_Value New svg

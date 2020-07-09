@@ -318,26 +318,29 @@ const C_CieConverter::C_CIECanMessage * C_CamDbDbc::GetDBCMessage(const QString 
    //Don't allow access to inactive file
    if (this->mq_Active)
    {
-      const QMap<QString, C_CamDbDbcMessageId>::const_iterator c_It = this->mc_FoundMessagesNodes.find(orc_Message);
+      const QMap<QString, C_CamDbDbcMessageId>::const_iterator c_ItMessage = this->mc_FoundMessagesNodes.find(
+         orc_Message);
 
-      if (c_It != this->mc_FoundMessagesNodes.end())
+      if (c_ItMessage != this->mc_FoundMessagesNodes.end())
       {
-         if (c_It->u32_NodeIndex < this->mc_Data.c_Nodes.size())
+         if (c_ItMessage->u32_NodeIndex < this->mc_Data.c_Nodes.size())
          {
-            const C_CieConverter::C_CIENode & rc_Node = this->mc_Data.c_Nodes[c_It->u32_NodeIndex];
-            if (c_It->q_MessageIsTx == false)
+            const C_CieConverter::C_CIENode & rc_Node = this->mc_Data.c_Nodes[c_ItMessage->u32_NodeIndex];
+            if (c_ItMessage->q_MessageIsTx == false)
             {
-               if (c_It->u32_MessageIndex < rc_Node.c_RxMessages.size())
+               if (c_ItMessage->u32_MessageIndex < rc_Node.c_RxMessages.size())
                {
-                  const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_RxMessages[c_It->u32_MessageIndex];
+                  const C_CieConverter::C_CIENodeMessage & rc_Message =
+                     rc_Node.c_RxMessages[c_ItMessage->u32_MessageIndex];
                   pc_Retval = &rc_Message.c_CanMessage;
                }
             }
             else
             {
-               if (c_It->u32_MessageIndex < rc_Node.c_TxMessages.size())
+               if (c_ItMessage->u32_MessageIndex < rc_Node.c_TxMessages.size())
                {
-                  const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_TxMessages[c_It->u32_MessageIndex];
+                  const C_CieConverter::C_CIENodeMessage & rc_Message =
+                     rc_Node.c_TxMessages[c_ItMessage->u32_MessageIndex];
                   pc_Retval = &rc_Message.c_CanMessage;
                }
             }

@@ -45,6 +45,7 @@ public:
    //Get
    const std::vector<C_CamProMessageData> & GetMessages(void) const;
    const C_CamProMessageData * GetMessageConst(const stw_types::uint32 ou32_Index) const;
+   const bool & GetCyclicMessageTransmitActive(void) const;
    const QString GetCANDllPath(void) const;
    const QString GetCustomCANDllPath(void) const;
    E_CANDllType GetCANDllType(void) const;
@@ -66,6 +67,7 @@ public:
                                    const stw_types::uint32 ou32_Offset);
    stw_types::sint32 SetMessageDataBytes(const stw_types::uint32 ou32_Index,
                                          const std::vector<stw_types::uint8> & orc_DataBytes);
+   void SetCyclicMessageTransmitActive(const bool oq_Active);
    void SetCustomCANDllPath(const QString & orc_CANDllPath);
    void SetCANDllType(const E_CANDllType oe_CANDllType);
    void SetFilters(const std::vector<C_CamProFilterData> & orc_Filters);
@@ -134,6 +136,7 @@ private:
 
    //Content
    std::vector<C_CamProMessageData> mc_Messages;
+   bool mq_CyclicMessageTransmitActive;
    std::vector<C_CamProFilterData> mc_Filters;
    bool mq_FiltersActive;
    std::vector<C_CamProDatabaseData> mc_Databases;

@@ -30,7 +30,6 @@ public:
    virtual ~C_GiRectPixmap();
 
    void SetBackgroundColor(const QColor & orc_Color);
-   void SetPixmap(const QPixmap & orc_Pixmap);
    void SetDrawPixmap(const bool oq_Active);
    void SetNewSize(const QSizeF & orc_Size);
    void SetNewRect(const QRectF & orc_Rect);

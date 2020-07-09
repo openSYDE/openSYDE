@@ -52,7 +52,6 @@ private:
 
    void m_SortDescending(void);
    void m_SortAscending(void);
-   bool m_CheckContinuous(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

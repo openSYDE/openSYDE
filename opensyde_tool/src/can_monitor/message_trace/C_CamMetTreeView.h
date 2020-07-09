@@ -56,8 +56,12 @@ public:
    void SetDisplayUniqueMessages(const bool oq_Value);
    void SetDisplayAsHex(const bool oq_Value);
    void SetDisplayTimestampRelative(const bool oq_Value);
+   void SetDisplayTimestampAbsoluteTimeOfDay(const bool oq_Value);
+   void SetTraceBufferSize(const stw_types::uint32 ou32_Value);
    bool GetDisplayAsHex(void);
    bool GetDisplayTimestampRelative(void);
+
+   void SearchTrace(const QString & orc_SearchString, const bool oq_Next);
 
    void SaveUserSettings(void) const;
    void SetCurrentColumnWidths(const std::vector<stw_types::sint32> & orc_ColumnWidths);

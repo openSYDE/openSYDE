@@ -208,7 +208,7 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
    C_RANGE  File does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetHandler::UpdateCRCForFile(const C_SCLString & orc_FilePath) const
+sint32 C_OSCParamSetHandler::h_UpdateCRCForFile(const C_SCLString & orc_FilePath)
 {
    return C_OSCParamSetFilerBase::h_AddCRC(orc_FilePath);
 }

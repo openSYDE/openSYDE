@@ -402,7 +402,6 @@ void C_SyvSeDllConfigurationDialog::m_OtherDllClicked(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_OnBrowse(void) const
 {
-   QString c_Path = "";
    QString c_Folder = C_PuiUtil::h_GetResolvedAbsPathFromExe(this->mpc_Ui->pc_LineEditCustomDllPath->GetPath());
    const QString c_Filter = QString(C_GtGetText::h_GetText("CAN DLL ")) + "(*.dll)";
    QFileDialog c_Dialog(this->parentWidget(), C_GtGetText::h_GetText("Select CAN DLL"), c_Folder, c_Filter);
@@ -411,7 +410,7 @@ void C_SyvSeDllConfigurationDialog::m_OnBrowse(void) const
 
    if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      c_Path = c_Dialog.selectedFiles().at(0);
+      QString c_Path = c_Dialog.selectedFiles().at(0);
       // check if relative path is possible and appreciated
       c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this->parentWidget(), c_Path, C_Uti::h_GetExePath());
 

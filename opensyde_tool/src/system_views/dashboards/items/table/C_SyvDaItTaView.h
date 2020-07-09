@@ -31,7 +31,7 @@ class C_SyvDaItTaView :
    Q_OBJECT
 
 public:
-   C_SyvDaItTaView(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_Data,
+   C_SyvDaItTaView(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_Data = NULL,
                    QWidget * const opc_Parent = NULL);
    ~C_SyvDaItTaView(void);
 

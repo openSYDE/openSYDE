@@ -380,7 +380,7 @@ void C_GiSyColorSelectWidget::m_InitElements(void) const
    this->mpc_Ui->pc_PushButtonRGBA->setCursor(Qt::PointingHandCursor);
 
    this->mpc_Ui->pc_PushButtonIcon->setFocusPolicy(Qt::NoFocus);
-   this->mpc_Ui->pc_PushButtonIcon->setIcon(QIcon(":/images/graphic_items/ColorPickerIcon.png"));
+   this->mpc_Ui->pc_PushButtonIcon->setIcon(QIcon(":/images/graphic_items/Icon_pipette.svg"));
    this->mpc_Ui->pc_PushButtonIcon->SetToolTipInformation(C_GtGetText::h_GetText("Screen color picking"),
                                                           C_GtGetText::h_GetText(
                                                              "Click on the pipette, then you can pick a color of "

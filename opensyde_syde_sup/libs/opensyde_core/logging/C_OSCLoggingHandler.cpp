@@ -35,6 +35,8 @@ using namespace stw_opensyde_core;
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 bool C_OSCLoggingHandler::mhq_WriteToFile = false;
 bool C_OSCLoggingHandler::mhq_WriteToConsole = true;
+bool C_OSCLoggingHandler::mhq_MeasureTime = false;
+std::map<uint16, uint32> C_OSCLoggingHandler::mhc_StartTimes = std::map<uint16, uint32>();
 C_SCLString C_OSCLoggingHandler::mhc_FileName = "";
 C_TGLCriticalSection C_OSCLoggingHandler::mhc_ConsoleCriticalSection;
 C_TGLCriticalSection C_OSCLoggingHandler::mhc_FileCriticalSection;
@@ -69,6 +71,17 @@ void C_OSCLoggingHandler::h_SetWriteToFileActive(const bool oq_Active)
 void C_OSCLoggingHandler::h_SetWriteToConsoleActive(const bool oq_Active)
 {
    C_OSCLoggingHandler::mhq_WriteToConsole = oq_Active;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set measure time active flag
+
+   \param[in] oq_Active New measure time active flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCLoggingHandler::h_SetMeasurePerformanceActive(const bool oq_Active)
+{
+   C_OSCLoggingHandler::mhq_MeasureTime = oq_Active;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -145,6 +158,55 @@ void C_OSCLoggingHandler::h_WriteLogError(const C_SCLString & orc_Activity, cons
                                           const stw_types::charn * const opc_Function)
 {
    C_OSCLoggingHandler::mh_WriteLog("ERROR", orc_Activity, orc_Message, opc_Class, opc_Function);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write time measurement message to log
+
+   Previous call of C_OSCLoggingHandler::h_StartPerformanceTimer() is mandatory ("tik and tok").
+
+   \param[in] ou16_TimerId Timer ID returned by previous call of C_OSCLoggingHandler::h_StartPerformanceTimer()
+   \param[in] orc_Message  Message to write (No '\n' necessary)
+   \param[in] opc_Class    Current class
+   \param[in] opc_Function Current function
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCLoggingHandler::h_WriteLogPerformance(const uint16 ou16_TimerId, const C_SCLString & orc_Message,
+                                                const charn * const opc_Class, const charn * const opc_Function)
+{
+   if (mhq_MeasureTime == true)
+   {
+      const std::map<uint16, uint32>::iterator c_StartTime = mhc_StartTimes.find(ou16_TimerId);
+      if (c_StartTime != mhc_StartTimes.end())
+      {
+         C_OSCLoggingHandler::mh_WriteLog(
+            "INFO", "Performance measurement",
+            orc_Message + " time: " + C_SCLString::IntToStr(stw_tgl::TGL_GetTickCount() - c_StartTime->second) + " ms",
+            opc_Class, opc_Function);
+
+         // update log file
+         C_OSCLoggingHandler::h_Flush();
+
+         // remove ID from map
+         mhc_StartTimes.erase(c_StartTime);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Start performance timer
+
+   \return
+   ID for getting elapsed time with C_OSCLoggingHandler::h_WriteLogPerformance
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint16 C_OSCLoggingHandler::h_StartPerformanceTimer(void)
+{
+   uint16 u16_Id = static_cast<uint16>(rand());
+
+   mhc_StartTimes[u16_Id] = stw_tgl::TGL_GetTickCount();
+
+   return u16_Id;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Export communication stack settings of a openSYDE node.
+   \brief       Export communication stack settings of an openSYDE node.
 
    Create a .c and .h file providing entire communication stack configuration.
 
@@ -21,6 +21,8 @@
 #include "CSCLStringList.h"
 #include "C_OSCExportCommunicationStack.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_OSCExportUti.h"
+#include "C_OSCExportDataPool.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -63,8 +65,9 @@ C_OSCExportCommunicationStack::~C_OSCExportCommunicationStack(void)
 
    Compose target file name for code generation.
 
-   \param[in]  ou8_InterfaceIndex      index of interface
-   \param[in]  ore_ProtocolType        protocol type (CL2, ECeS, ECoS)
+   \param[in]  ou8_InterfaceIndex   index of interface
+   \param[in]  ore_ProtocolType     protocol type (CL2, ECeS, ECoS)
+
    \return           assembled filename
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,8 +87,8 @@ C_SCLString C_OSCExportCommunicationStack::h_GetFileName(const uint8 ou8_Interfa
 
    Compose name of configuration structure for code generation.
 
-   \param[in]  ou8_InterfaceIndex      index of interface
-   \param[in]  ore_ProtocolType        protocol type (CL2, ECeS, ECoS)
+   \param[in]  ou8_InterfaceIndex   index of interface
+   \param[in]  ore_ProtocolType     protocol type (CL2, ECeS, ECoS)
 
    \return   assembled configuration structure name
 */
@@ -105,7 +108,7 @@ C_SCLString C_OSCExportCommunicationStack::h_GetConfigurationName(const uint8 ou
    The overall code generation version decodes the format versions of parametrization (*_datapool.c/.h files)
    and process data communication code (comm_*.c/.h files).
 
-   \param[in]       ou16_GenCodeVersion     Overall code format version
+   \param[in]  ou16_GenCodeVersion  Overall code format version
 
    \return version of parametrization code
 */
@@ -138,13 +141,13 @@ uint16 C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(const uint16 o
 
    The caller must provide a valid path and node configuration.
 
-   \param[in] orc_Path                 storage path for created files
-   \param[in] orc_Node                 node configuration
-   \param[in] ou16_ApplicationIndex    index of programmable application within orc_Node.c_Applications
-   \param[in] ou8_InterfaceIndex       index of CAN interface
-   \param[in] ou32_DatapoolIndex       index of Datapool
-   \param[in] ore_Protocol             protocol type (CL2, ECeS, ECoS)
-   \param[in] orc_ExportToolInfo       information about calling executable (name + version)
+   \param[in]  orc_Path                storage path for created files
+   \param[in]  orc_Node                node configuration
+   \param[in]  ou16_ApplicationIndex   index of programmable application within orc_Node.c_Applications
+   \param[in]  ou8_InterfaceIndex      index of CAN interface
+   \param[in]  ou32_DatapoolIndex      index of Datapool
+   \param[in]  ore_Protocol            protocol type (CL2, ECeS, ECoS)
+   \param[in]  orc_ExportToolInfo      information about calling executable (name + version)
 
    \return
    C_NO_ERR    Operation success
@@ -170,6 +173,8 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
    }
    else
    {
+      osc_write_log_error("Creating source code", "Application index " + C_SCLString::IntToStr(ou16_ApplicationIndex) +
+                          " out of range.");
       s32_Retval = C_RANGE;
    }
 
@@ -179,6 +184,9 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
       if ((c_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION) ||
           (c_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION))
       {
+         osc_write_log_error("Creating source code",
+                             "Did not generate code for application \"" + c_Application.c_Name +
+                             "\" because code format version is unknown or application is not programmable.");
          s32_Retval = C_NOACT;
       }
    }
@@ -210,7 +218,7 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
       else
       {
          osc_write_log_error("Creating source code",
-                             "Protocol definition or Datapool does not exist for specified communication protocol" +
+                             "Protocol definition or Datapool does not exist for specified communication protocol " +
                              mh_GetProtocolNameByType(ore_Protocol));
          s32_Retval = C_CONFIG;
       }
@@ -222,12 +230,12 @@ sint32 C_OSCExportCommunicationStack::h_CreateSourceCode(const C_SCLString & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create header file
 
-   \param[in] orc_ExportToolInfo       information about calling executable (name + version)
-   \param[in] orc_Path                 storage path for created file
-   \param[in] orc_Applicaton           application data
-   \param[in] orc_ComProtocol          communication protocol configuration
-   \param[in] ou8_InterfaceIndex       index of CAN interface
-   \param[in] orc_ProjectId            project id for consistency check
+   \param[in]  orc_ExportToolInfo   information about calling executable (name + version)
+   \param[in]  orc_Path             storage path for created file
+   \param[in]  orc_Applicaton       application data
+   \param[in]  orc_ComProtocol      communication protocol configuration
+   \param[in]  ou8_InterfaceIndex   index of CAN interface
+   \param[in]  orc_ProjectId        project id for consistency check
 
    \return
    C_NO_ERR Operation success
@@ -251,60 +259,52 @@ sint32 C_OSCExportCommunicationStack::mh_CreateHeaderFile(const C_SCLString & or
 
    // add includes
    c_Data.Append("");
-   c_Data.Append(
-      "/* -- Includes ------------------------------------------------------------------------------------------------------ */");
+   c_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Includes"));
    c_Data.Append("#include \"stwtypes.h\"");
    c_Data.Append("#include \"osy_com_configuration.h\"");
    c_Data.Append("");
-   c_Data.Append("#ifdef __cplusplus");
-   c_Data.Append("extern \"C\" {");
-   c_Data.Append("#endif");
-   c_Data.Append("");
+   C_OSCExportUti::h_AddExternCStart(c_Data);
 
    // add defines
    mh_AddDefines(c_Data, orc_ComProtocol.c_ComMessages[ou8_InterfaceIndex], ou8_InterfaceIndex,
                  orc_ComProtocol.e_Type, orc_ProjectId, orc_Applicaton.u16_GenCodeVersion, mhq_IS_HEADER_FILE);
 
    // add types
-   c_Data.Append(
-      "/* -- Types --------------------------------------------------------------------------------------------------------- */");
+   c_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Types"));
    c_Data.Append("");
 
    // add global variables
-   c_Data.Append(
-      "/* -- Global Variables ---------------------------------------------------------------------------------------------- */");
+   c_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Global Variables"));
    c_Data.Append("///Stack configuration");
    c_Data.Append("extern const T_osy_com_protocol_configuration " +
                  h_GetConfigurationName(ou8_InterfaceIndex, orc_ComProtocol.e_Type) + ";");
    c_Data.Append("");
 
    // add function prototypes
-   mh_AddFunctionPrototypes(c_Data, ou8_InterfaceIndex, orc_ComProtocol.e_Type, orc_ProjectId);
+   C_OSCExportUti::h_AddProjIdFunctionPrototype(c_Data, mh_GetMagicName(orc_ProjectId, ou8_InterfaceIndex,
+                                                                        orc_ComProtocol.e_Type));
 
    // add implementation
-   c_Data.Append(
-      "/* -- Implementation ------------------------------------------------------------------------------------------------ */");
-   c_Data.Append("#ifdef __cplusplus");
-   c_Data.Append("} /* end of extern \"C\" */");
-   c_Data.Append("#endif");
-   c_Data.Append("");
+   c_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Implementation"));
+   C_OSCExportUti::h_AddExternCEnd(c_Data);
    c_Data.Append("#endif");
 
    // finally save all stuff into the file
-   s32_Retval = mh_SaveToFile(c_Data, orc_Path, ou8_InterfaceIndex, orc_ComProtocol.e_Type, mhq_IS_HEADER_FILE);
+   s32_Retval =
+      C_OSCExportUti::h_SaveToFile(c_Data, orc_Path, h_GetFileName(ou8_InterfaceIndex, orc_ComProtocol.e_Type), true);
    return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Create implementation file
 
-   \param[in] orc_ExportToolInfo       information about calling executable (name + version)
-   \param[in] orc_Path                 storage path for created file
-   \param[in] orc_Applicaton           application data
-   \param[in] orc_ComProtocol          communication protocol configuration
-   \param[in] orc_DataPool             Datapool configuration
-   \param[in] ou8_InterfaceIndex       index of CAN interface
-   \param[in] orc_ProjectId            project id for consistency check
+   \param[in]  orc_ExportToolInfo   information about calling executable (name + version)
+   \param[in]  orc_Path             storage path for created file
+   \param[in]  orc_Applicaton       application data
+   \param[in]  orc_ComProtocol      communication protocol configuration
+   \param[in]  orc_DataPool         Datapool configuration
+   \param[in]  ou8_InterfaceIndex   index of CAN interface
+   \param[in]  orc_ProjectId        project id for consistency check
 
    \return
    C_NO_ERR    Operation success
@@ -337,7 +337,7 @@ sint32 C_OSCExportCommunicationStack::mh_CreateImplementationFile(const C_SCLStr
       mh_AddHeader(orc_ExportToolInfo, c_Data, ou8_InterfaceIndex, orc_ComProtocol.e_Type, mhq_IS_IMPLEMENTATION_FILE);
 
       // add includes
-      mh_AddCIncludes(c_Data, orc_DataPool.c_Name, ou8_InterfaceIndex, orc_ComProtocol.e_Type,
+      mh_AddCIncludes(c_Data, orc_DataPool, ou8_InterfaceIndex, orc_ComProtocol.e_Type,
                       ((q_RxMessagesPresent == false) || (q_TxMessagesPresent == false)));
 
       // add defines
@@ -346,8 +346,7 @@ sint32 C_OSCExportCommunicationStack::mh_CreateImplementationFile(const C_SCLStr
                     mhq_IS_IMPLEMENTATION_FILE);
 
       // add types
-      c_Data.Append(
-         "/* -- Types --------------------------------------------------------------------------------------------------------- */");
+      c_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Types"));
       c_Data.Append("");
 
       // add module global variables and function prototypes
@@ -360,13 +359,12 @@ sint32 C_OSCExportCommunicationStack::mh_CreateImplementationFile(const C_SCLStr
                              q_TxMessagesPresent, q_RxMessagesPresent);
 
       // add implementation
-      c_Data.Append(
-         "/* -- Implementation ------------------------------------------------------------------------------------------------ */");
+      c_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Implementation"));
       c_Data.Append("");
 
       // finally save all stuff into the file
-      s32_Retval = mh_SaveToFile(c_Data, orc_Path, ou8_InterfaceIndex, orc_ComProtocol.e_Type,
-                                 mhq_IS_IMPLEMENTATION_FILE);
+      s32_Retval = C_OSCExportUti::h_SaveToFile(c_Data, orc_Path,
+                                                h_GetFileName(ou8_InterfaceIndex, orc_ComProtocol.e_Type), false);
    }
    else
    {
@@ -383,19 +381,18 @@ sint32 C_OSCExportCommunicationStack::mh_CreateImplementationFile(const C_SCLStr
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add file header
 
-   \param[in]     orc_ExportToolInfo       information about calling executable (name + version)
-   \param[in,out] orc_Data             converted data to string list
-   \param[in]     ou8_InterfaceIndex   index of interface
-   \param[in]     ore_Protocol         protocol type (CL2, ECeS, ECoS)
-   \param[in]     oq_FileType          .c or .h file selected
+   \param[in]      orc_ExportToolInfo  information about calling executable (name + version)
+   \param[in,out]  orc_Data            converted data to string list
+   \param[in]      ou8_InterfaceIndex  index of interface
+   \param[in]      ore_Protocol        protocol type (CL2, ECeS, ECoS)
+   \param[in]      oq_FileType         .c or .h file selected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_AddHeader(const C_SCLString & orc_ExportToolInfo, C_SCLStringList & orc_Data,
                                                  const uint8 ou8_InterfaceIndex,
                                                  const C_OSCCanProtocol::E_Type & ore_Protocol, const bool oq_FileType)
 {
-   orc_Data.Append(
-      "//----------------------------------------------------------------------------------------------------------------------");
+   orc_Data.Append(C_OSCExportUti::h_GetHeaderSeparator());
    orc_Data.Append("/*!");
    orc_Data.Append("   \\file");
    if (oq_FileType == mhq_IS_IMPLEMENTATION_FILE)
@@ -406,23 +403,21 @@ void C_OSCExportCommunicationStack::mh_AddHeader(const C_SCLString & orc_ExportT
       orc_Data.Append("   Defines the communication configuration for protocol type " +
                       mh_GetProtocolNameByType(ore_Protocol) + " on CAN interface " +
                       C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + ".");
-      orc_Data.Append("   This file was generated by openSYDE " + orc_ExportToolInfo + ".");
+      orc_Data.Append(C_OSCExportUti::h_GetCreationToolInfo(orc_ExportToolInfo));
    }
    else
    {
       orc_Data.Append(
          "   \\brief       openSYDE Communication stack data definition (Header file with constant and global definitions)");
       orc_Data.Append("");
-      orc_Data.Append("   This file was generated by openSYDE " + orc_ExportToolInfo + ".");
+      orc_Data.Append(C_OSCExportUti::h_GetCreationToolInfo(orc_ExportToolInfo));
    }
    orc_Data.Append("*/");
-   orc_Data.Append(
-      "//----------------------------------------------------------------------------------------------------------------------");
+   orc_Data.Append(C_OSCExportUti::h_GetHeaderSeparator());
 
    if (oq_FileType == mhq_IS_HEADER_FILE)
    {
-      const C_SCLString c_HeaderGuard = "COMM_" + mh_GetProtocolNameByType(ore_Protocol).UpperCase() + "_CAN" +
-                                        C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "H";
+      const C_SCLString c_HeaderGuard = h_GetFileName(ou8_InterfaceIndex, ore_Protocol).UpperCase() + "H";
       orc_Data.Append("#ifndef " + c_HeaderGuard);
       orc_Data.Append("#define " + c_HeaderGuard);
    }
@@ -431,14 +426,14 @@ void C_OSCExportCommunicationStack::mh_AddHeader(const C_SCLString & orc_ExportT
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add includes into C file
 
-   \param[in,out] orc_Data             converted data to string list
-   \param[in]     orc_DataPoolName     name of Datapool
-   \param[in]     ou8_InterfaceIndex   index of interface
-   \param[in]     ore_Protocol         protocol type (CL2, ECeS, ECoS)
-   \param[in]     oq_NullRequired      true: definition of NULL required in .c file
+   \param[in,out]  orc_Data            converted data to string list
+   \param[in]      orc_DataPool        name of Datapool
+   \param[in]      ou8_InterfaceIndex  index of interface
+   \param[in]      ore_Protocol        protocol type (CL2, ECeS, ECoS)
+   \param[in]      oq_NullRequired     true: definition of NULL required in .c file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCExportCommunicationStack::mh_AddCIncludes(C_SCLStringList & orc_Data, const C_SCLString & orc_DataPoolName,
+void C_OSCExportCommunicationStack::mh_AddCIncludes(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                                     const uint8 ou8_InterfaceIndex,
                                                     const C_OSCCanProtocol::E_Type & ore_Protocol,
                                                     const bool oq_NullRequired)
@@ -446,8 +441,7 @@ void C_OSCExportCommunicationStack::mh_AddCIncludes(C_SCLStringList & orc_Data, 
    const C_SCLString c_ProtocolName = mh_GetProtocolNameByType(ore_Protocol).LowerCase();
 
    orc_Data.Append("");
-   orc_Data.Append(
-      "/* -- Includes ------------------------------------------------------------------------------------------------------ */");
+   orc_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Includes"));
 
    if (oq_NullRequired == true)
    {
@@ -455,25 +449,24 @@ void C_OSCExportCommunicationStack::mh_AddCIncludes(C_SCLStringList & orc_Data, 
       orc_Data.Append("");
    }
 
-   orc_Data.Append("#include \"comm_" + c_ProtocolName + "_can" + C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) +
-                   ".h\"");
+   orc_Data.Append("#include \"" + h_GetFileName(ou8_InterfaceIndex, ore_Protocol) + ".h\"");
    orc_Data.Append("");
    orc_Data.Append("#include \"osy_com_" + c_ProtocolName + "_driver.h\"");
    orc_Data.Append("");
-   orc_Data.Append("#include \"" + orc_DataPoolName.LowerCase() + "_data_pool.h\"");
+   orc_Data.Append("#include \"" + C_OSCExportDataPool::h_GetFileName(orc_DataPool) + ".h\"");
    orc_Data.Append("");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add defines
 
-   \param[in,out] orc_Data              converted data to string list
-   \param[in]     orc_ComMessage        communication protocol message definition
-   \param[in]     ou8_InterfaceIndex    index of interface
-   \param[in]     ore_Protocol          protocol type (CL2, ECeS, ECoS)
-   \param[in]     orc_ProjectId         project id for consistency check
-   \param[in]     ou16_GenCodeVersion   version of structure (generate code as specified for this version)
-   \param[in]     oq_FileType           .c or .h file selected
+   \param[in,out]  orc_Data               converted data to string list
+   \param[in]      orc_ComMessage         communication protocol message definition
+   \param[in]      ou8_InterfaceIndex     index of interface
+   \param[in]      ore_Protocol           protocol type (CL2, ECeS, ECoS)
+   \param[in]      orc_ProjectId          project id for consistency check
+   \param[in]      ou16_GenCodeVersion    version of structure (generate code as specified for this version)
+   \param[in]      oq_FileType            .c or .h file selected
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
@@ -484,19 +477,14 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
                                                   const bool oq_FileType)
 {
    const C_SCLString c_ProtocolName = mh_GetProtocolNameByType(ore_Protocol).UpperCase();
-   const C_SCLString c_MagicName = "COMM_" + c_ProtocolName + "_CAN" +
-                                   C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_PROJECT_ID_" + orc_ProjectId;
+   const C_SCLString c_MagicName = mh_GetMagicName(orc_ProjectId, ou8_InterfaceIndex, ore_Protocol);
 
-   orc_Data.Append(
-      "/* -- Defines ------------------------------------------------------------------------------------------------------- */");
+   orc_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Defines"));
 
    if (oq_FileType == mhq_IS_HEADER_FILE)
    {
-      orc_Data.Append("///unique ID to ensure consistency between .h and .c files");
-      orc_Data.Append("#define " + c_MagicName + " void " + c_MagicName.LowerCase() + "(void) {}");
-      orc_Data.Append("");
-
-      orc_Data.Append("///Index of TX messages");
+      C_OSCExportUti::h_AddProjectIdDef(orc_Data, c_MagicName, true);
+      orc_Data.Append("///Index of Tx messages");
       for (uint16 u16_MessageIndex = 0U; u16_MessageIndex < orc_ComMessage.c_TxMessages.size(); u16_MessageIndex++)
       {
          const C_SCLString c_Name = orc_ComMessage.c_TxMessages[u16_MessageIndex].c_Name.UpperCase();
@@ -509,7 +497,7 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
                       C_SCLString::IntToStr(orc_ComMessage.c_TxMessages.size()) + "U)");
       orc_Data.Append("");
 
-      orc_Data.Append("///Index of RX messages");
+      orc_Data.Append("///Index of Rx messages");
       for (uint16 u16_MessageIndex = 0U; u16_MessageIndex < orc_ComMessage.c_RxMessages.size(); u16_MessageIndex++)
       {
          const C_SCLString c_Name = orc_ComMessage.c_RxMessages[u16_MessageIndex].c_Name.UpperCase();
@@ -525,7 +513,7 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
       if (ou16_GenCodeVersion >= 2U)
       {
          bool q_CommentAdded = false;
-         // TX MUX messages
+         // Tx MUX messages
          for (uint16 u16_MessageIndex = 0U; u16_MessageIndex < orc_ComMessage.c_TxMessages.size(); u16_MessageIndex++)
          {
             const C_OSCCanMessage & rc_Message = orc_ComMessage.c_TxMessages[u16_MessageIndex];
@@ -540,7 +528,7 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
                if (q_CommentAdded == false)
                {
                   // add comment only if a multiplexed message was found and only once
-                  orc_Data.Append("///Index of TX multiplexed messages");
+                  orc_Data.Append("///Index of Tx multiplexed messages");
                   q_CommentAdded = true;
                }
 
@@ -561,7 +549,7 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
                orc_Data.Append("");
             }
          }
-         // RX MUX messages
+         // Rx MUX messages
          q_CommentAdded = false;
          for (uint16 u16_MessageIndex = 0U; u16_MessageIndex < orc_ComMessage.c_RxMessages.size(); u16_MessageIndex++)
          {
@@ -577,7 +565,7 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
                if (q_CommentAdded == false)
                {
                   // add comment only if a multiplexed message was found and only once
-                  orc_Data.Append("///Index of RX multiplexed messages");
+                  orc_Data.Append("///Index of Rx multiplexed messages");
                   q_CommentAdded = true;
                }
 
@@ -615,34 +603,8 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
          orc_Data.Append("#endif");
          orc_Data.Append("");
       }
-      orc_Data.Append("///ensure file consistency (if compilation fails here the .h file does not match this .c file)");
-      orc_Data.Append(c_MagicName);
-      orc_Data.Append("");
+      C_OSCExportUti::h_AddProjectIdDef(orc_Data, c_MagicName, false);
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add function prototypes.
-
-   \param[in,out] orc_Data              converted data to string list
-   \param[in]     ou8_InterfaceIndex    index of interface
-   \param[in]     ore_Protocol          protocol type (CL2, ECeS, ECoS)
-   \param[in]     orc_ProjectId         project id for consistency check
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OSCExportCommunicationStack::mh_AddFunctionPrototypes(C_SCLStringList & orc_Data, const uint8 ou8_InterfaceIndex,
-                                                             const C_OSCCanProtocol::E_Type & ore_Protocol,
-                                                             const C_SCLString & orc_ProjectId)
-{
-   const C_SCLString c_ProtocolName = mh_GetProtocolNameByType(ore_Protocol).UpperCase();
-   const C_SCLString c_MagicName = "COMM_" + c_ProtocolName + "_CAN" +
-                                   C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_PROJECT_ID_" + orc_ProjectId;
-
-   orc_Data.Append(
-      "/* -- Function Prototypes ------------------------------------------------------------------------------------------- */");
-   orc_Data.Append("///unique ID to ensure consistency between .h and .c files");
-   orc_Data.Append("extern void " + c_MagicName.LowerCase() + "(void);");
-   orc_Data.Append("");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -650,14 +612,14 @@ void C_OSCExportCommunicationStack::mh_AddFunctionPrototypes(C_SCLStringList & o
 
    Implementation file .C only.
 
-   \param[in,out] orc_Data              converted data to string list
-   \param[in]     oq_SafeData           true: place status data in safe RAM
-   \param[in]     orc_ComMessage        communication protocol message definition
-   \param[in]     ou8_InterfaceIndex    index of interface
-   \param[in]     ore_Protocol          protocol type (CL2, ECeS, ECoS)
-   \param[in]     ou16_GenCodeVersion   version of structure (generate code as specified for this version)
-   \param[in]     ou32_TxListIndex      Datapool list index for Tx messages
-   \param[in]     ou32_RxListIndex      Datapool list index for Rx messages
+   \param[in,out]  orc_Data               converted data to string list
+   \param[in]      oq_SafeData            true: place status data in safe RAM
+   \param[in]      orc_ComMessage         communication protocol message definition
+   \param[in]      ou8_InterfaceIndex     index of interface
+   \param[in]      ore_Protocol           protocol type (CL2, ECeS, ECoS)
+   \param[in]      ou16_GenCodeVersion    version of structure (generate code as specified for this version)
+   \param[in]      ou32_TxListIndex       Datapool list index for Tx messages
+   \param[in]      ou32_RxListIndex       Datapool list index for Rx messages
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Data, const bool oq_SafeData,
@@ -683,11 +645,10 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
       }
    }
 
-   orc_Data.Append(
-      "/* -- Module Global Variables --------------------------------------------------------------------------------------- */");
+   orc_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Module Global Variables"));
    orc_Data.Append("///message status");
 
-   // TX messages
+   // Tx messages
    if (orc_ComMessage.c_TxMessages.size() > 0)
    {
       if (ou16_GenCodeVersion >= 2U)
@@ -704,7 +665,7 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
       }
    }
 
-   // RX messages
+   // Rx messages
    if (orc_ComMessage.c_RxMessages.size() > 0)
    {
       if (ou16_GenCodeVersion >= 2U)
@@ -726,14 +687,14 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
    {
       orc_Data.Append("");
       orc_Data.Append("///mux status");
-      // TX mux messages
+      // Tx mux messages
       if  (orc_ComMessage.c_TxMessages.size() > 0)
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_mux_status mat_StatusMuxTxMessages[" +
                          mh_CountMuxMessages(orc_ComMessage.c_TxMessages) + "];");
       }
 
-      // RX mux messages
+      // Rx mux messages
       if (orc_ComMessage.c_RxMessages.size() > 0)
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_mux_status mat_StatusMuxRxMessages[" +
@@ -778,21 +739,19 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
                                ou16_GenCodeVersion, false);
    }
 
-   orc_Data.Append(
-      "/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */");
+   orc_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Module Global Function Prototypes"));
    orc_Data.Append("");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add global variables
 
-   \param[in,out] orc_Data              converted data to string list
-   \param[in]     orc_DataPoolName      name of Datapool
-   \param[in]     orc_ComMessage        communication protocol message definition
-   \param[in]     ou8_InterfaceIndex    index of interface
-   \param[in]     ore_Protocol          protocol type (CL2, ECeS, ECoS)
-   \param[in]     oq_TxMessagesPresent  true: There is at least one TX message defined
-   \param[in]     oq_RxMessagesPresent  true: There is at least one RX message defined
+   \param[in,out]  orc_Data               converted data to string list
+   \param[in]      orc_DataPoolName       name of Datapool
+   \param[in]      ou8_InterfaceIndex     index of interface
+   \param[in]      ore_Protocol           protocol type (CL2, ECeS, ECoS)
+   \param[in]      oq_TxMessagesPresent   true: There is at least one Tx message defined
+   \param[in]      oq_RxMessagesPresent   true: There is at least one Rx message defined
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_AddCGlobalVariables(C_SCLStringList & orc_Data,
@@ -804,8 +763,7 @@ void C_OSCExportCommunicationStack::mh_AddCGlobalVariables(C_SCLStringList & orc
 {
    const C_SCLString c_ProtocolName = mh_GetProtocolNameByType(ore_Protocol).UpperCase();
 
-   orc_Data.Append(
-      "/* -- Global Variables ---------------------------------------------------------------------------------------------- */");
+   orc_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Global Variables"));
    orc_Data.Append("///Stack configuration");
    orc_Data.Append("const T_osy_com_protocol_configuration " +
                    h_GetConfigurationName(ou8_InterfaceIndex, ore_Protocol) + " =");
@@ -818,44 +776,43 @@ void C_OSCExportCommunicationStack::mh_AddCGlobalVariables(C_SCLStringList & orc
    orc_Data.Append("      OSY_COM_CONFIG_DEFINITION_VERSION,  ///< configuration version");
    orc_Data.Append("      COMM_" + c_ProtocolName + "_CAN" +
                    C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) +
-                   "_NUMBER_OF_TX_MSGS,  ///< number of TX messages in this configuration");
+                   "_NUMBER_OF_TX_MSGS,  ///< number of Tx messages in this configuration");
    orc_Data.Append("      COMM_" + c_ProtocolName + "_CAN" +
                    C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) +
-                   "_NUMBER_OF_RX_MSGS,  ///< number of RX messages in this configuration");
+                   "_NUMBER_OF_RX_MSGS,  ///< number of Rx messages in this configuration");
    if (oq_TxMessagesPresent == true)
    {
-      orc_Data.Append("      &mat_MessagesTx[0],  ///< definition of TX messages");
+      orc_Data.Append("      &mat_MessagesTx[0],  ///< definition of Tx messages");
    }
    else
    {
-      orc_Data.Append("      NULL,  ///< definition of TX messages (none defined)");
+      orc_Data.Append("      NULL,  ///< definition of Tx messages (none defined)");
    }
    if (oq_RxMessagesPresent == true)
    {
-      orc_Data.Append("      &mat_MessagesRx[0],  ///< definition of RX messages");
+      orc_Data.Append("      &mat_MessagesRx[0],  ///< definition of Rx messages");
    }
    else
    {
-      orc_Data.Append("      NULL,  ///< definition of RX messages (none defined)");
+      orc_Data.Append("      NULL,  ///< definition of Rx messages (none defined)");
    }
    if (oq_TxMessagesPresent == true)
    {
-      orc_Data.Append("      &mat_StatusTx[0],  ///< status of TX messages");
+      orc_Data.Append("      &mat_StatusTx[0],  ///< status of Tx messages");
    }
    else
    {
-      orc_Data.Append("      NULL,  ///< status of TX messages (none defined)");
+      orc_Data.Append("      NULL,  ///< status of Tx messages (none defined)");
    }
    if (oq_RxMessagesPresent == true)
    {
-      orc_Data.Append("      &mat_StatusRx[0],  ///< status of RX messages");
+      orc_Data.Append("      &mat_StatusRx[0],  ///< status of Rx messages");
    }
    else
    {
-      orc_Data.Append("      NULL,  ///< status of RX messages (none defined)");
+      orc_Data.Append("      NULL,  ///< status of Rx messages (none defined)");
    }
-   orc_Data.Append("      &gt_" + orc_DataPoolName +
-                   "_DataPool  ///< Datapool containing signal values");
+   orc_Data.Append("      &gt_" + orc_DataPoolName + "_DataPool  ///< Datapool containing signal values");
    orc_Data.Append("   },");
    orc_Data.Append("   OSY_COM_" + c_ProtocolName + "_DRIVER  ///< pointer to protocol specific driver");
    orc_Data.Append("};");
@@ -869,7 +826,6 @@ void C_OSCExportCommunicationStack::mh_AddCGlobalVariables(C_SCLStringList & orc
    \param[in]      ou32_SignalListIndex   index of Datapool list containing signals
    \param[in]      orc_Messages           definition of messages
    \param[in]      ou16_GenCodeVersion    version of structure (generate code as specified for this version)
-
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_AddSignalDefinitions(C_SCLStringList & orc_Data,
@@ -941,9 +897,9 @@ void C_OSCExportCommunicationStack::mh_AddSignalDefinitions(C_SCLStringList & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add message mux definition section to C file
 
-   \param[in,out]  orc_Data               list of strings to add to
-   \param[in]      orc_Messages           definition of messages
-   \param[in]      orc_TxRxString         "Tx" or "Rx"
+   \param[in,out]  orc_Data         list of strings to add to
+   \param[in]      orc_Messages     definition of messages
+   \param[in]      orc_TxRxString   "Tx" or "Rx"
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_AddMessageMuxDefinitions(C_SCLStringList & orc_Data,
@@ -1061,13 +1017,13 @@ void C_OSCExportCommunicationStack::mh_AddMessageDefinitions(C_SCLStringList & o
       // differences of Tx and Rx
       if (oq_Tx == true)
       {
-         //delay time not used for RX messages and only applicable for change triggered transmissions
+         //delay time not used for Rx messages and only applicable for change triggered transmissions
          u16_DelayTime = (rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE) ?
                          rc_Message.u16_DelayTimeMs : 0U;
       }
       else
       {
-         // message counter gap is not relevant for TX messages
+         // message counter gap is not relevant for Tx messages
          if (ore_Protocol == C_OSCCanProtocol::eECES)
          {
             if (rc_Message.u32_CycleTimeMs != 0)
@@ -1160,7 +1116,7 @@ void C_OSCExportCommunicationStack::mh_AddMessageDefinitions(C_SCLStringList & o
    corresponding to this message, i.e. number of multiplex values. If the message has a multiplexer signal and
    therefore is multiplexed, but has no multiplexed signal at all, also count with one.
 
-   \param[in]       orc_Messages       Original messages
+   \param[in]  orc_Messages   Original messages
 
    \return
    Number of multiplex messages
@@ -1200,62 +1156,9 @@ uint32 C_OSCExportCommunicationStack::mh_CountMuxMessages(const std::vector<C_OS
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Store assembled data in file
-
-   \param[in] orc_Data                 converted data to string list
-   \param[in] orc_Path                 storage path for created file
-   \param[in] ou8_InterfaceIndex       index of CAN interface
-   \param[in] ore_Protocol             protocol type (CL2, ECeS, ECoS)
-   \param[in] oq_FileType              .c or .h file selected
-
-   \return
-   C_NO_ERR Operation success
-   C_RD_WR  Operation failure: cannot store file
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportCommunicationStack::mh_SaveToFile(C_SCLStringList & orc_Data, const C_SCLString & orc_Path,
-                                                    const uint8 ou8_InterfaceIndex,
-                                                    const C_OSCCanProtocol::E_Type & ore_Protocol,
-                                                    const bool oq_FileType)
-{
-   sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_PathAndFilename;
-   C_SCLString c_FileName;
-
-   // assemble filename
-   c_FileName = h_GetFileName(ou8_InterfaceIndex, ore_Protocol);
-
-   // assemble path and filename
-   // add path + add filename + extension
-   c_PathAndFilename = orc_Path + "/" + c_FileName;
-
-   if (oq_FileType == mhq_IS_HEADER_FILE)
-   {
-      c_PathAndFilename += ".h";
-   }
-   else
-   {
-      c_PathAndFilename += ".c";
-   }
-
-   // store into file
-   try
-   {
-      orc_Data.SaveToFile(c_PathAndFilename);
-   }
-   catch (...)
-   {
-      osc_write_log_error("Creating source code", "Could not write to file \"" + c_PathAndFilename + "\"");
-      s32_Retval = C_RD_WR;
-   }
-
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string of protocol name by protocol type
 
-   \param[in]  ore_Protocol            protocol type (CL2, ECeS, ECoS)
+   \param[in]  ore_Protocol   protocol type (CL2, ECeS, ECoS)
 
    \return
    protocol name as string
@@ -1286,7 +1189,7 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetProtocolNameByType(const C_OSCC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string of byte order by byte order type
 
-   \param[in]  ore_ByteOrder           byte order type (Intel, Motorola)
+   \param[in]  ore_ByteOrder  byte order type (Intel, Motorola)
 
    \return
    byte order as string
@@ -1315,7 +1218,7 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetByteOrderNameByType(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string of transmission trigger by transmission trigger type
 
-   \param[in]  ore_Trigger           transmission trigger type (cyclic, change)
+   \param[in]  ore_Trigger    transmission trigger type (cyclic, change)
 
    \return
    transmission trigger as string
@@ -1345,12 +1248,34 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetTransmissionTriggerNameByType(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get magic name for consistency checks.
+
+   \param[in]  orc_ProjectId        Project id for consistency check
+   \param[in]  ou8_InterfaceIndex   index of CAN interface
+   \param[in]  ore_Protocol         protocol type (CL2, ECeS, ECoS)
+
+   \return
+   Magic name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCExportCommunicationStack::mh_GetMagicName(const C_SCLString & orc_ProjectId,
+                                                           const stw_types::uint8 ou8_InterfaceIndex,
+                                                           const C_OSCCanProtocol::E_Type & ore_Protocol)
+{
+   const C_SCLString c_ProtocolName = mh_GetProtocolNameByType(ore_Protocol).UpperCase();
+   const C_SCLString c_MagicName = "COMM_" + c_ProtocolName + "_CAN" +
+                                   C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_PROJECT_ID_" + orc_ProjectId;
+
+   return c_MagicName;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Utility function for creating signal declarations
 
-   \param[in,out] orc_Data               converted data to string list
-   \param[in]     orc_Signals            list of signals for creating signal declarations for
-   \param[in]     ou32_SignalListIndex   index of Datapool list containing signals
-   \param[in]     oq_RemoveLastComma     flag to handle comma (very last signals string should not end on comma)
+   \param[in,out]  orc_Data               converted data to string list
+   \param[in]      orc_Signals            list of signals for creating signal declarations for
+   \param[in]      ou32_SignalListIndex   index of Datapool list containing signals
+   \param[in]      oq_RemoveLastComma     flag to handle comma (very last signals string should not end on comma)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_ConvertSignalsToStrings(C_SCLStringList & orc_Data,
@@ -1385,9 +1310,9 @@ void C_OSCExportCommunicationStack::mh_ConvertSignalsToStrings(C_SCLStringList &
    one vector to key -1, holding all non-mux signals. The first entry in mux case is always the multiplexer signal
    itself.
 
-   \param[in]       orc_Message              CAN message data for signal information
-   \param[in]       u32_MultiplexerIndex     Index of multiplexer signal in orc_Message
-   \param[out]      orc_SignalsPerValue      Signals sorted by multiplexer values (see description)
+   \param[in]   orc_Message            CAN message data for signal information
+   \param[in]   u32_MultiplexerIndex   Index of multiplexer signal in orc_Message
+   \param[out]  orc_SignalsPerValue    Signals sorted by multiplexer values (see description)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMessage & orc_Message,

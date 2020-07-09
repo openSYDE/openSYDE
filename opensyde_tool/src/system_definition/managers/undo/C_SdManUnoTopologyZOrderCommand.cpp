@@ -14,7 +14,6 @@
 
 #include "stwtypes.h"
 #include "gitypes.h"
-#include "C_SebScene.h"
 #include "C_SdManUnoTopologyZOrderCommand.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */

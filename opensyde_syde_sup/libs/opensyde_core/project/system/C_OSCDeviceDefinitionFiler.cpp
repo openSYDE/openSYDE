@@ -375,9 +375,7 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                c_Text = c_XML.SelectNodeParent(); //back to parent of parent ...
                tgl_assert(c_Text == "opensyde-device-definition");
             }
-         }
-         if (s32_Return == C_NO_ERR)
-         {
+
             c_Text = c_XML.SelectNodeChild("protocols-flashloader");
             if (c_Text != "protocols-flashloader")
             {
@@ -585,9 +583,7 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                c_Text = c_XML.SelectNodeParent(); //back to parent of parent ...
                tgl_assert(c_Text == "opensyde-device-definition");
             }
-         }
-         if (s32_Return == C_NO_ERR)
-         {
+
             c_Text = c_XML.SelectNodeChild("memory");
             if (c_Text != "memory")
             {
@@ -675,7 +671,7 @@ sint32 C_OSCDeviceDefinitionFiler::h_Save(const C_OSCDeviceDefinition & orc_Devi
       for (u32_Counter = 0U; u32_Counter < orc_DeviceDefinition.c_SupportedBitrates.size(); ++u32_Counter)
       {
          c_XML.CreateAndSelectNodeChild("can-bitrate");
-         c_XML.SetAttributeString("value", orc_DeviceDefinition.c_SupportedBitrates[u32_Counter]);
+         c_XML.SetAttributeUint32("value", orc_DeviceDefinition.c_SupportedBitrates[u32_Counter]);
          c_XML.SelectNodeParent();
       }
       c_XML.SelectNodeParent();

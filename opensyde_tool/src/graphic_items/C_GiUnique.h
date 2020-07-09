@@ -24,7 +24,7 @@ namespace stw_opensyde_gui_logic
 class C_GiUnique
 {
 public:
-   C_GiUnique(const stw_types::uint64 & oru64_ID);
+   C_GiUnique(const stw_types::uint64 & oru64_ID = 0);
    virtual ~C_GiUnique(void);
    bool CheckMatch(const stw_types::uint64 & oru64_ID) const;
 

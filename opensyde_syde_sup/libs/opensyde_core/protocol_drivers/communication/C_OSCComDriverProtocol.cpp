@@ -1662,7 +1662,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
       osc_write_log_info("Start IP to IP Routing",
                          "IP to IP Routing to node " +
                          C_SCLString::IntToStr(this->mc_ActiveNodesIndexes[ou32_ActiveNode]) +
-                         " over " + this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size() +
+                         " over " + C_SCLString::IntToStr(this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size()) +
                          " routing points started.");
    }
    else if (s32_Return != C_NO_ERR)
@@ -1975,7 +1975,7 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
    {
       osc_write_log_info("Start Routing",
                          "Routing to node " + C_SCLString::IntToStr(this->mc_ActiveNodesIndexes[ou32_ActiveNode]) +
-                         " over " + this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size() +
+                         " over " + C_SCLString::IntToStr(this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size()) +
                          " routing points started.");
    }
    else
@@ -2009,7 +2009,7 @@ void C_OSCComDriverProtocol::m_StopRouting(const uint32 ou32_ActiveNode)
       sint32 s32_CounterRoutePoints;
       const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[ou32_ActiveNode];
       const uintn un_LastRoutePointIndex = rc_ActRoute.c_VecRoutePoints.size() - 1;
-      uint32 u32_ActiveOsyTargetNode = ou32_ActiveNode;
+      uint32 u32_ActiveOsyTargetNode;
       bool q_Found;
 
       // Stop specific routing first. It needs the openSYDE routing if configured

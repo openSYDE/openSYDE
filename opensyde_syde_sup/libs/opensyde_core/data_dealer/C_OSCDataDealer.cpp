@@ -542,7 +542,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance
                                                        const std::vector<uint8> & orc_Value)
 {
    //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer * const>(opv_Instance);
+   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer *>(opv_Instance);
 
    tgl_assert(pc_Dealer != NULL);
    if (pc_Dealer != NULL)
@@ -649,7 +649,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Ins
                                                             const uint8 ou8_NrCode)
 {
    //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer * const>(opv_Instance);
+   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer *>(opv_Instance);
 
    tgl_assert(pc_Dealer != NULL);
    if (pc_Dealer != NULL)

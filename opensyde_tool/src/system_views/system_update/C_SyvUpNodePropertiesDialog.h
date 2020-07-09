@@ -49,7 +49,7 @@ public:
                   const std::vector<QString> * const opc_FileInfos,
                   const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * const opc_STWDevice,
                   const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * const opc_OSYDevice,
-                  const bool oq_UpdateSuccessful, const bool oq_ValidStatus);
+                  const bool oq_UpdateSuccessful, const bool oq_ValidStatus, const bool oq_Discarded);
    stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus GetStatus(void) const;
    const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * GetSTWDevice(void) const;
    const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * GetOSYDevice(void) const;

@@ -131,11 +131,11 @@ sint32 C_OSCCanProtocol::GetAllSignalsForMessage(const C_OSCNodeDataPool & orc_D
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get specific com list RX or TX
+/*! \brief   Get specific com list Rx or Tx
 
    \param[in] orc_DataPool         Data pool containing list
    \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if TX list was requested (otherwise RX)
+   \param[in] oq_IsTx              Flag if Tx list was requested (otherwise Rx)
 
    \return
    NULL No matching list found
@@ -161,7 +161,7 @@ const C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComListConst(const C_OSCNod
 
    \param[in] orc_DataPool         Data pool containing list
    \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if TX list was requested (otherwise RX)
+   \param[in] oq_IsTx              Flag if Tx list was requested (otherwise Rx)
 
    \return
      -1 No matching list found
@@ -196,11 +196,11 @@ sint32 C_OSCCanProtocol::h_GetListIndex(const C_OSCNodeDataPool & orc_DataPool, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get specific com list RX or TX
+/*! \brief   Get specific com list Rx or Tx
 
    \param[in] orc_DataPool         Data pool containing list
    \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if TX list was requested (otherwise RX)
+   \param[in] oq_IsTx              Flag if Tx list was requested (otherwise Rx)
 
    \return
    NULL No matching list found
@@ -233,11 +233,11 @@ C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComList(C_OSCNodeDataPool & orc_D
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get index of specific com list RX or TX
+/*! \brief   Get index of specific com list Rx or Tx
 
    \param[in]  orc_DataPool         Data pool containing list
    \param[in]  ou32_InterfaceIndex  Interface index
-   \param[in]  oq_IsTx              Flag if TX list was requested (otherwise RX)
+   \param[in]  oq_IsTx              Flag if Tx list was requested (otherwise Rx)
    \param[out] oru32_ListIndex      List index
 
    \return
@@ -275,7 +275,7 @@ sint32 C_OSCCanProtocol::h_GetComListIndex(const C_OSCNodeDataPool & orc_DataPoo
 
    \param[in] orc_DataPool         Data pool containing list element
    \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if element is part of TX list (otherwise RX)
+   \param[in] oq_IsTx              Flag if element is part of Tx list (otherwise Rx)
    \param[in] ou32_MessageIndex    Message index
    \param[in] ou32_SignalIndex     Signal index
 
@@ -319,7 +319,7 @@ const C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElementConst(co
 
    \param[in] orc_DataPool         Data pool containing list element
    \param[in] ou32_InterfaceIndex  Interface index
-   \param[in] oq_IsTx              Flag if element is part of TX list (otherwise RX)
+   \param[in] oq_IsTx              Flag if element is part of Tx list (otherwise Rx)
    \param[in] ou32_MessageIndex    Message index
    \param[in] ou32_SignalIndex     Signal index
 
@@ -363,8 +363,8 @@ C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElement(C_OSCNodeData
    \param[in]   orc_List    list to check
 
    \return
-   true  TX
-   false RX
+   true  Tx
+   false Rx
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanProtocol::h_ListIsComTx(const C_OSCNodeDataPoolList & orc_List)

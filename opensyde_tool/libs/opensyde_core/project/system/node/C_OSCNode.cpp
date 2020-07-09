@@ -1726,6 +1726,19 @@ sint32 C_OSCNode::CheckApplicationProcessIdValid(const uint32 ou32_ApplicationIn
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check HALC domain configuration valid
+
+   \param[out]     opq_ConfigInvalid         Config invalid
+   \param[in,out]  opc_InvalidDomainIndices  Invalid domain indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNode::CheckHalcConfigValid(bool * const opq_ConfigInvalid,
+                                     std::vector<uint32> * const opc_InvalidDomainIndices) const
+{
+   this->c_HALCConfig.CheckConfigValid(opq_ConfigInvalid, opc_InvalidDomainIndices);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Recalculate all com protocol data pool indices
 
    Based on assumption data pools are sorted as can protocols

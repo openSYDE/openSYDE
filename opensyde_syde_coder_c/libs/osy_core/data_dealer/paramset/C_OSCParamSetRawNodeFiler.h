@@ -27,7 +27,8 @@ class C_OSCParamSetRawNodeFiler :
    public C_OSCParamSetFilerBase
 {
 public:
-   static stw_types::sint32 h_LoadRawNode(C_OSCParamSetRawNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser, bool & orq_MissingOptionalContent);
+   static stw_types::sint32 h_LoadRawNode(C_OSCParamSetRawNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
+                                          bool & orq_MissingOptionalContent);
    static void h_SaveRawNode(const C_OSCParamSetRawNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser);
 
 private:

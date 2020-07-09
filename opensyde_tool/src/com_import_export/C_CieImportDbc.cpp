@@ -103,7 +103,7 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
 
       // add bus information
       orc_Definition.c_Bus.c_Name = c_FileName; // file name means network name
-      orc_Definition.c_Bus.c_Comment = c_DbcNetwork.comment.c_str();
+      orc_Definition.c_Bus.c_Comment = mh_ReEscapeCriticalSymbols(c_DbcNetwork.comment.c_str());
 
       osc_write_log_info("DBC file import",
                          "Reading node and messages with signals of network \"" + c_FileName + "\" ...");
@@ -125,8 +125,8 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
             s32_Return = C_WARN;
          }
 
-         osc_write_log_info("DBC file import", "Reading messages with signals for node \"" + c_Node.c_Properties.c_Name +
-                            "\" ...");
+         osc_write_log_info("DBC file import", "Reading messages with signals for node \"" +
+                            c_Node.c_Properties.c_Name + "\" ...");
 
          for (auto c_DbcMessage : c_DbcNetwork.messages)
          {
@@ -152,7 +152,7 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
       // check if there are some messages left which are not assigned to a node
       if (c_MessageAssignment.size() != 0)
       {
-         // some messages left, print warnings
+         // some messages left, add to unmapped messages/report ignore
          std::set<std::string>::const_iterator c_Iter;
          for (c_Iter = c_MessageAssignment.begin(); c_Iter != c_MessageAssignment.end(); ++c_Iter)
          {
@@ -163,10 +163,9 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
                   if (c_DbcMessage.second.name.compare(*c_Iter) == 0)
                   {
                      //Add found valid message to unmapped messages
-                     if (mh_ConvertAndAddMessage(c_DbcMessage.second, orc_Definition.c_UnmappedMessages) !=
-                         stw_errors::C_NO_ERR)
+                     if (mh_ConvertAndAddMessage(c_DbcMessage.second, orc_Definition.c_UnmappedMessages) != C_NO_ERR)
                      {
-                        s32_Return = stw_errors::C_WARN;
+                        s32_Return = C_WARN;
                      }
                      //Stop searching after finding the message
                      break;
@@ -255,7 +254,7 @@ sint32 C_CieImportDbc::mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieCo
    sint32 s32_Return = C_NO_ERR;
 
    orc_Node.c_Properties.c_Name = orc_DbcNode.name.c_str();
-   orc_Node.c_Properties.c_Comment = orc_DbcNode.comment.c_str();
+   orc_Node.c_Properties.c_Comment = mh_ReEscapeCriticalSymbols(orc_DbcNode.comment.c_str());
 
    return s32_Return;
 }
@@ -302,7 +301,7 @@ sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage
       // nothing to do here
    }
 
-   // check on receiver node
+   // check on receiver nodes
    for (auto c_DbcSignal : orc_DbcMessage.signals)
    {
       for (auto c_DbcReceiver : c_DbcSignal.second.receivers)
@@ -325,17 +324,17 @@ sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage
    if (q_IsTxMessage == true)
    {
       // add message if valid
-      if (mh_ConvertAndAddMessage(orc_DbcMessage, orc_Node.c_TxMessages) != stw_errors::C_NO_ERR)
+      if (mh_ConvertAndAddMessage(orc_DbcMessage, orc_Node.c_TxMessages) != C_NO_ERR)
       {
-         s32_Return = stw_errors::C_WARN;
+         s32_Return = C_WARN;
       }
    }
    else if (q_IsRxMessage == true)
    {
       // add message if valid
-      if (mh_ConvertAndAddMessage(orc_DbcMessage, orc_Node.c_RxMessages) != stw_errors::C_NO_ERR)
+      if (mh_ConvertAndAddMessage(orc_DbcMessage, orc_Node.c_RxMessages) != C_NO_ERR)
       {
-         s32_Return = stw_errors::C_WARN;
+         s32_Return = C_WARN;
       }
    }
    else
@@ -364,8 +363,8 @@ sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMes
    sint32 s32_Return = C_NO_ERR;
 
    orc_Message.c_CanMessage.c_Name = orc_DbcMessage.name.c_str();
-   orc_Message.c_CanMessage.c_Comment = orc_DbcMessage.comment.c_str();
-   if (orc_DbcMessage.id & (1 << 31U))
+   orc_Message.c_CanMessage.c_Comment = mh_ReEscapeCriticalSymbols(orc_DbcMessage.comment.c_str());
+   if (orc_DbcMessage.id & (1U << 31U))
    {
       orc_Message.c_CanMessage.q_IsExtended = true;
    }
@@ -374,10 +373,10 @@ sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMes
       orc_Message.c_CanMessage.q_IsExtended = false;
    }
 
-   orc_Message.c_CanMessage.u32_CanId = orc_DbcMessage.id & 0x7FFFFFFF;
+   orc_Message.c_CanMessage.u32_CanId = orc_DbcMessage.id & 0x7FFFFFFFU;
    orc_Message.c_CanMessage.u16_Dlc = static_cast<uint16>(orc_DbcMessage.size);
 
-   if (orc_Message.c_CanMessage.u32_CanId > 0x1FFFFFFF)
+   if (orc_Message.c_CanMessage.u32_CanId > 0x1FFFFFFFU)
    {
       s32_Return = C_CONFIG;
       osc_write_log_error("DBC file import", "CAN message \"" + orc_Message.c_CanMessage.c_Name + "\" has invalid ID.");
@@ -558,7 +557,7 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, b
    }
 
    c_Signal.c_Element.c_Name = orc_DbcSignal.name.c_str();
-   c_Signal.c_Element.c_Comment = orc_DbcSignal.comment.c_str();
+   c_Signal.c_Element.c_Comment = mh_ReEscapeCriticalSymbols(orc_DbcSignal.comment.c_str());
    if (q_MultiplexerSignal == false)
    {
       c_Signal.c_Element.f64_Factor = orc_DbcSignal.factor;
@@ -1261,7 +1260,6 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
    // otherwise it shall be of type eTX_METHOD_ON_EVENT)
    for (auto c_DbcAttributeValue : orc_DbcMessage.attributeValues)
    {
-      c_MessageType = ""; // clear old value
       // check for message send type
       if (mhc_SendType.AnsiCompare(c_DbcAttributeValue.first.c_str()) == 0)
       {
@@ -1387,4 +1385,27 @@ stw_types::sint32 C_CieImportDbc::mh_CheckRange(float64 of64_Value, C_OSCNodeDat
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle/re-escape critical symbols for DBC
+
+   Current:
+   Only handle " character: Replace \" by ".
+
+   Cf. C_CieExportDbc::mh_EscapeCriticalSymbols() for counter part.
+
+   \param[in] orc_String String to escape
+
+   \return
+   Escaped string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_CieImportDbc::mh_ReEscapeCriticalSymbols(const C_SCLString & orc_String)
+{
+   QString c_Temp(orc_String.c_str());
+
+   c_Temp.replace("\\\"", "\"");
+
+   return c_Temp.toStdString().c_str();
 }

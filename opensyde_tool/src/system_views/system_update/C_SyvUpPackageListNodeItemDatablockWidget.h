@@ -33,6 +33,7 @@ public:
                                 const QString & orc_AppBuildTime, const QString & orc_AppBuildDate) const override;
    virtual void ViewFileInfo(void) override;
    virtual bool IsViewFileInfoPossible(void) const override;
+   virtual bool IsUserHintPossible(void) const override;
 
 protected:
    virtual void m_LoadFileInformation(bool & orq_FileExists, bool & orq_FlashwareWarning,

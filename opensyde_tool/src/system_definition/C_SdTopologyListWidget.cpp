@@ -14,15 +14,19 @@
 #include <QEvent>
 #include <QMimeData>
 #include <QHelpEvent>
+#include <QFileInfo>
 
 #include "stwtypes.h"
 #include "constants.h"
+#include "C_GtGetText.h"
 #include "C_SdTopologyListWidget.h"
+#include "C_OgeWiCustomMessage.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
+using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 static const sintn msn_GRID_HEIGHT = 70;
@@ -49,7 +53,9 @@ const QString C_SdTopologyListWidget::hc_GroupName = "application/stw/opensyde/s
 //----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyListWidget::C_SdTopologyListWidget(QWidget * const opc_Parent) :
    C_OgeListWidgetToolTipBase(opc_Parent),
-   mq_AdaptMaximumHeight(true)
+   mq_AdaptMaximumHeight(true),
+   mpc_ContextMenu(new C_OgeContextMenu(this)),
+   mc_Position(0, 0)
 {
    this->setSelectionMode(QAbstractItemView::SingleSelection);
    this->setViewMode(QListView::IconMode);
@@ -65,19 +71,18 @@ C_SdTopologyListWidget::C_SdTopologyListWidget(QWidget * const opc_Parent) :
    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-   if (this->verticalScrollBarPolicy() == Qt::ScrollBarAlwaysOff)
-   {
-      this->setAutoScroll(false);
-      this->mq_MinimumSize = true;
-   }
-   else
-   {
-      this->setAutoScroll(true);
-      this->mq_MinimumSize = false;
-   }
+   this->setAutoScroll(false);
+   this->mq_MinimumSize = true;
 
    //set no focus policy to hide focus rectangle of an selected item
    this->setFocusPolicy(Qt::NoFocus);
+
+   this->mpc_DeleteAction = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Delete                     "));
+   connect(this->mpc_DeleteAction, &QAction::triggered, this, &C_SdTopologyListWidget::m_DeleteTriggered);
+
+   // connect left mouse click to open context menu
+   connect(this, &C_SdTopologyListWidget::customContextMenuRequested, this,
+           &C_SdTopologyListWidget::m_OnCustomContextMenuRequested);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,6 +93,7 @@ C_SdTopologyListWidget::C_SdTopologyListWidget(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyListWidget::~C_SdTopologyListWidget()
 {
+   //lint -e{1540}  no memory leak because of the parent all elements and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -146,6 +152,63 @@ void C_SdTopologyListWidget::SetGroupName(const QString & orc_Name)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Automatic adapting the minimum height
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyListWidget::UpdateSize(void)
+{
+   // Items on each row
+   sintn sn_ItemsRow = this->width() / msn_GRID_WIDTH;
+   sintn sn_RowCount;
+
+   if (this->mq_MinimumSize == true)
+   {
+      if (sn_ItemsRow < 1)
+      {
+         sn_ItemsRow = 1;
+      }
+
+      // calculate the necessary rows
+      sn_RowCount = this->count() / sn_ItemsRow;
+
+      // correct rounding error
+      if ((this->count() % sn_ItemsRow) > 0)
+      {
+         ++sn_RowCount;
+      }
+
+      this->setMinimumHeight(sn_RowCount * msn_GRID_HEIGHT);
+      // in some cases it is not necessary to adapt the maximum height
+      if (this->mq_AdaptMaximumHeight == true)
+      {
+         this->setMaximumHeight(sn_RowCount * msn_GRID_HEIGHT);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Getter function for mq_MinimumSize
+
+   \retval   mq_MinimumSize   True or false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdTopologyListWidget::GetMinimumSize() const
+{
+   return this->mq_MinimumSize;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Setter function for mq_MinimumSize
+
+   \param[in,out]   oq_MinimumSize   True or false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyListWidget::SetMinimumSize(const bool oq_MinimumSize)
+{
+   this->mq_MinimumSize = oq_MinimumSize;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten start drag event
 
    \param[in,out] oc_SupportedActions Event identification and information
@@ -190,33 +253,49 @@ void C_SdTopologyListWidget::startDrag(const Qt::DropActions oc_SupportedActions
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyListWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
-   // Items on each row
-   sintn sn_ItemsRow = this->width() / msn_GRID_WIDTH;
-   sintn sn_RowCount;
-
-   if (this->mq_MinimumSize == true)
-   {
-      if (sn_ItemsRow < 1)
-      {
-         sn_ItemsRow = 1;
-      }
-
-      // calculate the necessary rows
-      sn_RowCount = this->count() / sn_ItemsRow;
-
-      // correct rounding error
-      if ((this->count() % sn_ItemsRow) > 0)
-      {
-         ++sn_RowCount;
-      }
-
-      this->setMinimumHeight(sn_RowCount * msn_GRID_HEIGHT);
-      // in some cases it is not necessary to adapt the maximum height
-      if (this->mq_AdaptMaximumHeight == true)
-      {
-         this->setMaximumHeight(sn_RowCount * msn_GRID_HEIGHT);
-      }
-   }
-
+   this->UpdateSize();
    QListWidget::resizeEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize custom context menu functionality
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyListWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
+{
+   this->mc_Position = orc_Pos;
+
+   QListWidgetItem * const pc_Item = this->itemAt(orc_Pos);
+
+   // add action shall be shown only if no item concrete was clicked
+   if (pc_Item != NULL)
+   {
+      this->mpc_DeleteAction->setVisible(true);
+      this->mpc_ContextMenu->popup(this->mapToGlobal(orc_Pos));
+   }
+   else
+   {
+      this->mpc_DeleteAction->setVisible(false);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of delete button triggered
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyListWidget::m_DeleteTriggered(void)
+{
+   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+
+   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Delete User Nodes"));
+   c_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                  "Do you really want to delete this user node?"));
+   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
+   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+   c_MessageBox.SetCustomMinHeight(180, 180);
+
+   if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
+   {
+      Q_EMIT SigDelete(this->mc_Position);
+   }
 }

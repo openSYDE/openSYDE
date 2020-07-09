@@ -910,75 +910,6 @@ void C_SyvDaItDashboardProgressBarWidget::resizeEvent(QResizeEvent * const opc_E
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Adjust sub widget sizes to overall widget size
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardProgressBarWidget::m_AdjustWidgetSize(void) const
-{
-   const sintn sn_VerWidthSpacing = 5;
-   const float32 f32_RatioMinMaxVer = 1.0F / 6.0F;
-   const float32 f32_RatioValue2 = 100.0F / (100.0F + 30.0F);
-   const float32 f32_VerHeightMin = static_cast<float32>(this->height()) * f32_RatioMinMaxVer;
-   const sintn sn_VerHeightMin = static_cast<sintn>(f32_VerHeightMin);
-   const float32 f32_VerWidthValue2 = static_cast<float32>(this->width()) * f32_RatioValue2;
-   const sintn sn_VerWidthValue2 = static_cast<sintn>(f32_VerWidthValue2);
-
-   switch (this->me_Type)
-   {
-   case C_PuiSvDbProgressBar::eTYPE_1:
-
-      //Restore
-      mh_SetAutomatedWidthScaling(this->mpc_Ui->pc_ProgressBar);
-      mh_SetAutomatedHeightScaling(this->mpc_Ui->pc_ProgressBar);
-
-      break;
-   case C_PuiSvDbProgressBar::eTYPE_2:
-      mh_SetAutomatedWidthScaling(this->mpc_Ui->pc_ProgressBar);
-      mh_SetAutomatedHeightScaling(this->mpc_Ui->pc_ProgressBar);
-
-      break;
-   case C_PuiSvDbProgressBar::eTYPE_3:
-      this->mpc_Ui->pc_ProgressBar->setFixedSize((this->width() - sn_VerWidthValue2) - sn_VerWidthSpacing,
-                                                 this->height() - (2 * sn_VerHeightMin));
-      break;
-   default:
-      break;
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set automated width scaling for widget
-
-   \param[in,out] opc_Widget Widget to apply automated scaling for
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardProgressBarWidget::mh_SetAutomatedWidthScaling(QWidget * const opc_Widget)
-{
-   if (opc_Widget != NULL)
-   {
-      opc_Widget->setMinimumWidth(0);
-      //lint -e1960 we can not change Qt constant but it is still better than using the hard coded magic number 16777215
-      opc_Widget->setMaximumWidth(QWIDGETSIZE_MAX);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set automated height scaling for widget
-
-   \param[in,out] opc_Widget Widget to apply automated scaling for
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardProgressBarWidget::mh_SetAutomatedHeightScaling(QWidget * const opc_Widget)
-{
-   if (opc_Widget != NULL)
-   {
-      opc_Widget->setMinimumHeight(0);
-      //lint -e1960 we can not change Qt constant but it is still better than using the hard coded magic number 16777215
-      opc_Widget->setMaximumHeight(QWIDGETSIZE_MAX);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Arrow drawing function
 
    \param[in,out] orc_Painter Current painter
@@ -1097,7 +1028,7 @@ QPolygonF C_SyvDaItDashboardProgressBarWidget::mh_GetOuterRect(const QPointF & o
    //               \--------------------------------------------------------------
    */
    const QPointF c_P1ToP2 = orc_P2 - orc_P1;
-   const QPointF c_Perpendicular = C_GiBiLineBounding::GetPerpendicular(c_P1ToP2);
+   const QPointF c_Perpendicular = C_GiBiLineBounding::h_GetPerpendicular(c_P1ToP2);
    const float64 f64_LengthP1Perpendicular = std::sqrt(
       (c_Perpendicular.x() * c_Perpendicular.x()) + (c_Perpendicular.y() * c_Perpendicular.y()));
    const QPointF c_PerpendicularToNewPoints = (c_Perpendicular / f64_LengthP1Perpendicular) * of64_Width;

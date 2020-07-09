@@ -12,9 +12,9 @@
 #define C_OSCSYSTEMFILERUTIL_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-
 #include "C_OSCXMLParser.h"
 #include "C_OSCSystemBus.h"
+#include "C_OSCNodeCodeExportSettings.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -27,19 +27,23 @@ class C_OSCSystemFilerUtil
 {
 public:
    C_OSCSystemFilerUtil(void);
-   static stw_scl::C_SCLString mh_BusTypeEnumToString(const C_OSCSystemBus::E_Type oe_Type);
-   static stw_types::sint32 mh_BusTypeStringToEnum(const stw_scl::C_SCLString & orc_Type,
-                                                   C_OSCSystemBus::E_Type & ore_Type);
-   static stw_types::sint32 mh_GetParserForExistingFile(C_OSCXMLParser & orc_FileXMLParser,
-                                                        const stw_scl::C_SCLString & orc_Path,
-                                                        const stw_scl::C_SCLString & orc_RootNode);
-   static stw_types::sint32 mh_GetParserForNewFile(C_OSCXMLParser & orc_FileXMLParser,
-                                                   const stw_scl::C_SCLString & orc_Path,
-                                                   const stw_scl::C_SCLString & orc_RootNode);
-   static stw_types::sint32 mh_CreateFolder(const stw_scl::C_SCLString & orc_Path);
-   static stw_scl::C_SCLString mh_PrepareItemNameForFileName(const stw_scl::C_SCLString & orc_ItemName);
-   static stw_scl::C_SCLString mh_CombinePaths(const stw_scl::C_SCLString & orc_BasePathName,
-                                               const stw_scl::C_SCLString & orc_SubFolderFileName);
+   static stw_scl::C_SCLString h_BusTypeEnumToString(const C_OSCSystemBus::E_Type oe_Type);
+   static stw_types::sint32 h_BusTypeStringToEnum(const stw_scl::C_SCLString & orc_Type,
+                                                  C_OSCSystemBus::E_Type & ore_Type);
+   static stw_scl::C_SCLString h_CodeExportScalingTypeToString(const C_OSCNodeCodeExportSettings::E_Scaling &
+                                                               ore_Scaling);
+   static stw_types::sint32 h_StringToCodeExportScalingType(const stw_scl::C_SCLString & orc_String,
+                                                            C_OSCNodeCodeExportSettings::E_Scaling & ore_Scaling);
+   static stw_types::sint32 h_GetParserForExistingFile(C_OSCXMLParser & orc_FileXMLParser,
+                                                       const stw_scl::C_SCLString & orc_Path,
+                                                       const stw_scl::C_SCLString & orc_RootNode);
+   static stw_types::sint32 h_GetParserForNewFile(C_OSCXMLParser & orc_FileXMLParser,
+                                                  const stw_scl::C_SCLString & orc_Path,
+                                                  const stw_scl::C_SCLString & orc_RootNode);
+   static stw_types::sint32 h_CreateFolder(const stw_scl::C_SCLString & orc_Path);
+   static stw_scl::C_SCLString h_PrepareItemNameForFileName(const stw_scl::C_SCLString & orc_ItemName);
+   static stw_scl::C_SCLString h_CombinePaths(const stw_scl::C_SCLString & orc_BasePathName,
+                                              const stw_scl::C_SCLString & orc_SubFolderFileName);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

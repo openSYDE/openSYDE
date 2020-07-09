@@ -378,7 +378,7 @@ void C_GiBiArrow::m_GenerateArrows()
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::m_LoadFromData(const C_PuiBsLineArrow & orc_Data)
 {
-   this->LoadBasicData(orc_Data);
+   this->m_LoadBasicData(orc_Data);
    this->SetLineType(orc_Data.e_LineType);
    this->SetStartArrowHeadType(orc_Data.e_StartArrowHeadType);
    this->SetEndArrowHeadType(orc_Data.e_EndArrowHeadType);
@@ -392,7 +392,7 @@ void C_GiBiArrow::m_LoadFromData(const C_PuiBsLineArrow & orc_Data)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::m_UpdateData(C_PuiBsLineArrow & orc_Data) const
 {
-   this->UpdateBasicData(orc_Data);
+   this->m_UpdateBasicData(orc_Data);
    orc_Data.e_EndArrowHeadType = this->me_EndArrowHeadType;
    orc_Data.e_StartArrowHeadType = this->me_StartArrowHeadType;
    orc_Data.e_LineType = this->me_LineType;
@@ -422,12 +422,12 @@ void C_GiBiArrow::m_GenerateArrow(QGraphicsPathItem * const opc_ArrowItem,
       const QPointF c_LineStart = this->mapFromScene(opc_Conn->mapToScene(opc_Conn->GetP1()));
       const QPointF c_LineEnd = this->mapFromScene(opc_Conn->mapToScene(opc_Conn->GetP2()));
       const QPointF c_LineDiff = c_LineEnd - c_LineStart;
-      const QPointF c_AdaptedLineDiff = C_GiBiLineBounding::AdaptVecToWidth(c_LineDiff, this->mf64_ArrowLength);
+      const QPointF c_AdaptedLineDiff = C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff, this->mf64_ArrowLength);
       const QPointF c_ArrowWingVector =
-         C_GiBiLineBounding::AdaptVecToWidth(C_GiBiLineBounding::GetPerpendicular(c_LineDiff),
-                                             this->mf64_ArrowHeight / 2.0);
+         C_GiBiLineBounding::h_AdaptVecToWidth(C_GiBiLineBounding::h_GetPerpendicular(c_LineDiff),
+                                               this->mf64_ArrowHeight / 2.0);
       const QPointF c_HalfAdaptedLineDiff =
-         C_GiBiLineBounding::AdaptVecToWidth(c_LineDiff, this->mf64_ArrowLength / 2.0);
+         C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff, this->mf64_ArrowLength / 2.0);
       QPointF c_WidthAdaptedLineDiff;
       QPointF c_WidthAdaptedWingVector;
       //Important arrow bounding points
@@ -537,9 +537,9 @@ void C_GiBiArrow::m_GenerateArrow(QGraphicsPathItem * const opc_ArrowItem,
       case C_PuiBsLineArrow::E_ArrowHeadType::eLINE:
          s32_Width = this->GetWidth();
          //Offsets to include pen width and still half a 45 degree angle
-         c_WidthAdaptedLineDiff = C_GiBiLineBounding::AdaptVecToWidth(c_LineDiff, static_cast<float64>(s32_Width));
+         c_WidthAdaptedLineDiff = C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff, static_cast<float64>(s32_Width));
          c_WidthAdaptedWingVector =
-            C_GiBiLineBounding::AdaptVecToWidth(c_ArrowWingVector, static_cast<float64>(s32_Width) / 2.0);
+            C_GiBiLineBounding::h_AdaptVecToWidth(c_ArrowWingVector, static_cast<float64>(s32_Width) / 2.0);
          if (orq_Start == true)
          {
             this->mpc_LinePath->SetOffsetStart(static_cast<float64>(s32_Width));

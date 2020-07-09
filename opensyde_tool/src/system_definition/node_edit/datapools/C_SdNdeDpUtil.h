@@ -75,7 +75,6 @@ public:
       eARRAY_EDIT_DATA_SET
    };
 
-   static bool h_CheckConnected(const std::vector<stw_types::uint32> & orc_Items);
    static std::vector<stw_types::uint32> h_ConvertVector(const QModelIndexList & orc_Items,
                                                          const bool & orq_Rows = true);
    static void h_ConvertToElementGeneric(const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_OSCElement,
@@ -113,8 +112,6 @@ public:
    static void h_DrawTableBackgroundGeneric(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                             const QColor & orc_Default, const QColor & orc_Alternate,
                                             const QColor & orc_Selected);
-   static void h_DrawTableSelected(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
-                                   const QModelIndex & orc_Index, const QAbstractTableModel * const opc_TableModel);
    static bool h_CompareSpecifiedItemSmaller(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content1,
                                              const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Content2,
                                              const stw_types::uint32 & oru32_Index);
@@ -123,10 +120,10 @@ public:
                                            const stw_types::uint32 ou32_ListIndex,
                                            const stw_types::sintn osn_MaximumHeight = 0);
 
-   static stw_types::sint32 GetSharedDatapoolGroup(const stw_types::uint32 ou32_SharedDatapoolGroup,
-                                                   const stw_opensyde_core::C_OSCNodeDataPoolId & orc_BaseDatapoolId,
-                                                   const stw_types::uint32 ou32_NodeIndex,
-                                                   std::vector<QString> & orc_SharedDatapoolNameGroup);
+   static stw_types::sint32 h_GetSharedDatapoolGroup(const stw_types::uint32 ou32_SharedDatapoolGroup,
+                                                     const stw_opensyde_core::C_OSCNodeDataPoolId & orc_BaseDatapoolId,
+                                                     const stw_types::uint32 ou32_NodeIndex,
+                                                     std::vector<QString> & orc_SharedDatapoolNameGroup);
 
 private:
    C_SdNdeDpUtil();

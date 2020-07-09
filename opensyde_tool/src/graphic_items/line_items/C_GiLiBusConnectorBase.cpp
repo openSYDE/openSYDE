@@ -68,7 +68,7 @@ C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64 & oru64_ID, const QP
    std::vector<QPointF> c_Points;
    c_Points.push_back(orc_TriggerPos);
    c_Points.push_back(orc_TriggerPos);
-   this->Init(c_Points);
+   this->m_Init(c_Points);
 
    //Bus
    m_UpdateBus(orc_TriggerPos, opc_BusItem);
@@ -113,7 +113,7 @@ C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64 & oru64_ID,
       c_SaveVec.push_back(QPointF(0.0, 0.0));
       c_SaveVec.push_back(QPointF(0.0, 0.0));
    }
-   this->Init(c_SaveVec);
+   this->m_Init(c_SaveVec);
 
    //Bus
    m_UpdateBus(c_SaveVec[c_SaveVec.size() - 1], opc_BusItem);

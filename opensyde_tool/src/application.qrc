@@ -504,5 +504,7 @@
         <file>images/IconDoubleArrowRight.svg</file>
         <file>images/IconDoubleArrowRightDark.svg</file>
         <file>images/IconToolboxDark.svg</file>
+        <file>images/graphic_items/Icon_pipette.svg</file>
+        <file>images/Icon_toolbox_user_node.svg</file>
     </qresource>
 </RCC>

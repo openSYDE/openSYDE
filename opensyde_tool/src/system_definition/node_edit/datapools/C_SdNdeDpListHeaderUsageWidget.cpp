@@ -119,17 +119,6 @@ uint32 C_SdNdeDpListHeaderUsageWidget::SetUsage(const uint32 ou32_Size, const ui
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set tool tip status
-
-   \param[in] oq_Active Flag to set tool tip status
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListHeaderUsageWidget::SetToolTipActive(const bool oq_Active)
-{
-   this->mq_ActivateToolTip = oq_Active;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten default event slot
 
    Here: Handle tool tip

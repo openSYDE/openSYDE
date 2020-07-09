@@ -35,11 +35,18 @@ public:
                                             const stw_scl::C_SCLString & orc_MagicName);
    static stw_types::sint32 h_SaveToFile(stw_scl::C_SCLStringList & orc_Data, const stw_scl::C_SCLString & orc_Path,
                                          const stw_scl::C_SCLString & orc_FileName, const bool oq_HeaderFile);
+   static void h_CollectFilePaths(std::vector<stw_scl::C_SCLString> & orc_FilePaths,
+                                  const stw_scl::C_SCLString & orc_Path, const stw_scl::C_SCLString & orc_FileName);
 
    static stw_scl::C_SCLString h_GetTypePrefix(const C_OSCNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray);
    static stw_scl::C_SCLString h_GetElementCName(const stw_scl::C_SCLString & orc_Name, const bool oq_IsArray,
                                                  const C_OSCNodeDataPoolContent::E_Type oe_Type,
                                                  const stw_scl::C_SCLString & orc_ArrayPos = "0");
+
+   static stw_scl::C_SCLString h_FloatToStrCutZeroes(const stw_types::float64 of64_Value,
+                                                     const bool oq_MakePrecise = false);
+   static stw_scl::C_SCLString h_FloatToStrCutZeroes(const stw_types::float32 of32_Value,
+                                                     const bool oq_MakePrecise = false);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

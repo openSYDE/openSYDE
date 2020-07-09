@@ -601,93 +601,84 @@ void C_SyvUpUpdatePackageListWidget::ExportConfig(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::ImportConfig(void)
 {
-   const QString c_Folder = this->m_GetDialogPath();
    const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE Update Package Configuration File")) + "(*" +
                             mhc_CONFIG_FILE_TYPE + ")";
+   const QString c_FileName =
+      C_OgeWiUtil::h_GetOpenFileName(this->parentWidget(),
+                                     C_GtGetText::h_GetText("openSYDE Update Package Configuration File"),
+                                     this->m_GetDialogPath(), c_Filter, mhc_CONFIG_FILE_TYPE);
 
-   QFileDialog c_Dialog(this->parentWidget(), C_GtGetText::h_GetText(
-                           "openSYDE Update Package Configuration File"), c_Folder, c_Filter);
-
-   c_Dialog.setDefaultSuffix("(*" + mhc_CONFIG_FILE_TYPE + ")");
-
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_FileName != "")
    {
-      const QString c_FileName = c_Dialog.selectedFiles().at(0);
+      sint32 s32_Result;
+      C_SyvUpUpdatePackageConfig c_Config;
+      C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
+      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
 
-      if (c_FileName != "")
+      this->mc_LastPath = TGL_ExtractFilePath(c_FileName.toStdString().c_str()).c_str();
+
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Update Package configuration import"));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to overwrite the current Update "
+                                                         "Package configuration?"));
+      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Import"));
+      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+      c_MessageBox.SetCustomMinHeight(180, 180);
+      e_ReturnMessageBox = c_MessageBox.Execute();
+
+      if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
       {
-         sint32 s32_Result;
-         C_SyvUpUpdatePackageConfig c_Config;
-         C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
-         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+         // Load configuration
+         s32_Result = C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(c_FileName, c_Config);
 
-         this->mc_LastPath = TGL_ExtractFilePath(c_FileName.toStdString().c_str()).c_str();
-
-         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Update Package configuration import"));
-         c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                        "Do you really want to overwrite the current Update Package configuration?"));
-         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Import"));
-         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
-         c_MessageBox.SetCustomMinHeight(180, 180);
-         e_ReturnMessageBox = c_MessageBox.Execute();
-
-         if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
+         if (s32_Result == C_NO_ERR)
          {
+            sintn sn_Counter;
+
+            // Clear previous configuration first
+            this->RemoveAllFiles();
+
             // Load configuration
-            s32_Result = C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(c_FileName, c_Config);
-
-            if (s32_Result == C_NO_ERR)
+            for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
             {
-               sintn sn_Counter;
+               // Check all paths from all nodes
+               QListWidgetItem * const pc_Item = this->item(sn_Counter);
 
-               // Clear previous configuration first
-               this->RemoveAllFiles();
-
-               // Load configuration
-               for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+               C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
+                  dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
+               if (pc_WidgetItem != NULL)
                {
-                  // Check all paths from all nodes
-                  QListWidgetItem * const pc_Item = this->item(sn_Counter);
-
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-                  C_SyvUpUpdatePackageNodeWidget * const pc_WidgetItem =
-                     dynamic_cast<C_SyvUpUpdatePackageNodeWidget *>(this->itemWidget(pc_Item));
-                  if (pc_WidgetItem != NULL)
-                  {
-                     pc_WidgetItem->LoadImportConfig(c_Config);
-                  }
+                  pc_WidgetItem->LoadImportConfig(c_Config);
                }
             }
-
-            if (s32_Result != C_NO_ERR)
+         }
+         else
+         {
+            //Error handling
+            QString c_Details;
+            C_OgeWiCustomMessage c_MessageResultSave(this, C_OgeWiCustomMessage::E_Type::eERROR);
+            c_MessageResultSave.SetHeading(C_GtGetText::h_GetText("Update Package configuration import"));
+            c_MessageResultSave.SetDescription(C_GtGetText::h_GetText("Could not load file."));
+            switch (s32_Result)
             {
-               //Error handling
-               QString c_Details;
-               C_OgeWiCustomMessage c_MessageResultSave(this, C_OgeWiCustomMessage::E_Type::eERROR);
-               c_MessageResultSave.SetHeading(C_GtGetText::h_GetText("Update Package configuration import"));
-               c_MessageResultSave.SetDescription(C_GtGetText::h_GetText("Could not load file."));
-               switch (s32_Result)
-               {
-               case C_RD_WR:
-                  c_Details = C_GtGetText::h_GetText("There are problems accessing the file system.\n"
-                                                     "For example, there may be no read access to the file.");
-                  break;
-               case C_NOACT:
-                  c_Details = C_GtGetText::h_GetText("A file is present but its structure is invalid.\n"
-                                                     "For example this can be caused by an invalid XML file.");
-                  break;
-               case C_CONFIG:
-                  c_Details = C_GtGetText::h_GetText("Content of file is invalid or incomplete");
-                  break;
-               default:
-                  c_Details = C_GtGetText::h_GetText(
-                     "Error code: \n") + QString::number(s32_Result);
-                  break;
-               }
-               c_MessageResultSave.SetDetails(c_Details);
-               c_MessageResultSave.SetCustomMinHeight(180, 250);
-               c_MessageResultSave.Execute();
+            case C_RD_WR:
+               c_Details = C_GtGetText::h_GetText("There are problems accessing the file system.\n"
+                                                  "For example, there may be no read access to the file.");
+               break;
+            case C_NOACT:
+               c_Details = C_GtGetText::h_GetText("A file is present but its structure is invalid.\n"
+                                                  "For example this can be caused by an invalid XML file.");
+               break;
+            case C_CONFIG:
+               c_Details = C_GtGetText::h_GetText("Content of file is invalid or incomplete");
+               break;
+            default:
+               c_Details = C_GtGetText::h_GetText("Error code: \n") + QString::number(s32_Result);
+               break;
             }
+            c_MessageResultSave.SetDetails(c_Details);
+            c_MessageResultSave.SetCustomMinHeight(180, 250);
+            c_MessageResultSave.Execute();
          }
       }
    }
@@ -715,9 +706,8 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
                                                                c_str())) + ")";
    const QString c_Folder = this->m_GetDialogPath();
    const QString c_FullPackagePath =
-      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText(
-                                        "Select Directory for Service Update Package"), c_Folder, c_FilterName,
-                                     c_DefaultFilename);
+      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Directory for Service Update Package"),
+                                     c_Folder, c_FilterName, c_DefaultFilename);
 
    // check for user abort (empty string)
    if (c_FullPackagePath != "")
@@ -1375,6 +1365,7 @@ void C_SyvUpUpdatePackageListWidget::m_AddNewFile(const QString & orc_DialogCapt
    if (this->mpc_SelectedNode != NULL)
    {
       const QString c_Folder = this->m_GetDialogPath();
+      // File path checks are done by h_AskUserToSaveRelativePath(), so no need to use C_OgeWiUtil::h_GetOpenFileName()
       QStringList c_Files = QFileDialog::getOpenFileNames(this, orc_DialogCaption, c_Folder, orc_DialogFilter);
 
       if (c_Files.isEmpty() == false)
@@ -1415,7 +1406,6 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
    {
       QString c_Filter = "";
       const QString c_Folder = this->m_GetDialogPath();
-      QString c_File = "";
 
       if ((this->mpc_SelectedApp != NULL) && (this->mpc_SelectedSection != NULL))
       {
@@ -1448,17 +1438,11 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
 
          if (c_Filter != "")
          {
-            // do not use QFileDialog::getOpenFileName because it does not support default suffix
-            QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select File"), c_Folder, c_Filter);
-            if (q_HexFile == true)
+            const QString c_DefaultSuffix = q_HexFile ? "hex" : "";
+            QString c_File = C_OgeWiUtil::h_GetOpenFileName(this, C_GtGetText::h_GetText("Select File"),
+                                                            c_Folder, c_Filter, c_DefaultSuffix);
+            if (c_File != "")
             {
-               c_Dialog.setDefaultSuffix("hex");
-            }
-
-            if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
-            {
-               c_File = c_Dialog.selectedFiles().at(0); // multi-selection is not possible
-
                // remember path
                this->mc_LastPath = TGL_ExtractFilePath(c_File.toStdString().c_str()).c_str();
 
@@ -1466,11 +1450,8 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
                c_File = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_File,
                                                                C_PuiProject::h_GetInstance()->GetFolderPath());
 
-               if (c_File != "")
-               {
-                  // adapt file
-                  this->m_AdaptFile(c_File);
-               }
+               // adapt file
+               this->m_AdaptFile(c_File);
             }
          }
       }

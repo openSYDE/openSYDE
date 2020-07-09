@@ -137,19 +137,16 @@ sint32 C_CieExportDbc::h_ExportNetwork(const stw_scl::C_SCLString & orc_File,
       mh_SetNewSymbols(c_DbcNetwork.newSymbols);
       mh_SetAttributeDefaults(c_DbcNetwork.attributeDefaults);
       mh_SetAttributeDefinitions(c_DbcNetwork.attributeDefinitions);
-   }
 
-   // set nodes
-   if (s32_Return == C_NO_ERR)
-   {
+      // set nodes
       c_Message = "Inserting nodes for network ...";
       osc_write_log_info("DBC file export", c_Message);
       s32_Return = mh_SetNodes(orc_Definition.c_Nodes, c_DbcNetwork.nodes);
    }
 
-   // set messages
    if (s32_Return == C_NO_ERR)
    {
+      // set messages
       c_Message = "Inserting messages for network ...";
       osc_write_log_info("DBC file export", c_Message);
       s32_Return = mh_SetMessages(orc_Definition.c_Nodes, c_DbcNetwork.messages);
@@ -169,11 +166,8 @@ sint32 C_CieExportDbc::h_ExportNetwork(const stw_scl::C_SCLString & orc_File,
       {
          s32_Return = s32_Tmp; // C_WARN or worse
       }
-   }
 
-   // set status flag of this export
-   if ((s32_Return == C_NO_ERR) || (s32_Return == C_WARN))
-   {
+      // set status flag of this export
       mhq_ValidDbcExport = true;
    }
 
@@ -1133,6 +1127,8 @@ C_SCLString C_CieExportDbc::mh_NiceifyStringForDbcSymbol(const C_SCLString & orc
 
    Current:
    Only handle " character
+
+   Cf. C_CieImportDbc::mh_ReEscapeCriticalSymbols for counter part.
 
    \param[in] orc_String String to escape
 

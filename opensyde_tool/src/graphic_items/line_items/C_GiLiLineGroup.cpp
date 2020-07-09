@@ -68,7 +68,7 @@ C_GiLiLineGroup::C_GiLiLineGroup(const std::vector<QPointF> * const opc_Points, 
 
    if (opc_Points != NULL)
    {
-      this->Init(*opc_Points);
+      this->m_Init(*opc_Points);
    }
 }
 
@@ -152,7 +152,7 @@ void C_GiLiLineGroup::m_CheckLineGrid(const QPointF & orc_MouseScenePos)
          //Check degree
          const float64 f64_DistX = c_LineEnd.x() - c_LineStart.x();
          const float64 f64_DistY = c_LineEnd.y() - c_LineStart.y();
-         if (C_GiLiLineGroup::m_Near(f64_DistY, 0.0))
+         if (C_GiLiLineGroup::mh_Near(f64_DistY, 0.0))
          {
             //Align y
             if (s32_ItPoint == this->msn_ActiveItemIndex)
@@ -165,7 +165,7 @@ void C_GiLiLineGroup::m_CheckLineGrid(const QPointF & orc_MouseScenePos)
             }
             q_Adapted = true;
          }
-         else if (C_GiLiLineGroup::m_Near(f64_DistX, 0.0))
+         else if (C_GiLiLineGroup::mh_Near(f64_DistX, 0.0))
          {
             //Align x
             if (s32_ItPoint == this->msn_ActiveItemIndex)
@@ -194,7 +194,7 @@ void C_GiLiLineGroup::m_CheckLineGrid(const QPointF & orc_MouseScenePos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiLiLineGroup::m_Near(const float64 of64_Exact, const float64 of64_Eval)
+bool C_GiLiLineGroup::mh_Near(const float64 of64_Exact, const float64 of64_Eval)
 {
    bool q_Retval;
 
@@ -531,7 +531,7 @@ void C_GiLiLineGroup::m_RemovePointAt(const stw_types::sint32 & ors32_Index)
    \param[in,out] orc_Data Data element to load
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data)
+void C_GiLiLineGroup::m_LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data)
 {
    this->SetWidth(orc_Data.s32_UIWidthPixels);
    this->SetColor(orc_Data.c_UIColor);
@@ -545,7 +545,7 @@ void C_GiLiLineGroup::LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsLineBas
    \param[in,out] orc_Data Data element to update
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data) const
+void C_GiLiLineGroup::m_UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data) const
 {
    orc_Data.c_UIColor = this->GetColor();
    orc_Data.s32_UIWidthPixels = this->GetWidth();
@@ -566,7 +566,7 @@ void C_GiLiLineGroup::UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsLineBase & 
    \param[in] orc_Points Initial points
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::Init(const std::vector<QPointF> & orc_Points)
+void C_GiLiLineGroup::m_Init(const std::vector<QPointF> & orc_Points)
 {
    this->mpc_LinePath->Init(orc_Points);
    //Points

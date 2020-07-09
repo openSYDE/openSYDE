@@ -61,8 +61,6 @@ private:
       std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_CanMessages,
       std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_CanSignalData,
       std::vector<QString> & orc_WarningMessages);
-
-   static stw_types::uint32 mh_GetAutoTimeoutTime(const stw_types::uint32 ou32_CycleTime);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

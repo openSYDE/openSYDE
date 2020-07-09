@@ -46,6 +46,7 @@ static bool m_FileAgeDosTime(const C_SCLString & orc_FileName, uint16 * const op
 static sint32 m_FileFind(const C_SCLString & orc_SearchPattern, SCLDynamicArray<TGL_FileSearchRecord> & orc_FoundFiles,
                          const bool oq_IncludeDirectories = false,
                          SCLDynamicArray<uint8> * const opc_IsDirectory = NULL);
+static bool m_CheckUncShare(const C_SCLString & orc_Path);
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 //utility: get operating system file age
@@ -67,6 +68,55 @@ static bool m_FileAgeDosTime(const C_SCLString & orc_FileName, uint16 * const op
          q_Return = (FileTimeToDosDateTime(&t_LocalFileTime, opu16_Date, opu16_Time) == 0) ? false : true;
       }
    }
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   check if string is UNC server path
+
+   For paths of kind "\\mypc" the windows API for file attributes returns invalid, because it is only able
+   to handle sub-directories like "\\mypc\share". For this special case we check the last error of a
+   probably not existing sub-directory and use it for guessing on existence of the parent path.
+
+   \param[in]     orc_Path     path that might be an UNC server path
+
+   \return
+   true      path is an existing UNC share  \n
+   false     path is not an existing UNC share
+*/
+//----------------------------------------------------------------------------------------------------------------------
+static bool m_CheckUncShare(const C_SCLString & orc_Path)
+{
+   bool q_Return = false;
+   uint32 u32_Attrib = GetFileAttributesA(orc_Path.c_str());
+
+   if (u32_Attrib == INVALID_FILE_ATTRIBUTES)
+   {
+      // check beginning of path for "//" or "\\"
+      if ((orc_Path.SubString(1, 2) == "//") || (orc_Path.SubString(1, 2) == "\\\\"))
+      {
+         size_t un_CharIndex = orc_Path.AsStdString()->find_first_of("\\/", 2);
+         // check if no deeper UNC path like "\\mypc\shared"
+         if ((un_CharIndex == orc_Path.Length()) || // case path ends on slash
+             (un_CharIndex == std::string::npos))   // case path does not contain another slash
+         {
+            const C_SCLString c_SubPath = orc_Path + "\\randomsubdir";
+            uint32 u32_LastErr;
+
+            // check for a random sub-directory if it exists
+            u32_Attrib = GetFileAttributesA(c_SubPath.c_str());
+            u32_LastErr = GetLastError();
+
+            // check if last error indicates that the server exists (for non-existing servers last error is different)
+            if ((u32_Attrib != INVALID_FILE_ATTRIBUTES) /*for the unlikely case this random sub-directory exists*/ ||
+                (u32_LastErr == ERROR_BAD_NET_NAME))
+            {
+               q_Return = true;
+            }
+         }
+      }
+   }
+
    return q_Return;
 }
 
@@ -188,10 +238,17 @@ bool TGL_PACKAGE stw_tgl::TGL_DirectoryExists(const C_SCLString & orc_Path)
 {
    bool q_Return = false;
    const uint32 u32_Attrib = GetFileAttributesA(orc_Path.c_str());
+
    if ((u32_Attrib != INVALID_FILE_ATTRIBUTES) &&
        ((u32_Attrib & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
    {
       q_Return = true;
+   }
+   else
+   {
+      // UNC path fallback: Windows handles network shares without sub-directory (e.g. \\mypc) as invalid path,
+      // but it would be nicer to return true here. So check this special case separately.
+      q_Return = m_CheckUncShare(orc_Path);
    }
 
    return q_Return;

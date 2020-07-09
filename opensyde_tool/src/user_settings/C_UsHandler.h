@@ -48,6 +48,7 @@ public:
 
    //Get
    QString GetLanguage(void) const;
+   bool GetPerformanceActive(void) const;
    QStringList GetRecentProjects(void) const;
    QPoint GetScreenPos(void) const;
    QSize GetAppSize(void) const;
@@ -61,7 +62,7 @@ public:
    stw_types::sint32 GetSdBusEditTreeSplitterX(void) const;
    stw_types::sint32 GetSdBusEditTreeSplitterX2(void) const;
    stw_types::sint32 GetSdBusEditLayoutSplitterX(void) const;
-   static stw_types::uint8 GetMaxRecentProjects(void);
+   static stw_types::uint8 h_GetMaxRecentProjects(void);
    QString GetCurrentSaveAsPath(void) const;
    QVector<QColor> GetRecentColors(void) const;
    stw_types::sintn GetNextRecentColorButtonNumber(void) const;
@@ -87,8 +88,6 @@ public:
    const QList<QString> GetProjSdNodeKeysInternal(void) const;
    const QList<QString> GetProjSdBusKeysInternal(void) const;
    const QList<QString> GetProjSvSetupViewKeysInternal(void) const;
-   C_UsSystemViewDashboard GetProjSvDashboardSettings(const QString & orc_ViewName,
-                                                      const QString & orc_DashboardName) const;
    void GetProjLastScreenMode(stw_types::sint32 & ors32_SysDefSubMode, stw_types::uint32 & oru32_SysDefIndex,
                               stw_types::uint32 & oru32_SysDefFlag, stw_types::sint32 & ors32_SysViewSubMode,
                               stw_types::uint32 & oru32_SysViewIndex, stw_types::uint32 & oru32_SysViewFlag) const;
@@ -97,6 +96,7 @@ public:
 
    //Set
    stw_types::sint32 SetLanguage(const QString & orc_Lang);
+   void SetPerformanceActive(const bool oq_Active);
    void SetRecentProjects(const QStringList & orc_New);
    void SetScreenPos(const QPoint & orc_New);
    void SetAppSize(const QSize & orc_New);
@@ -156,10 +156,9 @@ public:
    void SetProjSvParamExport(const QString & orc_ViewName, const QString & orc_Path);
    void SetProjSvParamImport(const QString & orc_ViewName, const QString & orc_Path);
    void SetProjSvParamRecord(const QString & orc_ViewName, const QString & orc_Path, const QString & orc_FileName);
-   void AddProjSvUpdateDataRate(const QString & orc_ViewName, const stw_types::uint32 ou32_Checksum,
-                                const stw_types::uint64 ou64_DataRateBytesPerS);
-   void AddProjSvUpdateDataRatePerNode(const QString & orc_ViewName, const stw_types::uint32 ou32_Checksum,
-                                       const QMap<stw_types::uint32, stw_types::float64> & orc_DataRateBytesPerMs);
+   void AddProjSvNodeUpdateDataRate(const QString & orc_ViewName, const QString & orc_NodeName,
+                                    const stw_types::uint32 ou32_Checksum,
+                                    const stw_types::float64 of64_DataRateBytesPerMs);
    void SetProjSvUpdateSplitterX(const QString & orc_ViewName, const stw_types::sint32 os32_Value);
    void SetProjSvUpdateHorizontalSplitterY(const QString & orc_ViewName, const stw_types::sint32 os32_Value);
    void SetProjSvUpdateProgressLog(const QString & orc_ViewName, const QPoint & orc_Position, const QSize & orc_Size,
@@ -210,6 +209,7 @@ private:
    const QString mc_DefaultProjectsFolder;               ///< Default openSYDE projects location if no recent projects
                                                          // are available
    QString mc_Lang;                                      ///< Current language
+   bool mq_PerformanceMeasurementActive;                 ///< Flag if performance measurement is active (log entries)
    QString mc_CurrentSaveAsPath;                         ///< Current save as base path
    QVector<QColor> mc_RecentColors;                      ///< Recent colors from color picker
    stw_types::sintn msn_NextRecentColorButtonNumber;     ///< Next recent color button for color from color picker

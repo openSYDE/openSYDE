@@ -47,6 +47,7 @@ public:
    void OnMessageIdChange(void) const;
    void OnMessageNameChange(void) const;
    void OnSignalNameChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
+   void OnSignalStartBitChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void OnNodeDisconnected(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex) const;
    void RecheckErrorGlobal(void) const;
    void RecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;

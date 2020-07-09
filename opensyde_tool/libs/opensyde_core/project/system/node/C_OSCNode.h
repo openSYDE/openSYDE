@@ -130,6 +130,8 @@ public:
                           const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
    stw_types::sint32 CheckApplicationProcessIdValid(const stw_types::uint32 ou32_ApplicationIndex,
                                                     bool & orq_Valid) const;
+   void CheckHalcConfigValid(bool * const opq_ConfigInvalid,
+                             std::vector<stw_types::uint32> * const opc_InvalidDomainIndices) const;
    void ReCalcCanProtocolDataPoolIndices(void);
    bool IsAnyUpdateAvailable(void) const;
    bool IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const;

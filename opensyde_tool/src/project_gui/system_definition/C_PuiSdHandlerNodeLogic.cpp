@@ -12,13 +12,10 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QElapsedTimer>
-
 #include "C_Uti.h"
 #include "stwtypes.h"
 #include "TGLUtils.h"
 #include "stwerrors.h"
-#include "constants.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdUtil.h"
 #include "C_PuiSdHandlerNodeLogic.h"
@@ -49,7 +46,7 @@ using namespace stw_opensyde_gui_logic;
 
    \param[in]      orc_Name               Node name to check for
    \param[in]      opu32_NodeIndexToSkip  Optional parameter to skip one index
-                                        (Use-case: skip current node to avoid conflict with itself)
+                                          (Use-case: skip current node to avoid conflict with itself)
    \param[in,out]  opc_ExistingNames      Optional parameter to list all OTHER existing node names
 
    \return
@@ -318,6 +315,34 @@ sint32 C_PuiSdHandlerNodeLogic::SetNodeOpenSYDEServerSettings(const uint32 ou32_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node code export settings
+
+   \param[in]  ou32_Index     Node index
+   \param[in]  orc_Settings   Settings
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerNodeLogic::SetNodeCodeExportSettings(const uint32 ou32_Index,
+                                                          const C_OSCNodeCodeExportSettings & orc_Settings)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_Index < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_Index];
+      rc_Node.c_Properties.c_CodeExportSettings = orc_Settings;
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply node properties
 
    \param[in]  ou32_NodeIndex    Node index
@@ -418,7 +443,7 @@ uint32 C_PuiSdHandlerNodeLogic::AddNodeAndSort(C_OSCNode & orc_OSCNode, const C_
    const C_SCLString c_DeviceName = (orc_OSCNode.pc_DeviceDefinition !=
                                      NULL) ? orc_OSCNode.pc_DeviceDefinition->GetDisplayName() : "";
    const C_SCLString c_DefaultDeviceName =
-      C_PuiSdHandlerNodeLogic::h_AutomaticCStringAdaptation(c_DeviceName.c_str(), false).toStdString().c_str();
+      C_PuiSdHandlerNodeLogic::h_AutomaticCStringAdaptation(c_DeviceName.c_str()).toStdString().c_str();
 
    orc_OSCNode.c_Properties.c_Name = C_Uti::h_GetUniqueName(
       this->m_GetExistingNodeNames(), orc_OSCNode.c_Properties.c_Name, c_DefaultDeviceName);
@@ -471,18 +496,14 @@ void C_PuiSdHandlerNodeLogic::RemoveNode(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) const
 {
-   QElapsedTimer c_Timer;
    bool q_Retval;
    static QMap<uint32, bool> hc_PreviousResult;
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
    //Get reference hash
    const uint32 u32_Hash = this->m_GetHashNode(oru32_NodeIndex);
    //Look up
    const QMap<uint32, bool>::const_iterator c_It = hc_PreviousResult.find(u32_Hash);
+
    if (c_It == hc_PreviousResult.end())
    {
       bool q_NameConflict;
@@ -490,25 +511,26 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
       bool q_NodeIdInvalid;
       bool q_DataPoolsInvalid;
       bool q_ApplicationsInvalid;
+      bool q_DomainsInvalid;
 
       if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid,
-                                                 &q_DataPoolsInvalid, &q_ApplicationsInvalid, true, NULL,
-                                                 NULL,
-                                                 NULL) == C_NO_ERR)
+                                                 &q_DataPoolsInvalid, &q_ApplicationsInvalid, &q_DomainsInvalid,
+                                                 true, NULL, NULL, NULL, NULL) == C_NO_ERR)
       {
-         if (((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
-              (q_ApplicationsInvalid == true)) || (q_NameEmpty == true))
+         bool q_NvmSizeConflict = this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
+         if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
+                (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_NameEmpty == true)) ||
+             (q_NvmSizeConflict == true))
          {
             q_Retval = true;
          }
          else
          {
-            // one further check necessary
-            q_Retval = this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
+            q_Retval = false;
          }
          //Store for future reference
-         if ((((q_DataPoolsInvalid == true) || (q_ApplicationsInvalid == true)) ||
-              (q_NameEmpty == true)) || (this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex) == true))
+         if ((((q_DataPoolsInvalid == true) || (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true) ||
+              (q_NameEmpty == true)) || (q_NvmSizeConflict == true))
          {
             hc_PreviousResult.insert(u32_Hash, true);
          }
@@ -529,8 +551,7 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
       bool q_NodeIdInvalid;
 
       if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, NULL, &q_NodeIdInvalid, NULL, NULL,
-                                                 true, NULL,
-                                                 NULL, NULL) == C_NO_ERR)
+                                                 NULL, true, NULL, NULL, NULL, NULL) == C_NO_ERR)
       {
          if ((q_NameConflict == true) || (q_NodeIdInvalid == true))
          {
@@ -538,7 +559,7 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
          }
          else
          {
-            // one further check necessary
+            // use stored value
             q_Retval = c_It.value();
          }
       }
@@ -547,10 +568,7 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
          q_Retval = true;
       }
    }
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Node " << oru32_NodeIndex << " check: " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
    return q_Retval;
 }
 
@@ -746,6 +764,66 @@ const
    }
 
    return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Map node name to index
+
+   \param[in]   orc_NodeName     Node name
+   \param[out]  oru32_NodeIndex  Node index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerNodeLogic::MapNodeNameToIndex(const QString & orc_NodeName, uint32 & oru32_NodeIndex) const
+{
+   sint32 s32_Retval = C_RANGE;
+
+   for (uint32 u32_ItNode = 0UL; u32_ItNode < this->GetOSCNodesSize(); ++u32_ItNode)
+   {
+      const C_OSCNode * const pc_Node = this->GetOSCNodeConst(u32_ItNode);
+      tgl_assert(pc_Node != NULL);
+      if (pc_Node != NULL)
+      {
+         if (orc_NodeName.compare(pc_Node->c_Properties.c_Name.c_str()) == 0)
+         {
+            s32_Retval = C_NO_ERR;
+            oru32_NodeIndex = u32_ItNode;
+         }
+      }
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Map node index to name
+
+   \param[in]   ou32_NodeIndex   Node index
+   \param[out]  orc_NodeName     Node name
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerNodeLogic::MapNodeIndexToName(const uint32 ou32_NodeIndex, QString & orc_NodeName) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(ou32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      orc_NodeName = pc_Node->c_Properties.c_Name.c_str();
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -959,7 +1037,7 @@ sint32 C_PuiSdHandlerNodeLogic::RemoveDataPool(const uint32 & oru32_NodeIndex, c
          //Handle COMM
          m_CleanUpComDataPool(oru32_NodeIndex, oru32_DataPoolIndex);
          rc_UINode.c_UIDataPools.erase(rc_UINode.c_UIDataPools.begin() + oru32_DataPoolIndex);
-         rc_OSCNode.DeleteDataPool(oru32_DataPoolIndex);
+         s32_Retval = rc_OSCNode.DeleteDataPool(oru32_DataPoolIndex);
          //Handle NVM
          rc_OSCNode.RecalculateAddress();
 
@@ -1943,7 +2021,7 @@ std::vector<uint32> C_PuiSdHandlerNodeLogic::GetProgrammableAppIndices(const uin
    \param[in]  oru32_DataPoolIndex        Data pool index
    \param[in]  oru32_DataPoolListIndex    Data pool list index
    \param[in]  orc_OSCContent             OSC data pool list content
-                                        (name might be modified by this function if not unique)
+                                          (name might be modified by this function if not unique)
    \param[in]  orc_UIContent              UI data pool list content
    \param[in]  oq_HandleSharedDatapools   Optional flag if the shared Datapools shall be updated too
 
@@ -2789,7 +2867,7 @@ sint32 C_PuiSdHandlerNodeLogic::SetOSCNodeDataPoolDataSet(const uint32 & oru32_N
    \param[in]  oru32_DataPoolListIndex          Data pool list index
    \param[in]  oru32_DataPoolListDataSetIndex   Data pool list data set index
    \param[in]  orc_OSCName                      OSC data pool list data set name
-                                              (name might be modified by this function if not unique)
+                                                (name might be modified by this function if not unique)
    \param[in]  orc_OSCValues                    OSC data pool list data set values
    \param[in]  oq_HandleSharedDatapools         Optional flag if the shared Datapools shall be updated too
 
@@ -5160,11 +5238,11 @@ void C_PuiSdHandlerNodeLogic::m_SetUpComDataPool(const uint32 & oru32_NodeIndex,
       tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
       if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
       {
-         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
          C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
          //Check if com data pool
          if (rc_OSCDataPool.e_Type == C_OSCNodeDataPool::eCOM)
          {
+            C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
             C_OSCNodeDataPoolDataSet c_DataSetInit;
             c_DataSetInit.c_Name = "Init";
             //Clean

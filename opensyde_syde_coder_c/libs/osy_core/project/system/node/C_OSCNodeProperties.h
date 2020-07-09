@@ -19,6 +19,7 @@
 #include "C_OSCNodeComInterfaceSettings.h"
 #include "C_OSCNodeOpenSydeServerSettings.h"
 #include "C_OSCDeviceDefinition.h"
+#include "C_OSCNodeCodeExportSettings.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -68,6 +69,7 @@ public:
    std::vector<C_OSCNodeComInterfaceSettings> c_ComInterfaces; ///< List of all present com interfaces
    C_OSCNodeOpenSYDEServerSettings c_OpenSYDEServerSettings;   ///< Optional openSYDE server settings
    C_OSCNodeStwFlashloaderSettings c_STWFlashloaderSettings;   ///< Optional STW flashloader settings
+   C_OSCNodeCodeExportSettings c_CodeExportSettings;           ///< Optional code export settings
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

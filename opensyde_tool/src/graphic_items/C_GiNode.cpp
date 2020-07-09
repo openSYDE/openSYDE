@@ -281,6 +281,8 @@ void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
    this->m_DetectIconSize();
 
    // adapt conflict icon
+   // and adapt ports
+   // move the ports to the center of the respective side
    if (oq_Initial == false)
    {
       const sint32 s32_IconSizeDiff = this->ms32_IconSize - s32_OldIconSize;
@@ -288,12 +290,7 @@ void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
       this->mpc_ConflictIcon->SetNewSize(QSizeF(static_cast<float64>(this->ms32_IconSize),
                                                 static_cast<float64>(this->ms32_IconSize)));
       this->mpc_ConflictIcon->update();
-   }
 
-   // adapt ports
-   // move the ports to the center of the respective side
-   if (oq_Initial == false)
-   {
       // move only by mouse movements
       this->mc_Ports[ms32_IndexAbove]->moveBy((of64_DiffWidth / 2.0), 0.0);
       this->mc_Ports[ms32_IndexBottom]->moveBy((of64_DiffWidth / 2.0), of64_DiffHeight);
@@ -1224,40 +1221,6 @@ void C_GiNode::DeleteData(void)
 {
    C_PuiSdHandler::h_GetInstance()->RemoveNode(ms32_Index);
    this->mq_Valid = false;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Disconnect all refreneces to this bus
-
-   \param[in]   orc_BusName   Bus name
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_GiNode::DisconnectBus(const QString & orc_BusName)
-{
-   for (sint32 s32_ItConn = 0; s32_ItConn < this->mc_Connections.size();)
-   {
-      if (orc_BusName.compare(this->mc_Connections[s32_ItConn]->GetBusItem()->GetName()) == 0)
-      {
-         const C_PuiSdNodeConnectionId * const pc_ConnId = this->mc_Connections[s32_ItConn]->GetConnectionData();
-         if (pc_ConnId != NULL)
-         {
-            C_PuiSdHandler::h_GetInstance()->RemoveConnection(this->ms32_Index, *pc_ConnId);
-         }
-
-         this->mc_Connections[s32_ItConn]->DeleteConnection();
-
-         if (this->scene() != NULL)
-         {
-            this->scene()->removeItem(this->mc_Connections[s32_ItConn]);
-         }
-         this->mc_Connections[s32_ItConn]->deleteLater();
-         this->mc_Connections.remove(s32_ItConn);
-      }
-      else
-      {
-         ++s32_ItConn;
-      }
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

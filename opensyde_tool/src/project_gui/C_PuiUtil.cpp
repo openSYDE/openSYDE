@@ -90,13 +90,6 @@ QString C_PuiUtil::h_MakeIndependentOfDbProjectPath(const QString & orc_DbProjec
 
    if (c_Return.contains(mc_PATH_VARIABLE_DATABLOCK_PROJ) == true)
    {
-      QString c_DbProjectPath = orc_DbProjectPath;
-
-      // replace Data Block project variable
-      if (orc_DbProjectPath.endsWith('/') == false)
-      {
-         c_DbProjectPath += "/";
-      }
       c_Return.replace(mc_PATH_VARIABLE_DATABLOCK_PROJ, orc_DbProjectPath);
 
       // remove all double slashes but the first (network paths)

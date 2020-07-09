@@ -21,9 +21,9 @@ namespace stw_opensyde_core
 class C_OSCHALCMagicianUtil
 {
 public:
-   C_OSCHALCMagicianUtil();
+   C_OSCHALCMagicianUtil(void);
 
-   static stw_scl::C_SCLString h_GetDatapoolName(void);
+   static stw_scl::C_SCLString h_GetDatapoolName(const bool oq_IsSafe);
    static stw_scl::C_SCLString h_GetListName(const C_OSCHalcDefDomain::E_VariableSelector oe_Type);
    static stw_types::sint32 h_GetVariableName(const std::vector<C_OSCHalcDefStruct> & orc_DefinitionArray,
                                               const stw_types::uint32 ou32_ParameterIndexStruct,

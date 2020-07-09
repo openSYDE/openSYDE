@@ -18,6 +18,7 @@
 #include "C_OgeLabToolboxHeadingGroup.h"
 #include "C_OgeLabToolboxHeadingGroupBig.h"
 #include "C_SdUtil.h"
+#include "C_SdTopologyListWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -59,22 +60,32 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
 
    if (opc_Layout != NULL)
    {
-      C_OgeLabToolboxHeadingGroup * const pc_Heading = new C_OgeLabToolboxHeadingGroup(opc_Parent);
       pc_Retval = new C_SdTopologyListWidget(opc_Parent);
       sintn sn_Index;
 
-      pc_Heading->setText(orc_Name);
-      pc_Retval->SetGroupName(orc_Name);
+      if (orc_Name != "")
+      {
+         C_OgeLabToolboxHeadingGroup * const pc_Heading = new C_OgeLabToolboxHeadingGroup(opc_Parent);
+         pc_Heading->setText(orc_Name);
+         pc_Retval->SetGroupName(orc_Name);
 
-      //Configure
-      pc_Retval->setDropIndicatorShown(false);
+         // Configure
+         pc_Retval->setDropIndicatorShown(false);
 
-      // Heading
-      opc_Layout->addWidget(pc_Heading);
-      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LabelSize);
-      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
-      sn_Index = opc_Layout->indexOf(pc_Heading);
-      opc_Layout->setStretch(sn_Index, 0);
+         // Heading
+         opc_Layout->addWidget(pc_Heading);
+         pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LabelSize);
+         pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
+         sn_Index = opc_Layout->indexOf(pc_Heading);
+         opc_Layout->setStretch(sn_Index, 0);
+         //lint -e{429}  no memory leak because of the parent of pc_Heading and the Qt memory management
+      }
+      else
+      {
+         // Configure
+         pc_Retval->setDropIndicatorShown(false);
+         pc_Retval->setContextMenuPolicy(Qt::CustomContextMenu);
+      }
 
       //List
       opc_Layout->addWidget(pc_Retval);
@@ -112,7 +123,7 @@ C_OgeFrameSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name
       QVBoxLayout * const pc_FrameLayout = new QVBoxLayout();
       sintn sn_Index;
 
-      //Optional top spacer
+      // Optional top spacer
       if (oq_AddSpacerBefore == true)
       {
          QSpacerItem * const pc_SpacerTop = new QSpacerItem(0, C_SebToolboxUtil::hsn_HeadingSpacerSizeTop);
@@ -121,6 +132,7 @@ C_OgeFrameSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name
          // memory management
       }
 
+      // Set name to heading
       pc_Heading->setText(orc_Name);
 
       // Heading
@@ -130,7 +142,7 @@ C_OgeFrameSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name
       sn_Index = opc_Layout->indexOf(pc_Heading);
       opc_Layout->setStretch(sn_Index, 0);
 
-      // add frame separator between heading and subheading to new layout
+      // add frame separator between heading and subheading (in dashboard toolbox) to new layout
       pc_FrameLayout->addWidget(pc_FrameSeparator);
       pc_FrameSeparator->setMinimumHeight(1);
 
@@ -142,6 +154,78 @@ C_OgeFrameSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name
       // memory management
    }
    return pc_FrameSeparator;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add new section heading
+
+   \param[in]     orc_Name           Heading name
+   \param[in,out] opc_Layout         Layout to add heading to
+   \param[in,out] opc_Parent         Parent widget
+
+   \return
+   Pointer to svg icon button (add node and clear-all-nodes)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<C_OgePubIconOnly *> C_SebToolboxUtil::h_AddNewUserHeading(const QString & orc_Name,
+                                                                      QVBoxLayout * const opc_Layout,
+                                                                      QWidget * const opc_Parent)
+{
+   std::vector<C_OgePubIconOnly *> c_Icons;
+   C_OgePubIconOnly * pc_IconButton = NULL;
+   C_OgePubIconOnly * pc_ClearAllUserNodesButton = NULL;
+
+   if (opc_Layout != NULL)
+   {
+      //lint -e429  no memory leak because of the parent of the call of addSpacerItem and the Qt
+      // memory management
+      C_OgeLabToolboxHeadingGroup * const pc_Heading = new C_OgeLabToolboxHeadingGroup(opc_Parent);
+      C_OgeFrameSeparator * const pc_FrameSeparator = new C_OgeFrameSeparator(opc_Parent);
+      QVBoxLayout * const pc_FrameLayout = new QVBoxLayout();
+      QHBoxLayout * const pc_HorizontalLayout = new QHBoxLayout();
+      pc_IconButton = new C_OgePubIconOnly(opc_Parent);
+      pc_ClearAllUserNodesButton = new C_OgePubIconOnly(opc_Parent);
+
+      sintn sn_Index;
+
+      // Set name to heading
+      pc_Heading->setText(orc_Name);
+
+      // Heading
+      pc_HorizontalLayout->addWidget(pc_Heading);
+      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LabelSize);
+      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
+      sn_Index = pc_HorizontalLayout->indexOf(pc_Heading);
+      pc_HorizontalLayout->setStretch(sn_Index, 0);
+
+      // Add icon button
+      pc_IconButton->setIcon(QIcon("://images/IconAddEnabled.svg"));
+      pc_IconButton->setFixedSize(18, 18);
+      pc_HorizontalLayout->addWidget(pc_IconButton);
+
+      // Add icon for clear button
+      pc_ClearAllUserNodesButton->setIcon(QIcon("://images/system_views/IconClearAllEnabled.svg"));
+      pc_ClearAllUserNodesButton->setFixedSize(18, 18);
+      pc_HorizontalLayout->addWidget(pc_ClearAllUserNodesButton);
+
+      // Add spacer after button
+      pc_HorizontalLayout->addSpacerItem(new QSpacerItem(7, 0, QSizePolicy::Fixed));
+
+      // Add horizontal layout with heading and button to toolbox
+      opc_Layout->addLayout(pc_HorizontalLayout);
+
+      // add frame separator between heading and subheading (in dashboard toolbox) to new layout
+      pc_FrameLayout->addWidget(pc_FrameSeparator);
+      pc_FrameSeparator->setMinimumHeight(1);
+
+      // add new layout with frame separator to existing layout
+      opc_Layout->addLayout(pc_FrameLayout);
+      pc_FrameLayout->setContentsMargins(13, 0, 0, 0);
+
+      c_Icons.push_back(pc_IconButton);
+      c_Icons.push_back(pc_ClearAllUserNodesButton);
+   }
+   return c_Icons;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

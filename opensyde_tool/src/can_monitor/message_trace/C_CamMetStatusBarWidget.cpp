@@ -48,6 +48,8 @@ C_CamMetStatusBarWidget::C_CamMetStatusBarWidget(QWidget * const opc_Parent) :
    mpc_Ui(new Ui::C_CamMetStatusBarWidget),
    mq_BusLoadWarning(false),
    mq_TxError(false),
+   mu32_TxErrors(0U),
+   mu32_TransmittedMessages(0U),
    mu32_FilteredMessages(0U),
    mu32_ActiveFilters(0U)
 {
@@ -79,13 +81,12 @@ void C_CamMetStatusBarWidget::InitStaticNames(void)
       C_GtGetText::h_GetText("Active Receive Filters"),
       C_GtGetText::h_GetText("Number of active receive filters and "
                              "number of CAN messages which are filtered since measurement start."));
-
    this->mpc_Ui->pc_BusLoadLabel->SetToolTipInformation(
       C_GtGetText::h_GetText("Bus Load"),
       C_GtGetText::h_GetText("Approximate bus load."));
-   this->mpc_Ui->pc_TxErrorsLabel->SetToolTipInformation(
+   this->mpc_Ui->pc_TxInfoLabel->SetToolTipInformation(
       C_GtGetText::h_GetText("Tx Errors"),
-      C_GtGetText::h_GetText("Number of failed tries to send CAN messages."));
+      C_GtGetText::h_GetText("Number of failed tries to transmit CAN messages."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,31 +133,20 @@ void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad, con
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::SetTxErrors(const stw_types::uint32 ou32_TxErrors)
 {
-   if (ou32_TxErrors > 0U)
-   {
-      this->mpc_Ui->pc_TxErrorsLabel->setText(QString(C_GtGetText::h_GetText("Tx Errors: %1")).
-                                              arg(QString::number(ou32_TxErrors)));
+   this->mu32_TxErrors = ou32_TxErrors;
+   this->m_UpdateTxLabel();
+}
 
-      // Prevent applying the stylesheet each call
-      if (this->mq_TxError == false)
-      {
-         stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TxErrorsLabel, "Error",
-                                                                        true);
-         this->mq_TxError = true;
-      }
-   }
-   else
-   {
-      this->mpc_Ui->pc_TxErrorsLabel->setText(C_GtGetText::h_GetText("No Tx Errors"));
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sets the number of filtered CAN messages
 
-      // Prevent applying the stylesheet each call
-      if (this->mq_TxError == true)
-      {
-         stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TxErrorsLabel, "Error",
-                                                                        false);
-         this->mq_TxError = false;
-      }
-   }
+   \param[in] ou32_NumTxMessages Number of transmitted messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetStatusBarWidget::SetTransmittedMessages(const stw_types::uint32 ou32_NumTxMessages)
+{
+   this->mu32_TransmittedMessages = ou32_NumTxMessages;
+   this->m_UpdateTxLabel();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -206,4 +196,43 @@ void C_CamMetStatusBarWidget::m_UpdateFilterLabel(void) const
                                                    QString(C_GtGetText::h_GetText(" (Filtered Messages: %1)")).
                                                    arg(QString::number(this->mu32_FilteredMessages)));
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update the transmission information label
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetStatusBarWidget::m_UpdateTxLabel(void)
+{
+   QString c_Text = C_GtGetText::h_GetText("Tx Messages: ");
+
+   c_Text += QString::number(this->mu32_TransmittedMessages);
+
+   if (this->mu32_TxErrors > 0U)
+   {
+      c_Text += C_GtGetText::h_GetText(" (Tx Errors: ");
+      c_Text += QString::number(this->mu32_TxErrors);
+      c_Text += ")";
+
+      // Prevent applying the stylesheet each call
+      if (this->mq_TxError == false)
+      {
+         stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TxInfoLabel, "Error",
+                                                                        true);
+         this->mq_TxError = true;
+      }
+   }
+   else
+   {
+      // Prevent applying the stylesheet each call
+      if (this->mq_TxError == true)
+      {
+         stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TxInfoLabel, "Error",
+                                                                        false);
+         this->mq_TxError = false;
+      }
+   }
+
+   // Set label text
+   this->mpc_Ui->pc_TxInfoLabel->setText(c_Text);
 }

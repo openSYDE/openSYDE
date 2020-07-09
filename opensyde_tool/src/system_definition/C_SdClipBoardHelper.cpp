@@ -26,6 +26,7 @@
 #include "TGLUtils.h"
 #include "C_OSCNodeCommFiler.h"
 #include "C_OSCSystemDefinitionFiler.h"
+#include "C_OSCHalcConfigStandaloneFiler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -1242,6 +1243,63 @@ sint32 C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(C_SdTopologyDataSnap
    {
       s32_Retval = C_RANGE;
    }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store HALC item configuration to clipboard
+
+   \param[in]  orc_Data    Snapshot data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdClipBoardHelper::h_StoreHalcItemConfigToClipboard(const C_OSCHalcConfigStandalone & orc_Data)
+{
+   sint32 s32_Retval;
+   QString c_String;
+
+   stw_scl::C_SCLString c_XMLContent;
+   C_OSCXMLParserString c_StringXml;
+
+   c_StringXml.CreateAndSelectNodeChild("clip-board");
+
+   s32_Retval = C_OSCHalcConfigStandaloneFiler::h_SaveDataStandalone(orc_Data, c_StringXml);
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      //Final step
+      c_StringXml.SaveToString(c_XMLContent);
+      c_String = c_XMLContent.c_str();
+      C_SdClipBoardHelper::mh_SetClipBoard(c_String);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore HALC item configuration from clipboard
+
+   \param[out]  orc_Data   Snapshot data
+
+   \return
+   C_NO_ERR Found and loaded
+   C_CONFIG Clip board invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SdClipBoardHelper::h_LoadHalcItemConfigFromClipboard(C_OSCHalcConfigStandalone & orc_Data)
+{
+   sint32 s32_Retval = C_NO_ERR;
+   const QString c_Input = C_SdClipBoardHelper::mh_GetClipBoard();
+   C_OSCXMLParserString c_StringXml;
+
+   c_StringXml.LoadFromString(c_Input.toStdString().c_str());
+
+   if (c_StringXml.SelectRoot() == "clip-board")
+   {
+      s32_Retval = C_OSCHalcConfigStandaloneFiler::h_LoadDataStandalone(orc_Data, c_StringXml);
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
+
    return s32_Retval;
 }
 

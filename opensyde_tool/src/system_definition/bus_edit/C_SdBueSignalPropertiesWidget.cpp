@@ -67,7 +67,7 @@ const sint32 ms32_MUX_MULTIPLEXED_SIGNAL = 2;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc_Parent) :
@@ -258,7 +258,7 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set message sync manager
 
-   \param[in,out] opc_Value Message sync manager
+   \param[in,out]  opc_Value  Message sync manager
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::SetMessageSyncManager(
@@ -272,8 +272,8 @@ void C_SdBueSignalPropertiesWidget::SetMessageSyncManager(
 
    Sets the private signal id of widget
 
-   \param[in] orc_MessageId    Message identification indices
-   \param[in] ou32_SignalIndex New signal id
+   \param[in]  orc_MessageId     Message identification indices
+   \param[in]  ou32_SignalIndex  New signal id
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::SetSignalId(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -332,8 +332,8 @@ void C_SdBueSignalPropertiesWidget::SelectName(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   In case of a disconnected node update of the unique message ids
 
-   \param[in]     ou32_NodeIndex      Node index
-   \param[in]     ou32_InterfaceIndex Interface index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::OnNodeDisconnected(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
@@ -548,8 +548,8 @@ void C_SdBueSignalPropertiesWidget::m_HandleMuxValueChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt value to signal length
 
-   \param[in]     ou16_BitLength Current bit length
-   \param[in,out] orc_Content    Content to restrict
+   \param[in]      ou16_BitLength   Current bit length
+   \param[in,out]  orc_Content      Content to restrict
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16 ou16_BitLength,
@@ -579,13 +579,17 @@ void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16 ou1
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load generic content
 
-   \param[in,out] opc_Widget     Spin box
-   \param[in]     orc_Content    Value
-   \param[in]     of64_Factor    Scaling factor
-   \param[in]     of64_Offset    Scaling offset
-   \param[in]     ou16_BitLength Signal bit length
-   \param[in]     opc_Min        Optional minimum
-   \param[in]     opc_Max        Optional maximum
+   \param[in,out]  opc_Widget       Spin box
+   \param[in]      orc_Content      Value
+   \param[in]      of64_Factor      Scaling factor
+   \param[in]      of64_Offset      Scaling offset
+   \param[in]      ou16_BitLength   Signal bit length
+   \param[in]      opc_Min          Optional minimum
+   \param[in]      opc_Max          Optional maximum
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const opc_Widget,
@@ -659,8 +663,8 @@ sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set content to minimum allowed value
 
-   \param[in,out] orc_Content    Content to set
-   \param[in]     ou16_BitLength Signal bit length
+   \param[in,out]  orc_Content      Content to set
+   \param[in]      ou16_BitLength   Signal bit length
 
    \return
    C_NO_ERR Operation success
@@ -825,8 +829,8 @@ sint32 C_SdBueSignalPropertiesWidget::mh_InitMin(C_OSCNodeDataPoolContent & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set content to maximum allowed value
 
-   \param[in,out] orc_Content    Content to set
-   \param[in]     ou16_BitLength Signal bit length
+   \param[in,out]  orc_Content      Content to set
+   \param[in]      ou16_BitLength   Signal bit length
 
    \return
    C_NO_ERR Operation success
@@ -998,10 +1002,14 @@ sint32 C_SdBueSignalPropertiesWidget::mh_InitMax(C_OSCNodeDataPoolContent & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save generic content
 
-   \param[in]     opc_Widget  Spin box
-   \param[in,out] orc_Content Value
-   \param[in]     of64_Factor Scaling factor
-   \param[in]     of64_Offset Scaling offset
+   \param[in]      opc_Widget    Spin box
+   \param[in,out]  orc_Content   Value
+   \param[in]      of64_Factor   Scaling factor
+   \param[in]      of64_Offset   Scaling offset
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSignalPropertiesWidget::m_SaveGeneric(const C_OgeWiSpinBoxGroup * const opc_Widget,
@@ -1085,7 +1093,7 @@ C_OSCNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check signal name
 
-   \param[in] orq_SignalErrorChange Optional flag to suppress error signal
+   \param[in]  orq_SignalErrorChange   Optional flag to suppress error signal
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErrorChange)
@@ -1138,7 +1146,7 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check MUX type
 
-   \param[in] orq_SignalErrorChange Optional flag to suppress error signal
+   \param[in]  orq_SignalErrorChange   Optional flag to suppress error signal
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CheckMUXType(const bool & orq_SignalErrorChange)
@@ -1181,7 +1189,7 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXType(const bool & orq_SignalErrorC
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check MUX value
 
-   \param[in] orq_SignalErrorChange Optional flag to suppress error signal
+   \param[in]  orq_SignalErrorChange   Optional flag to suppress error signal
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CheckMUXValue(const bool & orq_SignalErrorChange)
@@ -1221,7 +1229,7 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXValue(const bool & orq_SignalError
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check position values
 
-   \param[in] orq_SignalErrorChange Optional flag to suppress error signal
+   \param[in]  orq_SignalErrorChange   Optional flag to suppress error signal
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_SignalErrorChange)
@@ -1294,6 +1302,7 @@ void C_SdBueSignalPropertiesWidget::m_HandleCommentChange(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data
+
    \param[in]  oe_Change   Detected UI change
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1364,8 +1373,8 @@ C_OSCCanSignal::E_MultiplexerType C_SdBueSignalPropertiesWidget::m_GetMuxType(vo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialize the combo box for multiplexer type
 
-   \param[in] orc_Message      Current message
-   \param[in] ou32_SignalIndex Current signal
+   \param[in]  orc_Message       Current message
+   \param[in]  ou32_SignalIndex  Current signal
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_InitComboBox(const C_OSCCanMessage & orc_Message,
@@ -1392,8 +1401,8 @@ void C_SdBueSignalPropertiesWidget::m_InitComboBox(const C_OSCCanMessage & orc_M
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle automated range for multiplexer value
 
-   \param[in] orc_Message      Current message
-   \param[in] ou32_SignalIndex Current signal
+   \param[in]  orc_Message       Current message
+   \param[in]  ou32_SignalIndex  Current signal
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_HandleMuxValueRange(const C_OSCCanMessage & orc_Message,
@@ -1426,9 +1435,9 @@ void C_SdBueSignalPropertiesWidget::m_HandleMuxValueRange(const C_OSCCanMessage 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle all changes on UI
 
-   \param[in] oe_Change                           Detected UI change
-   \param[in] oq_AllowSignalsToInformOtherWidgets Optional flag to allow or block signals to inform other widgets
-                                                  of changes
+   \param[in]  oe_Change                              Detected UI change
+   \param[in]  oq_AllowSignalsToInformOtherWidgets    Optional flag to allow or block signals to inform other widgets
+                                                      of changes
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_HandleAnyChange(const C_SdBueSignalPropertiesWidget::E_Change oe_Change,
@@ -1480,7 +1489,7 @@ void C_SdBueSignalPropertiesWidget::m_HandleAnyChange(const C_SdBueSignalPropert
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply value from UI
 
-   \param[in] oe_Change Detected UI change
+   \param[in]  oe_Change   Detected UI change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_ApplyNewValueFromUI(const C_SdBueSignalPropertiesWidget::E_Change oe_Change)
@@ -1577,11 +1586,11 @@ void C_SdBueSignalPropertiesWidget::m_ApplyNewValueFromUI(const C_SdBueSignalPro
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle automated adaptations for other fields based on the current change
 
-   \param[in]  oe_Change                                 Detected UI change
-   \param[out] orc_Changes                               Requested UI changes for other fields
-   \param[out] orc_ErrorChanges                          Requested error check (usually only relevant for itself)
-   \param[out] orc_UserNotificationText                  User notification text if any
-   \param[out] orc_UserNotificationAdditionalInformation User notification additional text if any
+   \param[in]   oe_Change                                   Detected UI change
+   \param[out]  orc_Changes                                 Requested UI changes for other fields
+   \param[out]  orc_ErrorChanges                            Requested error check (usually only relevant for itself)
+   \param[out]  orc_UserNotificationText                    User notification text if any
+   \param[out]  orc_UserNotificationAdditionalInformation   User notification additional text if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalPropertiesWidget::E_Change oe_Change,
@@ -1835,7 +1844,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Initialize data structure with potential new type
 
-   \param[in] oe_Type Expected Type
+   \param[in]  oe_Type  Expected Type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_InitializeDataWithPotentialNewType(const C_OSCNodeDataPoolContent::E_Type oe_Type)
@@ -1909,7 +1918,7 @@ void C_SdBueSignalPropertiesWidget::m_HandleInitValueRange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle any changes in other signals
 
-   \param[in] oe_Change Detected UI change
+   \param[in]  oe_Change   Detected UI change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
@@ -1960,7 +1969,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
 
   Includes error check for initial call
 
-   \param[in]  oe_Change Detected UI change
+   \param[in]  oe_Change   Detected UI change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change)
@@ -2242,7 +2251,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle UI updates based on the specified change
 
-   \param[in]  oe_Change Detected UI change
+   \param[in]  oe_Change   Detected UI change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_UpdateErrorForChange(const C_SdBueSignalPropertiesWidget::E_Change oe_Change)
@@ -2288,7 +2297,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateErrorForChange(const C_SdBueSignalPr
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle signals based on the current change
 
-   \param[in] oe_Change Detected UI change
+   \param[in]  oe_Change   Detected UI change
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_SendSignalForChange(const C_SdBueSignalPropertiesWidget::E_Change oe_Change)
@@ -2307,6 +2316,9 @@ void C_SdBueSignalPropertiesWidget::m_SendSignalForChange(const C_SdBueSignalPro
       Q_EMIT (this->SigRecheckError(this->mc_MessageId));
       break;
    case eCHA_START_BIT:
+      Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      Q_EMIT (this->SigStartBitChanged(this->mc_MessageId));
+      break;
    case eCHA_LENGTH:
       Q_EMIT (this->SigRecheckError(this->mc_MessageId));
       break;

@@ -53,11 +53,11 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     oru32_ViewIndex        Index of system view
-   \param[in]     oru32_DashboardIndex   Index of dashboard in system view
-   \param[in]     ors32_DataIndex        Index of data element in dashboard in system view
-   \param[in]     oru64_ID               Unique ID
-   \param[in,out] opc_Parent             Optional pointer to parent
+   \param[in]      oru32_ViewIndex        Index of system view
+   \param[in]      oru32_DashboardIndex   Index of dashboard in system view
+   \param[in]      ors32_DataIndex        Index of data element in dashboard in system view
+   \param[in]      oru64_ID               Unique ID
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaTableBase::C_GiSvDaTableBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
@@ -104,8 +104,8 @@ sintn C_GiSvDaTableBase::type(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply style
 
-   \param[in] oe_Style    New style type
-   \param[in] oq_DarkMode Flag if dark mode is active
+   \param[in]  oe_Style       New style type
+   \param[in]  oq_DarkMode    Flag if dark mode is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
@@ -218,8 +218,8 @@ void C_GiSvDaTableBase::UpdateShowValue(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparence value configured by the actual timeout state
 
-   \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                 Value for transparence (0..255)
+   \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
+   \param[in]  osn_Value               Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -234,7 +234,7 @@ void C_GiSvDaTableBase::UpdateTransparence(const uint32 ou32_DataElementIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in] oq_Active Flag if connection is active or not active now
+   \param[in]  oq_Active   Flag if connection is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::ConnectionActiveChanged(const bool oq_Active)
@@ -254,7 +254,7 @@ void C_GiSvDaTableBase::ConnectionActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of edit mode
 
-   \param[in]  oq_Active  Flag if edit mode is active or not active now
+   \param[in]  oq_Active   Flag if edit mode is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::EditModeActiveChanged(const bool oq_Active)
@@ -348,8 +348,8 @@ bool C_GiSvDaTableBase::CallProperties(void)
    - Add data element
    - Remove data element
 
-   \param[in] opc_ContextMenuManager Pointer to context menu manager for registration of actions
-   \param[in] oq_Active              Flag if context menu entries have to be shown or not
+   \param[in]  opc_ContextMenuManager  Pointer to context menu manager for registration of actions
+   \param[in]  oq_Active               Flag if context menu entries have to be shown or not
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
@@ -382,21 +382,21 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
       if (mpc_RemoveDataElement == NULL)
       {
          mpc_RemoveDataElement =
-            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Remove selected data element"));
+            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Remove selected data element(s)"));
          // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
          this->mpc_RemoveDataElement->setVisible(false);
       }
       if (mpc_MoveUpDataElement == NULL)
       {
          mpc_MoveUpDataElement =
-            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Move selected data element up"));
+            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Move selected data element(s) up"));
          // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
          this->mpc_MoveUpDataElement->setVisible(false);
       }
       if (mpc_MoveDownDataElement == NULL)
       {
          mpc_MoveDownDataElement =
-            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Move selected data element down"));
+            opc_ContextMenuManager->RegisterAction(C_GtGetText::h_GetText("Move selected data element(s) down"));
          // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
          this->mpc_MoveDownDataElement->setVisible(false);
       }
@@ -481,8 +481,8 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
 
    This function is thread safe.
 
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_Values                            Vector with result value(s)
+   \param[in]   ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[out]  orc_Values                         Vector with result value(s)
 
    \return
    C_NO_ERR    Value read
@@ -533,7 +533,7 @@ const C_PuiSvDbTable * C_GiSvDaTableBase::GetTableItem(void) const
 
    WARNING: Data element changes have to trigger RegisterDataElement
 
-   \param[in] orc_Content New content
+   \param[in]  orc_Content    New content
 
    \return
    C_NO_ERR Operation success
@@ -560,7 +560,7 @@ sint32 C_GiSvDaTableBase::SetTableItem(const C_PuiSvDbTable & orc_Content) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check view is active
 
-   \param[in] orc_DataPoolElementId Datapool element ID
+   \param[in]  orc_DataPoolElementId   Datapool element ID
 
    \return
    True  View active
@@ -645,9 +645,9 @@ uint32 C_GiSvDaTableBase::GetViewIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check item error
 
-   \param[in]  orc_DataPoolElementId   Datapool element ID
-   \param[out] orc_Content             Active error description
-   \param[out] orq_IsTransmissionError Flag if transmission error occurred
+   \param[in]   orc_DataPoolElementId     Datapool element ID
+   \param[out]  orc_Content               Active error description
+   \param[out]  orq_IsTransmissionError   Flag if transmission error occurred
 
    \return
    True  Error active
@@ -819,6 +819,15 @@ void C_GiSvDaTableBase::m_RemoveDataElement(void)
       std::vector<C_PuiSvDbNodeDataPoolListElementId> c_RemovedDataElements;
       //Remove data element(s)
       this->mpc_TableWidget->RemoveSelectedItems(c_RemovedDataElements);
+      //Necessary before view is checked
+      for (uint32 u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
+      {
+         const C_PuiSvDbNodeDataPoolListElementId & rc_RemovedItem = c_RemovedDataElements[u32_ItDataElement];
+         if (rc_RemovedItem.GetIsValid() == true)
+         {
+            this->RemoveDataPoolElement(rc_RemovedItem);
+         }
+      }
       //Remove read rail assignments as necessary
       pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
       if (pc_View != NULL)
@@ -826,11 +835,14 @@ void C_GiSvDaTableBase::m_RemoveDataElement(void)
          for (uint32 u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
          {
             const C_PuiSvDbNodeDataPoolListElementId & rc_RemovedItem = c_RemovedDataElements[u32_ItDataElement];
-            if ((rc_RemovedItem.GetIsValid() == true) && (pc_View->CheckReadUsage(rc_RemovedItem) == false))
+            if (rc_RemovedItem.GetIsValid() == true)
             {
-               //Allow error as the returned vector might not be unique (same id can occur multiple times)
-               C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
-                                                                       rc_RemovedItem);
+               if (pc_View->CheckReadUsage(rc_RemovedItem) == false)
+               {
+                  //Allow error as the returned vector might not be unique (same id can occur multiple times)
+                  C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
+                                                                          rc_RemovedItem);
+               }
             }
          }
       }
@@ -843,7 +855,7 @@ void C_GiSvDaTableBase::m_RemoveDataElement(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Register new data element rail assignment for new data element
 
-   \param[in] orc_DataPoolElementId New data element ID
+   \param[in]  orc_DataPoolElementId   New data element ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::m_RegisterDataElementRail(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
@@ -882,8 +894,8 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Map widget data element index to data element handler index
 
-   \param[in]  ou32_DataElementIndex      Widget data element index
-   \param[out] oru32_InternalElementIndex Data element handler index
+   \param[in]   ou32_DataElementIndex        Widget data element index
+   \param[out]  oru32_InternalElementIndex   Data element handler index
 
    \return
    C_NO_ERR Operation success

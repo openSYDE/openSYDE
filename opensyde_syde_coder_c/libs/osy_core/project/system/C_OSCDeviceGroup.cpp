@@ -97,6 +97,7 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
    sintn sn_NumDevices;
    sint32 s32_Return = C_NO_ERR;
 
+   this->mc_Devices.clear();
    //Check number of devices in group
    sn_NumDevices = orc_Ini.ReadInteger(this->mc_GroupName, "DeviceCount", 0);
    if (sn_NumDevices > 0)

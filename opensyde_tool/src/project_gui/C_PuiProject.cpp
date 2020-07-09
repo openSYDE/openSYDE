@@ -577,11 +577,9 @@ void C_PuiProject::h_HandlePendingEvents(void)
       //Process focus change and handle all pending events which may cause project changes before checking the project
       // for changes
       QApplication::processEvents();
-      if (c_PreviousFocusWidget != NULL)
-      {
-         //Restore original focus
-         c_PreviousFocusWidget->setFocus();
-      }
+
+      //Restore original focus
+      c_PreviousFocusWidget->setFocus();
    }
 }
 

@@ -41,11 +41,11 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_ViewIndex Index of view
-   \param[in]     ou32_DataIndex Index of dashboard
-   \param[in]     orc_Name       Name of dashboard
-   \param[in]     oq_Window      Flag if widget will be showed in a seperate window
-   \param[in,out] opc_Parent     Optional pointer to parent
+   \param[in]      ou32_ViewIndex   Index of view
+   \param[in]      ou32_DataIndex   Index of dashboard
+   \param[in]      orc_Name         Name of dashboard
+   \param[in]      oq_Window        Flag if widget will be showed in a seperate window
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DataIndex,
@@ -95,6 +95,12 @@ C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, cons
 
    connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigTriggerUpdateTransmissionConfiguration, this,
            &C_SyvDaDashboardWidget::SigTriggerUpdateTransmissionConfiguration);
+
+   // Delayed update
+   // Necessary because of issue #49525
+   this->mc_UpdateTimer.setSingleShot(true);
+   this->mc_UpdateTimer.setInterval(300);
+   connect(&this->mc_UpdateTimer, &QTimer::timeout, this->mpc_Scene, &C_SyvDaDashboardScene::UpdateBoundaries);
 
    // Manual datapool element handling
    connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigDataPoolWrite, this, &C_SyvDaDashboardWidget::SigDataPoolWrite);
@@ -158,7 +164,7 @@ uint32 C_SyvDaDashboardWidget::GetDataIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data index
 
-   \param[in] ou32_Value New data index
+   \param[in]  ou32_Value  New data index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetDataIndex(const uint32 ou32_Value)
@@ -182,7 +188,7 @@ QString C_SyvDaDashboardWidget::GetName(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the edit mode
 
-   \param[in]     oq_Active      Flag for edit mode
+   \param[in]  oq_Active   Flag for edit mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetEditMode(const bool oq_Active)
@@ -199,7 +205,7 @@ void C_SyvDaDashboardWidget::SetEditMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the dark mode
 
-   \param[in] oq_Active Dark mode active
+   \param[in]  oq_Active   Dark mode active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetDarkMode(const bool oq_Active)
@@ -215,7 +221,7 @@ void C_SyvDaDashboardWidget::SetDarkMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Function to activate or deactivate drawing of performance heavy widgets
 
-   \param[in] oq_Active Flag if widgets should currently be drawn
+   \param[in]  oq_Active   Flag if widgets should currently be drawn
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetDrawingActive(const bool oq_Active) const
@@ -255,7 +261,7 @@ void C_SyvDaDashboardWidget::Save(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
-   \param[in]     orc_ComDriver    Com driver containing information about all data dealer
+   \param[in]  orc_ComDriver  Com driver containing information about all data dealer
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) const
@@ -278,7 +284,7 @@ void C_SyvDaDashboardWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active      Flag if connection is active or not active now
+   \param[in]  oq_Active   Flag if connection is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::ConnectionActiveChanged(const bool oq_Active) const
@@ -317,8 +323,8 @@ void C_SyvDaDashboardWidget::UpdateTransmissionConfiguration(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle manual user operation finished event
 
-   \param[in] os32_Result Operation result
-   \param[in] ou8_NRC     Negative response code, if any
+   \param[in]  os32_Result    Operation result
+   \param[in]  ou8_NRC        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
@@ -332,8 +338,8 @@ void C_SyvDaDashboardWidget::HandleManualOperationFinished(const sint32 os32_Res
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal all widgets which read rail element ID registrations failed
 
-   \param[in]     orc_FailedIdRegisters    Failed IDs
-   \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
+   \param[in]      orc_FailedIdRegisters     Failed IDs
+   \param[in,out]  orc_FailedIdErrorDetails  Error details for element IDs which failed registration (if any)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetErrorForFailedCyclicElementIdRegistrations(
@@ -353,4 +359,18 @@ void C_SyvDaDashboardWidget::SetErrorForFailedCyclicElementIdRegistrations(
 void C_SyvDaDashboardWidget::SetSceneFocus(void) const
 {
    this->mpc_Ui->pc_GraphicsView->setFocus();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Event
+
+   \param[in,out]  opc_Event  Event
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardWidget::showEvent(QShowEvent * const opc_Event)
+{
+   QWidget::showEvent(opc_Event);
+   // Trigger delayed update
+   // Necessary because of issue #49525
+   this->mc_UpdateTimer.start();
 }

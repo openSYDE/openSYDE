@@ -30,8 +30,14 @@ public:
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
+   C_OSCHalcConfigChannel c_DomainConfig;                ///< Domain specific configuration
    std::vector<C_OSCHalcConfigChannel> c_ChannelConfigs; ///< Channels of domain of IO description (synced with
                                                          // C_OSCHalcDefBase)
+
+private:
+   static void mh_AddParameters(const std::vector<C_OSCHalcDefStruct> & orc_Parameters,
+                                std::vector<C_OSCHalcConfigParameterStruct> & orc_ParamConfig);
+   static C_OSCHalcConfigChannel mh_InitConfigFromName(const stw_scl::C_SCLString & orc_Name);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

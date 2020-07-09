@@ -48,6 +48,7 @@ public:
 
    void InitText(void);
    void SaveUserSettings(void) const;
+   static stw_opensyde_core::C_OSCParamSetInterpretedFileInfoData h_GetFileInfoData(const QString & orc_Comment);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -98,7 +99,6 @@ private:
    void m_ReportError(const QString & orc_FunctionName, const QString & orc_ErrorText,
                       const stw_types::sint32 os32_ErrorCode);
    void m_ReportErrorNvmSafeReadParameterValues(const stw_types::sint32 os32_ErrorCode);
-   stw_opensyde_core::C_OSCParamSetInterpretedFileInfoData m_GetFileInfoData(const QString & orc_Comment) const;
 
    Ui::C_SyvDaItPaImageRecordWidget * mpc_Ui;
 

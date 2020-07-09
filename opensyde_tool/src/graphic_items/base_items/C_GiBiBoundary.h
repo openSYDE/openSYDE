@@ -28,7 +28,7 @@ class C_GiBiBoundary :
 {
 public:
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiBoundary(const stw_types::uint64 & oru64_ID, const stw_types::float64 of64_Width = mhf64_MinWidthBoundary,
+   C_GiBiBoundary(const stw_types::uint64 & oru64_ID = 0, const stw_types::float64 of64_Width = mhf64_MinWidthBoundary,
                   const stw_types::float64 of64_Height = mhf64_MinHeightBoundary,
                   QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiBiBoundary(void);

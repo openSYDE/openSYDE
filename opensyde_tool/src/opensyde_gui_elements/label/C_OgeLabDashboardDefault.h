@@ -27,7 +27,7 @@ class C_OgeLabDashboardDefault :
    Q_OBJECT
 
 public:
-   C_OgeLabDashboardDefault(QWidget * const opc_Parent);
+   C_OgeLabDashboardDefault(QWidget * const opc_Parent = NULL);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

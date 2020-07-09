@@ -1189,7 +1189,7 @@ sintn C_SCLString::ToInt(void) const
 
       try
       {
-         s32_Return = m_StrTos32(pcn_String, q_Hex);
+         s32_Return = mh_StrTos32(pcn_String, q_Hex);
       }
       catch (...)
       {
@@ -1201,7 +1201,7 @@ sintn C_SCLString::ToInt(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 
-sint32 C_SCLString::m_StrTos32(const charn * const opcn_String, const bool oq_Hex)
+sint32 C_SCLString::mh_StrTos32(const charn * const opcn_String, const bool oq_Hex)
 {
    bool q_IsNegative = false;
    sint32 s32_CharVal;
@@ -1259,7 +1259,7 @@ sint32 C_SCLString::m_StrTos32(const charn * const opcn_String, const bool oq_He
 
 //----------------------------------------------------------------------------------------------------------------------
 
-sint64 C_SCLString::m_StrTos64(const charn * const opcn_String, const bool oq_Hex)
+sint64 C_SCLString::mh_StrTos64(const charn * const opcn_String, const bool oq_Hex)
 {
    bool q_IsNegative = false;
    sint32 s32_CharVal;
@@ -1370,7 +1370,7 @@ sint64 C_SCLString::ToInt64(void) const
 
       try
       {
-         s64_Return = m_StrTos64(pcn_String, q_Hex);
+         s64_Return = mh_StrTos64(pcn_String, q_Hex);
       }
       catch (...)
       {

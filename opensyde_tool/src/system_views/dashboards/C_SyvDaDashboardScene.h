@@ -61,6 +61,8 @@ public:
    virtual void SetDarkModeActive(const bool oq_Value) override;
    void SetDarkModeInitialized(void);
 
+   void UpdateBoundaries(void) const;
+
    //lint -e{1735} Suppression, because default parameters are identical
    virtual void CopyFromManagerToScene(const QPointF * const opc_Pos = NULL) override;
    virtual void UpdateTransform(const QTransform & orc_Transform) override;

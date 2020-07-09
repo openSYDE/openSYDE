@@ -388,12 +388,12 @@ void C_OSCNodeCommFiler::h_SaveNodeComMessageContainer(const C_OSCCanMessageCont
 {
    orc_XMLParser.SetAttributeBool("com-protocol-usage-flag",
                                   orc_NodeComMessageContainer.q_IsComProtocolUsedByInterface);
-   //TX messages
+   //Tx messages
    orc_XMLParser.CreateAndSelectNodeChild("tx-messages");
    h_SaveNodeComMessages(orc_NodeComMessageContainer.c_TxMessages, orc_XMLParser);
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-container");
-   //RX messages
+   //Rx messages
    orc_XMLParser.CreateAndSelectNodeChild("rx-messages");
    h_SaveNodeComMessages(orc_NodeComMessageContainer.c_RxMessages, orc_XMLParser);
    //Return

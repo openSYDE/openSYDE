@@ -44,6 +44,8 @@ public:
 
    void AddBitmaskItem(const C_OSCHalcDefContentBitmaskItem & orc_Value);
    const std::vector<C_OSCHalcDefContentBitmaskItem> & GetBitmaskItems(void) const;
+   stw_types::sint32 GetBitmask(const stw_scl::C_SCLString & orc_DisplayName, bool & orq_Value) const;
+   stw_types::sint32 SetBitmask(const stw_scl::C_SCLString & orc_DisplayName, const bool oq_Value);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 

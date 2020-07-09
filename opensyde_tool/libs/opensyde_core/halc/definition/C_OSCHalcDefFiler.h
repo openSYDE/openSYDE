@@ -27,6 +27,11 @@ public:
    static stw_types::sint32 h_LoadData(C_OSCHalcDefBase & orc_IOData, C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 h_SaveData(const C_OSCHalcDefBase & orc_IOData, C_OSCXMLParserBase & orc_XMLParser);
 
+   static stw_types::sint32 h_LoadAvailability(const stw_scl::C_SCLString & orc_AvailabilityString,
+                                               std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability,
+                                               const stw_types::uint32 ou32_NumChannels);
+   static stw_types::sint32 h_CheckUseCaseValue(const C_OSCHalcDefDomain & orc_IODataDomain);
+
 private:
    static const stw_types::uint16 hu16_FILE_VERSION_1 = 1U;
 
@@ -37,19 +42,19 @@ private:
                                             C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDomain,
                                                 C_OSCXMLParserBase & orc_XMLParser);
-   static stw_types::sint32 mh_LoadChannels(std::vector<stw_scl::C_SCLString> & orc_Channels,
+   static stw_types::sint32 mh_CheckIODataDomain(const C_OSCHalcDefDomain & orc_IODataDomain);
+   static stw_types::sint32 mh_CheckDefaultUseCase(const C_OSCHalcDefDomain & orc_IODataDomain);
+   static stw_types::sint32 mh_LoadChannels(std::vector<C_OSCHalcDefChannelDef> & orc_Channels,
                                             C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadChannelUseCases(std::vector<C_OSCHalcDefChannelUseCase> & orc_ChannelUsecases,
                                                    C_OSCXMLParserBase & orc_XMLParser,
                                                    const stw_types::uint32 ou32_NumChannels);
-   static stw_types::sint32 mh_LoadAvailability(const stw_scl::C_SCLString & orc_AvailabilityString,
-                                                std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability,
-                                                const stw_types::uint32 ou32_NumChannels);
    static stw_types::sint32 mh_SplitAvailabilityString(const stw_scl::C_SCLString & orc_AvailabilityString,
                                                        std::vector<stw_scl::C_SCLString> & orc_SubElements);
    static stw_types::sint32 mh_ParseAvailabilityStringSubElements(
       const std::vector<stw_scl::C_SCLString> & orc_SubElements,
       std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability, const stw_types::uint32 ou32_NumChannels);
+   static stw_types::sint32 mh_CheckAvailability(const std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability);
    static stw_types::sint32 mh_ConvertStringToNumber(const stw_scl::C_SCLString & orc_Number,
                                                      stw_types::sintn & orsn_Number);
    static stw_types::sint32 mh_HandleNumberSection(stw_scl::C_SCLString & orc_Number,

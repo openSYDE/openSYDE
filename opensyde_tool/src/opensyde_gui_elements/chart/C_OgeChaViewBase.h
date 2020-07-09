@@ -39,7 +39,7 @@ public:
       eSETTING_ZM_Y
    };
 
-   C_OgeChaViewBase(QtCharts::QChart * const opc_Chart, QWidget * const opc_Parent = NULL);
+   C_OgeChaViewBase(QtCharts::QChart * const opc_Chart = NULL, QWidget * const opc_Parent = NULL);
 
    void SetDrawingActive(const bool oq_Active);
    void SetZoomMode(const E_SettingZoomMode oe_ZoomMode);

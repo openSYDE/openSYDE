@@ -10,8 +10,9 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "CSCLString.h"
+#include "C_OSCHalcDefChannelDef.h"
+#include "C_OSCHalcDefChannelValues.h"
 #include "C_OSCHalcDefChannelUseCase.h"
-#include "C_OSCHalcDefStruct.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -39,12 +40,11 @@ public:
    stw_scl::C_SCLString c_Id;                                 ///< Unique ID for later reference of this domain
    stw_scl::C_SCLString c_Name;                               ///< Displayable plural name of domain
    stw_scl::C_SCLString c_SingularName;                       ///< Displayable singular name of domain
-   std::vector<stw_scl::C_SCLString> c_Channels;              ///< All available channels for this domain
+   stw_scl::C_SCLString c_Comment;                            ///< Description to display to user
+   std::vector<C_OSCHalcDefChannelDef> c_Channels;            ///< All available channels for this domain
    std::vector<C_OSCHalcDefChannelUseCase> c_ChannelUseCases; ///< All available channel use-cases for this domain
-   std::vector<C_OSCHalcDefStruct> c_Parameters;              ///< All available parameters for this domain
-   std::vector<C_OSCHalcDefStruct> c_InputValues;             ///< All available inputs for this domain
-   std::vector<C_OSCHalcDefStruct> c_OutputValues;            ///< All available outputs for this domain
-   std::vector<C_OSCHalcDefStruct> c_StatusValues;            ///< All available status values for this domain
+   C_OSCHalcDefChannelValues c_DomainValues;                  ///< All available values for the domain
+   C_OSCHalcDefChannelValues c_ChannelValues;                 ///< All available values for each channel
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

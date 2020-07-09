@@ -907,7 +907,7 @@ stw_types::sint32 C_PuiBsElementsFiler::mh_LoadLineArrow(C_PuiBsLineArrow & orc_
    orc_XMLParser.SelectNodeParent(); //back to line-arrow
    if (orc_XMLParser.SelectNodeChild("start-arrow-head-type") == "start-arrow-head-type")
    {
-      orc_LineArrow.e_StartArrowHeadType = C_PuiBsLineArrow::ArrowHeadTypeFromString(orc_XMLParser.GetNodeContent());
+      orc_LineArrow.e_StartArrowHeadType = C_PuiBsLineArrow::h_ArrowHeadTypeFromString(orc_XMLParser.GetNodeContent());
    }
    else
    {
@@ -916,7 +916,7 @@ stw_types::sint32 C_PuiBsElementsFiler::mh_LoadLineArrow(C_PuiBsLineArrow & orc_
    orc_XMLParser.SelectNodeParent(); //back to line-arrow
    if (orc_XMLParser.SelectNodeChild("end-arrow-head-type") == "end-arrow-head-type")
    {
-      orc_LineArrow.e_EndArrowHeadType = C_PuiBsLineArrow::ArrowHeadTypeFromString(orc_XMLParser.GetNodeContent());
+      orc_LineArrow.e_EndArrowHeadType = C_PuiBsLineArrow::h_ArrowHeadTypeFromString(orc_XMLParser.GetNodeContent());
    }
    else
    {
@@ -925,7 +925,7 @@ stw_types::sint32 C_PuiBsElementsFiler::mh_LoadLineArrow(C_PuiBsLineArrow & orc_
    orc_XMLParser.SelectNodeParent(); //back to line-arrow
    if (orc_XMLParser.SelectNodeChild("line-type") == "line-type")
    {
-      orc_LineArrow.e_LineType = C_PuiBsLineArrow::LineTypeFromString(orc_XMLParser.GetNodeContent());
+      orc_LineArrow.e_LineType = C_PuiBsLineArrow::h_LineTypeFromString(orc_XMLParser.GetNodeContent());
    }
    else
    {
@@ -958,13 +958,13 @@ void C_PuiBsElementsFiler::mh_SaveLineArrow(const C_PuiBsLineArrow & orc_LineArr
    h_SaveLineBase(orc_LineArrow, orc_XMLParser);
    orc_XMLParser.SelectNodeParent(); //back to "image"
    orc_XMLParser.CreateAndSelectNodeChild("start-arrow-head-type");
-   orc_XMLParser.SetNodeContent(C_PuiBsLineArrow::ArrowHeadTypeToString(orc_LineArrow.e_StartArrowHeadType));
+   orc_XMLParser.SetNodeContent(C_PuiBsLineArrow::h_ArrowHeadTypeToString(orc_LineArrow.e_StartArrowHeadType));
    orc_XMLParser.SelectNodeParent(); //back to "image"
    orc_XMLParser.CreateAndSelectNodeChild("end-arrow-head-type");
-   orc_XMLParser.SetNodeContent(C_PuiBsLineArrow::ArrowHeadTypeToString(orc_LineArrow.e_EndArrowHeadType));
+   orc_XMLParser.SetNodeContent(C_PuiBsLineArrow::h_ArrowHeadTypeToString(orc_LineArrow.e_EndArrowHeadType));
    orc_XMLParser.SelectNodeParent(); //back to "image"
    orc_XMLParser.CreateAndSelectNodeChild("line-type");
-   orc_XMLParser.SetNodeContent(C_PuiBsLineArrow::LineTypeToString(orc_LineArrow.e_LineType));
+   orc_XMLParser.SetNodeContent(C_PuiBsLineArrow::h_LineTypeToString(orc_LineArrow.e_LineType));
    orc_XMLParser.SelectNodeParent(); //back to "image"
    orc_XMLParser.CreateAndSelectNodeChild("dark-color");
    h_SaveColor(orc_LineArrow.c_UIColorDark, orc_XMLParser);

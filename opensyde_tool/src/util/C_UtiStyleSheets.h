@@ -28,7 +28,6 @@ class C_UtiStyleSheets
 {
 public:
    static QString h_GetStylesheet(void);
-   static QString h_ToStyledHtml(const QString & orc_Html);
 
    static QColor h_GetStyleSheetColor(const QString & orc_Style);
    static void h_SetStyleSheetBackgroundColor(QString & orc_Style, const QColor & orc_Color);

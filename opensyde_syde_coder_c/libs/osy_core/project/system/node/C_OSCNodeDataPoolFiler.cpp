@@ -116,7 +116,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPo
    orc_NodeDataPool.q_IsSafety = orc_XMLParser.GetAttributeBool("is-safety");
    if (orc_XMLParser.AttributeExists("scope-is-private") == true)
    {
-      orc_NodeDataPool.q_ScopeIsPrivate = orc_XMLParser.GetAttributeSint32("scope-is-private");
+      orc_NodeDataPool.q_ScopeIsPrivate = orc_XMLParser.GetAttributeBool("scope-is-private");
    }
    else
    {
@@ -893,6 +893,9 @@ C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::
    case C_OSCNodeDataPool::eNVM:
       c_Retval = "nvm";
       break;
+   case C_OSCNodeDataPool::eHALC:
+      c_Retval = "halc";
+      break;
    default:
       c_Retval = "invalid";
       break;
@@ -926,6 +929,10 @@ sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String
    else if (orc_String == "diag")
    {
       ore_Type = C_OSCNodeDataPool::eDIAG;
+   }
+   else if (orc_String == "halc")
+   {
+      ore_Type = C_OSCNodeDataPool::eHALC;
    }
    else
    {

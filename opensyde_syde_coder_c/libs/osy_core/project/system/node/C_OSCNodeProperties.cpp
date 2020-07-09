@@ -64,6 +64,7 @@ void C_OSCNodeProperties::Initialize(void)
    c_ComInterfaces.resize(0);
    c_OpenSYDEServerSettings.Initialize();
    c_STWFlashloaderSettings.Initialize();
+   c_CodeExportSettings.Initialize();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,6 +92,7 @@ void C_OSCNodeProperties::CalcHash(uint32 & oru32_HashValue) const
 
    this->c_OpenSYDEServerSettings.CalcHash(oru32_HashValue);
    this->c_STWFlashloaderSettings.CalcHash(oru32_HashValue);
+   this->c_CodeExportSettings.CalcHash(oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

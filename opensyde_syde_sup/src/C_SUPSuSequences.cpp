@@ -290,7 +290,9 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
    case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
-   case C_OSCSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
+   case C_OSCSuSequences::eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
+   case C_OSCSuSequences::eRESET_SYSTEM_OSY_BROADCAST_ERROR:
+   case C_OSCSuSequences::eRESET_SYSTEM_XFL_BROADCAST_ERROR:
       q_Return = true;
       break;
    default:
@@ -591,8 +593,14 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eRESET_SYSTEM_START:
       c_Text = "Reset System - Start";
       break;
-   case eRESET_SYSTEM_OSY_NODE_ERROR:
-      c_Text = "Reset System - Node error";
+   case eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
+      c_Text = "Reset System - Routed node error";
+      break;
+   case eRESET_SYSTEM_OSY_BROADCAST_ERROR:
+      c_Text = "Reset System - openSYDE nodes error";
+      break;
+   case eRESET_SYSTEM_XFL_BROADCAST_ERROR:
+      c_Text = "Reset System - STW Flashloader nodes error";
       break;
    case eRESET_SYSTEM_FINISHED:
       c_Text = "Reset System - Finished";

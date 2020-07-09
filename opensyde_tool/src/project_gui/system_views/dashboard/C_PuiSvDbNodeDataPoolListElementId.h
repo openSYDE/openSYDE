@@ -68,10 +68,8 @@ public:
 
    stw_types::uint32 GetArrayElementIndex(void) const;
    stw_types::uint32 GetArrayElementIndexOrZero(void) const;
-   void SetArrayElementIndex(const stw_types::uint32 ou32_Value);
 
    bool GetUseArrayElementIndex(void) const;
-   void SetUseArrayElementIndex(const bool oq_Value);
 
 private:
    E_Type me_Type;

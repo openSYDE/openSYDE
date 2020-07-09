@@ -16,7 +16,7 @@
 
 #include "stwtypes.h"
 #include "stwerrors.h"
-#include "constants.h"
+#include "C_OSCLoggingHandler.h"
 #include "TGLUtils.h"
 #include "C_SdNdeUnoDataPoolListDataChangeCommand.h"
 #include "C_PuiSdHandler.h"
@@ -96,15 +96,12 @@ void C_SdNdeUnoDataPoolListDataChangeCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListDataChangeCommand::m_Change(QVariant & orc_PreviousData, const QVariant & orc_NewData)
 {
-   QElapsedTimer c_Timer;
+   const uint16 u16_TimerId = osc_write_log_performance_start();
+
    const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex,
       this->mu32_DataPoolListIndex);
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
    if (pc_List != NULL)
    {
       //Save previous
@@ -148,10 +145,7 @@ void C_SdNdeUnoDataPoolListDataChangeCommand::m_Change(QVariant & orc_PreviousDa
       }
    }
 
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Any list change " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+   osc_write_log_performance_stop(u16_TimerId, "Any change of list");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

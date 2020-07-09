@@ -51,40 +51,6 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if indices connected
-
-   \param[in]  orc_Items   Indices to connect
-
-   \return
-   true  Indices connected
-   false Indices not connected
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpUtil::h_CheckConnected(const std::vector<uint32> & orc_Items)
-{
-   bool q_Retval = true;
-
-   //Convert & sort
-   const std::vector<uint32> c_Items = C_Uti::h_UniquifyAndSortAscending(orc_Items);
-
-   //Check connected
-   if (c_Items.size() > 0)
-   {
-      const uint32 u32_Start = c_Items[0];
-
-      for (uint32 u32_It = 1; u32_It < c_Items.size(); ++u32_It)
-      {
-         if (c_Items[u32_It] != (u32_Start + u32_It))
-         {
-            q_Retval = false;
-            break;
-         }
-      }
-   }
-   return q_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert item selection to std vector
 
    \param[in]  orc_Items   Item selection
@@ -796,54 +762,6 @@ void C_SdNdeDpUtil::h_DrawTableBackgroundGeneric(QPainter * const opc_Painter, c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Draw selected table cell
-
-   \param[in,out]  opc_Painter      Active painter
-   \param[in]      orc_Option       Active option(s)
-   \param[in]      orc_Index        Active index
-   \param[in]      opc_TableModel   Active table model
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpUtil::h_DrawTableSelected(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
-                                        const QModelIndex & orc_Index, const QAbstractTableModel * const opc_TableModel)
-{
-   if (opc_Painter != NULL)
-   {
-      //Draw background
-      C_SdNdeDpUtil::h_DrawTableBackground(opc_Painter, orc_Option, false);
-      if (opc_TableModel != NULL)
-      {
-         QTextOption c_Option;
-         //Somehow these values seem to fit
-         QRect c_Target = orc_Option.rect.adjusted(4, 1, -4, -1);
-         const QFont c_Font =
-            qvariant_cast<QFont>(opc_TableModel->data(orc_Index, static_cast<sintn>(Qt::FontRole)));
-         QColor c_Color =
-            qvariant_cast<QColor>(opc_TableModel->data(orc_Index, static_cast<sintn>(Qt::ForegroundRole)));
-         c_Option.setAlignment(
-            Qt::Alignment(opc_TableModel->data(orc_Index, static_cast<sintn>(Qt::TextAlignmentRole)).toInt()));
-         QString c_Text = opc_TableModel->data(orc_Index, static_cast<sintn>(Qt::DisplayRole)).toString();
-         const QFontMetrics c_FontMetrics(c_Font);
-         //Configure text length
-         c_Text = C_Uti::h_AdaptStringToSize(c_Text, c_FontMetrics,
-                                             static_cast<float64>(c_Target.width()));
-         //Special color handling
-         if (c_Color == mc_STYLE_GUIDE_COLOR_10)
-         {
-            c_Color = mc_STYLE_GUIDE_COLOR_11;
-         }
-         //Style label
-         //Draw foreground
-         opc_Painter->save();
-         opc_Painter->setPen(QPen(c_Color));
-         opc_Painter->setFont(c_Font);
-         opc_Painter->drawText(c_Target, c_Text, c_Option);
-         opc_Painter->restore();
-      }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility function to compare one item of two content types
 
    \param[in]  orc_Content1   Content 1
@@ -994,10 +912,10 @@ sint32 C_SdNdeDpUtil::h_GetTableSize(const uint32 ou32_NodeIndex, const uint32 o
    C_RANGE     ou32_SharedDatapoolGroup is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeDpUtil::GetSharedDatapoolGroup(const uint32 ou32_SharedDatapoolGroup,
-                                             const C_OSCNodeDataPoolId & orc_BaseDatapoolId,
-                                             const uint32 ou32_NodeIndex,
-                                             std::vector<QString> & orc_SharedDatapoolNameGroup)
+sint32 C_SdNdeDpUtil::h_GetSharedDatapoolGroup(const uint32 ou32_SharedDatapoolGroup,
+                                               const C_OSCNodeDataPoolId & orc_BaseDatapoolId,
+                                               const uint32 ou32_NodeIndex,
+                                               std::vector<QString> & orc_SharedDatapoolNameGroup)
 {
    sint32 s32_Return = C_RANGE;
    const C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapoolsConst();

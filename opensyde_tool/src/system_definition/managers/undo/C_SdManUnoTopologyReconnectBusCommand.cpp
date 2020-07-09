@@ -15,6 +15,7 @@
 #include "stwtypes.h"
 #include "C_SdManUnoTopologyReconnectBusCommand.h"
 #include "C_GiLiBus.h"
+#include "C_SdUtil.h"
 #include "C_PuiSdHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -38,14 +39,17 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in,out] opc_Scene            Pointer to currently active scene
-   \param[in]     orc_IDs              Affected unique IDs
-   \param[in]     oru64_StartingNodeID Initial bus ID
-   \param[in]     oru64_LastNodeID     New bus ID
-   \param[in]     orc_ConnectionPos    Event position
-   \param[in]     ors32_Interface      Interface to connect to
-   \param[in]     oru8_NodeId          New node id
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in,out]  opc_Scene                 Pointer to currently active scene
+   \param[in]      orc_IDs                   Affected unique IDs
+   \param[in]      oru64_StartingNodeID      Initial bus ID
+   \param[in]      oru64_LastNodeID          New bus ID
+   \param[in]      orc_ConnectionPos         Event position
+   \param[in]      ors32_Interface           Interface to connect to
+   \param[in]      oru8_NodeId               New node id
+   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
+   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
+   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
+   \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyReconnectBusCommand::C_SdManUnoTopologyReconnectBusCommand(QGraphicsScene * const opc_Scene,
@@ -55,9 +59,13 @@ C_SdManUnoTopologyReconnectBusCommand::C_SdManUnoTopologyReconnectBusCommand(QGr
                                                                              const QPointF & orc_ConnectionPos,
                                                                              const stw_types::sint32 & ors32_Interface,
                                                                              const uint8 & oru8_NodeId,
+                                                                             const bool oq_ActivateDatapoolL2,
+                                                                             const bool oq_ActivateDatapoolECeS,
+                                                                             const bool oq_ActivateDatapoolECoS,
                                                                              QUndoCommand * const opc_Parent) :
    C_SdManUnoTopologyReconnectBaseCommand(opc_Scene, orc_IDs, oru64_StartingNodeID, oru64_LastNodeID, orc_ConnectionPos,
-                                          ors32_Interface, oru8_NodeId, "Reconnect bus connetor(s) to new bus",
+                                          ors32_Interface, oru8_NodeId, oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
+                                          oq_ActivateDatapoolECoS, "Reconnect bus connetor(s) to new bus",
                                           opc_Parent)
 {
    C_GiLiBusConnector * pc_BusConnector = m_GetBusConnector();
@@ -104,14 +112,20 @@ C_SdManUnoTopologyReconnectBusCommand::~C_SdManUnoTopologyReconnectBusCommand(vo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reconnect from specified bus to specified bus using specified interface
 
-   \param[in] oru64_StartingID ID of initial bus
-   \param[in] oru64_LastID     ID of new bus
-   \param[in] ors32_Interface  Interface number to use
-   \param[in] oru8_NodeId      New node id
+   \param[in]  oru64_StartingID           ID of initial bus
+   \param[in]  oru64_LastID               ID of new bus
+   \param[in]  ors32_Interface            Interface number to use
+   \param[in]  oru8_NodeId                New node id
+   \param[in]  oq_ActivateDatapoolL2      Activate datapool L2
+   \param[in]  oq_ActivateDatapoolECeS    Activate datapool ECeS
+   \param[in]  oq_ActivateDatapoolECoS    Activate datapool ECoS
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyReconnectBusCommand::m_Reconnect(const uint64 & oru64_StartingID, const uint64 & oru64_LastID,
-                                                        const sint32 & ors32_Interface, const uint8 & oru8_NodeId)
+                                                        const sint32 & ors32_Interface, const uint8 & oru8_NodeId,
+                                                        const bool oq_ActivateDatapoolL2,
+                                                        const bool oq_ActivateDatapoolECeS,
+                                                        const bool oq_ActivateDatapoolECoS)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    C_GiLiBus * pc_StartingBus = dynamic_cast<C_GiLiBus *>(m_GetSceneItem(oru64_StartingID));
@@ -122,5 +136,12 @@ void C_SdManUnoTopologyReconnectBusCommand::m_Reconnect(const uint64 & oru64_Sta
    if (pc_BusConnector != NULL)
    {
       pc_BusConnector->Reconnect(pc_StartingBus, pc_LastBus, this->mc_ConnectionPos, ors32_Interface, oru8_NodeId);
+      if ((pc_BusConnector->GetNodeItem() != NULL) && (pc_BusConnector->GetNodeItem()->GetIndex() >= 0L))
+      {
+         C_SdUtil::h_ConfigureComDatapools(
+            static_cast<uint32>(pc_BusConnector->GetNodeItem()->GetIndex()), static_cast<uint8>(ors32_Interface),
+            oq_ActivateDatapoolL2, oq_ActivateDatapoolECeS,
+            oq_ActivateDatapoolECoS);
+      }
    }
 }

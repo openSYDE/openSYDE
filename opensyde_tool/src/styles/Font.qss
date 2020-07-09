@@ -11,7 +11,8 @@
 
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_10 */
-stw_opensyde_gui_elements--C_OgeLabUpdateAppPath
+stw_opensyde_gui_elements--C_OgeLabUpdateAppPath,
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="10"][SemiBold="false"][Bold="false"]
 {
 font-family: "Segoe UI";
 font-size: 10px;
@@ -32,7 +33,8 @@ stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView,
 stw_opensyde_gui_elements--C_OgeLabStatusInformationSmall,
 stw_opensyde_gui_elements--C_OgeLabGroupSubItem,
 stw_opensyde_gui--C_SdTopologyListWidget,
-stw_opensyde_gui_elements--C_OgeLabProgressLogItem
+stw_opensyde_gui_elements--C_OgeLabProgressLogItem,
+stw_opensyde_gui_elements--C_OgeLabTopologyToolboxUserNodes
 {
 font-family: "Segoe UI";
 font-size: 11px;
@@ -108,6 +110,7 @@ stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeTedPropertiesComment,
 stw_opensyde_gui_elements--C_OgeTebReport,
 stw_opensyde_gui--C_TblTreDataElementView,
+stw_opensyde_gui--C_SdNdeHalcConfigImportView,
 stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget,
 stw_opensyde_gui_elements--C_OgeChxDefaultSmall,
 stw_opensyde_gui_elements--C_OgeLeProperties,
@@ -121,7 +124,9 @@ stw_opensyde_gui_elements--C_OgeMuSections QLabel,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="13"][SemiBold="false"][Bold="false"],
 stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroup,
 stw_opensyde_gui_elements--C_OgeTawToolBox QTabBar::tab,
-stw_opensyde_gui_elements--C_OgeLabProgressLogHeading
+stw_opensyde_gui_elements--C_OgeLabProgressLogHeading,
+stw_opensyde_gui_elements--C_OgeCbxMultiSelect,
+stw_opensyde_gui_elements--C_OgeCbxMultiSelect QListWidget
 {
 font-family: "Segoe UI";
 font-size: 13px;

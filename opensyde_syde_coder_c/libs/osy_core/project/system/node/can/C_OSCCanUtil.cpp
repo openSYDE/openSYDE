@@ -41,8 +41,8 @@ C_OSCCanUtil::C_OSCCanUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Checks if signal fits into a CAN message with a specific DLC
 
-   \param[in] ou8_Dlc    Length of CAN message
-   \param[in] orc_Signal Signal for checking
+   \param[in]  ou8_Dlc     Length of CAN message
+   \param[in]  orc_Signal  Signal for checking
 
    \return
    true     Signal fits into message
@@ -68,10 +68,10 @@ bool C_OSCCanUtil::h_IsSignalInMessage(const uint8 ou8_Dlc, const C_OSCCanSignal
 
    Signals will be converted to little endian (Intel)
 
-   \param[in]     orau8_CanDb       Data bytes of CAN message
-   \param[in]     orc_Signal        Signal configuration used for extraction
-   \param[in,out] orc_DataPoolData  Data with extracted value (Size must be already set)
-   \param[in]     oe_ContentType    Content type
+   \param[in]      orau8_CanDb         Data bytes of CAN message
+   \param[in]      orc_Signal          Signal configuration used for extraction
+   \param[in,out]  orc_DataPoolData    Data with extracted value (Size must be already set)
+   \param[in]      oe_ContentType      Content type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanUtil::h_GetSignalValue(const uint8 (&orau8_CanDb)[8], const C_OSCCanSignal & orc_Signal,
@@ -187,17 +187,18 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8 (&orau8_CanDb)[8], const C_OSCCa
       {
          // The byte of the signal in the Datapool data which has the bit for the signed value
          // It is not always the same as the byte length of the signal
-         const uint16 u16_SignedBitByte = C_OSCNodeDataPoolContentUtil::h_GetDataTypeSizeInByte(oe_ContentType) - 1U;
+         const uint16 u16_SignedBitByte =
+            static_cast<uint16>(C_OSCNodeDataPoolContentUtil::h_GetDataTypeSizeInByte(oe_ContentType) - 1UL);
          // The signed bit mask for the signal based on the concrete size of the signal
-         const uint16 u16_SignedBitMask = static_cast<uint16>(0x01U << (u16_LengthBitOffset - 1U));
+         const uint8 u8_SignedBitMask = static_cast<uint8>(0x01UL << (u16_LengthBitOffset - 1UL));
 
          // Check the type and its length and where the signed bit of the native type has to be
 
          // Check if it is a negative value
-         if ((orc_DataPoolData[u16_IndexLastByte] & u16_SignedBitMask) == u16_SignedBitMask)
+         if ((orc_DataPoolData[u16_IndexLastByte] & u8_SignedBitMask) == u8_SignedBitMask)
          {
             // Remove the signed bit of the signal based on the length of the message payload signal size
-            orc_DataPoolData[u16_IndexLastByte] ^= u16_SignedBitMask;
+            orc_DataPoolData[u16_IndexLastByte] ^= u8_SignedBitMask;
 
             // Add it on last signal bit position of the native type
             orc_DataPoolData[u16_SignedBitByte] |= 0x80U;
@@ -209,9 +210,9 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8 (&orau8_CanDb)[8], const C_OSCCa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Gets value for signal out of CAN message data bytes
 
-   \param[in]     orau8_CanDb    Data bytes of CAN message
-   \param[in]     orc_Signal     Signal configuration used for extraction
-   \param[in,out] orc_Value      Extracted value and source for size of value
+   \param[in]      orau8_CanDb   Data bytes of CAN message
+   \param[in]      orc_Signal    Signal configuration used for extraction
+   \param[in,out]  orc_Value     Extracted value and source for size of value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanUtil::h_GetSignalValue(const uint8 (&orau8_CanDb)[8], const C_OSCCanSignal & orc_Signal,
@@ -231,9 +232,9 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8 (&orau8_CanDb)[8], const C_OSCCa
 
    copied from: module: comm_stack/osy_com_utils.c function: m_fill_message_payload_from_data_pool_data
 
-   \param[in,out] orau8_CanDb Current data bytes of CAN message
-   \param[in]     orc_Signal  Current signal
-   \param[in]     orc_Value   Data from data pool to write into the message
+   \param[in,out]  orau8_CanDb   Current data bytes of CAN message
+   \param[in]      orc_Signal    Current signal
+   \param[in]      orc_Value     Data from data pool to write into the message
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanUtil::h_SetSignalValue(uint8 (&orau8_CanDb)[8], const C_OSCCanSignal & orc_Signal,
@@ -252,11 +253,8 @@ void C_OSCCanUtil::h_SetSignalValue(uint8 (&orau8_CanDb)[8], const C_OSCCanSigna
    {
       // Round up
       ++u8_LengthByte;
-   }
 
-   // Handle a signal with not standard length first
-   if (u8_LengthBitOffset != 0U)
-   {
+      // Handle a signal with not standard length first
       // The byte of the signal in the Datapool data which has the bit for the signed value
       // It is not always the same as the byte length of the signal
       const uint16 u16_LastDataTypeByte =

@@ -574,17 +574,17 @@ void C_SyvHandlerWidget::CallHelp(void)
    //get sub mode
    if (this->ms32_SubMode == ms32_SUBMODE_SYSVIEW_SETUP)
    {
-      stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
          "stw_opensyde_gui::C_SyvSeSetupWidget");
    }
    else if (this->ms32_SubMode == ms32_SUBMODE_SYSVIEW_UPDATE)
    {
-      stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
          "stw_opensyde_gui::C_SyvUpUpdateWidget");
    }
    else if (this->ms32_SubMode == ms32_SUBMODE_SYSVIEW_DASHBOARD)
    {
-      stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
          "stw_opensyde_gui::C_SyvDaDashboardsWidget");
    }
 }

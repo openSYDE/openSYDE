@@ -90,6 +90,7 @@ private:
    bool mq_UpdateFailed;
    bool mq_UpdateSuccess;
    bool mq_ValidStatus;
+   bool mq_Discarded;
    stw_types::uint32 mu32_FailedApplicationIndex;
    std::vector<stw_diag_lib::C_XFLECUInformation> mc_HexFileInfos;
    std::vector<QString> mc_ParamFileInfos;

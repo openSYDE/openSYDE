@@ -71,6 +71,7 @@ void C_TGLCriticalSection::Acquire(void)
 bool C_TGLCriticalSection::TryAcquire(void)
 {
    bool q_Return;
+
    q_Return = (TryEnterCriticalSection(&mt_CriticalSection) == 0) ? false : true;
    return q_Return;
 }
@@ -101,7 +102,7 @@ C_TGLTimer::C_TGLTimer(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-C_TGLTimer::C_TGLTimer(const PR_TGLTimer_Event opr_Callback, void * const opv_Instance, const uint32 ou32_Interval,
+C_TGLTimer::C_TGLTimer(const PR_TGLTimerEvent opr_Callback, void * const opv_Instance, const uint32 ou32_Interval,
                        const bool oq_Enabled)
 {
    mpr_Callback         = opr_Callback;
@@ -122,7 +123,7 @@ C_TGLTimer::~C_TGLTimer(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_TGLTimer::SetEventCallback(const PR_TGLTimer_Event opr_Callback, void * const opv_Instance)
+void C_TGLTimer::SetEventCallback(const PR_TGLTimerEvent opr_Callback, void * const opv_Instance)
 {
    mpr_Callback         = opr_Callback;
    mpv_CallbackInstance = opv_Instance;
@@ -139,8 +140,8 @@ void C_TGLTimer::SetInterval(const stw_types::uint32 ou32_Interval)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void __stdcall C_TGLTimer::m_TimerCallback(HWND opv_Hwnd, const stw_types::uintn oun_Msg,
-                                           const UINT_PTR oun_TimerHandle, const stw_types::uint32 ou32_Time)
+void __stdcall C_TGLTimer::mh_TimerCallback(HWND opv_Hwnd, const UINT oun_Msg, const UINT_PTR oun_TimerHandle,
+                                            const DWORD ou32_Time)
 {
    sint32 s32_Index;
 
@@ -192,7 +193,7 @@ void C_TGLTimer::m_UpdateTimer(void)
    m_KillTimer();
    if ((u32_Interval != 0U) && (mq_Enabled == true) && (mpr_Callback != NULL))
    {
-      mun_TimerHandle = SetTimer(NULL, 0U, u32_Interval, &C_TGLTimer::m_TimerCallback);
+      mun_TimerHandle = SetTimer(NULL, 0U, u32_Interval, &C_TGLTimer::mh_TimerCallback);
       if (mun_TimerHandle == 0)
       {
          throw "C_TGLTimer: SetTimer failed. Out of resources ?";

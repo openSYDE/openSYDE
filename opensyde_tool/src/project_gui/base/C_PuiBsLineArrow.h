@@ -57,10 +57,10 @@ public:
    E_ArrowHeadType e_EndArrowHeadType;
    E_LineType e_LineType;
 
-   static stw_scl::C_SCLString ArrowHeadTypeToString(const E_ArrowHeadType & ore_Type);
-   static stw_scl::C_SCLString LineTypeToString(const E_LineType & ore_Type);
-   static E_ArrowHeadType ArrowHeadTypeFromString(const stw_scl::C_SCLString & orc_Str);
-   static E_LineType LineTypeFromString(const stw_scl::C_SCLString & orc_Str);
+   static stw_scl::C_SCLString h_ArrowHeadTypeToString(const E_ArrowHeadType & ore_Type);
+   static stw_scl::C_SCLString h_LineTypeToString(const E_LineType & ore_Type);
+   static E_ArrowHeadType h_ArrowHeadTypeFromString(const stw_scl::C_SCLString & orc_Str);
+   static E_LineType h_LineTypeFromString(const stw_scl::C_SCLString & orc_Str);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

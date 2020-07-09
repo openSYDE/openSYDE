@@ -26,7 +26,7 @@ class C_SyvTopologyBaseScene :
    public C_SebTopologyBaseScene
 {
 public:
-   C_SyvTopologyBaseScene(const stw_types::uint32 ou32_ViewIndex, QObject * const opc_Parent = NULL);
+   C_SyvTopologyBaseScene(const stw_types::uint32 ou32_ViewIndex = 0, QObject * const opc_Parent = NULL);
    virtual ~C_SyvTopologyBaseScene();
 
    virtual void Load(void);

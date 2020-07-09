@@ -27,6 +27,7 @@ public:
                                         const bool oq_StwFlashloader, QWidget * const opc_Parent = NULL);
 
    virtual bool IsViewFileInfoPossible(void) const override;
+   virtual bool IsUserHintPossible(void) const override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

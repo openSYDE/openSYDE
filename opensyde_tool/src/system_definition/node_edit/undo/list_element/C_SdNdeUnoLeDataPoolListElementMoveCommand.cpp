@@ -12,11 +12,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QElapsedTimer>
-
 #include "C_Uti.h"
 #include "stwtypes.h"
-#include "constants.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_SdNdeUnoLeDataPoolListElementMoveCommand.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeUnoUtil.h"
@@ -81,21 +79,16 @@ void C_SdNdeUnoLeDataPoolListElementMoveCommand::redo(void)
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
-         std::vector<std::vector<uint32> > c_Items;
-         QElapsedTimer c_Timer;
+         const uint16 u16_TimerId = osc_write_log_performance_start();
 
-         if (mq_TIMING_OUTPUT)
-         {
-            c_Timer.start();
-         }
+         std::vector<std::vector<uint32> > c_Items;
+
          pc_Model->DoMoveRows(mc_SourceRow, mc_TargetRow);
          //Sort ascending, only done for the "source" row which is not necessary here
          c_Items = C_Uti::h_GetContiguousSectionsAscending(C_Uti::h_UniquifyAndSortAscending(mc_TargetRow));
          m_ReSelect(c_Items, false);
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "Move elements " << c_Timer.restart() << " ms" << &std::endl;
-         }
+
+         osc_write_log_performance_stop(u16_TimerId, "Move elements");
       }
    }
    C_SdNdeUnoLeDataPoolListElementBaseCommand::redo();
@@ -114,20 +107,16 @@ void C_SdNdeUnoLeDataPoolListElementMoveCommand::undo(void)
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
+         const uint16 u16_TimerId = osc_write_log_performance_start();
+
          std::vector<std::vector<uint32> > c_Items;
-         QElapsedTimer c_Timer;
-         if (mq_TIMING_OUTPUT)
-         {
-            c_Timer.start();
-         }
+
          pc_Model->DoMoveRows(mc_TargetRow, mc_SourceRow);
          //Sort ascending, only done for the "source" row which is not necessary here
          c_Items = C_Uti::h_GetContiguousSectionsAscending(C_Uti::h_UniquifyAndSortAscending(mc_SourceRow));
          m_ReSelect(c_Items, false);
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "Move elements " << c_Timer.restart() << " ms" << &std::endl;
-         }
+
+         osc_write_log_performance_stop(u16_TimerId, "Move elements");
       }
    }
 }

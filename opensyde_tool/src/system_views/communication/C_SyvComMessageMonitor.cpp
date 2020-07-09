@@ -51,6 +51,7 @@ C_SyvComMessageMonitor::C_SyvComMessageMonitor(void) :
    mu32_BusIndex(0U),
    ms32_Result(0),
    mu8_BusLoad(0U),
+   mu32_TxMessages(0U),
    mu32_TxErrors(0U)
 {
    mpc_LoadingThread = new C_SyvComDriverThread(&C_SyvComMessageMonitor::mh_ThreadFunc, this);
@@ -547,6 +548,21 @@ void C_SyvComMessageMonitor::UpdateBusLoad(const uint8 ou8_BusLoad)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for getting the current count of all Tx messages
+
+   This function is thread safe
+
+   \param[in]  ou32_TxCount  Current number of all CAN Tx messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvComMessageMonitor::UpdateTxCounter(const uint32 ou32_TxCount)
+{
+   this->mc_CriticalSectionMeta.Acquire();
+   this->mu32_TxMessages = ou32_TxCount;
+   this->mc_CriticalSectionMeta.Release();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function for getting the current count of Tx errors
 
    This function is thread safe
@@ -579,6 +595,26 @@ uint8 C_SyvComMessageMonitor::GetBusLoad(void) const
    this->mc_CriticalSectionMeta.Release();
 
    return u8_BusLoad;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the current count of Tx messages
+
+   This function is thread safe
+
+   \return
+   Current number of Tx messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SyvComMessageMonitor::GetTxCount() const
+{
+   uint32 u32_TxCount;
+
+   this->mc_CriticalSectionMeta.Acquire();
+   u32_TxCount = this->mu32_TxMessages;
+   this->mc_CriticalSectionMeta.Release();
+
+   return u32_TxCount;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

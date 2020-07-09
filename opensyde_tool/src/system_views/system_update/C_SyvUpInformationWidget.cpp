@@ -571,18 +571,8 @@ void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progr
       //Remember data rate
       if (u64_AverageDataRate != 0ULL)
       {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-         if (pc_View != NULL)
-         {
-            const uint32 u32_Checksum = pc_View->CalcSetupHash();
-            C_UsHandler::h_GetInstance()->AddProjSvUpdateDataRate(pc_View->GetName(), u32_Checksum,
-                                                                  u64_AverageDataRate);
-            C_UsHandler::h_GetInstance()->AddProjSvUpdateDataRatePerNode(
-               pc_View->GetName(), u32_Checksum,
-               this->mc_FileSizeInformation.GetBytesPerMsMapPerNode());
-            //Remember for next update steps
-            this->mu64_LastKnownDataRateS = u64_AverageDataRate;
-         }
+         //Remember for next update steps
+         this->mc_FileSizeInformation.SaveUserSettings(this->mu32_ViewIndex);
       }
    }
 }
@@ -710,10 +700,7 @@ void C_SyvUpInformationWidget::m_UpdateDataTransfer(const uint64 & oru64_Overall
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::m_UpdateLabel(void) const
 {
-   QFont c_Font("Segoe UI");
    QString c_DataRateCombined;
-
-   c_Font.setPixelSize(16);
 
    if (this->mq_ShowDataRateBytesPerSecond == true)
    {
@@ -754,17 +741,6 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
       {
          bool q_Worked;
          uint64 u64_WaitingTimeS = this->mc_FileSizeInformation.GetEstimatedTimeS(&q_Worked);
-         //Check if estimated time is valid, otherwise try alternative route
-         if (!q_Worked)
-         {
-            //Try the previous method
-            if (this->mu64_LastKnownDataRateS > 0ULL)
-            {
-               u64_WaitingTimeS = this->mc_FileSizeInformation.GetOverallFilesSize() /
-                                  this->mu64_LastKnownDataRateS;
-               q_Worked = true;
-            }
-         }
          //After all estimations were attempted check if any succeeded
          if (q_Worked)
          {
@@ -836,7 +812,7 @@ void C_SyvUpInformationWidget::m_UpdateDataRate()
          c_Unit = "GB";
          c_DataTransferRate = QString::number(f64_NumberOfFlashedBytesThisSecond / (1024.0 * 1024.0 * 1024.0), 'f', 0);
       }
-      if (u64_NumberOfFlashedBytesThisSecond > (1024ULL * 1024ULL))
+      else if (u64_NumberOfFlashedBytesThisSecond > (1024ULL * 1024ULL))
       {
          //MB
          c_Unit = "MB";
@@ -935,35 +911,17 @@ void C_SyvUpInformationWidget::m_LoadUserSettings()
       }
 
       this->mpc_Ui->pc_SplitterVert->SetSecondSegment(s32_LastSegmentWidth);
-      {
-         //Init update rate
-         const uint32 u32_Checksum = pc_View->CalcSetupHash();
-         const QMap<uint32, uint64> & rc_UpdateDataRateHistory = c_UserView.GetUpdateDataRateHistory();
-         const QMap<uint32,
-                    QMap<uint32,
-                         float64> > & rc_UpdateDataRateHistoryPerNode = c_UserView.GetUpdateDataRateHistoryPerNode();
-         const QMap<uint32, uint64>::const_iterator c_ItGlobal = rc_UpdateDataRateHistory.find(u32_Checksum);
-         const QMap<uint32, QMap<uint32, float64> >::const_iterator c_ItPerNode = rc_UpdateDataRateHistoryPerNode.find(
-            u32_Checksum);
-         if (c_ItGlobal != rc_UpdateDataRateHistory.end())
-         {
-            this->mu64_LastKnownDataRateS = c_ItGlobal.value();
-         }
-         if (c_ItPerNode != rc_UpdateDataRateHistoryPerNode.end())
-         {
-            this->mc_FileSizeInformation.SetFileSizesByteMapPerNode(c_ItPerNode.value());
-         }
 
-         if (c_UserView.GetUpdateSummaryBig() == true)
-         {
-            this->m_HideSmallUpdateSummary();
-         }
-         else
-         {
-            this->m_HideBigUpdateSummary();
-         }
+      if (c_UserView.GetUpdateSummaryBig() == true)
+      {
+         this->m_HideSmallUpdateSummary();
+      }
+      else
+      {
+         this->m_HideBigUpdateSummary();
       }
    }
+   this->mc_FileSizeInformation.LoadUserSettings(this->mu32_ViewIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

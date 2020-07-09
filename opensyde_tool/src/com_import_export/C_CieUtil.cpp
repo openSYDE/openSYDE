@@ -97,41 +97,36 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_BusIndex, const C_OSCCanProtoco
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
 
-   QFileDialog c_Dialog(opc_Parent, C_GtGetText::h_GetText(
-                           "Select COMM Interface Description File"), c_Folder, c_Filter);
-   c_Dialog.setDefaultSuffix("*.dbc");
+   const QString c_FullFilePath =
+      C_OgeWiUtil::h_GetOpenFileName(opc_Parent, C_GtGetText::h_GetText("Select COMM Interface Description File"),
+                                     c_Folder, c_Filter, "*.dbc");
 
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   // check for user abort (empty string)
+   if (c_FullFilePath != "")
    {
-      const QString c_FullFilePath = c_Dialog.selectedFiles().at(0);
-
-      // check for user abort (empty string)
-      if (c_FullFilePath != "")
+      const QFileInfo c_FileInfo(c_FullFilePath);
+      //Only use lower case suffix
+      const QString c_Extension = c_FileInfo.completeSuffix().toLower();
+      //Store new user settings value
+      C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownImportPath(c_FileInfo.absoluteDir().absolutePath());
+      if (c_Extension.contains("dbc") == true)
       {
-         const QFileInfo c_FileInfo(c_FullFilePath);
-         //Only use lower case suffix
-         const QString c_Extension = c_FileInfo.completeSuffix().toLower();
-         //Store new user settings value
-         C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownImportPath(c_FileInfo.absoluteDir().absolutePath());
-         if (c_Extension.contains("dbc") == true)
-         {
-            s32_Return = C_CieUtil::mh_ImportDBCFile(ou32_BusIndex, oe_ProtocolType, c_FullFilePath, opc_Parent,
+         s32_Return = C_CieUtil::mh_ImportDBCFile(ou32_BusIndex, oe_ProtocolType, c_FullFilePath, opc_Parent,
+                                                  orc_NodeIndexes, orc_InterfaceIndexes);
+      }
+      else if ((c_Extension.contains("eds") == true) || (c_Extension.contains("dcf") == true))
+      {
+         s32_Return = C_CieUtil::mh_ImportDCFEDSFile(ou32_BusIndex, oe_ProtocolType, c_FullFilePath, opc_Parent,
                                                      orc_NodeIndexes, orc_InterfaceIndexes);
-         }
-         else if ((c_Extension.contains("eds") == true) || (c_Extension.contains("dcf") == true))
-         {
-            s32_Return = C_CieUtil::mh_ImportDCFEDSFile(ou32_BusIndex, oe_ProtocolType, c_FullFilePath, opc_Parent,
-                                                        orc_NodeIndexes, orc_InterfaceIndexes);
-         }
-         else
-         {
-            // strange
-            C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
-            c_Message.SetHeading(C_GtGetText::h_GetText("Import from File"));
-            c_Message.SetDescription(C_GtGetText::h_GetText("File type not allowed."));
-            c_Message.SetCustomMinHeight(180, 180);
-            c_Message.Execute();
-         }
+      }
+      else
+      {
+         // strange
+         C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Import from File"));
+         c_Message.SetDescription(C_GtGetText::h_GetText("File type not allowed."));
+         c_Message.SetCustomMinHeight(180, 180);
+         c_Message.Execute();
       }
    }
 

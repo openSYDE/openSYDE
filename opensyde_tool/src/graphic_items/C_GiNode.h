@@ -65,7 +65,6 @@ public:
    virtual void UpdateData(void) override;
    void RemoveConnector(const C_GiLiBusConnector * const opc_BusConnectorGraphicsItem);
    virtual void DeleteData(void);
-   void DisconnectBus(const QString & orc_BusName);
    bool HasConnectionType(const stw_opensyde_core::C_OSCSystemBus::E_Type oe_Type) const;
    bool CheckConnectionAvailable(const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_Type) const;
    bool CheckInterfaceAvailable(const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_Type,

@@ -482,16 +482,19 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
             //we would not have gotten here if we could not get a decent dump ...
             tgl_assert(pc_HexDump != NULL);
 
-            // Save file index
-            this->mu32_CurrentFile = u32_File;
-
-            //lint -e{613}  //see assertion
-            s32_Return = m_FlashOneFileOpenSydeHex(*pc_HexDump, c_SignatureAddresses[u32_File],
-                                                   ou32_RequestDownloadTimeout, ou32_TransferDataTimeout);
-            if (s32_Return != C_NO_ERR)
+            if (pc_HexDump != NULL)
             {
-               //error report is already in subfunction
-               break;
+               // Save file index
+               this->mu32_CurrentFile = u32_File;
+
+               //lint -e{613}  //see assertion
+               s32_Return = m_FlashOneFileOpenSydeHex(*pc_HexDump, c_SignatureAddresses[u32_File],
+                                                      ou32_RequestDownloadTimeout, ou32_TransferDataTimeout);
+               if (s32_Return != C_NO_ERR)
+               {
+                  //error report is already in subfunction
+                  break;
+               }
             }
          }
       }
@@ -2098,8 +2101,6 @@ sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
                // Continue with nodes without routing
                if (s32_Return == C_NOACT)
                {
-                  s32_Return = C_NO_ERR;
-
                   if (e_ProtocolType == C_OSCNodeProperties::eFL_OPEN_SYDE)
                   {
                      //if connected via Ethernet we need to reconnect as the reset will break the active TCP
@@ -2986,13 +2987,14 @@ sint32 C_OSCSuSequences::ResetSystem(void)
       const uint32 u32_LongestRoute = this->mpc_ComDriver->GetRoutingPointMaximum();
       sint32 s32_RouteSizeCounter;
       std::set<uint32> c_XflResetSentForBus;
+      sint32 s32_ReturnBroadcast = C_NO_ERR;
 
       (void)m_ReportProgress(eRESET_SYSTEM_START, C_NO_ERR, 0U, "Resetting System ...");
 
       // Reset the system beginning with the longest route.
       // Avoiding conflicts with resetting a node, which is necessary for an other route
       for (s32_RouteSizeCounter = static_cast<sint32>(u32_LongestRoute);
-           s32_RouteSizeCounter >= 0; --s32_RouteSizeCounter)
+           s32_RouteSizeCounter > 0; --s32_RouteSizeCounter)
       {
          for (uint32 u32_Node = 0U; u32_Node < this->mpc_SystemDefinition->c_Nodes.size(); u32_Node++)
          {
@@ -3062,8 +3064,8 @@ sint32 C_OSCSuSequences::ResetSystem(void)
                      }
                      if (s32_Return != C_NO_ERR)
                      {
-                        (void)m_ReportProgress(eRESET_SYSTEM_OSY_NODE_ERROR, s32_Return, 0U, mc_CurrentNode,
-                                               "Could not reset node.");
+                        (void)m_ReportProgress(eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR, s32_Return, 0U, mc_CurrentNode,
+                                               "Could not reset routed node.");
                         s32_Return = C_COM;
                         break;
                      }
@@ -3081,6 +3083,43 @@ sint32 C_OSCSuSequences::ResetSystem(void)
                }
             }
          }
+      }
+
+      // Local bus: Sending broadcast to be consistent with activate flashloader
+      if (this->mq_OpenSydeDevicesActive == true)
+      {
+         // send openSYDE broadcast "EcuReset"
+         s32_ReturnBroadcast = this->mpc_ComDriver->SendOsyBroadcastEcuReset(
+            C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_KEY_OFF_ON);
+         if (s32_ReturnBroadcast != C_NO_ERR)
+         {
+            (void)m_ReportProgress(eRESET_SYSTEM_OSY_BROADCAST_ERROR, s32_ReturnBroadcast, 50U,
+                                   "Could not reset openSYDE nodes on local bus.");
+            s32_ReturnBroadcast = C_COM;
+         }
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         // Do not overwrite other error codes
+         s32_Return = s32_ReturnBroadcast;
+      }
+
+      if (this->mq_StwFlashloaderDevicesActiveOnLocalBus == true)
+      {
+         s32_ReturnBroadcast = this->mpc_ComDriver->SendStwNetReset();
+         if (s32_ReturnBroadcast != C_NO_ERR)
+         {
+            (void)m_ReportProgress(eRESET_SYSTEM_XFL_BROADCAST_ERROR, s32_ReturnBroadcast, 50U,
+                                   "Could not reset STW Flashloader nodes on local bus.");
+            s32_ReturnBroadcast = C_COM;
+         }
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         // Do not overwrite other error codes
+         s32_Return = s32_ReturnBroadcast;
       }
    }
 

@@ -82,9 +82,11 @@ public:
    virtual stw_types::sint32 HandleCanMessage(const stw_can::T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx) override;
    virtual void ResetCounter(void) override;
    virtual void UpdateBusLoad(const stw_types::uint8 ou8_BusLoad) override;
+   virtual void UpdateTxCounter(const stw_types::uint32 ou32_TxCount) override;
    virtual void UpdateTxErrors(const stw_types::uint32 ou32_TxErrors) override;
 
    stw_types::uint8 GetBusLoad(void) const;
+   stw_types::uint32 GetTxCount(void) const;
    stw_types::uint32 GetTxErrors(void) const;
 
    stw_types::sint32 GetResults(stw_types::sint32 & ors32_Result) const;
@@ -151,6 +153,7 @@ private:
    QList<stw_opensyde_core::C_OSCComMessageLoggerData> mc_ReceivedMessages;
 
    stw_types::uint8 mu8_BusLoad;
+   stw_types::uint32 mu32_TxMessages;
    stw_types::uint32 mu32_TxErrors;
    stw_types::uint32 mu32_FilteredMessages;
 

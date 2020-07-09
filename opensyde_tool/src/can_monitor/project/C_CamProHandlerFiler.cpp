@@ -58,6 +58,7 @@ void C_CamProHandlerFiler::h_Save(const C_CamProHandler & orc_Handler, C_OSCXMLP
 
    // messages
    orc_XMLParser.CreateAndSelectNodeChild("messages");
+   orc_XMLParser.SetAttributeBool("cyclic-active", orc_Handler.GetCyclicMessageTransmitActive());
    h_SaveMessages(orc_Handler.GetMessages(), orc_XMLParser);
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-can-monitor-configuration");
@@ -76,7 +77,7 @@ void C_CamProHandlerFiler::h_Save(const C_CamProHandler & orc_Handler, C_OSCXMLP
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_Load(C_CamProHandler & orc_Handler, C_OSCXMLParserBase & orc_XMLParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_CONFIG;
 
    if (orc_XMLParser.SelectRoot() == "opensyde-can-monitor-configuration")
    {
@@ -87,29 +88,26 @@ sint32 C_CamProHandlerFiler::h_Load(C_CamProHandler & orc_Handler, C_OSCXMLParse
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-can-monitor-configuration");
       }
-      else
-      {
-         s32_Retval = C_CONFIG;
-      }
 
       // load messages
       if (orc_XMLParser.SelectNodeChild("messages") == "messages")
       {
          std::vector<C_CamProMessageData> c_Messages;
+         if (orc_XMLParser.AttributeExists("cyclic-active"))
+         {
+            orc_Handler.SetCyclicMessageTransmitActive(orc_XMLParser.GetAttributeBool("cyclic-active"));
+         }
+         else
+         {
+            orc_Handler.SetCyclicMessageTransmitActive(true);
+         }
          s32_Retval = h_LoadMessages(c_Messages, orc_XMLParser);
          orc_Handler.SetMessages(c_Messages);
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-can-monitor-configuration");
       }
-      else
-      {
-         s32_Retval = C_CONFIG;
-      }
    }
-   else
-   {
-      s32_Retval = C_CONFIG;
-   }
+
    return s32_Retval;
 }
 

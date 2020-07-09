@@ -34,11 +34,8 @@ public:
    C_SyvDaItPaTreeView(QWidget * const opc_Parent = NULL);
    ~C_SyvDaItPaTreeView(void);
 
-   void DeleteAll(void);
-   void DeleteSelected(void);
    bool IsEmpty(void) const;
    void ClearECUValues(void);
-   void ApplyEcuValues(void);
    void ReloadSetValues(void);
    void ApplySelectedEcuValues(void);
    bool CheckRange(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds,
@@ -64,7 +61,6 @@ public:
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbExpandedTreeIndex> GetAllExpandedTreeItems(void) const;
    void SetAllExpandedTreeItems(const std::vector<stw_opensyde_gui_logic::C_PuiSvDbExpandedTreeIndex> & orc_Items);
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetAllListIds(void) const;
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetAllSelectedListIds(void) const;
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetChangedListElementIds(void) const;
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> GetInvalidListIds(void) const;
    void SetCRCStatus(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_ListId, const bool oq_Status);

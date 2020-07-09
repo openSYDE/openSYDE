@@ -63,6 +63,7 @@ Q_SIGNALS:
    void SigMessageIdChanged(void);
    void SigMessageNameChanged(void);
    void SigSignalNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void SigSignalStartBitChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void SigRecheckErrorGlobal(void);
    void SigRecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void SigSignalSelected(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -102,6 +103,7 @@ private:
    void m_OnSignalUpdatedViaSelector(void);
    void m_OnSignalActivated(const stw_types::uint32 ou32_SignalIndex);
    void m_OnSignalNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void m_OnSignalStartBitChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_OnSignalTypeChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                               const stw_types::uint32 ou32_SignalIndex) const;
    void m_RecheckErrorGlobal(void);

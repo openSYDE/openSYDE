@@ -411,17 +411,6 @@ stw_types::uint32 C_PuiSvDbNodeDataPoolListElementId::GetArrayElementIndexOrZero
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set array element index
-
-   \param[in] ou32_Value New array element index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbNodeDataPoolListElementId::SetArrayElementIndex(const stw_types::uint32 ou32_Value)
-{
-   this->mu32_ArrayElementIndex = ou32_Value;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get array element index usage flag
 
    \return
@@ -431,15 +420,4 @@ void C_PuiSvDbNodeDataPoolListElementId::SetArrayElementIndex(const stw_types::u
 bool C_PuiSvDbNodeDataPoolListElementId::GetUseArrayElementIndex(void) const
 {
    return this->mq_UseArrayElementIndex;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set array element index usage flag
-
-   \param[in] oq_Value   New array element index usage flag
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbNodeDataPoolListElementId::SetUseArrayElementIndex(const bool oq_Value)
-{
-   this->mq_UseArrayElementIndex = oq_Value;
 }

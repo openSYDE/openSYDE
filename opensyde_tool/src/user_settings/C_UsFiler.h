@@ -49,17 +49,15 @@ private:
    static void mh_SaveView(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                            const QString & orc_ViewIdBase, const QString & orc_ViewName,
                            const C_UsSystemView & orc_View);
-   static void mh_SaveDataRates(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
-                                const QString & orc_DataRateIdBase, const C_UsSystemView & orc_View);
    static void mh_SaveDataRatesPerNode(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
-                                       const QString & orc_DataRatePerNodeIdBase, const C_UsSystemView & orc_View);
+                                       const QString & orc_DataRatePerNodeIdBase, const C_UsSystemViewNode & orc_Node);
    static void mh_SaveViewNode(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                const QString & orc_ViewNodeIdBase, const QString & orc_NodeName,
                                const C_UsSystemViewNode & orc_ViewNode);
    static void mh_SaveDashboard(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                 const QString & orc_DashboardIdBase, const QString & orc_DashboardName,
                                 const C_UsSystemViewDashboard & orc_Dashboard);
-   static void mh_SaveLanguages(const C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
+   static void mh_SaveCommon(const C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_SaveColors(const C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_SaveNextRecentColorButtonNumber(const C_UsHandler & orc_UserSettings,
                                                   stw_scl::C_SCLIniFile & orc_Ini);
@@ -82,19 +80,16 @@ private:
    static void mh_LoadView(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                            const QString & orc_ViewIdBase, const QString & orc_ViewName,
                            C_UsHandler & orc_UserSettings);
-   static void mh_LoadDataRates(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
-                                const QString & orc_DataRateIdBase, const QString & orc_ViewName,
-                                C_UsHandler & orc_UserSettings);
    static void mh_LoadDataRatesPerNode(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                        const QString & orc_DataRatePerNodeIdBase, const QString & orc_ViewName,
-                                       C_UsHandler & orc_UserSettings);
+                                       const QString & orc_NodeName, C_UsHandler & orc_UserSettings);
    static void mh_LoadViewNode(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                const QString & orc_ViewNodeIdBase, const QString & orc_ViewName,
                                C_UsHandler & orc_UserSettings);
    static void mh_LoadDashboard(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                 const QString & orc_DashboardIdBase, const QString & orc_ViewName,
                                 C_UsHandler & orc_UserSettings);
-   static void mh_LoadLanguages(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
+   static void mh_LoadCommon(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_LoadColors(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_LoadNextRecentColorButtonNumber(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);

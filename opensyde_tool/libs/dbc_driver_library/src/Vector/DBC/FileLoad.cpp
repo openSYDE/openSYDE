@@ -302,7 +302,9 @@ void File::readSignal(Network & network, Message & message, std::string & line)
         std::istringstream iss(m[13]);
         while (iss.good()) {
             std::string node;
-            iss >> node;
+            // 2020-06-04 STW: When more than one receiver is specified, they are separated by ',', not ' ' as the
+            //                 original implementation assumed. Also see File::writeSignals.
+            std::getline(iss, node, ',');
             if (node != "Vector__XXX") {
                 signal.receivers.insert(node);
             }

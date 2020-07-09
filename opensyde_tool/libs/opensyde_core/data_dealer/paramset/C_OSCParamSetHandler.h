@@ -38,7 +38,7 @@ public:
    stw_types::sint32 ReadFile(const stw_scl::C_SCLString & orc_FilePath, const bool oq_IgnoreCrc,
                               const bool oq_InterpretedDataOnly = false, stw_types::uint16 * const opu16_FileCrc = NULL,
                               bool * const opq_MissingOptionalContent = NULL);
-   stw_types::sint32 UpdateCRCForFile(const stw_scl::C_SCLString & orc_FilePath) const;
+   static stw_types::sint32 h_UpdateCRCForFile(const stw_scl::C_SCLString & orc_FilePath);
 
    //Data
    void ClearContent(void);

@@ -62,8 +62,9 @@ C_OSCNodeDataPoolFilerV2::C_OSCNodeDataPoolFilerV2(void)
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPool(const uint16 ou16_XmlFormatVersion, C_OSCNodeDataPool & orc_NodeDataPool,
-                                              C_OSCXMLParserBase & orc_XMLParser)
+sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPool(const uint16 ou16_XmlFormatVersion,
+                                                C_OSCNodeDataPool & orc_NodeDataPool,
+                                                C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -159,7 +160,7 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPool(const uint16 ou16_XmlFormatVersi
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFilerV2::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDataPool,
-                                            C_OSCXMLParserBase & orc_XMLParser)
+                                              C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeSint32("related-application-index", orc_NodeDataPool.s32_RelatedDataBlockIndex);
    orc_XMLParser.SetAttributeBool("is-safety", orc_NodeDataPool.q_IsSafety);
@@ -200,8 +201,8 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPool(const C_OSCNodeDataPool & orc_Node
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolList(const uint16 ou16_XmlFormatVersion,
-                                                  C_OSCNodeDataPoolList & orc_NodeDataPoolList,
-                                                  C_OSCXMLParserBase & orc_XMLParser)
+                                                    C_OSCNodeDataPoolList & orc_NodeDataPoolList,
+                                                    C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -279,7 +280,7 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolList(const uint16 ou16_XmlFormatV
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolList(const C_OSCNodeDataPoolList & orc_NodeDataPoolList,
-                                                C_OSCXMLParserBase & orc_XMLParser)
+                                                  C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeBool("nvm-crc-active", orc_NodeDataPoolList.q_NvMCRCActive);
    orc_XMLParser.SetAttributeUint32("nvm-crc", orc_NodeDataPoolList.u32_NvMCRC);
@@ -316,8 +317,8 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolList(const C_OSCNodeDataPoolList & 
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElement(const uint16 ou16_XmlFormatVersion,
-                                                     C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
-                                                     C_OSCXMLParserBase & orc_XMLParser)
+                                                       C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
+                                                       C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -510,7 +511,7 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElement(const uint16 ou16_XmlForm
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElement(const C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
-                                                   C_OSCXMLParserBase & orc_XMLParser)
+                                                     C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeFloat64("factor", orc_NodeDataPoolListElement.f64_Factor);
    orc_XMLParser.SetAttributeFloat64("offset", orc_NodeDataPoolListElement.f64_Offset);
@@ -546,8 +547,8 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElement(const C_OSCNodeDataPoolList
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolLists(const uint16 ou16_XmlFormatVersion,
-                                                   std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
-                                                   C_OSCXMLParserBase & orc_XMLParser)
+                                                     std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
+                                                     C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
    C_SCLString c_CurNodeList;
@@ -614,7 +615,7 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolLists(const uint16 ou16_XmlFormat
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolLists(const std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
-                                                 C_OSCXMLParserBase & orc_XMLParser)
+                                                   C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeUint32("length", orc_NodeDataPoolLists.size());
    for (uint32 u32_ItList = 0; u32_ItList < orc_NodeDataPoolLists.size(); ++u32_ItList)
@@ -643,8 +644,8 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolLists(const std::vector<C_OSCNodeDa
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolListElements(const uint16 ou16_XmlFormatVersion,
-                                                          std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements,
-                                                          C_OSCXMLParserBase & orc_XMLParser)
+                                                            std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements,
+                                                            C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
    C_SCLString c_CurNodeDataElement;
@@ -732,7 +733,7 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolListElements(
    All returned elements will be of the type defined by orc_ContentType.
 
    \param[in]     ou16_XmlFormatVersion                     version of XML format
-   \param[in]     orc_ContentType                           type reference (see description)
+   \param[in]     orc_ContType                              content type reference (see description)
    \param[out]    orc_NodeDataPoolListElementDataSetValues  data storage
    \param[in,out] orc_XMLParser                             XML with list active
 
@@ -742,9 +743,9 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolListElements(
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolListElementDataSetValues(const uint16 ou16_XmlFormatVersion,
-                                                                      const C_OSCNodeDataPoolContent & orc_ContentType,
-                                                                      std::vector<C_OSCNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues,
-                                                                      C_OSCXMLParserBase & orc_XMLParser)
+                                                                        const C_OSCNodeDataPoolContent & orc_ContType,
+                                                                        std::vector<C_OSCNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues,
+                                                                        C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
    C_SCLString c_CurNodeDataSetValue = orc_XMLParser.SelectNodeChild("data-set-value");
@@ -753,7 +754,7 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolListElementDataSetValues(const ui
    {
       do
       {
-         C_OSCNodeDataPoolContent c_CurDataSetValue = orc_ContentType; //pre set content type
+         C_OSCNodeDataPoolContent c_CurDataSetValue = orc_ContType; //pre set content type
 
          if (s32_Retval == C_NO_ERR)
          {
@@ -939,7 +940,8 @@ C_SCLString C_OSCNodeDataPoolFilerV2::h_DataPoolToString(const C_OSCNodeDataPool
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFilerV2::h_StringToDataPool(const C_SCLString & orc_String, C_OSCNodeDataPool::E_Type & ore_Type)
+sint32 C_OSCNodeDataPoolFilerV2::h_StringToDataPool(const C_SCLString & orc_String,
+                                                    C_OSCNodeDataPool::E_Type & ore_Type)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -981,7 +983,7 @@ sint32 C_OSCNodeDataPoolFilerV2::h_StringToDataPool(const C_SCLString & orc_Stri
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElementType(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                         C_OSCXMLParserBase & orc_XMLParser)
+                                                           C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_CONFIG;
 
@@ -1020,7 +1022,7 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElementType(C_OSCNodeDataPoolCont
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElementType(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                       C_OSCXMLParserBase & orc_XMLParser)
+                                                         C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("type");
    orc_XMLParser.SetAttributeString("base-type", mh_NodeDataPoolContentToString(orc_NodeDataPoolContent.GetType()));
@@ -1051,7 +1053,7 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElementType(const C_OSCNodeDataPool
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElementValue(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                          C_OSCXMLParserBase & orc_XMLParser)
+                                                            C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -1180,8 +1182,8 @@ sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolElementValue(C_OSCNodeDataPoolCon
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElementValue(const stw_scl::C_SCLString & orc_NodeName,
-                                                        const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                        C_OSCXMLParserBase & orc_XMLParser)
+                                                          const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
+                                                          C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild(orc_NodeName);
    if (orc_NodeDataPoolContent.GetArray() == false)
@@ -1290,7 +1292,7 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolElementValue(const stw_scl::C_SCLSt
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                     C_OSCXMLParserBase & orc_XMLParser)
+                                                       C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeBool("array", orc_NodeDataPoolContent.GetArray());
    orc_XMLParser.CreateNodeChild("type", mh_NodeDataPoolContentToString(orc_NodeDataPoolContent.GetType()));
@@ -1404,7 +1406,7 @@ void C_OSCNodeDataPoolFilerV2::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCo
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                       C_OSCXMLParserBase & orc_XMLParser)
+                                                         C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -1569,7 +1571,7 @@ C_SCLString C_OSCNodeDataPoolFilerV2::mh_NodeDataPoolContentToString(
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::mh_StringToNodeDataPoolContent(const C_SCLString & orc_String,
-                                                              C_OSCNodeDataPoolContent::E_Type & ore_Type)
+                                                                C_OSCNodeDataPoolContent::E_Type & ore_Type)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -1663,7 +1665,7 @@ C_SCLString C_OSCNodeDataPoolFilerV2::mh_NodeDataPoolElementAccessToString(
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFilerV2::mh_StringToNodeDataPoolElementAccess(const C_SCLString & orc_String,
-                                                                    C_OSCNodeDataPoolListElement::E_Access & ore_Type)
+                                                                      C_OSCNodeDataPoolListElement::E_Access & ore_Type)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -1694,7 +1696,7 @@ sint32 C_OSCNodeDataPoolFilerV2::mh_StringToNodeDataPoolElementAccess(const C_SC
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFilerV2::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_String,
-                                                   const uint64 ou64_Input)
+                                                     const uint64 ou64_Input)
 {
    std::stringstream c_Stream;
    c_Stream << ou64_Input;
@@ -1713,7 +1715,7 @@ void C_OSCNodeDataPoolFilerV2::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XM
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint64 C_OSCNodeDataPoolFilerV2::mh_GetAttributeUint64(const C_OSCXMLParserBase & orc_XMLParser,
-                                                     const C_SCLString & orc_String)
+                                                       const C_SCLString & orc_String)
 {
    uint64 u64_Retval = 0;
 

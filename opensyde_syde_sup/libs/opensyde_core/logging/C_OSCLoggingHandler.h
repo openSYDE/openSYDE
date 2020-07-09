@@ -17,6 +17,7 @@
 #include "TGLTime.h"
 #include "TGLTasks.h"
 #include <fstream>
+#include <map>
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -35,6 +36,9 @@ namespace stw_opensyde_core
                             message) (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogError(activity, message, \
                                                                                               __FILE__, \
                                                                                               TGL_UTIL_FUNC_ID))
+#define osc_write_log_performance_start() (stw_opensyde_core::C_OSCLoggingHandler::h_StartPerformanceTimer())
+#define osc_write_log_performance_stop(timerid, message) \
+   (stw_opensyde_core::C_OSCLoggingHandler::h_WriteLogPerformance(timerid, message, __FILE__, TGL_UTIL_FUNC_ID))
 //lint -restore
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -46,6 +50,7 @@ public:
    //Configuration
    static void h_SetWriteToFileActive(const bool oq_Active);
    static void h_SetWriteToConsoleActive(const bool oq_Active);
+   static void h_SetMeasurePerformanceActive(const bool oq_Active);
    static void h_SetCompleteLogFileLocation(const stw_scl::C_SCLString & orc_CompleteLogFileLocation);
    static const stw_scl::C_SCLString & h_GetCompleteLogFileLocation(void);
 
@@ -59,7 +64,11 @@ public:
    static void h_WriteLogError(const stw_scl::C_SCLString & orc_Activity, const stw_scl::C_SCLString & orc_Message,
                                const stw_types::charn * const opc_Class = NULL,
                                const stw_types::charn * const opc_Function = NULL);
+   static void h_WriteLogPerformance(const stw_types::uint16 ou16_TimerId, const stw_scl::C_SCLString & orc_Message,
+                                     const stw_types::charn * const opc_Class = NULL,
+                                     const stw_types::charn * const opc_Function = NULL);
 
+   static stw_types::uint16 h_StartPerformanceTimer(void);
    static stw_scl::C_SCLString h_StwError(const stw_types::sint32 os32_Error);
 
    //Utility functions
@@ -69,6 +78,8 @@ public:
 private:
    static bool mhq_WriteToFile;
    static bool mhq_WriteToConsole;
+   static bool mhq_MeasureTime;
+   static std::map<stw_types::uint16, stw_types::uint32> mhc_StartTimes; ///< first: Timer ID, second: start time
    static stw_scl::C_SCLString mhc_FileName;
    static stw_tgl::C_TGLCriticalSection mhc_ConsoleCriticalSection;
    static stw_tgl::C_TGLCriticalSection mhc_FileCriticalSection;

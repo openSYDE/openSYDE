@@ -43,9 +43,9 @@ public:
                                                const stw_types::uint32 ou32_FileIndex) const;
    void SetElapsedTimeForNode(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint64 ou64_ElapsedTimeMs);
 
-   const QMap<stw_types::uint32, stw_types::float64> & GetBytesPerMsMapPerNode(void) const;
-
-   void SetFileSizesByteMapPerNode(const QMap<stw_types::uint32, stw_types::float64> & orc_Value);
+   //User settings
+   void LoadUserSettings(const stw_types::uint32 ou32_ViewIndex);
+   void SaveUserSettings(const stw_types::uint32 ou32_ViewIndex) const;
 
 private:
    stw_types::uint64 mu64_OverallFilesSize;

@@ -26,7 +26,7 @@ class C_UtiUndoStack :
    public QUndoStack
 {
 public:
-   C_UtiUndoStack(QObject * const opc_Parent);
+   C_UtiUndoStack(QObject * const opc_Parent = NULL);
    ~C_UtiUndoStack(void);
 
    void DoPush(QUndoCommand * const opc_UndoCommand);

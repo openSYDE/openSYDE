@@ -309,12 +309,16 @@ sint32 C_CamTitleBarWidget::LoadConfig(const QString & orc_FilePath)
 
    if (s32_Return != C_NO_ERR)
    {
-      const QString c_Log = C_Uti::h_GetLink(
-         C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str(), mc_STYLE_GUIDE_COLOR_LINK,
-         QString("file:\\\\\\") + C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+      QString c_Details;
+
       c_Message.SetHeading(C_GtGetText::h_GetText("Project load"));
-      c_Message.SetDescription(QString(C_GtGetText::h_GetText("For more details see log file %1")).arg(c_Log));
+      c_Message.SetDescription(C_GtGetText::h_GetText("Failed to load project: ") + orc_FilePath);
+      c_Details = C_GtGetText::h_GetText("For more information see ");
+      c_Details += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
+                                    C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+      c_Details += ".";
+      c_Message.SetDetails(c_Details);
 
       //Update log file
       C_OSCLoggingHandler::h_Flush();
@@ -371,7 +375,7 @@ void C_CamTitleBarWidget::m_ShowAbout(void)
 void C_CamTitleBarWidget::m_TriggerHelp(void)
 {
    //lint -e{10,48,64,746,1013,1055} Will be defined via moc compiler, PC lint unable to handle this construct
-   stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(this->metaObject()->className());
+   stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->metaObject()->className());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -439,10 +443,17 @@ void C_CamTitleBarWidget::m_OnOpenProjectClicked(void)
 {
    if (HandleProjectComparison() == true)
    {
+      QString c_PreviousDir = C_CamProHandler::h_GetInstance()->GetCurrentProjDir();
+
+      if (c_PreviousDir.isEmpty())
+      {
+         c_PreviousDir = C_Uti::h_GetExePath();
+      }
+
       const QString c_FullFilePath =
-         QFileDialog::getOpenFileName(this,
-                                      C_GtGetText::h_GetText("Select openSYDE CAN Monitor Project File"),
-                                      C_Uti::h_GetExePath(), C_CamTitleBarWidget::mhc_FILTER, NULL);
+         C_OgeWiUtil::h_GetOpenFileName(this, C_GtGetText::h_GetText("Select openSYDE CAN Monitor Project File"),
+                                        c_PreviousDir, C_CamTitleBarWidget::mhc_FILTER, "*.syde_cam");
+
       if (c_FullFilePath != "")
       {
          // Let all modules save their specific user settings before saving to file

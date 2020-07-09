@@ -30,28 +30,18 @@
 using namespace stw_types;
 using namespace stw_scl;
 
-//Unfortunately we need a hack for Visual C++ and MinGW here: vsnprintf is not in the std namespace, so we drag it in
+//Unfortunately we need a hack for Visual C++ and older version of the MinGW libraries here:
+// vsnprintf is not in the std namespace, so we drag it in.
 //Officially vsnprintf is only part of std in C++11
 #if defined(_MSC_VER) || defined(__MINGW32__)
 namespace std
 {
+//lint -e{763}   //but in newer library versions the symbol is in the namespace resulting in redundant declaration
 using ::vsnprintf;
 }
 #endif
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-//unfortunately the 64bit printf specifier is not fully portable :-(
-#ifdef _WIN32
-//MS-VC, Borland C++, MinGW (MinGW also uses the MSVCRT.dll !)
-static const charn macn_PRINTF_SPEC_64BITS[] = "%I64i";
-static const charn macn_PRINTF_SPEC_64BITU[] = "%I64u";
-static const charn macn_PRINTF_SPEC_64BITX[] = "%I64x";
-#else
-//GCC non-Windows (Borland C++ could also handle this)
-static const charn macn_PRINTF_SPEC_64BITS[] = "%lli";
-static const charn macn_PRINTF_SPEC_64BITU[] = "%llu";
-static const charn macn_PRINTF_SPEC_64BITX[] = "%llx";
-#endif
 
 //ASCII lookup table to speed up conversion
 const uint8 mau8_ConvTable[256] =
@@ -106,17 +96,43 @@ C_SCLString::C_SCLString(void) :
 {
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
+/*! \brief    Constructor
 
-   Initialize string data to opcn_InitValue.
+   Initialize string data to ou8_Value (interpreted as a number)
+   We cannot use the template constructor as by default streams interpret uint8 as a character.
 
-   \param[in]  opcn_InitValue      pointer to zero-terminated initial string
+   \param[in]  ou8_InitValue   initial value
+
+   \return
+   value converted to string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const charn * const opcn_InitValue)
+C_SCLString::C_SCLString(const stw_types::uint8 ou8_InitValue)
 {
-   c_String.operator = (opcn_InitValue);
+   std::stringstream c_Stream;
+   c_Stream << static_cast<uint32>(ou8_InitValue);
+   c_String = c_Stream.str();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Constructor
+
+   Initialize string data to os8_Value (interpreted as a number)
+   We cannot use the template constructor as by default streams interpret sint8 as a character.
+
+   \param[in]  os8_InitValue   initial value
+
+   \return
+   value converted to string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString::C_SCLString(const stw_types::sint8 os8_InitValue)
+{
+   std::stringstream c_Stream;
+   c_Stream << static_cast<sint32>(os8_InitValue);
+   c_String = c_Stream.str();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -173,123 +189,6 @@ C_SCLString::C_SCLString(const C_SCLString & orc_InitValue)
 C_SCLString::C_SCLString(const charn * const opcn_InitValue, const uintn oun_Length)
 {
    (void)c_String.assign(opcn_InitValue, oun_Length);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
-
-   Initialize string data to contain one character.
-
-   \param[in]  ocn_InitValue    initial character
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const charn ocn_InitValue)
-{
-   this->StringPrintFormatted("%c", ocn_InitValue);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
-
-   Initialize string data to string representation of numeric value.
-
-   \param[in]  os16_InitValue    numeric init value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const sint16 os16_InitValue)
-{
-   this->StringPrintFormatted("%d", os16_InitValue);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
-
-   Initialize string data to string representation of numeric value.
-
-   \param[in]  ou16_InitValue    numeric init value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const uint16 ou16_InitValue)
-{
-   this->StringPrintFormatted("%u", ou16_InitValue);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
-
-   Initialize string data to string representation of numeric value.
-
-   \param[in]  osn_InitValue    numeric init value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const sintn osn_InitValue)
-{
-   this->StringPrintFormatted("%d", osn_InitValue);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
-
-   Initialize string data to string representation of numeric value.
-
-   \param[in]  oun_InitValue    numeric init value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const uintn oun_InitValue)
-{
-   this->StringPrintFormatted("%u", oun_InitValue);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
-
-   Initialize string data to string representation of numeric value.
-
-   \param[in]  os32_InitValue    numeric init value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const sint32 os32_InitValue)
-{
-   this->StringPrintFormatted("%d", os32_InitValue);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
-
-   Initialize string data to string representation of numeric value.
-
-   \param[in]  ou32_InitValue    numeric init value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const uint32 ou32_InitValue)
-{
-   this->StringPrintFormatted("%u", ou32_InitValue);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
-
-   Initialize string data to string representation of numeric value.
-
-   \param[in]  os64_InitValue    numeric init value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const sint64 os64_InitValue)
-{
-   this->StringPrintFormatted(macn_PRINTF_SPEC_64BITS, os64_InitValue);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Constructor.
-
-   Initialize string data to string representation of numeric value.
-
-   \param[in]  ou64_InitValue    numeric init value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString::C_SCLString(const uint64 ou64_InitValue)
-{
-   this->StringPrintFormatted(macn_PRINTF_SPEC_64BITU, ou64_InitValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -782,62 +681,6 @@ C_SCLString & C_SCLString::cat_sprintf(const charn * const opcn_Format, ...) //l
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert integer to hexadecimal string
-
-   Compose string from integer value data.
-   Does not insert a "0x" prefix before the data.
-
-   Example:
-   "IntToHex(0x123, 4)" will return 0123.
-
-   \param[in]  osn_Value    value to convert
-   \param[in]  ou32_Digits  number of digits to return (zeroes will be filled in from the left)
-
-   \return
-   Resulting string
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SCLString::IntToHex(const sintn osn_Value, const uint32 ou32_Digits)
-{
-   C_SCLString c_HelperString;
-
-   c_HelperString.PrintFormatted("%x", osn_Value);
-   while (c_HelperString.Length() < ou32_Digits)
-   {
-      c_HelperString = static_cast<C_SCLString>("0") + c_HelperString;
-   }
-   return c_HelperString;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert integer to hexadecimal string
-
-   Compose string from integer value data.
-   Does not insert a "0x" prefix before the data.
-
-   Example:
-   "IntToHex(0x123, 4)" will return 0123.
-
-   \param[in]  os64_Value   value to convert
-   \param[in]  ou32_Digits  number of digits to return (zeroes will be filled in from the left)
-
-   \return
-   Resulting string
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SCLString::IntToHex(const sint64 os64_Value, const uint32 ou32_Digits)
-{
-   C_SCLString c_HelperString;
-
-   c_HelperString.PrintFormatted(macn_PRINTF_SPEC_64BITX, os64_Value);
-   while (c_HelperString.Length() < ou32_Digits)
-   {
-      c_HelperString = static_cast<C_SCLString>("0") + c_HelperString;
-   }
-   return c_HelperString;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Insert string into existing string data
 
    Insert string into existing string at specified position.
@@ -1189,7 +1032,7 @@ sintn C_SCLString::ToInt(void) const
 
       try
       {
-         s32_Return = m_StrTos32(pcn_String, q_Hex);
+         s32_Return = mh_StrTos32(pcn_String, q_Hex);
       }
       catch (...)
       {
@@ -1201,7 +1044,7 @@ sintn C_SCLString::ToInt(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 
-sint32 C_SCLString::m_StrTos32(const charn * const opcn_String, const bool oq_Hex)
+sint32 C_SCLString::mh_StrTos32(const charn * const opcn_String, const bool oq_Hex)
 {
    bool q_IsNegative = false;
    sint32 s32_CharVal;
@@ -1259,7 +1102,7 @@ sint32 C_SCLString::m_StrTos32(const charn * const opcn_String, const bool oq_He
 
 //----------------------------------------------------------------------------------------------------------------------
 
-sint64 C_SCLString::m_StrTos64(const charn * const opcn_String, const bool oq_Hex)
+sint64 C_SCLString::mh_StrTos64(const charn * const opcn_String, const bool oq_Hex)
 {
    bool q_IsNegative = false;
    sint32 s32_CharVal;
@@ -1370,7 +1213,7 @@ sint64 C_SCLString::ToInt64(void) const
 
       try
       {
-         s64_Return = m_StrTos64(pcn_String, q_Hex);
+         s64_Return = mh_StrTos64(pcn_String, q_Hex);
       }
       catch (...)
       {
@@ -1516,109 +1359,81 @@ const std::string * C_SCLString::AsStdString(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert sint64 value to string
+/*! \brief    Convert charn number to string
 
-   Converts sint64 number to string.
+   If the user calls IntToStr explicitly the expectation is to put the character's value into the string, not the
+    character itself.
+   Can not be done with the template function as charn is interpreted as character by streams.
 
-   \param[in]  os64_Value   value to convert
+   \param[in]  ocn_Value    value to convert
 
    \return
-   value converted to string
+   Resulting string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SCLString::IntToStr(const sint64 os64_Value)
+C_SCLString C_SCLString::IntToStr(const charn ocn_Value)
 {
-   C_SCLString c_Text(os64_Value);
+   C_SCLString c_Text;
+   std::stringstream c_Stream;
+   //a "sint32" should be enough for a charn on all platforms
+   c_Stream << static_cast<sint32>(ocn_Value);
+   c_Text.c_String = c_Stream.str();
 
    return c_Text;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert uint64 value to string
+/*! \brief    Convert uint8 number to hexadecimal string
 
-   Converts uint64 number to string.
+   Compose string from uint8 value data.
+   Does not insert a "0x" prefix before the data.
 
-   \param[in]  ou64_Value   value to convert
+   Can not be done with the template function as uint8 is interpreted as character by streams.
+
+   Example:
+   "IntToHex(0x023, 4)" will return 0023.
+
+   \param[in]  ou8_Value    value to convert
+   \param[in]  ou32_Digits  number of digits to return (zeroes will be filled in from the left)
 
    \return
-   value converted to string
+   Resulting string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SCLString::IntToStr(const uint64 ou64_Value)
+C_SCLString C_SCLString::IntToHex(const uint8 ou8_Value, const uint32 ou32_Digits)
 {
-   C_SCLString c_Text(ou64_Value);
+   C_SCLString c_Text;
+   std::stringstream c_Stream;
+   c_Stream << &std::hex << std::setw(ou32_Digits) << std::setfill('0') << static_cast<uint32>(ou8_Value);
+   c_Text.c_String = c_Stream.str();
 
    return c_Text;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert sint32 value to string
+/*! \brief    Convert sint8 number to hexadecimal string
 
-   Converts sint32 number to string.
+   Compose string from sint8 value data.
+   Does not insert a "0x" prefix before the data.
 
-   \param[in]  os32_Value   value to convert
+   Can not be done with the template function as sint8 is interpreted as character by streams.
 
-   \return
-   value converted to string
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SCLString::IntToStr(const sint32 os32_Value)
-{
-   C_SCLString c_Text(os32_Value);
+   Example:
+   "IntToHex(0x23, 4)" will return 0023.
 
-   return c_Text;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert uint32 value to string
-
-   Converts uint32 number to string.
-
-   \param[in]  ou32_Value   value to convert
+   \param[in]  os8_Value    value to convert
+   \param[in]  ou32_Digits  number of digits to return (zeroes will be filled in from the left)
 
    \return
-   value converted to string
+   Resulting string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SCLString::IntToStr(const uint32 ou32_Value)
+C_SCLString C_SCLString::IntToHex(const sint8 os8_Value, const uint32 ou32_Digits)
 {
-   C_SCLString c_Text(ou32_Value);
-
-   return c_Text;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert sintn value to string
-
-   Converts sintn number to string.
-
-   \param[in]  osn_Value   value to convert
-
-   \return
-   value converted to string
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SCLString::IntToStr(const sintn osn_Value)
-{
-   C_SCLString c_Text(osn_Value);
-
-   return c_Text;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert uintn value to string
-
-   Converts uintn number to string.
-
-   \param[in]  oun_Value   value to convert
-
-   \return
-   value converted to string
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SCLString::IntToStr(const uintn oun_Value)
-{
-   C_SCLString c_Text(oun_Value);
+   C_SCLString c_Text;
+   std::stringstream c_Stream;
+   c_Stream << &std::hex << std::setw(ou32_Digits) << std::setfill('0') << static_cast<sint32>(os8_Value);
+   c_Text.c_String = c_Stream.str();
 
    return c_Text;
 }
@@ -1734,6 +1549,7 @@ uint32 C_SCLString::LastDelimiter(const C_SCLString & orc_Delimiters) const
    {
       for (s32_Pos = (static_cast<sint32>(u32_Length) - 1); s32_Pos >= 0; s32_Pos--)
       {
+         //lint -e{1036,747} //False positive: operator[] returns a "charn" which is handled by the template constructor
          if (orc_Delimiters.Pos(c_String.operator [](static_cast<uint32>(s32_Pos))) != 0U)
          {
             u32_Return = static_cast<uint32>(s32_Pos) + 1U;

@@ -38,8 +38,8 @@ private:
    class C_TcpConnection
    {
    public:
-      stw_types::sintn sn_Socket;         ///< client socket
-      stw_types::uint8 au8_IpAddress[4];  ///< server's IP (remembered for reconnecting)
+      stw_types::sintn sn_Socket;        ///< client socket
+      stw_types::uint8 au8_IpAddress[4]; ///< server's IP (remembered for reconnecting)
    };
 
    class C_BufferIdentifier

@@ -120,7 +120,10 @@ void C_NagAboutDialog::InitStaticNames(void) const
 void C_NagAboutDialog::InitDynamicNames(void) const
 {
    //lint -e{40} Defined by project file
+   QString c_BinaryHash = stw_opensyde_gui_logic::C_Uti::h_GetHashValueAsQString();
+
    mpc_Ui->pc_LabelValOpenSYDEVersion->setText(C_Uti::h_GetApplicationVersion());
+   mpc_Ui->pc_LabelValOpenSYDEHash->setText("MD5-Checksum: " + c_BinaryHash);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

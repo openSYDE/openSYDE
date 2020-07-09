@@ -1614,8 +1614,8 @@ sint32 C_OSCProtocolDriverOsy::m_PackDataPoolIdentifier(const uint8 ou8_DataPool
    \param[out] oru16_ElementIndex  element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCProtocolDriverOsy::m_UnpackDataPoolIdentifier(const uint8 (&orau8_PackedId)[3], uint8 & oru8_DataPoolIndex,
-                                                        uint16 & oru16_ListIndex, uint16 & oru16_ElementIndex) const
+void C_OSCProtocolDriverOsy::mh_UnpackDataPoolIdentifier(const uint8 (&orau8_PackedId)[3], uint8 & oru8_DataPoolIndex,
+                                                         uint16 & oru16_ListIndex, uint16 & oru16_ElementIndex)
 {
    const uint32 u32_PackedId = (static_cast<uint32>(orau8_PackedId[0]) << 16) +
                                (static_cast<uint32>(orau8_PackedId[1]) << 8) +
@@ -3471,7 +3471,7 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataEvent(
       (void)std::memcpy(&c_Value[0], &orc_ReceivedService.c_Data[4], u16_NumberOfBytes);
 
       // Get the indexes of all parameter
-      this->m_UnpackDataPoolIdentifier(au8_Identifier, u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex);
+      mh_UnpackDataPoolIdentifier(au8_Identifier, u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex);
 
       m_OsyReadDataPoolDataEventReceived(u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex, c_Value);
 
@@ -3519,7 +3519,7 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataErrorEvent(
       au8_Identifier[2] = orc_ReceivedService.c_Data[5];
 
       // Get the indexes of all parameter
-      this->m_UnpackDataPoolIdentifier(au8_Identifier, u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex);
+      mh_UnpackDataPoolIdentifier(au8_Identifier, u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex);
 
       m_OsyReadDataPoolDataEventErrorReceived(u8_DataPoolIndex, u16_ListIndex, u16_ElementIndex,
                                               orc_ReceivedService.c_Data[2]);

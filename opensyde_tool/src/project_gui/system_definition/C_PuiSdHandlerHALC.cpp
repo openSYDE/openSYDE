@@ -108,6 +108,7 @@ const C_OSCHalcConfigDomain * C_PuiSdHandlerHALC::GetHALCDomainConfigDataConst(c
    \param[in]  ou32_NodeIndex       Node index
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  oq_UseChannelIndex   Use channel index
 
    \return
    NULL Data not found
@@ -116,20 +117,28 @@ const C_OSCHalcConfigDomain * C_PuiSdHandlerHALC::GetHALCDomainConfigDataConst(c
 //----------------------------------------------------------------------------------------------------------------------
 const C_OSCHalcConfigChannel * C_PuiSdHandlerHALC::GetHALCDomainChannelConfigData(const uint32 ou32_NodeIndex,
                                                                                   const uint32 ou32_DomainIndex,
-                                                                                  const uint32 ou32_ChannelIndex) const
+                                                                                  const uint32 ou32_ChannelIndex,
+                                                                                  const bool oq_UseChannelIndex) const
 {
    const C_OSCHalcConfigChannel * pc_Retval;
    const C_OSCHalcConfigDomain * const pc_Config = this->GetHALCDomainConfigDataConst(ou32_NodeIndex, ou32_DomainIndex);
 
    if (pc_Config != NULL)
    {
-      if (ou32_ChannelIndex < pc_Config->c_ChannelConfigs.size())
+      if (oq_UseChannelIndex)
       {
-         pc_Retval = &pc_Config->c_ChannelConfigs[ou32_ChannelIndex];
+         if (ou32_ChannelIndex < pc_Config->c_ChannelConfigs.size())
+         {
+            pc_Retval = &pc_Config->c_ChannelConfigs[ou32_ChannelIndex];
+         }
+         else
+         {
+            pc_Retval = NULL;
+         }
       }
       else
       {
-         pc_Retval = NULL;
+         pc_Retval = &pc_Config->c_DomainConfig;
       }
    }
    else
@@ -146,6 +155,7 @@ const C_OSCHalcConfigChannel * C_PuiSdHandlerHALC::GetHALCDomainChannelConfigDat
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
    \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  oq_UseChannelIndex   Use channel index
 
    \return
    NULL Data not found
@@ -154,12 +164,13 @@ const C_OSCHalcConfigChannel * C_PuiSdHandlerHALC::GetHALCDomainChannelConfigDat
 //----------------------------------------------------------------------------------------------------------------------
 const C_OSCHalcConfigParameterStruct * C_PuiSdHandlerHALC::GetHALCDomainChannelParameterConfigData(
    const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-   const uint32 ou32_ParameterIndex) const
+   const uint32 ou32_ParameterIndex, const bool oq_UseChannelIndex) const
 {
    const C_OSCHalcConfigParameterStruct * pc_Retval;
    const C_OSCHalcConfigChannel * const pc_Config = this->GetHALCDomainChannelConfigData(ou32_NodeIndex,
                                                                                          ou32_DomainIndex,
-                                                                                         ou32_ChannelIndex);
+                                                                                         ou32_ChannelIndex,
+                                                                                         oq_UseChannelIndex);
 
    if (pc_Config != NULL)
    {
@@ -304,16 +315,23 @@ const C_OSCHalcDefStruct * C_PuiSdHandlerHALC::GetHALCDomainFileVariableData(con
                                                                              const uint32 ou32_Index) const
 {
    const C_OSCHalcDefStruct * pc_Retval;
-   const C_OSCHalcDefDomain * const pc_Config = this->GetHALCDomainFileDataConst(ou32_NodeIndex, ou32_DomainIndex);
+   const C_OSCHalcDefDomain * const pc_DefDomain = this->GetHALCDomainFileDataConst(ou32_NodeIndex, ou32_DomainIndex);
+   const C_OSCHalcConfigDomain * const pc_ConfigDomain = this->GetHALCDomainConfigDataConst(ou32_NodeIndex,
+                                                                                            ou32_DomainIndex);
 
-   if (pc_Config != NULL)
+   if ((pc_DefDomain != NULL) && (pc_ConfigDomain != NULL))
    {
+      //differentiate domain or channel values
+      const C_OSCHalcDefChannelValues & rc_Values =
+         (pc_ConfigDomain->c_ChannelConfigs.size() == 0UL) ?
+         pc_DefDomain->c_DomainValues : pc_DefDomain->c_ChannelValues;
+
       switch (oe_Selector)
       {
       case C_OSCHalcDefDomain::eVA_PARAM:
-         if (ou32_Index < pc_Config->c_Parameters.size())
+         if (ou32_Index < rc_Values.c_Parameters.size())
          {
-            pc_Retval = &pc_Config->c_Parameters[ou32_Index];
+            pc_Retval = &rc_Values.c_Parameters[ou32_Index];
          }
          else
          {
@@ -321,9 +339,9 @@ const C_OSCHalcDefStruct * C_PuiSdHandlerHALC::GetHALCDomainFileVariableData(con
          }
          break;
       case C_OSCHalcDefDomain::eVA_INPUT:
-         if (ou32_Index < pc_Config->c_InputValues.size())
+         if (ou32_Index < rc_Values.c_InputValues.size())
          {
-            pc_Retval = &pc_Config->c_InputValues[ou32_Index];
+            pc_Retval = &rc_Values.c_InputValues[ou32_Index];
          }
          else
          {
@@ -331,9 +349,9 @@ const C_OSCHalcDefStruct * C_PuiSdHandlerHALC::GetHALCDomainFileVariableData(con
          }
          break;
       case C_OSCHalcDefDomain::eVA_OUTPUT:
-         if (ou32_Index < pc_Config->c_OutputValues.size())
+         if (ou32_Index < rc_Values.c_OutputValues.size())
          {
-            pc_Retval = &pc_Config->c_OutputValues[ou32_Index];
+            pc_Retval = &rc_Values.c_OutputValues[ou32_Index];
          }
          else
          {
@@ -341,9 +359,9 @@ const C_OSCHalcDefStruct * C_PuiSdHandlerHALC::GetHALCDomainFileVariableData(con
          }
          break;
       case C_OSCHalcDefDomain::eVA_STATUS:
-         if (ou32_Index < pc_Config->c_StatusValues.size())
+         if (ou32_Index < rc_Values.c_StatusValues.size())
          {
-            pc_Retval = &pc_Config->c_StatusValues[ou32_Index];
+            pc_Retval = &rc_Values.c_StatusValues[ou32_Index];
          }
          else
          {
@@ -360,6 +378,33 @@ const C_OSCHalcDefStruct * C_PuiSdHandlerHALC::GetHALCDomainFileVariableData(con
       pc_Retval = NULL;
    }
    return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Clear HALC configuration
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerHALC::ClearHALCConfig(const uint32 ou32_NodeIndex)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      rc_Node.c_HALCConfig.Clear();
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -381,6 +426,66 @@ sint32 C_PuiSdHandlerHALC::SetHALCConfig(const uint32 ou32_NodeIndex, const C_OS
    {
       C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       rc_Node.c_HALCConfig = orc_Config;
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set HALC config safe data block
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  oq_IsSet          Is set
+   \param[in]  ou32_NewValue     New value
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerHALC::SetHALCConfigSafeDataBlock(const uint32 ou32_NodeIndex, const bool oq_IsSet,
+                                                      const uint32 ou32_NewValue)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      rc_Node.c_HALCConfig.SetSafeDatablockAssigned(oq_IsSet, ou32_NewValue);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set HALC config unsafe data block
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  oq_IsSet          Is set
+   \param[in]  ou32_NewValue     New value
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerHALC::SetHALCConfigUnsafeDataBlock(const uint32 ou32_NodeIndex, const bool oq_IsSet,
+                                                        const uint32 ou32_NewValue)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      rc_Node.c_HALCConfig.SetUnsafeDatablockAssigned(oq_IsSet, ou32_NewValue);
    }
    else
    {
@@ -426,15 +531,8 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainConfig(const uint32 ou32_NodeIndex, cons
    \param[in]  ou32_NodeIndex       Node index
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  oq_Active            Active
-   \param[in]  orc_Name             Name
-   \param[in]  orc_Comment          Comment
-   \param[in]  oq_SafetyRelevant    Safety relevant
-   \param[in]  oq_DatablockSet      Datablock set
-   \param[in]  ou32_DatablockIndex  Datablock index
-   \param[in]  oq_UseCaseSet        Use case set
-   \param[in]  ou32_UseCaseIndex    Use case index
-   \param[in]  orc_DatablockConfig  Datablock config
+   \param[in]  oq_UseChannelIndex   Use channel index
+   \param[in]  orc_Channel          New channel
 
    \return
    C_NO_ERR Operation success
@@ -442,54 +540,44 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainConfig(const uint32 ou32_NodeIndex, cons
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfig(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
-                                                      const uint32 ou32_ChannelIndex, const bool oq_Active,
-                                                      const stw_scl::C_SCLString & orc_Name,
-                                                      const stw_scl::C_SCLString & orc_Comment,
-                                                      const bool oq_SafetyRelevant, const bool oq_DatablockSet,
-                                                      const uint32 ou32_DatablockIndex, const bool oq_UseCaseSet,
-                                                      const uint32 ou32_UseCaseIndex,
-                                                      const std::vector<C_OSCHalcConfigChannel::E_DataBlockConfig> & orc_DatablockConfig)
+                                                      const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
+                                                      const C_OSCHalcConfigChannel & orc_Channel)
 {
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
-   {
-      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfig(ou32_DomainIndex, ou32_ChannelIndex, oq_Active, orc_Name,
-                                                               orc_Comment, oq_SafetyRelevant, oq_DatablockSet,
-                                                               ou32_DatablockIndex,
-                                                               oq_UseCaseSet, ou32_UseCaseIndex, orc_DatablockConfig);
-   }
-   else
-   {
-      s32_Retval = C_RANGE;
-   }
-
-   return s32_Retval;
+   return this->SetHALCDomainChannelConfig(ou32_NodeIndex, ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex,
+                                           orc_Channel.c_Name, orc_Channel.c_Comment, orc_Channel.q_SafetyRelevant,
+                                           orc_Channel.u32_UseCaseIndex);
 }
-
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set HALC domain channel config active
+/*! \brief  Set domain channel config
 
    \param[in]  ou32_NodeIndex       Node index
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  oq_Active            Active
+   \param[in]  oq_UseChannelIndex   Use channel index
+   \param[in]  orc_Name             Name
+   \param[in]  orc_Comment          Comment
+   \param[in]  oq_SafetyRelevant    Safety relevant
+   \param[in]  ou32_UseCaseIndex    Use case index
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigActive(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
-                                                            const uint32 ou32_ChannelIndex, const bool oq_Active)
+sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfig(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
+                                                      const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
+                                                      const stw_scl::C_SCLString & orc_Name,
+                                                      const stw_scl::C_SCLString & orc_Comment,
+                                                      const bool oq_SafetyRelevant, const uint32 ou32_UseCaseIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
       C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfigActive(ou32_DomainIndex, ou32_ChannelIndex, oq_Active);
+      s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfig(ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex,
+                                                               orc_Name, orc_Comment, oq_SafetyRelevant,
+                                                               ou32_UseCaseIndex);
    }
    else
    {
@@ -505,6 +593,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigActive(const uint32 ou32_No
    \param[in]  ou32_NodeIndex       Node index
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  orc_Name             Name
 
    \return
@@ -513,7 +602,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigActive(const uint32 ou32_No
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigName(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
-                                                          const uint32 ou32_ChannelIndex,
+                                                          const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
                                                           const stw_scl::C_SCLString & orc_Name)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -521,7 +610,8 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigName(const uint32 ou32_Node
    if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
       C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfigName(ou32_DomainIndex, ou32_ChannelIndex, orc_Name);
+      s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfigName(ou32_DomainIndex, ou32_ChannelIndex,
+                                                                   oq_UseChannelIndex, orc_Name);
    }
    else
    {
@@ -537,6 +627,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigName(const uint32 ou32_Node
    \param[in]  ou32_NodeIndex       Node index
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  orc_Comment          Comment
 
    \return
@@ -546,6 +637,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigName(const uint32 ou32_Node
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigComment(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
                                                              const uint32 ou32_ChannelIndex,
+                                                             const bool oq_UseChannelIndex,
                                                              const stw_scl::C_SCLString & orc_Comment)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -554,7 +646,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigComment(const uint32 ou32_N
    {
       C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfigComment(ou32_DomainIndex, ou32_ChannelIndex,
-                                                                      orc_Comment);
+                                                                      oq_UseChannelIndex, orc_Comment);
    }
    else
    {
@@ -570,6 +662,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigComment(const uint32 ou32_N
    \param[in]  ou32_NodeIndex       Node index
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  oq_SafetyRelevant    Safety relevant
 
    \return
@@ -579,7 +672,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigComment(const uint32 ou32_N
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigSafety(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
                                                             const uint32 ou32_ChannelIndex,
-                                                            const bool oq_SafetyRelevant)
+                                                            const bool oq_UseChannelIndex, const bool oq_SafetyRelevant)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -587,44 +680,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigSafety(const uint32 ou32_No
    {
       C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfigSafety(ou32_DomainIndex, ou32_ChannelIndex,
-                                                                     oq_SafetyRelevant);
-   }
-   else
-   {
-      s32_Retval = C_RANGE;
-   }
-
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set HALC domain channel config datablock
-
-   \param[in]  ou32_NodeIndex       Node index
-   \param[in]  ou32_DomainIndex     Domain index
-   \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  oq_DatablockSet      Datablock set
-   \param[in]  ou32_DatablockIndex  Datablock index
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigDatablock(const uint32 ou32_NodeIndex,
-                                                               const uint32 ou32_DomainIndex,
-                                                               const uint32 ou32_ChannelIndex,
-                                                               const bool oq_DatablockSet,
-                                                               const uint32 ou32_DatablockIndex)
-{
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
-   {
-      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfigDatablock(ou32_DomainIndex, ou32_ChannelIndex,
-                                                                        oq_DatablockSet,
-                                                                        ou32_DatablockIndex);
+                                                                     oq_UseChannelIndex, oq_SafetyRelevant);
    }
    else
    {
@@ -640,7 +696,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigDatablock(const uint32 ou32
    \param[in]  ou32_NodeIndex       Node index
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  oq_UseCaseSet        Use case set
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  ou32_UseCaseIndex    Use case index
 
    \return
@@ -649,7 +705,8 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigDatablock(const uint32 ou32
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigUseCase(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
-                                                             const uint32 ou32_ChannelIndex, const bool oq_UseCaseSet,
+                                                             const uint32 ou32_ChannelIndex,
+                                                             const bool oq_UseChannelIndex,
                                                              const uint32 ou32_UseCaseIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -658,41 +715,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigUseCase(const uint32 ou32_N
    {
       C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfigUseCase(ou32_DomainIndex, ou32_ChannelIndex,
-                                                                      oq_UseCaseSet, ou32_UseCaseIndex);
-   }
-   else
-   {
-      s32_Retval = C_RANGE;
-   }
-
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set HALC domain channel config datablock config
-
-   \param[in]  ou32_NodeIndex       Node index
-   \param[in]  ou32_DomainIndex     Domain index
-   \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  orc_DatablockConfig  Datablock config
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigDatablockConfig(const uint32 ou32_NodeIndex,
-                                                                     const uint32 ou32_DomainIndex,
-                                                                     const uint32 ou32_ChannelIndex,
-                                                                     const std::vector<C_OSCHalcConfigChannel::E_DataBlockConfig> & orc_DatablockConfig)
-{
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
-   {
-      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelConfigDatablockConfig(ou32_DomainIndex, ou32_ChannelIndex,
-                                                                              orc_DatablockConfig);
+                                                                      oq_UseChannelIndex, ou32_UseCaseIndex);
    }
    else
    {
@@ -709,6 +732,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelConfigDatablockConfig(const uint3
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
    \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  orc_Parameter        Parameter
 
    \return
@@ -720,6 +744,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelParameterConfig(const uint32 ou32
                                                                const uint32 ou32_DomainIndex,
                                                                const uint32 ou32_ChannelIndex,
                                                                const uint32 ou32_ParameterIndex,
+                                                               const bool oq_UseChannelIndex,
                                                                const C_OSCHalcConfigParameterStruct & orc_Parameter)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -728,7 +753,8 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelParameterConfig(const uint32 ou32
    {
       C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelParameterConfig(ou32_DomainIndex, ou32_ChannelIndex,
-                                                                        ou32_ParameterIndex, orc_Parameter);
+                                                                        ou32_ParameterIndex, oq_UseChannelIndex,
+                                                                        orc_Parameter);
    }
    else
    {
@@ -746,6 +772,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelParameterConfig(const uint32 ou32
    \param[in]  ou32_ChannelIndex    Channel index
    \param[in]  ou32_ParameterIndex  Parameter index
    \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  orc_Parameter        Parameter
 
    \return
@@ -758,6 +785,7 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelParameterConfigElement(const uint
                                                                       const uint32 ou32_ChannelIndex,
                                                                       const uint32 ou32_ParameterIndex,
                                                                       const uint32 ou32_ElementIndex,
+                                                                      const bool oq_UseChannelIndex,
                                                                       const C_OSCHalcConfigParameter & orc_Parameter)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -767,7 +795,95 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelParameterConfigElement(const uint
       C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelParameterConfigElement(ou32_DomainIndex, ou32_ChannelIndex,
                                                                                ou32_ParameterIndex, ou32_ElementIndex,
-                                                                               orc_Parameter);
+                                                                               oq_UseChannelIndex, orc_Parameter);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set HALC domain channel parameter config element
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_UseChannelIndex   Use channel index
+   \param[in]  orc_DisplayName      Display name
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelParameterConfigElementEnum(const uint32 ou32_NodeIndex,
+                                                                          const uint32 ou32_DomainIndex,
+                                                                          const uint32 ou32_ChannelIndex,
+                                                                          const uint32 ou32_ParameterIndex,
+                                                                          const uint32 ou32_ElementIndex,
+                                                                          const bool oq_UseChannelIndex,
+                                                                          const stw_scl::C_SCLString & orc_DisplayName)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelParameterConfigElementEnum(ou32_DomainIndex, ou32_ChannelIndex,
+                                                                                   ou32_ParameterIndex,
+                                                                                   ou32_ElementIndex,
+                                                                                   oq_UseChannelIndex, orc_DisplayName);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set HALC domain channel parameter config element
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_UseChannelIndex   Use channel index
+   \param[in]  orc_DisplayName      Display name
+   \param[in]  oq_Value             Value
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelParameterConfigElementBitmask(const uint32 ou32_NodeIndex,
+                                                                             const uint32 ou32_DomainIndex,
+                                                                             const uint32 ou32_ChannelIndex,
+                                                                             const uint32 ou32_ParameterIndex,
+                                                                             const uint32 ou32_ElementIndex,
+                                                                             const bool oq_UseChannelIndex,
+                                                                             const stw_scl::C_SCLString & orc_DisplayName,
+                                                                             const bool oq_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      s32_Retval = rc_Node.c_HALCConfig.SetDomainChannelParameterConfigElementBitmask(ou32_DomainIndex,
+                                                                                      ou32_ChannelIndex,
+                                                                                      ou32_ParameterIndex,
+                                                                                      ou32_ElementIndex,
+                                                                                      oq_UseChannelIndex,
+                                                                                      orc_DisplayName, oq_Value);
    }
    else
    {
@@ -786,7 +902,6 @@ sint32 C_PuiSdHandlerHALC::SetHALCDomainChannelParameterConfigElement(const uint
    C_NO_ERR Datapool generated
    C_CONFIG Configuration invalid
    C_RANGE  Parameter invalid
-   C_BUSY   No programmable application block found
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerHALC::HALCGenerateDatapools(const uint32 ou32_NodeIndex)
@@ -797,34 +912,20 @@ sint32 C_PuiSdHandlerHALC::HALCGenerateDatapools(const uint32 ou32_NodeIndex)
        (ou32_NodeIndex < this->mc_UINodes.size()))
    {
       C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      C_PuiSdNode & rc_UiNode = this->mc_UINodes[ou32_NodeIndex];
       std::vector<C_OSCNodeDataPool> c_Datapools;
       C_OSCHALCMagicianGenerator c_Magician(&rc_OSCNode);
       s32_Retval = c_Magician.GenerateHALCDatapools(c_Datapools);
       if (s32_Retval == C_NO_ERR)
       {
+         C_PuiSdNode & rc_UiNode = this->mc_UINodes[ou32_NodeIndex];
          tgl_assert(rc_OSCNode.c_DataPools.size() == rc_UiNode.c_UIDataPools.size());
          if (rc_OSCNode.c_DataPools.size() == rc_UiNode.c_UIDataPools.size())
          {
             std::vector<C_PuiSdNodeDataPool> c_UiDatapools;
-            std::vector<C_OSCNodeDataPool>::iterator c_ItOSC = rc_OSCNode.c_DataPools.begin();
-            std::vector<C_PuiSdNodeDataPool>::iterator c_ItUi = rc_UiNode.c_UIDataPools.begin();
+
             //Clean up existing datapools
-            for (; c_ItOSC != rc_OSCNode.c_DataPools.end();)
-            {
-               if (c_ItOSC->e_Type == C_OSCNodeDataPool::eHALC)
-               {
-                  //Erase
-                  c_ItOSC = rc_OSCNode.c_DataPools.erase(c_ItOSC);
-                  c_ItUi = rc_UiNode.c_UIDataPools.erase(c_ItUi);
-               }
-               else
-               {
-                  //Iterate
-                  ++c_ItOSC;
-                  ++c_ItUi;
-               }
-            }
+            this->HALCRemoveDatapools(ou32_NodeIndex);
+
             //Get ui datapools
             for (uint32 u32_It = 0UL; u32_It < c_Datapools.size(); ++u32_It)
             {
@@ -851,6 +952,97 @@ sint32 C_PuiSdHandlerHALC::HALCGenerateDatapools(const uint32 ou32_NodeIndex)
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  HALC remove datapools
+
+   \param[in]  ou32_NodeIndex    Node index
+
+   \return
+   C_NO_ERR Datapools removed
+   C_RANGE  Parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerHALC::HALCRemoveDatapools(const uint32 ou32_NodeIndex)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+
+      std::vector<C_OSCNodeDataPool>::const_iterator c_ItOSC = rc_OSCNode.c_DataPools.begin();
+      uint32 u32_DatapoolIndex = 0;
+      for (; c_ItOSC != rc_OSCNode.c_DataPools.end();)
+      {
+         if (c_ItOSC->e_Type == C_OSCNodeDataPool::eHALC)
+         {
+            // Remove Datapool
+            s32_Retval = this->RemoveDataPool(ou32_NodeIndex, u32_DatapoolIndex);
+         }
+         else
+         {
+            //Iterate
+            ++c_ItOSC;
+            ++u32_DatapoolIndex;
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check HALC channel name available
+
+   \param[in]  ou32_NodeIndex             Node index
+   \param[in]  ou32_DomainIndex           Domain index
+   \param[in]  orc_ChannelName            Channel name to check for
+   \param[in]  opu32_ChannelIndexToSkip   Channel index to skip
+                                          (Use-case: skip current channel to avoid conflict with itself)
+   \return
+   true  Available
+   false Already in use
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PuiSdHandlerHALC::CheckHALCChannelNameAvailable(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
+                                                       const stw_scl::C_SCLString & orc_ChannelName,
+                                                       const uint32 * const opu32_ChannelIndexToSkip) const
+{
+   bool q_Retval = true;
+
+   const C_OSCHalcConfigDomain * pc_Domain = this->GetHALCDomainConfigDataConst(ou32_NodeIndex, ou32_DomainIndex);
+
+   if (pc_Domain != NULL)
+   {
+      // compare channel name with all existing channel names
+      for (uint32 u32_ItChannel = 0; (u32_ItChannel < pc_Domain->c_ChannelConfigs.size()) && (q_Retval == true);
+           ++u32_ItChannel)
+      {
+         bool q_Skip = false;
+         if (opu32_ChannelIndexToSkip != NULL)
+         {
+            if (*opu32_ChannelIndexToSkip == u32_ItChannel)
+            {
+               q_Skip = true;
+            }
+         }
+         if (q_Skip == false)
+         {
+            const C_OSCHalcConfigChannel & rc_Channel = pc_Domain->c_ChannelConfigs[u32_ItChannel];
+            if (rc_Channel.c_Name.LowerCase() == orc_ChannelName.LowerCase())
+            {
+               q_Retval = false;
+            }
+         }
+      }
+   }
+   return q_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

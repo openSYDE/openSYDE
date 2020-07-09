@@ -88,7 +88,7 @@ void C_PuiBsLineArrow::CalcHash(uint32 & oru32_HashValue) const
    Arrow head type as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_PuiBsLineArrow::ArrowHeadTypeToString(const E_ArrowHeadType & ore_Type)
+stw_scl::C_SCLString C_PuiBsLineArrow::h_ArrowHeadTypeToString(const E_ArrowHeadType & ore_Type)
 {
    stw_scl::C_SCLString c_Retval;
    switch (ore_Type)
@@ -125,7 +125,7 @@ stw_scl::C_SCLString C_PuiBsLineArrow::ArrowHeadTypeToString(const E_ArrowHeadTy
    Line type as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_PuiBsLineArrow::LineTypeToString(const E_LineType & ore_Type)
+stw_scl::C_SCLString C_PuiBsLineArrow::h_LineTypeToString(const E_LineType & ore_Type)
 {
    stw_scl::C_SCLString c_Retval;
    switch (ore_Type)
@@ -159,7 +159,7 @@ stw_scl::C_SCLString C_PuiBsLineArrow::LineTypeToString(const E_LineType & ore_T
    Arrow type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::ArrowHeadTypeFromString(const stw_scl::C_SCLString & orc_Str)
+C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::h_ArrowHeadTypeFromString(const stw_scl::C_SCLString & orc_Str)
 {
    C_PuiBsLineArrow::E_ArrowHeadType e_Retval;
    if (orc_Str == "normal")
@@ -198,7 +198,7 @@ C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::ArrowHeadTypeFromString(cons
    Line type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiBsLineArrow::E_LineType C_PuiBsLineArrow::LineTypeFromString(const stw_scl::C_SCLString & orc_Str)
+C_PuiBsLineArrow::E_LineType C_PuiBsLineArrow::h_LineTypeFromString(const stw_scl::C_SCLString & orc_Str)
 {
    C_PuiBsLineArrow::E_LineType e_Retval;
    if (orc_Str == "dash")

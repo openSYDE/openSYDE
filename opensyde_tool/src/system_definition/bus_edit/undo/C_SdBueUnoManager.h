@@ -28,7 +28,7 @@ class C_SdBueUnoManager :
    public C_UtiUndoStack
 {
 public:
-   C_SdBueUnoManager(QObject * const opc_Parent);
+   C_SdBueUnoManager(QObject * const opc_Parent = NULL);
    ~C_SdBueUnoManager(void);
    void DoConnectNodeToProt(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                             const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget);

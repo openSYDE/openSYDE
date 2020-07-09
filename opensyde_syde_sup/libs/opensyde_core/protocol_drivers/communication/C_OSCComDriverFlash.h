@@ -112,8 +112,8 @@ public:
                                            stw_scl::C_SCLString & orc_DeviceName,
                                            stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 SendOsyReadSerialNumber(const C_OSCProtocolDriverOsyNode &orc_ServerId,
-                                             stw_types::uint8(
-                                                &orau8_SerialNumber)[6], stw_types::uint8 * const opu8_NrCode = NULL);
+                                             stw_types::uint8(&orau8_SerialNumber)[6],
+                                             stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 SendOsyReadActiveDiagnosticSession(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                         stw_types::uint8 & oru8_SessionId,
                                                         stw_types::uint8 * const opu8_NrCode = NULL) const;

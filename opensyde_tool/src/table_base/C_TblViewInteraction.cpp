@@ -156,7 +156,8 @@ void C_TblViewInteraction::m_HandleGlobalMousePos(const QPoint & orc_GlobalPos)
          c_Index = this->indexAt(this->viewport()->mapFromGlobal(orc_GlobalPos));
          if (c_Index.isValid())
          {
-            if (this->model()->data(c_Index, msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)
+            if ((this->model()->data(c_Index, msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == true) &&
+                this->model()->flags(c_Index).testFlag(Qt::ItemIsEnabled))
             {
                this->setCursor(Qt::PointingHandCursor);
             }

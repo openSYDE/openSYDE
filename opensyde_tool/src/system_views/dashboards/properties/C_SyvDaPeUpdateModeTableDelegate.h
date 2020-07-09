@@ -26,7 +26,7 @@ class C_SyvDaPeUpdateModeTableDelegate :
    public QStyledItemDelegate
 {
 public:
-   C_SyvDaPeUpdateModeTableDelegate(const stw_types::uint32 ou32_ViewIndex);
+   C_SyvDaPeUpdateModeTableDelegate(const stw_types::uint32 ou32_ViewIndex = 0);
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960

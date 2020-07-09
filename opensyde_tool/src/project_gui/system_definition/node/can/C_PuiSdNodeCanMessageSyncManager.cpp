@@ -24,10 +24,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <iostream>
-
-#include <QElapsedTimer>
-
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "TGLUtils.h"
@@ -1157,14 +1153,8 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
                                                      bool * const opq_MessageSignalInvalid,
                                                      const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset) const
 {
-   QElapsedTimer c_Timer;
-
    std::vector<C_OSCCanMessageIdentificationIndices> c_UniqueMessageIds;
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
    c_UniqueMessageIds = this->GetUniqueMessages();
 
    if ((opq_MessageNameInvalid != NULL) || (opq_MessageIdInvalid != NULL))
@@ -1207,10 +1197,6 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
       }
    }
 
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Message name & id check:" << c_Timer.elapsed() << &std::endl;
-   }
    if (opq_MessagesHaveNoTx != NULL)
    {
       *opq_MessagesHaveNoTx = false;

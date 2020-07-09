@@ -33,13 +33,13 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor for adding a generic element
 
-   \param[in,out] opc_Scene                         Pointer to currently active scene
-   \param[in]     orc_IDs                           Affected unique IDs
-   \param[in]     ore_Type                          Item type
-   \param[in]     orc_NewPos                        New position
-   \param[in]     orc_AdditionalInformation         Additional string information
-   \param[in,out] opc_Parent                        Optional pointer to parent
-   \param[in]     orq_ForceUseAdditionalInformation Optional flag to force use of additional string information
+   \param[in,out]  opc_Scene                          Pointer to currently active scene
+   \param[in]      orc_IDs                            Affected unique IDs
+   \param[in]      ore_Type                           Item type
+   \param[in]      orc_NewPos                         New position
+   \param[in]      orc_AdditionalInformation          Additional string information
+   \param[in,out]  opc_Parent                         Optional pointer to parent
+   \param[in]      orq_ForceUseAdditionalInformation  Optional flag to force use of additional string information
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * const opc_Scene,
@@ -57,6 +57,9 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
    mu64_BusConnectorBusID(0),
    mu8_InterfaceNumber(0),
    mu8_NodeId(0),
+   mq_ActivateDatapoolL2(false),
+   mq_ActivateDatapoolECeS(false),
+   mq_ActivateDatapoolECoS(false),
    mq_ForceUseAdditionalInformation(orq_ForceUseAdditionalInformation)
 {
 }
@@ -64,33 +67,42 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor for adding a bus connector
 
-   \param[in,out] opc_Scene                 Pointer to currently active scene
-   \param[in]     orc_IDs                   Affected unique IDs
-   \param[in]     ore_Type                  Item type
-   \param[in]     orc_NewPos                New position
-   \param[in]     oru64_BusConnectorNodeID  Node ID for bus connector creation
-   \param[in]     oru64_BusConnectorBusID   Bus ID for bus connector creation
-   \param[in]     oru8_InterfaceNumber      Interface number for bus connector creation
-   \param[in]     oru8_NodeId               New node id
-   \param[in,out] opc_Parent                Optional pointer to parent
+   \param[in,out]  opc_Scene                 Pointer to currently active scene
+   \param[in]      orc_IDs                   Affected unique IDs
+   \param[in]      ore_Type                  Item type
+   \param[in]      orc_NewPos                New position
+   \param[in]      ou64_BusConnectorNodeID   Bus connector node ID
+   \param[in]      ou64_BusConnectorBusID    Bus connector bus ID
+   \param[in]      ou8_InterfaceNumber       Interface number
+   \param[in]      ou8_NodeId                Node id
+   \param[in]      oq_ActivateDatapoolL2     Activate datapool L2
+   \param[in]      oq_ActivateDatapoolECeS   Activate datapool ECeS
+   \param[in]      oq_ActivateDatapoolECoS   Activate datapool ECoS
+   \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * const opc_Scene,
                                                            const std::vector<stw_types::uint64> & orc_IDs,
                                                            const E_ElementType & ore_Type, const QPointF & orc_NewPos,
-                                                           const stw_types::uint64 & oru64_BusConnectorNodeID,
-                                                           const stw_types::uint64 & oru64_BusConnectorBusID,
-                                                           const stw_types::uint8 & oru8_InterfaceNumber,
-                                                           const stw_types::uint8 & oru8_NodeId,
+                                                           const stw_types::uint64 ou64_BusConnectorNodeID,
+                                                           const stw_types::uint64 ou64_BusConnectorBusID,
+                                                           const stw_types::uint8 ou8_InterfaceNumber,
+                                                           const stw_types::uint8 ou8_NodeId,
+                                                           const bool oq_ActivateDatapoolL2,
+                                                           const bool oq_ActivateDatapoolECeS,
+                                                           const bool oq_ActivateDatapoolECoS,
                                                            QUndoCommand * const opc_Parent) :
    C_SdManUnoTopologyAddBaseCommand(opc_Scene, orc_IDs, "Add drawing element(s)",
                                     opc_Parent),
    me_Type(ore_Type),
    mc_NewPos(orc_NewPos),
-   mu64_BusConnectorNodeID(oru64_BusConnectorNodeID),
-   mu64_BusConnectorBusID(oru64_BusConnectorBusID),
-   mu8_InterfaceNumber(oru8_InterfaceNumber),
-   mu8_NodeId(oru8_NodeId),
+   mu64_BusConnectorNodeID(ou64_BusConnectorNodeID),
+   mu64_BusConnectorBusID(ou64_BusConnectorBusID),
+   mu8_InterfaceNumber(ou8_InterfaceNumber),
+   mu8_NodeId(ou8_NodeId),
+   mq_ActivateDatapoolL2(oq_ActivateDatapoolL2),
+   mq_ActivateDatapoolECeS(oq_ActivateDatapoolECeS),
+   mq_ActivateDatapoolECoS(oq_ActivateDatapoolECoS),
    mq_ForceUseAdditionalInformation(false)
 {
 }
@@ -173,7 +185,9 @@ void C_SdManUnoTopologyAddCommand::m_AddNew(void)
                if (pc_Node->CheckInterfaceAvailable(pc_Bus->GetType(), this->mu8_InterfaceNumber) == true)
                {
                   pc_Scene->AddBusConnector(pc_Node, pc_Bus, this->mu8_InterfaceNumber, this->mu8_NodeId,
-                                            this->mc_NewPos, &(c_IDs[0]));
+                                            this->mq_ActivateDatapoolL2,
+                                            this->mq_ActivateDatapoolECeS,
+                                            this->mq_ActivateDatapoolECoS, this->mc_NewPos, &(c_IDs[0]));
                }
             }
             break;

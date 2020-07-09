@@ -97,6 +97,7 @@ private:
    stw_types::uint32 mu32_CanMessageBits;
    stw_types::sint32 ms32_CanBitrate;
 
+   stw_types::uint32 mu32_CanTxCounter;
    stw_types::uint32 mu32_CanTxErrors;
 };
 

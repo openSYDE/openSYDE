@@ -17,6 +17,7 @@
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeDpUtil.h"
+#include "C_ImpUtil.h"
 #include "C_SyvDaItPaImportReport.h"
 #include "C_SdNdeDpContentUtil.h"
 #include "ui_C_SyvDaItPaImportReport.h"
@@ -49,12 +50,12 @@ const QString C_SyvDaItPaImportReport::mhc_HTML_TABLE_DATA_START =
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent       Reference to parent
-   \param[in]     orc_Data         Loaded data
-   \param[in]     orc_ElementIds   Element IDs to overwrite
-   \param[in]     orc_Id           Selected element ID
-   \param[in]     ou32_ValidLayers Number of valid layers in selected element ID
-   \param[in]     orc_Path         Selected file path
+   \param[in,out]  orc_Parent          Reference to parent
+   \param[in]      orc_Data            Loaded data
+   \param[in]      orc_ElementIds      Element IDs to overwrite
+   \param[in]      orc_Id              Selected element ID
+   \param[in]      ou32_ValidLayers    Number of valid layers in selected element ID
+   \param[in]      orc_Path            Selected file path
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaImportReport::C_SyvDaItPaImportReport(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
@@ -108,8 +109,8 @@ void C_SyvDaItPaImportReport::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get results
 
-   \param[out] orc_OutputListIds Element IDs to replace
-   \param[out] orc_OutputContent Content to replace items with
+   \param[out]  orc_OutputListIds   Element IDs to replace
+   \param[out]  orc_OutputContent   Content to replace items with
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::GetOutput(std::vector<C_OSCNodeDataPoolListElementId> & orc_OutputListIds,
@@ -124,7 +125,7 @@ void C_SyvDaItPaImportReport::GetOutput(std::vector<C_OSCNodeDataPoolListElement
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -192,33 +193,17 @@ void C_SyvDaItPaImportReport::m_SetReport(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle source file information
 
-   \param[in,out] orc_Text Text to append to
+   \param[in,out]  orc_Text   Text to append to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_HandleSourceFileInformation(QString & orc_Text) const
 {
+   QString c_ReadContent;
    uint32 u32_NodeCount = 0UL;
    uint32 u32_DatapoolCount = 0UL;
    uint32 u32_ListCount = 0UL;
    uint32 u32_ParameterCount = 0UL;
 
-   orc_Text += "<h3>";
-   orc_Text += C_GtGetText::h_GetText("Source File Information");
-   orc_Text += "</h3>";
-   orc_Text += "<table><tr>";
-   orc_Text += C_SyvDaItPaImportReport::mhc_HTML_TABLE_DATA_START;
-   orc_Text += C_GtGetText::h_GetText("Path:");
-   orc_Text += "</td>";
-   orc_Text += C_SyvDaItPaImportReport::mhc_HTML_TABLE_DATA_START;
-   orc_Text += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>").
-               arg(this->mrc_Path).
-               arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-               arg(this->mrc_Path);
-   orc_Text += "</td></tr><tr>";
-   orc_Text += C_SyvDaItPaImportReport::mhc_HTML_TABLE_DATA_START;
-   orc_Text += C_GtGetText::h_GetText("Read Content:");
-   orc_Text += "</td>";
-   orc_Text += C_SyvDaItPaImportReport::mhc_HTML_TABLE_DATA_START;
    for (uint32 u32_ItNode = 0UL; u32_ItNode < this->mrc_Data.size(); ++u32_ItNode)
    {
       const C_OSCParamSetInterpretedNode & rc_Node = this->mrc_Data[u32_ItNode];
@@ -235,16 +220,16 @@ void C_SyvDaItPaImportReport::m_HandleSourceFileInformation(QString & orc_Text) 
          }
       }
    }
-   orc_Text +=
+   c_ReadContent +=
       QString(C_GtGetText::h_GetText("Nodes: %1, Datapools: %2, Lists: %3, Parameters: %4")).arg(u32_NodeCount).arg(
          u32_DatapoolCount).arg(u32_ListCount).arg(u32_ParameterCount);
-   orc_Text += "</td></tr></table>";
+   orc_Text += C_ImpUtil::h_FormatSourceFileInfoForReport(this->mrc_Path, c_ReadContent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle parsing information
 
-   \param[in,out] orc_Text Text to append to
+   \param[in,out]  orc_Text   Text to append to
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_HandleParsing(QString & orc_Text)
@@ -374,12 +359,12 @@ void C_SyvDaItPaImportReport::m_HandleParsing(QString & orc_Text)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Parse for interpreted file content to get table content
 
-   \param[in,out] orc_TableApplyContent    Content for table in apply section
-   \param[in,out] orc_TableMismatchContent Content for table in mismatch section
-   \param[in,out] orc_TableRemainContent   Content for table in remain section
-   \param[in,out] oru32_TableApplyCount    Number of entries in table in apply section
-   \param[in,out] oru32_TableMismatchCount Number of entries in table in mismatch section
-   \param[in,out] oru32_TableRemainCount   Number of entries in table in remain section
+   \param[in,out]  orc_TableApplyContent     Content for table in apply section
+   \param[in,out]  orc_TableMismatchContent  Content for table in mismatch section
+   \param[in,out]  orc_TableRemainContent    Content for table in remain section
+   \param[in,out]  oru32_TableApplyCount     Number of entries in table in apply section
+   \param[in,out]  oru32_TableMismatchCount  Number of entries in table in mismatch section
+   \param[in,out]  oru32_TableRemainCount    Number of entries in table in remain section
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyContent, QString & orc_TableMismatchContent,
@@ -487,9 +472,8 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
                                        pc_Element->c_MaxValue, pc_Element->f64_Factor, pc_Element->f64_Offset, c_Max);
                                     const QString c_Description =
                                        QString(C_GtGetText::h_GetText(
-                                                  "Specified value not in allowed range. Min: %2, Max: %3")).
-                                       arg(c_Value)
-                                       .arg(c_Min).arg(c_Max);
+                                                  "Specified value not in allowed range. Min: %1, Max: %2")).arg(c_Min).
+                                       arg(c_Max);
                                     m_AppendTableEntry(orc_TableMismatchContent, oru32_TableMismatchCount, rc_ParamId,
                                                        c_Value, c_Description);
                                  }
@@ -520,11 +504,11 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Append entry to table
 
-   \param[in,out] orc_TableContent Table content to append entry to
-   \param[in,out] oru32_TableCount Current number of entries in table
-   \param[in]     orc_Id           ID of element to append to table
-   \param[in]     orc_Value        Value as string
-   \param[in]     orc_Reason       Optional reason for discarding
+   \param[in,out]  orc_TableContent    Table content to append entry to
+   \param[in,out]  oru32_TableCount    Current number of entries in table
+   \param[in]      orc_Id              ID of element to append to table
+   \param[in]      orc_Value           Value as string
+   \param[in]      orc_Reason          Optional reason for discarding
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_AppendTableEntry(QString & orc_TableContent, uint32 & oru32_TableCount,
@@ -577,7 +561,7 @@ void C_SyvDaItPaImportReport::m_AppendTableEntry(QString & orc_TableContent, uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get filter name for index
 
-   \param[in] ou32_Value Index to get filter for
+   \param[in]  ou32_Value  Index to get filter for
 
    \return
    Get Name for current filter

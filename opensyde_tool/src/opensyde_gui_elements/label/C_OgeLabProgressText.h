@@ -27,7 +27,7 @@ class C_OgeLabProgressText :
    Q_OBJECT
 
 public:
-   C_OgeLabProgressText(QWidget * const opc_Parent);
+   C_OgeLabProgressText(QWidget * const opc_Parent = NULL);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

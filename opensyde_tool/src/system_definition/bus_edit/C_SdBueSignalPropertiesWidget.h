@@ -163,6 +163,7 @@ Q_SIGNALS:
    //lint -restore
    void SigChanged(void);
    void SigNameChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
+   void SigStartBitChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void SigUpdateMlv(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 ou32_SignalIndex);
    void SigRecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);

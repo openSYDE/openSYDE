@@ -225,7 +225,7 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
             c_Header = C_GtGetText::h_GetText("CAN message data in bytes.");
             break;
          case eCYCLIC_TRIGGER:
-            c_Header = C_GtGetText::h_GetText("Send this CAN message cyclic.");
+            c_Header = C_GtGetText::h_GetText("Transmit this CAN message cyclically.");
             break;
          case eCYCLIC_TIME:
             c_Header = C_GtGetText::h_GetText("CAN message cycle time in ms.");
@@ -744,7 +744,8 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
                   else
                   {
                      //Special for cyclic trigger: change the current message as necessary (no two signals necessary)
-                     if (e_Col == eCYCLIC_TRIGGER)
+                     if ((e_Col == eCYCLIC_TRIGGER) &&
+                         (C_CamProHandler::h_GetInstance()->GetCyclicMessageTransmitActive() == true))
                      {
                         Q_EMIT (this->SigRegisterCyclicMessage(u32_Index, q_Val));
                      }
@@ -1120,7 +1121,8 @@ void C_CamGenTableModel::m_CheckAndHandleRegisterCyclicMessage(const uint32 ou32
    const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(ou32_MessageIndex);
 
    //Only send this signal if the message is currently cyclic
-   if ((pc_Message != NULL) && (pc_Message->q_DoCyclicTrigger == true))
+   if ((pc_Message != NULL) && (pc_Message->q_DoCyclicTrigger == true) &&
+       ((C_CamProHandler::h_GetInstance()->GetCyclicMessageTransmitActive() == true)))
    {
       Q_EMIT (this->SigRegisterCyclicMessage(ou32_MessageIndex, oq_Active));
    }

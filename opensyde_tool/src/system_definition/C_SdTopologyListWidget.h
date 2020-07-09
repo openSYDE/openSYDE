@@ -11,6 +11,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeListWidgetToolTipBase.h"
+#include "C_OgeContextMenu.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -31,8 +32,18 @@ public:
    void SetMaximumHeightAdaption(const bool oq_Active);
    void ApplyDarkMode(const bool oq_Active) const;
    void SetGroupName(const QString & orc_Name);
+   void UpdateSize(void);
+
+   bool GetMinimumSize(void) const;
+   void SetMinimumSize(const bool oq_MinimumSize);
 
    static const QString hc_GroupName;
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+Q_SIGNALS:
+   //lint -restore
+   void SigDelete(const QPoint & orc_Pos);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -46,9 +57,15 @@ private:
    C_SdTopologyListWidget(const C_SdTopologyListWidget &);
    C_SdTopologyListWidget & operator =(const C_SdTopologyListWidget &);
 
+   void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
+   void m_DeleteTriggered(void);
+
    bool mq_MinimumSize;
    bool mq_AdaptMaximumHeight;
    QString mc_Name;
+   stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
+   QAction * mpc_DeleteAction;
+   QPoint mc_Position;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

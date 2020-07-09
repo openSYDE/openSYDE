@@ -22,6 +22,7 @@
 
 #include "TGLUtils.h"
 #include "TGLTime.h"
+#include "C_OSCUtils.h"
 #include "C_Uti.h"
 #include "C_OgeWiUtil.h"
 #include "C_CamUti.h"
@@ -35,6 +36,7 @@
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
+using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
@@ -77,14 +79,14 @@ C_CamMainWindow::C_CamMainWindow(QWidget * const opc_Parent) :
    this->ms32_SettingsSplitterPosition = 0;
    this->ms32_MessageGenSplitterPosition = 0;
 
-   //Drag & drop of *.syde_cam files
+   //Drag & drop of *.syde_cam and database files
    this->setAcceptDrops(true);
 
    // window title
    this->setWindowTitle("openSYDE CAN Monitor");
 
    // set help file path (openSYDE CAN Monitor specific)
-   stw_opensyde_gui_logic::C_HeHandler::GetInstance().SetHelpFileRelPath("/../Help/openSYDE PC Tool.chm");
+   stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().SetHelpFileRelPath("/../Help/openSYDE PC Tool.chm");
 
    // Connections
    // State handling
@@ -192,6 +194,8 @@ C_CamMainWindow::C_CamMainWindow(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_GeneratorWidget, &C_CamGenWidget::SigSendMessage, this, &C_CamMainWindow::m_SendMessage);
    connect(this->mpc_Ui->pc_GeneratorWidget, &C_CamGenWidget::SigRegisterCyclicMessage, this,
            &C_CamMainWindow::m_RegisterCyclicMessage);
+   connect(this->mpc_Ui->pc_GeneratorWidget, &C_CamGenWidget::SigRemoveAllCyclicMessages, this,
+           &C_CamMainWindow::m_RemoveAllCyclicMessages);
 
    this->m_LoadUserSettings();
 }
@@ -264,9 +268,9 @@ void C_CamMainWindow::closeEvent(QCloseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
-   if (stw_opensyde_gui_logic::C_HeHandler::CheckHelpKey(opc_KeyEvent) == true)
+   if (stw_opensyde_gui_logic::C_HeHandler::h_CheckHelpKey(opc_KeyEvent) == true)
    {
-      stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
          this->metaObject()->className());
    }
    else if (this->mpc_Ui->pc_GeneratorWidget->CheckAndHandleKey(opc_KeyEvent->text()) == true)
@@ -283,6 +287,20 @@ void C_CamMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F12))
    {
       this->mpc_Ui->pc_TitleBarWidget->SaveAsConfig();
+   }
+   // Search on F3
+   else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F3))
+   {
+      if (opc_KeyEvent->modifiers().testFlag(Qt::ShiftModifier) == false)
+      {
+         // Search forward on F3
+         this->mpc_Ui->pc_TraceWidget->SearchNext();
+      }
+      else
+      {
+         // Search backward on Shift F3
+         this->mpc_Ui->pc_TraceWidget->SearchPrev();
+      }
    }
    else
    {
@@ -346,27 +364,35 @@ void C_CamMainWindow::dropEvent(QDropEvent * const opc_Event)
 
    if (mh_CheckMime(pc_MimeData, &c_FilePath) == true)
    {
-      QFileInfo c_FileInfo(c_FilePath);
-
-      // drop of project file
-      if (c_FileInfo.suffix().compare("syde_cam", Qt::CaseInsensitive) == 0)
+      // Check if path is a valid path with no irregular characters
+      if (C_OSCUtils::h_CheckValidFilePath(c_FilePath.toStdString().c_str()) == false)
       {
-         if (this->mpc_Ui->pc_TitleBarWidget->HandleProjectComparison() == true)
-         {
-            // Let all modules save their specific user settings before saving to file
-            this->m_SaveUserSettings();
-
-            // save user settings to not lose project dependent user settings
-            C_UsHandler::h_GetInstance()->Save();
-
-            // load configuration
-            this->mpc_Ui->pc_TitleBarWidget->LoadConfig(c_FilePath);
-         }
+         C_OgeWiUtil::h_ShowPathInvalidError(this, c_FilePath);
       }
-      // drop of database file
       else
       {
-         this->mpc_Ui->pc_SettingsWidget->OnDatabaseDropped(c_FilePath);
+         QFileInfo c_FileInfo(c_FilePath);
+
+         // drop of project file
+         if (c_FileInfo.suffix().compare("syde_cam", Qt::CaseInsensitive) == 0)
+         {
+            if (this->mpc_Ui->pc_TitleBarWidget->HandleProjectComparison() == true)
+            {
+               // Let all modules save their specific user settings before saving to file
+               this->m_SaveUserSettings();
+
+               // save user settings to not lose project dependent user settings
+               C_UsHandler::h_GetInstance()->Save();
+
+               // load configuration
+               this->mpc_Ui->pc_TitleBarWidget->LoadConfig(c_FilePath);
+            }
+         }
+         // drop of database file
+         else
+         {
+            this->mpc_Ui->pc_SettingsWidget->OnDatabaseDropped(c_FilePath);
+         }
       }
    }
    QMainWindow::dropEvent(opc_Event);
@@ -420,14 +446,14 @@ void C_CamMainWindow::m_StartLogging(void)
       this->mc_ComDriver.StartLogging(s32_Bitrate);
       this->mpc_Ui->pc_TraceWidget->SetCANBitrate(s32_Bitrate);
       this->mpc_CanThread->start();
-      this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStarted();
+      this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStarted(true);
       this->mpc_Ui->pc_SettingsWidget->OnCommunicationStarted(true);
       this->mq_LoggingStarted = true;
    }
    else
    {
       this->mpc_Ui->pc_TraceWidget->StopLogging();
-      this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStopped();
+      this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStarted(false);
       this->mpc_Ui->pc_SettingsWidget->OnCommunicationStarted(false);
    }
 }
@@ -439,7 +465,7 @@ void C_CamMainWindow::m_StartLogging(void)
 void C_CamMainWindow::m_PauseLogging(void)
 {
    this->mc_ComDriver.PauseLogging();
-   this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStopped();
+   this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStarted(false);
    this->mc_ComDriver.RemoveAllCyclicCanMessages();
 }
 
@@ -450,7 +476,7 @@ void C_CamMainWindow::m_PauseLogging(void)
 void C_CamMainWindow::m_ContinueLogging(void)
 {
    this->mc_ComDriver.ContinueLogging();
-   this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStarted();
+   this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStarted(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -465,7 +491,7 @@ void C_CamMainWindow::m_StopLogging(void)
    this->mpc_CanThread->wait();
    this->mc_ComDriver.StopLogging();
    this->m_CloseCan();
-   this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStopped();
+   this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStarted(false);
    this->mc_ComDriver.RemoveAllCyclicCanMessages();
    this->mpc_Ui->pc_SettingsWidget->OnCommunicationStarted(false);
    //Clear bitrate
@@ -1003,6 +1029,15 @@ void C_CamMainWindow::m_SendMessage(const uint32 ou32_MessageIndex, const stw_ty
       //Send
       this->mc_ComDriver.SendCanMessage(c_Message);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for removing all registered cyclic messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMainWindow::m_RemoveAllCyclicMessages(void)
+{
+   this->mc_ComDriver.RemoveAllCyclicCanMessages();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

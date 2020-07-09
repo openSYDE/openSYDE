@@ -129,7 +129,7 @@ uint16 C_OSCDataDealerNvm::NvmCalcCrc(const C_OSCNodeDataPoolList & orc_List) co
    C_RD_WR     Datapool element size configuration does not match with count of read bytes
    C_CHECKSUM  Checksum of read datapool list is invalid
    C_TIMEOUT   Expected response not received within timeout
-   C_NOACT     Could not send request (e.g. TX buffer full)
+   C_NOACT     Could not send request (e.g. Tx buffer full)
    C_WARN      Error response or malformed protocol response
    C_COM       Pre-requisites not correct; e.g. driver not initialized or
                parameter out of range (checked by client side)
@@ -179,7 +179,7 @@ sint32 C_OSCDataDealerNvm::NvmReadList(const uint32 ou32_DataPoolIndex, const ui
    C_CONFIG   no node or diagnostic protocol are known (was this class properly Initialize()d ?)
               protocol driver reported configuration error (was the protocol driver properly initialized ?)
    C_TIMEOUT  Expected server response not received within timeout
-   C_NOACT    Could not send request (e.g. TX buffer full)
+   C_NOACT    Could not send request (e.g. Tx buffer full)
    C_WARN     Server sent error response
    C_RD_WR    unexpected content in server response (here: wrong data pool index)
    C_COM      communication driver reported error
@@ -214,7 +214,7 @@ sint32 C_OSCDataDealerNvm::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, con
    C_NO_ERR   Request sent, positive response received
    C_OVERFLOW List has no elements. Nothing to read
    C_TIMEOUT  Expected response not received within timeout
-   C_NOACT    Could not send request (e.g. TX buffer full)
+   C_NOACT    Could not send request (e.g. Tx buffer full)
    C_WARN     Error response
    C_CONFIG   Pre-requisites not correct; e.g. driver not initialized or
               parameter out of range (checked by client side)
@@ -354,7 +354,7 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc
          {
             (void)pc_Element->c_NvmValue.SetValueFromLittleEndianBlob(c_ElementData);
          }
-         pc_Element->q_IsValid = true;
+         pc_Element->q_NvmValueIsValid = true;
       }
       else
       {
@@ -374,7 +374,7 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc
    \return
    C_NO_ERR   Request sent, positive response received
    C_TIMEOUT  Expected response not received within timeout
-   C_NOACT    Could not send request (e.g. TX buffer full)
+   C_NOACT    Could not send request (e.g. Tx buffer full)
    C_WARN     Error response or malformed protocol response
    C_COM      Expected server response not received because of communication error
    C_CONFIG   Pre-requisites not correct; e.g. driver not initialized or

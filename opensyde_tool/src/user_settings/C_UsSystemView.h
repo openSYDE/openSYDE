@@ -36,12 +36,8 @@ public:
    // put System Commissioning Setup user settings Setter & Getter here
 
    // Update
-   const QMap<stw_types::uint32, stw_types::uint64> & GetUpdateDataRateHistory(void) const;
-   const QMap<stw_types::uint32, QMap<stw_types::uint32,
-                                      stw_types::float64> > & GetUpdateDataRateHistoryPerNode(void) const;
-   void AddUpdateDataRate(const stw_types::uint32 ou32_Checksum, const stw_types::uint64 ou64_DataRateBytesPerS);
-   void AddUpdateDataRatePerNode(const stw_types::uint32 ou32_Checksum, const QMap<stw_types::uint32,
-                                                                                   stw_types::float64> & orc_DataRateBytesPerMs);
+   void AddNodeUpdateDataRate(const QString & orc_NodeName, const stw_types::uint32 ou32_Checksum,
+                              const stw_types::float64 of64_DataRateBytesPerMs);
    stw_types::sint32 GetUpdateSplitterX(void) const;
    stw_types::sint32 GetUpdateHorizontalSplitterY(void) const;
    void SetUpdateSplitterX(const stw_types::sint32 os32_Value);
@@ -92,13 +88,8 @@ public:
    QString c_ParamRecordFileName;
 
 private:
-   QMap<QString, C_UsSystemViewDashboard> mc_Dashboards;                ///< History of last known view dashboard user
-                                                                        // settings
-   QMap<stw_types::uint32, stw_types::uint64> mc_UpdateDataRateHistory; ///< History of last known view update
-                                                                        // effective data rates
-   QMap<stw_types::uint32,
-        QMap<stw_types::uint32,
-             stw_types::float64> > mc_UpdateDataRateHistoryPerNode; ///< History of last known view update
+   QMap<QString, C_UsSystemViewDashboard> mc_Dashboards; ///< History of last known view dashboard user
+                                                         // settings
    // effective data rates (per node)
    bool mq_NavigationExpanded;                       ///< History of last known navigation status
    stw_types::sint32 ms32_UpdateSplitterX;           ///< History of last known update splitter position x value

@@ -23,6 +23,7 @@
 #include "C_OSCNode.h"
 #include "C_OSCNodeDataPoolListElementId.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
+#include "C_PuiSdNodeCanMessage.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -72,6 +73,7 @@ public:
    static std::vector<stw_types::uint32> h_GetUsedBusIdsUniqueAndSortedAscending(
       const stw_types::sint32 os32_SpecialBusIndex);
    static void h_AdaptMessageToProtocolType(stw_opensyde_core::C_OSCCanMessage & orc_Message,
+                                            stw_opensyde_gui_logic::C_PuiSdNodeCanMessage * const opc_UiMessage,
                                             const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Type,
                                             QStringList * const opc_AdaptationInfos);
    static void h_AdaptSignalToProtocolType(stw_opensyde_core::C_OSCCanSignal & orc_Signal,
@@ -115,6 +117,15 @@ public:
    template <typename T, typename U>
    static void h_SortIndicesAscendingAndSync(std::vector<stw_types::uint32> & orc_IndicesTmp,
                                              std::vector<T> & orc_OSCContentTmp, std::vector<U> & orc_UIContentTmp);
+   static void h_ConfigureComDatapools(const stw_types::uint32 ou32_NodeIndex,
+                                       const stw_types::uint8 ou8_InterfaceNumber, const bool oq_ComProtocolL2,
+                                       const bool oq_ComProtocolECeS, const bool oq_ComProtocolECoS);
+
+private:
+   static void mh_ConfigureComDatapool(const stw_types::uint32 ou32_NodeIndex,
+                                       const stw_types::uint32 ou32_InterfaceIndex,
+                                       const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType,
+                                       const bool oq_Active);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -310,8 +310,8 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
 
          c_ToolTipText += C_GtGetText::h_GetText("Share configuration with:\n");
 
-         C_SdNdeDpUtil::GetSharedDatapoolGroup(u32_SharedGroup, this->mc_DatapoolId,
-                                               this->mc_DatapoolId.u32_NodeIndex, c_SharedDatapoolGroup);
+         C_SdNdeDpUtil::h_GetSharedDatapoolGroup(u32_SharedGroup, this->mc_DatapoolId,
+                                                 this->mc_DatapoolId.u32_NodeIndex, c_SharedDatapoolGroup);
 
          for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < c_SharedDatapoolGroup.size(); ++u32_DatapoolCounter)
          {

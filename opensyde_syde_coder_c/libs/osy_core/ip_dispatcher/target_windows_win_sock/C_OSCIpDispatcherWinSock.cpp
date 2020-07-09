@@ -904,7 +904,7 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<u
       {
          sintn sn_Return;
          uint32 u32_SizeInBuffer;
-         //do we have enough bytes in RX buffer ?
+         //do we have enough bytes in Rx buffer ?
          sn_Return = ioctlsocket(this->mc_SocketsTcp[ou32_Handle].un_Socket, m_WsFionRead(), &u32_SizeInBuffer);
          if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= orc_Data.size()))
          {
@@ -1184,7 +1184,7 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
       {
          if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
          {
-            //do we have a package in RX buffer ?
+            //do we have a package in Rx buffer ?
             uint32 u32_SizeInBuffer;
             sintn sn_Return = ioctlsocket(mc_SocketsUdpServer[u32_Interface], m_WsFionRead(), &u32_SizeInBuffer);
             if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= 1U))

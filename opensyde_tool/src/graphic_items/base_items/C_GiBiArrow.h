@@ -30,7 +30,7 @@ class C_GiBiArrow :
    public stw_opensyde_gui_logic::C_GiUnique
 {
 public:
-   C_GiBiArrow(const stw_types::uint64 & oru64_ID, const std::vector<QPointF> * const opc_Points = NULL,
+   C_GiBiArrow(const stw_types::uint64 & oru64_ID = 0, const std::vector<QPointF> * const opc_Points = NULL,
                QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiBiArrow(void);
    virtual QPainterPath shape(void) const override;

@@ -55,8 +55,8 @@ using namespace stw_opensyde_core;
 sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & orc_FilePath)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForExistingFile(c_XMLParser, orc_FilePath,
-                                                                         "opensyde-node-core-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser, orc_FilePath,
+                                                                        "opensyde-node-core-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -159,8 +159,8 @@ sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLStr
                                       std::vector<C_SCLString> * const opc_CreatedFiles)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForNewFile(c_XMLParser, orc_FilePath,
-                                                                    "opensyde-node-core-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForNewFile(c_XMLParser, orc_FilePath,
+                                                                   "opensyde-node-core-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -281,7 +281,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & or
             else
             {
                s32_Retval = C_OSCNodeCommFiler::h_LoadNodeComProtocolFile(c_CurComProtocol,
-                                                                          C_OSCSystemFilerUtil::mh_CombinePaths(
+                                                                          C_OSCSystemFilerUtil::h_CombinePaths(
                                                                              orc_BasePath,
                                                                              orc_XMLParser.GetNodeContent()),
                                                                           orc_NodeDataPools);
@@ -356,7 +356,7 @@ sint32 C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
          else
          {
             const C_SCLString c_FileName = C_OSCNodeCommFiler::h_GetFileName(rc_CurDatapool.c_Name);
-            const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath, c_FileName);
+            const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
             //Save comm definition file
             s32_Retval = C_OSCNodeCommFiler::h_SaveNodeComProtocolFile(orc_NodeComProtocols[u32_ItComProtocol],
                                                                        c_CombinedFileName,
@@ -394,7 +394,7 @@ sint32 C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeFiler::h_GetFolderName(const C_SCLString & orc_NodeName)
 {
-   return "node_" + C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(orc_NodeName);
+   return "node_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(orc_NodeName);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -474,119 +474,14 @@ sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropertie
          osc_write_log_error("Loading node definition", "Could not find \"properties\".\"flash-loader\" node.");
          s32_Retval = C_CONFIG;
       }
+
       //Communication interfaces
       if ((orc_XMLParser.SelectNodeChild("communication-interfaces") == "communication-interfaces") &&
           (s32_Retval == C_NO_ERR))
       {
-         C_SCLString c_CurNode = orc_XMLParser.SelectNodeChild("communication-interface");
-         if (c_CurNode == "communication-interface")
-         {
-            do
-            {
-               C_OSCNodeComInterfaceSettings c_ComInterface;
-
-               c_ComInterface.u8_InterfaceNumber =
-                  static_cast<uint8>(orc_XMLParser.GetAttributeUint32("interface-number"));
-               c_ComInterface.u8_NodeID = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("node-id"));
-               c_ComInterface.q_IsUpdateEnabled = orc_XMLParser.GetAttributeBool("update-available");
-               c_ComInterface.q_IsRoutingEnabled = orc_XMLParser.GetAttributeBool("routing-available");
-               c_ComInterface.q_IsDiagnosisEnabled = orc_XMLParser.GetAttributeBool("diagnosis-available");
-               //Type
-               if ((orc_XMLParser.SelectNodeChild("type") == "type") && (s32_Retval == C_NO_ERR))
-               {
-                  s32_Retval = C_OSCSystemFilerUtil::mh_BusTypeStringToEnum(
-                     orc_XMLParser.GetNodeContent(), c_ComInterface.e_InterfaceType);
-                  //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-               }
-               else
-               {
-                  osc_write_log_error("Loading node definition",
-                                      "Could not find \"communication-interface\".\"type\" node.");
-                  s32_Retval = C_CONFIG;
-               }
-
-               //IP address
-               if ((orc_XMLParser.SelectNodeChild("ip-address") == "ip-address") && (s32_Retval == C_NO_ERR))
-               {
-                  c_ComInterface.c_Ip.au8_IpAddress[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte1"));
-                  c_ComInterface.c_Ip.au8_IpAddress[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte2"));
-                  c_ComInterface.c_Ip.au8_IpAddress[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte3"));
-                  c_ComInterface.c_Ip.au8_IpAddress[3] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte4"));
-                  //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-               }
-               else
-               {
-                  c_ComInterface.c_Ip.au8_IpAddress[0] = 0U;
-                  c_ComInterface.c_Ip.au8_IpAddress[1] = 0U;
-                  c_ComInterface.c_Ip.au8_IpAddress[2] = 0U;
-                  c_ComInterface.c_Ip.au8_IpAddress[3] = 0U;
-               }
-
-               //net mask
-               if ((orc_XMLParser.SelectNodeChild("net-mask") == "net-mask") && (s32_Retval == C_NO_ERR))
-               {
-                  c_ComInterface.c_Ip.au8_NetMask[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte1"));
-                  c_ComInterface.c_Ip.au8_NetMask[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte2"));
-                  c_ComInterface.c_Ip.au8_NetMask[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte3"));
-                  c_ComInterface.c_Ip.au8_NetMask[3] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte4"));
-                  //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-               }
-               else
-               {
-                  c_ComInterface.c_Ip.au8_NetMask[0] = 0U;
-                  c_ComInterface.c_Ip.au8_NetMask[1] = 0U;
-                  c_ComInterface.c_Ip.au8_NetMask[2] = 0U;
-                  c_ComInterface.c_Ip.au8_NetMask[3] = 0U;
-               }
-
-               //default gateway
-               if ((orc_XMLParser.SelectNodeChild("default-gateway") == "default-gateway") && (s32_Retval == C_NO_ERR))
-               {
-                  c_ComInterface.c_Ip.au8_DefaultGateway[0] =
-                     static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte1"));
-                  c_ComInterface.c_Ip.au8_DefaultGateway[1] =
-                     static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte2"));
-                  c_ComInterface.c_Ip.au8_DefaultGateway[2] =
-                     static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte3"));
-                  c_ComInterface.c_Ip.au8_DefaultGateway[3] =
-                     static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte4"));
-                  //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-               }
-               else
-               {
-                  c_ComInterface.c_Ip.au8_DefaultGateway[0] = 0U;
-                  c_ComInterface.c_Ip.au8_DefaultGateway[1] = 0U;
-                  c_ComInterface.c_Ip.au8_DefaultGateway[2] = 0U;
-                  c_ComInterface.c_Ip.au8_DefaultGateway[3] = 0U;
-               }
-               //Bus
-               if (orc_XMLParser.SelectNodeChild("bus") == "bus")
-               {
-                  c_ComInterface.q_IsBusConnected = orc_XMLParser.GetAttributeBool("connected");
-                  c_ComInterface.u32_BusIndex = orc_XMLParser.GetAttributeUint32("bus-index");
-                  //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-               }
-               else
-               {
-                  osc_write_log_error("Loading node definition",
-                                      "Could not find \"communication-interface\".\"bus\" node.");
-                  s32_Retval = C_CONFIG;
-               }
-               orc_NodeProperties.c_ComInterfaces.push_back(c_ComInterface);
-               c_CurNode = orc_XMLParser.SelectNodeNext("communication-interface");
-            }
-            while (c_CurNode == "communication-interface");
-            //Return
-            tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interfaces");
-         }
-         //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+         s32_Retval = mh_LoadComInterface(orc_NodeProperties.c_ComInterfaces, orc_XMLParser);
       }
+
       //openSYDE server settings
       if (orc_XMLParser.SelectNodeChild("open-syde-server-settings") == "open-syde-server-settings")
       {
@@ -644,10 +539,35 @@ sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropertie
          orc_NodeProperties.c_OpenSYDEServerSettings.Initialize();
       }
 
+      //Flashloader settings
       if (s32_Retval == C_NO_ERR)
       {
          s32_Retval = mh_LoadStwFlashloaderOptions(orc_NodeProperties.c_STWFlashloaderSettings, orc_XMLParser);
       }
+
+      //Code export settings
+      if ((orc_XMLParser.SelectNodeChild("code-export-settings") == "code-export-settings") && (s32_Retval == C_NO_ERR))
+      {
+         if (orc_XMLParser.SelectNodeChild("scaling-support") == "scaling-support")
+         {
+            s32_Retval = C_OSCSystemFilerUtil::h_StringToCodeExportScalingType(
+               orc_XMLParser.GetNodeContent(), orc_NodeProperties.c_CodeExportSettings.e_ScalingSupport);
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "code-export-settings");
+         }
+         else
+         {
+            orc_NodeProperties.c_CodeExportSettings.e_ScalingSupport = C_OSCNodeCodeExportSettings::eFLOAT32;
+         }
+
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+      }
+      else
+      {
+         orc_NodeProperties.c_CodeExportSettings.Initialize();
+      }
+
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
    }
@@ -680,59 +600,9 @@ void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePrope
    orc_XMLParser.CreateNodeChild("diagnostic-server",
                                  mh_DiagnosticServerToString(orc_NodeProperties.e_DiagnosticServer));
    orc_XMLParser.CreateNodeChild("flash-loader", mh_FlashLoaderToString(orc_NodeProperties.e_FlashLoader));
-   //Com interfaces
-   orc_XMLParser.CreateAndSelectNodeChild("communication-interfaces");
-   for (uint32 u32_ItComInterface = 0; u32_ItComInterface < orc_NodeProperties.c_ComInterfaces.size();
-        ++u32_ItComInterface)
-   {
-      const C_OSCNodeComInterfaceSettings & rc_CurComInterface = orc_NodeProperties.c_ComInterfaces[u32_ItComInterface];
 
-      orc_XMLParser.CreateAndSelectNodeChild("communication-interface");
-      orc_XMLParser.SetAttributeUint32("interface-number", static_cast<uint32>(rc_CurComInterface.u8_InterfaceNumber));
-      orc_XMLParser.SetAttributeUint32("node-id", static_cast<uint32>(rc_CurComInterface.u8_NodeID));
-      orc_XMLParser.SetAttributeBool("update-available", rc_CurComInterface.q_IsUpdateEnabled);
-      orc_XMLParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
-      orc_XMLParser.SetAttributeBool("diagnosis-available", rc_CurComInterface.q_IsDiagnosisEnabled);
-      orc_XMLParser.CreateNodeChild("type",
-                                    C_OSCSystemFilerUtil::mh_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
-      if (rc_CurComInterface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
-      {
-         orc_XMLParser.CreateAndSelectNodeChild("ip-address");
-         orc_XMLParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_IpAddress[0]);
-         orc_XMLParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_IpAddress[1]);
-         orc_XMLParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_IpAddress[2]);
-         orc_XMLParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_IpAddress[3]);
-         //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-         orc_XMLParser.CreateAndSelectNodeChild("net-mask");
-         orc_XMLParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_NetMask[0]);
-         orc_XMLParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_NetMask[1]);
-         orc_XMLParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_NetMask[2]);
-         orc_XMLParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_NetMask[3]);
-         //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-         orc_XMLParser.CreateAndSelectNodeChild("default-gateway");
-         orc_XMLParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_DefaultGateway[0]);
-         orc_XMLParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_DefaultGateway[1]);
-         orc_XMLParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_DefaultGateway[2]);
-         orc_XMLParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_DefaultGateway[3]);
-         //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-      }
-      //Create this section for compatibility reasons (had content and was required by previous openSYDE versions)
-      orc_XMLParser.CreateAndSelectNodeChild("communication-protocol");
-      //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-      orc_XMLParser.CreateAndSelectNodeChild("bus");
-      orc_XMLParser.SetAttributeBool("connected", rc_CurComInterface.q_IsBusConnected);
-      orc_XMLParser.SetAttributeUint32("bus-index", rc_CurComInterface.u32_BusIndex);
-      //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-      //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interfaces");
-   }
-   //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+   //Com interfaces
+   mh_SaveComInterface(orc_NodeProperties.c_ComInterfaces, orc_XMLParser);
 
    //openSYDE server settings
    orc_XMLParser.CreateAndSelectNodeChild("open-syde-server-settings");
@@ -748,7 +618,17 @@ void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePrope
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
 
+   //Flashloader options
    mh_SaveStwFlashloaderOptions(orc_NodeProperties.c_STWFlashloaderSettings, orc_XMLParser);
+
+   //Code export settings
+   orc_XMLParser.CreateAndSelectNodeChild("code-export-settings");
+   orc_XMLParser.CreateNodeChild("scaling-support",
+                                 C_OSCSystemFilerUtil::h_CodeExportScalingTypeToString(orc_NodeProperties.
+                                                                                       c_CodeExportSettings.
+                                                                                       e_ScalingSupport));
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
 
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
@@ -896,6 +776,206 @@ void C_OSCNodeFiler::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderS
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load node communication interface settings
+
+   Load node data from XML file
+   pre-condition: the passed XML parser has the active node set to "properties"
+   post-condition: the passed XML parser has the active node set to the same "properties"
+
+   \param[out]     orc_ComInterfaces      data storage
+   \param[in,out]  orc_XMLParser          XML with core active
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeFiler::mh_LoadComInterface(std::vector<C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
+                                           C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = C_NO_ERR;
+   C_SCLString c_CurNode = orc_XMLParser.SelectNodeChild("communication-interface");
+
+   if (c_CurNode == "communication-interface")
+   {
+      do
+      {
+         C_OSCNodeComInterfaceSettings c_ComInterface;
+
+         c_ComInterface.u8_InterfaceNumber =
+            static_cast<uint8>(orc_XMLParser.GetAttributeUint32("interface-number"));
+         c_ComInterface.u8_NodeID = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("node-id"));
+         c_ComInterface.q_IsUpdateEnabled = orc_XMLParser.GetAttributeBool("update-available");
+         c_ComInterface.q_IsRoutingEnabled = orc_XMLParser.GetAttributeBool("routing-available");
+         c_ComInterface.q_IsDiagnosisEnabled = orc_XMLParser.GetAttributeBool("diagnosis-available");
+         //Type
+         if ((orc_XMLParser.SelectNodeChild("type") == "type") && (s32_Retval == C_NO_ERR))
+         {
+            s32_Retval = C_OSCSystemFilerUtil::h_BusTypeStringToEnum(
+               orc_XMLParser.GetNodeContent(), c_ComInterface.e_InterfaceType);
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+         }
+         else
+         {
+            osc_write_log_error("Loading node definition",
+                                "Could not find \"communication-interface\".\"type\" node.");
+            s32_Retval = C_CONFIG;
+         }
+
+         //IP address
+         if ((orc_XMLParser.SelectNodeChild("ip-address") == "ip-address") && (s32_Retval == C_NO_ERR))
+         {
+            c_ComInterface.c_Ip.au8_IpAddress[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte1"));
+            c_ComInterface.c_Ip.au8_IpAddress[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte2"));
+            c_ComInterface.c_Ip.au8_IpAddress[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte3"));
+            c_ComInterface.c_Ip.au8_IpAddress[3] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte4"));
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+         }
+         else
+         {
+            c_ComInterface.c_Ip.au8_IpAddress[0] = 0U;
+            c_ComInterface.c_Ip.au8_IpAddress[1] = 0U;
+            c_ComInterface.c_Ip.au8_IpAddress[2] = 0U;
+            c_ComInterface.c_Ip.au8_IpAddress[3] = 0U;
+         }
+
+         //net mask
+         if ((orc_XMLParser.SelectNodeChild("net-mask") == "net-mask") && (s32_Retval == C_NO_ERR))
+         {
+            c_ComInterface.c_Ip.au8_NetMask[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte1"));
+            c_ComInterface.c_Ip.au8_NetMask[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte2"));
+            c_ComInterface.c_Ip.au8_NetMask[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte3"));
+            c_ComInterface.c_Ip.au8_NetMask[3] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte4"));
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+         }
+         else
+         {
+            c_ComInterface.c_Ip.au8_NetMask[0] = 0U;
+            c_ComInterface.c_Ip.au8_NetMask[1] = 0U;
+            c_ComInterface.c_Ip.au8_NetMask[2] = 0U;
+            c_ComInterface.c_Ip.au8_NetMask[3] = 0U;
+         }
+
+         //default gateway
+         if ((orc_XMLParser.SelectNodeChild("default-gateway") == "default-gateway") && (s32_Retval == C_NO_ERR))
+         {
+            c_ComInterface.c_Ip.au8_DefaultGateway[0] =
+               static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte1"));
+            c_ComInterface.c_Ip.au8_DefaultGateway[1] =
+               static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte2"));
+            c_ComInterface.c_Ip.au8_DefaultGateway[2] =
+               static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte3"));
+            c_ComInterface.c_Ip.au8_DefaultGateway[3] =
+               static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte4"));
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+         }
+         else
+         {
+            c_ComInterface.c_Ip.au8_DefaultGateway[0] = 0U;
+            c_ComInterface.c_Ip.au8_DefaultGateway[1] = 0U;
+            c_ComInterface.c_Ip.au8_DefaultGateway[2] = 0U;
+            c_ComInterface.c_Ip.au8_DefaultGateway[3] = 0U;
+         }
+         //Bus
+         if (orc_XMLParser.SelectNodeChild("bus") == "bus")
+         {
+            c_ComInterface.q_IsBusConnected = orc_XMLParser.GetAttributeBool("connected");
+            c_ComInterface.u32_BusIndex = orc_XMLParser.GetAttributeUint32("bus-index");
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+         }
+         else
+         {
+            osc_write_log_error("Loading node definition",
+                                "Could not find \"communication-interface\".\"bus\" node.");
+            s32_Retval = C_CONFIG;
+         }
+         orc_ComInterfaces.push_back(c_ComInterface);
+         c_CurNode = orc_XMLParser.SelectNodeNext("communication-interface");
+      }
+      while (c_CurNode == "communication-interface");
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interfaces");
+   }
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save node communication interface settings
+
+   Save node to XML file
+   pre-condition: the passed XML parser has the active node set to "properties"
+   post-condition: the passed XML parser has the active node set to the same "properties"
+
+   \param[in]      orc_ComInterfaces     data storage
+   \param[in,out]  orc_XMLParser         XML with core active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeFiler::mh_SaveComInterface(const std::vector<C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
+                                         C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.CreateAndSelectNodeChild("communication-interfaces");
+   for (uint32 u32_ItComInterface = 0; u32_ItComInterface < orc_ComInterfaces.size();
+        ++u32_ItComInterface)
+   {
+      const C_OSCNodeComInterfaceSettings & rc_CurComInterface = orc_ComInterfaces[u32_ItComInterface];
+
+      orc_XMLParser.CreateAndSelectNodeChild("communication-interface");
+      orc_XMLParser.SetAttributeUint32("interface-number", static_cast<uint32>(rc_CurComInterface.u8_InterfaceNumber));
+      orc_XMLParser.SetAttributeUint32("node-id", static_cast<uint32>(rc_CurComInterface.u8_NodeID));
+      orc_XMLParser.SetAttributeBool("update-available", rc_CurComInterface.q_IsUpdateEnabled);
+      orc_XMLParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
+      orc_XMLParser.SetAttributeBool("diagnosis-available", rc_CurComInterface.q_IsDiagnosisEnabled);
+      orc_XMLParser.CreateNodeChild("type",
+                                    C_OSCSystemFilerUtil::h_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
+      if (rc_CurComInterface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
+      {
+         orc_XMLParser.CreateAndSelectNodeChild("ip-address");
+         orc_XMLParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_IpAddress[0]);
+         orc_XMLParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_IpAddress[1]);
+         orc_XMLParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_IpAddress[2]);
+         orc_XMLParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_IpAddress[3]);
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+         orc_XMLParser.CreateAndSelectNodeChild("net-mask");
+         orc_XMLParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_NetMask[0]);
+         orc_XMLParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_NetMask[1]);
+         orc_XMLParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_NetMask[2]);
+         orc_XMLParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_NetMask[3]);
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+         orc_XMLParser.CreateAndSelectNodeChild("default-gateway");
+         orc_XMLParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_DefaultGateway[0]);
+         orc_XMLParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_DefaultGateway[1]);
+         orc_XMLParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_DefaultGateway[2]);
+         orc_XMLParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_DefaultGateway[3]);
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+      }
+      //Create this section for compatibility reasons (had content and was required by previous openSYDE versions)
+      orc_XMLParser.CreateAndSelectNodeChild("communication-protocol");
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+      orc_XMLParser.CreateAndSelectNodeChild("bus");
+      orc_XMLParser.SetAttributeBool("connected", rc_CurComInterface.q_IsBusConnected);
+      orc_XMLParser.SetAttributeUint32("bus-index", rc_CurComInterface.u32_BusIndex);
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interfaces");
+   }
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load node applications
 
    Load node data from XML file
@@ -1009,7 +1089,7 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_ProjectPath = "";
             }
 
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("ide-call") == "ide-call"))
@@ -1021,7 +1101,7 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_IDECall = "";
             }
 
             if ((s32_Retval == C_NO_ERR) &&
@@ -1034,7 +1114,7 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_CodeGeneratorPath = "";
             }
 
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("generate-path") == "generate-path"))
@@ -1046,7 +1126,7 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_ResultPath = "";
+               c_CurApplication.c_GeneratePath = "";
             }
 
             if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("result-path") == "result-path"))
@@ -1179,9 +1259,9 @@ sint32 C_OSCNodeFiler::mh_LoadDataPools(C_OSCNode & orc_Node, C_OSCXMLParserBase
             {
                s32_Retval =
                   C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(c_CurDataPool,
-                                                             C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath,
-                                                                                                   orc_XMLParser.
-                                                                                                   GetNodeContent()));
+                                                             C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                                  orc_XMLParser.
+                                                                                                  GetNodeContent()));
             }
             if (s32_Retval != C_NO_ERR)
             {
@@ -1247,7 +1327,7 @@ sint32 C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
    sint32 s32_Retval = C_NO_ERR;
 
    orc_XMLParser.CreateAndSelectNodeChild("data-pools");
-   orc_XMLParser.SetAttributeString("length", orc_NodeDataPools.size());
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeDataPools.size());
    for (uint32 u32_ItDataPool = 0; (u32_ItDataPool < orc_NodeDataPools.size()) && (s32_Retval == C_NO_ERR);
         ++u32_ItDataPool)
    {
@@ -1261,7 +1341,7 @@ sint32 C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
       else
       {
          const C_SCLString c_FileName = C_OSCNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
-         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath, c_FileName);
+         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
          //Save datapool file
          s32_Retval = C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(rc_CurDatapool, c_CombinedFileName);
          //Set file reference
@@ -1310,9 +1390,9 @@ sint32 C_OSCNodeFiler::mh_LoadHALC(C_OSCHalcConfig & orc_Config, C_OSCXMLParserB
       {
          s32_Retval =
             C_OSCHalcConfigFiler::h_LoadFile(orc_Config,
-                                             C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath,
-                                                                                   orc_XMLParser.
-                                                                                   GetNodeContent()), orc_BasePath);
+                                             C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                  orc_XMLParser.
+                                                                                  GetNodeContent()), orc_BasePath);
       }
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
@@ -1356,7 +1436,7 @@ sint32 C_OSCNodeFiler::mh_SaveHALC(const C_OSCHalcConfig & orc_Config, C_OSCXMLP
          // const C_SCLString c_FileName = C_OSCNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
          //Fix
          const C_SCLString c_FileName = "halc.xml";
-         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath, c_FileName);
+         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
          //Save datapool file
          s32_Retval = C_OSCHalcConfigFiler::h_SaveFile(orc_Config, c_CombinedFileName, orc_BasePath, opc_CreatedFiles);
          //Set file reference
@@ -1435,7 +1515,7 @@ sint32 C_OSCNodeFiler::mh_StringToDiagnosticServer(const C_SCLString & orc_Strin
    }
    else
    {
-      osc_write_log_error("Loading node definition", "Invalid value for \"properties\".\"diagnostic-server\":" +
+      osc_write_log_error("Loading node definition", "Invalid value for \"properties\".\"diagnostic-server\": " +
                           orc_String);
       s32_Retval = C_RANGE;
    }
@@ -1505,7 +1585,7 @@ sint32 C_OSCNodeFiler::mh_StringToFlashLoader(const C_SCLString & orc_String,
    else
    {
       osc_write_log_error("Loading node definition",
-                          "Invalid value for \"properties\".\"flash-loader\":" + orc_String);
+                          "Invalid value for \"properties\".\"flash-loader\": " + orc_String);
       s32_Retval = C_RANGE;
    }
 

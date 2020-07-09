@@ -68,7 +68,7 @@ void C_SyvDaUnoManager::DoDelete(const QList<QGraphicsItem *> & orc_Items)
       std::vector<uint64> c_IDs;
       C_SyvDaUnoDeleteCommand * pc_DeleteCommand;
 
-      m_MapItemToID(orc_Items, c_IDs);
+      mh_MapItemToID(orc_Items, c_IDs);
 
       pc_DeleteCommand = new C_SyvDaUnoDeleteCommand(this->mpc_Scene, c_IDs);
       this->DoPush(pc_DeleteCommand);

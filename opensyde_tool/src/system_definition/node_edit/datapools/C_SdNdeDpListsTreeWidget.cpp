@@ -15,7 +15,6 @@
 #include <iostream>
 
 #include <QDrag>
-#include <QElapsedTimer>
 #include <QDragMoveEvent>
 #include <QScrollBar>
 
@@ -28,7 +27,7 @@
 #include "C_SdNdeDpUtil.h"
 #include "C_Uti.h"
 #include "C_OgeWiUtil.h"
-#include "constants.h"
+#include "C_OSCLoggingHandler.h"
 #include "TGLUtils.h"
 #include "C_SdUtil.h"
 #include "C_UsHandler.h"
@@ -60,7 +59,7 @@ using namespace stw_tgl;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListsTreeWidget::C_SdNdeDpListsTreeWidget(QWidget * const opc_Parent) :
@@ -139,18 +138,14 @@ C_SdNdeDpListsTreeWidget::~C_SdNdeDpListsTreeWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new data pool
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::SetDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)
 {
-   QElapsedTimer c_Timer;
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
    if (this->mq_InitialUserSettings == true)
    {
       this->mq_InitialUserSettings = false;
@@ -170,10 +165,9 @@ void C_SdNdeDpListsTreeWidget::SetDataPool(const uint32 & oru32_NodeIndex, const
    this->mc_Delegate.SetMaximumHeight(this->height());
    m_InitFromData();
    m_RestoreUserSettings();
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "List switch DP(" << this->mu32_DataPoolIndex << ") " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
+   osc_write_log_performance_stop(
+      u16_TimerId, QString("Switch list tree to Datapool %1").arg(this->mu32_DataPoolIndex).toStdString().c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -254,7 +248,7 @@ void C_SdNdeDpListsTreeWidget::UpdateUI(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert new row at specified row index
 
-   \param[in] oru32_TargetRow Row index
+   \param[in]  oru32_TargetRow   Row index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::InsertRowWithoutData(const uint32 & oru32_TargetRow)
@@ -375,7 +369,7 @@ void C_SdNdeDpListsTreeWidget::InsertAction(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Insert tree item
 
-   \param[in] orq_SetFocus Optional flag if inital focus should be set
+   \param[in]  orq_SetFocus   Optional flag if inital focus should be set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::Insert(const bool & orq_SetFocus)
@@ -622,8 +616,8 @@ bool C_SdNdeDpListsTreeWidget::CheckDataPoolFull(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to open a concrete datapool list or dataelement
 
-   \param[in] os32_ListIndex          Optional list index (if not used set to -1)
-   \param[in] os32_DataElementIndex   Optional data element index (if not used set to -1)
+   \param[in]  os32_ListIndex          Optional list index (if not used set to -1)
+   \param[in]  os32_DataElementIndex   Optional data element index (if not used set to -1)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::OpenDetail(const sint32 os32_ListIndex, const sint32 os32_DataElementIndex)
@@ -698,7 +692,7 @@ void C_SdNdeDpListsTreeWidget::HandleErrorChange(void)
 
    Here: Skip old item, find new item and add widget (widget is not copied)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::dropEvent(QDropEvent * const opc_Event)
@@ -761,7 +755,7 @@ void C_SdNdeDpListsTreeWidget::dropEvent(QDropEvent * const opc_Event)
 
    Here: Accept table item type
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::dragEnterEvent(QDragEnterEvent * const opc_Event)
@@ -802,7 +796,7 @@ void C_SdNdeDpListsTreeWidget::dragEnterEvent(QDragEnterEvent * const opc_Event)
 
    Here: selective deactivation of autoexpand feature
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
@@ -843,8 +837,8 @@ void C_SdNdeDpListsTreeWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
 
    Here: minimize last selected item & signal selection change
 
-   \param[in] orc_Selected   New selected items
-   \param[in] orc_Deselected Last selected items
+   \param[in]  orc_Selected      New selected items
+   \param[in]  orc_Deselected    Last selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::selectionChanged(const QItemSelection & orc_Selected,
@@ -908,7 +902,7 @@ void C_SdNdeDpListsTreeWidget::selectionChanged(const QItemSelection & orc_Selec
 
    Here: handle list paste
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::keyPressEvent(QKeyEvent * const opc_Event)
@@ -1009,9 +1003,9 @@ void C_SdNdeDpListsTreeWidget::keyPressEvent(QKeyEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle expand request
 
-   \param[in] opc_Item  Affected tree item widget
-   \param[in] oq_Expand true: expand
-                        false collapse
+   \param[in]  opc_Item    Affected tree item widget
+   \param[in]  oq_Expand   true: expand
+                           false collapse
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnExpandRequestedHeader(const C_SdNdeDpListHeaderWidget * const opc_Item,
@@ -1032,9 +1026,9 @@ void C_SdNdeDpListsTreeWidget::m_OnExpandRequestedHeader(const C_SdNdeDpListHead
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle expand request
 
-   \param[in] os32_Index Index
-   \param[in] oq_Expand  true: expand
-                         false collapse
+   \param[in]  os32_Index  Index
+   \param[in]  oq_Expand   true: expand
+                           false collapse
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnExpandRequestedIndex(const sint32 os32_Index, const bool oq_Expand)
@@ -1054,8 +1048,8 @@ void C_SdNdeDpListsTreeWidget::m_OnExpandRequestedIndex(const sint32 os32_Index,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set up new tree item widget
 
-   \param[in,out] opc_Item   Tree item widget to set up
-   \param[in]     os32_Index According index
+   \param[in,out]  opc_Item      Tree item widget to set up
+   \param[in]      os32_Index    According index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * const opc_Item, const sint32 os32_Index)
@@ -1126,8 +1120,8 @@ void C_SdNdeDpListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * const op
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move item in tree
 
-   \param[in] oru32_SourceIndices Source index
-   \param[in] oru32_TargetIndices Target index
+   \param[in]  oru32_SourceIndices  Source index
+   \param[in]  oru32_TargetIndices  Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_Move(const std::vector<uint32> & oru32_SourceIndices,
@@ -1205,7 +1199,7 @@ void C_SdNdeDpListsTreeWidget::m_UpdateAddress(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
 
-   \param[in] orc_Pos Local context menu position
+   \param[in]  orc_Pos  Local context menu position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
@@ -1269,7 +1263,7 @@ void C_SdNdeDpListsTreeWidget::m_SetupContextMenu(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle collapse event
 
-   \param[in] orc_Index Collapsed item
+   \param[in]  orc_Index   Collapsed item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) const
@@ -1287,7 +1281,7 @@ void C_SdNdeDpListsTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle expand event
 
-   \param[in] orc_Index Expanded item
+   \param[in]  orc_Index   Expanded item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnExpand(const QModelIndex & orc_Index) const
@@ -1305,9 +1299,9 @@ void C_SdNdeDpListsTreeWidget::m_OnExpand(const QModelIndex & orc_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle error change signal of any data set item
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
-   \param[in] oru32_ListIndex     List index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
+   \param[in]  oru32_ListIndex      List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_HandleDataSetErrorChange(const uint32 & oru32_NodeIndex,
@@ -1342,8 +1336,8 @@ void C_SdNdeDpListsTreeWidget::m_HandleSizeChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle table selction change
 
-   \param[in] oru32_ListIndex Source list
-   \param[in] oru32_Count     Number of selected items
+   \param[in]  oru32_ListIndex   Source list
+   \param[in]  oru32_Count       Number of selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_HandleTableSelection(const uint32 & oru32_ListIndex, const uint32 & oru32_Count)
@@ -1384,13 +1378,13 @@ std::vector<uint32> C_SdNdeDpListsTreeWidget::m_GetSelectedIndices(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward signal
 
-   \param[in] orq_AddActive      Push button add active
-   \param[in] orq_CutActive      Push button cut active
-   \param[in] orq_CopyActive     Push button copy active
-   \param[in] orq_PasteActive    Push button paste active
-   \param[in] orq_DeleteActive   Push button delete active
-   \param[in] orq_MoveDownActive Push button move down active
-   \param[in] orq_MoveUpActive   Push button move up active
+   \param[in]  orq_AddActive        Push button add active
+   \param[in]  orq_CutActive        Push button cut active
+   \param[in]  orq_CopyActive       Push button copy active
+   \param[in]  orq_PasteActive      Push button paste active
+   \param[in]  orq_DeleteActive     Push button delete active
+   \param[in]  orq_MoveDownActive   Push button move down active
+   \param[in]  orq_MoveUpActive     Push button move up active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
@@ -1460,7 +1454,7 @@ void C_SdNdeDpListsTreeWidget::m_CheckActions(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get active table
 
-   \param[in] orq_IgnoreSelectedItems Optional indicator if selected item size should be ignored
+   \param[in]  orq_IgnoreSelectedItems    Optional indicator if selected item size should be ignored
 
    \return
    NULL No active table
@@ -1512,7 +1506,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get active table tree widget item
 
-   \param[in] orq_IgnoreSelectedItems Optional indicator if selected item size should be ignored
+   \param[in]  orq_IgnoreSelectedItems    Optional indicator if selected item size should be ignored
 
    \return
    NULL No active table tree widget item
@@ -1563,9 +1557,9 @@ QTreeWidgetItem * C_SdNdeDpListsTreeWidget::m_GetActiveTableTreeWidget(const boo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt target position of drop action
 
-   \param[in]     orc_SelectedIndices       Selected indices
-   \param[in]     ore_DropIndicatorPosition Drop indicator position
-   \param[in,out] ors32_TargetPosition      Target position (Requirement: valid initialization)
+   \param[in]      orc_SelectedIndices          Selected indices
+   \param[in]      ore_DropIndicatorPosition    Drop indicator position
+   \param[in,out]  ors32_TargetPosition         Target position (Requirement: valid initialization)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::mh_AdaptDropTargetIndex(const std::vector<uint32> & orc_SelectedIndices,
@@ -1618,9 +1612,9 @@ void C_SdNdeDpListsTreeWidget::m_HandleChanged(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle data set size change
 
-   \param[in] oru32_NodeIndex         Node index
-   \param[in] oru32_DataPoolIndex     Data pool index
-   \param[in] oru32_DataPoolListIndex List index
+   \param[in]  oru32_NodeIndex      Node index
+   \param[in]  oru32_DataPoolIndex  Data pool index
+   \param[in]  oru32_ListIndex      List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_UpdateDataSetCount(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
@@ -1691,7 +1685,7 @@ uint32 C_SdNdeDpListsTreeWidget::m_GetOneAfterHighestSelected(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward signal
 
-   \param[in] orq_Error Changed error status
+   \param[in]  orq_Error   Changed error status
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_OnErrorChangePossible(const bool & orq_Error)
@@ -1702,7 +1696,7 @@ void C_SdNdeDpListsTreeWidget::m_OnErrorChangePossible(const bool & orq_Error)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Disable all table selections
 
-   \param[in] ors32_Exception Optional parameter to allow one table to not have its selection cleared
+   \param[in]  ors32_Exception   Optional parameter to allow one table to not have its selection cleared
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_ClearTableSelection(const sint32 & ors32_Exception) const
@@ -1735,7 +1729,7 @@ void C_SdNdeDpListsTreeWidget::m_ClearTableSelection(const sint32 & ors32_Except
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle exclusive list selection
 
-   \param[in] oru32_ListIndex List index
+   \param[in]  oru32_ListIndex   List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_HandleExclusiveListSelection(const uint32 & oru32_ListIndex) const

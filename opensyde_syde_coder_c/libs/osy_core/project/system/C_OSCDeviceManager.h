@@ -28,6 +28,13 @@ class C_OSCDeviceManager
 public:
    const C_OSCDeviceDefinition * LookForDevice(const stw_scl::C_SCLString & orc_Name) const;
 
+   stw_types::sint32 AddDevice(const stw_scl::C_SCLString & orc_DeviceDefinitionFile,
+                               const stw_scl::C_SCLString & orc_DeviceGroup, const stw_scl::C_SCLString & orc_IniFile);
+
+   stw_types::sint32 ChangeDevices(std::vector<C_OSCDeviceDefinition> & orc_Devices,
+                                   const stw_scl::C_SCLString & orc_DeviceGroup,
+                                   const stw_scl::C_SCLString & orc_IniFile);
+
    std::vector<C_OSCDeviceGroup> GetDeviceGroups(void) const;
 
    bool WasLoaded(void) const;

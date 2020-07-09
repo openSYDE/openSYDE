@@ -128,28 +128,6 @@ C_SyvDaItPaTreeView::~C_SyvDaItPaTreeView(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete all elements
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeView::DeleteAll(void)
-{
-   this->mc_Model.DeleteSpecified(this->GetAllListIds());
-   //Reload
-   this->Init(this->mpc_DataWidget);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Delete selected elements
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeView::DeleteSelected()
-{
-   this->mc_Model.DeleteSpecified(this->GetAllSelectedListIds());
-   //Reload
-   this->Init(this->mpc_DataWidget);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if tree empty
 
    \return
@@ -172,30 +150,12 @@ void C_SyvDaItPaTreeView::ClearECUValues(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set set values same as device values
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeView::ApplyEcuValues(void)
-{
-   this->mc_Model.ApplyEcuValues(this->GetAllListIds());
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reload set data column
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::ReloadSetValues(void)
 {
    this->mc_Model.ReloadSetValues();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set selected set values same as device values
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeView::ApplySelectedEcuValues()
-{
-   this->mc_Model.ApplyEcuValues(this->GetAllSelectedListIds());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -588,30 +548,6 @@ void C_SyvDaItPaTreeView::SetAllExpandedTreeItems(const std::vector<C_PuiSvDbExp
 std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeView::GetAllListIds(void) const
 {
    return this->mc_Model.GetAllListIds();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get all selected list IDs
-
-   \return
-   All selected list IDs
-*/
-//----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeView::GetAllSelectedListIds() const
-{
-   std::vector<C_OSCNodeDataPoolListElementId> c_Retval;
-   const QModelIndexList c_IndexList = this->selectedIndexes();
-
-   for (sint32 s32_ItSelectedIndex = 0UL; s32_ItSelectedIndex < c_IndexList.size(); ++s32_ItSelectedIndex)
-   {
-      const std::vector<C_OSCNodeDataPoolListElementId> c_Lists =
-         this->mc_Model.GetListIdsForIndex(c_IndexList[s32_ItSelectedIndex]);
-      for (uint32 u32_ItItem = 0UL; u32_ItItem < c_Lists.size(); ++u32_ItItem)
-      {
-         C_SyvDaItPaTreeModel::h_AppendOnlyUniqueListId(c_Retval, c_Lists[u32_ItItem]);
-      }
-   }
-   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

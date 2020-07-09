@@ -10,6 +10,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OSCNode.h"
+#include "C_OSCHALCMagicianDatapoolListHandler.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -30,36 +31,73 @@ private:
 
    stw_types::sint32 m_GenerateHALCDatapoolsDefinition(std::vector<C_OSCNodeDataPool> & orc_Datapools) const;
    stw_types::sint32 m_FillHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools) const;
-   static stw_types::sint32 m_FillHALCElement(C_OSCNodeDataPoolListElement * const opc_Element,
-                                              const C_OSCHalcConfigParameter & orc_HALCParameter,
-                                              const stw_types::uint32 ou32_ChannelIndex);
-   static void m_AddUseCaseVariable(const stw_scl::C_SCLString & orc_DomainSingularName,
+   stw_types::sint32 m_FillHALCDatapoolsDomain(C_OSCNodeDataPoolList & orc_List,
+                                               const C_OSCHalcConfigDomain & orc_Domain,
+                                               const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
+                                               const stw_types::uint32 ou32_ItDomain, const bool oq_IsSafe) const;
+   stw_types::sint32 m_FillHALCDatapoolsChanNum(C_OSCNodeDataPoolList & orc_List,
+                                                const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
+                                                const stw_types::uint32 ou32_ItDomain, const bool oq_IsSafe,
+                                                const stw_types::uint32 ou32_RelevantIndex,
+                                                const stw_types::uint32 ou32_ChanNum) const;
+   stw_types::sint32 m_FillHALCDatapoolsUseCase(C_OSCNodeDataPoolList & orc_List,
+                                                const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
+                                                const stw_types::uint32 ou32_ItDomain, const bool oq_IsSafe,
+                                                const stw_types::uint32 ou32_RelevantIndex,
+                                                const stw_types::uint32 ou32_UseCase) const;
+   stw_types::sint32 m_FillHALCDatapoolsChannel(C_OSCNodeDataPoolList & orc_List,
+                                                const C_OSCHalcConfigChannel & orc_Channel,
+                                                const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
+                                                const stw_types::uint32 ou32_ItDomain,
+                                                const stw_types::uint32 ou32_ItRelevantChannel) const;
+   static stw_types::sint32 mh_FillHALCElement(C_OSCNodeDataPoolListElement * const opc_Element,
+                                               const C_OSCHalcConfigParameter & orc_HALCParameter,
+                                               const stw_types::uint32 ou32_ChannelIndex);
+   static void mh_AddChanNumVariable(const stw_scl::C_SCLString & orc_DomainSingularName,
+                                     const stw_types::uint32 ou32_NumChannels, const bool oq_AddDataset,
+                                     C_OSCNodeDataPoolList & orc_List);
+   static void mh_AddUseCaseVariable(const stw_scl::C_SCLString & orc_DomainSingularName,
+                                     const stw_types::uint32 ou32_NumChannels, const bool oq_AddDataset,
+                                     C_OSCNodeDataPoolList & orc_List);
+   static void mh_HandleGenericType(C_OSCNodeDataPoolListElement & orc_Element,
                                     const stw_types::uint32 ou32_NumChannels, const bool oq_AddDataset,
-                                    C_OSCNodeDataPoolList & orc_List);
-   static stw_types::sint32 m_GenerateVariablesForVector(const std::vector<C_OSCHalcDefStruct> & orc_Definition,
-                                                         const stw_scl::C_SCLString & orc_DomainSingularName,
-                                                         const stw_types::uint32 ou32_NumChannels,
-                                                         const bool oq_AddDataset, C_OSCNodeDataPoolList & orc_List);
-   static stw_types::sint32 m_AddVariableToList(const C_OSCHalcDefElement & orc_Definition,
-                                                const std::vector<C_OSCHalcDefStruct> & orc_DefinitionArray,
-                                                const stw_types::uint32 ou32_ParameterIndexStruct,
-                                                const stw_types::uint32 ou32_ParameterIndexElement,
-                                                const stw_scl::C_SCLString & orc_DomainSingularName,
-                                                const stw_types::uint32 ou32_NumChannels, const bool oq_AddDataset,
-                                                C_OSCNodeDataPoolList & orc_List);
-   static stw_types::sint32 m_ConvertToDatapoolWithoutArray(const C_OSCHalcDefContent & orc_HALCContent,
-                                                            C_OSCNodeDataPoolContent & orc_DpContent);
-   static stw_types::sint32 m_ConvertToDatapoolAndAssign(const C_OSCHalcDefContent & orc_HALCContent,
-                                                         C_OSCNodeDataPoolContent & orc_DpContent,
-                                                         const stw_types::uint32 ou32_Index);
-   static stw_types::sint32 m_ConvertToDatapoolAndResize(const C_OSCHalcDefContent & orc_HALCContent,
-                                                         const stw_types::uint32 ou32_NumChannels,
-                                                         C_OSCNodeDataPoolContent & orc_DpContent);
-   static void m_InitList(C_OSCNodeDataPoolList & orc_List, const stw_scl::C_SCLString & orc_Name,
-                          const bool oq_AddDataset = false);
-   static void m_CleanUpHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools);
+                                    const bool oq_UseU16);
+   static stw_types::sint32 mh_GenerateVariablesForDomain(const C_OSCHalcConfigDomain & orc_Domain,
+                                                          C_OSCNodeDataPoolList & orc_HALCListParam,
+                                                          C_OSCNodeDataPoolList & orc_HALCListInput,
+                                                          C_OSCNodeDataPoolList & orc_HALCListOutput,
+                                                          C_OSCNodeDataPoolList & orc_HALCListStatus,
+                                                          const bool oq_IsSafe);
+   static stw_types::sint32 mh_GenerateVariablesForVector(const std::vector<C_OSCHalcDefStruct> & orc_Definition,
+                                                          const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                          const stw_types::uint32 ou32_NumChannels,
+                                                          const bool oq_AddDataset, C_OSCNodeDataPoolList & orc_List);
+   static stw_types::sint32 mh_GenerateVariablesForVectorElement(const std::vector<C_OSCHalcDefStruct> & orc_Definition,
+                                                                 const stw_types::uint32 ou32_DefinitionElementIndex,
+                                                                 const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                                 const stw_types::uint32 ou32_NumChannels,
+                                                                 const bool oq_AddDataset,
+                                                                 C_OSCNodeDataPoolList & orc_List);
+   static stw_types::sint32 mh_AddVariableToList(const C_OSCHalcDefElement & orc_Definition,
+                                                 const std::vector<C_OSCHalcDefStruct> & orc_DefinitionArray,
+                                                 const stw_types::uint32 ou32_ParameterIndexStruct,
+                                                 const stw_types::uint32 ou32_ParameterIndexElement,
+                                                 const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                 const stw_types::uint32 ou32_NumChannels, const bool oq_AddDataset,
+                                                 C_OSCNodeDataPoolList & orc_List);
+   static stw_types::sint32 mh_ConvertToDatapoolWithoutArray(const C_OSCHalcDefContent & orc_HALCContent,
+                                                             C_OSCNodeDataPoolContent & orc_DpContent);
+   static stw_types::sint32 mh_ConvertToDatapoolAndAssign(const C_OSCHalcDefContent & orc_HALCContent,
+                                                          C_OSCNodeDataPoolContent & orc_DpContent,
+                                                          const stw_types::uint32 ou32_Index);
+   static stw_types::sint32 mh_ConvertToDatapoolAndResize(const C_OSCHalcDefContent & orc_HALCContent,
+                                                          const stw_types::uint32 ou32_NumChannels,
+                                                          C_OSCNodeDataPoolContent & orc_DpContent);
+   static void mh_InitList(C_OSCNodeDataPoolList & orc_List, const stw_scl::C_SCLString & orc_Name,
+                           const bool oq_AddDataset = false);
+   static void mh_CleanUpHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools);
    stw_types::sint32 m_AssignHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools) const;
-   static void m_SetCommonDefaults(C_OSCNodeDataPoolListElement & orc_Element);
+   static void mh_SetCommonDefaults(C_OSCNodeDataPoolListElement & orc_Element);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -992,7 +992,7 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
                //Type
                if ((orc_XMLParser.SelectNodeChild("type") == "type") && (s32_Retval == C_NO_ERR))
                {
-                  s32_Retval = C_OSCSystemFilerUtil::mh_BusTypeStringToEnum(
+                  s32_Retval = C_OSCSystemFilerUtil::h_BusTypeStringToEnum(
                      orc_XMLParser.GetNodeContent(), c_ComInterface.e_InterfaceType);
                   //Return
                   tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
@@ -1192,7 +1192,7 @@ void C_OSCNodeFilerV2::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePro
       orc_XMLParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
       orc_XMLParser.SetAttributeBool("diagnosis-available", rc_CurComInterface.q_IsDiagnosisEnabled);
       orc_XMLParser.CreateNodeChild("type",
-                                    C_OSCSystemFilerUtil::mh_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
+                                    C_OSCSystemFilerUtil::h_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
       if (rc_CurComInterface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
       {
          orc_XMLParser.CreateAndSelectNodeChild("ip-address");
@@ -1717,7 +1717,7 @@ void C_OSCNodeFilerV2::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
                                         C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("data-pools");
-   orc_XMLParser.SetAttributeString("length", orc_NodeDataPools.size());
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeDataPools.size());
    for (uint32 u32_ItDataPool = 0; u32_ItDataPool < orc_NodeDataPools.size(); ++u32_ItDataPool)
    {
       orc_XMLParser.CreateAndSelectNodeChild("data-pool");

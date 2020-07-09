@@ -13,7 +13,6 @@
 #include "precomp_headers.h"
 
 #include <QPainter>
-#include <QFileDialog>
 
 #include "stwerrors.h"
 #include "constants.h"
@@ -528,19 +527,16 @@ void C_NagMainWidget::m_OnOpenProj(void)
 {
    if (C_PopUtil::h_AskUserToContinue(this) == true)
    {
-      QString c_Folder;
-      const QString c_Suffix = "syde";
-      const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE project")) + " (*." + c_Suffix + ")";
+      QString c_Folder = "";
+      const QString c_Suffix = "*.syde";
+      const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE project")) + " (" + c_Suffix + ")";
 
       C_UsHandler::h_GetInstance()->GetMostRecentFolder(c_Folder);
 
-      // do not use QFileDialog::getOpenFileName because it does not support default suffix
-      // that we want to be added automatically (if typing "project" instead of "project.syde": load project.syde)
-      QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Open openSYDE Project"), c_Folder, c_Filter);
-      c_Dialog.setDefaultSuffix(c_Suffix);
-      if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+      const QString c_File = C_OgeWiUtil::h_GetOpenFileName(this, C_GtGetText::h_GetText("Open openSYDE Project"),
+                                                            c_Folder, c_Filter, c_Suffix);
+      if (c_File.isEmpty() == false)
       {
-         const QString c_File = c_Dialog.selectedFiles().at(0); // multi-selection is not possible
          LoadProject(c_File);
       }
    }

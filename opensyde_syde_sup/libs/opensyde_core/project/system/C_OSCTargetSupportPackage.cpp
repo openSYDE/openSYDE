@@ -1,9 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       short description (implementation)
-
-   detailed description
+   \brief       openSYDE target support package data handling class (implementation)
 
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -67,6 +65,7 @@ C_OSCTargetSupportPackage::C_OSCTargetSupportPackage(void) :
    c_TemplatePath("")
 {
    c_Applications.clear();
+   c_CodeExportSettings.Initialize();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -87,4 +86,5 @@ void C_OSCTargetSupportPackage::Clear(void)
    u16_MaxRoutingMessageBufferRx = 585U;
 
    c_Applications.clear();
+   c_CodeExportSettings.Initialize();
 }

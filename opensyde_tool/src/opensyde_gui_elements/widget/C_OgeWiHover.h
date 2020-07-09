@@ -82,8 +82,7 @@ private:
    void m_SearchChanged(const QString & orc_Text);
    void m_UpdateParentSize(void);
 
-   static stw_types::uint32 mhu32_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_Size,
-                                                const bool oq_Maximized);
+   static stw_types::uint32 mh_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_Size, const bool oq_Maximized);
 
    static void mh_AdaptMouseRangePos(QPoint & orc_Pos, const QSize & orc_Range, const QPoint & orc_TopLeft,
                                      const stw_types::sintn osn_OffsetX, const stw_types::sintn osn_OffsetY);

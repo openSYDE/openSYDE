@@ -250,7 +250,6 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
                osc_write_log_error("Loading Dataset data", "Node \"node\".\"raw\".\"raw-entry\".\"value\" contains non-integer value (" +
                                    rc_Token + ").");
 
-
                s32_Retval = C_CONFIG;
             }
          }

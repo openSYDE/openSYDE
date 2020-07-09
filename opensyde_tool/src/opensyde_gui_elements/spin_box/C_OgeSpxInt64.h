@@ -40,7 +40,6 @@ public:
    QVariant GetValue(void) const;
    QVariant GetMinimum(void) const;
    QVariant GetMaximum(void) const;
-   QString GetSuffix(void) const;
    stw_types::uint64 GetStepWidth(void) const;
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions

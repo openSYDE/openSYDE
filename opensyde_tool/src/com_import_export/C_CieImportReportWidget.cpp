@@ -20,6 +20,8 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
 #include "C_PuiSdUtil.h"
+#include "C_ImpUtil.h"
+#include "C_Uti.h"
 #include "C_OgePopUpDialog.h"
 #include "C_CieImportDatapoolSelectWidget.h"
 #include "C_CieImportReportWidget.h"
@@ -328,7 +330,8 @@ void C_CieImportReportWidget::m_AdaptMessagesToProtocolType(void)
          QStringList c_Infos;
          QString & rc_CurInfoMessage = rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerRxMessage[u32_ItMessage];
          C_OSCCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData[u32_ItMessage];
-         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, this->me_ProtocolType, &c_Infos);
+         C_PuiSdNodeCanMessage & rc_CurUiMessage = rc_CurData.c_ImportData.c_Ui.c_UiRxMessageData[u32_ItMessage];
+         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, &rc_CurUiMessage, this->me_ProtocolType, &c_Infos);
          //Add info
          if (rc_CurInfoMessage.isEmpty() == false)
          {
@@ -343,7 +346,8 @@ void C_CieImportReportWidget::m_AdaptMessagesToProtocolType(void)
          QStringList c_Infos;
          QString & rc_CurInfoMessage = rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerTxMessage[u32_ItMessage];
          C_OSCCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData[u32_ItMessage];
-         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, this->me_ProtocolType, &c_Infos);
+         C_PuiSdNodeCanMessage & rc_CurUiMessage = rc_CurData.c_ImportData.c_Ui.c_UiTxMessageData[u32_ItMessage];
+         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, &rc_CurUiMessage, this->me_ProtocolType, &c_Infos);
          //Add info
          if (rc_CurInfoMessage.isEmpty() == false)
          {
@@ -459,47 +463,30 @@ sint32 C_CieImportReportWidget::m_ShowReport(void)
    if (s32_Retval == C_NO_ERR)
    {
       QString c_CompleteLog;
+      QString c_ReadContent;
+
+      //Sum up read content
+      c_ReadContent += C_GtGetText::h_GetText("Nodes: ");
+      for (uint32 u32_ItNodes = 0; u32_ItNodes < this->mc_ImportedAssignedData.size(); u32_ItNodes++)
+      {
+         C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
+         c_ReadContent += rc_CurData.c_ImportData.c_NodeName;
+         c_ReadContent += QString(C_GtGetText::h_GetText(" (%1 Tx / %2 Rx); ")).
+                          arg(rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.size()).
+                          arg(rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.size());
+      }
+      c_ReadContent += "<br/>";
+      c_ReadContent += C_GtGetText::h_GetText("For parsing errors, warnings and detailed information see ");
+      c_ReadContent += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
+                                        C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+      c_ReadContent += ".";
 
       //Start
       c_CompleteLog += "<html>";
       c_CompleteLog += "<body>";
-      //File
-      c_CompleteLog += "<h3>";
-      c_CompleteLog += C_GtGetText::h_GetText("Source File Information");
-      c_CompleteLog += "</h3>";
-      c_CompleteLog += "<table><tr>";
-      c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
-      c_CompleteLog += C_GtGetText::h_GetText("Path:");
-      c_CompleteLog += "</td>";
-      c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
-      c_CompleteLog += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>").
-                       arg(this->mc_FilePath).
-                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                       arg(this->mc_FilePath);
-      c_CompleteLog += "</td></tr><tr>";
 
-      //Content
-      c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
-      c_CompleteLog += C_GtGetText::h_GetText("Read Content:");
-      c_CompleteLog += "</td>";
-      c_CompleteLog += C_CieImportReportWidget::mhc_HTML_TABLE_DATA_START;
-      //Add node names
-      c_CompleteLog += C_GtGetText::h_GetText("Nodes: ");
-      for (uint32 u32_ItNodes = 0; u32_ItNodes < this->mc_ImportedAssignedData.size(); u32_ItNodes++)
-      {
-         C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
-         c_CompleteLog += rc_CurData.c_ImportData.c_NodeName;
-         c_CompleteLog += QString(C_GtGetText::h_GetText(" (%1 Tx / %2 Rx); ")).
-                          arg(rc_CurData.c_ImportData.c_Core.c_OSCTxMessageData.size()).
-                          arg(rc_CurData.c_ImportData.c_Core.c_OSCRxMessageData.size());
-      }
-      c_CompleteLog += "<br/>";
-      c_CompleteLog += C_GtGetText::h_GetText("For parsing errors, warnings and detailed information see ");
-      c_CompleteLog += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
-                       arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
-                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
-                       arg(C_GtGetText::h_GetText("log file"));
-      c_CompleteLog += "</td></tr></table>";
+      //Source File Info
+      c_CompleteLog += C_ImpUtil::h_FormatSourceFileInfoForReport(this->mc_FilePath, c_ReadContent);
 
       //Update log file
       C_OSCLoggingHandler::h_Flush();

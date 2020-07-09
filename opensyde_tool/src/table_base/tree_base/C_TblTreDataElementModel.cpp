@@ -12,11 +12,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QElapsedTimer>
-
 #include "TGLUtils.h"
-#include "constants.h"
 #include "stwerrors.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_GtGetText.h"
 #include "CSCLChecksums.h"
 #include "C_PuiSvHandler.h"
@@ -30,7 +28,6 @@
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
-using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
@@ -279,12 +276,8 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
                                       const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                       const bool oq_ShowArrayIndexElements, const bool oq_Show64BitValues)
 {
-   QElapsedTimer c_Timer;
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
    QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState>::const_iterator c_It;
    const std::vector<uint32> c_Hashes = C_TblTreDataElementModel::mh_GetViewSdHash(ou32_ViewIndex);
 
@@ -304,10 +297,6 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
          this->mc_MessageSyncManagers = rc_It.c_SyncManagers;
          this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_ShowArrayIndexElements,
                                        oq_Show64BitValues);
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "Restored" << &std::endl;
-         }
       }
       else
       {
@@ -321,10 +310,6 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
                                                            C_TblTreDataElementModel::C_TblTreDataElementModelState(
                                                               this->mpc_InvisibleRootItem,
                                                               this->mc_MessageSyncManagers));
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "New" << &std::endl;
-         }
       }
       break;
    case eBUS_SIGNAL:
@@ -336,10 +321,6 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
          this->mc_MessageSyncManagers = rc_It.c_SyncManagers;
          this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_ShowArrayIndexElements,
                                        oq_Show64BitValues);
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "Restored" << &std::endl;
-         }
       }
       else
       {
@@ -353,10 +334,6 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
                                                            C_TblTreDataElementModel::C_TblTreDataElementModelState(
                                                               this->mpc_InvisibleRootItem,
                                                               this->mc_MessageSyncManagers));
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "New" << &std::endl;
-         }
       }
       break;
    case eNVM_LIST:
@@ -368,10 +345,6 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
          this->mc_MessageSyncManagers = rc_It.c_SyncManagers;
          this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_ShowArrayIndexElements,
                                        oq_Show64BitValues);
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "Restored" << &std::endl;
-         }
       }
       else
       {
@@ -384,10 +357,6 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
                                                            C_TblTreDataElementModel::C_TblTreDataElementModelState(
                                                               this->mpc_InvisibleRootItem,
                                                               this->mc_MessageSyncManagers));
-         if (mq_TIMING_OUTPUT)
-         {
-            std::cout << "New" << &std::endl;
-         }
       }
       break;
    default:
@@ -395,10 +364,8 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
       tgl_assert(false);
    }
    this->endResetModel();
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Setup data element tree:" << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
+   osc_write_log_performance_stop(u16_TimerId, "Setup data element tree");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1882,7 +1849,7 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetD
                         //2: List item
                         //1: Element item
                         c_Retval.push_back(C_PuiSvDbNodeDataPoolListElementId(pc_FifthParent->u32_Index,
-                                                                              pc_FourthParent->u32_Index,
+                                                                              pc_ThirdParent->u32_Index,
                                                                               pc_SecondParent->u32_Index,
                                                                               pc_FirstParent->u32_Index,
                                                                               C_PuiSvDbNodeDataPoolListElementId::

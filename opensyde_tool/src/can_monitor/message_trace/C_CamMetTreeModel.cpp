@@ -17,14 +17,14 @@
 
 #include <QBitArray>
 
-#include "stwtypes.h"
-#include "CCMONProtocol.h"
-#include "C_GtGetText.h"
-#include "C_CamMetTreeModel.h"
 #include "TGLTime.h"
-
-#include "cam_constants.h"
+#include "stwtypes.h"
 #include "constants.h"
+#include "C_GtGetText.h"
+#include "C_CamMetUtil.h"
+#include "cam_constants.h"
+#include "CCMONProtocol.h"
+#include "C_CamMetTreeModel.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -35,7 +35,6 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::uint32 C_CamMetTreeModel::mhu32_MAX_STORAGE = 1000;
 const QString C_CamMetTreeModel::mhc_IconMessage = ":images/IconMessageInactive.svg";
 const QString C_CamMetTreeModel::mhc_IconMessageSelected = "://images/IconMessageSelected.svg";
 const QString C_CamMetTreeModel::mhc_IconSignal = ":images/IconSignalInactive.svg";
@@ -65,20 +64,24 @@ C_CamMetTreeModel::C_CamMetTreeModel(QObject * const opc_Parent) :
    mq_UniqueMessageMode(false),
    mq_DisplayAsHex(false),
    mq_DisplayTimestampRelative(false),
+   mq_DisplayTimestampAbsoluteTimeOfDay(false),
+   mu32_TraceBufferSizeUsed(1000U),
+   mu32_TraceBufferSizeConfig(1000U),
    mq_DataUnlocked(false),
    mu32_OldestItemIndex(0),
    ms32_SelectedParentRow(-1),
    mq_GrayOutPause(false),
    mu32_GrayOutPauseTimeStamp(0U),
    mpc_RootItemContinuous(new C_TblTreSimpleItem()),
-   mpc_RootItemStatic(new C_TblTreSimpleItem())
+   mpc_RootItemStatic(new C_TblTreSimpleItem()),
+   msn_LastSearchedMessageRow(-1),
+   msn_LastSearchedSignalRow(-1),
+   msn_LastSearchedSignalRowMultiplexed(-1),
+   mq_IsLastSearchedSignalLastOfMessage(true)
 {
    sintn sn_Counter;
 
-   //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mc_DataBase.reserve(C_CamMetTreeModel::mhu32_MAX_STORAGE);
-   //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_RootItemContinuous->ReserveChildrenSpace(C_CamMetTreeModel::mhu32_MAX_STORAGE);
+   this->m_AdaptTraceBufferSize();
 
    // Prepare the transparency colors for the gray out font
    this->mc_FontTransparcencyColors.resize((msn_TRACE_TRANSPARENCY_START - msn_TRACE_TRANSPARENCY_END) + 1,
@@ -225,6 +228,13 @@ void C_CamMetTreeModel::ActionClearData(void)
    //Every reset will clear the selection
    this->SetSelection(-1, -1);
    this->endResetModel();
+
+   if (this->mu32_TraceBufferSizeUsed != this->mu32_TraceBufferSizeConfig)
+   {
+      this->m_AdaptTraceBufferSize();
+   }
+
+   this->m_ResetSearch();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -328,6 +338,8 @@ void C_CamMetTreeModel::SetDisplayUniqueMessages(const bool oq_Value)
       this->mpc_InvisibleRootItem = this->mpc_RootItemContinuous;
    }
    this->endResetModel();
+
+   this->m_ResetSearch();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -362,7 +374,30 @@ void C_CamMetTreeModel::SetDisplayTimestampRelative(const bool oq_Value)
    //Update value
    this->mq_DisplayTimestampRelative = oq_Value;
    //Update UI
-   Q_EMIT this->dataChanged(this->index(0, s32_ColID), this->index(this->rowCount() - 1, s32_ColID));
+   Q_EMIT (this->dataChanged(this->index(0, s32_ColID), this->index(this->rowCount() - 1, s32_ColID)));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set display style for absolute timestamp
+
+   If relative timestamp is active, this mode does not change the trace
+
+   \param[in]  oq_Value    New value
+                           true: Timestamp with time of day
+                           false: Timestamp beginning at start of measurement
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeModel::SetDisplayTimestampAbsoluteTimeOfDay(const bool oq_Value)
+{
+   //Update value
+   this->mq_DisplayTimestampAbsoluteTimeOfDay = oq_Value;
+
+   if (this->mq_DisplayTimestampRelative == false)
+   {
+      const sint32 s32_ColID = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
+      //Update UI
+      Q_EMIT (this->dataChanged(this->index(0, s32_ColID), this->index(this->rowCount() - 1, s32_ColID)));
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -389,6 +424,34 @@ bool C_CamMetTreeModel::GetDisplayAsHex(void) const
 bool C_CamMetTreeModel::GetDisplayTimestampRelative(void) const
 {
    return this->mq_DisplayTimestampRelative;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns display style for absolute timestamp
+
+   \return
+   true     Displaying absolute timestamp with time of day
+   false    Displaying absolute timestamp beginning at start of measurement
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamMetTreeModel::GetDisplayTimestampAbsoluteTimeOfDay(void) const
+{
+   return this->mq_DisplayTimestampAbsoluteTimeOfDay;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sets a new size of the trace buffer
+
+   This will affect the maximum shown messages in the trace view.
+
+   The new size will be used on the next call of function ActionClearData.
+
+   \param[in]       ou32_Value     New size of trace buffer
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeModel::SetTraceBufferSize(const uint32 ou32_Value)
+{
+   this->mu32_TraceBufferSizeConfig = ou32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -515,8 +578,16 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
          switch (e_Col)
          {
          case eTIME_STAMP:
-            c_Retval = C_GtGetText::h_GetText("Absolute time (hh:mm:ss.ms.us) from the measurement start, or relative "
-                                              "to the previous event.");
+            if (this->mq_DisplayTimestampAbsoluteTimeOfDay == false)
+            {
+               c_Retval = C_GtGetText::h_GetText("Absolute time (hh:mm:ss.ms.us) from the measurement start, or relative "
+                                                 "to the previous event.");
+            }
+            else
+            {
+               c_Retval = C_GtGetText::h_GetText("Absolute time (hh:mm:ss.ms.us) with time of day, or relative "
+                                                 "to the previous event.");
+            }
             break;
          case eCAN_ID:
             c_Retval = C_GtGetText::h_GetText("CAN identifier of the message.");
@@ -702,9 +773,13 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                   {
                      c_Retval = pc_CurMessage->c_TimeStampRelative.c_str();
                   }
+                  else if (this->mq_DisplayTimestampAbsoluteTimeOfDay == false)
+                  {
+                     c_Retval = pc_CurMessage->c_TimeStampAbsoluteStart.c_str();
+                  }
                   else
                   {
-                     c_Retval = pc_CurMessage->c_TimeStampAbsolute.c_str();
+                     c_Retval = pc_CurMessage->c_TimeStampAbsoluteTimeOfDay.c_str();
                   }
                   break;
                case eCAN_ID:
@@ -1170,7 +1245,7 @@ const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const sintn osn
    {
       //If not unique messages: look in "queue"/vector
       const uint32 u32_Index = (this->mu32_OldestItemIndex + static_cast<uint32>(osn_Row)) %
-                               C_CamMetTreeModel::mhu32_MAX_STORAGE;
+                               this->mu32_TraceBufferSizeUsed;
       pc_Retval = &this->mc_DataBase[u32_Index];
    }
    else
@@ -1183,6 +1258,239 @@ const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const sintn osn
       pc_Retval = &c_It.value();
    }
    return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search a matching item
+
+   \param[in]       orc_SearchString            String to search in model
+   \param[in]       oq_Next                     Flag for search direction
+                                                 true:  Search the next entry, forward
+                                                 false: Search the previous entry, backward
+   \param[out]      orsn_SignalRow               < 0: No signal of the message as search result
+                                                >= 0: If orsn_MultiplexedSignalRow >= 0: Row of Multiplexer signal
+                                                      If orsn_MultiplexedSignalRow < 0: Row of checked signal
+   \param[out]      orsn_MultiplexedSignalRow   >= 0: Row of Multiplexed signal
+                                                 < 0: Signal is not a multiplexed signal
+
+   \retval  >= 0   Message found, row returned
+   \retval  < 0    No Message found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, const bool oq_Next, sintn & orsn_SignalRow,
+                                           sintn & orsn_MultiplexedSignalRow)
+{
+   sintn sn_Row = -1;
+   const uint32 u32_NumberEntries = this->rowCount();
+   uint32 u32_NumberEntriesToCheck = u32_NumberEntries;
+   const sintn sn_START_AT_LAST_SIGNAL = -2;
+
+   orsn_SignalRow = -1;
+   orsn_MultiplexedSignalRow = -1;
+
+   if (u32_NumberEntries > 0U)
+   {
+      uint32 u32_Counter;
+      uint32 u32_StartIndex;
+      // -1 means no signal was the match at the last search
+      sintn sn_CurrentSignalIndex = -1;
+      sintn sn_CurrentSignalIndexMultiplexed = -1;
+
+      if ((this->mc_LastSearchedString == orc_SearchString) &&
+          (this->msn_LastSearchedMessageRow >= 0))
+      {
+         // In case of the same search string, continue search with next or previous index
+         if (oq_Next == true)
+         {
+            // Forward
+            if (this->mq_IsLastSearchedSignalLastOfMessage == true)
+            {
+               // Start with message itself again
+               u32_StartIndex = (static_cast<uint32>(this->msn_LastSearchedMessageRow) + 1) % u32_NumberEntries;
+            }
+            else
+            {
+               // Start search with next available signal of last message
+               u32_StartIndex = static_cast<uint32>(this->msn_LastSearchedMessageRow);
+               sn_CurrentSignalIndex = this->msn_LastSearchedSignalRow + 1;
+               sn_CurrentSignalIndexMultiplexed = this->msn_LastSearchedSignalRowMultiplexed + 1;
+               if (sn_CurrentSignalIndex >= 0)
+               {
+                  // In case of a wrap around search, the signals before the start signal must be checked at the end too
+                  // No further abort condition for this scenario: Assuming the start condition is the found signal
+                  // from the last search trigger, so in case of no further result, the same signal is found again
+                  // which is no problem
+                  ++u32_NumberEntriesToCheck;
+               }
+            }
+         }
+         else
+         {
+            // Check last signal first
+            if (this->msn_LastSearchedSignalRow < 0)
+            {
+               // Prevent a minus value here
+               if (this->msn_LastSearchedMessageRow == 0)
+               {
+                  u32_StartIndex = u32_NumberEntries - 1U;
+               }
+               else
+               {
+                  u32_StartIndex = (static_cast<uint32>(this->msn_LastSearchedMessageRow) - 1);
+               }
+
+               // special case: starting at the last signal of the message
+               // but at this point the number of signals of the messages is here not available
+               sn_CurrentSignalIndex = sn_START_AT_LAST_SIGNAL;
+               sn_CurrentSignalIndexMultiplexed = sn_START_AT_LAST_SIGNAL;
+            }
+            else
+            {
+               // Start search with previous available signal of last message or the message itself (-1)
+               u32_StartIndex = static_cast<uint32>(this->msn_LastSearchedMessageRow);
+               sn_CurrentSignalIndex = this->msn_LastSearchedSignalRow - 1;
+               sn_CurrentSignalIndexMultiplexed = this->msn_LastSearchedSignalRowMultiplexed - 1;
+
+               // In case of a wrap around search, the signals after the start signal must be checked at the end too
+               // No further abort condition for this scenario: Assuming the start condition is the found signal
+               // from the last search trigger, so in case of no further result, the same signal is found again
+               // which is no problem
+               ++u32_NumberEntriesToCheck;
+            }
+         }
+      }
+      else if (oq_Next == false)
+      {
+         // Start index when searching backward is the end
+         u32_StartIndex = u32_NumberEntries - 1U;
+      }
+      else
+      {
+         // Start index when searching forward is the begin
+         u32_StartIndex = 0U;
+      }
+
+      for (u32_Counter = 0U; u32_Counter < u32_NumberEntriesToCheck; ++u32_Counter)
+      {
+         uint32 u32_Row;
+         const C_CamMetTreeLoggerData * pc_Data;
+
+         if (oq_Next == true)
+         {
+            // Search forward
+            u32_Row = (u32_StartIndex + u32_Counter) % u32_NumberEntries;
+         }
+         else
+         {
+            // Search backward
+            // Count from back
+            const uint32 u32_Offset = (u32_NumberEntries - u32_StartIndex);
+            const uint32 u32_RevCounter = (u32_NumberEntries - u32_Counter);
+
+            // Compensate the start index
+            if (u32_RevCounter >= u32_Offset)
+            {
+               u32_Row = u32_RevCounter - u32_Offset;
+            }
+            else
+            {
+               u32_Row = (u32_NumberEntries + u32_RevCounter) - u32_Offset;
+            }
+
+            if (u32_Counter > 0U)
+            {
+               // special case: starting at the last signal of the message due to backward search
+               // the decision of the first message of the loop is set at the initial check of the start indexs
+               sn_CurrentSignalIndex = sn_START_AT_LAST_SIGNAL;
+               sn_CurrentSignalIndexMultiplexed = sn_START_AT_LAST_SIGNAL;
+            }
+         }
+
+         pc_Data = this->GetMessageData(u32_Row);
+
+         if (pc_Data != NULL)
+         {
+            bool q_SearchMessageResult;
+
+            if (sn_CurrentSignalIndex <= sn_START_AT_LAST_SIGNAL)
+            {
+               // special case: starting at the last signal of the message due to backward search
+               sn_CurrentSignalIndex = static_cast<sintn>(pc_Data->c_Signals.size()) - 1;
+               sn_CurrentSignalIndexMultiplexed = sn_CurrentSignalIndex;
+            }
+
+            // Search the message and all of its signals till something was found or no signals are left to check
+            q_SearchMessageResult = this->m_CheckDataForSearch(*pc_Data, orc_SearchString, oq_Next,
+                                                               sn_CurrentSignalIndex,
+                                                               this->mq_IsLastSearchedSignalLastOfMessage);
+
+            if (q_SearchMessageResult == true)
+            {
+               sn_Row = static_cast<sintn>(u32_Row);
+
+               // Save the match for next call
+               this->msn_LastSearchedMessageRow = sn_Row;
+               this->msn_LastSearchedSignalRow = sn_CurrentSignalIndex;
+               // Set the multiplexed value in case of a non multiplexed message
+               this->msn_LastSearchedSignalRowMultiplexed = this->msn_LastSearchedSignalRow;
+               this->mc_LastSearchedString = orc_SearchString;
+
+               if (sn_CurrentSignalIndex >= 0)
+               {
+                  // Check for multiplexer message
+                  if (C_CamMetTreeModel::mh_IsMessageMultiplexed(*pc_Data) == true)
+                  {
+                     bool q_LastMessageDummy; // Not relevant of the second search
+                     C_CamMetTreeLoggerData c_CopyData = *pc_Data;
+                     // In this case the signals must be sorted
+                     C_CamMetTreeModel::mh_SortMultiplexedSignals(c_CopyData.c_Signals);
+
+                     // Search again
+                     q_SearchMessageResult = this->m_CheckDataForSearch(c_CopyData, orc_SearchString, oq_Next,
+                                                                        sn_CurrentSignalIndexMultiplexed,
+                                                                        q_LastMessageDummy);
+
+                     if (q_SearchMessageResult == true)
+                     {
+                        // Should be a true again
+                        this->msn_LastSearchedSignalRowMultiplexed = sn_CurrentSignalIndexMultiplexed;
+
+                        // A concrete signal of the message was found
+                        // Get the correct row for the found signal
+                        this->m_GetMultiplexedMsgSignalRow(c_CopyData.c_Signals,
+                                                           static_cast<uint32>(sn_CurrentSignalIndexMultiplexed),
+                                                           orsn_SignalRow, orsn_MultiplexedSignalRow);
+                     }
+                     else
+                     {
+                        // Should not happen
+                        orsn_SignalRow = -1;
+                        orsn_MultiplexedSignalRow = -1;
+                     }
+                  }
+                  else
+                  {
+                     // No multiplexed message, order of vector equals order of tree
+                     orsn_SignalRow = sn_CurrentSignalIndex;
+                  }
+               }
+
+               break;
+            }
+            else
+            {
+               sn_CurrentSignalIndexMultiplexed = -1;
+            }
+         }
+      }
+   }
+
+   if (sn_Row == -1)
+   {
+      this->m_ResetSearch();
+   }
+
+   return sn_Row;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1238,72 +1546,25 @@ uint32 C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const sint32 os32_Messa
 
    if (pc_Message != NULL)
    {
-      const std::vector<sintn> c_Order = C_CamMetTreeModel::mh_GetMultiplexerOrder(*pc_Message);
-      uint32 u32_Counter = 0UL;
-      if (static_cast<uint32>(os32_SignalIndex) < c_Order.size())
-      {
-         //Part of multiplexer
-         for (uint32 u32_ItSigL1 = 0UL; u32_ItSigL1 < pc_Message->c_Signals.size(); ++u32_ItSigL1)
-         {
-            const C_OSCComMessageLoggerDataSignal & rc_SignalData = pc_Message->c_Signals[u32_ItSigL1];
-            if (os32_SignalIndexL2 >= 0)
-            {
-               if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
-               {
-                  //Multiplexed
-                  if (rc_SignalData.c_OscSignal.u16_MultiplexValue == c_Order[static_cast<uint32>(os32_SignalIndex)])
-                  {
-                     if (u32_Counter == static_cast<uint32>(os32_SignalIndexL2))
-                     {
-                        u32_Retval = u32_ItSigL1;
-                        break;
-                     }
-                     else
-                     {
-                        //Only count children (= multiplexed signals with this multiplexer value)
-                        ++u32_Counter;
-                     }
-                  }
-               }
-            }
-            else
-            {
-               //Multiplexer
-               if ((rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
-                   (rc_SignalData.c_RawValueDec.ToInt() == c_Order[static_cast<uint32>(os32_SignalIndex)]))
-               {
-                  //Just use first multiplexer
-                  u32_Retval = u32_ItSigL1;
-                  //lint -e{1960} break is more efficient
-                  break;
-               }
-            }
-         }
-      }
-      else
-      {
-         //Skip multiplexer in counting
-         u32_Counter += c_Order.size();
-         //Others
-         for (uint32 u32_ItSig = 0UL; u32_ItSig < pc_Message->c_Signals.size(); ++u32_ItSig)
-         {
-            const C_OSCComMessageLoggerDataSignal & rc_SignalData = pc_Message->c_Signals[u32_ItSig];
-            if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
-            {
-               if (u32_Counter == static_cast<uint32>(os32_SignalIndex))
-               {
-                  u32_Retval = u32_ItSig;
-                  break;
-               }
-               else
-               {
-                  ++u32_Counter;
-               }
-            }
-         }
-      }
+      u32_Retval = C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(pc_Message->c_Signals, os32_SignalIndex,
+                                                                        os32_SignalIndexL2);
    }
    return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reserves new size by the necessary vectors and sets the configured buffer size as used value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeModel::m_AdaptTraceBufferSize(void)
+{
+   // Activate the changed buffer size configuration
+   this->mu32_TraceBufferSizeUsed = this->mu32_TraceBufferSizeConfig;
+
+   //lint -e{1938}  static const is guaranteed preinitialized before main
+   this->mc_DataBase.reserve(this->mu32_TraceBufferSizeUsed);
+   //lint -e{1938}  static const is guaranteed preinitialized before main
+   this->mpc_RootItemContinuous->ReserveChildrenSpace(this->mu32_TraceBufferSizeUsed);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1327,7 +1588,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
                                       static_cast<uint32>(orc_Data.size());
 
       //Check if only append case
-      if (u32_CompleteSize <= C_CamMetTreeModel::mhu32_MAX_STORAGE)
+      if (u32_CompleteSize <= this->mu32_TraceBufferSizeUsed)
       {
          //Appending so notify model of insert action
          if (this->mq_UniqueMessageMode == false)
@@ -1352,7 +1613,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
          }
       }
       //Check if we need to append any items to reach the max storage size
-      else if (this->mc_DataBase.size() < C_CamMetTreeModel::mhu32_MAX_STORAGE)
+      else if (this->mc_DataBase.size() < this->mu32_TraceBufferSizeUsed)
       {
          //Simple model reset notification (if replaced: look at two segments: adding new and queuing mechanism)
          if (this->mq_UniqueMessageMode == false)
@@ -1366,7 +1627,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
             C_TblTreSimpleItem * const pc_Item = new C_TblTreSimpleItem();
             m_UpdateTreeItemBasedOnMessage(pc_Item, *c_ItData, false, -1);
             //1. insert until space is no longer available
-            if (this->mc_DataBase.size() < C_CamMetTreeModel::mhu32_MAX_STORAGE)
+            if (this->mc_DataBase.size() < this->mu32_TraceBufferSizeUsed)
             {
                //Append in reserved space
                this->mc_DataBase.push_back(*c_ItData);
@@ -1384,7 +1645,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
                this->mpc_RootItemContinuous->AddChild(pc_Item);
                //Iterate
                ++this->mu32_OldestItemIndex;
-               this->mu32_OldestItemIndex %= C_CamMetTreeModel::mhu32_MAX_STORAGE;
+               this->mu32_OldestItemIndex %= this->mu32_TraceBufferSizeUsed;
             }
          }
          //Simple model reset notification
@@ -1418,7 +1679,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
             this->mpc_RootItemContinuous->AddChild(pc_Item);
             //Iterate
             ++this->mu32_OldestItemIndex;
-            this->mu32_OldestItemIndex %= C_CamMetTreeModel::mhu32_MAX_STORAGE;
+            this->mu32_OldestItemIndex %= this->mu32_TraceBufferSizeUsed;
          }
          //End queue shift
          if (this->mq_UniqueMessageMode == false)
@@ -1466,7 +1727,7 @@ void C_CamMetTreeModel::m_AddRowsUnique(const std::list<C_CamMetTreeLoggerData> 
          const QMap<stw_scl::C_SCLString,
                     C_CamMetTreeLoggerData>::const_iterator c_ItMessage = this->mc_UniqueMessages.find(
             c_ItData->c_CanIdDec);
-         const sint32 s32_MuxValue = C_CamMetTreeModel::mh_GetMultiplexerValue(*c_ItData);
+         const sint32 s32_MuxValue = C_CamMetUtil::mh_GetMultiplexerValue(c_ItData->c_Signals);
 
          //Check if there is a new row
          if (c_ItMessage != this->mc_UniqueMessages.end())
@@ -1493,11 +1754,11 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
                                                                          const stw_scl::C_SCLString & orc_ExistingMessageKey,
                                                                          const sint32 os32_MultiplexerValue)
 {
-   sint32 s32_Counter = 0L;
+   sint32 s32_MessageCounter = 0L;
    bool q_UpdateDataTimeStamp;
    C_CamMetTreeLoggerData & rc_Message = this->mc_UniqueMessages[orc_Message.c_CanIdDec];
-   const uint64 u64_PreviousAbsoluteTimestampValue = rc_Message.u64_TimeStampAbsolute;
-   const uint64 u64_NewAbsoluteTimestampValue = orc_Message.u64_TimeStampAbsolute;
+   const uint64 u64_PreviousAbsoluteTimestampValue = rc_Message.u64_TimeStampAbsoluteStart;
+   const uint64 u64_NewAbsoluteTimestampValue = orc_Message.u64_TimeStampAbsoluteStart;
    uint64 u64_RelativeTimestamp;
 
    const uint32 u32_PrevMsgTimeStamp = static_cast<uint32>(rc_Message.c_CanMsg.u64_TimeStamp / 1000ULL);
@@ -1538,12 +1799,12 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
       }
       else
       {
-         ++s32_Counter;
+         ++s32_MessageCounter;
       }
    }
    //Update existing tree item
-   m_UpdateTreeItemBasedOnMessage(this->mpc_RootItemStatic->c_Children[static_cast<uint32>(s32_Counter)], rc_Message,
-                                  true, s32_Counter);
+   m_UpdateTreeItemBasedOnMessage(this->mpc_RootItemStatic->c_Children[static_cast<uint32>(s32_MessageCounter)],
+                                  rc_Message, true, s32_MessageCounter);
    //Notify the model of data changes for all replaced items (current: all items)
    if (this->mq_UniqueMessageMode == true)
    {
@@ -1553,12 +1814,13 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
       const sint32 s32_ColIDTime = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
       const sint32 s32_ColIDCounter = C_CamMetTreeModel::h_EnumToColumn(eCAN_COUNTER);
       //Notification for possible new child
-      this->dataChanged(this->index(s32_Counter, s32_ColIDTime), this->index(s32_Counter, s32_ColIDTime));
-      this->dataChanged(this->index(s32_Counter, s32_ColIDCounter), this->index(s32_Counter, s32_ColIDCounter));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDTime), this->index(s32_MessageCounter, s32_ColIDTime));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDCounter),
+                        this->index(s32_MessageCounter, s32_ColIDCounter));
       //Possible changes
-      this->dataChanged(this->index(s32_Counter, s32_ColIDName), this->index(s32_Counter, s32_ColIDName));
-      this->dataChanged(this->index(s32_Counter, s32_ColIDDLC), this->index(s32_Counter, s32_ColIDDLC));
-      this->dataChanged(this->index(s32_Counter, s32_ColIDData), this->index(s32_Counter, s32_ColIDData));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDName), this->index(s32_MessageCounter, s32_ColIDName));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDDLC), this->index(s32_MessageCounter, s32_ColIDDLC));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDData), this->index(s32_MessageCounter, s32_ColIDData));
    }
 }
 
@@ -1579,7 +1841,7 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessage(const C_CamMetTreeLoggerData & 
    QMap<C_SCLString, C_CamMetTreeLoggerData>::iterator c_NewPos;
    //Handle begin!
    C_TblTreSimpleItem * const pc_NewItem = new C_TblTreSimpleItem();
-   const sintn sn_EstimatedPosIndex = this->m_GetPosIndexForUniqueMessage(orc_Message.c_TimeStampAbsolute);
+   const sintn sn_EstimatedPosIndex = this->m_GetPosIndexForUniqueMessage(orc_Message.c_TimeStampAbsoluteStart);
    //Update tree with known index
    m_UpdateTreeItemBasedOnMessage(pc_NewItem, orc_Message, false, sn_EstimatedPosIndex);
    this->mpc_RootItemStatic->InsertChild(sn_EstimatedPosIndex, pc_NewItem);
@@ -1594,7 +1856,7 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessage(const C_CamMetTreeLoggerData & 
    }
 
    //Insert new item
-   this->mc_UniqueMessagesOrdering.insert(orc_Message.c_TimeStampAbsolute, orc_Message.c_CanIdDec);
+   this->mc_UniqueMessagesOrdering.insert(orc_Message.c_TimeStampAbsoluteStart, orc_Message.c_CanIdDec);
    c_NewPos = this->mc_UniqueMessages.insert(orc_Message.c_CanIdDec, orc_Message);
    // New message, new data. Update the timestamp of the CAN message data and its bytes
    c_NewPos->c_GreyOutInformation.u32_DataChangedTimeStamp =
@@ -1687,7 +1949,7 @@ void C_CamMetTreeModel::m_GrayOutTimer(void)
                 rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToGrayOutValue[c_ItValue->first])
             {
                QVector<sintn> c_Roles;
-               const sint32 s32_Row = C_CamMetTreeModel::mh_GetRowForMultiplexerValue(rc_Data, c_ItValue->first);
+               const sint32 s32_Row = C_CamMetUtil::mh_GetRowForMultiplexerValue(rc_Data.c_Signals, c_ItValue->first);
                // Save the new value
                rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToGrayOutValue[c_ItValue->first] =
                   sn_TransparencyStepDataByte;
@@ -1838,25 +2100,24 @@ void C_CamMetTreeModel::mh_ResizeIfNecessary(QString & orc_Str, const sint32 os3
 
    \param[in,out]  opc_Item         Item to update
    \param[in]      orc_Message      Message to update from
-   \param[in]      oq_IsContinuous  Flag if tree item is for continuous mode (simplified handling)
    \param[in]      oq_SignalInsert  Flag if begin and end insert should be called
-   \param[in]      os32_Row         Message row index
+   \param[in]      os32_MessageRow  Message row index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * const opc_Item,
                                                        const C_CamMetTreeLoggerData & orc_Message,
-                                                       const bool oq_SignalInsert, const sint32 os32_Row)
+                                                       const bool oq_SignalInsert, const sint32 os32_MessageRow)
 {
-   const std::vector<sintn> c_Order = C_CamMetTreeModel::mh_GetMultiplexerOrder(orc_Message);
+   const std::vector<sintn> c_Order = C_CamMetUtil::h_GetMultiplexerOrder(orc_Message.c_Signals);
 
    if (c_Order.size() == 0UL)
    {
       //Normal message
       if (opc_Item->c_Children.size() < orc_Message.c_Signals.size())
       {
-         if ((oq_SignalInsert) && (os32_Row >= 0))
+         if ((oq_SignalInsert) && (os32_MessageRow >= 0))
          {
-            this->beginInsertRows(this->index(os32_Row, 0), static_cast<sintn>(opc_Item->c_Children.size()),
+            this->beginInsertRows(this->index(os32_MessageRow, 0), static_cast<sintn>(opc_Item->c_Children.size()),
                                   static_cast<sintn>(opc_Item->c_Children.size() + orc_Message.c_Signals.size()));
          }
          //Add
@@ -1864,14 +2125,14 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
          {
             opc_Item->AddChild(new C_TblTreSimpleItem());
          }
-         if ((oq_SignalInsert) && (os32_Row >= 0))
+         if ((oq_SignalInsert) && (os32_MessageRow >= 0))
          {
             this->endInsertRows();
          }
       }
       else if (opc_Item->c_Children.size() > orc_Message.c_Signals.size())
       {
-         if ((oq_SignalInsert) && (os32_Row >= 0))
+         if ((oq_SignalInsert) && (os32_MessageRow >= 0))
          {
             this->beginResetModel();
          }
@@ -1881,7 +2142,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
          {
             opc_Item->AddChild(new C_TblTreSimpleItem());
          }
-         if ((oq_SignalInsert) && (os32_Row >= 0))
+         if ((oq_SignalInsert) && (os32_MessageRow >= 0))
          {
             this->endResetModel();
          }
@@ -1942,9 +2203,9 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
                                                                                                     u32_InsertNum);
          if (q_FixByInsertingNewChild)
          {
-            if ((oq_SignalInsert) && (os32_Row >= 0))
+            if ((oq_SignalInsert) && (os32_MessageRow >= 0))
             {
-               this->beginInsertRows(this->index(os32_Row, 0), u32_InsertAt, u32_InsertAt);
+               this->beginInsertRows(this->index(os32_MessageRow, 0), u32_InsertAt, u32_InsertAt);
             }
             C_TblTreSimpleItem * const pc_Parent = new C_TblTreSimpleItem();
             for (uint32 u32_ItChild = 0UL; u32_ItChild < u32_InsertNum; ++u32_ItChild)
@@ -1952,14 +2213,14 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
                pc_Parent->AddChild(new C_TblTreSimpleItem());
             }
             opc_Item->InsertChild(u32_InsertAt, pc_Parent);
-            if ((oq_SignalInsert) && (os32_Row >= 0))
+            if ((oq_SignalInsert) && (os32_MessageRow >= 0))
             {
                this->endInsertRows();
             }
          }
          else
          {
-            if ((oq_SignalInsert) && (os32_Row >= 0))
+            if ((oq_SignalInsert) && (os32_MessageRow >= 0))
             {
                this->beginResetModel();
             }
@@ -1975,7 +2236,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
                }
                opc_Item->AddChild(pc_Parent);
             }
-            if ((oq_SignalInsert) && (os32_Row >= 0))
+            if ((oq_SignalInsert) && (os32_MessageRow >= 0))
             {
                this->endResetModel();
             }
@@ -1983,6 +2244,392 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
       }
    }
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compares one data entry with the search string
+
+   \param[in]     orc_Data              Message to search
+   \param[in]     orc_SearchString      String to search in data for
+   \param[in]     oq_Next               Flag for search direction of signals
+                                          true:  Search the next entry, forward
+                                          false: Search the previous entry, backward
+   \param[in,out] orsn_SignalIndex      Input: >= 0: signal index to start search; -1: start with message
+                                        Output: >= 0: signal matches; -1: no signal matched or the message matches
+   \param[out]    orq_LastSignalChecked true: all signals were checked of the message, not necessary to check in next
+                                              round
+                                        false: something did match to the search string, but not all signal were
+                                               checked. At least one further check is necessary for this message
+
+
+   \retval   true    The message or one signal does match to the search string
+   \retval   false   The message and its signals does not match to search string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamMetTreeModel::m_CheckDataForSearch(const C_CamMetTreeLoggerData & orc_Data, const QString & orc_SearchString,
+                                             const bool oq_Next, stw_types::sintn & orsn_SignalIndex,
+                                             bool & orq_LastSignalChecked) const
+{
+   bool q_Return = false;
+
+   if (orc_SearchString != "")
+   {
+      // Check only the string variant, which are visible
+      // Strings which has no letters, no upper case necessary
+      const sintn osn_StartSignalRow = orsn_SignalIndex;
+      bool q_SkipSignals = false;
+
+      // Reset the signal row for not found as default output
+      orsn_SignalIndex = -1;
+
+      // Check message strings when no start signal is defined
+      if (osn_StartSignalRow < 0)
+      {
+         q_Return = this->m_CheckMessageDataForSearch(orc_Data, orc_SearchString);
+
+         if (oq_Next == false)
+         {
+            // Searching backward means in this case no signals of the message will be checked at this run
+            q_SkipSignals = true;
+         }
+      }
+
+      if (q_SkipSignals == false)
+      {
+         // Check signals
+         if (orc_Data.c_Signals.size() > 0)
+         {
+            orq_LastSignalChecked = false;
+
+            if (q_Return == false)
+            {
+               // Check signals
+               uint32 u32_Counter = 0U;
+               bool q_SearchFinished = false;
+
+               if (osn_StartSignalRow > 0)
+               {
+                  // Set start signal
+                  u32_Counter = static_cast<uint32>(osn_StartSignalRow);
+               }
+
+               do
+               {
+                  // Check each signal
+                  q_Return = this->m_CheckSignalDataForSearch(orc_Data.c_Signals[u32_Counter], orc_SearchString);
+
+                  if (q_Return == true)
+                  {
+                     // Found a match, search finished
+                     orsn_SignalIndex = static_cast<sintn>(u32_Counter);
+                     q_SearchFinished = true;
+                  }
+                  else
+                  {
+                     if (oq_Next == true)
+                     {
+                        // Searching forward
+                        ++u32_Counter;
+
+                        if (u32_Counter >= orc_Data.c_Signals.size())
+                        {
+                           q_SearchFinished = true;
+                        }
+                     }
+                     else
+                     {
+                        // Searching backward
+                        if (u32_Counter > 0UL)
+                        {
+                           --u32_Counter;
+                        }
+                        else
+                        {
+                           q_SearchFinished = true;
+                        }
+                     }
+                  }
+               }
+               while (q_SearchFinished == false);
+
+               // Check if the last signal was reached. Not relevant if it matched or not
+               if (u32_Counter == (orc_Data.c_Signals.size() - 1UL))
+               {
+                  orq_LastSignalChecked = true;
+               }
+
+               // Special case: Searching backward, started with a signal and nothing found yet -> Search message now
+               if ((oq_Next == false) &&
+                   (q_Return == false))
+               {
+                  q_Return = this->m_CheckMessageDataForSearch(orc_Data, orc_SearchString);
+               }
+            }
+         }
+         else
+         {
+            // No signals available for checking
+            orq_LastSignalChecked = true;
+         }
+      }
+   }
+   else
+   {
+      orq_LastSignalChecked = true;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compares one data entry with the search string
+
+   \param[in]     orc_Data              Message to search
+   \param[in]     orc_SearchString     String to search in model
+
+   \retval   true    The message does match to the search string
+   \retval   false   The message does not match to search string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamMetTreeModel::m_CheckMessageDataForSearch(const C_CamMetTreeLoggerData & orc_Data,
+                                                    const QString & orc_SearchString) const
+{
+   bool q_Return = false;
+
+   // Compare all in upper case to be case insensitive
+   const C_SCLString c_SearchString = orc_SearchString.toUpper().toStdString().c_str();
+
+   if (orc_SearchString != "")
+   {
+      // Check only the string variant, which are visible
+      // Strings which has no letters, no upper case necessary
+
+      // Check message strings
+      if ((orc_Data.c_Name.UpperCase().Pos(c_SearchString) > 0) ||
+          (orc_Data.c_CanDlc.Pos(c_SearchString) > 0) ||
+          ((this->mq_DisplayTimestampRelative == true) &&
+           (orc_Data.c_TimeStampRelative.Pos(c_SearchString) > 0)) ||
+          ((this->mq_DisplayTimestampAbsoluteTimeOfDay == true) &&
+           (orc_Data.c_TimeStampAbsoluteTimeOfDay.Pos(c_SearchString) > 0)) ||
+          ((this->mq_DisplayTimestampAbsoluteTimeOfDay == false) &&
+           (orc_Data.c_TimeStampAbsoluteStart.Pos(c_SearchString) > 0)))
+      {
+         q_Return = true;
+      }
+      else
+      {
+         if (this->mq_DisplayAsHex == true)
+         {
+            // Check hex display specific strings
+            if ((orc_Data.c_CanIdHex.UpperCase().Pos(c_SearchString) > 0) ||
+                (orc_Data.c_CanDataHex.UpperCase().Pos(c_SearchString) > 0) ||
+                (orc_Data.c_ProtocolTextHex.UpperCase().Pos(c_SearchString) > 0))
+            {
+               q_Return = true;
+            }
+         }
+         else
+         {
+            // Check decimal display specific strings
+            if ((orc_Data.c_CanIdDec.Pos(c_SearchString) > 0) ||
+                (orc_Data.c_CanDataDec.Pos(c_SearchString) > 0) ||
+                (orc_Data.c_ProtocolTextDec.UpperCase().Pos(c_SearchString) > 0))
+            {
+               q_Return = true;
+            }
+         }
+      }
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compares one data signal entry with the search string
+
+   \param[in]     orc_SignalData       Message to search
+   \param[in]     orc_SearchString     String to search in model
+
+   \retval   true    The signal does match to the search string
+   \retval   false   The signal does not match to search string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamMetTreeModel::m_CheckSignalDataForSearch(const C_OSCComMessageLoggerDataSignal & orc_SignalData,
+                                                   const QString & orc_SearchString) const
+{
+   bool q_Return = false;
+
+   // Compare all in upper case to be case insensitive
+   const C_SCLString c_SearchString = orc_SearchString.toUpper().toStdString().c_str();
+
+   if (orc_SearchString != "")
+   {
+      // Check only the string variant, which are visible
+      // Strings which has no letters, no upper case necessary
+
+      if ((orc_SignalData.c_Name.UpperCase().Pos(c_SearchString) > 0) ||
+          (orc_SignalData.c_Comment.UpperCase().Pos(c_SearchString) > 0) ||
+          (orc_SignalData.c_Unit.UpperCase().Pos(c_SearchString) > 0) ||
+          (orc_SignalData.c_Value.UpperCase().Pos(c_SearchString) > 0))
+      {
+         q_Return = true;
+      }
+      else
+      {
+         if (this->mq_DisplayAsHex == true)
+         {
+            // Check hex display specific strings
+            if (orc_SignalData.c_RawValueHex.UpperCase().Pos(c_SearchString) > 0)
+            {
+               q_Return = true;
+            }
+         }
+         else
+         {
+            // Check decimal display specific strings
+            if (orc_SignalData.c_RawValueDec.Pos(c_SearchString) > 0)
+            {
+               q_Return = true;
+            }
+         }
+      }
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks a signal for its multiplexer configuration and the resulting row position and tree layer position
+
+   If orsn_MultiplexedSignalRow is >= 0, the checked  signal is a multiplexed signal and the signal is on
+   the third level of the model. Then osn_SignalRow equals the row of the multiplexer signal.
+
+   If orsn_MultiplexedSignalRow is < 0, the checked signal can be a normal signal or the multiplexer signal and is on
+   the second level of the model.
+
+   Condition: The vector of signals must be sorted by function mh_SortMultiplexedSignals or by default
+
+   \param[in]       orc_Signals                All signals to compare and check with
+   \param[in]       ou32_SignalIndexToCheck    The signal to check
+   \param[out]      orsn_SignalRow              >= 0: If orsn_MultiplexedSignalRow >= 0: Row of Multiplexer signal
+                                                       If orsn_MultiplexedSignalRow < 0: Row of checked signal
+                                                 < 0: ou32_SignalIndexToCheck not valid
+   \param[out]      orsn_MultiplexedSignalRow   >= 0: Row of Multiplexed signal
+                                                 < 0: Signal is not a multiplexed signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeModel::m_GetMultiplexedMsgSignalRow(const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals,
+                                                     const uint32 ou32_SignalIndexToCheck, sintn & orsn_SignalRow,
+                                                     sintn & orsn_MultiplexedSignalRow) const
+{
+   orsn_SignalRow = -1;
+   orsn_MultiplexedSignalRow = -1;
+
+   if (ou32_SignalIndexToCheck < orc_Signals.size())
+   {
+      uint32 u32_Counter;
+      const C_OSCCanSignal & rc_OscSginalToCheck = orc_Signals[ou32_SignalIndexToCheck].c_OscSignal;
+
+      // Multiplexer signals come first
+      // Multiplexed signals has the matching multiplexer signal as parent
+      // Default signals come after the multiplexer signals with its multiplexed signals
+      if (rc_OscSginalToCheck.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
+      {
+         orsn_SignalRow = 0;
+
+         for (u32_Counter = 0U; u32_Counter < orc_Signals.size(); ++u32_Counter)
+         {
+            const C_OSCCanSignal & rc_OscSginal = orc_Signals[u32_Counter].c_OscSignal;
+
+            // Count all multiplexer signals which are always at the beginning and all default signals
+            // which have a lower index
+            // Multiplexed signals are not on the same level
+            if ((rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) ||
+                ((rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT) &&
+                 (u32_Counter < ou32_SignalIndexToCheck)))
+            {
+               ++orsn_SignalRow;
+            }
+         }
+      }
+      else if (rc_OscSginalToCheck.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+      {
+         orsn_MultiplexedSignalRow = 0;
+
+         // The signal is on third level of the tree below the multiplexer signal
+         for (u32_Counter = 0U; u32_Counter < orc_Signals.size(); ++u32_Counter)
+         {
+            const C_OSCComMessageLoggerDataSignal & rc_Signal = orc_Signals[u32_Counter];
+            const C_OSCCanSignal & rc_OscSginal = rc_Signal.c_OscSignal;
+
+            if ((u32_Counter < ou32_SignalIndexToCheck) &&
+                (rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                (rc_OscSginal.u16_MultiplexValue == rc_OscSginalToCheck.u16_MultiplexValue))
+            {
+               // Search the multiplexed signals with the same multiplexer value with a lower index to get the row of
+               // the checked signal below the multiplexer signal
+               ++orsn_MultiplexedSignalRow;
+            }
+            else if (rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+            {
+               const sintn sn_Value = rc_Signal.c_RawValueDec.ToIntDef(-1);
+
+               if (sn_Value >= 0)
+               {
+                  uint16 u16_Value = static_cast<uint16>(sn_Value);
+                  if (u16_Value <= rc_OscSginalToCheck.u16_MultiplexValue)
+                  {
+                     // In this case, this is the row of the multiplexer signal
+                     // Starting with -1 all multiplexer signals whit a concrete value lower or equal to the
+                     // expected value count for the row
+                     ++orsn_SignalRow;
+                  }
+               }
+            }
+            else
+            {
+               // Nothing to do
+            }
+         }
+      }
+      else
+      {
+         // Multiplexer signal
+         const sintn sn_CheckValue = orc_Signals[ou32_SignalIndexToCheck].c_RawValueDec.ToIntDef(-1);
+
+         if (sn_CheckValue >= 0)
+         {
+            for (u32_Counter = 0U; u32_Counter < orc_Signals.size(); ++u32_Counter)
+            {
+               const C_OSCComMessageLoggerDataSignal & rc_Signal = orc_Signals[u32_Counter];
+               const C_OSCCanSignal & rc_OscSginal = rc_Signal.c_OscSignal;
+               const sintn sn_Value = rc_Signal.c_RawValueDec.ToIntDef(-1);
+
+               if (sn_Value >= 0)
+               {
+                  // Starting with -1 all multiplexer signals whit a concrete value lower or equal to the
+                  // expected value count for the row
+                  if ((rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
+                      (sn_Value <= sn_CheckValue))
+                  {
+                     ++orsn_SignalRow;
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the last search information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeModel::m_ResetSearch(void)
+{
+   this->mc_LastSearchedString = "";
+   this->msn_LastSearchedMessageRow = -1;
+   this->msn_LastSearchedSignalRow = -1;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2110,32 +2757,6 @@ void C_CamMetTreeModel::mh_ApplyPreviousGreyOutInformation(C_CamMetTreeLoggerDat
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get multiplexer value ordering
-
-   \param[in]  orc_Message    Message to look for multiplexer
-
-   \return
-   Multiplexer value ordering
-*/
-//----------------------------------------------------------------------------------------------------------------------
-std::vector<sintn> C_CamMetTreeModel::mh_GetMultiplexerOrder(const C_CamMetTreeLoggerData & orc_Message)
-{
-   std::vector<sintn> c_Order;
-   //Multiplexer order
-   for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
-   {
-      const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
-      if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
-      {
-         c_Order.push_back(rc_SignalData.c_RawValueDec.ToInt());
-      }
-   }
-   //lint -e{864} Call as expected by interface
-   std::sort(c_Order.begin(), c_Order.end());
-   return c_Order;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if the difference between the two vectors can be fixed by inserting a new item
 
    \param[in]   orc_ExpectedVec  Expected vector
@@ -2158,10 +2779,21 @@ bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint
    if (orc_ExpectedVec.size() == (orc_CurrentVec.size() + 1UL))
    {
       uint32 u32_Counter = 0UL;
+      bool q_FoundMismatch = false;
       //Assuming we hit no problem
       q_FixByInsertingNewChild = true;
-      //If orc_CurrentVec is empty, that's also valid but needs to be handled
-      oru32_InsertNum = orc_ExpectedVec[0UL];
+      //Default
+      if (orc_ExpectedVec.size() == 1UL)
+      {
+         //If orc_CurrentVec is empty, that's also valid but needs to be handled
+         oru32_InsertNum = orc_ExpectedVec[0UL];
+      }
+      else
+      {
+         //If all valid, use last item
+         oru32_InsertAt = orc_CurrentVec.size();
+         oru32_InsertNum = orc_ExpectedVec[static_cast<std::vector<uint32>::size_type>(orc_ExpectedVec.size() - 1UL)];
+      }
       for (uint32 u32_ItCurrent = 0; (u32_ItCurrent < orc_CurrentVec.size()) && q_FixByInsertingNewChild;
            ++u32_ItCurrent)
       {
@@ -2174,27 +2806,43 @@ bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint
             }
             else
             {
-               //Try next position
-               oru32_InsertAt = u32_Counter;
-               oru32_InsertNum = orc_ExpectedVec[u32_Counter];
-               ++u32_Counter;
-               if (u32_Counter < orc_ExpectedVec.size())
-               {
-                  if (orc_ExpectedVec[u32_Counter] == orc_CurrentVec[u32_ItCurrent])
-                  {
-                     //pass
-                     ++u32_Counter;
-                  }
-                  else
-                  {
-                     //No match possible
-                     q_FixByInsertingNewChild = false;
-                  }
-               }
-               else
+               //Only accept one conflict
+               if (q_FoundMismatch)
                {
                   //No match possible
                   q_FixByInsertingNewChild = false;
+               }
+               else
+               {
+                  //Try insert here
+                  oru32_InsertAt = u32_ItCurrent;
+                  oru32_InsertNum = orc_ExpectedVec[u32_Counter];
+                  ++u32_Counter;
+                  q_FoundMismatch = true;
+                  //Check the next to match with the current
+                  if (u32_Counter < orc_ExpectedVec.size())
+                  {
+                     if (orc_ExpectedVec[u32_Counter] == orc_CurrentVec[u32_ItCurrent])
+                     {
+                        //next element matches again so continue
+                        //pass
+                        ++u32_Counter;
+                     }
+                     else
+                     {
+                        //The current element and the next expected element also don't match, so at least two operations
+                        // are necessary
+                        //No match possible
+                        q_FixByInsertingNewChild = false;
+                     }
+                  }
+                  else
+                  {
+                     //The current vector contains one more element than the expected and also has a mismatch, so at
+                     // least two operations are necessary
+                     //No match possible
+                     q_FixByInsertingNewChild = false;
+                  }
                }
             }
          }
@@ -2280,54 +2928,228 @@ void C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(C_CamMetTreeLogg
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get multiplexer value for this instance of a message
+/*! \brief  Translate tree rows to signal index
 
-   \param[in]  orc_Message    Message to search the multiplexer value in
+   \param[in]  orc_Signals          Signals
+   \param[in]  os32_SignalIndex     Signal index
+   \param[in]  os32_SignalIndexL2   Second level row (optional)
 
    \return
-   -1:   invalid
-   else: found multiplexer value
+   Translated signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMetTreeModel::mh_GetMultiplexerValue(const C_CamMetTreeLoggerData & orc_Message)
+uint32 C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
+   const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals, const sint32 os32_SignalIndex,
+   const sint32 os32_SignalIndexL2)
 {
-   sint32 s32_Value = -1;
+   uint32 u32_Retval = 0UL;
+   const std::vector<sintn> c_Order = C_CamMetUtil::h_GetMultiplexerOrder(orc_Signals);
+   uint32 u32_Counter = 0UL;
 
-   for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+   if (static_cast<uint32>(os32_SignalIndex) < c_Order.size())
    {
-      const C_OSCComMessageLoggerDataSignal & rc_Sig = orc_Message.c_Signals[u32_ItSig];
-      if (rc_Sig.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      //Part of multiplexer
+      for (uint32 u32_ItSigL1 = 0UL; u32_ItSigL1 < orc_Signals.size(); ++u32_ItSigL1)
       {
-         s32_Value = rc_Sig.c_RawValueDec.ToInt();
-         break;
+         const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Signals[u32_ItSigL1];
+         if (os32_SignalIndexL2 >= 0)
+         {
+            if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+            {
+               //Multiplexed
+               if (rc_SignalData.c_OscSignal.u16_MultiplexValue == c_Order[static_cast<uint32>(os32_SignalIndex)])
+               {
+                  if (u32_Counter == static_cast<uint32>(os32_SignalIndexL2))
+                  {
+                     u32_Retval = u32_ItSigL1;
+                     break;
+                  }
+                  else
+                  {
+                     //Only count children (= multiplexed signals with this multiplexer value)
+                     ++u32_Counter;
+                  }
+               }
+            }
+         }
+         else
+         {
+            //Multiplexer
+            if ((rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
+                (rc_SignalData.c_RawValueDec.ToInt() == c_Order[static_cast<uint32>(os32_SignalIndex)]))
+            {
+               //Just use first multiplexer
+               u32_Retval = u32_ItSigL1;
+               //lint -e{1960} break is more efficient
+               break;
+            }
+         }
       }
    }
-   return s32_Value;
+   else
+   {
+      //Skip multiplexer in counting
+      u32_Counter += c_Order.size();
+      //Others
+      for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
+      {
+         const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Signals[u32_ItSig];
+         if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
+         {
+            if (u32_Counter == static_cast<uint32>(os32_SignalIndex))
+            {
+               u32_Retval = u32_ItSig;
+               break;
+            }
+            else
+            {
+               ++u32_Counter;
+            }
+         }
+      }
+   }
+
+   return u32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get row in message for multiplexer value
+/*! \brief   Checks if a message is multiplexed
 
-   \param[in]  orc_Message             Message to search in
-   \param[in]  os32_MultiplexerValue   Multiplexer value to search for
+   \param[in]     orc_Data              Message to search
 
-   \return
-   -1:   invalid
-   else: valid row (of message index)
+   \retval   true    The message or one signal does match to the search string
+   \retval   false   The message and its signals does not match to search string
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMetTreeModel::mh_GetRowForMultiplexerValue(const C_CamMetTreeLoggerData & orc_Message,
-                                                       const sint32 os32_MultiplexerValue)
+bool C_CamMetTreeModel::mh_IsMessageMultiplexed(const C_CamMetTreeLoggerData & orc_Data)
 {
-   sint32 s32_Retval = -1;
-   const std::vector<sintn> c_MuxValues = C_CamMetTreeModel::mh_GetMultiplexerOrder(orc_Message);
+   bool q_Return = false;
+   uint32 u32_Counter;
 
-   for (uint32 u32_It = 0UL; u32_It < c_MuxValues.size(); ++u32_It)
+   for (u32_Counter = 0U; u32_Counter < orc_Data.c_Signals.size(); ++u32_Counter)
    {
-      if (c_MuxValues[u32_It] == os32_MultiplexerValue)
+      if (orc_Data.c_Signals[u32_Counter].c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         s32_Retval = static_cast<sint32>(u32_It);
+         q_Return = true;
+         break;
       }
    }
-   return s32_Retval;
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sorts the signals in order of the tree
+
+  Example:
+   - Multiplexer signal
+   -- Multiplexed signal
+   -- Multiplexed signal
+   -- Multiplexed signal
+   - Multiplexer signal
+   -- Multiplexed signal
+   -- Multiplexed signal
+   - Default signal
+   - Default signal
+   - Default signal
+
+   \param[in,out]   orc_Signals   Vector with signals to sort (input sorted by start bit)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeModel::mh_SortMultiplexedSignals(std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals)
+{
+   uint32 u32_MultiplexerCounter = 0U;
+   uint32 u32_SignalCounter;
+
+   //lint -e{864} Call as expected by interface
+   std::sort(orc_Signals.begin(), orc_Signals.end(), T_LoggerDataComparatorForMultiplexer());
+
+   // Search all multiplexed signal for each the multiplexer. Iterate over the multiplexer signals
+   while (u32_MultiplexerCounter < orc_Signals.size())
+   {
+      const C_OSCComMessageLoggerDataSignal & rc_MultiplexerSig = orc_Signals[u32_MultiplexerCounter];
+      if (rc_MultiplexerSig.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      {
+         const sintn sn_MultiplexerValue = rc_MultiplexerSig.c_RawValueDec.ToIntDef(-1);
+
+         if (sn_MultiplexerValue >= 0)
+         {
+            // Compare the multiplexer value of this multiplexer signal with all multiplexed signals
+            for (u32_SignalCounter = u32_MultiplexerCounter + 1U; u32_SignalCounter < orc_Signals.size();
+                 ++u32_SignalCounter)
+            {
+               if ((orc_Signals[u32_SignalCounter].c_OscSignal.e_MultiplexerType ==
+                    C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                   (orc_Signals[u32_SignalCounter].c_OscSignal.u16_MultiplexValue ==
+                    static_cast<uint16>(sn_MultiplexerValue)))
+               {
+                  const C_OSCComMessageLoggerDataSignal c_SigCopy = orc_Signals[u32_SignalCounter];
+
+                  // Remove the signal from the original position
+                  orc_Signals.erase(orc_Signals.begin() + u32_SignalCounter);
+
+                  // Increment the multiplexer counter, due to the insert
+                  ++u32_MultiplexerCounter;
+
+                  // Insert this signal after the multiplexer signal again
+                  orc_Signals.insert(orc_Signals.begin() + u32_MultiplexerCounter, c_SigCopy);
+               }
+            }
+         }
+
+         // Check next element
+         ++u32_MultiplexerCounter;
+      }
+      else
+      {
+         // All multiplexer signals checked. Finished
+         break;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Custom operator for sorting C_OSCComMessageLoggerDataSignal
+
+   All multiplexer signals will be sorted to the beginning (less than) in order of the set multiplexer value
+
+   \param[in]       orc_Data1     Detailed input parameter description
+   \param[in]       orc_Data2     Detailed input parameter description
+
+   \retval   true    orc_Data1 is less than orc_Data2
+   \retval   false   orc_Data2 is less or equal than orc_Data1
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_CamMetTreeModel::T_LoggerDataComparatorForMultiplexer::operator ()(
+   const stw_opensyde_core::C_OSCComMessageLoggerDataSignal & orc_Data1,
+   const stw_opensyde_core::C_OSCComMessageLoggerDataSignal & orc_Data2) const
+{
+   bool q_Return;
+
+   if ((orc_Data1.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
+       (orc_Data2.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL))
+   {
+      // Both are multiplexer signals, compare the values
+      const sintn sn_Value1 = orc_Data1.c_RawValueDec.ToIntDef(-1);
+      const sintn sn_Value2 = orc_Data2.c_RawValueDec.ToIntDef(-1);
+
+      q_Return = sn_Value1 < sn_Value2;
+   }
+   else if (orc_Data1.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+   {
+      // orc_Data2 is not a multiplexer signal
+      q_Return = true;
+   }
+   else if (orc_Data2.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+   {
+      // orc_Data1 is not a multiplexer signal
+      q_Return = false;
+   }
+   else
+   {
+      // Default compare
+      q_Return = orc_Data1 < orc_Data2;
+   }
+
+   return q_Return;
 }

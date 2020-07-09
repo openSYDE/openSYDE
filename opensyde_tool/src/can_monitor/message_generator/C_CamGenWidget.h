@@ -42,8 +42,7 @@ public:
 
    void TriggerSignalReload(void) const;
    void RemoveMessagesForFile(const QString & orc_File) const;
-   void SetCommunicationStarted(void) const;
-   void SetCommunicationStopped(void) const;
+   void SetCommunicationStarted(const bool oq_Online) const;
    bool CheckAndHandleKey(const QString & orc_Input) const;
 
    void ExpandMessageGen(const bool oq_Expand) const;
@@ -55,6 +54,7 @@ Q_SIGNALS:
    //lint -restore
    void SigExpandMessageGen(const bool oq_Expand); // true: expand message generator, false: minimize message generator
    void SigRegisterCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
+   void SigRemoveAllCyclicMessages(void);
    void SigSendMessage(const stw_types::uint32 ou32_MessageIndex, const stw_types::uint32 ou32_TimeToSend);
 
 private:

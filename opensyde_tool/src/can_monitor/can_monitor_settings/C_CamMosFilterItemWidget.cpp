@@ -314,7 +314,7 @@ void C_CamMosFilterItemWidget::m_SetFilterNameElided(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overridden event function.
 
-    Here: Show or hide buttons
+    Here: Show or hide buttons; elide text if necessary.
 
    \param[in,out]    opc_Event   Event identification and information
 

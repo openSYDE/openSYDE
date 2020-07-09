@@ -89,6 +89,7 @@ public:
    virtual void ResetCounter(void);
    virtual void UpdateBusLoad(const stw_types::uint8 ou8_BusLoad);
    virtual void UpdateTxErrors(const stw_types::uint32 ou32_TxErrors);
+   virtual void UpdateTxCounter(const stw_types::uint32 ou32_TxCount);
 
 protected:
    const C_OSCComMessageLoggerData & m_GetHandledCanMessage(void) const;
@@ -142,8 +143,11 @@ private:
    void m_ResetCounter(void);
 
    C_OSCComMessageLoggerData mc_HandledCanMessage;
-   stw_types::uint64 mu64_FirstTimeStamp;
+   stw_types::uint64 mu64_FirstTimeStampStart;
+   stw_types::uint64 mu64_FirstTimeStampDayOfTime;
    stw_types::uint64 mu64_LastTimeStamp;
+
+   static const stw_types::uint64 mhu64_MAX_TIMESTAMP_DAY_OF_TIME;
 
    C_OSCComLoggerProtocols mc_ProtocolHex;
    C_OSCComLoggerProtocols mc_ProtocolDec;

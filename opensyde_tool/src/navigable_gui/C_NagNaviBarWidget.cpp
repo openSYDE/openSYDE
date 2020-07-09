@@ -13,9 +13,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <iostream>
-
-#include <QElapsedTimer>
 #include <QProcess>
 
 #include "TGLUtils.h"
@@ -25,7 +22,6 @@
 #include "C_GtGetText.h"
 #include "ui_C_NagNaviBarWidget.h"
 
-#include "constants.h"
 #include "stwtypes.h"
 #include "stwerrors.h"
 
@@ -42,6 +38,7 @@
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
+using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
@@ -600,19 +597,12 @@ void C_NagNaviBarWidget::m_BussesChanged(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_AddViewClicked(void)
 {
-   QElapsedTimer c_Timer;
-
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
    Q_EMIT this->SigAddViewClicked();
    m_SysViewSizeChanged();
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Add view: " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
+   osc_write_log_performance_stop(u16_TimerId, "Add view");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -712,7 +702,7 @@ void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
    {
       //Restore defaults
       this->mpc_Ui->pc_ScrollArea->setMinimumHeight(0);
-      //lint -e1960 we can not change Qt constant but it is still better than using the hard coded magic number 16777215
+      //lint -e1960 we cannot change Qt constant but it is still better than using the hard coded magic number 16777215
       this->mpc_Ui->pc_ScrollArea->setMaximumHeight(QWIDGETSIZE_MAX);
    }
 }

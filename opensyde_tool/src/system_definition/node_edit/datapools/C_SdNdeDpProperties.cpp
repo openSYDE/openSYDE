@@ -195,8 +195,8 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
       if (q_IsShared == true)
       {
          // Scenario 1: Edit of a shared Datapool
-         C_SdNdeDpUtil::GetSharedDatapoolGroup(u32_SharedDatapoolGroup, c_DpId, this->mu32_NodeIndex,
-                                               c_DatapoolGroup);
+         C_SdNdeDpUtil::h_GetSharedDatapoolGroup(u32_SharedDatapoolGroup, c_DpId, this->mu32_NodeIndex,
+                                                 c_DatapoolGroup);
       }
    }
    else if (opc_SharedDatapoolId != NULL)
@@ -211,10 +211,10 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
          // Scenario 2: New shared Datapool and the shared Datapool was already shared with an other Datapool
          // The group exist. We want all group member. The second parameter for ignoring a concrete Datapool must be
          // invalid. The new Datapool is not registered in shared Datapools yet.
-         C_SdNdeDpUtil::GetSharedDatapoolGroup(u32_SharedDatapoolGroup,
-                                               C_OSCNodeDataPoolId(0xFFFFFFFFU, 0xFFFFFFFFU),
-                                               this->mu32_NodeIndex,
-                                               c_DatapoolGroup);
+         C_SdNdeDpUtil::h_GetSharedDatapoolGroup(u32_SharedDatapoolGroup,
+                                                 C_OSCNodeDataPoolId(0xFFFFFFFFU, 0xFFFFFFFFU),
+                                                 this->mu32_NodeIndex,
+                                                 c_DatapoolGroup);
       }
       else
       {

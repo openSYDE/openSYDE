@@ -16,7 +16,6 @@
 
 #include <iostream>
 
-#include <QElapsedTimer>
 #include <QApplication>
 #include <QFileInfo>
 #include <QDesktopWidget>
@@ -28,6 +27,8 @@
 #include "constants.h"
 
 #include "TGLUtils.h"
+#include "C_OSCUtils.h"
+#include "C_OSCLoggingHandler.h"
 #include "stwerrors.h"
 #include "C_SyvUtil.h"
 #include "C_HeHandler.h"
@@ -56,6 +57,7 @@
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
+using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
@@ -95,12 +97,11 @@ C_NagMainWindow::C_NagMainWindow(void) :
    mu32_SvIndex(0U),
    mu32_SvFlag(0U)
 {
-   QElapsedTimer c_Timer;
-
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
+   // Performance measurement
+   // Switch on and off because using flag from user settings would load them, hence this loading time would not count
+   C_OSCLoggingHandler::h_SetMeasurePerformanceActive(true);
+   const uint16 u16_TimerId = osc_write_log_performance_start();
+   C_OSCLoggingHandler::h_SetMeasurePerformanceActive(false);
 
    mpc_Ui->setupUi(this);
 
@@ -113,7 +114,10 @@ C_NagMainWindow::C_NagMainWindow(void) :
 
    // load devices so they are known to UI
    stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
-      C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str());
+      C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str(), false);
+
+   stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
+      C_Uti::h_GetAbsolutePathFromExe("../devices/user_devices.ini").toStdString().c_str(), true);
 
    this->mpc_MainWidget = new C_NagMainWidget(this->mpc_Ui->pc_workAreaWidget);
    this->mpc_UseCaseWidget = new C_NagUseCaseViewWidget(this->mpc_Ui->pc_workAreaWidget);
@@ -169,6 +173,10 @@ C_NagMainWindow::C_NagMainWindow(void) :
       C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Position, c_Size, QSize(1000, 700), true);
       this->setGeometry(c_Position.x(), c_Position.y(), c_Size.width(), c_Size.height());
    }
+
+   // Performance time measurement
+   C_OSCLoggingHandler::h_SetMeasurePerformanceActive(C_UsHandler::h_GetInstance()->GetPerformanceActive());
+
    //Drag & drop of *.syde files
    this->setAcceptDrops(true);
 
@@ -178,10 +186,9 @@ C_NagMainWindow::C_NagMainWindow(void) :
 
    //Window icon
    C_OgeWiUtil::h_SetWindowIcon(this);
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Main:" << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
+   //Time measurement log
+   osc_write_log_performance_stop(u16_TimerId, "Main");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -262,8 +269,15 @@ void C_NagMainWindow::m_ShowStartView()
 void C_NagMainWindow::m_ChangeUseCase(const sint32 os32_Mode, const sint32 os32_SubIndex, const bool oq_ChangeUseCase)
 {
    bool q_Worked;
+   QString c_Name;
+   QString c_SubItemName;
 
-   q_Worked = m_ChangeMode(os32_Mode, os32_SubIndex, 0U, "", "", 0U, oq_ChangeUseCase);
+   //Get appropriate default heading
+   C_NagMainWindow::h_GetHeadingNames(os32_Mode, os32_SubIndex, 0UL, c_Name, c_SubItemName);
+
+   //Change use-case
+   q_Worked = m_ChangeMode(os32_Mode, os32_SubIndex, 0U, c_Name, c_SubItemName, 0U, oq_ChangeUseCase);
+
    if (q_Worked == false)
    {
       this->mpc_Ui->pc_NaviBar->ResetUseCaseAfterChangeFailure(this->ms32_Mode);
@@ -337,7 +351,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_ToolTipHidden1 = false;
    bool q_ToolTipHidden2 = false;
 
-   if (stw_opensyde_gui_logic::C_HeHandler::CheckHelpKey(opc_KeyEvent) == true)
+   if (stw_opensyde_gui_logic::C_HeHandler::h_CheckHelpKey(opc_KeyEvent) == true)
    {
       if (this->mq_StartView == false)
       {
@@ -361,7 +375,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       }
       else
       {
-         stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
+         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             this->mpc_MainWidget->metaObject()->className());
       }
    }
@@ -588,7 +602,15 @@ void C_NagMainWindow::dropEvent(QDropEvent * const opc_Event)
          if ((this->mq_BlockDragAndDrop == false) &&
              (mh_CheckMime(pc_MimeData, &c_FilePath) == true))
          {
-            this->mpc_MainWidget->LoadProject(c_FilePath);
+            // Check if path is a valid path with no irregular characters
+            if (C_OSCUtils::h_CheckValidFilePath(c_FilePath.toStdString().c_str()) == false)
+            {
+               C_OgeWiUtil::h_ShowPathInvalidError(this, c_FilePath);
+            }
+            else
+            {
+               this->mpc_MainWidget->LoadProject(c_FilePath);
+            }
          }
       }
    }
@@ -761,39 +783,6 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
          ors32_SubMode = this->ms32_SdSubMode;
          oru32_Index = this->mu32_SdIndex;
          oru32_Flag = this->mu32_SdFlag;
-
-         if (ors32_SubMode == ms32_SUBMODE_SYSDEF_NODEEDIT)
-         {
-            const stw_opensyde_core::C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(oru32_Index);
-            if (pc_Node != NULL)
-            {
-               orc_SubItemName = pc_Node->c_Properties.c_Name.c_str();
-            }
-            else
-            {
-               orc_SubItemName = "Node";
-            }
-            orc_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
-         }
-         else if (ors32_SubMode == ms32_SUBMODE_SYSDEF_BUSEDIT)
-         {
-            const stw_opensyde_core::C_OSCSystemBus * const pc_Bus =
-               C_PuiSdHandler::h_GetInstance()->GetOSCBus(oru32_Index);
-            if (pc_Bus != NULL)
-            {
-               orc_SubItemName = pc_Bus->c_Name.c_str();
-            }
-            else
-            {
-               orc_SubItemName = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
-            }
-            orc_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
-         }
-         else
-         {
-            orc_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
-         }
       }
       else if (os32_Mode == ms32_MODE_SYSVIEW)
       {
@@ -803,13 +792,73 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
 
          //Handle new views if necessary
          this->mc_SystemViewManager.HandleInitialSystemView();
-
-         C_SyvUtil::h_GetViewDisplayName(oru32_Index, ors32_SubMode, orc_Name, orc_SubItemName);
       }
       else
       {
          // Nothing to do
       }
+
+      //Get names (last as indices need to be up to date)
+      C_NagMainWindow::h_GetHeadingNames(os32_Mode, ors32_SubMode, oru32_Index, orc_Name, orc_SubItemName);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get System Definition display name
+
+   \param[in]      os32_Mode        Mode
+   \param[out]     ors32_SubMode    Sub mode
+   \param[in]      ou32_Index       Index
+   \param[in,out]  orc_SubMode      Sub mode
+   \param[in,out]  orc_SubSubMode   Sub sub mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWindow::h_GetHeadingNames(const sint32 os32_Mode, const sint32 & ors32_SubMode, const uint32 ou32_Index,
+                                        QString & orc_SubMode, QString & orc_SubSubMode)
+{
+   if (os32_Mode == ms32_MODE_SYSDEF)
+   {
+      if (ors32_SubMode == ms32_SUBMODE_SYSDEF_NODEEDIT)
+      {
+         const stw_opensyde_core::C_OSCNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_Index);
+         if (pc_Node != NULL)
+         {
+            orc_SubSubMode = pc_Node->c_Properties.c_Name.c_str();
+         }
+         else
+         {
+            orc_SubSubMode = "Node";
+         }
+         orc_SubMode = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
+      }
+      else if (ors32_SubMode == ms32_SUBMODE_SYSDEF_BUSEDIT)
+      {
+         const stw_opensyde_core::C_OSCSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOSCBus(ou32_Index);
+         if (pc_Bus != NULL)
+         {
+            orc_SubSubMode = pc_Bus->c_Name.c_str();
+         }
+         else
+         {
+            orc_SubSubMode = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
+         }
+         orc_SubMode = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
+      }
+      else
+      {
+         orc_SubMode = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
+         orc_SubSubMode = "";
+      }
+   }
+   else if (os32_Mode == ms32_MODE_SYSVIEW)
+   {
+      C_SyvUtil::h_GetViewDisplayName(ou32_Index, ors32_SubMode, orc_SubMode, orc_SubSubMode);
+   }
+   else
+   {
+      // Nothing to do
    }
 }
 
@@ -1281,7 +1330,6 @@ bool C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
                                    const uint32 ou32_Index, const QString & orc_Name, const QString & orc_SubSubName,
                                    const uint32 ou32_Flag, const bool oq_ChangeUseCase)
 {
-   QElapsedTimer c_Timer;
    bool q_Continue;
    sint32 s32_SubMode = os32_SubMode;
    uint32 u32_Index = ou32_Index;
@@ -1289,10 +1337,7 @@ bool C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
    QString c_SubSubName = orc_SubSubName;
    uint32 u32_Flag = ou32_Flag;
 
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
    // Get the previous parameter for each use case, if a change from the main widget was triggered
    this->m_AdaptParameter(os32_Mode, s32_SubMode, u32_Index, c_Name, c_SubSubName, u32_Flag, oq_ChangeUseCase);
@@ -1364,9 +1409,9 @@ bool C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
       this->mpc_Ui->pc_NaviBar->LoadUserSettings();
    }
 
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "Switch " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+   osc_write_log_performance_stop(u16_TimerId, QString("Switch to mode %1 submode %2 index %3")
+                                  .arg(this->ms32_Mode).arg(this->ms32_SubMode).arg(
+                                     this->mu32_Index).toStdString().c_str());
+
    return q_Continue;
 }

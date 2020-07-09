@@ -12,6 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <limits>
 #include <sstream>
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -50,8 +51,8 @@ C_OSCNodeDataPoolFiler::C_OSCNodeDataPoolFiler(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load datapool file
 
-   \param[out] orc_NodeDataPool Data storage
-   \param[in]  orc_FilePath     File path
+   \param[out]  orc_NodeDataPool    Data storage
+   \param[in]   orc_FilePath        File path
 
    \return
    C_NO_ERR   data read
@@ -62,8 +63,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
                                                   const C_SCLString & orc_FilePath)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForExistingFile(c_XMLParser, orc_FilePath,
-                                                                         "opensyde-dp-core-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser, orc_FilePath,
+                                                                        "opensyde-dp-core-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -92,8 +93,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
    pre-condition: the passed XML parser has the active node set to "data-pool"
    post-condition: the passed XML parser has the active node set to the same "data-pool"
 
-   \param[out]    orc_NodeDataPool data storage
-   \param[in,out] orc_XMLParser    XML with data-pool active
+   \param[out]     orc_NodeDataPool    data storage
+   \param[in,out]  orc_XMLParser       XML with data-pool active
 
    \return
    C_NO_ERR   data read
@@ -199,8 +200,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPo
    pre-condition: the passed XML parser has the active node set to "data-pool"
    post-condition: the passed XML parser has the active node set to the same "data-pool"
 
-   \param[in]     orc_NodeDataPool data storage
-   \param[in,out] orc_XMLParser    XML with data-pool active
+   \param[in]      orc_NodeDataPool    data storage
+   \param[in,out]  orc_XMLParser       XML with data-pool active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDataPool,
@@ -236,8 +237,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDa
    pre-condition: the passed XML parser has the active node set to "list"
    post-condition: the passed XML parser has the active node set to the same "list"
 
-   \param[out]    orc_NodeDataPoolList data storage
-   \param[in,out] orc_XMLParser        XML with data-pool active
+   \param[out]     orc_NodeDataPoolList   data storage
+   \param[in,out]  orc_XMLParser          XML with data-pool active
 
    \return
    C_NO_ERR   data read
@@ -318,8 +319,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_No
    pre-condition: the passed XML parser has the active node set to "list"
    post-condition: the passed XML parser has the active node set to the same "list"
 
-   \param[in]     orc_NodeDataPoolList data storage
-   \param[in,out] orc_XMLParser        XML with data-pool active
+   \param[in]      orc_NodeDataPoolList   data storage
+   \param[in,out]  orc_XMLParser          XML with data-pool active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolList(const C_OSCNodeDataPoolList & orc_NodeDataPoolList,
@@ -350,8 +351,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolList(const C_OSCNodeDataPoolList & or
    pre-condition: the passed XML parser has the active node set to "data-element"
    post-condition: the passed XML parser has the active node set to the same "data-element"
 
-   \param[out]    orc_NodeDataPoolListElement data storage
-   \param[in,out] orc_XMLParser               XML with list active
+   \param[out]     orc_NodeDataPoolListElement  data storage
+   \param[in,out]  orc_XMLParser                XML with list active
 
    \return
    C_NO_ERR   data read
@@ -389,7 +390,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
          //copy over value so we have the correct type:
          orc_NodeDataPoolListElement.c_MinValue = orc_NodeDataPoolListElement.c_Value;
 
-         s32_Retval = h_LoadDataPoolElementValue(orc_NodeDataPoolListElement.c_MinValue, orc_XMLParser);
+         s32_Retval = h_LoadDataPoolElementValue(orc_NodeDataPoolListElement.c_MinValue, orc_XMLParser, false);
          // Use minimum value as init value for value and NVM value
          orc_NodeDataPoolListElement.c_NvmValue = orc_NodeDataPoolListElement.c_MinValue;
          orc_NodeDataPoolListElement.c_Value = orc_NodeDataPoolListElement.c_MinValue;
@@ -410,7 +411,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
          //copy over value so we have the correct type:
          orc_NodeDataPoolListElement.c_MaxValue = orc_NodeDataPoolListElement.c_Value;
 
-         s32_Retval = h_LoadDataPoolElementValue(orc_NodeDataPoolListElement.c_MaxValue, orc_XMLParser);
+         s32_Retval = h_LoadDataPoolElementValue(orc_NodeDataPoolListElement.c_MaxValue, orc_XMLParser, false);
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
       }
@@ -494,8 +495,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
    pre-condition: the passed XML parser has the active node set to "data-element"
    post-condition: the passed XML parser has the active node set to the same "data-element"
 
-   \param[in]     orc_NodeDataPoolListElement data storage
-   \param[in,out] orc_XMLParser               XML with list active
+   \param[in]      orc_NodeDataPoolListElement  data storage
+   \param[in,out]  orc_XMLParser                XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolElement(const C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
@@ -525,8 +526,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElement(const C_OSCNodeDataPoolListEl
    pre-condition: the passed XML parser has the active node set to "lists"
    post-condition: the passed XML parser has the active node set to the same "lists"
 
-   \param[out]    orc_NodeDataPoolLists data storage
-   \param[in,out] orc_XMLParser         XML with data-pool active
+   \param[out]     orc_NodeDataPoolLists  data storage
+   \param[in,out]  orc_XMLParser          XML with data-pool active
 
    \return
    C_NO_ERR   data read
@@ -596,8 +597,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OSCNodeDataPool
    pre-condition: the passed XML parser has the active node set to "data-pool"
    post-condition: the passed XML parser has the active node set to the same "data-pool"
 
-   \param[in]     orc_NodeDataPoolLists data storage
-   \param[in,out] orc_XMLParser         XML with data-pool active
+   \param[in]      orc_NodeDataPoolLists  data storage
+   \param[in,out]  orc_XMLParser          XML with data-pool active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
@@ -620,8 +621,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeData
    pre-condition: the passed XML parser has the active node set to "data-elements"
    post-condition: the passed XML parser has the active node set to the same "data-elements"
 
-   \param[out]    orc_NodeDataPoolListElements data storage
-   \param[in,out] orc_XMLParser                XML with list active
+   \param[out]     orc_NodeDataPoolListElements    data storage
+   \param[in,out]  orc_XMLParser                   XML with list active
 
    \return
    C_NO_ERR   data read
@@ -689,8 +690,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
    pre-condition: the passed XML parser has the active node set to "data-elements"
    post-condition: the passed XML parser has the active node set to the same "data-elements"
 
-   \param[in]     orc_NodeDataPoolListElements data storage
-   \param[in,out] orc_XMLParser                XML with list active
+   \param[in]      orc_NodeDataPoolListElements    data storage
+   \param[in,out]  orc_XMLParser                   XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
@@ -716,9 +717,9 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
 
    All returned elements will be of the type defined by orc_ContentType.
 
-   \param[in]     orc_ContentType                          type reference (see description)
-   \param[out]    orc_NodeDataPoolListElementDataSetValues data storage
-   \param[in,out] orc_XMLParser                            XML with list active
+   \param[in]      orc_ContentType                             type reference (see description)
+   \param[out]     orc_NodeDataPoolListElementDataSetValues    data storage
+   \param[in,out]  orc_XMLParser                               XML with list active
 
    \return
    C_NO_ERR   data read
@@ -740,7 +741,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElementDataSetValues(const C_OS
 
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadDataPoolElementValue(c_CurDataSetValue, orc_XMLParser);
+            s32_Retval = h_LoadDataPoolElementValue(c_CurDataSetValue, orc_XMLParser, false);
          }
 
          //Append
@@ -763,8 +764,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElementDataSetValues(const C_OS
    pre-condition: the passed XML parser has the active node set to "data-set-values"
    post-condition: the passed XML parser has the active node set to the same "data-set-values"
 
-   \param[in]     orc_NodeDataPoolListElementDataSetValues data storage
-   \param[in,out] orc_XMLParser                            XML with list active
+   \param[in]      orc_NodeDataPoolListElementDataSetValues    data storage
+   \param[in,out]  orc_XMLParser                               XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElementDataSetValues(
@@ -787,8 +788,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElementDataSetValues(
    pre-condition: the passed XML parser has the active node set to "data-sets"
    post-condition: the passed XML parser has the active node set to the same "data-sets"
 
-   \param[out]    orc_NodeDataPoolListDataSets data storage
-   \param[in,out] orc_XMLParser                XML with list active
+   \param[out]     orc_NodeDataPoolListDataSets    data storage
+   \param[in,out]  orc_XMLParser                   XML with list active
 
    \return
    C_NO_ERR   data read
@@ -850,8 +851,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListDataSets(
    pre-condition: the passed XML parser has the active node set to "data-sets"
    post-condition: the passed XML parser has the active node set to the same "data-sets"
 
-   \param[in]     orc_NodeDataPoolListDataSets data storage
-   \param[in,out] orc_XMLParser                XML with list active
+   \param[in]      orc_NodeDataPoolListDataSets    data storage
+   \param[in,out]  orc_XMLParser                   XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolListDataSets(
@@ -872,7 +873,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListDataSets(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Transform data pool type to string
 
-   \param[in] ore_DataPool Data pool type
+   \param[in]  ore_DataPool   Data pool type
 
    \return
    Stringified data pool type
@@ -906,8 +907,8 @@ C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Transform string to data pool type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Data pool type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Data pool type
 
    \return
    C_NO_ERR   no error
@@ -951,8 +952,8 @@ sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String
 
    The function does not change the active node.
 
-   \param[out]    orc_NodeDataPoolContent data storage
-   \param[in,out] orc_XMLParser           XML with unknown (Node to store data pool variable) active
+   \param[out]     orc_NodeDataPoolContent   data storage
+   \param[in,out]  orc_XMLParser             XML with unknown (Node to store data pool variable) active
 
    \return
    C_NO_ERR   data read
@@ -994,8 +995,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(C_OSCNodeDataPoolConten
    Will create a node and write the value there.
    Does not modify the active node.
 
-   \param[in]     orc_NodeDataPoolContent data storage
-   \param[in,out] orc_XMLParser           XML parser
+   \param[in]      orc_NodeDataPoolContent   data storage
+   \param[in,out]  orc_XMLParser             XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
@@ -1021,8 +1022,10 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolCo
    * the element type of orc_NodeDataPoolContent must match the data contained in the file
    The function does not change the active node.
 
-   \param[out]    orc_NodeDataPoolContent data storage
-   \param[in,out] orc_XMLParser           XML with unknown (Node to store data pool variable) active
+   \param[out]     orc_NodeDataPoolContent         data storage
+   \param[in,out]  orc_XMLParser                   XML with unknown (Node to store data pool variable) active
+   \param[in]      oq_CheckDataType                Check data type
+   \param[in,out]  opc_CheckDataTypeErrorDetails   Check data type error details
 
    \return
    C_NO_ERR   data read
@@ -1030,45 +1033,55 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolCo
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                          C_OSCXMLParserBase & orc_XMLParser)
+                                                          C_OSCXMLParserBase & orc_XMLParser,
+                                                          const bool oq_CheckDataType,
+                                                          stw_scl::C_SCLString * const opc_CheckDataTypeErrorDetails)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (orc_NodeDataPoolContent.GetArray() == false)
    {
-      //Single
-      switch (orc_NodeDataPoolContent.GetType())
+      if (oq_CheckDataType)
       {
-      case C_OSCNodeDataPoolContent::eUINT8:
-         orc_NodeDataPoolContent.SetValueU8(static_cast<uint8>(orc_XMLParser.GetAttributeUint32("value")));
-         break;
-      case C_OSCNodeDataPoolContent::eUINT16:
-         orc_NodeDataPoolContent.SetValueU16(static_cast<uint16>(orc_XMLParser.GetAttributeUint32("value")));
-         break;
-      case C_OSCNodeDataPoolContent::eUINT32:
-         orc_NodeDataPoolContent.SetValueU32(orc_XMLParser.GetAttributeUint32("value"));
-         break;
-      case C_OSCNodeDataPoolContent::eUINT64:
-         orc_NodeDataPoolContent.SetValueU64(mh_GetAttributeUint64(orc_XMLParser, "value"));
-         break;
-      case C_OSCNodeDataPoolContent::eSINT8:
-         orc_NodeDataPoolContent.SetValueS8(static_cast<sint8>(orc_XMLParser.GetAttributeSint64("value")));
-         break;
-      case C_OSCNodeDataPoolContent::eSINT16:
-         orc_NodeDataPoolContent.SetValueS16(static_cast<sint16>(orc_XMLParser.GetAttributeSint64("value")));
-         break;
-      case C_OSCNodeDataPoolContent::eSINT32:
-         orc_NodeDataPoolContent.SetValueS32(static_cast<sint32>(orc_XMLParser.GetAttributeSint64("value")));
-         break;
-      case C_OSCNodeDataPoolContent::eSINT64:
-         orc_NodeDataPoolContent.SetValueS64(orc_XMLParser.GetAttributeSint64("value"));
-         break;
-      case C_OSCNodeDataPoolContent::eFLOAT32:
-         orc_NodeDataPoolContent.SetValueF32(orc_XMLParser.GetAttributeFloat32("value"));
-         break;
-      case C_OSCNodeDataPoolContent::eFLOAT64:
-         orc_NodeDataPoolContent.SetValueF64(orc_XMLParser.GetAttributeFloat64("value"));
-         break;
+         s32_Retval = C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(
+            orc_NodeDataPoolContent.GetType(), orc_XMLParser, opc_CheckDataTypeErrorDetails);
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Single
+         switch (orc_NodeDataPoolContent.GetType())
+         {
+         case C_OSCNodeDataPoolContent::eUINT8:
+            orc_NodeDataPoolContent.SetValueU8(static_cast<uint8>(orc_XMLParser.GetAttributeUint32("value")));
+            break;
+         case C_OSCNodeDataPoolContent::eUINT16:
+            orc_NodeDataPoolContent.SetValueU16(static_cast<uint16>(orc_XMLParser.GetAttributeUint32("value")));
+            break;
+         case C_OSCNodeDataPoolContent::eUINT32:
+            orc_NodeDataPoolContent.SetValueU32(orc_XMLParser.GetAttributeUint32("value"));
+            break;
+         case C_OSCNodeDataPoolContent::eUINT64:
+            orc_NodeDataPoolContent.SetValueU64(mh_GetAttributeUint64(orc_XMLParser, "value"));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT8:
+            orc_NodeDataPoolContent.SetValueS8(static_cast<sint8>(orc_XMLParser.GetAttributeSint64("value")));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT16:
+            orc_NodeDataPoolContent.SetValueS16(static_cast<sint16>(orc_XMLParser.GetAttributeSint64("value")));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT32:
+            orc_NodeDataPoolContent.SetValueS32(static_cast<sint32>(orc_XMLParser.GetAttributeSint64("value")));
+            break;
+         case C_OSCNodeDataPoolContent::eSINT64:
+            orc_NodeDataPoolContent.SetValueS64(orc_XMLParser.GetAttributeSint64("value"));
+            break;
+         case C_OSCNodeDataPoolContent::eFLOAT32:
+            orc_NodeDataPoolContent.SetValueF32(orc_XMLParser.GetAttributeFloat32("value"));
+            break;
+         case C_OSCNodeDataPoolContent::eFLOAT64:
+            orc_NodeDataPoolContent.SetValueF64(orc_XMLParser.GetAttributeFloat64("value"));
+            break;
+         }
       }
    }
    else
@@ -1085,6 +1098,11 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
                break; //too much information ...
             }
 
+            if (oq_CheckDataType)
+            {
+               s32_Retval = C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(
+                  orc_NodeDataPoolContent.GetType(), orc_XMLParser, opc_CheckDataTypeErrorDetails);
+            }
             switch (orc_NodeDataPoolContent.GetType())
             {
             case C_OSCNodeDataPoolContent::eUINT8:
@@ -1131,7 +1149,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
             u32_CurIndex++; //next element
             c_CurNode = orc_XMLParser.SelectNodeNext("element");
          }
-         while (c_CurNode == "element");
+         while ((c_CurNode == "element") && (s32_Retval == C_NO_ERR));
 
          //check whether we have the correct number of elements:
          if (u32_CurIndex != orc_NodeDataPoolContent.GetArraySize())
@@ -1143,6 +1161,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
       //Return
       orc_XMLParser.SelectNodeParent();
    }
+
    return s32_Retval;
 }
 
@@ -1153,9 +1172,9 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
    Will create a node and write the value there.
    Does not modify the active node.
 
-   \param[in]     orc_NodeName            name of node to create value in
-   \param[in]     orc_NodeDataPoolContent data storage
-   \param[in,out] orc_XMLParser           XML parser
+   \param[in]      orc_NodeName              name of node to create value in
+   \param[in]      orc_NodeDataPoolContent   data storage
+   \param[in,out]  orc_XMLParser             XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLString & orc_NodeName,
@@ -1264,8 +1283,8 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLStri
    pre-condition: the passed XML parser has the active node set to variable (Node to store data pool content)
    post-condition: the passed XML parser has the active node set to the same variable (Node to store data pool content)
 
-   \param[in]     orc_NodeDataPoolContent data storage
-   \param[in,out] orc_XMLParser           XML with variable (Node to store data pool content) active
+   \param[in]      orc_NodeDataPoolContent   data storage
+   \param[in,out]  orc_XMLParser             XML with variable (Node to store data pool content) active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
@@ -1370,7 +1389,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCont
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get automatically generated file name
 
-   \param[in] orc_DatapoolName Datapool name
+   \param[in]  orc_DatapoolName  Datapool name
 
    \return
    Automatically generated file name
@@ -1378,7 +1397,154 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCont
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeDataPoolFiler::h_GetFileName(const C_SCLString & orc_DatapoolName)
 {
-   return "dp_" + C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(orc_DatapoolName) + "_core.xml";
+   return "dp_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(orc_DatapoolName) + "_core.xml";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check data pool element value type
+
+   \param[in]      orc_ContentType                 Content type
+   \param[in]      orc_XMLParser                   XML parser
+   \param[in,out]  opc_CheckDataTypeErrorDetails   Check data type error details
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDataPoolContent::E_Type & orc_ContentType,
+                                                               const C_OSCXMLParserBase & orc_XMLParser,
+                                                               stw_scl::C_SCLString * const opc_CheckDataTypeErrorDetails)
+{
+   sint32 s32_Retval = C_CONFIG;
+
+   //Load value
+   const uint64 u64_Val = mh_GetAttributeUint64(orc_XMLParser, "value");
+   const sint64 s64_Val = orc_XMLParser.GetAttributeSint64("value");
+   const float64 f64_Val = orc_XMLParser.GetAttributeFloat64("value");
+
+   switch (orc_ContentType)
+   {
+   case C_OSCNodeDataPoolContent::eUINT8:
+      if ((((u64_Val >= std::numeric_limits<stw_types::uint8>::min()) &&
+            (u64_Val <= std::numeric_limits<stw_types::uint8>::max())) &&
+           ((s64_Val >= std::numeric_limits<stw_types::uint8>::min()) &&
+            (s64_Val <=
+             std::numeric_limits<stw_types::uint8>::max()))) &&
+          (((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint8>::min())) &&
+            (f64_Val <=
+             static_cast<float64>(std::numeric_limits<stw_types::uint8>::max())))))
+      {
+         s32_Retval = C_NO_ERR;
+      }
+      break;
+   case C_OSCNodeDataPoolContent::eUINT16:
+      if ((((u64_Val >= std::numeric_limits<stw_types::uint16>::min()) &&
+            (u64_Val <= std::numeric_limits<stw_types::uint16>::max())) &&
+           ((s64_Val >= std::numeric_limits<stw_types::uint16>::min()) &&
+            (s64_Val <=
+             std::numeric_limits<stw_types::uint16>::max()))) &&
+          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint16>::min())) &&
+           (f64_Val <=
+            static_cast<float64>(std::numeric_limits<stw_types::uint16>::max()))))
+      {
+         s32_Retval = C_NO_ERR;
+      }
+      break;
+   case C_OSCNodeDataPoolContent::eUINT32:
+      if ((((u64_Val >= std::numeric_limits<stw_types::uint32>::min()) &&
+            (u64_Val <= std::numeric_limits<stw_types::uint32>::max())) &&
+           ((s64_Val >= std::numeric_limits<stw_types::uint32>::min()) &&
+            (s64_Val <=
+             std::numeric_limits<stw_types::uint32>::max()))) &&
+          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint32>::min())) &&
+           (f64_Val <=
+            static_cast<float64>(std::numeric_limits<stw_types::uint32>::max()))))
+      {
+         s32_Retval = C_NO_ERR;
+      }
+      break;
+   case C_OSCNodeDataPoolContent::eUINT64:
+      //Sint64 check not reliable as the range of uint64 and sint64 don't completely overlap
+      // and overflows might mess up the check
+      if (((u64_Val >= std::numeric_limits<stw_types::uint64>::min()) &&
+           (u64_Val <= std::numeric_limits<stw_types::uint64>::max())) &&
+          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint64>::min())) &&
+           (f64_Val <=
+            static_cast<float64>(std::numeric_limits<stw_types::uint64>::max()))))
+      {
+         s32_Retval = C_NO_ERR;
+      }
+      break;
+   case C_OSCNodeDataPoolContent::eSINT8:
+      //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
+      // and overflows might mess up the check
+      if ((((s64_Val >= std::numeric_limits<stw_types::sint8>::min()) &&
+            (s64_Val <=
+             std::numeric_limits<stw_types::sint8>::max()))) &&
+          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint8>::min())) &&
+           (f64_Val <=
+            static_cast<float64>(std::numeric_limits<stw_types::sint8>::max()))))
+      {
+         s32_Retval = C_NO_ERR;
+      }
+      break;
+   case C_OSCNodeDataPoolContent::eSINT16:
+      //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
+      // and overflows might mess up the check
+      if ((((s64_Val >= std::numeric_limits<stw_types::sint16>::min()) &&
+            (s64_Val <=
+             std::numeric_limits<stw_types::sint16>::max()))) &&
+          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint16>::min())) &&
+           (f64_Val <=
+            static_cast<float64>(std::numeric_limits<stw_types::sint16>::max()))))
+      {
+         s32_Retval = C_NO_ERR;
+      }
+      break;
+   case C_OSCNodeDataPoolContent::eSINT32:
+      //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
+      // and overflows might mess up the check
+      if ((((s64_Val >= std::numeric_limits<stw_types::sint32>::min()) &&
+            (s64_Val <=
+             std::numeric_limits<stw_types::sint32>::max()))) &&
+          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint32>::min())) &&
+           (f64_Val <=
+            static_cast<float64>(std::numeric_limits<stw_types::sint32>::max()))))
+      {
+         s32_Retval = C_NO_ERR;
+      }
+      break;
+   case C_OSCNodeDataPoolContent::eSINT64:
+      //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
+      // and overflows might mess up the check
+      if ((((s64_Val >= std::numeric_limits<stw_types::sint64>::min()) &&
+            (s64_Val <= std::numeric_limits<stw_types::sint64>::max()))) &&
+          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint64>::min())) &&
+           (f64_Val <=
+            static_cast<float64>(std::numeric_limits<stw_types::sint64>::max()))))
+      {
+         s32_Retval = C_NO_ERR;
+      }
+      break;
+   case C_OSCNodeDataPoolContent::eFLOAT32:
+   case C_OSCNodeDataPoolContent::eFLOAT64:
+      //No range error or wrong type error possible for uint64 or sint64
+      s32_Retval = C_NO_ERR;
+      break;
+   }
+   if (s32_Retval != C_NO_ERR)
+   {
+      if (opc_CheckDataTypeErrorDetails != NULL)
+      {
+         const stw_scl::C_SCLString c_Val = orc_XMLParser.GetAttributeString("value");
+         const stw_scl::C_SCLString c_DataType =
+            C_OSCNodeDataPoolFiler::mh_NodeDataPoolContentToString(orc_ContentType);
+
+         *opc_CheckDataTypeErrorDetails = "\"" + c_Val + "\" not in range of data type " + c_DataType;
+      }
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1388,8 +1554,8 @@ C_SCLString C_OSCNodeDataPoolFiler::h_GetFileName(const C_SCLString & orc_Datapo
    pre-condition: the passed XML parser has the active node set to unknown (Node to store data pool variable)
    post-condition: the passed XML parser has the active node set to the same unknown (Node to store data pool variable)
 
-   \param[out]    orc_NodeDataPoolContent data storage
-   \param[in,out] orc_XMLParser           XML with unknown (Node to store data pool variable) active
+   \param[out]     orc_NodeDataPoolContent   data storage
+   \param[in,out]  orc_XMLParser             XML with unknown (Node to store data pool variable) active
 
    \return
    C_NO_ERR   data read
@@ -1418,7 +1584,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent 
    if (orc_NodeDataPoolContent.GetArray() == false)
    {
       //same format as in newer file version:
-      h_LoadDataPoolElementValue(orc_NodeDataPoolContent, orc_XMLParser);
+      h_LoadDataPoolElementValue(orc_NodeDataPoolContent, orc_XMLParser, false);
    }
    else
    {
@@ -1502,8 +1668,8 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent 
 
    Save node to XML file
 
-   \param[in]     orc_NodeDataPool data storage
-   \param[in,out] orc_FilePath     File path for xml
+   \param[in]      orc_NodeDataPool    data storage
+   \param[in,out]  orc_FilePath        File path for xml
 
    \return
    C_NO_ERR   data saved
@@ -1514,8 +1680,8 @@ sint32 C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(const C_OSCNodeDataPool & orc_
                                                   const C_SCLString & orc_FilePath)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForNewFile(c_XMLParser, orc_FilePath,
-                                                                    "opensyde-dp-core-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForNewFile(c_XMLParser, orc_FilePath,
+                                                                   "opensyde-dp-core-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -1542,7 +1708,7 @@ sint32 C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(const C_OSCNodeDataPool & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Transform node data pool content type to string
 
-   \param[in] ore_NodeDataPoolContent Node data pool content type
+   \param[in]  ore_NodeDataPoolContent    Node data pool content type
 
    \return
    Stringified node data pool content type
@@ -1595,8 +1761,8 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolContentToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Transform string to node data pool content type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Node data pool content type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Node data pool content type
 
    \return
    C_NO_ERR   no error
@@ -1660,7 +1826,7 @@ sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolContent(const C_SCLString 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Transform node data pool element access type to string
 
-   \param[in] ore_NodeDataPoolElementAccess Node data pool element access type
+   \param[in]  ore_NodeDataPoolElementAccess    Node data pool element access type
 
    \return
    Stringified node data pool element access type
@@ -1689,8 +1855,8 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolElementAccessToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Transform string to node data pool element access type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Node data pool element access type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Node data pool element access type
 
    \return
    C_NO_ERR   no error
@@ -1723,9 +1889,9 @@ sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolElementAccess(const C_SCLS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set unit64 attribute
 
-   \param[in,out] orc_XMLParser XML
-   \param[in]     orc_String    Attribute
-   \param[in]     ou64_Input    Value
+   \param[in,out]  orc_XMLParser    XML
+   \param[in]      orc_String       Attribute
+   \param[in]      ou64_Input       Value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolFiler::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_String,
@@ -1740,8 +1906,8 @@ void C_OSCNodeDataPoolFiler::mh_SetAttributeUint64(C_OSCXMLParserBase & orc_XMLP
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get unit64 attribute
 
-   \param[in] orc_XMLParser XML
-   \param[in] orc_String    Attribute
+   \param[in]  orc_XMLParser  XML
+   \param[in]  orc_String     Attribute
 
    \return
    Value

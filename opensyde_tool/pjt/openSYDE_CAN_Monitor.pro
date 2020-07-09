@@ -18,78 +18,18 @@ DESTDIR = ../result/tool/CAN_Monitor
 #version info:
 RC_FILE = ../src/can_monitor/cam_resources.rc
 
-SOURCES +=\
-    ../libs/opensyde_core/scl/CSCLChecksums.cpp \
-    ../libs/opensyde_core/scl/CSCLDateTime.cpp \
-    ../libs/opensyde_core/scl/CSCLIniFile.cpp \
-    ../libs/opensyde_core/scl/CSCLString.cpp \
-    ../libs/opensyde_core/scl/CSCLStringList.cpp \
-    ../libs/opensyde_core/xml_parser/C_OSCXMLParser.cpp \
-    ../libs/opensyde_core/xml_parser/tinyxml2/tinyxml2.cpp \
-    ../libs/opensyde_core/kefex_diaglib/tgl_windows/TGLFile.cpp \
-    ../libs/opensyde_core/kefex_diaglib/tgl_windows/TGLTasks.cpp \
-    ../libs/opensyde_core/kefex_diaglib/tgl_windows/TGLTime.cpp \
-    ../libs/opensyde_core/kefex_diaglib/tgl_windows/TGLUtils.cpp \
+#include relevant openSYDE core modules
+opensyde_core_skip_modules += opensyde_core_skip_code_generation
+include(../libs/opensyde_core/opensyde_core.pri)
+
+SOURCES += \
     ../src/gettext/C_GtGetText.cpp \
-    ../libs/opensyde_core/project/system/C_OSCSystemFilerUtil.cpp \
-    ../libs/opensyde_core/project/system/C_OSCDeviceDefinition.cpp \
-    ../libs/opensyde_core/project/system/C_OSCDeviceDefinitionFiler.cpp \
-    ../libs/opensyde_core/project/system/C_OSCSystemBus.cpp \
-    ../libs/opensyde_core/project/system/C_OSCSystemBusFiler.cpp \
-    ../libs/opensyde_core/project/system/C_OSCSystemDefinition.cpp \
-    ../libs/opensyde_core/project/system/C_OSCSystemDefinitionFiler.cpp \
-    ../libs/opensyde_core/project/system/C_OSCDeviceGroup.cpp \
-    ../libs/opensyde_core/project/system/C_OSCDeviceManager.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNode.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeFiler.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeApplication.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeComInterfaceSettings.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPool.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContent.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolDataSet.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolFiler.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolList.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElement.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeOpenSydeServerSettings.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeProperties.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolId.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListId.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeStwFlashloaderSettings.cpp \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanMessage.cpp \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanMessageContainer.cpp \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanProtocol.cpp \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanSignal.cpp \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanMessageIdentificationIndices.cpp \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanUtil.cpp \
-    ../libs/opensyde_core/C_OSCUtils.cpp \
     ../src/util/C_Uti.cpp \
-    ../libs/opensyde_core/can_dispatcher/dispatcher/CCANBase.cpp \
-    ../libs/opensyde_core/can_dispatcher/dispatcher/CCANDispatcher.cpp \
-    ../libs/opensyde_core/can_dispatcher/target_windows_stw_dlls/CCAN.cpp \
-    ../libs/opensyde_core/can_dispatcher/target_windows_stw_dlls/CCANDLL.cpp \
-    ../libs/opensyde_core/md5/CMD5Checksum.cpp \
-    ../libs/opensyde_core/project/C_OSCProject.cpp \
-    ../libs/opensyde_core/project/C_OSCProjectFiler.cpp \
-    ../libs/opensyde_core/xml_parser/C_OSCChecksummedXML.cpp \
-    ../libs/opensyde_core/C_OSCChecksummedIniFile.cpp \
     ../src/system_views/communication/C_SyvComMessageMonitor.cpp \
     ../src/system_views/communication/C_SyvComMessageLoggerFileBlf.cpp \
     ../src/system_views/communication/C_SyvComDriverThread.cpp \
-    ../libs/opensyde_core/logging/C_OSCLoggingHandler.cpp \
     ../src/com_import_export/C_CieImportDbc.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpContentUtil.cpp\
-    ../libs/opensyde_core/kefex_diaglib/DLStrings.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CSCLResourceStrings.cpp \
-    ../libs/opensyde_core/kefex_diaglib/stwcompid.c \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComDriverBase.cpp \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLogger.cpp \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerData.cpp \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerOsySysDefConfig.cpp \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileBase.cpp \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileAsc.cpp \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocols.cpp \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocolOpenSYDE.cpp \
     ../src/can_monitor/cam_main.cpp \
     ../src/project_operations/C_PopErrorHandling.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/Attribute.cpp \
@@ -146,17 +86,6 @@ SOURCES +=\
     ../src/can_monitor/message_trace/C_CamMetTreeView.cpp \
     ../src/table_base/tree_base/C_TblTreItem.cpp \
     ../src/table_base/tree_base/C_TblTreModel.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocol.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolBase.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolCANopen.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolGD.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolJ1939.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolKEFEX.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolL2.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolOpenSYDE.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolSHIPIPIVA.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolSTWFF.cpp \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolXFL.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconOnly.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabSvgOnly.cpp \
     ../src/can_monitor/user_settings/C_UsHandler.cpp \
@@ -282,11 +211,6 @@ SOURCES +=\
     ../src/can_monitor/util/C_CamUti.cpp \
     ../src/can_monitor/message_generator/C_CamGenTableDelegate.cpp \
     ../src/table_base/C_TblDelegateUtil.cpp \
-    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeDataPoolFilerV2.cpp \
-    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.cpp \
-    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.cpp \
-    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.cpp \
     ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.cpp \
     ../src/can_monitor/can_monitor_gui_elements/push_button/C_CamOgePubPathVariables.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePathBase.cpp \
@@ -298,89 +222,18 @@ SOURCES +=\
     ../src/can_monitor/message_trace/C_CamMetTreeLoggerDataGreyOutInformation.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.cpp \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfig.cpp \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigChannel.cpp \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigDomain.cpp \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigFiler.cpp \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameter.cpp \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameterStruct.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDef.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelAvailability.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelUseCase.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContent.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContentBitmaskItem.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefDomain.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefElement.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefFiler.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStruct.cpp \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStructFiler.cpp \
-    ../libs/opensyde_core/halc/definition/base/C_OSCHalcDefBase.cpp \
-    ../src/can_monitor/table_base/C_CamTblDelegate.cpp
+    ../src/can_monitor/table_base/C_CamTblDelegate.cpp \
+    ../src/can_monitor/message_trace/C_CamMetUtil.cpp \
+    ../src/can_monitor/message_trace/C_CamMetSettingsPopup.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/can_monitor/precomp_headers.h
 
-HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
-    ../libs/opensyde_core/scl/CSCLChecksums.h \
-    ../libs/opensyde_core/scl/CSCLDateTime.h \
-    ../libs/opensyde_core/scl/CSCLIniFile.h \
-    ../libs/opensyde_core/scl/CSCLString.h \
-    ../libs/opensyde_core/scl/CSCLStringList.h \
-    ../libs/opensyde_core/scl/SCLDynamicArray.h \
-    ../libs/opensyde_core/stwerrors.h \
-    ../libs/opensyde_core/xml_parser/C_OSCXMLParser.h \
-    ../libs/opensyde_core/xml_parser/tinyxml2/tinyxml2.h \
-    ../libs/opensyde_core/kefex_diaglib/tgl_windows/TGLFile.h \
-    ../libs/opensyde_core/kefex_diaglib/tgl_windows/TGLTasks.h \
-    ../libs/opensyde_core/kefex_diaglib/tgl_windows/TGLTime.h \
-    ../libs/opensyde_core/kefex_diaglib/tgl_windows/TGLUtils.h \
+HEADERS  += \
     ../src/gettext/C_GtGetText.h \
-    ../libs/opensyde_core/project/system/C_OSCSystemFilerUtil.h \
-    ../libs/opensyde_core/project/system/C_OSCDeviceDefinition.h \
-    ../libs/opensyde_core/project/system/C_OSCDeviceDefinitionFiler.h \
-    ../libs/opensyde_core/project/system/C_OSCSystemBus.h \
-    ../libs/opensyde_core/project/system/C_OSCSystemBusFiler.h \
-    ../libs/opensyde_core/project/system/C_OSCSystemDefinition.h \
-    ../libs/opensyde_core/project/system/C_OSCSystemDefinitionFiler.h \
-    ../libs/opensyde_core/project/system/C_OSCDeviceGroup.h \
-    ../libs/opensyde_core/project/system/C_OSCDeviceManager.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNode.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeFiler.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeApplication.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeComInterfaceSettings.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPool.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContent.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolDataSet.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolFiler.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolList.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElement.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeOpenSydeServerSettings.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeProperties.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolId.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListId.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeStwFlashloaderSettings.h \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanMessage.h \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanMessageContainer.h \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanProtocol.h \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanSignal.h \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanMessageIdentificationIndices.h \
-    ../libs/opensyde_core/C_OSCUtils.h \
     ../src/util/C_Uti.h \
-    ../libs/opensyde_core/can_dispatcher/dispatcher/CCANBase.h \
-    ../libs/opensyde_core/can_dispatcher/dispatcher/CCANDispatcher.h \
-    ../libs/opensyde_core/can_dispatcher/dispatcher/stw_can.h \
-    ../libs/opensyde_core/can_dispatcher/target_windows_stw_dlls/CCAN.h \
-    ../libs/opensyde_core/can_dispatcher/target_windows_stw_dlls/CCANDLL.h \
-    ../libs/opensyde_core/md5/CMD5Checksum.h \
-    ../libs/opensyde_core/project/C_OSCProject.h \
-    ../libs/opensyde_core/project/C_OSCProjectFiler.h \
-    ../libs/opensyde_core/xml_parser/C_OSCChecksummedXML.h \
-    ../libs/opensyde_core/C_OSCChecksummedIniFile.h \
     ../src/system_views/communication/C_SyvComMessageMonitor.h \
     ../src/system_views/communication/C_SyvComMessageLoggerFileBlf.h \
     ../src/system_views/communication/C_SyvComDriverThread.h \
-    ../libs/opensyde_core/logging/C_OSCLoggingHandler.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Attribute.h \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeDefinition.h \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeRelation.h \
@@ -408,17 +261,6 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../src/com_import_export/C_CieImportDbc.h \
     ../src/com_import_export/C_CieConverter.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpContentUtil.h \
-    ../libs/opensyde_core/kefex_diaglib/DLStrings.h \
-    ../libs/opensyde_core/kefex_diaglib/CSCLResourceStrings.h \
-    ../libs/opensyde_core/kefex_diaglib/stwcompid.h \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComDriverBase.h \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLogger.h \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerData.h \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerOsySysDefConfig.h \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileBase.h \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileAsc.h \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocols.h \
-    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocolOpenSYDE.h \
     ../src/project_operations/C_PopErrorHandling.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiError.h \
@@ -458,19 +300,6 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../src/can_monitor/message_trace/C_CamMetTreeView.h \
     ../src/table_base/tree_base/C_TblTreItem.h \
     ../src/table_base/tree_base/C_TblTreModel.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocol.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolBase.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolCANopen.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolGD.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolJ1939.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolKEFEX.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolL2.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolOpenSYDE.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolSHIPIPIVA.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolSTWFF.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolXFL.h \
-    ../libs/opensyde_core/kefex_diaglib/CCMONProtocolTarget.h \
-    ../libs/opensyde_core/project/system/node/can/C_OSCCanUtil.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconOnly.h \
     ../src/opensyde_gui_elements/label/C_OgeLabSvgOnly.h \
     ../src/can_monitor/cam_constants.h \
@@ -712,11 +541,6 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../src/can_monitor/util/C_CamUti.h \
     ../src/can_monitor/message_generator/C_CamGenTableDelegate.h \
     ../src/table_base/C_TblDelegateUtil.h \
-    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeDataPoolFilerV2.h \
-    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.h \
-    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.h \
-    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.h \
     ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.h \
     ../src/can_monitor/can_monitor_gui_elements/push_button/C_CamOgePubPathVariables.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePathBase.h \
@@ -728,25 +552,9 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../src/can_monitor/message_trace/C_CamMetTreeLoggerDataGreyOutInformation.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageCancel.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolContentUtil.h \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfig.h \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigChannel.h \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigDomain.h \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigFiler.h \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameter.h \
-    ../libs/opensyde_core/halc/configuration/C_OSCHalcConfigParameterStruct.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDef.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelAvailability.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefChannelUseCase.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContent.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefContentBitmaskItem.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefDomain.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefElement.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefFiler.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStruct.h \
-    ../libs/opensyde_core/halc/definition/C_OSCHalcDefStructFiler.h \
-    ../libs/opensyde_core/halc/definition/base/C_OSCHalcDefBase.h \
-    ../src/can_monitor/table_base/C_CamTblDelegate.h
+    ../src/can_monitor/table_base/C_CamTblDelegate.h \
+    ../src/can_monitor/message_trace/C_CamMetUtil.h \
+    ../src/can_monitor/message_trace/C_CamMetSettingsPopup.h
 
 FORMS    += \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.ui \
@@ -775,7 +583,8 @@ FORMS    += \
     ../src/can_monitor/can_monitor_settings/C_CamMosDatabaseBusSelectionPopup.ui \
     ../src/can_monitor/message_generator/C_CamGenKeySelect.ui \
     ../src/opensyde_gui_elements/widget/C_OgeWiSpinBoxGroup.ui \
-    ../src/can_monitor/can_monitor_settings/C_CamMosDatabaseSelectionPopup.ui
+    ../src/can_monitor/can_monitor_settings/C_CamMosDatabaseSelectionPopup.ui \
+    ../src/can_monitor/message_trace/C_CamMetSettingsPopup.ui
 
 INCLUDEPATH += ../src \
                ../src/can_monitor \
@@ -828,27 +637,6 @@ INCLUDEPATH += ../src \
                ../src/gettext \
                ../src/util \
                ../src/precompiled_headers/can_monitor \
-               ../libs/opensyde_core \
-               ../libs/opensyde_core/can_dispatcher \
-               ../libs/opensyde_core/can_dispatcher/target_windows_stw_dlls \
-               ../libs/opensyde_core/can_dispatcher/dispatcher \
-               ../libs/opensyde_core/halc/configuration \
-               ../libs/opensyde_core/halc/definition \
-               ../libs/opensyde_core/halc/definition/base \
-               ../libs/opensyde_core/logging \
-               ../libs/opensyde_core/md5 \
-               ../libs/opensyde_core/project \
-               ../libs/opensyde_core/project/system \
-               ../libs/opensyde_core/project/system/node \
-               ../libs/opensyde_core/project/system/node/can \
-               ../libs/opensyde_core/project/system/FileLoadersV2 \
-               ../libs/opensyde_core/protocol_drivers/communication \
-               ../libs/opensyde_core/scl \
-               ../libs/opensyde_core/stwtypes\
-               ../libs/opensyde_core/kefex_diaglib \
-               ../libs/opensyde_core/kefex_diaglib/tgl_windows \
-               ../libs/opensyde_core/xml_parser \
-               ../libs/opensyde_core/xml_parser/tinyxml2 \
                ../libs/gettext \
                ../libs/dbc_driver_library/src \
                ../libs/dbc_driver_library/src/Vector \

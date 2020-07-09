@@ -46,7 +46,7 @@ private:
                                              const stw_scl::SCLDynamicArray<C_OSCCanOpenObject> & orc_COObjects,
                                              const std::vector<stw_types::uint32> & orc_Dummies,
                                              std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_OSCMessageData,
-                                             std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCSignalData, const bool oq_IsEds, std::vector<std::vector<stw_scl::C_SCLString> > & orc_ImportMessages);
+                                             std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCSignalData, const bool oq_IsEds, std::vector<std::vector<stw_scl::C_SCLString> > & orc_ImportMessages, const bool oq_IsTx);
    static stw_types::sint32 mh_ParseSignals(const stw_types::uint32 ou32_COMessageId, const stw_types::uint8 ou8_NodeId,
                                             const stw_scl::SCLDynamicArray<C_OSCCanOpenObject> & orc_COObjects,
                                             const std::vector<stw_types::uint32> & orc_Dummies,

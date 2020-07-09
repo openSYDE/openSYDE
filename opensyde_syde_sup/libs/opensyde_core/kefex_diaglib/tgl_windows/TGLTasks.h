@@ -52,13 +52,13 @@ public:
 
 //----------------------------------------------------------------------------------------------------------------------
 
-typedef void (* PR_TGLTimer_Event)(void * opv_Instance);
+typedef void (* PR_TGLTimerEvent)(void * opv_Instance);
 
 ///Non-threaded timer. To be triggered by the OS's message queue handler
 class TGL_PACKAGE C_TGLTimer
 {
 private:
-   PR_TGLTimer_Event mpr_Callback;
+   PR_TGLTimerEvent mpr_Callback;
    void * mpv_CallbackInstance;
    bool mq_Enabled;
    stw_types::uint32 u32_Interval;
@@ -71,8 +71,8 @@ private:
    static stw_scl::SCLDynamicArray<UINT_PTR> mhc_Handles;
    static stw_scl::SCLDynamicArray<C_TGLTimer *> mhc_Instances;
 
-   static void __stdcall m_TimerCallback(HWND opv_Hwnd, const stw_types::uintn oun_Msg,
-                                         const UINT_PTR oun_TimerHandle, const stw_types::uint32 ou32_Time);
+   static void __stdcall mh_TimerCallback(HWND opv_Hwnd, const UINT oun_Msg, const UINT_PTR oun_TimerHandle,
+                                          const DWORD ou32_Time);
 
    void m_UpdateTimer(void);
 
@@ -82,11 +82,11 @@ private:
 
 public:
    C_TGLTimer(void);
-   C_TGLTimer(const PR_TGLTimer_Event opr_Callback, void * const opv_Instance, const stw_types::uint32 ou32_Interval,
+   C_TGLTimer(const PR_TGLTimerEvent opr_Callback, void * const opv_Instance, const stw_types::uint32 ou32_Interval,
               const bool oq_Enabled);
    virtual ~C_TGLTimer(void);
 
-   void SetEventCallback(const PR_TGLTimer_Event opr_Callback, void * const opv_Instance);
+   void SetEventCallback(const PR_TGLTimerEvent opr_Callback, void * const opv_Instance);
    void SetInterval(const stw_types::uint32 ou32_Interval);
    void SetEnabled(const bool oq_Enabled);
 

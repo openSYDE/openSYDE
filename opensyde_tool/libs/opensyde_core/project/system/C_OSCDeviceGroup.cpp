@@ -77,6 +77,47 @@ const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if the device name and the device alias name already exist
+
+   Pre check the new device with all existing devices in one device group.
+   It compares the device name, the device alias name and the device path.
+   If one of these is existing, the new device won't be added to the group.
+
+   The device alias name can contain an empty string so it's checked if it's empty.
+   If no, then it's compared with the alias name of the existing device, otherwise
+   it's compared with the device name again. So the comparison of whether the alias
+   name is the same as the device name could be executed twice.
+
+   \param[in]     orc_DeviceName         Name of the device definition
+   \param[in]     orc_DeviceNameAlias    Alias name of the device definition
+   \param[in]     orc_DevicePath         File path of the device definition
+
+   \return
+   false    Device isn't existing
+   true     Device exists
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCDeviceGroup::PreCheckDevice(const C_SCLString & orc_DeviceName, const C_SCLString & orc_DeviceNameAlias,
+                                      const C_SCLString & orc_DevicePath) const
+{
+   bool q_IsEqual = false;
+
+   for (uint32 u32_ItDevice = 0U; u32_ItDevice < this->mc_Devices.size(); ++u32_ItDevice)
+   {
+      if ((orc_DeviceName == this->mc_Devices[u32_ItDevice].c_DeviceName) ||
+          (orc_DeviceNameAlias == this->mc_Devices[u32_ItDevice].c_DeviceName) ||
+          (orc_DeviceName == this->mc_Devices[u32_ItDevice].c_DeviceNameAlias) ||
+          (orc_DeviceNameAlias == this->mc_Devices[u32_ItDevice].GetDisplayName()) ||
+          (orc_DevicePath.UpperCase() == this->mc_Devices[u32_ItDevice].c_FilePath.UpperCase()))
+      {
+         q_IsEqual = true;
+         break;
+      }
+   }
+   return q_IsEqual;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load group listed in ini file
 
    Requires:
@@ -97,6 +138,7 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
    sintn sn_NumDevices;
    sint32 s32_Return = C_NO_ERR;
 
+   this->mc_Devices.clear();
    //Check number of devices in group
    sn_NumDevices = orc_Ini.ReadInteger(this->mc_GroupName, "DeviceCount", 0);
    if (sn_NumDevices > 0)
@@ -114,8 +156,17 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
          }
          else
          {
+            C_SCLString c_FullDevicePath;
             C_OSCDeviceDefinition c_DeviceDefinition;
-            const C_SCLString c_FullDevicePath = C_SCLString(orc_BasePath + c_DevicePath);
+            if (TGL_FileExists(c_DevicePath) == 0)
+            {
+               c_FullDevicePath = C_SCLString(orc_BasePath + c_DevicePath);
+            }
+            else
+            {
+               c_FullDevicePath = c_DevicePath;
+            }
+
             if (C_OSCDeviceDefinitionFiler::h_Load(c_DeviceDefinition, c_FullDevicePath) == C_NO_ERR)
             {
                this->mc_Devices.push_back(c_DeviceDefinition);

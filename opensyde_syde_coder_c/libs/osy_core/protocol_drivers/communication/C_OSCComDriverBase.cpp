@@ -106,6 +106,7 @@ C_OSCComDriverBase::C_OSCComDriverBase(void) :
    mq_Paused(false),
    mu32_CanMessageBits(0U),
    ms32_CanBitrate(1000U),
+   mu32_CanTxCounter(0U),
    mu32_CanTxErrors(0U)
 {
 }
@@ -190,6 +191,7 @@ sint32 C_OSCComDriverBase::StartLogging(const stw_types::sint32 os32_Bitrate)
       this->ms32_CanBitrate = os32_Bitrate;
       // Reset the counter
       this->mu32_CanMessageBits = 0U;
+      this->mu32_CanTxCounter = 0U;
       this->mu32_CanTxErrors = 0U;
 
       // Inform all logger about the start
@@ -216,7 +218,9 @@ void C_OSCComDriverBase::StopLogging(void)
    for (un_Counter = 0U; un_Counter < this->mc_Logger.size(); ++un_Counter)
    {
       this->mc_Logger[un_Counter]->Stop();
-      this->mc_Logger[un_Counter]->UpdateBusLoad(0);
+      this->mc_Logger[un_Counter]->UpdateBusLoad(0U);
+      this->mc_Logger[un_Counter]->UpdateTxErrors(0U);
+      this->mc_Logger[un_Counter]->UpdateTxCounter(0U);
    }
 }
 
@@ -230,6 +234,7 @@ void C_OSCComDriverBase::StopLogging(void)
 void C_OSCComDriverBase::ContinueLogging(void)
 {
    uintn un_Counter;
+
    this->mq_Paused = false;
 
    // Inform all logger about the continue
@@ -249,6 +254,7 @@ void C_OSCComDriverBase::ContinueLogging(void)
 void C_OSCComDriverBase::PauseLogging(void)
 {
    uintn un_Counter;
+
    this->mq_Paused = true;
 
    // Inform all logger about the pause
@@ -348,10 +354,11 @@ void C_OSCComDriverBase::DistributeMessages(void)
          }
       }
 
-      // Inform about TX errros
+      // Inform about Tx errros and counter
       for (un_LoggerCounter = 0U; un_LoggerCounter < this->mc_Logger.size(); ++un_LoggerCounter)
       {
          this->mc_Logger[un_LoggerCounter]->UpdateTxErrors(this->mu32_CanTxErrors);
+         this->mc_Logger[un_LoggerCounter]->UpdateTxCounter(this->mu32_CanTxCounter);
       }
    }
 }
@@ -407,12 +414,18 @@ sint32 C_OSCComDriverBase::SendCanMessageDirect(const T_STWCAN_Msg_TX & orc_Msg)
          c_Msg.u64_TimeStamp = stw_tgl::TGL_GetTickCountUS();
 
          this->m_HandleCanMessage(c_Msg, true);
+
+         // Count the message
+         if (this->mu32_CanTxCounter < 0xFFFFFFFFU)
+         {
+            ++this->mu32_CanTxCounter;
+         }
       }
       else
       {
          if (this->mu32_CanTxErrors < 0xFFFFFFFFU)
          {
-            // Count the errors
+            // Count the error
             ++this->mu32_CanTxErrors;
          }
          s32_Return = C_COM;

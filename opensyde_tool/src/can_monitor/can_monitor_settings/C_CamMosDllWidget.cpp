@@ -368,7 +368,7 @@ void C_CamMosDllWidget::m_OnExpand(const bool oq_Expand) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_OnBrowse(void)
 {
-   QString c_Path = "";
+   QString c_Path;
    QString c_Folder = C_CamProHandler::h_GetInstance()->GetCustomCANDllPath();
    const QString c_Filter = QString(C_GtGetText::h_GetText("CAN DLL ")) + "(*.dll)";
    QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select CAN DLL"), c_Folder, c_Filter);

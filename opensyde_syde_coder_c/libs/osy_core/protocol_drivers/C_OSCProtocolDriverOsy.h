@@ -84,8 +84,9 @@ private:
                                               const stw_types::uint16 ou16_ListIndex,
                                               const stw_types::uint16 ou16_ElementIndex,
                                               stw_types::uint8(&orau8_PackedId)[3]) const;
-   void m_UnpackDataPoolIdentifier(const stw_types::uint8(&orau8_PackedId)[3], stw_types::uint8 & oru8_DataPoolIndex,
-                                   stw_types::uint16 & oru16_ListIndex, stw_types::uint16 & oru16_ElementIndex) const;
+   static void mh_UnpackDataPoolIdentifier(const stw_types::uint8(&orau8_PackedId)[3],
+                                           stw_types::uint8 & oru8_DataPoolIndex, stw_types::uint16 & oru16_ListIndex,
+                                           stw_types::uint16 & oru16_ElementIndex);
    stw_types::sint32 m_RoutineControl(const stw_types::uint16 ou16_RoutineIdentifier,
                                       const stw_types::uint8 ou8_SubFunction,
                                       const std::vector<stw_types::uint8> & orc_SendData,

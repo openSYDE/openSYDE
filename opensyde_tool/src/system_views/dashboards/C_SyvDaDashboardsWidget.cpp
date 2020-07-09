@@ -1106,7 +1106,7 @@ void C_SyvDaDashboardsWidget::m_HandleConnectionResult(const sint32 os32_Result,
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard connect"));
       c_MessageBox.SetDescription(orc_Message);
       c_MessageBox.SetDetails(orc_MessageDetails);
-      c_MessageBox.SetCustomMinHeight(200, 400);
+      c_MessageBox.SetCustomMinHeight(220, 400);
       c_MessageBox.SetCustomMinWidth(650);
       c_MessageBox.Execute();
       //Reset internal state AFTER user confirmation to block any screen switches until this point

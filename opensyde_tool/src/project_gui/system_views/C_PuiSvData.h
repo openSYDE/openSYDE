@@ -40,7 +40,7 @@ public:
    C_PuiSvData(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
-   stw_types::uint32 CalcSetupHash(void) const;
+   stw_types::uint32 CalcUpdateHash(void) const;
 
    const C_PuiSvPc & GetPcData(void) const;
    void SetPcData(const C_PuiSvPc & orc_Value);

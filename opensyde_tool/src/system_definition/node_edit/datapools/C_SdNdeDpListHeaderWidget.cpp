@@ -482,9 +482,7 @@ void C_SdNdeDpListHeaderWidget::PopUp(void)
          this->m_UpdateUi();
          Q_EMIT this->SigUpdateTable();
       }
-   }
-   if (c_Dialog != NULL)
-   {
+
       c_Dialog->HideOverlay();
    }
 }

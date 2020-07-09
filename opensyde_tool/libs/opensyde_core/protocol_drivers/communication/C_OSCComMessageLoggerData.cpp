@@ -74,9 +74,11 @@ bool C_OSCComMessageLoggerDataSignal::operator <(const C_OSCComMessageLoggerData
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCComMessageLoggerData::C_OSCComMessageLoggerData(void) :
    u64_TimeStampRelative(0U),
-   u64_TimeStampAbsolute(0U),
+   u64_TimeStampAbsoluteStart(0U),
+   u64_TimeStampAbsoluteTimeOfDay(0U),
    c_TimeStampRelative(""),
-   c_TimeStampAbsolute(""),
+   c_TimeStampAbsoluteStart(""),
+   c_TimeStampAbsoluteTimeOfDay(""),
    c_CanIdDec(""),
    c_CanIdHex(""),
    c_CanDlc(""),

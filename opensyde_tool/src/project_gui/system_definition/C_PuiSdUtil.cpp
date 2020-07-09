@@ -386,6 +386,34 @@ sint32 C_PuiSdUtil::h_ConvertFromSignalIndex(const C_OSCCanMessageIdentification
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the default cycle time of a CAN message
+
+   \return
+   Default message cycle time
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_PuiSdUtil::h_GetDefaultMessageCycleTime(void)
+{
+   return 100U;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the automatic timeout time of a CAN message depending of the cylce time
+
+   The time is (3 * cycle time) + 10
+
+   \param[in]       ou32_CycleTime     Cycle time of CAN message
+
+   \return
+   Calculated timeout time
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_PuiSdUtil::h_GetMessageAutoTimeoutTime(const uint32 ou32_CycleTime)
+{
+   return (ou32_CycleTime * 3U) + 10U;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------

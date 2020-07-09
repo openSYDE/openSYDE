@@ -10,8 +10,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QFileDialog>
-
 #include "C_SyvDaItPaWidgetNew.h"
 #include "ui_C_SyvDaItPaWidgetNew.h"
 
@@ -484,61 +482,6 @@ void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle read selected items action
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::ReadSelected(void)
-{
-   this->mc_ListIds = this->mpc_Ui->pc_TreeView->GetAllSelectedListIds();
-   m_ReadElements();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle write selected items action
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::WriteSelected(void)
-{
-   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_SelectedListIds =
-      this->mpc_Ui->pc_TreeView->GetAllSelectedListIds();
-
-   m_HandleWriteProcessTrigger(c_SelectedListIds);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle apply selected items action
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::ApplySelected(void) const
-{
-   this->mpc_Ui->pc_TreeView->ApplySelectedEcuValues();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle record selected items action
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::RecordSelected(void)
-{
-   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_SelectedListIds =
-      this->mpc_Ui->pc_TreeView->GetAllSelectedListIds();
-
-   this->m_RecordElements(c_SelectedListIds);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get flag if read is allowed
-
-   \return
-   Flag if read is allowed
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaItPaWidgetNew::AllowReadAction(void) const
-{
-   return this->mq_ReadAllowed;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get template with the type description for the current selection
 
    \return
@@ -662,42 +605,6 @@ void C_SyvDaItPaWidgetNew::paintEvent(QPaintEvent * const opc_Event)
 {
    stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
    QWidget::paintEvent(opc_Event);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::ButtonReadClicked(void)
-{
-   this->mc_ListIds = this->mpc_Ui->pc_TreeView->GetAllListIds();
-   m_ReadElements();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Write button handling
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::ButtonWriteClicked(void)
-{
-   if (this->mpc_Ui->pc_TreeView->CheckAllListsRead() == true)
-   {
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_Elements =
-         this->mpc_Ui->pc_TreeView->GetChangedListElementIds();
-      m_WriteElements(c_Elements);
-   }
-   else
-   {
-      //Activate flag to continue write after read
-      this->mq_WriteActive = true;
-      this->mc_ElementsToWriteAfterRead = this->mpc_Ui->pc_TreeView->GetChangedListElementIds();
-      ButtonReadClicked();
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::m_ButtonRecordClicked(void)
-{
-   const std::vector<C_OSCNodeDataPoolListElementId> c_ListItemIds = this->mpc_Ui->pc_TreeView->GetAllListIds();
-
-   m_RecordElements(c_ListItemIds);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -965,30 +872,24 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
 
    if (pc_View != NULL)
    {
-      QString c_Folder;
-      QString c_File;
-      const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE Parameter Set File")) + " (*" +
-                               mhc_FILE_EXTENSION_PARAMSET + ")";
-
-      //User settings restore
-      c_Folder = C_Uti::h_CheckAndReplaceWithExePathIfNecessary(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
-                                                                   pc_View->GetName()).c_ParamImportPath);
-
-      // do not use QFileDialog::getOpenFileName because it does not support default suffix
-      QFileDialog c_Dialog(NULL, C_GtGetText::h_GetText("Load Parameter Set File"), c_Folder, c_Filter);
-      c_Dialog.setDefaultSuffix(mhc_FILE_EXTENSION_PARAMSET);
-
-      if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
+      if (pc_ParamWidget != NULL)
       {
-         // Import configuration from parameter set (image) file
-         c_File = c_Dialog.selectedFiles().at(0); // multi-selection is not possible
-      }
+         QString c_Folder;
+         QString c_File;
+         const QString c_Filter = QString(C_GtGetText::h_GetText("openSYDE Parameter Set File")) + " (*" +
+                                  mhc_FILE_EXTENSION_PARAMSET + ")";
 
-      if (c_File.compare("") != 0)
-      {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
-         if (pc_ParamWidget != NULL)
+         //User settings restore
+         c_Folder = C_Uti::h_CheckAndReplaceWithExePathIfNecessary(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
+                                                                      pc_View->GetName()).c_ParamImportPath);
+
+         c_File = C_OgeWiUtil::h_GetOpenFileName(pc_ParamWidget->GetPopUpParent(),
+                                                 C_GtGetText::h_GetText("Load Parameter Set File"),
+                                                 c_Folder, c_Filter, mhc_FILE_EXTENSION_PARAMSET);
+
+         if (c_File.compare("") != 0)
          {
             C_OSCParamSetHandler c_ParamSetHandler;
             sint32 s32_Result;
@@ -1064,12 +965,24 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
             }
             else
             {
-               // TODO: Error handling
+               QString c_Details;
                C_OgeWiCustomMessage c_MessageResultRead(
                   pc_ParamWidget->GetPopUpParent(), C_OgeWiCustomMessage::E_Type::eERROR);
+
+               C_OSCLoggingHandler::h_Flush();
+
                c_MessageResultRead.SetHeading(C_GtGetText::h_GetText("Import configuration"));
                c_MessageResultRead.SetDescription(C_GtGetText::h_GetText("Could not read the file."));
-               c_MessageResultRead.SetCustomMinHeight(180, 180);
+               c_Details = C_GtGetText::h_GetText("Possible reasons:<br/>"
+                                                  "- Invalid xml format (e.g. wrong filetype selected)<br/>"
+                                                  "- Invalid xml version (e.g. version incompatible with current tool version)<br/>"
+                                                  "- Invalid content (e.g. values invalid)<br/>");
+               c_Details += C_GtGetText::h_GetText("For more information see ");
+               c_Details += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
+                                             C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+               c_Details += ".";
+               c_MessageResultRead.SetDetails(c_Details);
+               c_MessageResultRead.SetCustomMinHeight(300, 300);
                c_MessageResultRead.Execute();
             }
          }
@@ -1098,11 +1011,15 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
    std::vector<uint32> c_UsedNodeIndices;
    // For each node which is synchronous to c_UsedNodeIndices
    std::vector<std::vector<uint32> > c_UsedDataPoolIndices;
+   const C_OSCParamSetInterpretedFileInfoData c_FileInfo = C_SyvDaItPaImageRecordWidget::h_GetFileInfoData("");
 
    if (orc_ListIds.size() == 0)
    {
       return;
    }
+
+   //General info
+   c_ParamSetFileHandler.AddInterpretedFileData(c_FileInfo);
 
    // Convert all necessary information to the interpreted node format
    for (u32_ListCounter = 0U; u32_ListCounter < orc_ListIds.size(); ++u32_ListCounter)
@@ -1402,15 +1319,6 @@ void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OSCNodeDataPoolL
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Apply action
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWidgetNew::m_ButtonApplyClicked(void) const
-{
-   this->mpc_Ui->pc_TreeView->ApplyEcuValues();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update number of selection items
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1586,7 +1494,7 @@ QString C_SyvDaItPaWidgetNew::mh_GetDefaultFileName(const uint32 ou32_ViewIndex,
    {
       const QString c_ViewPart1 = QString(C_GtGetText::h_GetText("View_%1_")).arg(ou32_ViewIndex + 1UL);
       const QString c_ViewPart1File = C_OSCUtils::h_NiceifyStringForFileName(c_ViewPart1.toStdString().c_str()).c_str();
-      const QString c_ViewPart2 = C_PuiSdHandler::h_AutomaticCStringAdaptation(pc_View->GetName(), true);
+      const QString c_ViewPart2 = C_PuiSdHandler::h_AutomaticCStringAdaptation(pc_View->GetName());
       const QString c_DataElementFileName = mh_GetFile(orc_Id, ou32_ValidLayers);
       const QString c_ViewFileName = QString("%1%2").arg(c_ViewPart1File).arg(c_ViewPart2);
       if (c_DataElementFileName.isEmpty() == false)

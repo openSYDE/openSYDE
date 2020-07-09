@@ -619,6 +619,28 @@ void C_SyvDaDashboardScene::SetDarkModeInitialized(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update text
+
+   Necessary because of issue #49525
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardScene::UpdateBoundaries(void) const
+{
+   const QList<QGraphicsItem *> & rc_Items = this->items();
+
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end();
+        ++c_ItItem)
+   {
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_GiSvDaBoundary * const pc_Item = dynamic_cast< C_GiSvDaBoundary * const>(*c_ItItem);
+      if (pc_Item != NULL)
+      {
+         pc_Item->update();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy items to scene from copy paste manager
 
    \param[in]  opc_Pos  Optional position offset

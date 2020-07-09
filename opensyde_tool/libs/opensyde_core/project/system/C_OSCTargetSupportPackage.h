@@ -1,9 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       short description (header)
-
-   See cpp file for detailed description
+   \brief       openSYDE target support package data handling class (header)
 
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -13,6 +11,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "CSCLString.h"
+#include "C_OSCNodeCodeExportSettings.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -52,6 +51,8 @@ public:
    ///< (number of messages that can be buffered by in Tx direction)
    stw_types::uint16 u16_MaxRoutingMessageBufferRx; ///< CAN Rx routing FIFO size
    ///< (number of messages that can be buffered by in Rx direction)
+
+   C_OSCNodeCodeExportSettings c_CodeExportSettings; ///< General export settings
 
    stw_scl::C_SCLString c_TemplatePath; ///< path to template package archive
    void Clear(void);

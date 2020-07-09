@@ -45,10 +45,11 @@ public:
                                 const bool & orq_ForceUseAdditionalInformation = false);
    C_SdManUnoTopologyAddCommand(QGraphicsScene * const opc_Scene, const std::vector<stw_types::uint64> & orc_IDs,
                                 const E_ElementType & ore_Type, const QPointF & orc_NewPos,
-                                const stw_types::uint64 & oru64_BusConnectorNodeID = 0,
-                                const stw_types::uint64 & oru64_BusConnectorBusID = 0,
-                                const stw_types::uint8 & oru8_InterfaceNumber = 0,
-                                const stw_types::uint8 & oru8_NodeId = 0, QUndoCommand * const opc_Parent = NULL);
+                                const stw_types::uint64 ou64_BusConnectorNodeID = 0,
+                                const stw_types::uint64 ou64_BusConnectorBusID = 0,
+                                const stw_types::uint8 ou8_InterfaceNumber = 0, const stw_types::uint8 ou8_NodeId = 0,
+                                const bool oq_ActivateDatapoolL2 = false, const bool oq_ActivateDatapoolECeS = false,
+                                const bool oq_ActivateDatapoolECoS = false, QUndoCommand * const opc_Parent = NULL);
    virtual ~C_SdManUnoTopologyAddCommand(void);
 
 protected:
@@ -62,6 +63,9 @@ private:
    const stw_types::uint64 mu64_BusConnectorBusID;
    const stw_types::uint8 mu8_InterfaceNumber;
    const stw_types::uint8 mu8_NodeId;
+   const bool mq_ActivateDatapoolL2;
+   const bool mq_ActivateDatapoolECeS;
+   const bool mq_ActivateDatapoolECoS;
    const bool mq_ForceUseAdditionalInformation;
 };
 

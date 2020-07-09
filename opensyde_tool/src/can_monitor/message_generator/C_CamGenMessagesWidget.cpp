@@ -56,6 +56,8 @@ C_CamGenMessagesWidget::C_CamGenMessagesWidget(QWidget * const opc_Parent) :
    this->SetBackgroundColor(11);
    this->mpc_Ui->pc_LabelHeading->SetForegroundColor(4);
    this->mpc_Ui->pc_LabelHeading->SetFontPixel(14, true, false);
+   this->mpc_Ui->pc_LabelCyclic->SetForegroundColor(4);
+   this->mpc_Ui->pc_LabelCyclic->SetFontPixel(12, false, false);
    this->mpc_Ui->pc_LabelNoMessages->SetForegroundColor(8);
    this->mpc_Ui->pc_LabelNoMessages->SetFontPixel(12, false, false);
 
@@ -66,6 +68,8 @@ C_CamGenMessagesWidget::C_CamGenMessagesWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_PushButtonMoveDown->setVisible(false);
 
    //Connections
+   connect(C_CamProHandler::h_GetInstance(), &C_CamProHandler::SigNewConfiguration,
+           this, &C_CamGenMessagesWidget::m_LoadConfig);
    connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigSelected, this, &C_CamGenMessagesWidget::SigSelected);
    connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigItemCountChanged, this,
            &C_CamGenMessagesWidget::m_OnItemCountChanged);
@@ -92,12 +96,16 @@ C_CamGenMessagesWidget::~C_CamGenMessagesWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_LabelNoMessages->setText(C_GtGetText::h_GetText(
-                                                "No messages are declared, add any via the '+' button."));
+   this->mpc_Ui->pc_LabelNoMessages->setText(C_GtGetText::h_GetText("No messages are declared, add any via the '+' "
+                                                                    "button."));
+   this->mpc_Ui->pc_LabelCyclic->setText(C_GtGetText::h_GetText("Cyclic Transmissions"));
    //Tooltips
+   this->mpc_Ui->pc_PushButtonToggleTx->SetToolTipInformation(C_GtGetText::h_GetText("Cyclic Message Transmission"),
+                                                              C_GtGetText::h_GetText("Disable or enable all cyclic "
+                                                                                     "message transmissions."));
    this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add Message"), "");
-   this->mpc_Ui->pc_PushButtonAddFromDatabase->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                        "Add Message from Database"), "");
+   this->mpc_Ui->pc_PushButtonAddFromDatabase->SetToolTipInformation(C_GtGetText::h_GetText("Add Message from "
+                                                                                            "Database"), "");
    this->mpc_Ui->pc_PushButtonCopy->SetToolTipInformation(C_GtGetText::h_GetText("Copy"), "");
    this->mpc_Ui->pc_PushButtonPaste->SetToolTipInformation(C_GtGetText::h_GetText("Paste"), "");
    this->mpc_Ui->pc_PushButtonCut->SetToolTipInformation(C_GtGetText::h_GetText("Cut"), "");
@@ -137,20 +145,13 @@ void C_CamGenMessagesWidget::RemoveMessagesForFile(const QString & orc_File) con
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Signal communication start
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamGenMessagesWidget::SetCommunicationStarted(void) const
-{
-   this->mpc_Ui->pc_TableView->SetCommunicationStarted();
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Signal communication stop
+   \param[in]  oq_Online    Online/offline flag of trace
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenMessagesWidget::SetCommunicationStopped(void) const
+void C_CamGenMessagesWidget::SetCommunicationStarted(const bool oq_Online)
 {
-   this->mpc_Ui->pc_TableView->SetCommunicationStopped();
+   this->mpc_Ui->pc_TableView->SetCommunicationStarted(oq_Online);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -195,12 +196,32 @@ void C_CamGenMessagesWidget::TriggerModelUpdateCyclicMessage(const stw_types::ui
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overridden resize event slot
+
+   Here: remove or add label text depending on size
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenMessagesWidget::resizeEvent(QResizeEvent * const opc_Event)
+{
+   C_OgeWiOnlyBackground::resizeEvent(opc_Event);
+
+   // hide label if space gets to small
+   this->mpc_Ui->pc_LabelCyclic->setVisible(this->width() > 500);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle buttons init state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::m_InitButtons(void) const
 {
    QString c_Icon;
+
+   this->mpc_Ui->pc_PushButtonToggleTx->setCheckable(true);
+   this->mpc_Ui->pc_PushButtonToggleTx->SetSvg("://images/ToggleOffMsgTransmission.svg", "", "",
+                                               "://images/ToggleOnMsgTransmission.svg", "");
 
    c_Icon = "://images/IconAddDataBaseBlue";
    this->mpc_Ui->pc_PushButtonAddFromDatabase->SetSvg(c_Icon + ".svg", "", c_Icon + "Hover.svg", "", "", "",
@@ -226,7 +247,10 @@ void C_CamGenMessagesWidget::m_InitButtons(void) const
    c_Icon = "://images/IconMoveDown";
    this->mpc_Ui->pc_PushButtonMoveDown->SetSvg(c_Icon + ".svg", "", c_Icon + "Hover.svg", "", "", "",
                                                c_Icon + "Pressed.svg");
+
    //Connects
+   connect(this->mpc_Ui->pc_PushButtonToggleTx, &C_OgePubSvgIconOnly::toggled,
+           this, &C_CamGenMessagesWidget::m_OnTransmissionToggled);
    connect(this->mpc_Ui->pc_PushButtonAddFromDatabase, &C_OgePubSvgIconOnly::clicked, this->mpc_Ui->pc_TableView,
            &C_CamGenTableView::AddMessageFromDatabase);
    connect(this->mpc_Ui->pc_PushButtonAdd, &C_OgePubSvgIconOnly::clicked, this->mpc_Ui->pc_TableView,
@@ -257,6 +281,20 @@ void C_CamGenMessagesWidget::m_UpdateHeading(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load configuration.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenMessagesWidget::m_LoadConfig(void) const
+{
+   const bool q_TxActive = C_CamProHandler::h_GetInstance()->GetCyclicMessageTransmitActive();
+
+   this->mpc_Ui->pc_PushButtonToggleTx->setChecked(q_TxActive);
+   this->mpc_Ui->pc_TableView->SetCyclicActive(q_TxActive);
+
+   // loading of messages is handled by table model
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Register item count change
 
    \param[in] ou32_NewItemCount New item count
@@ -274,5 +312,26 @@ void C_CamGenMessagesWidget::m_OnItemCountChanged(const stw_types::uint32 ou32_N
    {
       this->mpc_Ui->pc_GroupBoxNoMessages->setVisible(true);
       this->mpc_Ui->pc_TableView->setVisible(false);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On transmission toggled
+
+   \param[in]  oq_Active   true: transmit messages; false: block message transmitting
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamGenMessagesWidget::m_OnTransmissionToggled(const bool oq_Active)
+{
+   // store in data handling
+   C_CamProHandler::h_GetInstance()->SetCyclicMessageTransmitActive(oq_Active);
+
+   // inform table view
+   this->mpc_Ui->pc_TableView->SetCyclicActive(oq_Active);
+
+   // remove cyclic messages if inactive
+   if (oq_Active == false)
+   {
+      Q_EMIT (this->SigRemoveAllCyclicMessages());
    }
 }

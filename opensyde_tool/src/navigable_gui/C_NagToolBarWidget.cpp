@@ -472,7 +472,7 @@ void C_NagToolBarWidget::m_BtnClicked(const uint32 ou32_Index)
 void C_NagToolBarWidget::m_TriggerHelp(void)
 {
    //lint -e{10,48,64,746,1013,1055} Will be defined via moc compiler, PC lint unable to handle this construct
-   stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(this->metaObject()->className());
+   stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->metaObject()->className());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

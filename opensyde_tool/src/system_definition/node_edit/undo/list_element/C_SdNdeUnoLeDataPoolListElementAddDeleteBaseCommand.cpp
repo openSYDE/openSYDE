@@ -12,11 +12,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include <QElapsedTimer>
-
 #include "stwtypes.h"
 #include "stwerrors.h"
-#include "constants.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdUtil.h"
 #include "C_SdNdeDpListTableView.h"
@@ -72,12 +70,7 @@ C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::C_SdNdeUnoLeDataPoolListEle
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
 {
-   QElapsedTimer c_Timer;
-
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
    //Sort
    m_SortAscending();
@@ -93,10 +86,8 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
          m_ReSelect(c_Continous, true);
       }
    }
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "rows inserted " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
+   osc_write_log_performance_stop(u16_TimerId, "Insert rows");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -105,12 +96,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
 {
-   QElapsedTimer c_Timer;
-
-   if (mq_TIMING_OUTPUT)
-   {
-      c_Timer.start();
-   }
+   const uint16 u16_TimerId = osc_write_log_performance_start();
 
    this->mc_OSCContent.resize(this->mc_Indices.size());
    this->mc_UIContent.resize(this->mc_Indices.size());
@@ -166,10 +152,8 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
          }
       }
    }
-   if (mq_TIMING_OUTPUT)
-   {
-      std::cout << "rows deleted " << c_Timer.elapsed() << " ms" << &std::endl;
-   }
+
+   osc_write_log_performance_stop(u16_TimerId, "Delete rows");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -283,34 +267,4 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SortAscending(void)
 {
    C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
       this->mc_Indices, this->mc_OSCContent, this->mc_UIContent);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Check if indices continuos
-
-   \return
-   true  Indices all continuous
-   false Indices do contain holes
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_CheckContinuous(void)
-{
-   bool q_Retval = true;
-
-   //Sorting necessary
-   m_SortAscending();
-   if (this->mc_Indices.size() > 1)
-   {
-      uint32 u32_Start = this->mc_Indices[0];
-      for (uint32 u32_ItIndex = 1; (u32_ItIndex < this->mc_Indices.size()) && (q_Retval == true); ++u32_ItIndex)
-      {
-         //Check if expected value
-         if (this->mc_Indices[u32_ItIndex] != (u32_Start + u32_ItIndex))
-         {
-            q_Retval = false;
-         }
-      }
-   }
-
-   return q_Retval;
 }

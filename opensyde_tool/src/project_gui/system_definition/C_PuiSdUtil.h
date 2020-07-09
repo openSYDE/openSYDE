@@ -50,6 +50,9 @@ public:
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageID,
       const stw_types::uint32 ou32_SignalIndex, stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ElementID);
 
+   static stw_types::uint32 h_GetDefaultMessageCycleTime(void);
+   static stw_types::uint32 h_GetMessageAutoTimeoutTime(const stw_types::uint32 ou32_CycleTime);
+
 private:
    C_PuiSdUtil(void);
 };

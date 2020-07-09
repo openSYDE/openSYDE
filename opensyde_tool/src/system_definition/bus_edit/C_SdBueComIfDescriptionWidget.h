@@ -110,6 +110,7 @@ private:
    void m_OnMessageIdChange(void) const;
    void m_OnMessageNameChange(void) const;
    void m_OnSignalNameChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
+   void m_OnSignalStartBitChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void m_OnConnectionChange(void) const;
    void m_OnSignalCountOfMessageChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_RecheckErrorGlobal(void) const;

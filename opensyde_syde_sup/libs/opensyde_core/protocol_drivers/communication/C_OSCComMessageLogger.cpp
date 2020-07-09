@@ -35,6 +35,8 @@ using namespace stw_opensyde_core;
 using namespace stw_cmon_protocol;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const stw_types::uint64 C_OSCComMessageLogger::mhu64_MAX_TIMESTAMP_DAY_OF_TIME =
+   ((((24ULL * 60ULL) * 60ULL) * 1000ULL) * 1000ULL);
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -92,7 +94,8 @@ C_OSCComMessageLogger::C_OSCComMessageLogger(void) :
    mpc_OsySysDefDataPoolList(NULL),
    me_Protocol(stw_cmon_protocol::CMONL7ProtocolNone),
    mq_Paused(false),
-   mu64_FirstTimeStamp(0U),
+   mu64_FirstTimeStampStart(0U),
+   mu64_FirstTimeStampDayOfTime(0U),
    mu64_LastTimeStamp(0U),
    mu32_FilteredMessages(0U)
 {
@@ -158,13 +161,30 @@ void C_OSCComMessageLogger::Stop(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCComMessageLogger::Start(void)
 {
+   stw_tgl::C_TGLDateTime c_Time;
+
    this->mq_Paused = false;
    this->mu32_FilteredMessages = 0U;
 
-   // Init both reference timestamps on each start
+   stw_tgl::TGL_GetDateTimeNow(c_Time);
+
+   // Init all reference timestamps on each start
    // Save first timestamp for starting at current time
-   this->mu64_FirstTimeStamp = stw_tgl::TGL_GetTickCountUS();
-   this->mu64_LastTimeStamp = this->mu64_FirstTimeStamp;
+   // Using the same function as the CAN message timestamps bases on
+   this->mu64_FirstTimeStampStart = stw_tgl::TGL_GetTickCountUS();
+   this->mu64_LastTimeStamp = this->mu64_FirstTimeStampStart;
+
+   // Calculate the start time beginning at midnight too, for showing the absolute timestamp as time of day
+   // In seconds
+   this->mu64_FirstTimeStampDayOfTime =
+      (((static_cast<uint64>(c_Time.mu8_Hour) * 60ULL) * 60ULL) +
+       (static_cast<uint64>(c_Time.mu8_Minute) * 60ULL)) +
+      static_cast<uint64>(c_Time.mu8_Second);
+   // the ms
+   this->mu64_FirstTimeStampDayOfTime *= 1000ULL;
+   this->mu64_FirstTimeStampDayOfTime += static_cast<uint64>(c_Time.mu16_MilliSeconds);
+   // in us
+   this->mu64_FirstTimeStampDayOfTime *= 1000ULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -246,7 +266,6 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
       {
          uint32 u32_BusCounter;
          uint32 u32_FirstBusIndex = 0U;
-         uint32 u32_UsedBusIndex = 0U;
          bool q_CanBusFound = false;
          bool q_ConcreteCanBusFound = false;
 
@@ -277,6 +296,7 @@ sint32 C_OSCComMessageLogger::AddOsySysDef(const C_SCLString & orc_PathSystemDef
 
          if (q_CanBusFound == true)
          {
+            uint32 u32_UsedBusIndex;
             if (q_ConcreteCanBusFound == true)
             {
                // Set bus index was found, use it
@@ -693,6 +713,20 @@ void C_OSCComMessageLogger::UpdateBusLoad(const uint8 ou8_BusLoad)
 void C_OSCComMessageLogger::UpdateTxErrors(const uint32 ou32_TxErrors)
 {
    (void)ou32_TxErrors;
+   // Nothing to do here
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Optional function for getting the current counted CAN Tx messages
+
+   This implementation does nothing with the value. This function must be overridden to use the counted CAN Tx messages.
+
+   \param[in] ou32_TxCount Current counted CAN Tx messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCComMessageLogger::UpdateTxCounter(const uint32 ou32_TxCount)
+{
+   (void)ou32_TxCount;
    // Nothing to do here
 }
 
@@ -1310,13 +1344,18 @@ void C_OSCComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
    // So we must prevent possible negative values.
 
    // Absolute
-   if (orc_Msg.u64_TimeStamp > this->mu64_FirstTimeStamp)
+   if (orc_Msg.u64_TimeStamp > this->mu64_FirstTimeStampStart)
    {
-      this->mc_HandledCanMessage.u64_TimeStampAbsolute = orc_Msg.u64_TimeStamp - this->mu64_FirstTimeStamp;
+      this->mc_HandledCanMessage.u64_TimeStampAbsoluteStart = orc_Msg.u64_TimeStamp - this->mu64_FirstTimeStampStart;
+      // Calculating the us by starting at midnight to get the timestamp based on time of day
+      // Days will not be counted and shown and will be dropped
+      this->mc_HandledCanMessage.u64_TimeStampAbsoluteTimeOfDay =
+         (mu64_FirstTimeStampDayOfTime + this->mc_HandledCanMessage.u64_TimeStampAbsoluteStart) %
+         mhu64_MAX_TIMESTAMP_DAY_OF_TIME;
    }
    else
    {
-      this->mc_HandledCanMessage.u64_TimeStampAbsolute = 0ULL;
+      this->mc_HandledCanMessage.u64_TimeStampAbsoluteStart = 0ULL;
    }
 
    // Relative
@@ -1329,8 +1368,10 @@ void C_OSCComMessageLogger::m_ConvertCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
       this->mc_HandledCanMessage.u64_TimeStampRelative = 0ULL;
    }
 
-   this->mc_HandledCanMessage.c_TimeStampAbsolute =
-      C_OSCComMessageLoggerData::h_GetTimestampAsString(this->mc_HandledCanMessage.u64_TimeStampAbsolute);
+   this->mc_HandledCanMessage.c_TimeStampAbsoluteStart =
+      C_OSCComMessageLoggerData::h_GetTimestampAsString(this->mc_HandledCanMessage.u64_TimeStampAbsoluteStart);
+   this->mc_HandledCanMessage.c_TimeStampAbsoluteTimeOfDay =
+      C_OSCComMessageLoggerData::h_GetTimestampAsString(this->mc_HandledCanMessage.u64_TimeStampAbsoluteTimeOfDay);
    this->mc_HandledCanMessage.c_TimeStampRelative =
       C_OSCComMessageLoggerData::h_GetTimestampAsString(this->mc_HandledCanMessage.u64_TimeStampRelative);
    // Save the timestamp for the next message to calculate the relative timestamp

@@ -999,7 +999,7 @@ void C_SdBueMessagePropertiesWidget::m_OnRxChanged(const uint32 ou32_NodeIndex, 
                   std::vector<stw_types::uint32> c_TmpInterfaceIndexes;
                   std::vector<stw_types::uint32> c_TmpDatapoolIndexes;
                   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR, C_GtGetText::h_GetText(
-                                                       "A message can not exist without a receiver and transmitter."));
+                                                       "A message cannot exist without a receiver and transmitter."));
                   c_MessageBox.SetCustomMinHeight(180, 180);
                   c_TmpNodeIndexes.push_back(ou32_NodeIndex);
                   c_TmpInterfaceIndexes.push_back(ou32_InterfaceIndex);

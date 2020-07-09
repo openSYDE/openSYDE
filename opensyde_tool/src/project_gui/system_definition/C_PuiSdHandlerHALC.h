@@ -31,11 +31,12 @@ public:
    const;
    const stw_opensyde_core::C_OSCHalcConfigChannel * GetHALCDomainChannelConfigData(
       const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DomainIndex,
-      const stw_types::uint32 ou32_ChannelIndex)
+      const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex)
    const;
    const stw_opensyde_core::C_OSCHalcConfigParameterStruct * GetHALCDomainChannelParameterConfigData(
       const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DomainIndex,
-      const stw_types::uint32 ou32_ChannelIndex, const stw_types::uint32 ou32_ParameterIndex)
+      const stw_types::uint32 ou32_ChannelIndex, const stw_types::uint32 ou32_ParameterIndex,
+      const bool oq_UseChannelIndex)
    const;
    const stw_opensyde_core::C_OSCHalcDefDomain * GetHALCDomainFileDataConst(const stw_types::uint32 ou32_NodeIndex,
                                                                             const stw_types::uint32 ou32_DomainIndex)
@@ -54,63 +55,81 @@ public:
                                                                                const stw_types::uint32 ou32_Index) const;
 
    //Set
+   stw_types::sint32 ClearHALCConfig(const stw_types::uint32 ou32_NodeIndex);
    stw_types::sint32 SetHALCConfig(const stw_types::uint32 ou32_NodeIndex,
                                    const stw_opensyde_core::C_OSCHalcConfig & orc_Config);
+   stw_types::sint32 SetHALCConfigSafeDataBlock(const stw_types::uint32 ou32_NodeIndex, const bool oq_IsSet,
+                                                const stw_types::uint32 ou32_NewValue);
+   stw_types::sint32 SetHALCConfigUnsafeDataBlock(const stw_types::uint32 ou32_NodeIndex, const bool oq_IsSet,
+                                                  const stw_types::uint32 ou32_NewValue);
    stw_types::sint32 SetHALCDomainConfig(const stw_types::uint32 ou32_NodeIndex,
                                          const stw_types::uint32 ou32_DomainIndex,
                                          const stw_opensyde_core::C_OSCHalcConfigDomain & orc_Domain);
    stw_types::sint32 SetHALCDomainChannelConfig(const stw_types::uint32 ou32_NodeIndex,
                                                 const stw_types::uint32 ou32_DomainIndex,
-                                                const stw_types::uint32 ou32_ChannelIndex, const bool oq_Active,
-                                                const stw_scl::C_SCLString & orc_Name,
+                                                const stw_types::uint32 ou32_ChannelIndex,
+                                                const bool oq_UseChannelIndex,
+                                                const stw_opensyde_core::C_OSCHalcConfigChannel & orc_Channel);
+   stw_types::sint32 SetHALCDomainChannelConfig(const stw_types::uint32 ou32_NodeIndex,
+                                                const stw_types::uint32 ou32_DomainIndex,
+                                                const stw_types::uint32 ou32_ChannelIndex,
+                                                const bool oq_UseChannelIndex, const stw_scl::C_SCLString & orc_Name,
                                                 const stw_scl::C_SCLString & orc_Comment, const bool oq_SafetyRelevant,
-                                                const bool oq_DatablockSet, const stw_types::uint32 ou32_DatablockIndex,
-                                                const bool oq_UseCaseSet, const stw_types::uint32 ou32_UseCaseIndex,
-                                                const std::vector<stw_opensyde_core::C_OSCHalcConfigChannel::E_DataBlockConfig> & orc_DatablockConfig);
-   stw_types::sint32 SetHALCDomainChannelConfigActive(const stw_types::uint32 ou32_NodeIndex,
-                                                      const stw_types::uint32 ou32_DomainIndex,
-                                                      const stw_types::uint32 ou32_ChannelIndex, const bool
-                                                      oq_Active);
+                                                const stw_types::uint32 ou32_UseCaseIndex);
    stw_types::sint32 SetHALCDomainChannelConfigName(const stw_types::uint32 ou32_NodeIndex,
                                                     const stw_types::uint32 ou32_DomainIndex,
                                                     const stw_types::uint32 ou32_ChannelIndex,
+                                                    const bool oq_UseChannelIndex,
                                                     const stw_scl::C_SCLString & orc_Name);
    stw_types::sint32 SetHALCDomainChannelConfigComment(const stw_types::uint32 ou32_NodeIndex,
                                                        const stw_types::uint32 ou32_DomainIndex,
                                                        const stw_types::uint32 ou32_ChannelIndex,
+                                                       const bool oq_UseChannelIndex,
                                                        const stw_scl::C_SCLString & orc_Comment);
    stw_types::sint32 SetHALCDomainChannelConfigSafety(const stw_types::uint32 ou32_NodeIndex,
                                                       const stw_types::uint32 ou32_DomainIndex,
                                                       const stw_types::uint32 ou32_ChannelIndex,
-                                                      const bool oq_SafetyRelevant);
-   stw_types::sint32 SetHALCDomainChannelConfigDatablock(const stw_types::uint32 ou32_NodeIndex,
-                                                         const stw_types::uint32 ou32_DomainIndex,
-                                                         const stw_types::uint32 ou32_ChannelIndex,
-                                                         const bool oq_DatablockSet,
-                                                         const stw_types::uint32 ou32_DatablockIndex);
+                                                      const bool oq_UseChannelIndex, const bool oq_SafetyRelevant);
    stw_types::sint32 SetHALCDomainChannelConfigUseCase(const stw_types::uint32 ou32_NodeIndex,
                                                        const stw_types::uint32 ou32_DomainIndex,
                                                        const stw_types::uint32 ou32_ChannelIndex,
-                                                       const bool oq_UseCaseSet,
+                                                       const bool oq_UseChannelIndex,
                                                        const stw_types::uint32 ou32_UseCaseIndex);
-   stw_types::sint32 SetHALCDomainChannelConfigDatablockConfig(const stw_types::uint32 ou32_NodeIndex,
-                                                               const stw_types::uint32 ou32_DomainIndex,
-                                                               const stw_types::uint32 ou32_ChannelIndex, const
-                                                               std::vector<stw_opensyde_core::C_OSCHalcConfigChannel::E_DataBlockConfig> & orc_DatablockConfig);
    stw_types::sint32 SetHALCDomainChannelParameterConfig(const stw_types::uint32 ou32_NodeIndex,
                                                          const stw_types::uint32 ou32_DomainIndex,
                                                          const stw_types::uint32 ou32_ChannelIndex,
-                                                         const stw_types::uint32 ou32_ParameterIndex, const stw_opensyde_core::C_OSCHalcConfigParameterStruct &
+                                                         const stw_types::uint32 ou32_ParameterIndex,
+                                                         const bool oq_UseChannelIndex, const stw_opensyde_core::C_OSCHalcConfigParameterStruct &
                                                          orc_Parameter);
    stw_types::sint32 SetHALCDomainChannelParameterConfigElement(const stw_types::uint32 ou32_NodeIndex,
                                                                 const stw_types::uint32 ou32_DomainIndex,
                                                                 const stw_types::uint32 ou32_ChannelIndex,
                                                                 const stw_types::uint32 ou32_ParameterIndex,
-                                                                const stw_types::uint32 ou32_ElementIndex, const stw_opensyde_core::C_OSCHalcConfigParameter &
+                                                                const stw_types::uint32 ou32_ElementIndex,
+                                                                const bool oq_UseChannelIndex, const stw_opensyde_core::C_OSCHalcConfigParameter &
                                                                 orc_Parameter);
+   stw_types::sint32 SetHALCDomainChannelParameterConfigElementEnum(const stw_types::uint32 ou32_NodeIndex,
+                                                                    const stw_types::uint32 ou32_DomainIndex,
+                                                                    const stw_types::uint32 ou32_ChannelIndex,
+                                                                    const stw_types::uint32 ou32_ParameterIndex,
+                                                                    const stw_types::uint32 ou32_ElementIndex,
+                                                                    const bool oq_UseChannelIndex,
+                                                                    const stw_scl::C_SCLString & orc_DisplayName);
+   stw_types::sint32 SetHALCDomainChannelParameterConfigElementBitmask(const stw_types::uint32 ou32_NodeIndex,
+                                                                       const stw_types::uint32 ou32_DomainIndex,
+                                                                       const stw_types::uint32 ou32_ChannelIndex,
+                                                                       const stw_types::uint32 ou32_ParameterIndex,
+                                                                       const stw_types::uint32 ou32_ElementIndex,
+                                                                       const bool oq_UseChannelIndex,
+                                                                       const stw_scl::C_SCLString & orc_DisplayName,
+                                                                       const bool oq_Value);
 
    //Misc
    stw_types::sint32 HALCGenerateDatapools(const stw_types::uint32 ou32_NodeIndex);
+   stw_types::sint32 HALCRemoveDatapools(const stw_types::uint32 ou32_NodeIndex);
+   bool CheckHALCChannelNameAvailable(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DomainIndex,
+                                      const stw_scl::C_SCLString & orc_ChannelName,
+                                      const stw_types::uint32 * const opu32_ChannelIndexToSkip = NULL) const;
 
 private:
    static C_PuiSdNodeDataPool mh_GetUiDatapoolForOSCDataPool(

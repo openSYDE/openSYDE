@@ -103,6 +103,7 @@ private:
 
    void m_RegisterCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
    void m_SendMessage(const stw_types::uint32 ou32_MessageIndex, const stw_types::uint32 ou32_TimeToSend);
+   void m_RemoveAllCyclicMessages(void);
 
    void m_OnClearOldConfiguration(void);
    void m_OnNewConfiguration(void);
