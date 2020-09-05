@@ -471,7 +471,7 @@ sint32 C_OSCExportDataPool::mh_AddDefinesHeader(C_SCLStringList & orc_Data, cons
             {
                const C_SCLString c_ElementName = rc_List.c_Elements[u16_ElementIndex].c_Name.UpperCase();
                const C_SCLString c_Factor =
-                  C_OSCExportUti::h_FloatToStrCutZeroes(rc_List.c_Elements[u16_ElementIndex].f64_Factor);
+                  C_OSCExportUti::h_FloatToStrCutZeroes(rc_List.c_Elements[u16_ElementIndex].f64_Factor, true);
 
                if ((rc_List.c_Elements[u16_ElementIndex].f64_Factor <= 0.0) || (c_Factor == "0.0"))
                {
