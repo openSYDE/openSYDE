@@ -322,6 +322,7 @@ bool C_GiSvDaTableBase::CallProperties(void)
                   this->RemoveDataPoolElement(c_ElementId);
                   this->RegisterDataPoolElement(c_Tmp.c_ElementId, c_Tmp.c_ElementScaling);
 
+                  tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(c_Tmp.c_ElementId) == C_NO_ERR);
                   tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                                  this->mu32_DashboardIndex,
                                                                                  static_cast<uint32>(this->ms32_Index),
@@ -546,6 +547,11 @@ sint32 C_GiSvDaTableBase::SetTableItem(const C_PuiSvDbTable & orc_Content) const
 
    if (this->ms32_Index >= 0)
    {
+      for (uint32 u32_ItEl = 0UL; u32_ItEl < orc_Content.c_DataPoolElementsConfig.size(); ++u32_ItEl)
+      {
+         const C_PuiSvDbNodeDataElementConfig & rc_Config = orc_Content.c_DataPoolElementsConfig[u32_ItEl];
+         tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(rc_Config.c_ElementId) == C_NO_ERR);
+      }
       s32_Retval = C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
                                                                        static_cast<uint32>(this->ms32_Index),
                                                                        &orc_Content, C_PuiSvDbDataElement::eTABLE);

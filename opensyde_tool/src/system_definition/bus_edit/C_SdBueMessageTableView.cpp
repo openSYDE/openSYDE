@@ -47,12 +47,11 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageTableView::C_SdBueMessageTableView(QWidget * const opc_Parent) :
-   //Do not use common base class because of spacing issue at bottom
-   QTableView(opc_Parent)
+   C_TblViewScroll(opc_Parent)
 {
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
@@ -90,9 +89,9 @@ C_SdBueMessageTableView::C_SdBueMessageTableView(QWidget * const opc_Parent) :
    m_InitColumns();
    //Row Height
    this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-   this->verticalHeader()->setMinimumSectionSize(40);
-   this->verticalHeader()->setMaximumSectionSize(40);
-   this->verticalHeader()->setDefaultSectionSize(40);
+   this->verticalHeader()->setMinimumSectionSize(25);
+   this->verticalHeader()->setMaximumSectionSize(25);
+   this->verticalHeader()->setDefaultSectionSize(25);
    //Icon
    // make sure to resize to icon size
    this->horizontalHeader()->resizeSection(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eICON),
@@ -104,17 +103,6 @@ C_SdBueMessageTableView::C_SdBueMessageTableView(QWidget * const opc_Parent) :
 
    //Hover event
    this->setMouseTracking(true);
-
-   // configure the scrollbar to stop resizing the widget when showing or hiding the scrollbar
-   this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-   this->verticalScrollBar()->hide();
-
-   // Deactivate custom context menu of scroll bar
-   this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
-   this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
-
-   connect(this->verticalScrollBar(), &QScrollBar::rangeChanged, this,
-           &C_SdBueMessageTableView::m_ScrollBarRangeChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -128,9 +116,34 @@ C_SdBueMessageTableView::~C_SdBueMessageTableView(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load user settings
+
+   \param[in]  orc_Values  Values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageTableView::LoadUserSettings(const std::vector<sint32> & orc_Values)
+{
+   if (this->m_SetColumnWidths(orc_Values) == false)
+   {
+      m_InitColumns();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save user settings
+
+   \param[in,out]  orc_Values    Values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageTableView::SaveUserSettings(std::vector<sint32> & orc_Values) const
+{
+   orc_Values = this->m_GetColumnWidths();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set message sync manager
 
-   \param[in,out] opc_Value Message sync manager
+   \param[in,out]  opc_Value  Message sync manager
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::SetMessageSyncManager(
@@ -166,7 +179,7 @@ sintn C_SdBueMessageTableView::GetCountRows(void) const
 
    Here: Track mouse hover
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
@@ -191,7 +204,7 @@ void C_SdBueMessageTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 
    Here: Handle hover effect change
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::leaveEvent(QEvent * const opc_Event)
@@ -208,7 +221,7 @@ void C_SdBueMessageTableView::leaveEvent(QEvent * const opc_Event)
 
    Here: Send selection signal
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
@@ -227,20 +240,6 @@ void C_SdBueMessageTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Even
             Q_EMIT this->SigMessageSelected(c_MessageId);
          }
       }
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageTableView::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const
-{
-   // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
-   if ((osn_Min == 0) && (osn_Max == 0))
-   {
-      this->verticalScrollBar()->hide();
-   }
-   else
-   {
-      this->verticalScrollBar()->show();
    }
 }
 

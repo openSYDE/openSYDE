@@ -42,16 +42,16 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]     orc_MessageId          Message identification indices
-   \param[in]     oru32_SignalIndex      Signal index
-   \param[in]     ou16_StartBit          Start bit of signal
-   \param[in]     oe_MultiplexerType     Multiplexer signal type
-   \param[in]     ou16_MultiplexerValue  Multiplexer value (only relevant if
-                                         oe_MultiplexerType is eMUX_MULTIPLEXED_SIGNAL)
-   \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
-   \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
-   \param[in]     orc_Text               Optional command text for informational display
-   \param[in,out] opc_Parent             Optional pointer to parent
+   \param[in]      orc_MessageId             Message identification indices
+   \param[in]      oru32_SignalIndex         Signal index
+   \param[in]      ou16_StartBit             Start bit of signal
+   \param[in]      oe_MultiplexerType        Multiplexer signal type
+   \param[in]      ou16_MultiplexerValue     Multiplexer value (only relevant if
+                                             oe_MultiplexerType is eMUX_MULTIPLEXED_SIGNAL)
+   \param[in,out]  opc_MessageSyncManager    Message sync manager to perform actions on
+   \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
+   \param[in]      orc_Text                  Optional command text for informational display
+   \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoSignalAddDeleteBaseCommand::C_SdBueUnoSignalAddDeleteBaseCommand(
@@ -133,18 +133,22 @@ void C_SdBueUnoSignalAddDeleteBaseCommand::m_Store(void)
             this->mu64_UniqueId),
          this->mu32_SignalIndex);
 
+      tgl_assert(pc_Signal != NULL);
       if (pc_Signal != NULL)
       {
          this->mc_Signal = *pc_Signal;
       }
+      tgl_assert(pc_OSCSignalCommon != NULL);
       if (pc_OSCSignalCommon != NULL)
       {
          this->mc_OSCSignalCommon = *pc_OSCSignalCommon;
       }
+      tgl_assert(pc_UISignalCommon != NULL);
       if (pc_UISignalCommon != NULL)
       {
          this->mc_UISignalCommon = *pc_UISignalCommon;
       }
+      tgl_assert(pc_UISignal != NULL);
       if (pc_UISignal != NULL)
       {
          this->mc_UISignal = *pc_UISignal;

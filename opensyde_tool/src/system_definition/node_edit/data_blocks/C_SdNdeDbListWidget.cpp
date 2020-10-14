@@ -125,8 +125,6 @@ void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint
 
    //Connections
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigDelete, this, &C_SdNdeDbListWidget::SigDelete);
-   connect(pc_ItemWidget, &C_SdNdeDbWidget::SigReloadDataPools, this,
-           &C_SdNdeDbListWidget::SigReloadDataPools);
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigCheckNodeId, this,
            &C_SdNdeDbListWidget::m_CheckNodeId);
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigOpenDataPool, this,

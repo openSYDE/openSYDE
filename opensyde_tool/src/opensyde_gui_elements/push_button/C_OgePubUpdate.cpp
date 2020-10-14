@@ -16,7 +16,6 @@
 #include "precomp_headers.h"
 
 #include "C_OgePubUpdate.h"
-#include "constants.h"
 #include <QPainter>
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -46,7 +45,7 @@ using namespace stw_opensyde_gui;
 C_OgePubUpdate::C_OgePubUpdate(QWidget * const opc_Parent) :
    C_OgePubStandard(opc_Parent)
 {
-   this->setIconSize(mc_ICON_SIZE_24);
+   this->setIconSize(QSize(16, 16));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,14 +66,14 @@ void C_OgePubUpdate::paintEvent(QPaintEvent * const opc_Event)
       QPainter c_Painter(this);
       QPixmap c_PixmapEnabled;
       c_PixmapEnabled = this->mc_IconEnabled.pixmap(this->iconSize());
-      c_Painter.drawPixmap(13, 8, c_PixmapEnabled);
+      c_Painter.drawPixmap(10, 7, c_PixmapEnabled);
    }
    else
    {
       QPainter c_Painter(this);
       QPixmap c_PixmapDisabled;
       c_PixmapDisabled = this->mc_IconDisabled.pixmap(this->iconSize());
-      c_Painter.drawPixmap(13, 8, c_PixmapDisabled);
+      c_Painter.drawPixmap(10, 7, c_PixmapDisabled);
    }
 }
 

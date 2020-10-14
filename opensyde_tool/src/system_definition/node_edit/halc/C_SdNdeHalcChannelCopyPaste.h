@@ -35,16 +35,21 @@ private:
                                          QString & orc_ErrorDescription);
    static bool mh_CheckSelectedChannels(const stw_types::uint32 ou32_NodeIndex,
                                         const stw_opensyde_core::C_OSCHalcConfigStandalone & orc_HalcConfig,
-                                        const QModelIndexList & orc_TargetIndexes, QString & orc_ErrorDescription);
+                                        const QModelIndexList & orc_TargetIndexes, bool & orq_ChannelCase,
+                                        QString & orc_ErrorDescription);
    static bool mh_CheckSelectedChannel(const stw_types::uint32 ou32_NodeIndex,
                                        const stw_opensyde_core::C_OSCHalcConfigStandaloneDomain & orc_SourceDomain,
                                        const stw_opensyde_core::C_OSCHalcConfigChannel & orc_SourceChannel, const
                                        QModelIndex & orc_TargetIndex, QString & orc_InvalidChannels);
+   static bool mh_CheckSelectedDomain(const stw_types::uint32 ou32_NodeIndex,
+                                      const stw_opensyde_core::C_OSCHalcConfigStandaloneDomain & orc_SourceDomain,
+                                      const QModelIndex & orc_TargetIndex, QString & orc_InvalidDomain);
    static void mh_PasteToSelectedChannels(const stw_types::uint32 ou32_NodeIndex,
                                           const stw_opensyde_core::C_OSCHalcConfigStandalone & orc_HalcConfig,
                                           const QModelIndexList & orc_TargetIndexes);
-   static std::map<stw_scl::C_SCLString, bool> mh_GetExistingChannelNames(const stw_types::uint32 ou32_NodeIndex,
-                                                                          const stw_types::uint32 ou32_DomainIndex);
+   static void mh_PasteToSelectedDomain(const stw_types::uint32 ou32_NodeIndex,
+                                        const stw_opensyde_core::C_OSCHalcConfigStandalone & orc_HalcConfig,
+                                        const QModelIndexList & orc_TargetIndexes);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

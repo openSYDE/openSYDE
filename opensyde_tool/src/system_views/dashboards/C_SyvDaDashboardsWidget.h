@@ -104,6 +104,7 @@ private:
 
    void m_WiFixPosMaxBtnClicked(void);
    void m_WiHoverMinBtnClicked(void);
+   void m_AdaptSpaceHolderWidgetColor(void) const;
 
    enum E_ConnectState
    {
@@ -123,6 +124,7 @@ private:
    QTimer mc_Timer;
    stw_types::uint32 mu32_ViewIndex;
    bool mq_EditModeActive;
+   bool mq_DarkModeActive;
    bool mq_ConnectActive;
    std::set<stw_opensyde_core::C_OSCNodeDataPoolListId> mc_MissedReadNvmOperations;
    std::set<stw_opensyde_core::C_OSCNodeDataPoolListElementId> mc_MissedReadOperations;

@@ -118,6 +118,8 @@ public:
 
    //Sync to system definition
    void OnSyncNodeAdded(const stw_types::uint32 ou32_Index);
+   void OnSyncNodeHALC(const stw_types::uint32 ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                                          C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew);
    void OnSyncNodeAboutToBeDeleted(const stw_types::uint32 ou32_Index);
    void OnSyncBusAdded(const stw_types::uint32 ou32_Index);
    void OnSyncBusDeleted(const stw_types::uint32 ou32_Index);

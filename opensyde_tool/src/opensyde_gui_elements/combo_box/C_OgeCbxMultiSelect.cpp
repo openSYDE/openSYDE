@@ -12,13 +12,18 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include "C_OgeCbxMultiSelect.h"
-#include "C_OgeCbxTableBase.h"
-
 #include <QVBoxLayout>
 #include <QStylePainter>
 
+#include "stwtypes.h"
+
+#include "C_GtGetText.h"
+#include "C_OgeCbxMultiSelect.h"
+#include "C_OgeCbxTableBase.h"
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_types;
+using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -42,20 +47,22 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxMultiSelect::C_OgeCbxMultiSelect(QWidget * const opc_Parent) :
-   C_OgeCbxTableBase(opc_Parent),
+   QComboBox(opc_Parent),
    mu32_Screenbound(50),
-   mpc_PopFrame(new QFrame(NULL, Qt::Popup)),
-   mpc_ListWidget(new QListWidget),
-   mpc_ListWidgetItem(NULL)
+   mpc_PopFrame(new QFrame(this, Qt::Popup)),
+   mpc_ListWidget(new QListWidget)
 {
-   this->SetDisplayText("Not Set");
+   this->SetDisplayText(C_GtGetText::h_GetText("<none>"));
 
+   //Handle pop up interaction even with parent
+   this->mpc_PopFrame->setAttribute(Qt::WA_WindowPropagation);
+   this->mpc_PopFrame->setAttribute(Qt::WA_X11NetWmWindowTypeCombo);
    // setup the popup list
    this->mpc_PopFrame->setLayout(new QVBoxLayout());
    this->mpc_PopFrame->layout()->addWidget(this->mpc_ListWidget);
    this->mpc_PopFrame->layout()->setContentsMargins(0, 0, 0, 0);
 
-   connect(this->mpc_ListWidget, &QListWidget::itemChanged, this, &C_OgeCbxMultiSelect::m_ScanItemSelect);
+   connect(this->mpc_ListWidget, &QListWidget::itemClicked, this, &C_OgeCbxMultiSelect::m_ScanItemSelect);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,16 +71,13 @@ C_OgeCbxMultiSelect::C_OgeCbxMultiSelect(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxMultiSelect::~C_OgeCbxMultiSelect()
 {
-   disconnect(this->mpc_ListWidget);
-   delete this->mpc_ListWidgetItem;
-   delete this->mpc_ListWidget;
-   delete this->mpc_PopFrame;
+   //lint -e{1540}  no memory leak because of the parent of mpc_ListWidget (use addWidget) and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set the text to combo box
 
-   \param[in]  oc_Text    Text, which is set
+   \param[in]  oc_Text  Text, which is set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxMultiSelect::SetDisplayText(const QString oc_Text)
@@ -104,11 +108,43 @@ void C_OgeCbxMultiSelect::RemoveAllItems()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get values as bit array
+
+   \return
+   Values as bit array
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QBitArray C_OgeCbxMultiSelect::GetValuesAsBitArray(void) const
+{
+   QBitArray c_Retval;
+
+   c_Retval.resize(this->mpc_ListWidget->count());
+   for (stw_types::sint32 s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); ++s32_Counter)
+   {
+      // get one item from list widget
+      const QListWidgetItem * const pc_Item = this->mpc_ListWidget->item(s32_Counter);
+
+      if (pc_Item != NULL)
+      {
+         if (pc_Item->checkState() == Qt::Checked)
+         {
+            c_Retval.setBit(s32_Counter, true);
+         }
+         else
+         {
+            c_Retval.setBit(s32_Counter, false);
+         }
+      }
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Overwritten paint event slot
 
    Here: Paint multi select combo box
 
-   \param[in,out]  opc_Event    Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxMultiSelect::paintEvent(QPaintEvent * const opc_Event)
@@ -169,26 +205,87 @@ void C_OgeCbxMultiSelect::hidePopup()
 
    Add an item to the list widget
 
-   \param[in]  orc_Text        Text of the item
-   \param[in]  orc_UserData    Data of the item
+   \param[in]  orc_Text       Text of the item
+   \param[in]  orc_UserData   Data of the item
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxMultiSelect::AddItem(const QString & orc_Text, const QVariant & orc_UserData)
 {
-   this->mpc_ListWidgetItem = new QListWidgetItem(orc_Text);
+   QListWidgetItem * const pc_ListWidgetItem = new QListWidgetItem(orc_Text);
 
-   this->mpc_ListWidgetItem->setFlags(this->mpc_ListWidgetItem->flags() | Qt::ItemIsUserCheckable);
+   pc_ListWidgetItem->setFlags(pc_ListWidgetItem->flags() | Qt::ItemIsUserCheckable);
 
    if (orc_UserData.toBool())
    {
-      this->mpc_ListWidgetItem->setCheckState(Qt::Checked);
+      pc_ListWidgetItem->setCheckState(Qt::Checked);
    }
    else
    {
-      this->mpc_ListWidgetItem->setCheckState(Qt::Unchecked);
+      pc_ListWidgetItem->setCheckState(Qt::Unchecked);
    }
 
-   this->mpc_ListWidget->addItem(this->mpc_ListWidgetItem);
+   this->mpc_ListWidget->addItem(pc_ListWidgetItem);
+   //lint -e{429}  no memory leak because of the parent of pc_ListWidgetItem (use addItem) and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set the check state to item
+
+   Set the check state "checked" to the items which are checked in the data storage
+
+   \param[in]  orc_DisplayName   Name of the item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeCbxMultiSelect::SetItem(const QString & orc_DisplayName)
+{
+   QString c_Display;
+
+   if (this->mc_DisplayText.contains(C_GtGetText::h_GetText("<none>")))
+   {
+      this->mc_DisplayText = "";
+   }
+   // search for the item
+   for (stw_types::sint32 s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); s32_Counter++)
+   {
+      // get one item from list widget
+      QListWidgetItem * const pc_Item = this->mpc_ListWidget->item(s32_Counter);
+
+      if (pc_Item != NULL)
+      {
+         if (pc_Item->text().toStdString().c_str() == orc_DisplayName)
+         {
+            pc_Item->setCheckState(Qt::Checked);
+            // set display text
+            if (!this->mc_DisplayText.isEmpty())
+            {
+               c_Display += ", ";
+            }
+            c_Display += pc_Item->text();
+         }
+      }
+   }
+
+   // set the item names to combo box
+   this->SetDisplayText(this->GetDisplayText() + c_Display);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize from generic types
+
+   \param[in]  orc_Strings    Strings
+   \param[in]  orc_Values     Values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeCbxMultiSelect::Init(const QStringList & orc_Strings, const QBitArray & orc_Values)
+{
+   this->RemoveAllItems();
+   if (orc_Strings.size() == orc_Values.size())
+   {
+      for (sintn sn_It = 0; sn_It < orc_Strings.size(); ++sn_It)
+      {
+         this->AddItem(orc_Strings.at(sn_It), orc_Values.at(sn_It));
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -202,31 +299,41 @@ void C_OgeCbxMultiSelect::AddItem(const QString & orc_Text, const QVariant & orc
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxMultiSelect::m_ScanItemSelect(const QListWidgetItem * const opc_Item)
 {
-   if (opc_Item->checkState() == Qt::Checked)
+   bool q_Found = false;
+   QString c_Display;
+
+   // search for items are checked
+   for (stw_types::sint32 s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); s32_Counter++)
    {
-      if ((!this->mc_DisplayText.contains("Not Set")) || (!this->mc_DisplayText.contains("")))
+      // get one item from list widget
+      QListWidgetItem * const pc_Item = this->mpc_ListWidget->item(s32_Counter);
+
+      if (pc_Item != NULL)
       {
-         this->SetDisplayText(this->mc_DisplayText + ", " + opc_Item->text());
-      }
-      else
-      {
-         this->SetDisplayText((this->mc_DisplayText.remove(0, this->mc_DisplayText.size())) + opc_Item->text());
+         if (pc_Item->checkState() == Qt::Checked)
+         {
+            // a checked item is found
+            q_Found = true;
+
+            // set display text
+            if (!c_Display.isEmpty())
+            {
+               c_Display += ", ";
+            }
+            c_Display += pc_Item->text();
+         }
       }
    }
-   else
+
+   // no checked item found
+   if (q_Found == false)
    {
-      if (this->mc_DisplayText.contains(opc_Item->text() + ", "))
-      {
-         this->mc_DisplayText = this->mc_DisplayText.remove(opc_Item->text() + ", ");
-      }
-      else if (!this->mc_DisplayText.contains(", "))
-      {
-         this->mc_DisplayText = this->mc_DisplayText.remove(opc_Item->text()) + "Not Set";
-      }
-      else
-      {
-         this->mc_DisplayText = this->mc_DisplayText.remove(", " + opc_Item->text());
-      }
-      this->SetDisplayText(this->mc_DisplayText);
+      c_Display = C_GtGetText::h_GetText("<none>");
    }
+
+   // set the item names to combo box
+   this->SetDisplayText(c_Display);
+
+   // inform about value changed
+   Q_EMIT (SigValueChanged(opc_Item->text(), opc_Item->checkState() == Qt::Checked));
 }

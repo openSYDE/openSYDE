@@ -117,7 +117,8 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_Topology);
    this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
 
-   C_UsHandler::h_GetInstance()->GetProjLastSysDefTabIndex(this->msn_NodeEditTabIndex, this->msn_BusEditTabIndex);
+   this->msn_NodeEditTabIndex = C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex();
+   this->msn_BusEditTabIndex = C_UsHandler::h_GetInstance()->GetProjLastSysDefBusTabIndex();
 
    // configure toolbar functions
    // the order of adding the function is very important
@@ -164,7 +165,8 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 C_SdHandlerWidget::~C_SdHandlerWidget()
 {
-   C_UsHandler::h_GetInstance()->SetProjLastSysDefTabIndex(this->msn_NodeEditTabIndex, this->msn_BusEditTabIndex);
+   C_UsHandler::h_GetInstance()->SetProjLastSysDefNodeTabIndex(this->msn_NodeEditTabIndex);
+   C_UsHandler::h_GetInstance()->SetProjLastSysDefBusTabIndex(this->msn_BusEditTabIndex);
 
    delete mpc_Ui;
    //lint -e{1579,1740}  no memory leak because of the parent all elements and the Qt memory management
@@ -475,6 +477,8 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
                  &C_SdHandlerWidget::Save);
          connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSaveAs, this,
                  &C_SdHandlerWidget::SaveAs);
+         connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToBusProperties, this,
+                 &C_SdHandlerWidget::m_SwitchToBusProperties);
 
          //Buttons
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true));
@@ -601,6 +605,19 @@ void C_SdHandlerWidget::m_SwitchToBus(const uint32 ou32_Index, const QString & o
 {
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
                               mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Switch to bus edit widget, properties tab
+
+   \param[in]  ou32_Index     Bus index
+   \param[in]  orc_BusName    Bus name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_SwitchToBusProperties(const uint32 ou32_Index, const QString & orc_BusName)
+{
+   Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
+                              mu32_FLAG_OPEN_PROPERTIES);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -961,19 +978,26 @@ void C_SdHandlerWidget::CallHelp(void)
 {
    if (this->mpc_ActNodeEdit != NULL)
    {
-      //TabIndex == Datapools
-      if (this->mpc_ActNodeEdit->GetTabIndex() == 1)
+      const sintn sn_TabIndex = this->mpc_ActNodeEdit->GetTabIndex();
+      if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TabIndexDataPool)
       {
+         //TabIndex == Datapools
          stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdNdeDbViewWidget");
       }
-      else if (this->mpc_ActNodeEdit->GetTabIndex() == 2) //TabIndex == COMM
+      else if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TabIndexComm)
       {
+         //TabIndex == COMM
          stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdBueComIfDescriptionWidget");
       }
-      else //properties
+      else if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TabIndexHalc)
       {
+         // TODO: HALC Manual
+      }
+      else
+      {
+         // Properties
          stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdNdeNodeEditWidget");
       }

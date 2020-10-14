@@ -68,7 +68,7 @@ C_OSCNodeDataPoolListElement::C_OSCNodeDataPoolListElement(void) :
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolListElement::CalcHash(uint32 & oru32_HashValue) const
@@ -94,6 +94,37 @@ void C_OSCNodeDataPoolListElement::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculates the hash value over one element
+
+   The hash value is a 32 bit CRC value.
+
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
+   \param[in]      ou32_Index       Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeDataPoolListElement::CalcHashElement(uint32 & oru32_HashValue, const uint32 ou32_Index) const
+{
+   uint32 u32_Counter;
+
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   this->c_MinValue.CalcHashElement(oru32_HashValue, ou32_Index);
+   this->c_MaxValue.CalcHashElement(oru32_HashValue, ou32_Index);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_DiagEventCall, sizeof(this->q_DiagEventCall), oru32_HashValue);
+
+   for (u32_Counter = 0U; u32_Counter < this->c_DataSetValues.size(); ++u32_Counter)
+   {
+      this->c_DataSetValues[u32_Counter].CalcHashElement(oru32_HashValue, ou32_Index);
+   }
+   // Do not calculate the value to the CRC
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMStartAddress, sizeof(this->u32_NvMStartAddress), oru32_HashValue);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get size in bytes
 
    \return
@@ -110,7 +141,7 @@ uint32 C_OSCNodeDataPoolListElement::GetSizeByte(void) const
 
    Change type of all variables which are of variable type
 
-   \param[in] ore_Value New type value
+   \param[in]  ore_Value   New type value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolListElement::SetType(const C_OSCNodeDataPoolContent::E_Type & ore_Value)
@@ -128,7 +159,7 @@ void C_OSCNodeDataPoolListElement::SetType(const C_OSCNodeDataPoolContent::E_Typ
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change array status
 
-   \param[in] oq_Array New value
+   \param[in]  oq_Array    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolListElement::SetArray(const bool oq_Array)
@@ -146,10 +177,7 @@ void C_OSCNodeDataPoolListElement::SetArray(const bool oq_Array)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Resize current array
 
-   \param[in] oru32_Size New size value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  oru32_Size  New size value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolListElement::SetArraySize(const uint32 & oru32_Size)

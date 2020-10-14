@@ -47,6 +47,8 @@ private:
    stw_types::float64 mf64_ScaledMax;
    stw_types::float64 mf64_StepWidth;
 
+   QString m_PrepareSpinBoxValue(const QString & orc_Text) const;
+   QString m_ExtractSpinBoxValue(const QString & orc_Text) const;
    static stw_types::sint32 mh_GetValue(const QString & orc_Input, stw_types::float64 & orf64_Output);
 };
 

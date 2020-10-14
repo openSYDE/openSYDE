@@ -33,14 +33,15 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_UsNode::C_UsNode(void)
+C_UsNode::C_UsNode(void) :
+   me_SelectedProtocol(stw_opensyde_core::C_OSCCanProtocol::eLAYER2)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get project system definition node datapool user settings
 
-   \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
+   \param[in]  orc_DatapoolName  Project system definition node datapool name (identifier)
 
    \return
    Project system definition node datapool user settings
@@ -76,9 +77,69 @@ QString C_UsNode::GetSelectedDatapoolName(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected protocol type
+
+   \return
+   Selected protocol type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_opensyde_core::C_OSCCanProtocol::E_Type C_UsNode::GetSelectedProtocol(void) const
+{
+   return this->me_SelectedProtocol;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get halc overview column width
+
+   \return
+   Halc overview column width
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<stw_types::sint32> & C_UsNode::GetHalcOverviewColumnWidth(void) const
+{
+   return this->mc_HalcOverviewColumnWidth;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get HALC parameter configuration table column widths
+
+   \return
+   widths of parameter configuration table columns
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<stw_types::sint32> & C_UsNode::GetHalcConfigColumnWidth() const
+{
+   return this->mc_HalcConfigColumnWidth;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get selected HALC domain name resp. domain name of selected HALC channel
+
+   \return
+   selected HALC domain name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsNode::GetSelectedHalcDomainName(void) const
+{
+   return this->mc_SelectedHalcDomainName;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get selected HALC channel ID
+
+   \return
+   Selected channel ID
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsNode::GetSelectedHalcChannel(void) const
+{
+   return this->mc_SelectedHalcChannelId;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set selected data pool name
 
-   \param[in] orc_DatapoolName Selected data pool name
+   \param[in]  orc_DatapoolName  Selected data pool name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNode::SetSelectedDatapoolName(const QString & orc_DatapoolName)
@@ -87,10 +148,21 @@ void C_UsNode::SetSelectedDatapoolName(const QString & orc_DatapoolName)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set selected protocol
+
+   \param[in]  oe_Protocol    Selected protocol
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetSelectedProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol)
+{
+   this->me_SelectedProtocol = oe_Protocol;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set project system definition node datapool expanded list names
 
-   \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
-   \param[in] orc_New          Expanded list names
+   \param[in]  orc_DatapoolName  Project system definition node datapool name (identifier)
+   \param[in]  orc_New           Expanded list names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNode::SetDatapoolOpenListNames(const QString & orc_DatapoolName, const std::vector<QString> & orc_New)
@@ -111,8 +183,8 @@ void C_UsNode::SetDatapoolOpenListNames(const QString & orc_DatapoolName, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set project system definition node datapool selected list names
 
-   \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
-   \param[in] orc_New          Selected list names
+   \param[in]  orc_DatapoolName  Project system definition node datapool name (identifier)
+   \param[in]  orc_New           Selected list names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNode::SetDatapoolSelectedListNames(const QString & orc_DatapoolName, const std::vector<QString> & orc_New)
@@ -133,8 +205,8 @@ void C_UsNode::SetDatapoolSelectedListNames(const QString & orc_DatapoolName, co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set project system definition node datapool selected variable names
 
-   \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
-   \param[in] orc_New          Selected variable names
+   \param[in]  orc_DatapoolName  Project system definition node datapool name (identifier)
+   \param[in]  orc_New           Selected variable names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNode::SetDatapoolSelectedVariableNames(const QString & orc_DatapoolName, const std::vector<QString> & orc_New)
@@ -153,15 +225,63 @@ void C_UsNode::SetDatapoolSelectedVariableNames(const QString & orc_DatapoolName
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set datapool comm overview column width
+
+   \param[in]  orc_DatapoolName  Datapool name
+   \param[in]  orc_ListName      List name
+   \param[in]  orc_Value         Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetDatapoolCommMessageOverviewColumnWidth(const QString & orc_DatapoolName, const QString & orc_ListName,
+                                                         const std::vector<stw_types::sint32> & orc_Value)
+{
+   if (this->mc_Datapools.contains(orc_DatapoolName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_Datapools.operator [](orc_DatapoolName).SetCommMessageOverviewColumnWidth(orc_ListName, orc_Value);
+   }
+   else
+   {
+      C_UsNodeDatapool c_Datapool;
+      c_Datapool.SetCommMessageOverviewColumnWidth(orc_ListName, orc_Value);
+      this->mc_Datapools.insert(orc_DatapoolName, c_Datapool);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set datapool comm signal overview column width
+
+   \param[in]  orc_DatapoolName  Datapool name
+   \param[in]  orc_ListName      List name
+   \param[in]  orc_Value         Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetDatapoolCommSignalOverviewColumnWidth(const QString & orc_DatapoolName, const QString & orc_ListName,
+                                                        const std::vector<stw_types::sint32> & orc_Value)
+{
+   if (this->mc_Datapools.contains(orc_DatapoolName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_Datapools.operator [](orc_DatapoolName).SetCommSignalOverviewColumnWidth(orc_ListName, orc_Value);
+   }
+   else
+   {
+      C_UsNodeDatapool c_Datapool;
+      c_Datapool.SetCommSignalOverviewColumnWidth(orc_ListName, orc_Value);
+      this->mc_Datapools.insert(orc_DatapoolName, c_Datapool);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set datapool list selected message
 
-   \param[in] orc_DatapoolName        Datapool name (identifier)
-   \param[in] orc_ListName            Datapool list name (identifier)
-   \param[in] oe_SelectedProtocol     Protocol type
-   \param[in] oq_MessageSelected      Set flag if there is a selected message
-   \param[in] orc_SelectedMessageName Selected message name if any
-   \param[in] oq_SignalSelected       Flag if signal selected
-   \param[in] orc_SelectedSignalName  Selected signal name if any
+   \param[in]  orc_DatapoolName           Datapool name (identifier)
+   \param[in]  orc_ListName               Datapool list name (identifier)
+   \param[in]  oe_SelectedProtocol        Protocol type
+   \param[in]  oq_MessageSelected         Set flag if there is a selected message
+   \param[in]  orc_SelectedMessageName    Selected message name if any
+   \param[in]  oq_SignalSelected          Flag if signal selected
+   \param[in]  orc_SelectedSignalName     Selected signal name if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNode::SetDatapoolListSelectedMessage(const QString & orc_DatapoolName, const QString & orc_ListName,
@@ -190,9 +310,9 @@ void C_UsNode::SetDatapoolListSelectedMessage(const QString & orc_DatapoolName, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set datapool list column widths
 
-   \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
-   \param[in] orc_ListName     Project system definition node datapool list name (identifier)
-   \param[in] orc_ColumnWidths Last known column widths
+   \param[in]  orc_DatapoolName  Project system definition node datapool name (identifier)
+   \param[in]  orc_ListName      Project system definition node datapool list name (identifier)
+   \param[in]  orc_ColumnWidths  Last known column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNode::SetDatapoolListColumnSizes(const QString & orc_DatapoolName, const QString & orc_ListName,
@@ -209,4 +329,48 @@ void C_UsNode::SetDatapoolListColumnSizes(const QString & orc_DatapoolName, cons
       c_Datapool.SetListColumnSizes(orc_ListName, orc_ColumnWidths);
       this->mc_Datapools.insert(orc_DatapoolName, c_Datapool);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set halc overview column width
+
+   \param[in]  orc_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetHalcOverviewColumnWidth(const std::vector<stw_types::sint32> & orc_Value)
+{
+   this->mc_HalcOverviewColumnWidth = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set HALC parameter configuration table column widths
+
+   \param[in]  orc_Value   Column widths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetHalcConfigColumnWidth(const std::vector<stw_types::sint32> & orc_Value)
+{
+   this->mc_HalcConfigColumnWidth = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set selected HALC domain name
+
+   \param[in]  orc_Value   Domain name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetSelectedHalcDomain(const QString & orc_Value)
+{
+   this->mc_SelectedHalcDomainName = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set selected HALC channel ID
+
+   \param[in]  orc_Value   Channel ID
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetSelectedHalcChannel(const QString & orc_Value)
+{
+   this->mc_SelectedHalcChannelId = orc_Value;
 }

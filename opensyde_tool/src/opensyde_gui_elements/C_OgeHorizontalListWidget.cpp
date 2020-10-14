@@ -111,17 +111,11 @@ sintn C_OgeHorizontalListWidget::GetActualLine(void) const
    The native row of the list is each item.
 
    \param[in]  osn_Line       New row count
-   \param[in]  oq_SetActive   Set the widget of the new line active or not
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeHorizontalListWidget::SetActualLine(const sintn osn_Line, const bool oq_SetActive)
+void C_OgeHorizontalListWidget::SetActualLine(const sintn osn_Line)
 {
    const sintn sn_Row = osn_Line * this->msn_ItemsPerLine;
-
-   if (oq_SetActive == true)
-   {
-      this->setCurrentRow(sn_Row);
-   }
 
    this->msn_ActualLine = osn_Line;
    this->scrollTo(this->indexFromItem(this->item(sn_Row)));
@@ -147,7 +141,7 @@ void C_OgeHorizontalListWidget::ScrollToItem(const sintn osn_Index)
       sn_LineNumber = 0;
    }
 
-   this->SetActualLine(sn_LineNumber, false);
+   this->SetActualLine(sn_LineNumber);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

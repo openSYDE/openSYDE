@@ -816,83 +816,66 @@ sint32 C_SdNdeDpUtil::h_GetTableSize(const uint32 ou32_NodeIndex, const uint32 o
    const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(ou32_NodeIndex,
                                                                                                      ou32_DataPoolIndex,
                                                                                                      ou32_ListIndex);
+   const sintn sn_HeaderOffset = 40;
 
    if ((pc_List != NULL) && (pc_Datapool != NULL))
    {
-      //Configure
-      const sintn sn_ConstOffset = 73;
-      const sintn sn_ConstChecksumOffset = 49;
-      const sintn sn_ItemOffset = 40;
+      const sintn sn_ConstOffset = 65;
+      const sintn sn_ConstChecksumOffset = 33;
+      const sintn sn_ItemOffset = 30;
       const uint32 u32_VisibleItemCount = 7;
-      const uint32 u32_MaxVisibleItemCount = 50;
       const uint32 u32_ItemCount = pc_List->c_Elements.size();
       sintn sn_Height = sn_ConstOffset;
 
-      //Adapt dynamic elements
+      //Add checksum checkbox offset for NVM Datapool lists
       if (pc_Datapool->e_Type == C_OSCNodeDataPool::eNVM)
       {
          sn_Height += sn_ConstChecksumOffset;
       }
+
       if (u32_ItemCount <= u32_VisibleItemCount)
       {
+         // case: number of rows smaller than limit -> show all rows
          sn_Height += sn_ItemOffset * static_cast<sintn>(u32_ItemCount);
-      }
-      else if (static_cast<uint32>(pc_Datapool->c_Lists.size() - 1) == ou32_ListIndex)
-      {
-         if (u32_ItemCount < u32_MaxVisibleItemCount)
-         {
-            sn_Height += sn_ItemOffset * static_cast<sintn>(u32_ItemCount);
-         }
-         else
-         {
-            sn_Height += sn_ItemOffset * static_cast<sintn>(u32_MaxVisibleItemCount);
-         }
-
-         if (osn_MaximumHeight > 0)
-         {
-            const sintn sn_HeaderOffset = 66;
-            const sintn sn_MinimumMaximumHeight = sn_ConstOffset + (sn_ItemOffset *
-                                                                    static_cast<sintn>(u32_VisibleItemCount));
-            uint32 u32_ListCounter;
-            sintn sn_HeightOtherLists = 0;
-
-            // Check the available height for all lists/tables
-            for (u32_ListCounter = 0U; u32_ListCounter < (pc_Datapool->c_Lists.size() - 1UL); ++u32_ListCounter)
-            {
-               // Sum all other list heights
-               sn_HeightOtherLists +=
-                  static_cast<sintn>(C_SdNdeDpUtil::h_GetTableSize(ou32_NodeIndex, ou32_DataPoolIndex,
-                                                                   u32_ListCounter)) +
-                  sn_HeaderOffset;
-            }
-
-            if ((sn_HeightOtherLists + (sn_Height + sn_HeaderOffset)) > osn_MaximumHeight)
-            {
-               // List does not fit
-               if (((osn_MaximumHeight - (sn_HeightOtherLists + sn_HeaderOffset)) < sn_MinimumMaximumHeight) &&
-                   (sn_Height >= sn_MinimumMaximumHeight))
-               {
-                  // List falls below the minimum of the maximum
-                  sn_Height = sn_MinimumMaximumHeight;
-               }
-               else
-               {
-                  // List can use the rest of the space
-                  sn_Height = (osn_MaximumHeight - sn_HeightOtherLists) - sn_HeaderOffset;
-               }
-            }
-         }
       }
       else
       {
+         // case: more rows than limit -> show limited number of rows
          sn_Height += sn_ItemOffset * static_cast<sintn>(u32_VisibleItemCount);
       }
+
+      // special case: last list -> if enough space exists, show as much rows as possible
+      if (static_cast<uint32>(pc_Datapool->c_Lists.size() - 1) == ou32_ListIndex)
+      {
+         uint32 u32_ListCounter;
+         sintn sn_HeightOtherLists = 0;
+         sintn sn_RemainingSpace;
+
+         // sum up sizes of lists above (in their expanded state)
+         for (u32_ListCounter = 0U; u32_ListCounter < (pc_Datapool->c_Lists.size() - 1UL); ++u32_ListCounter)
+         {
+            sn_HeightOtherLists +=
+               static_cast<sintn>(C_SdNdeDpUtil::h_GetTableSize(ou32_NodeIndex, ou32_DataPoolIndex, u32_ListCounter)) +
+               sn_HeaderOffset; // no infinite recursion because of list index check above
+         }
+
+         // calculate remaining space for last table
+         sn_RemainingSpace = osn_MaximumHeight - sn_HeightOtherLists;
+
+         // check if more remaining space than the current proposed height
+         if ((sn_Height + sn_HeaderOffset) < sn_RemainingSpace)
+         {
+            // list can use the remaining space
+            sn_Height = sn_RemainingSpace - sn_HeaderOffset;
+         }
+      }
+
       s32_Retval = sn_Height;
    }
    else
    {
       //Fallback, should not happen
-      s32_Retval = 66;
+      s32_Retval = sn_HeaderOffset;
    }
    return s32_Retval;
 }
@@ -955,6 +938,66 @@ sint32 C_SdNdeDpUtil::h_GetSharedDatapoolGroup(const uint32 ou32_SharedDatapoolG
                orc_SharedDatapoolNameGroup.push_back(c_Text);
             }
          }
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get next DIAG or NVM Datapool index.
+
+   Wraps around:
+      Forwards from last NVM Datapool index is the first DIAG Datapool index, i.e. 0.
+      Backwards from first DIAG Datapool index is last NVM Datapool index.
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_Forwards          true: select next Datapool
+                                    false: select previous Datapool
+
+   \return
+   Index of next DIAG or NVM Datapool (-1 if parameters are invalid)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SdNdeDpUtil::h_GetNextDiagOrNvmDpIndex(const uint32 ou32_NodeIndex, const uint32 ou32_DatapoolIndex,
+                                                const bool oq_Forwards)
+{
+   sint32 s32_Return = -1;
+   sint32 s32_NumberNVM = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex, C_OSCNodeDataPool::eNVM);
+   sint32 s32_NumberDIAG = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex, C_OSCNodeDataPool::eDIAG);
+
+   if ((s32_NumberNVM >= 0) && (s32_NumberDIAG >= 0))
+   {
+      const sint32 s32_Max = s32_NumberNVM + s32_NumberDIAG;
+
+      if (static_cast<sint32>(ou32_DatapoolIndex) < s32_Max) // indirectly checks if NVM/DIAG Datapool index was passed
+      {
+         sint32 s32_NextDpIndex = ou32_DatapoolIndex;
+
+         // count one index forwards or backwards
+         if (oq_Forwards == true)
+         {
+            s32_NextDpIndex += 1;
+         }
+         else
+         {
+            s32_NextDpIndex -= 1;
+         }
+
+         // forward wrap: select first Datapool
+         if (s32_NextDpIndex >= s32_Max)
+         {
+            s32_NextDpIndex = 0;
+         }
+
+         // backward wrap: select last DIAG Datapool
+         if (s32_NextDpIndex < 0)
+         {
+            s32_NextDpIndex = s32_Max - 1; // -1 if no NVM and no DIAG Datapool exist (which is invalid)
+         }
+
+         s32_Return = s32_NextDpIndex;
       }
    }
 

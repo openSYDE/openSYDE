@@ -53,6 +53,9 @@ public:
    static stw_types::uint32 h_CountRelevantItems(const std::vector<C_OSCHalcConfigChannel> & orc_Channels,
                                                  const C_OSCHalcConfigChannel & orc_DomainConfig, const bool oq_IsSafe);
 
+   static stw_types::uint32 h_CountElements(const std::vector<C_OSCHalcDefStruct> & orc_Structs);
+   static stw_types::uint32 h_CountElements(const C_OSCHalcDefStruct & orc_Struct);
+
 private:
    //lint -e{1725} it is indeed a reference (improves performance)
    const C_OSCHalcConfig & mrc_HalcConfig;
@@ -65,8 +68,6 @@ private:
                                     const bool oq_GetUseCaseIndex, const bool oq_GetChanNumIndex,
                                     const bool oq_IsSafe) const;
 
-   static stw_types::uint32 mh_CountElements(const std::vector<C_OSCHalcDefStruct> & orc_Structs);
-   static stw_types::uint32 mh_CountElements(const C_OSCHalcDefStruct & orc_Struct);
    static stw_types::sint32 mh_GetSubElementIndex(const stw_types::uint32 ou32_Index,
                                                   const stw_types::uint32 ou32_ElementIndex,
                                                   const std::vector<C_OSCHalcDefStruct> & orc_Values,

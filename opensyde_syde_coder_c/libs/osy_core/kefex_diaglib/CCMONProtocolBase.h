@@ -70,8 +70,6 @@ public:
 
       To be overloaded by inheriting class.
 
-      \param[in]       orc_Msg    CAN message to convert to string
-
       \return
       string representation of protocol name
    */

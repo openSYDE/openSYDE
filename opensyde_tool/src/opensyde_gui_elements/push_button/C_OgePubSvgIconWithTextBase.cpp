@@ -50,6 +50,7 @@ C_OgePubSvgIconWithTextBase::C_OgePubSvgIconWithTextBase(QWidget * const opc_Par
    msn_TopBorderDisabledWidth(0),
    msn_LeftBorderDisabledWidth(0),
    msn_BottomBorderDisabledWidth(0),
+   mq_IconLeft(true),
    ms32_MarginLeft(0),
    ms32_MarginInBetween(0),
    mq_Dark(false)
@@ -85,15 +86,34 @@ void C_OgePubSvgIconWithTextBase::paintEvent(QPaintEvent * const opc_Event)
       QTextOption c_Option;
       QColor c_BackgroundColor;
       QColor c_TextColor;
-      //Sub rectangles
-      const QRect c_IconRect(this->rect().topLeft() + QPoint(this->ms32_MarginLeft,
-                                                             (this->rect().height() - this->iconSize().height()) / 2),
-                             this->iconSize());
-      const QRect c_TextRect(this->rect().topLeft() + QPoint(
-                                static_cast<sintn>(this->ms32_MarginLeft) +
-                                this->iconSize().width() + static_cast<sintn>(this->ms32_MarginInBetween), 0), QSize(
-                                this->rect().width(), this->rect().height()));
       QPainter c_Painter(this);
+      QRect c_IconRect;
+      QRect c_TextRect;
+
+      //Sub rectangles
+      if (this->mq_IconLeft == true)
+      {
+         c_IconRect = QRect(this->rect().topLeft() +
+                            QPoint(static_cast<sintn>(this->ms32_MarginLeft),
+                                   (this->rect().height() - this->iconSize().height()) / 2),
+                            this->iconSize());
+         c_TextRect = QRect(this->rect().topLeft() +
+                            QPoint(static_cast<sintn>(this->ms32_MarginLeft) + this->iconSize().width() +
+                                   static_cast<sintn>(this->ms32_MarginInBetween), 0),
+                            QSize(this->rect().width(), this->rect().height()));
+      }
+      else
+      {
+         c_IconRect = QRect(this->rect().topRight() +
+                            QPoint(-(static_cast<sintn>(this->ms32_MarginLeft) + this->iconSize().width()),
+                                   (this->rect().height() - this->iconSize().height()) / 2),
+                            this->iconSize());
+         c_TextRect = QRect(this->rect().topLeft(),
+                            QSize(this->rect().width() - (static_cast<sintn>(this->ms32_MarginLeft) +
+                                                          this->iconSize().width() +
+                                                          static_cast<sintn>(this->ms32_MarginInBetween)),
+                                  this->rect().height()));
+      }
       //Background
       //==========
       if (this->isEnabled() == true)
@@ -192,7 +212,14 @@ void C_OgePubSvgIconWithTextBase::paintEvent(QPaintEvent * const opc_Event)
       c_Painter.setBrush(Qt::NoBrush);
       c_Painter.setPen(c_TextColor);
       c_Painter.setFont(this->mc_FontPixel);
-      c_Option.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+      if (this->mq_IconLeft == true)
+      {
+         c_Option.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+      }
+      else
+      {
+         c_Option.setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+      }
       c_Painter.drawText(c_TextRect, this->text(), c_Option);
    }
 }

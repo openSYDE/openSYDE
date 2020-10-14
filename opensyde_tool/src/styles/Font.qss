@@ -49,13 +49,34 @@ stw_opensyde_gui_elements--C_OgeLabUpdateAppVersion,
 stw_opensyde_gui--C_SdTopologyListWidget::item:selected,
 stw_opensyde_gui--C_SdTopologyListWidget::item:hover,
 stw_opensyde_gui_elements--C_OgeTedTable,
-stw_opensyde_gui_elements--C_OgeTedSdListHeader,
-stw_opensyde_gui_elements--C_OgeTedSyListHeader,
 stw_opensyde_gui_elements--C_OgeLabToolBarSearchResultTitle,
 stw_opensyde_gui_elements--C_OgeLabToolBarSearchResultSubtitle,
 stw_opensyde_gui_elements--C_OgeLabToolBarNoSearchResult,
 stw_opensyde_gui_elements--C_OgeLeToolBarSearch,
-stw_opensyde_gui_elements--C_OgeTebMessageDetails
+stw_opensyde_gui_elements--C_OgeTebMessageDetails,
+stw_opensyde_gui--C_SdNdeHalcConfigTreeView,
+stw_opensyde_gui_elements--C_OgeLeTable,
+stw_opensyde_gui_elements--C_OgeSpxTable,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox,
+stw_opensyde_gui--C_SdNdeDpListDataSetView,
+stw_opensyde_gui--C_SdNdeDpListDataSetView::item,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableView,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableView::item,
+stw_opensyde_gui--C_SyvDaItPaArView,
+stw_opensyde_gui--C_SyvDaItPaArView::item,
+stw_opensyde_gui--C_SdNdeDpListArrayEditView,
+stw_opensyde_gui--C_SdNdeDpListArrayEditView::item,
+stw_opensyde_gui--C_SdNdeSfoResetMessageTableView,
+stw_opensyde_gui--C_SdNdeSfoResetMessageTableView::item,
+stw_opensyde_gui_elements--C_OgeCbxTable,
+stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView,
+stw_opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox,
+stw_opensyde_gui_elements--C_OgeCbxTableHalc,
+stw_opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView,
+stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
+stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListWidget
 {
 font-family: "Segoe UI";
 font-size: 12px;
@@ -63,6 +84,15 @@ font-weight: normal;
 }
 
 /* STYLE_GUIDE_FONT_SEMIBOLD_12 */
+stw_opensyde_gui--C_SdNdeSingleHeaderView,
+stw_opensyde_gui--C_SdNdeSingleHeaderView::section,
+stw_opensyde_gui--C_SdNdeDpListDataSetView QLabel,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView::section,
+stw_opensyde_gui--C_SyvDaItPaArView QLabel,
+stw_opensyde_gui--C_SdNdeDpListArrayEditView QLabel,
+stw_opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView,
+stw_opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView::section,
 stw_opensyde_gui_elements--C_OgeLabNavigationSubHeading
 {
 font-family: "Segoe UI Semibold";
@@ -88,15 +118,8 @@ stw_opensyde_gui_elements--C_OgeCbxTextLineEdit,
 stw_opensyde_gui_elements--C_OgeCbxText QListView,
 stw_opensyde_gui_elements--C_OgeCbxLine,
 stw_opensyde_gui_elements--C_OgeCbxLine QListView,
-stw_opensyde_gui--C_SyvDaItPaArView,
 stw_opensyde_gui_elements--C_OgeCbxArrow,
 stw_opensyde_gui_elements--C_OgeCbxArrow QListView,
-stw_opensyde_gui--C_SdNdeDpListArrayEditView,
-stw_opensyde_gui--C_SdNdeDpListArrayEditView::item,
-stw_opensyde_gui--C_SdNdeDpListDataSetView,
-stw_opensyde_gui--C_SdNdeDpListDataSetView::item,
-stw_opensyde_gui--C_SdNdeSfoResetMessageTableView,
-stw_opensyde_gui--C_SdNdeSfoResetMessageTableView::item,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF QCheckBox,
 stw_opensyde_gui_elements--C_OgeLabNodePropComIfTable,
@@ -125,8 +148,7 @@ stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="13"][SemiBold
 stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroup,
 stw_opensyde_gui_elements--C_OgeTawToolBox QTabBar::tab,
 stw_opensyde_gui_elements--C_OgeLabProgressLogHeading,
-stw_opensyde_gui_elements--C_OgeCbxMultiSelect,
-stw_opensyde_gui_elements--C_OgeCbxMultiSelect QListWidget
+stw_opensyde_gui--C_SdNdeHalcChannelTreeView
 {
 font-family: "Segoe UI";
 font-size: 13px;
@@ -138,14 +160,14 @@ stw_opensyde_gui_elements--C_OgePubProjAction[Border="true"],
 stw_opensyde_gui_elements--C_OgePubConfigure,
 stw_opensyde_gui_elements--C_OgeLeSearch,
 stw_opensyde_gui_elements--C_OgePubToolBar,
-stw_opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView,
-stw_opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView::section,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF QHeaderView,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF QHeaderView::section,
 stw_opensyde_gui_elements--C_OgePubTreeWidgetRoot,
 stw_opensyde_gui--C_SdBueNodeSelectorWidget QLabel#pc_BueNodeSelectorTitleLabel,
 stw_opensyde_gui_elements--C_OgePubMessageOk,
-stw_opensyde_gui_elements--C_OgePubMessageCancel
+stw_opensyde_gui_elements--C_OgePubMessageCancel,
+stw_opensyde_gui_elements--C_OgePubHalcOverview,
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="13"][SemiBold="true"][Bold="false"]
 {
 font-family: "Segoe UI Semibold";
 font-size: 13px;
@@ -166,21 +188,17 @@ font-weight: bold;
 stw_opensyde_gui_elements--C_OgeLeNavigation,
 stw_opensyde_gui_elements--C_OgeLabFrameError,
 stw_opensyde_gui_elements--C_OgePubNavigation,
-stw_opensyde_gui--C_SyvDaPeUpdateModeTableView,
-stw_opensyde_gui--C_SyvDaPeUpdateModeTableView::item,
-stw_opensyde_gui_elements--C_OgeLeTable,
+stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled,
 stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable,
 stw_opensyde_gui_elements--C_OgeSpxInt64Table,
-stw_opensyde_gui_elements--C_OgeSpxTable,
-stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox,
-stw_opensyde_gui_elements--C_OgeSpxTableDouble,
-stw_opensyde_gui_elements--C_OgeSpxFactorTable,
-stw_opensyde_gui_elements--C_OgeCbxTable,
-stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView,
 stw_opensyde_gui_elements--C_OgeLabDashboardChart,
 stw_opensyde_gui_elements--C_OgeLabStateInfo,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="14"][SemiBold="false"][Bold="false"],
+stw_opensyde_gui_elements--C_OgeLabNodeDataPoolSelectedItems,
 stw_opensyde_gui_elements--C_OgeContextMenu,
+stw_opensyde_gui_elements--C_OgeLabListHeaderHighlighted,
+stw_opensyde_gui_elements--C_OgeLabComListHeader,
+stw_opensyde_gui_elements--C_OgeSpxEditProperties,
 stw_opensyde_gui_elements--C_OgeLabDescriptionMessage
 {
 font-family: "Segoe UI";
@@ -194,16 +212,13 @@ stw_opensyde_gui_elements--C_OgePubDialog,
 stw_opensyde_gui_elements--C_OgePubTextOnlyUnderline,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="14"][SemiBold="true"][Bold="false"],
 QTextEdit#pc_TextEditDpName,
-stw_opensyde_gui--C_SyvDaItPaArView QLabel,
-stw_opensyde_gui--C_SdNdeDpListArrayEditView QLabel,
-stw_opensyde_gui--C_SdNdeDpListDataSetView QLabel,
 stw_opensyde_gui--C_SdNdeDpListDataSetHeaderView,
 stw_opensyde_gui--C_SdNdeDpListDataSetHeaderView::section,
-stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView,
-stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView::section,
-stw_opensyde_gui--C_SdNdeSingleHeaderView,
-stw_opensyde_gui--C_SdNdeSingleHeaderView::section,
-stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch
+stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch,
+stw_opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
+stw_opensyde_gui_elements--C_OgePubUpdate,
+stw_opensyde_gui_elements--C_OgeChxSystemCommisioningEdit,
+stw_opensyde_gui_elements--C_OgePubHalcPanel
 {
 font-family: "Segoe UI Semibold";
 font-size: 14px;
@@ -222,23 +237,17 @@ font-weight: bold;
 /* STYLE_GUIDE_FONT_REGULAR_16 */
 stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroupBig,
 stw_opensyde_gui_elements--C_OgeLabHeadingGroupBold,
-stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled,
 stw_opensyde_gui_elements--C_OgeLabStatusInformation,
-stw_opensyde_gui_elements--C_OgeLabNodeDataPoolSelectedItems,
-stw_opensyde_gui_elements--C_OgeLabComListHeader,
-stw_opensyde_gui_elements--C_OgeLabComListHeaderLink,
 stw_opensyde_gui_elements--C_OgeRabCheckBox,
 stw_opensyde_gui_elements--C_OgeLabListHeader,
-stw_opensyde_gui_elements--C_OgeLabListLink,
-stw_opensyde_gui_elements--C_OgeSpxEditProperties,
-stw_opensyde_gui_elements--C_OgeLabListHeaderHighlighted,
 stw_opensyde_gui_elements--C_OgePubZoomNotification,
 stw_opensyde_gui_elements--C_OgeLabProgressText,
 stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab,
-stw_opensyde_gui_elements--C_OgePubUpdate,
 stw_opensyde_gui_elements--C_OgeLabHeadingToolTip,
-stw_opensyde_gui_elements--C_OgeChxSystemCommisioningEdit,
-stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="16"][SemiBold="false"][Bold="false"]
+stw_opensyde_gui_elements--C_OgeLabListHeaderHeading,
+stw_opensyde_gui_elements--C_OgeLeListHeader,
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="16"][SemiBold="false"][Bold="false"],
+stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab
 {
 font-family: "Segoe UI";
 font-size: 16px;
@@ -250,7 +259,10 @@ stw_opensyde_gui_elements--C_OgePubTextOnlyEdit,
 stw_opensyde_gui_elements--C_OgePubTextWithBorderEdit,
 stw_opensyde_gui_elements--C_OgePubUseCaseNav,
 stw_opensyde_gui_elements--C_OgeLabReadSub,
-stw_opensyde_gui_elements--C_OgePubProjAction
+stw_opensyde_gui_elements--C_OgePubProjAction,
+stw_opensyde_gui_elements--C_OgeLabUpdateNodeTitle,
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="16"][SemiBold="true"][Bold="false"],
+stw_opensyde_gui_elements--C_OgeLabDashboardTab
 {
 font-family: "Segoe UI Semibold";
 font-size: 16px;
@@ -268,9 +280,7 @@ font-weight: bold;
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_18 */
 stw_opensyde_gui_elements--C_OgeLePropertiesName,
-stw_opensyde_gui_elements--C_OgeLeListHeader,
-stw_opensyde_gui_elements--C_OgeLabTreeNodeDataPool,
-stw_opensyde_gui_elements--C_OgeLabListHeaderHeading
+stw_opensyde_gui_elements--C_OgeLabTreeNodeDataPool
 {
 font-family: "Segoe UI";
 font-size: 18px;
@@ -284,7 +294,6 @@ stw_opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"]::ta
 stw_opensyde_gui_elements--C_OgePubIconText,
 stw_opensyde_gui_elements--C_OgePubUseCase,
 stw_opensyde_gui_elements--C_OgeLabReadMain,
-stw_opensyde_gui_elements--C_OgeLabUpdateNodeTitle,
 stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="18"][SemiBold="true"][Bold="false"]
 {
 font-family: "Segoe UI Semibold";
@@ -292,10 +301,17 @@ font-size: 18px;
 font-weight: normal;
 }
 
+/* STYLE_GUIDE_FONT_BOLD_18 */
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="18"][SemiBold="false"][Bold="true"]
+{
+font-family: "Segoe UI";
+font-size: 18px;
+font-weight: bold;
+}
+
 /* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_20 */
-stw_opensyde_gui_elements--C_OgeLabUpdateHeading,
-stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab
+stw_opensyde_gui_elements--C_OgeLabUpdateHeading
 {
 font-family: "Segoe UI";
 font-size: 20px;
@@ -322,7 +338,6 @@ font-weight: normal;
 /* STYLE_GUIDE_FONT_SEMIBOLD_22 */
 stw_opensyde_gui_elements--C_OgeLabParamHeading,
 stw_opensyde_gui_elements--C_OgeLabTreeNode,
-stw_opensyde_gui_elements--C_OgeLabDashboardTab,
 stw_opensyde_gui_elements--C_OgeLabNodeType,
 stw_opensyde_gui_elements--C_OgeLabCategorySubHeading
 {
@@ -369,6 +384,14 @@ font-weight: normal;
 stw_opensyde_gui_elements--C_OgeLabUpdateTime
 {
 font-family: "Segoe UI";
+font-size: 36px;
+font-weight: normal;
+}
+
+/* STYLE_GUIDE_FONT_SEMIBOLD_36 */
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="36"][SemiBold="true"][Bold="false"]
+{
+font-family: "Segoe UI Semibold";
 font-size: 36px;
 font-weight: normal;
 }

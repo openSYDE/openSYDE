@@ -13,10 +13,12 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
+#include "stwerrors.h"
 #include "C_OSCHalcConfigDomain.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
+using namespace stw_errors;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -62,40 +64,18 @@ C_OSCHalcConfigDomain::C_OSCHalcConfigDomain(const C_OSCHalcDefDomain & orc_Base
    this->c_SingularName = orc_Base.c_SingularName;
    this->c_DomainValues.c_StatusValues = orc_Base.c_DomainValues.c_StatusValues;
    this->c_ChannelValues.c_StatusValues = orc_Base.c_ChannelValues.c_StatusValues;
-   //initialize from base
+   this->e_Category = orc_Base.e_Category;
+
+   //Initialize from base (after definition copy-over!):
+
    //Channels
    for (uint32 u32_ItChannel = 0UL; u32_ItChannel < orc_Base.c_Channels.size(); ++u32_ItChannel)
    {
-      C_OSCHalcConfigChannel c_NewChannel =
-         C_OSCHalcConfigDomain::mh_InitConfigFromName(orc_Base.c_Channels[u32_ItChannel].c_Name);
-
-      //Defaults
-      for (uint32 u32_ItUseCase = 0UL; u32_ItUseCase < orc_Base.c_ChannelUseCases.size(); ++u32_ItUseCase)
-      {
-         const C_OSCHalcDefChannelUseCase & rc_UseCase = orc_Base.c_ChannelUseCases[u32_ItUseCase];
-         for (uint32 u32_ItDefault = 0UL; u32_ItDefault < rc_UseCase.c_DefaultChannels.size(); ++u32_ItDefault)
-         {
-            if (rc_UseCase.c_DefaultChannels[u32_ItDefault] == u32_ItChannel)
-            {
-               c_NewChannel.u32_UseCaseIndex = u32_ItUseCase;
-               break;
-            }
-         }
-      }
-
-      //Add parameters
-      C_OSCHalcConfigDomain::mh_AddParameters(orc_Base.c_ChannelValues.c_Parameters, c_NewChannel.c_Parameters);
-
-      //Datablock config cannot be done here!
-
-      this->c_ChannelConfigs.push_back(c_NewChannel);
+      this->c_ChannelConfigs.push_back(this->m_InitChannelConfig(u32_ItChannel));
    }
 
    //Domain
-   this->c_DomainConfig = C_OSCHalcConfigDomain::mh_InitConfigFromName(orc_Base.c_Name);
-
-   //Add parameters
-   C_OSCHalcConfigDomain::mh_AddParameters(orc_Base.c_DomainValues.c_Parameters, this->c_DomainConfig.c_Parameters);
+   this->m_InitDomainConfig();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,6 +96,202 @@ void C_OSCHalcConfigDomain::CalcHash(uint32 & oru32_HashValue) const
    {
       this->c_ChannelConfigs[u32_It].CalcHash(oru32_HashValue);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check channel name unique
+
+   \param[in]   ou32_ChannelIndex   Channel index
+   \param[out]  opq_NameConflict    Name not unique
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfigDomain::CheckChannelNameUnique(const uint32 ou32_ChannelIndex, bool * const opq_NameConflict) const
+{
+   if ((opq_NameConflict != NULL) && (ou32_ChannelIndex < this->c_ChannelConfigs.size()))
+   {
+      const C_OSCHalcConfigChannel & rc_CheckedChannel = this->c_ChannelConfigs[ou32_ChannelIndex];
+
+      *opq_NameConflict = false;
+
+      // check if any other channel has the same name
+      for (uint32 u32_ItCompChannels = 0; u32_ItCompChannels < this->c_ChannelConfigs.size();
+           ++u32_ItCompChannels)
+      {
+         if (u32_ItCompChannels != ou32_ChannelIndex) // skip current channel to avoid comparison "with itself"
+         {
+            const C_OSCHalcConfigChannel & rc_ComparedChannel = this->c_ChannelConfigs[u32_ItCompChannels];
+            if (rc_CheckedChannel.c_Name.LowerCase() == rc_ComparedChannel.c_Name.LowerCase())
+            {
+               *opq_NameConflict = true;
+               break; // if we have one conflict we can stop searching
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reset channel configuration to default
+
+   \param[in]  ou32_ChannelIndex    Channel index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfigDomain::ResetChannelToDefault(const uint32 ou32_ChannelIndex)
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   if ((ou32_ChannelIndex < this->c_ChannelConfigs.size()) && (ou32_ChannelIndex < this->c_Channels.size()))
+   {
+      this->c_ChannelConfigs[ou32_ChannelIndex] = this->m_InitChannelConfig(ou32_ChannelIndex);
+   }
+   else
+   {
+      s32_Return = C_RANGE;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reset domain configuration to default
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfigDomain::ResetDomainToDefault(void)
+{
+   this->m_InitDomainConfig();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get relevant indices for selected use case
+
+   \param[in]      ou32_ChannelIndex      Channel index
+   \param[in]      oq_UseChannelIndex     Use channel index
+   \param[in,out]  opc_ParameterIndices   Parameter indices
+   \param[in,out]  opc_InputIndices       Input indices
+   \param[in,out]  opc_OutputIndices      Output indices
+   \param[in,out]  opc_StatusIndices      Status indices
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfigDomain::GetRelevantIndicesForSelectedUseCase(const uint32 ou32_ChannelIndex,
+                                                                   const bool oq_UseChannelIndex,
+                                                                   std::vector<uint32> * const opc_ParameterIndices,
+                                                                   std::vector<uint32> * const opc_InputIndices,
+                                                                   std::vector<uint32> * const opc_OutputIndices,
+                                                                   std::vector<uint32> * const opc_StatusIndices) const
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   if (oq_UseChannelIndex)
+   {
+      if (ou32_ChannelIndex < this->c_ChannelConfigs.size())
+      {
+         const C_OSCHalcConfigChannel & rc_Channel = this->c_ChannelConfigs[ou32_ChannelIndex];
+         if (opc_ParameterIndices != NULL)
+         {
+            for (uint32 u32_It = 0UL; u32_It < this->c_ChannelValues.c_Parameters.size(); ++u32_It)
+            {
+               const C_OSCHalcDefStruct & rc_Struct = this->c_ChannelValues.c_Parameters[u32_It];
+               for (uint32 u32_ItAvail = 0UL; u32_ItAvail < rc_Struct.c_UseCaseAvailabilities.size(); ++u32_ItAvail)
+               {
+                  if (rc_Struct.c_UseCaseAvailabilities[u32_ItAvail] == rc_Channel.u32_UseCaseIndex)
+                  {
+                     opc_ParameterIndices->push_back(u32_It);
+                  }
+               }
+            }
+         }
+         if (opc_InputIndices != NULL)
+         {
+            for (uint32 u32_It = 0UL; u32_It < this->c_ChannelValues.c_InputValues.size(); ++u32_It)
+            {
+               const C_OSCHalcDefStruct & rc_Struct = this->c_ChannelValues.c_InputValues[u32_It];
+               for (uint32 u32_ItAvail = 0UL; u32_ItAvail < rc_Struct.c_UseCaseAvailabilities.size(); ++u32_ItAvail)
+               {
+                  if (rc_Struct.c_UseCaseAvailabilities[u32_ItAvail] == rc_Channel.u32_UseCaseIndex)
+                  {
+                     opc_InputIndices->push_back(u32_It);
+                  }
+               }
+            }
+         }
+         if (opc_OutputIndices != NULL)
+         {
+            for (uint32 u32_It = 0UL; u32_It < this->c_ChannelValues.c_OutputValues.size(); ++u32_It)
+            {
+               const C_OSCHalcDefStruct & rc_Struct = this->c_ChannelValues.c_OutputValues[u32_It];
+               for (uint32 u32_ItAvail = 0UL; u32_ItAvail < rc_Struct.c_UseCaseAvailabilities.size(); ++u32_ItAvail)
+               {
+                  if (rc_Struct.c_UseCaseAvailabilities[u32_ItAvail] == rc_Channel.u32_UseCaseIndex)
+                  {
+                     opc_OutputIndices->push_back(u32_It);
+                  }
+               }
+            }
+         }
+         if (opc_StatusIndices != NULL)
+         {
+            for (uint32 u32_It = 0UL; u32_It < this->c_ChannelValues.c_StatusValues.size(); ++u32_It)
+            {
+               const C_OSCHalcDefStruct & rc_Struct = this->c_ChannelValues.c_StatusValues[u32_It];
+               for (uint32 u32_ItAvail = 0UL; u32_ItAvail < rc_Struct.c_UseCaseAvailabilities.size(); ++u32_ItAvail)
+               {
+                  if (rc_Struct.c_UseCaseAvailabilities[u32_ItAvail] == rc_Channel.u32_UseCaseIndex)
+                  {
+                     opc_StatusIndices->push_back(u32_It);
+                  }
+               }
+            }
+         }
+      }
+      else
+      {
+         s32_Return = C_RANGE;
+      }
+   }
+   else
+   {
+      if (opc_ParameterIndices != NULL)
+      {
+         opc_ParameterIndices->reserve(this->c_DomainValues.c_Parameters.size());
+         for (uint32 u32_It = 0UL; u32_It < this->c_DomainValues.c_Parameters.size(); ++u32_It)
+         {
+            opc_ParameterIndices->push_back(u32_It);
+         }
+      }
+      if (opc_InputIndices != NULL)
+      {
+         opc_InputIndices->reserve(this->c_DomainValues.c_InputValues.size());
+         for (uint32 u32_It = 0UL; u32_It < this->c_DomainValues.c_InputValues.size(); ++u32_It)
+         {
+            opc_InputIndices->push_back(u32_It);
+         }
+      }
+      if (opc_OutputIndices != NULL)
+      {
+         opc_OutputIndices->reserve(this->c_DomainValues.c_OutputValues.size());
+         for (uint32 u32_It = 0UL; u32_It < this->c_DomainValues.c_OutputValues.size(); ++u32_It)
+         {
+            opc_OutputIndices->push_back(u32_It);
+         }
+      }
+      if (opc_StatusIndices != NULL)
+      {
+         opc_StatusIndices->reserve(this->c_DomainValues.c_StatusValues.size());
+         for (uint32 u32_It = 0UL; u32_It < this->c_DomainValues.c_StatusValues.size(); ++u32_It)
+         {
+            opc_StatusIndices->push_back(u32_It);
+         }
+      }
+   }
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,4 +341,58 @@ C_OSCHalcConfigChannel C_OSCHalcConfigDomain::mh_InitConfigFromName(const stw_sc
    c_NewChannel.c_Comment = "";
 
    return c_NewChannel;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize channel configuration
+
+   \param[in]  ou32_ChannelIndex    Channel index (undefined behavior if out of range)
+
+   \return
+   Initialized channel configuration
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCHalcConfigChannel C_OSCHalcConfigDomain::m_InitChannelConfig(const uint32 ou32_ChannelIndex)
+{
+   C_OSCHalcConfigChannel c_NewChannel;
+
+   if (ou32_ChannelIndex < this->c_Channels.size())
+   {
+      // Default Name
+      c_NewChannel =
+         C_OSCHalcConfigDomain::mh_InitConfigFromName(this->c_SingularName + "_" +
+                                                      stw_scl::C_SCLString::IntToStr(ou32_ChannelIndex + 1));
+
+      //Defaults
+      for (uint32 u32_ItUseCase = 0UL; u32_ItUseCase < this->c_ChannelUseCases.size(); ++u32_ItUseCase)
+      {
+         const C_OSCHalcDefChannelUseCase & rc_UseCase = this->c_ChannelUseCases[u32_ItUseCase];
+         for (uint32 u32_ItDefault = 0UL; u32_ItDefault < rc_UseCase.c_DefaultChannels.size(); ++u32_ItDefault)
+         {
+            if (rc_UseCase.c_DefaultChannels[u32_ItDefault] == ou32_ChannelIndex)
+            {
+               c_NewChannel.u32_UseCaseIndex = u32_ItUseCase;
+               break;
+            }
+         }
+      }
+
+      //Add parameters
+      C_OSCHalcConfigDomain::mh_AddParameters(this->c_ChannelValues.c_Parameters, c_NewChannel.c_Parameters);
+   }
+
+   return c_NewChannel;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize domain configuration
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfigDomain::m_InitDomainConfig(void)
+{
+   //General
+   this->c_DomainConfig = C_OSCHalcConfigDomain::mh_InitConfigFromName(this->c_Name);
+
+   //Add parameters
+   C_OSCHalcConfigDomain::mh_AddParameters(this->c_DomainValues.c_Parameters, this->c_DomainConfig.c_Parameters);
 }

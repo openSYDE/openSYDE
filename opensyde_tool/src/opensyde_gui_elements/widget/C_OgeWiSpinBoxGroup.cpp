@@ -511,9 +511,7 @@ void C_OgeWiSpinBoxGroup::m_InitConnections(void)
 {
    if (this->mq_DoubleMode == true)
    {
-      //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-      connect(this->mpc_Ui->pc_DoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(
-                                                             stw_types::float64)>(&QDoubleSpinBox::valueChanged), this,
+      connect(this->mpc_Ui->pc_DoubleSpinBox, &C_OgeSpxDoubleAutoFixCustomTrigger::SigValueChanged, this,
               &C_OgeWiSpinBoxGroup::SigValueChanged);
    }
    else
@@ -531,9 +529,7 @@ void C_OgeWiSpinBoxGroup::m_DeactivateConnections(void)
 {
    if (this->mq_DoubleMode == true)
    {
-      //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-      disconnect(this->mpc_Ui->pc_DoubleSpinBox, static_cast<void (QDoubleSpinBox::*)(
-                                                                stw_types::float64)>(&QDoubleSpinBox::valueChanged), this,
+      disconnect(this->mpc_Ui->pc_DoubleSpinBox, &C_OgeSpxDoubleAutoFixCustomTrigger::SigValueChanged, this,
                  &C_OgeWiSpinBoxGroup::SigValueChanged);
    }
    else

@@ -41,7 +41,7 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sint32 C_SyvUpUpdatePackageNodeWidget::mhs32_LAYOUT_THRESHOLD = 93; // Keep synced with update
+const stw_types::sint32 C_SyvUpUpdatePackageNodeWidget::mhs32_LAYOUT_THRESHOLD = 100; // Keep synced with update
 // summary widget
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -146,7 +146,7 @@ C_SyvUpUpdatePackageNodeWidget::C_SyvUpUpdatePackageNodeWidget(const uint32 ou32
 
    // Start defaults to make delegate work properly ("drag-mode")
    this->mpc_Ui->pc_ScrollArea->setVisible(false);
-   this->mpc_Ui->pc_WidgetTitle->setMinimumHeight(30);
+   this->mpc_Ui->pc_WidgetTitle->setMinimumHeight(25);
    this->mpc_Ui->pc_FrameSepTop->setVisible(false);
    this->mpc_Ui->pc_FrameSepMiddle->setVisible(false);
    this->mpc_Ui->pc_FrameSepBottom->setVisible(false);
@@ -971,13 +971,13 @@ void C_SyvUpUpdatePackageNodeWidget::resizeEvent(QResizeEvent * const opc_Event)
    {
       this->mpc_Ui->pc_ScrollArea->setVisible(false);
       this->mpc_Ui->pc_FrameSepTop->setVisible(false);
-      this->mpc_Ui->pc_WidgetTitle->setMinimumHeight(30);
+      this->mpc_Ui->pc_WidgetTitle->setMinimumHeight(25);
    }
    else
    {
       this->mpc_Ui->pc_ScrollArea->setVisible(true);
       this->mpc_Ui->pc_FrameSepTop->setVisible(true);
-      this->mpc_Ui->pc_WidgetTitle->setMinimumHeight(50);
+      this->mpc_Ui->pc_WidgetTitle->setMinimumHeight(45);
    }
 }
 

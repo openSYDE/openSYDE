@@ -11,6 +11,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
+#include <QTimer>
 
 #include "stwtypes.h"
 
@@ -46,6 +47,9 @@ private:
 
    Ui::C_SdNdeNodePropertiesWidget * mpc_Ui;
    stw_types::uint32 mu32_NodeIndex;
+   QTimer mc_Timer;
+   stw_types::uint32 mu32_BusIndex;
+   QString mc_BusName;
    static const stw_types::sint32 mhs32_PR_INDEX_DISABLED;
    static const stw_types::sint32 mhs32_PR_INDEX_ENABLED;
 
@@ -55,7 +59,10 @@ private:
    void m_RegisterChange(void);
    void m_RegisterNameChange(void);
    void m_CheckComIfId(const stw_types::uint32 ou32_Row, const stw_types::uint32 ou32_Column) const;
-   void m_IpAddressClick(const stw_types::uint32 ou32_Row, const stw_types::uint32 ou32_Column);
+   void m_HandleCellClick(const stw_types::uint32 ou32_Row, const stw_types::uint32 ou32_Column);
+   void m_IpAddressClick(const stw_types::uint32 ou32_Row);
+   void m_BusBitrateClick(const stw_types::uint32 ou32_Row, const stw_types::uint32 ou32_Column);
+   void m_OpenBus(void);
    void m_LoadFromData(void);
    void m_FlashloaderOptions(void) const;
 
@@ -67,6 +74,7 @@ Q_SIGNALS:
    void SigChanged(void);
    void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName,
                        const bool oq_CombineItemAndSubSubName);
+   void SigBusBitrateClicked(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

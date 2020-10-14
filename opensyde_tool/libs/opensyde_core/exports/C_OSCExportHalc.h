@@ -30,6 +30,7 @@ public:
    static stw_scl::C_SCLString h_GetFileName(const bool oq_IsSafe);
    static stw_types::uint16 h_ConvertOverallCodeVersion(const stw_types::uint16 ou16_GenCodeVersion);
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path,
+                                               const stw_types::uint16 ou16_GenCodeVersion,
                                                const C_OSCHalcConfig & orc_HalcConfig,
                                                const stw_opensyde_core::C_OSCNodeDataPool & orc_Datapool,
                                                const stw_scl::C_SCLString & orc_ExportToolInfo);
@@ -42,19 +43,22 @@ private:
    static stw_types::sint32 mh_CreateHeaderFile(const stw_scl::C_SCLString & orc_ExportToolInfo,
                                                 const stw_scl::C_SCLString & orc_Path,
                                                 const C_OSCHalcConfig & orc_HalcConfig,
-                                                const stw_scl::C_SCLString & orc_ProjectId, const bool oq_IsSafe);
+                                                const stw_scl::C_SCLString & orc_ProjectId, const bool oq_IsSafe,
+                                                const stw_types::uint16 ou16_GenCodeVersion);
 
    static stw_types::sint32 mh_CreateImplementationFile(const stw_scl::C_SCLString & orc_ExportToolInfo,
                                                         const stw_scl::C_SCLString & orc_Path,
                                                         const C_OSCHalcConfig & orc_HalcConfig,
                                                         const stw_scl::C_SCLString & orc_ProjectId,
-                                                        const bool oq_IsSafe);
+                                                        const bool oq_IsSafe,
+                                                        const stw_types::uint16 ou16_GenCodeVersion);
 
    static void mh_AddHeader(const stw_scl::C_SCLString & orc_ExportToolInfo, stw_scl::C_SCLStringList & orc_Data,
                             const bool oq_FileType, const bool oq_IsSafe);
    static void mh_AddIncludes(stw_scl::C_SCLStringList & orc_Data, const bool oq_FileType, const bool oq_IsSafe);
    static void mh_AddDefines(stw_scl::C_SCLStringList & orc_Data,  const C_OSCHalcConfig & orc_HalcConfig,
-                             const stw_scl::C_SCLString & orc_ProjectId, const bool oq_FileType, const bool oq_IsSafe);
+                             const stw_scl::C_SCLString & orc_ProjectId, const bool oq_FileType, const bool oq_IsSafe,
+                             const stw_types::uint16 ou16_GenCodeVersion);
    static void mh_AddGlobalVariables(stw_scl::C_SCLStringList & orc_Data, const C_OSCHalcConfig & orc_HalcConfig,
                                      const bool oq_FileType, const bool oq_IsSafe);
    static stw_scl::C_SCLString mh_GetMagicName(const stw_scl::C_SCLString & orc_ProjectId, const bool oq_IsSafe);

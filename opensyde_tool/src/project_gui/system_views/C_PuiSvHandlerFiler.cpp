@@ -57,10 +57,10 @@ C_PuiSvHandlerFiler::C_PuiSvHandlerFiler(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load system views
 
-   \param[in,out] orc_Views     System view elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "opensyde-system-views" element
-   \param[in]     opc_BasePath  Base path (Optional for save to string)
-   \param[in]     orc_OSCNodes  OSC node information (Necessary for update information)
+   \param[in,out]  orc_Views        System view elements (Cleared if necessary)
+   \param[in]      orc_OSCNodes     OSC node information (Necessary for update information)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "opensyde-system-views" element
+   \param[in]      opc_BasePath     Base path (Optional for save to string)
 
    \return
    C_NO_ERR    information loaded
@@ -123,6 +123,8 @@ sint32 C_PuiSvHandlerFiler::h_LoadViews(std::vector<C_PuiSvData> & orc_Views,
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
       }
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-views");
    }
    else
    {
@@ -136,9 +138,9 @@ sint32 C_PuiSvHandlerFiler::h_LoadViews(std::vector<C_PuiSvData> & orc_Views,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save data pools
 
-   \param[in]     orc_Views     System view elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "opensyde-system-views" element
-   \param[in]     opc_BasePath  Base path (Optional for save to string)
+   \param[in]      orc_Views        System view elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "opensyde-system-views" element
+   \param[in]      opc_BasePath     Base path (Optional for save to string)
 
    \return
    C_NO_ERR   data saved
@@ -179,9 +181,9 @@ sint32 C_PuiSvHandlerFiler::h_SaveViews(const std::vector<C_PuiSvData> & orc_Vie
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load dashboard element
 
-   \param[in,out] orc_Dashboard           Dashboard element
-   \param[in,out] orc_XMLParser           XML parser with the "current" element set to the "dashboard" element
-   \param[in]     oq_IgnoreMostErrorCases Optional flag to allow some error cases to still return C_NO_ERR
+   \param[in,out]  orc_Dashboard             Dashboard element
+   \param[in,out]  orc_XMLParser             XML parser with the "current" element set to the "dashboard" element
+   \param[in]      oq_IgnoreMostErrorCases   Optional flag to allow some error cases to still return C_NO_ERR
 
    \return
    C_NO_ERR    information loaded
@@ -323,8 +325,8 @@ sint32 C_PuiSvHandlerFiler::h_LoadDashboard(C_PuiSvDashboard & orc_Dashboard, C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save dashboard element
 
-   \param[in]     orc_Dashboard Dashboard element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Dashboard    Dashboard element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::h_SaveDashboard(const C_PuiSvDashboard & orc_Dashboard, C_OSCXMLParserBase & orc_XMLParser)
@@ -348,8 +350,8 @@ void C_PuiSvHandlerFiler::h_SaveDashboard(const C_PuiSvDashboard & orc_Dashboard
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load read rails
 
-   \param[in,out] orc_Rails     Read rails
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "rail-assignments" element
+   \param[in,out]  orc_Rails        Read rails
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "rail-assignments" element
 
    \return
    C_NO_ERR    information loaded
@@ -424,8 +426,8 @@ sint32 C_PuiSvHandlerFiler::h_LoadReadRails(QMap<C_OSCNodeDataPoolListElementId,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save read rails
 
-   \param[in]     orc_Rails     Read rails
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "rail-assignments" element
+   \param[in]      orc_Rails        Read rails
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "rail-assignments" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::h_SaveReadRails(const QMap<C_OSCNodeDataPoolListElementId,
@@ -455,9 +457,84 @@ void C_PuiSvHandlerFiler::h_SaveReadRails(const QMap<C_OSCNodeDataPoolListElemen
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load last known halc crcs
+
+   \param[in,out]  orc_Crcs         Crcs
+   \param[in,out]  orc_XMLParser    XML parser
+
+   \return
+   C_NO_ERR    information loaded
+   C_CONFIG    error loading information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandlerFiler::h_LoadLastKnownHalcCrcs(std::map<C_PuiSvDbNodeDataPoolListElementId, uint32> & orc_Crcs,
+                                                    C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   orc_Crcs.clear();
+   if (orc_XMLParser.SelectNodeChild("last-known-halc-crcs") == "last-known-halc-crcs")
+   {
+      C_SCLString c_CurrentNode = orc_XMLParser.SelectNodeChild("last-known-halc-crc");
+
+      if (c_CurrentNode == "last-known-halc-crc")
+      {
+         do
+         {
+            C_PuiSvDbNodeDataPoolListElementId c_Id;
+            C_PuiSvHandlerFiler::mh_LoadUiIndex(c_Id, orc_XMLParser);
+            if (orc_XMLParser.AttributeExists("crc"))
+            {
+               const uint32 u32_Crc = orc_XMLParser.GetAttributeUint32("crc");
+               //Insert
+               orc_Crcs[c_Id] = u32_Crc;
+            }
+            else
+            {
+               s32_Retval = C_CONFIG;
+            }
+            //Next
+            c_CurrentNode = orc_XMLParser.SelectNodeNext("last-known-halc-crc");
+         }
+         while ((c_CurrentNode == "last-known-halc-crc") && (s32_Retval == C_NO_ERR));
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "last-known-halc-crcs");
+      }
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-views");
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save last known halc crcs
+
+   \param[in]      orc_Crcs         Crcs
+   \param[in,out]  orc_XMLParser    XML parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvHandlerFiler::h_SaveLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId, uint32> & orc_Crcs,
+                                                  C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.CreateAndSelectNodeChild("last-known-halc-crcs");
+   for (std::map<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_It = orc_Crcs.begin();
+        c_It != orc_Crcs.end(); ++c_It)
+   {
+      orc_XMLParser.CreateAndSelectNodeChild("last-known-halc-crc");
+      mh_SaveUiIndex(c_It->first, orc_XMLParser);
+      orc_XMLParser.SetAttributeUint32("crc", c_It->second);
+
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "last-known-halc-crcs");
+   }
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-views");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get automatically generated file name
 
-   \param[in] orc_ViewName View name
+   \param[in]  orc_ViewName   View name
 
    \return
    Automatically generated file name
@@ -473,8 +550,8 @@ QString C_PuiSvHandlerFiler::h_GetViewFileName(const QString & orc_ViewName)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node active flags
 
-   \param[in,out] orc_NodeActiveFlags Node active flags (Cleared if necessary)
-   \param[in,out] orc_XMLParser       XML parser with the "current" element set to the "opensyde-system-view" element
+   \param[in,out]  orc_NodeActiveFlags    Node active flags (Cleared if necessary)
+   \param[in,out]  orc_XMLParser          XML parser with the "current" element set to the "opensyde-system-view" element
 
    \return
    C_NO_ERR    information loaded
@@ -520,10 +597,10 @@ sint32 C_PuiSvHandlerFiler::mh_LoadNodeActiveFlags(std::vector<uint8> & orc_Node
 
    System definition must be loaded already.
 
-   \param[in,out] orc_NodeUpdateInformation Node update information (Cleared if necessary)
-   \param[in,out] orc_XMLParser             XML parser with the "current" element set
-                                            to the "opensyde-system-view" element
-   \param[in]     orc_OSCNodes              OSC node information (Necessary for update information)
+   \param[in,out]  orc_NodeUpdateInformation    Node update information (Cleared if necessary)
+   \param[in,out]  orc_XMLParser                XML parser with the "current" element set
+                                                to the "opensyde-system-view" element
+   \param[in]      orc_OSCNodes                 OSC node information (Necessary for update information)
 
    \return
    C_NO_ERR    information loaded
@@ -624,9 +701,9 @@ sint32 C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformation(std::vector<C_PuiSvNode
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load any update information path
 
-   \param[out]    orc_Paths          Read paths
-   \param[in]     orc_XMLTagBaseName XML tag base name (parent with s and children as is)
-   \param[in,out] orc_XMLParser      XML parser
+   \param[out]     orc_Paths           Read paths
+   \param[in]      orc_XMLTagBaseName  XML tag base name (parent with s and children as is)
+   \param[in,out]  orc_XMLParser       XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationPaths(std::vector<QString> & orc_Paths,
@@ -661,10 +738,11 @@ void C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationPaths(std::vector<QString>
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node update information
 
-   \param[in,out] orc_NodeUpdateInformation Node update information
-   \param[in,out] orc_XMLParser             XML parser with the "current" element set
-                                            to the "node-update-information" or
-                                                   "node-specific-update-information" element
+   \param[in,out]  orc_NodeUpdateInformation    Node update information
+   \param[in,out]  orc_XMLParser                XML parser with the "current" element set
+                                                to the "node-update-information" or
+                                                "node-specific-update-information" element
+   \param[in]      orc_Node                     Node
 
    \return
    C_NO_ERR    information loaded
@@ -736,10 +814,10 @@ sint32 C_PuiSvHandlerFiler::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load node parameter set update information
 
-   \param[out]    orc_Info      Parsed parameter set update information
-   \param[in,out] orc_XMLParser XML parser with the "current" element set
-                                to the "node-update-information" or
-                                       "node-specific-update-information" element
+   \param[out]     orc_Info         Parsed parameter set update information
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set
+                                    to the "node-update-information" or
+                                    "node-specific-update-information" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationParam(std::vector<C_PuiSvNodeUpdateParamInfo> & orc_Info,
@@ -796,8 +874,8 @@ void C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformationParam(std::vector<C_PuiSvN
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load dashboard elements
 
-   \param[in,out] orc_Dashboards Dashboard elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "opensyde-system-view" element
+   \param[in,out]  orc_Dashboards   Dashboard elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "opensyde-system-view" element
 
    \return
    C_NO_ERR    information loaded
@@ -842,9 +920,9 @@ sint32 C_PuiSvHandlerFiler::mh_LoadDashboards(std::vector<C_PuiSvDashboard> & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load view
 
-   \param[in,out] orc_View     View data storage
-   \param[in]     orc_FilePath File path
-   \param[in]     orc_OSCNodes OSC node information (Necessary for update information)
+   \param[in,out]  orc_View      View data storage
+   \param[in]      orc_FilePath  File path
+   \param[in]      orc_OSCNodes  OSC node information (Necessary for update information)
 
    \return
    C_NO_ERR    information loaded
@@ -882,9 +960,9 @@ sint32 C_PuiSvHandlerFiler::mh_LoadViewFile(C_PuiSvData & orc_View, const QStrin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load view element
 
-   \param[in,out] orc_View      View element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "opensyde-system-view" element
-   \param[in]     orc_OSCNodes  OSC node information (Necessary for update information)
+   \param[in,out]  orc_View         View element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "opensyde-system-view" element
+   \param[in]      orc_OSCNodes     OSC node information (Necessary for update information)
 
    \return
    C_NO_ERR    information loaded
@@ -1011,8 +1089,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadView(C_PuiSvData & orc_View, C_OSCXMLParserBa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load PC element
 
-   \param[in,out] orc_Pc        PC element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "pc" element
+   \param[in,out]  orc_Pc           PC element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "pc" element
 
    \return
    C_NO_ERR    information loaded
@@ -1095,8 +1173,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadPc(C_PuiSvPc & orc_Pc, C_OSCXMLParserBase & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1185,8 +1263,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadCharts(std::vector<C_PuiSvDbChart> & orc_Widg
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1251,8 +1329,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadLabels(std::vector<C_PuiSvDbLabel> & orc_Widg
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1319,8 +1397,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadParams(std::vector<C_PuiSvDbParam> & orc_Widg
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load tree elements
 
-   \param[out]    orc_Items     Tree elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "param" element
+   \param[out]     orc_Items        Tree elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "param" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_LoadParamExpandedItems(std::vector<C_PuiSvDbExpandedTreeIndex> & orc_Items,
@@ -1360,8 +1438,8 @@ void C_PuiSvHandlerFiler::mh_LoadParamExpandedItems(std::vector<C_PuiSvDbExpande
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load column position indices elements
 
-   \param[out]    orc_Items     Column position indices elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "param" element
+   \param[out]     orc_Items        Column position indices elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "param" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_LoadParamColumnPositionIndices(std::vector<sint32> & orc_Items,
@@ -1400,8 +1478,8 @@ void C_PuiSvHandlerFiler::mh_LoadParamColumnPositionIndices(std::vector<sint32> 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1448,8 +1526,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadPieCharts(std::vector<C_PuiSvDbPieChart> & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1517,8 +1595,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadSpinBoxes(std::vector<C_PuiSvDbSpinBox> & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1590,8 +1668,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadTables(std::vector<C_PuiSvDbTable> & orc_Widg
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1664,8 +1742,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadSliders(std::vector<C_PuiSvDbSlider> & orc_Wi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1753,8 +1831,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadProgressBars(std::vector<C_PuiSvDbProgressBar
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget elements
 
-   \param[in,out] orc_Widgets    Widget elements (Cleared if necessary)
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "dashboard" element
+   \param[in,out]  orc_Widgets      Widget elements (Cleared if necessary)
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 
    \return
    C_NO_ERR    information loaded
@@ -1822,8 +1900,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadToggles(std::vector<C_PuiSvDbToggle> & orc_Wi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load widget element
 
-   \param[in,out] orc_Widget    Widget element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the any widget element
+   \param[in,out]  orc_Widget       Widget element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the any widget element
 
    \return
    C_NO_ERR    information loaded
@@ -1941,8 +2019,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadWidgetBase(C_PuiSvDbWidgetBase & orc_Widget, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load a UI index
 
-   \param[out]    orc_Id        Read index
-   \param[in,out] orc_XMLParser XML parser
+   \param[out]     orc_Id           Read index
+   \param[in,out]  orc_XMLParser    XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & orc_Id,
@@ -2013,8 +2091,8 @@ void C_PuiSvHandlerFiler::mh_LoadUiIndex(C_PuiSvDbNodeDataPoolListElementId & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load values
 
-   \param[in,out] orc_Values    Values
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "param" element
+   \param[in,out]  orc_Values       Values
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "param" element
 
    \return
    C_NO_ERR    information loaded
@@ -2064,8 +2142,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadParamDataSetIndices(std::vector<sint32> & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load values
 
-   \param[in,out] orc_Values    Values
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "param" element
+   \param[in,out]  orc_Values       Values
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "param" element
 
    \return
    C_NO_ERR    information loaded
@@ -2108,8 +2186,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadParamValues(std::vector<C_OSCNodeDataPoolCont
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load values
 
-   \param[in,out] orc_Values    Values
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "param" element
+   \param[in,out]  orc_Values       Values
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "param" element
 
    \return
    C_NO_ERR    information loaded
@@ -2155,8 +2233,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadParamTables(std::vector<std::vector<sint32> >
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load values
 
-   \param[in,out] orc_Values    Values
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "table" element
+   \param[in,out]  orc_Values       Values
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "table" element
 
    \return
    C_NO_ERR    information loaded
@@ -2204,8 +2282,8 @@ sint32 C_PuiSvHandlerFiler::mh_LoadParamColumns(std::vector<sint32> & orc_Values
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load data element id
 
-   \param[in,out] orc_Id        Data element id
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to any element
+   \param[in,out]  orc_Id           Data element id
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to any element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_LoadDataElement(C_OSCNodeDataPoolListElementId & orc_Id,
@@ -2220,8 +2298,8 @@ void C_PuiSvHandlerFiler::mh_LoadDataElement(C_OSCNodeDataPoolListElementId & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to write mode
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Mode   Write mode
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Mode      Write mode
 
    \return
    C_NO_ERR   no error
@@ -2253,8 +2331,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToWriteMode(const QString & orc_String,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to display style
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Style  Display style
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Style     Display style
 
    \return
    C_NO_ERR   no error
@@ -2294,8 +2372,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToDisplayStyle(const QString & orc_String,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to toggle type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Toggle type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Toggle type
 
    \return
    C_NO_ERR   no error
@@ -2330,8 +2408,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToToggleType(const QString & orc_String, C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to spin box type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Spin box type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Spin box type
 
    \return
    C_NO_ERR   no error
@@ -2362,8 +2440,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToSpinBoxType(const QString & orc_String, C
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to label type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Label type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Label type
 
    \return
    C_NO_ERR   no error
@@ -2394,8 +2472,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToLabelType(const QString & orc_String, C_P
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to slider type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Slider type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Slider type
 
    \return
    C_NO_ERR   no error
@@ -2434,8 +2512,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToSliderType(const QString & orc_String, C_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to progress bar type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Progress bar type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Progress bar type
 
    \return
    C_NO_ERR   no error
@@ -2471,8 +2549,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToProgressBarType(const QString & orc_Strin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to progress bar alignment type
 
-   \param[in]  orc_String    String to interpret
-   \param[out] ore_Alignment Progress bar alignment type
+   \param[in]   orc_String       String to interpret
+   \param[out]  ore_Alignment    Progress bar alignment type
 
    \return
    C_NO_ERR   no error
@@ -2512,8 +2590,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToProgressBarAlignmentType(const QString & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to transmission mode
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Transmission mode
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Mode      Mode
 
    \return
    C_NO_ERR   no error
@@ -2549,8 +2627,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToTransmissionMode(const QString & orc_Stri
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to source type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Source type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Source type
 
    \return
    C_NO_ERR   no error
@@ -2582,8 +2660,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToSourceType(const QString & orc_String,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to source type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Source type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_ZoomMode  Zoom mode
 
    \return
    C_NO_ERR   no error
@@ -2619,8 +2697,8 @@ sint32 C_PuiSvHandlerFiler::mh_StringToChartSettingZoomMode(const QString & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node active flags
 
-   \param[in]     orc_NodeActiveFlags Node active flags
-   \param[in,out] orc_XMLParser       XML parser with the "current" element set to the "opensyde-system-view" element
+   \param[in]      orc_NodeActiveFlags    Node active flags
+   \param[in,out]  orc_XMLParser          XML parser with the "current" element set to the "opensyde-system-view" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveNodeActiveFlags(const std::vector<uint8> & orc_NodeActiveFlags,
@@ -2641,9 +2719,9 @@ void C_PuiSvHandlerFiler::mh_SaveNodeActiveFlags(const std::vector<uint8> & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node update information
 
-   \param[in]     orc_NodeUpdateInformation Node update information
-   \param[in,out] orc_XMLParser             XML parser with the "current" element set
-                                            to the "opensyde-system-view" element
+   \param[in]      orc_NodeUpdateInformation    Node update information
+   \param[in,out]  orc_XMLParser                XML parser with the "current" element set
+                                                to the "opensyde-system-view" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformation(const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation,
@@ -2678,10 +2756,10 @@ void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformation(const std::vector<C_PuiSv
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save node update path information
 
-   \param[in]     orc_Paths          Paths to save
-   \param[in]     orc_XMLTagBaseName XML tag to use for saving
-   \param[in,out] orc_XMLParser      XML parser with the "current" element set
-                                     to the "node-specific-update-information" element
+   \param[in]      orc_Paths           Paths to save
+   \param[in]      orc_XMLTagBaseName  XML tag to use for saving
+   \param[in,out]  orc_XMLParser       XML parser with the "current" element set
+                                       to the "node-specific-update-information" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformationPaths(const std::vector<QString> & orc_Paths,
@@ -2704,9 +2782,9 @@ void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformationPaths(const std::vector<QS
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save update information for parameter sets
 
-   \param[in]     orc_Info       Update information for parameter sets
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set
-                                 to the "node-specific-update-information" element
+   \param[in]      orc_Info         Update information for parameter sets
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set
+                                    to the "node-specific-update-information" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformationParamInfo(
@@ -2729,8 +2807,8 @@ void C_PuiSvHandlerFiler::mh_SaveNodeUpdateInformationParamInfo(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save dashboard elements
 
-   \param[in]     orc_Dashboards Dashboard elements
-   \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "opensyde-system-view" element
+   \param[in]      orc_Dashboards   Dashboard elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "opensyde-system-view" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveDashboards(const std::vector<C_PuiSvDashboard> & orc_Dashboards,
@@ -2753,8 +2831,8 @@ void C_PuiSvHandlerFiler::mh_SaveDashboards(const std::vector<C_PuiSvDashboard> 
 
    Save view to XML file
 
-   \param[in]     orc_View     View data storage
-   \param[in,out] orc_FilePath File path for xml
+   \param[in]      orc_View      View data storage
+   \param[in,out]  orc_FilePath  File path for xml
 
    \return
    C_NO_ERR   data saved
@@ -2792,8 +2870,8 @@ sint32 C_PuiSvHandlerFiler::mh_SaveViewFile(const C_PuiSvData & orc_View, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save view element
 
-   \param[in]     orc_View      View element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "opensyde-system-view" element
+   \param[in]      orc_View         View element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "opensyde-system-view" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveView(const C_PuiSvData & orc_View, C_OSCXMLParserBase & orc_XMLParser)
@@ -2830,8 +2908,8 @@ void C_PuiSvHandlerFiler::mh_SaveView(const C_PuiSvData & orc_View, C_OSCXMLPars
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save PC element
 
-   \param[in]     orc_Pc        PC element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "pc" element
+   \param[in]      orc_Pc           PC element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "pc" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SavePc(const C_PuiSvPc & orc_Pc, C_OSCXMLParserBase & orc_XMLParser)
@@ -2860,8 +2938,8 @@ void C_PuiSvHandlerFiler::mh_SavePc(const C_PuiSvPc & orc_Pc, C_OSCXMLParserBase
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveCharts(const std::vector<C_PuiSvDbChart> & orc_Widgets,
@@ -2899,8 +2977,8 @@ void C_PuiSvHandlerFiler::mh_SaveCharts(const std::vector<C_PuiSvDbChart> & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveLabels(const std::vector<C_PuiSvDbLabel> & orc_Widgets,
@@ -2926,8 +3004,8 @@ void C_PuiSvHandlerFiler::mh_SaveLabels(const std::vector<C_PuiSvDbLabel> & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveParams(const std::vector<C_PuiSvDbParam> & orc_Widgets,
@@ -2994,8 +3072,8 @@ void C_PuiSvHandlerFiler::mh_SaveParams(const std::vector<C_PuiSvDbParam> & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save tree elements
 
-   \param[in]     orc_Items     Tree elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "param" element
+   \param[in]      orc_Items        Tree elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "param" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveParamExpandedItems(const std::vector<C_PuiSvDbExpandedTreeIndex> & orc_Items,
@@ -3019,8 +3097,8 @@ void C_PuiSvHandlerFiler::mh_SaveParamExpandedItems(const std::vector<C_PuiSvDbE
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save column position indices elements
 
-   \param[in]     orc_Items     Column position indices elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "param" element
+   \param[in]      orc_Items        Column position indices elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "param" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveParamColumnPositionIndices(const std::vector<sint32> & orc_Items,
@@ -3041,8 +3119,8 @@ void C_PuiSvHandlerFiler::mh_SaveParamColumnPositionIndices(const std::vector<si
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SavePieCharts(const std::vector<C_PuiSvDbPieChart> & orc_Widgets,
@@ -3067,8 +3145,8 @@ void C_PuiSvHandlerFiler::mh_SavePieCharts(const std::vector<C_PuiSvDbPieChart> 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveSpinBoxes(const std::vector<C_PuiSvDbSpinBox> & orc_Widgets,
@@ -3100,8 +3178,8 @@ void C_PuiSvHandlerFiler::mh_SaveSpinBoxes(const std::vector<C_PuiSvDbSpinBox> &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveTables(const std::vector<C_PuiSvDbTable> & orc_Widgets,
@@ -3137,8 +3215,8 @@ void C_PuiSvHandlerFiler::mh_SaveTables(const std::vector<C_PuiSvDbTable> & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveSliders(const std::vector<C_PuiSvDbSlider> & orc_Widgets,
@@ -3164,8 +3242,8 @@ void C_PuiSvHandlerFiler::mh_SaveSliders(const std::vector<C_PuiSvDbSlider> & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveProgressBars(const std::vector<C_PuiSvDbProgressBar> & orc_Widgets,
@@ -3194,8 +3272,8 @@ void C_PuiSvHandlerFiler::mh_SaveProgressBars(const std::vector<C_PuiSvDbProgres
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget elements
 
-   \param[in]     orc_Widgets   Widget elements
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the "dashboard" element
+   \param[in]      orc_Widgets      Widget elements
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the "dashboard" element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveToggles(const std::vector<C_PuiSvDbToggle> & orc_Widgets,
@@ -3225,8 +3303,8 @@ void C_PuiSvHandlerFiler::mh_SaveToggles(const std::vector<C_PuiSvDbToggle> & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save widget element
 
-   \param[in]     orc_Widget    Widget element
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the any widget element
+   \param[in]      orc_Widget       Widget element
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the any widget element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveWidgetBase(const C_PuiSvDbWidgetBase & orc_Widget, C_OSCXMLParserBase & orc_XMLParser)
@@ -3273,8 +3351,8 @@ void C_PuiSvHandlerFiler::mh_SaveWidgetBase(const C_PuiSvDbWidgetBase & orc_Widg
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save UI index to CURRENT node
 
-   \param[in]     orc_Id        ID to store
-   \param[in,out] orc_XMLParser XML parser
+   \param[in]      orc_Id           ID to store
+   \param[in,out]  orc_XMLParser    XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveUiIndex(const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
@@ -3300,8 +3378,8 @@ void C_PuiSvHandlerFiler::mh_SaveUiIndex(const C_PuiSvDbNodeDataPoolListElementI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save ID
 
-   \param[in]     orc_Id        ID
-   \param[in,out] orc_XMLParser XML parser with the "current" element set to the any element
+   \param[in]      orc_Id           ID
+   \param[in,out]  orc_XMLParser    XML parser with the "current" element set to the any element
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::mh_SaveDataElement(const C_OSCNodeDataPoolListElementId & orc_Id,
@@ -3316,7 +3394,7 @@ void C_PuiSvHandlerFiler::mh_SaveDataElement(const C_OSCNodeDataPoolListElementI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform device config mode to string
 
-   \param[in] oe_Mode Device config mode
+   \param[in]  oe_Mode  Device config mode
 
    \return
    Stringified device config mode
@@ -3342,7 +3420,7 @@ QString C_PuiSvHandlerFiler::mh_DeviceConfigModeToString(const C_PuiSvData::E_De
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform write mode to string
 
-   \param[in] oe_Mode Write mode
+   \param[in]  oe_Mode  Write mode
 
    \return
    Stringified write mode
@@ -3368,7 +3446,7 @@ QString C_PuiSvHandlerFiler::mh_WriteModeToString(const C_PuiSvDbWidgetBase::E_W
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform display style to string
 
-   \param[in] oe_Style Display style
+   \param[in]  oe_Style    Display style
 
    \return
    Stringified display style
@@ -3400,7 +3478,7 @@ QString C_PuiSvHandlerFiler::mh_DisplayStyleToString(const C_PuiSvDbWidgetBase::
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform toggle type to string
 
-   \param[in] oe_Type Toggle type
+   \param[in]  oe_Type  Toggle type
 
    \return
    Stringified toggle type
@@ -3429,7 +3507,7 @@ QString C_PuiSvHandlerFiler::mh_ToggleTypeToString(const C_PuiSvDbToggle::E_Type
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform spin box type to string
 
-   \param[in] oe_Type Spin box type
+   \param[in]  oe_Type  Spin box type
 
    \return
    Stringified spin box type
@@ -3455,7 +3533,7 @@ QString C_PuiSvHandlerFiler::mh_SpinBoxTypeToString(const C_PuiSvDbSpinBox::E_Ty
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform label type to string
 
-   \param[in] oe_Type Label type
+   \param[in]  oe_Type  Label type
 
    \return
    Stringified label type
@@ -3481,7 +3559,7 @@ QString C_PuiSvHandlerFiler::mh_LabelTypeToString(const C_PuiSvDbLabel::E_Type o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform slider type to string
 
-   \param[in] oe_Type Slider type
+   \param[in]  oe_Type  Slider type
 
    \return
    Stringified slider type
@@ -3513,7 +3591,7 @@ QString C_PuiSvHandlerFiler::mh_SliderTypeToString(const C_PuiSvDbSlider::E_Type
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform progress bar type to string
 
-   \param[in] oe_Type Progress bar type
+   \param[in]  oe_Type  Progress bar type
 
    \return
    Stringified progress bar type
@@ -3542,7 +3620,7 @@ QString C_PuiSvHandlerFiler::mh_ProgressBarTypeToString(const C_PuiSvDbProgressB
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform progress bar alignment type to string
 
-   \param[in] oe_Type Progress bar alignment type
+   \param[in]  oe_Alignment   Alignment
 
    \return
    Stringified progress bar alignment type
@@ -3574,7 +3652,7 @@ QString C_PuiSvHandlerFiler::mh_ProgressBarAlignmentTypeToString(const C_PuiSvDb
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform transmission mode to string
 
-   \param[in] oe_Mode Transmission mode
+   \param[in]  oe_Mode  Transmission mode
 
    \return
    Stringified transmission mode
@@ -3603,7 +3681,7 @@ QString C_PuiSvHandlerFiler::mh_TransmissionModeToString(const C_PuiSvReadDataCo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform source type to string
 
-   \param[in] oe_Type Source type
+   \param[in]  oe_Type  Source type
 
    \return
    Stringified source type
@@ -3629,7 +3707,7 @@ QString C_PuiSvHandlerFiler::mh_SourceTypeToString(const C_PuiSvDbNodeDataPoolLi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Interpret device config mode string
 
-   \param[in] orc_Input String to interpret
+   \param[in]  orc_Input   String to interpret
 
    \return
    Device config mode
@@ -3658,7 +3736,7 @@ C_PuiSvData::E_DeviceConfigurationMode C_PuiSvHandlerFiler::mh_StringToDeviceCon
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform chart zoom mode to string
 
-   \param[in] oe_Type Zoom mode setting
+   \param[in]  oe_ZoomMode    Zoom mode
 
    \return
    Stringified zoom mode setting

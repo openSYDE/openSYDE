@@ -12,6 +12,10 @@
 
 #include "C_SdNdeHalcConfigTreeDelegate.h"
 
+#include "C_OgeCbxMultiSelectTableHalc.h"
+#include "C_OgeCbxTableHalc.h"
+#include "C_OgeSpxTableHalc.h"
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
@@ -33,37 +37,38 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcConfigTreeDelegate::C_SdNdeHalcConfigTreeDelegate(QObject * const opc_Parent) :
    C_TblDelegate(opc_Parent)
 {
+   this->mq_InitialSelection = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create spin box
 
-   \param[in,out] opc_Parent Parent
+   \param[in,out]  opc_Parent    Parent
 
    \return
    HALC spin box interaction element
-   TODO return correctly styled spin box
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiSpinBoxGroup * C_SdNdeHalcConfigTreeDelegate::m_CreateSpinBox(QWidget * const opc_Parent) const
 {
-   return new C_OgeWiSpinBoxGroup(opc_Parent);
+   return new C_OgeSpxTableHalc(opc_Parent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create line edit
 
-   \param[in,out] opc_Parent Parent
+   Returns unstyled line edit as we do not need a line edit for HALC parameter editing.
+
+   \param[in,out]  opc_Parent    Parent
 
    \return
    HALC line edit interaction element
-   TODO return correctly styled spin box
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblEditLineEditBase * C_SdNdeHalcConfigTreeDelegate::m_CreateLineEdit(QWidget * const opc_Parent) const
@@ -74,14 +79,27 @@ C_TblEditLineEditBase * C_SdNdeHalcConfigTreeDelegate::m_CreateLineEdit(QWidget 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create combo box
 
-   \param[in,out] opc_Parent Parent
+   \param[in,out]  opc_Parent    Parent
 
    \return
    HALC combo box interaction element
-   TODO return correctly styled spin box
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeCbxTableBase * C_SdNdeHalcConfigTreeDelegate::m_CreateComboBox(QWidget * const opc_Parent) const
 {
-   return new C_OgeCbxTableBase(opc_Parent);
+   return new C_OgeCbxTableHalc(opc_Parent);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create multi select combo box
+
+   \param[in,out]  opc_Parent    Parent
+
+   \return
+   HALC multi select combo box interaction element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OgeCbxMultiSelect * C_SdNdeHalcConfigTreeDelegate::m_CreateMultiSelectComboBox(QWidget * const opc_Parent) const
+{
+   return new C_OgeCbxMultiSelectTableHalc(opc_Parent);
 }

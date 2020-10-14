@@ -42,6 +42,8 @@ public:
    void Init(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_InterfaceIndex,
              const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComProtocol);
    std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> GetUniqueMessages(void) const;
+   stw_types::uint32 GetUniqueMessageCount(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ComProtocol,
+                                           stw_types::uint32 * const opu32_SignalCount = NULL) const;
    static void h_GetConnectedAndActiveInterfaces(const stw_types::uint32 ou32_BusIndex,
                                                  const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComProtocol,
                                                  std::vector<stw_types::uint32> & orc_NodeIndexes,

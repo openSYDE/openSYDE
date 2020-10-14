@@ -42,7 +42,7 @@ using namespace stw_opensyde_gui;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_TblViewToolTipBase::C_TblViewToolTipBase(QWidget * const opc_Parent) :
@@ -71,7 +71,7 @@ C_TblViewToolTipBase::~C_TblViewToolTipBase(void)
 
    Here: Handle tooltip if necessary
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
@@ -85,7 +85,7 @@ void C_TblViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 
    Here: handle enter or return click: enter edit mode or toggle checkbox
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblViewToolTipBase::keyPressEvent(QKeyEvent * const opc_Event)
@@ -145,7 +145,7 @@ void C_TblViewToolTipBase::keyPressEvent(QKeyEvent * const opc_Event)
 
    Here: Handle tool tip
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 
    \return
    True  Event was recognized and processed
@@ -315,9 +315,53 @@ void C_TblViewToolTipBase::m_HideToolTip(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get column widths
+
+   \return
+   Column widths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<sint32> C_TblViewToolTipBase::m_GetColumnWidths(void) const
+{
+   std::vector<sint32> c_ColumnWidths;
+   c_ColumnWidths.reserve(this->model()->columnCount());
+   for (sint32 s32_ItColumn = 0; s32_ItColumn < this->model()->columnCount(); ++s32_ItColumn)
+   {
+      c_ColumnWidths.push_back(this->columnWidth(s32_ItColumn));
+   }
+   return c_ColumnWidths;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set column widths
+
+   \param[in]  orc_ColumnWidths  Column widths
+
+   \retval   true   Were set
+   \retval   false  Were not set
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_TblViewToolTipBase::m_SetColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
+{
+   bool q_Retval = false;
+
+   //Only apply user settings if number of expected columns, otherwise this could lead to unexpected behavior
+   if ((orc_ColumnWidths.size() > 0UL) &&
+       (static_cast<uint32>(this->model()->columnCount()) == orc_ColumnWidths.size()))
+   {
+      q_Retval = true;
+      for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
+      {
+         this->setColumnWidth(static_cast<sint32>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
+      }
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle mouse move (tool tip related)
 
-   \param[in] orc_GlobalPos Global mouse pos
+   \param[in]  orc_GlobalPos  Global mouse pos
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)

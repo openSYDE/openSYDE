@@ -26,6 +26,7 @@
 #include "TGLFile.h"
 #include "C_OsyCodeExportBase.h"
 #include "C_OSCUtils.h"
+#include "C_OSCBinaryHash.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -151,6 +152,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
 
    mc_ExeName = acn_ApplicationName;
    mc_ExeVersion = h_GetApplicationVersion(mc_ExeName);
+   mc_BinaryHash = stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash();
 
    mc_LogFileName = TGL_ChangeFileExtension(mc_ExeName, ".log");
    mc_ListOfFilesFileName = TGL_ChangeFileExtension(mc_ExeName, "") + "_file_list.txt";
@@ -158,6 +160,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
    m_PrintBanner();
 
    std::cout << "Version: " << mc_ExeVersion.c_str() << &std::endl;
+   std::cout << "MD5-Checksum: " << mc_BinaryHash.c_str() << &std::endl;
 
    //configure logging engine to log to local file:
    //remove pre-existing file:
@@ -165,7 +168,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
    stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToFileActive(true);
    stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToConsoleActive(false);
    stw_opensyde_core::C_OSCLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFileName);
-   osc_write_log_info("Starting tool", mc_ExeName + " Version: " + mc_ExeVersion);
+   osc_write_log_info("Starting tool", mc_ExeName + " Version: " + mc_ExeVersion + ", MD5-Checksum: " + mc_BinaryHash);
 
    //try to remove list-of-files file if it already exists
    if (stw_tgl::TGL_FileExists(mc_ListOfFilesFileName) == true)

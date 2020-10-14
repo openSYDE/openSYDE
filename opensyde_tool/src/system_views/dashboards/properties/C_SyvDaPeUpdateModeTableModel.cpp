@@ -450,7 +450,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                                                                        rc_CurId.u32_DataPoolIndex,
                                                                        e_DataPoolType) == C_NO_ERR)
                   {
-                     c_Tmp.push_back(QString::number(20));
+                     c_Tmp.push_back(QString::number(16)); // icon size
                      if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eDIAG)
                      {
                         c_Tmp.push_back(":/images/system_definition/IconVariable.svg");

@@ -62,9 +62,39 @@ C_SCLString C_OSCExportHalc::h_GetFileName(const bool oq_IsSafe)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert overall code structure version to HALC code subversion.
+
+   The overall code generation version decodes the format versions of parametrization, COMM, HALC code.
+
+   \param[in]       ou16_GenCodeVersion     Overall code format version
+
+   \return version of HALC code
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint16 C_OSCExportHalc::h_ConvertOverallCodeVersion(const uint16 ou16_GenCodeVersion)
+{
+   uint16 u16_Return;
+
+   //Technically HALC code is "compatible" with overall versions up to 4. So don't impose any artifical limits here.
+   if (ou16_GenCodeVersion <= 4U)
+   {
+      u16_Return = 1U;
+   }
+   else
+   {
+      // should never occur...
+      tgl_assert(false);
+      u16_Return = 0U;
+   }
+
+   return u16_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create source code
 
    \param[in]  orc_Path             Storage path for created file
+   \param[in]  ou16_GenCodeVersion  version of structure (generate code as specified for this version)
    \param[in]  orc_HalcConfig       HALC configuration
    \param[in]  orc_Datapool         Datapool definition
    \param[in]  orc_ExportToolInfo   Information about calling executable (name + version)
@@ -75,7 +105,7 @@ C_SCLString C_OSCExportHalc::h_GetFileName(const bool oq_IsSafe)
    C_NOACT     Datapool is not of type HALC
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportHalc::h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path,
+sint32 C_OSCExportHalc::h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path, const uint16 ou16_GenCodeVersion,
                                            const C_OSCHalcConfig & orc_HalcConfig,
                                            const C_OSCNodeDataPool & orc_Datapool,
                                            const stw_scl::C_SCLString & orc_ExportToolInfo)
@@ -87,6 +117,14 @@ sint32 C_OSCExportHalc::h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path
    orc_HalcConfig.CalcHash(u32_HashValue);
    orc_Datapool.CalcHash(u32_HashValue);
    const C_SCLString c_ProjectId = C_SCLString::IntToStr(u32_HashValue);
+
+   // make sure version is known
+   if (ou16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
+   {
+      s32_Retval = C_NOACT;
+      osc_write_log_error("Creating source code",
+                          "Did not generate code for HALC configuration because code format version is unknown.");
+   }
 
    // make sure Datapool is of type HALC
    if (orc_Datapool.e_Type != C_OSCNodeDataPool::eHALC)
@@ -100,13 +138,13 @@ sint32 C_OSCExportHalc::h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = mh_CreateHeaderFile(orc_ExportToolInfo, orc_Path, orc_HalcConfig, c_ProjectId,
-                                       orc_Datapool.q_IsSafety);
+                                       orc_Datapool.q_IsSafety, ou16_GenCodeVersion);
    }
 
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = mh_CreateImplementationFile(orc_ExportToolInfo, orc_Path, orc_HalcConfig, c_ProjectId,
-                                               orc_Datapool.q_IsSafety);
+                                               orc_Datapool.q_IsSafety, ou16_GenCodeVersion);
    }
 
    return s32_Retval;
@@ -120,6 +158,7 @@ sint32 C_OSCExportHalc::h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path
    \param[in]  orc_HalcConfig       HALC configuration
    \param[in]  orc_ProjectId        Project id for consistency check
    \param[in]  oq_IsSafe            true: generate code for safe HALC
+   \param[in]  ou16_GenCodeVersion  version of structure (generate code as specified for this version)
 
    \return
    C_NO_ERR    Success
@@ -129,7 +168,8 @@ sint32 C_OSCExportHalc::h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path
 sint32 C_OSCExportHalc::mh_CreateHeaderFile(const stw_scl::C_SCLString & orc_ExportToolInfo,
                                             const stw_scl::C_SCLString & orc_Path,
                                             const C_OSCHalcConfig & orc_HalcConfig,
-                                            const stw_scl::C_SCLString & orc_ProjectId, const bool oq_IsSafe)
+                                            const stw_scl::C_SCLString & orc_ProjectId, const bool oq_IsSafe,
+                                            const uint16 ou16_GenCodeVersion)
 {
    sint32 s32_Retval;
    C_SCLStringList c_Data;
@@ -141,7 +181,7 @@ sint32 C_OSCExportHalc::mh_CreateHeaderFile(const stw_scl::C_SCLString & orc_Exp
    mh_AddIncludes(c_Data, mhq_IS_HEADER_FILE, oq_IsSafe);
 
    // add defines
-   mh_AddDefines(c_Data, orc_HalcConfig, orc_ProjectId, mhq_IS_HEADER_FILE, oq_IsSafe);
+   mh_AddDefines(c_Data, orc_HalcConfig, orc_ProjectId, mhq_IS_HEADER_FILE, oq_IsSafe, ou16_GenCodeVersion);
 
    // add types
    c_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Types"));
@@ -172,6 +212,7 @@ sint32 C_OSCExportHalc::mh_CreateHeaderFile(const stw_scl::C_SCLString & orc_Exp
    \param[in]  orc_HalcConfig       HALC configuration
    \param[in]  orc_ProjectId        Project id for consistency check
    \param[in]  oq_IsSafe            true: generate code for safe HALC
+   \param[in]  ou16_GenCodeVersion  version of structure (generate code as specified for this version)
 
    \return
    C_NO_ERR    Success
@@ -181,7 +222,8 @@ sint32 C_OSCExportHalc::mh_CreateHeaderFile(const stw_scl::C_SCLString & orc_Exp
 sint32 C_OSCExportHalc::mh_CreateImplementationFile(const stw_scl::C_SCLString & orc_ExportToolInfo,
                                                     const stw_scl::C_SCLString & orc_Path,
                                                     const C_OSCHalcConfig & orc_HalcConfig,
-                                                    const stw_scl::C_SCLString & orc_ProjectId, const bool oq_IsSafe)
+                                                    const stw_scl::C_SCLString & orc_ProjectId, const bool oq_IsSafe,
+                                                    const uint16 ou16_GenCodeVersion)
 {
    sint32 s32_Retval;
 
@@ -194,7 +236,7 @@ sint32 C_OSCExportHalc::mh_CreateImplementationFile(const stw_scl::C_SCLString &
    mh_AddIncludes(c_Data, mhq_IS_IMPLEMENTATION_FILE, oq_IsSafe);
 
    // add defines
-   mh_AddDefines(c_Data, orc_HalcConfig, orc_ProjectId, mhq_IS_IMPLEMENTATION_FILE, oq_IsSafe);
+   mh_AddDefines(c_Data, orc_HalcConfig, orc_ProjectId, mhq_IS_IMPLEMENTATION_FILE, oq_IsSafe, ou16_GenCodeVersion);
 
    // add types
    c_Data.Append(C_OSCExportUti::h_GetSectionSeparator("Types"));
@@ -292,15 +334,17 @@ void C_OSCExportHalc::mh_AddIncludes(C_SCLStringList & orc_Data, const bool oq_F
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add defines
 
-   \param[in,out]  orc_Data         Data converted to string list
-   \param[in]      orc_HalcConfig   HALC configuration
-   \param[in]      orc_ProjectId    Project id for consistency check
-   \param[in]      oq_FileType      Flag for .c vs. .h file
-   \param[in]      oq_IsSafe        true: generate code for safe HALC
+   \param[in,out]  orc_Data             Data converted to string list
+   \param[in]      orc_HalcConfig       HALC configuration
+   \param[in]      orc_ProjectId        Project id for consistency check
+   \param[in]      oq_FileType          Flag for .c vs. .h file
+   \param[in]      oq_IsSafe            true: generate code for safe HALC
+   \param[in]      ou16_GenCodeVersion  version of structure (generate code as specified for this version)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportHalc::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCHalcConfig & orc_HalcConfig,
-                                    const C_SCLString & orc_ProjectId, const bool oq_FileType, const bool oq_IsSafe)
+                                    const C_SCLString & orc_ProjectId, const bool oq_FileType, const bool oq_IsSafe,
+                                    const uint16 ou16_GenCodeVersion)
 {
    const C_SCLString c_MagicName = mh_GetMagicName(orc_ProjectId, oq_IsSafe);
 
@@ -352,6 +396,15 @@ void C_OSCExportHalc::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCHalcC
    else
    {
       orc_Data.Append("///check for correct version of structure definitions");
+      orc_Data.Append("#if OSY_HAL_DEFINITION_FORMAT_VERSION != 0x" +
+                      C_SCLString::IntToHex(static_cast<sint64>(C_OSCExportHalc::h_ConvertOverallCodeVersion(
+                                                                   ou16_GenCodeVersion)), 4U) + "U");
+
+      orc_Data.Append("///if compilation fails here the HALC driver version does not match the format version of the "
+                      "generated code");
+      orc_Data.Append("static T_osy_non_existing_type_" + orc_ProjectId + " mt_Variable;");
+      orc_Data.Append("#endif");
+      orc_Data.Append("");
       orc_Data.Append("#if OSY_HAL_DEFINITION_VERSION != 0x" +
                       C_SCLString::IntToHex(static_cast<sint64>(orc_HalcConfig.u32_ContentVersion), 4U) + "U");
       orc_Data.Append("///if compilation fails here the HALC driver version does not match the version of the PC-side "
@@ -393,6 +446,10 @@ void C_OSCExportHalc::mh_AddGlobalVariables(C_SCLStringList & orc_Data, const C_
 
       orc_Data.Append("const T_osy_hal_trg_config " + c_ConfigurationStructureName + " =");
       orc_Data.Append("{");
+
+      orc_Data.Append("   " + C_OSCHALCMagicianUtil::h_GetDatapoolName(oq_IsSafe) +
+                      "_DATA_POOL_INDEX, //index of associated Datapool");
+
       if (u32_DomainNumber > 0U)
       {
          for (uint32 u32_DomainIt = 0U; u32_DomainIt < u32_DomainNumber; u32_DomainIt++)
@@ -406,20 +463,13 @@ void C_OSCExportHalc::mh_AddGlobalVariables(C_SCLStringList & orc_Data, const C_
                const C_OSCHalcDefChannelValues * pc_ChannelValues;
                std::vector<C_OSCHalcConfigChannel> c_ChannelConfigs;
                uint32 u32_NumberOfAssignedChannels = 0U;
+               bool q_BracketIsOpen = false;
+               const bool q_DomainHasChannels = (pc_Domain->c_Channels.size() > 0U) ? true : false;
 
                orc_Data.Append("   //" + pc_Domain->c_Name);
                orc_Data.Append("   {");
 
-               // add channel number resp. its define if there exists more than one channel (i.e. it is not just a
-               // channelless domain)
-               if (pc_Domain->c_ChannelConfigs.size() > 0U)
-               {
-                  orc_Data.Append("      " + C_OSCHALCMagicianUtil::h_GetDatapoolName(oq_IsSafe) + "_NUMBER_OF_" +
-                                  pc_Domain->c_Name.UpperCase() + ",");
-               }
-
-               orc_Data.Append("      {");
-
+               // get number of channels assigned to this safetyness:
                for (uint32 u32_Channel = 0U; u32_Channel < pc_Domain->c_ChannelConfigs.size(); u32_Channel++)
                {
                   if (pc_Domain->c_ChannelConfigs[u32_Channel].q_SafetyRelevant == oq_IsSafe)
@@ -428,57 +478,81 @@ void C_OSCExportHalc::mh_AddGlobalVariables(C_SCLStringList & orc_Data, const C_
                   }
                }
 
-               // add channel number and use case and pointers if there exists at least one use case ...
-               if (pc_Domain->c_ChannelUseCases.size() > 0U)
+               // make some decision based on whether we have channels or a "pure" domain
+               if (q_DomainHasChannels == true)
                {
-                  //... and at least one channel is assigned to the desired safetyty:
-                  if (u32_NumberOfAssignedChannels > 0U)
-                  {
-                     // result should be an array of length channel number resp. no array if less than 2 channels
-                     const C_SCLString c_Head = "         &gt_" + C_OSCHALCMagicianUtil::h_GetDatapoolName(oq_IsSafe) +
-                                                "_DataPoolValues.t_ConfigurationValues." +
-                                                ((u32_NumberOfAssignedChannels > 1U) ? "a" : "");
-                     const C_SCLString c_Tail =
-                        ((u32_NumberOfAssignedChannels > 1U) ? "[0]" : static_cast<C_SCLString>("")) + ",";
+                  // add channel number resp. its define
+                  orc_Data.Append("      " + C_OSCHALCMagicianUtil::h_GetDatapoolName(oq_IsSafe) + "_NUMBER_OF_" +
+                                  pc_Domain->c_Name.UpperCase() + ",");
 
-                     //if we have use cases we also have channel numbers
-                     c_Tmp = c_Head + "u16_" + pc_Domain->c_SingularName + "ChannelNumber" + c_Tail;
-                     orc_Data.Append(c_Tmp);
+                  //set actual data to use for values and parameters:
+                  pc_ChannelValues = &pc_Domain->c_ChannelValues;
+                  c_ChannelConfigs = pc_Domain->c_ChannelConfigs;
 
-                     c_Tmp = c_Head + "u8_" + pc_Domain->c_SingularName + "UseCase" + c_Tail;
-                     orc_Data.Append(c_Tmp);
-                  }
-                  else
-                  {
-                     //no channels assigned to this safetyty: no data to reference: use NULL:
-                     orc_Data.Append("         NULL,"); //channel number
-                     orc_Data.Append("         NULL,"); //use case
-                  }
-               }
-
-               // add references to corresponding elements of parameters/configuration
-               if (pc_Domain->c_Channels.size() == 0)
-               {
-                  //we have a domain: use domain parameters
-                  pc_ChannelValues = &pc_Domain->c_DomainValues;
-                  c_ChannelConfigs.push_back(pc_Domain->c_DomainConfig); //just one config ...
-                  q_IsArray = false;
+                  //domain with channel: depends on number of channels
+                  q_IsArray = (u32_NumberOfAssignedChannels > 1U);
                }
                else
                {
-                  pc_ChannelValues = &pc_Domain->c_ChannelValues;
-                  c_ChannelConfigs = pc_Domain->c_ChannelConfigs;
-                  q_IsArray = (u32_NumberOfAssignedChannels > 1U);
+                  //set actual data to use for values and parameters:
+                  pc_ChannelValues = &pc_Domain->c_DomainValues;
+                  c_ChannelConfigs.push_back(pc_Domain->c_DomainConfig); //just one config ...
+
+                  //channelless domain: simple
+                  q_IsArray = false;
                }
 
-               mh_AddDpListElementReferences(orc_Data, pc_ChannelValues->c_Parameters, c_ChannelConfigs,
-                                             C_OSCHalcDefDomain::eVA_PARAM,
-                                             pc_Domain->c_SingularName, q_IsArray, oq_IsSafe);
+               // configuration sub-structure
+               // To be generated if
+               // a) the domain has channels or
+               // b) the domain does not have channels but at least one parameter (in any safetyty):
+               if ((q_DomainHasChannels == true) || (pc_Domain->c_DomainValues.c_Parameters.size() > 0))
+               {
+                  orc_Data.Append("      {");
+                  q_BracketIsOpen = true;
+
+                  // add channel number and use case and pointers if there exists at least one use case ...
+                  if (pc_Domain->c_ChannelUseCases.size() > 0U)
+                  {
+                     //... and at least one channel is assigned to the desired safetyty:
+                     if (u32_NumberOfAssignedChannels > 0U)
+                     {
+                        // result should be an array of length channel number resp. no array if less than 2 channels
+                        const C_SCLString c_Head = "         &gt_" +
+                                                   C_OSCHALCMagicianUtil::h_GetDatapoolName(oq_IsSafe) +
+                                                   "_DataPoolValues.t_ConfigurationValues." +
+                                                   ((u32_NumberOfAssignedChannels > 1U) ? "a" : "");
+                        const C_SCLString c_Tail =
+                           ((u32_NumberOfAssignedChannels > 1U) ? "[0]" : static_cast<C_SCLString>("")) + ",";
+
+                        //if we have use cases we also have channel numbers
+                        c_Tmp = c_Head + "u16_" + pc_Domain->c_SingularName + "ChannelNumber" + c_Tail;
+                        orc_Data.Append(c_Tmp);
+
+                        c_Tmp = c_Head + "u8_" + pc_Domain->c_SingularName + "UseCase" + c_Tail;
+                        orc_Data.Append(c_Tmp);
+                     }
+                     else
+                     {
+                        //no channels assigned to this safetyty: no data to reference: use NULL:
+                        orc_Data.Append("         NULL,"); //channel number
+                        orc_Data.Append("         NULL,"); //use case
+                     }
+                  }
+
+                  // add references to corresponding elements of parameters/configuration
+                  mh_AddDpListElementReferences(orc_Data, pc_ChannelValues->c_Parameters, c_ChannelConfigs,
+                                                C_OSCHalcDefDomain::eVA_PARAM,
+                                                pc_Domain->c_SingularName, q_IsArray, oq_IsSafe);
+               }
 
                // add references to corresponding elements of list inputs
                if (pc_ChannelValues->c_InputValues.size() > 0U)
                {
-                  orc_Data.Append("      },");
+                  if (q_BracketIsOpen == true)
+                  {
+                     orc_Data.Append("      },");
+                  }
                   orc_Data.Append("      {");
                   mh_AddDpListElementReferences(orc_Data, pc_ChannelValues->c_InputValues, c_ChannelConfigs,
                                                 C_OSCHalcDefDomain::eVA_INPUT,
@@ -488,7 +562,10 @@ void C_OSCExportHalc::mh_AddGlobalVariables(C_SCLStringList & orc_Data, const C_
                // add references to corresponding elements of list outputs
                if (pc_ChannelValues->c_OutputValues.size() > 0U)
                {
-                  orc_Data.Append("      },");
+                  if (q_BracketIsOpen == true)
+                  {
+                     orc_Data.Append("      },");
+                  }
                   orc_Data.Append("      {");
                   mh_AddDpListElementReferences(orc_Data, pc_ChannelValues->c_OutputValues, c_ChannelConfigs,
                                                 C_OSCHalcDefDomain::eVA_OUTPUT,
@@ -498,14 +575,20 @@ void C_OSCExportHalc::mh_AddGlobalVariables(C_SCLStringList & orc_Data, const C_
                // add references to corresponding elements of list statuses
                if (pc_ChannelValues->c_StatusValues.size() > 0)
                {
-                  orc_Data.Append("      },");
+                  if (q_BracketIsOpen == true)
+                  {
+                     orc_Data.Append("      },");
+                  }
                   orc_Data.Append("      {");
                   mh_AddDpListElementReferences(orc_Data, pc_ChannelValues->c_StatusValues, c_ChannelConfigs,
                                                 C_OSCHalcDefDomain::eVA_STATUS,
                                                 pc_Domain->c_SingularName, q_IsArray, oq_IsSafe);
                }
 
-               orc_Data.Append("      }");
+               if (q_BracketIsOpen == true)
+               {
+                  orc_Data.Append("      }");
+               }
 
                c_Tmp = (u32_DomainIt != (u32_DomainNumber - 1)) ? "   }," : "   }";
                orc_Data.Append(c_Tmp);

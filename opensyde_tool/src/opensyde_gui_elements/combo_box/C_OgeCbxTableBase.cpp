@@ -65,7 +65,7 @@ void C_OgeCbxTableBase::InitFromStringList(const QStringList & orc_Strings, cons
       this->mc_Values.reserve(this->mc_Strings.size());
       for (sintn sn_It = 0; sn_It < this->mc_Strings.size(); ++sn_It)
       {
-         this->mc_Values[sn_It] = QString::number(sn_It);
+         this->mc_Values.push_back(QString::number(sn_It));
       }
    }
 }

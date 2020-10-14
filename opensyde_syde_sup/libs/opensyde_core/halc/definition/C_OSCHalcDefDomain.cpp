@@ -36,7 +36,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefDomain::C_OSCHalcDefDomain(void)
+C_OSCHalcDefDomain::C_OSCHalcDefDomain(void) :
+   e_Category(C_OSCHalcDefDomain::eCA_OTHER)
 {
 }
 
@@ -62,6 +63,7 @@ void C_OSCHalcDefDomain::CalcHash(stw_types::uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_SingularName.c_str(), this->c_SingularName.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Category, sizeof(this->e_Category), oru32_HashValue);
 
    for (uint32 u32_It = 0UL; u32_It < this->c_Channels.size(); ++u32_It)
    {

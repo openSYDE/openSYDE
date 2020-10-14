@@ -48,7 +48,10 @@ border-style: solid;
 border-radius: 0px;
 border-width: 1px;
 padding: 0px;
-padding-left: 33px;
+padding-left: 22px;
+padding-bottom: 1px;
+height: 27px; /* 27 (height) + 1  (padding) + 2x1 (Border) = 30 (real height) */
+width: 126px; /* 126 (width) + 22 (padding) + 2x1 (Border) = 150 (real width) */
 }
 
 /* --------------------------------------------------------------------- */
@@ -206,7 +209,8 @@ padding-right: 15px;
 }
 
 stw_opensyde_gui_elements--C_OgePubMessageOk:focus,
-stw_opensyde_gui_elements--C_OgePubMessageCancel:focus
+stw_opensyde_gui_elements--C_OgePubMessageCancel:focus,
+stw_opensyde_gui_elements--C_OgePubHalcPanel:focus
 {
 text-decoration: underline;
 }
@@ -229,3 +233,23 @@ border-radius: 14px;
 }
 
 /* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgePubHalcOverview
+{
+border-style: solid;
+border-width: 1px;
+border-bottom-width: 0px;
+text-align: left;
+padding-left: 19px;
+padding-right: 19px;
+}
+
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgePubHalcPanel
+{
+border-style: solid;
+border-width: 1px;
+border-radius: 0px;
+text-align: center;
+width: 78px; /*2px border*/
+height: 28px; /*2px border*/
+}

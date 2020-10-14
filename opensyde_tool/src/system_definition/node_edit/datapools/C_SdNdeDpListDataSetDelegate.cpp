@@ -183,22 +183,6 @@ void C_SdNdeDpListDataSetDelegate::setModelData(QWidget * const opc_Editor, QAbs
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Paint item
-
-   Here: special handling for boolean & deactivated cells
-
-   \param[in,out]  opc_Painter   Painter
-   \param[in]      orc_Option    Option
-   \param[in]      orc_Index     Index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
-                                         const QModelIndex & orc_Index) const
-{
-   QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set hovered row index
 
    \param[in]  ors32_Value    New hovered row index

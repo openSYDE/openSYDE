@@ -503,7 +503,8 @@ sint32 C_OSCHalcConfigFiler::mh_SaveIODataBase(const C_OSCHalcDefBase & orc_IODa
    }
    else
    {
-      const stw_scl::C_SCLString c_IODataFileName = "halc_definition_file.xml";
+      const stw_scl::C_SCLString c_IODataFileName = (orc_IOData.c_OriginalFileName.IsEmpty() == false) ?
+                                                    orc_IOData.c_OriginalFileName : "halc_definition_file.xml";
       const stw_scl::C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
                                                                                            c_IODataFileName);
       s32_Retval = C_OSCHalcDefFiler::h_SaveFile(orc_IOData, c_CombinedFileName);

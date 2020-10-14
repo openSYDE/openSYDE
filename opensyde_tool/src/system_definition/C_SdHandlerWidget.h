@@ -64,6 +64,7 @@ private:
    void m_BusChanged(const stw_types::uint32 ou32_Index);
 
    void m_SwitchToBus(const stw_types::uint32 ou32_Index, const QString & orc_BusName);
+   void m_SwitchToBusProperties(const stw_types::uint32 ou32_Index, const QString & orc_BusName);
    void m_SetFlag(const stw_types::uint32 ou32_Flag) const;
    void m_ErrorChange(void);
    void GenerateCode(void) const;

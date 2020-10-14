@@ -76,6 +76,8 @@ sint32 C_OSCHalcDefFiler::h_LoadFile(C_OSCHalcDefBase & orc_IOData, const stw_sc
          {
             //Save file to string
             C_OSCUtils::h_FileToString(orc_Path, orc_IOData.c_FileString);
+            //Remember name
+            orc_IOData.c_OriginalFileName = TGL_ExtractFileName(orc_Path);
          }
       }
       else
@@ -400,6 +402,51 @@ sint32 C_OSCHalcDefFiler::h_CheckUseCaseValue(const C_OSCHalcDefDomain & orc_IOD
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check domain display names
+
+   \param[in]  orc_IODataDomain  IO data domain
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    IO definition content is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcDefFiler::h_CheckDomainDisplayNames(const C_OSCHalcDefDomain & orc_IODataDomain)
+{
+   sint32 s32_Retval;
+
+   std::vector<stw_scl::C_SCLString> c_Names;
+
+   C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_ChannelValues.c_Parameters, c_Names);
+   C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_DomainValues.c_Parameters, c_Names);
+
+   s32_Retval = C_OSCHalcDefFiler::mh_CheckDuplicateNames("parameters", orc_IODataDomain.c_SingularName, c_Names);
+   if (s32_Retval == C_NO_ERR)
+   {
+      c_Names.clear();
+      C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_ChannelValues.c_InputValues, c_Names);
+      C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_DomainValues.c_InputValues, c_Names);
+      s32_Retval = C_OSCHalcDefFiler::mh_CheckDuplicateNames("inputs", orc_IODataDomain.c_SingularName, c_Names);
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      c_Names.clear();
+      C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_ChannelValues.c_OutputValues, c_Names);
+      C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_DomainValues.c_OutputValues, c_Names);
+      s32_Retval = C_OSCHalcDefFiler::mh_CheckDuplicateNames("outputs", orc_IODataDomain.c_SingularName, c_Names);
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      c_Names.clear();
+      C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_ChannelValues.c_StatusValues, c_Names);
+      C_OSCHalcDefFiler::mh_GetAllNames(orc_IODataDomain.c_DomainValues.c_StatusValues, c_Names);
+      s32_Retval = C_OSCHalcDefFiler::mh_CheckDuplicateNames("status", orc_IODataDomain.c_SingularName, c_Names);
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -494,6 +541,11 @@ sint32 C_OSCHalcDefFiler::mh_SaveIODomain(const C_OSCHalcDefDomain & orc_IODataD
    //Singular name
    tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("singular-name") == "singular-name");
    orc_XMLParser.SetNodeContent(orc_IODataDomain.c_SingularName);
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "domain");
+   //Category
+   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("category") == "category");
+   orc_XMLParser.SetNodeContent(C_OSCHalcDefFiler::mh_DomainCategoryEnumToString(orc_IODataDomain.e_Category));
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "domain");
    //Channels
@@ -661,6 +713,50 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
          orc_IODataDomain.c_SingularName = orc_IODataDomain.c_Name;
       }
       s32_Retval = mh_LoadChannels(orc_IODataDomain.c_Channels, orc_XMLParser);
+      //Check
+      if (s32_Retval == C_NO_ERR)
+      {
+         const uint32 u32_LongestConstVarNameOffset = 13UL;
+         if (orc_IODataDomain.c_SingularName.Length() > (C_OSCHalcDefStructFiler::
+                                                         hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH -
+                                                         u32_LongestConstVarNameOffset))
+         {
+            osc_write_log_error("Loading HALC definition",
+                                stw_scl::C_SCLString(stw_scl::C_SCLString(
+                                                        "Content of domain \"singular-name\" (or \"name\" if not existing) node is too long, maximum allowed characters: ")
+                                                     +
+                                                     stw_scl::C_SCLString::IntToStr(C_OSCHalcDefStructFiler::
+                                                                                    hu32_MAX_ALLOWED_COMBINED_VARIABLE_LENGTH
+                                                                                    -
+                                                                                    u32_LongestConstVarNameOffset)
+                                                     +
+                                                     " (Current: " +
+                                                     stw_scl::C_SCLString::IntToStr(orc_IODataDomain.c_SingularName.
+                                                                                    Length()) +
+                                                     ")."));
+            s32_Retval = C_CONFIG;
+         }
+      }
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      //Category
+      if (orc_XMLParser.SelectNodeChild("category") == "category")
+      {
+         if (C_OSCHalcDefFiler::mh_DomainCategoryStringToEnum(orc_XMLParser.GetNodeContent(),
+                                                              orc_IODataDomain.e_Category) != C_NO_ERR)
+         {
+            s32_Retval = C_CONFIG;
+            osc_write_log_error("Loading HALC definition", "Unknown value for \"category\" node.");
+         }
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "domain");
+      }
+      else
+      {
+         //Optional
+         orc_IODataDomain.e_Category = C_OSCHalcDefDomain::eCA_OTHER;
+      }
    }
    if (s32_Retval == C_NO_ERR)
    {
@@ -672,7 +768,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
       s32_Retval = C_OSCHalcDefStructFiler::h_LoadStructs(orc_IODataDomain.c_DomainValues.c_Parameters, orc_XMLParser,
                                                           orc_IODataDomain.c_ChannelUseCases,  "domain",
                                                           "domain-parameters", "parameter", "parameter-element", true,
-                                                          false, orc_IODataDomain.c_Name.Length());
+                                                          false, orc_IODataDomain.c_SingularName.Length());
    }
    if (s32_Retval == C_NO_ERR)
    {
@@ -683,7 +779,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
                                                              orc_IODataDomain.c_ChannelUseCases,
                                                              "domain-values",
                                                              "input-values", "value", "value-element", false,
-                                                             false, orc_IODataDomain.c_Name.Length());
+                                                             false, orc_IODataDomain.c_SingularName.Length());
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = C_OSCHalcDefStructFiler::h_LoadStructs(orc_IODataDomain.c_DomainValues.c_OutputValues,
@@ -691,7 +787,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
                                                                 orc_IODataDomain.c_ChannelUseCases,
                                                                 "domain-values", "output-values", "value",
                                                                 "value-element",
-                                                                false, false, orc_IODataDomain.c_Name.Length());
+                                                                false, false, orc_IODataDomain.c_SingularName.Length());
          }
          if (s32_Retval == C_NO_ERR)
          {
@@ -700,7 +796,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
                                                                 orc_IODataDomain.c_ChannelUseCases,
                                                                 "domain-values", "status-values", "value",
                                                                 "value-element",
-                                                                false, false, orc_IODataDomain.c_Name.Length());
+                                                                false, false, orc_IODataDomain.c_SingularName.Length());
          }
          if (s32_Retval == C_NO_ERR)
          {
@@ -714,7 +810,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
       s32_Retval = C_OSCHalcDefStructFiler::h_LoadStructs(orc_IODataDomain.c_ChannelValues.c_Parameters, orc_XMLParser,
                                                           orc_IODataDomain.c_ChannelUseCases,  "domain",
                                                           "channel-parameters", "parameter", "parameter-element", true,
-                                                          false, orc_IODataDomain.c_Name.Length());
+                                                          false, orc_IODataDomain.c_SingularName.Length());
    }
    if (s32_Retval == C_NO_ERR)
    {
@@ -725,7 +821,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
                                                              orc_IODataDomain.c_ChannelUseCases,
                                                              "channel-values",
                                                              "input-values", "value", "value-element", false,
-                                                             false, orc_IODataDomain.c_Name.Length());
+                                                             false, orc_IODataDomain.c_SingularName.Length());
          if (s32_Retval == C_NO_ERR)
          {
             s32_Retval = C_OSCHalcDefStructFiler::h_LoadStructs(orc_IODataDomain.c_ChannelValues.c_OutputValues,
@@ -733,7 +829,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
                                                                 orc_IODataDomain.c_ChannelUseCases,
                                                                 "channel-values", "output-values", "value",
                                                                 "value-element",
-                                                                false, false, orc_IODataDomain.c_Name.Length());
+                                                                false, false, orc_IODataDomain.c_SingularName.Length());
          }
          if (s32_Retval == C_NO_ERR)
          {
@@ -742,7 +838,7 @@ sint32 C_OSCHalcDefFiler::mh_LoadIODataDomain(C_OSCHalcDefDomain & orc_IODataDom
                                                                 orc_IODataDomain.c_ChannelUseCases,
                                                                 "channel-values", "status-values", "value",
                                                                 "value-element",
-                                                                false, false, orc_IODataDomain.c_Name.Length());
+                                                                false, false, orc_IODataDomain.c_SingularName.Length());
          }
          if (s32_Retval == C_NO_ERR)
          {
@@ -775,6 +871,10 @@ sint32 C_OSCHalcDefFiler::mh_CheckIODataDomain(const C_OSCHalcDefDomain & orc_IO
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = C_OSCHalcDefFiler::h_CheckUseCaseValue(orc_IODataDomain);
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = C_OSCHalcDefFiler::h_CheckDomainDisplayNames(orc_IODataDomain);
    }
 
    return s32_Retval;
@@ -817,7 +917,8 @@ sint32 C_OSCHalcDefFiler::mh_CheckDefaultUseCase(const C_OSCHalcDefDomain & orc_
                {
                   osc_write_log_error("Loading HALC definition",
                                       stw_scl::C_SCLString(stw_scl::C_SCLString(
-                                                              "Ambiguous default for use-case index ") +
+                                                              "Ambiguous default in attribute \"is-default-for\" for use-case index ")
+                                                           +
                                                            stw_scl::C_SCLString::IntToStr(u32_ItUseCase) +
                                                            ".").c_str());
                   s32_Retval = C_CONFIG;
@@ -829,7 +930,9 @@ sint32 C_OSCHalcDefFiler::mh_CheckDefaultUseCase(const C_OSCHalcDefDomain & orc_
       if (q_FoundOne == false)
       {
          osc_write_log_error("Loading HALC definition",
-                             stw_scl::C_SCLString(stw_scl::C_SCLString("Could not find default for channel index ") +
+                             stw_scl::C_SCLString(stw_scl::C_SCLString(
+                                                     "Could not find default in attribute \"is-default-for\" for channel index ")
+                                                  +
                                                   stw_scl::C_SCLString::IntToStr(u32_ItChannel) + ".").c_str());
          s32_Retval = C_CONFIG;
          break;
@@ -858,7 +961,8 @@ sint32 C_OSCHalcDefFiler::mh_CheckDefaultUseCase(const C_OSCHalcDefDomain & orc_
          if (q_DefaultAvailable == false)
          {
             osc_write_log_error("Loading HALC definition",
-                                stw_scl::C_SCLString(stw_scl::C_SCLString("Default of use-case index ") +
+                                stw_scl::C_SCLString(stw_scl::C_SCLString(
+                                                        "Default in attribute \"is-default-for\" of use-case index ") +
                                                      stw_scl::C_SCLString::IntToStr(u32_ItUseCase) +
                                                      " is not available for this use-case.").c_str());
             s32_Retval = C_CONFIG;
@@ -1601,5 +1705,136 @@ sint32 C_OSCHalcDefFiler::mh_SaveUseCase(const C_OSCHalcDefChannelUseCase & orc_
    orc_XMLParser.SetNodeContent(orc_UseCase.c_Comment);
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "channel-use-case");
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Domain category enum to string
+
+   \param[in]  oe_Category    Category
+
+   \return
+   string representation of oe_Category
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_scl::C_SCLString C_OSCHalcDefFiler::mh_DomainCategoryEnumToString(const C_OSCHalcDefDomain::E_Category oe_Category)
+{
+   stw_scl::C_SCLString c_Retval;
+   switch (oe_Category)
+   {
+   case C_OSCHalcDefDomain::eCA_INPUT:
+      c_Retval = "input";
+      break;
+   case C_OSCHalcDefDomain::eCA_OUTPUT:
+      c_Retval = "output";
+      break;
+   case C_OSCHalcDefDomain::eCA_OTHER:
+      c_Retval = "other";
+      break;
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Domain category string to enum
+
+   \param[in]   orc_Category  Category
+   \param[out]  ore_Category  Category
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcDefFiler::mh_DomainCategoryStringToEnum(const stw_scl::C_SCLString & orc_Category,
+                                                        C_OSCHalcDefDomain::E_Category & ore_Category)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_Category == "input")
+   {
+      ore_Category = C_OSCHalcDefDomain::eCA_INPUT;
+   }
+   else if (orc_Category == "output")
+   {
+      ore_Category = C_OSCHalcDefDomain::eCA_OUTPUT;
+   }
+   else if (orc_Category == "other")
+   {
+      ore_Category = C_OSCHalcDefDomain::eCA_OTHER;
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all names
+
+   \param[in]      orc_Values    Values
+   \param[in,out]  orc_Names     Names
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcDefFiler::mh_GetAllNames(const std::vector<C_OSCHalcDefStruct> & orc_Values,
+                                       std::vector<stw_scl::C_SCLString> & orc_Names)
+{
+   for (uint32 u32_ItVal = 0UL; u32_ItVal < orc_Values.size(); ++u32_ItVal)
+   {
+      const C_OSCHalcDefStruct & rc_Struct = orc_Values[u32_ItVal];
+      if (rc_Struct.c_StructElements.size() == 0UL)
+      {
+         orc_Names.push_back(rc_Struct.c_Display);
+      }
+      for (uint32 u32_ItValElem = 0UL; u32_ItValElem < rc_Struct.c_StructElements.size(); ++u32_ItValElem)
+      {
+         const C_OSCHalcDefElement & rc_Elem = rc_Struct.c_StructElements[u32_ItValElem];
+         orc_Names.push_back(rc_Elem.c_Display);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check duplicate names
+
+   \param[in]      orc_Section               Section
+   \param[in]      orc_DomainSingularName    Domain singular name
+   \param[in,out]  orc_Names                 Names
+
+   \return
+   C_NO_ERR    data read
+   C_CONFIG    IO definition content is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcDefFiler::mh_CheckDuplicateNames(const stw_scl::C_SCLString & orc_Section,
+                                                 const stw_scl::C_SCLString & orc_DomainSingularName,
+                                                 std::vector<stw_scl::C_SCLString> & orc_Names)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   for (uint32 u32_ItName1 = 0UL; (u32_ItName1 < orc_Names.size()) && (s32_Retval == C_NO_ERR); ++u32_ItName1)
+   {
+      for (uint32 u32_ItName2 = u32_ItName1; (u32_ItName2 < orc_Names.size()) && (s32_Retval == C_NO_ERR);
+           ++u32_ItName2)
+      {
+         if (u32_ItName1 != u32_ItName2)
+         {
+            const stw_scl::C_SCLString & rc_Name = orc_Names[u32_ItName2];
+            if (orc_Names[u32_ItName1] == rc_Name)
+            {
+               s32_Retval = C_CONFIG;
+               osc_write_log_error("Loading HALC definition",
+                                   stw_scl::C_SCLString(stw_scl::C_SCLString(
+                                                           "Duplicate display name found in domain \"") +
+                                                        orc_DomainSingularName + "\", section \"" + orc_Section +
+                                                        "\": \"" +
+                                                        orc_Names[u32_ItName1] +
+                                                        "\"")
+                                   .c_str());
+            }
+         }
+      }
+   }
    return s32_Retval;
 }

@@ -37,7 +37,7 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamTblDelegate::C_CamTblDelegate(QObject * const opc_Parent) :
@@ -48,7 +48,7 @@ C_CamTblDelegate::C_CamTblDelegate(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create CAN monitor combo box interaction element
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 
    \return
    CAN monitor combo box interaction element
@@ -60,9 +60,23 @@ C_OgeCbxTableBase * C_CamTblDelegate::m_CreateComboBox(QWidget * const opc_Paren
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create multi select combo box
+
+   \param[in,out]  opc_Parent    Parent
+
+   \return
+   CAN monitor multi select combo box interaction element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OgeCbxMultiSelect * C_CamTblDelegate::m_CreateMultiSelectComboBox(QWidget * const opc_Parent) const
+{
+   return new C_OgeCbxMultiSelect(opc_Parent);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create CAN monitor line edit interaction element
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 
    \return
    CAN monitor line edit interaction element
@@ -76,7 +90,7 @@ C_TblEditLineEditBase * C_CamTblDelegate::m_CreateLineEdit(QWidget * const opc_P
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Create CAN monitor spin box interaction element
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 
    \return
    CAN monitor spin box interaction element

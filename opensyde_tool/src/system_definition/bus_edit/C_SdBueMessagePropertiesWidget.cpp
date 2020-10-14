@@ -1305,7 +1305,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateTxSelection(
    this->mc_DatapoolNamesTxSelection.clear();
 
    if (C_SdUtil::h_GetNames(this->mc_BusNodeIndexes, this->mc_BusInterfaceIndexes, c_NodeNames,
-                            &this->mc_BusDatapoolIndexes, &c_DatapoolNames) == C_NO_ERR)
+                            false, &this->mc_BusDatapoolIndexes, &c_DatapoolNames) == C_NO_ERR)
    {
       std::vector<uint32> c_MappingDatapools;
       std::vector<QString> c_MappingDatapoolNames;
@@ -1411,7 +1411,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
    }
 
    // get all names
-   if (C_SdUtil::h_GetNames(this->mc_BusNodeIndexes, this->mc_BusInterfaceIndexes, c_NodeNames,
+   if (C_SdUtil::h_GetNames(this->mc_BusNodeIndexes, this->mc_BusInterfaceIndexes, c_NodeNames, false,
                             &this->mc_BusDatapoolIndexes, &c_DatapoolNames) == C_NO_ERR)
    {
       std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_ReceiveTimeoutModes;
@@ -1792,7 +1792,7 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Di
          }
 
          // get all names
-         if (C_SdUtil::h_GetNames(c_NodeIndexes, c_InterfaceIndexes, c_NodeNames,
+         if (C_SdUtil::h_GetNames(c_NodeIndexes, c_InterfaceIndexes, c_NodeNames, false,
                                   &this->mc_NodeDatapoolIndexes, &c_DatapoolNames) == C_NO_ERR)
          {
             tgl_assert(c_NodeNames.size() == c_NodeIndexes.size());

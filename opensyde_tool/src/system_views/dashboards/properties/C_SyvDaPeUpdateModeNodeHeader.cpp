@@ -27,7 +27,7 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SyvDaPeUpdateModeNodeHeader::mhu32_HeaderHeight = 66;
+const uint32 C_SyvDaPeUpdateModeNodeHeader::mhu32_HeaderHeight = 40;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -167,7 +167,7 @@ void C_SyvDaPeUpdateModeNodeHeader::RegisterExpandOrCollapse(const bool & orq_Ex
    this->mpc_Ui->pc_PushButtonExpand->setChecked(orq_Expanded);
    if (orq_Expanded == true)
    {
-      this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconArrowBottom.svg",
+      this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconCloseList.svg",
                                                         "://images/IconArrowBottomHovered.svg",
                                                         "://images/IconArrowBottomClicked.svg",
                                                         "://images/IconArrowBottomDisabledBright.svg");
@@ -206,7 +206,7 @@ void C_SyvDaPeUpdateModeNodeHeader::m_OnPushButtonExpandClicked(const bool oq_Ch
    //Resize expanded
    if (oq_Checked == true)
    {
-      this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconArrowBottom.svg",
+      this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconCloseList.svg",
                                                         "://images/IconArrowBottomHovered.svg",
                                                         "://images/IconArrowBottomClicked.svg",
                                                         "://images/IconArrowBottomDisabledBright.svg");

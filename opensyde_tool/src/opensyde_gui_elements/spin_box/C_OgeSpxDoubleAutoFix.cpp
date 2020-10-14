@@ -48,7 +48,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxDoubleAutoFix::C_OgeSpxDoubleAutoFix(QWidget * const opc_Parent) :
@@ -76,7 +76,7 @@ sintn C_OgeSpxDoubleAutoFix::GetLineEditWidth(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Fix intermediate string
 
-   \param[in,out] orc_String Intermediate string to fix
+   \param[in,out]  orc_String    Intermediate string to fix
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
@@ -86,7 +86,8 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
    if ((validate(orc_String, sn_Pos) == QValidator::Intermediate) && (this->mu64_NumberOfStepsAvailable > 0))
    {
       float64 f64_Value;
-      if (C_OgeSpxDoubleAutoFix::mh_GetValue(orc_String, f64_Value) == C_NO_ERR)
+      const QString c_ValueOnly = this->m_ExtractSpinBoxValue(orc_String);
+      if (C_OgeSpxDoubleAutoFix::mh_GetValue(c_ValueOnly, f64_Value) == C_NO_ERR)
       {
          //Get the value in the data type range
          const float64 f64_RangeValue = f64_Value - this->mf64_ScaledMin;
@@ -94,7 +95,8 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
          //lint -e{18,762,830,1055}  C++ 11 feature
          const float64 f64_Steps = std::round(f64_RangeValue / this->mf64_StepWidth);
          //Apply improved value
-         orc_String = this->textFromValue(this->mf64_ScaledMin + (f64_Steps * this->mf64_StepWidth));
+         orc_String =
+            this->m_PrepareSpinBoxValue(this->textFromValue(this->mf64_ScaledMin + (f64_Steps * this->mf64_StepWidth)));
       }
       else
       {
@@ -110,8 +112,8 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Validate current input string
 
-   \param[in,out] orc_Input Input string
-   \param[in,out] orc_Pos   Position
+   \param[in,out]  orc_Input  Input string
+   \param[in,out]  orc_Pos    Position
 
    \return
    Invalid      Unusable
@@ -125,7 +127,8 @@ QValidator::State C_OgeSpxDoubleAutoFix::validate(QString & orc_Input, sintn & o
    if ((e_Retval == QValidator::Acceptable) && (this->mu64_NumberOfStepsAvailable > 0))
    {
       float64 f64_Value;
-      if (C_OgeSpxDoubleAutoFix::mh_GetValue(orc_Input, f64_Value) == C_NO_ERR)
+      const QString c_ValueOnly = this->m_ExtractSpinBoxValue(orc_Input);
+      if (C_OgeSpxDoubleAutoFix::mh_GetValue(c_ValueOnly, f64_Value) == C_NO_ERR)
       {
          const float64 f64_RangeValue = f64_Value - this->mf64_ScaledMin;
          const float64 f64_Steps = f64_RangeValue / this->mf64_StepWidth;
@@ -222,10 +225,50 @@ void C_OgeSpxDoubleAutoFix::m_Init(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Prepare spin box value
+
+   \param[in]  orc_Text    Text
+
+   \return
+   String with suffix
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxDoubleAutoFix::m_PrepareSpinBoxValue(const QString & orc_Text) const
+{
+   QString c_Retval;
+
+   if (this->suffix().compare("") == 0)
+   {
+      c_Retval = orc_Text;
+   }
+   else
+   {
+      c_Retval = QString("%1 %2").arg(orc_Text, this->suffix());
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Extract spin box value
+
+   \param[in]  orc_Text    Text
+
+   \return
+   String without suffix
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxDoubleAutoFix::m_ExtractSpinBoxValue(const QString & orc_Text) const
+{
+   QString c_Retval = orc_Text;
+
+   return c_Retval.remove(this->suffix());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get value from string if any
 
-   \param[in]  orc_Value    Input string
-   \param[out] orf64_Output Output value
+   \param[in]   orc_Input     Input
+   \param[out]  orf64_Output  Output value
 
    \return
    C_NO_ERR Operation success

@@ -122,6 +122,7 @@ void C_OSCHalcDefBase::Clear()
    this->u32_ContentVersion = 0UL;
    this->c_DeviceName = "";
    this->c_FileString = "";
+   this->c_OriginalFileName = "";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -137,7 +138,8 @@ bool C_OSCHalcDefBase::IsClear(void) const
 
    if ((this->u32_ContentVersion == 0UL) &&
        (this->c_DeviceName == "") &&
-       (this->c_FileString == ""))
+       (this->c_FileString == "") &&
+       (this->c_OriginalFileName == ""))
    {
       q_Return = true;
    }
@@ -158,6 +160,8 @@ void C_OSCHalcDefBase::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_ContentVersion, sizeof(this->u32_ContentVersion), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_DeviceName.c_str(), this->c_DeviceName.Length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_FileString.c_str(), this->c_FileString.Length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->c_OriginalFileName.c_str(),
+                                      this->c_OriginalFileName.Length(), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

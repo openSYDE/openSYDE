@@ -31,9 +31,12 @@ class C_OgeLeListHeader :
 public:
    C_OgeLeListHeader(QWidget * const opc_Parent = NULL);
 
+   void SetCounter(const stw_types::uint32 ou32_Counter);
+   void SetName(const QString & orc_Name);
+   QString GetName(void) const;
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
-
 Q_SIGNALS:
    //lint -restore
    void SigFocus(void);
@@ -47,6 +50,11 @@ protected:
 
 private:
    bool mq_JustGotFocus;
+   stw_types::uint32 mu32_Counter;
+   QString mc_Name;
+
+   void m_UpdateText(void);
+   void m_OnEditingFinished(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

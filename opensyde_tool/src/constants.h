@@ -173,6 +173,7 @@ const stw_types::sint32 ms32_MESSAGE_BOX_DEFAULT_WIDTH = 600;
 //Icon Size
 const QSize mc_ICON_SIZE_24 = QSize(24, 24);
 const QSize mc_ICON_SIZE_20 = QSize(20, 20);
+const QSize mc_ICON_SIZE_16 = QSize(16, 16);
 
 // Paths
 const QString mc_DLL_PATH_PEAK = "STW_dlls\\stwpeak2\\stwpeak2.dll";
@@ -224,10 +225,13 @@ const stw_types::sintn msn_USER_ROLE_ERROR = static_cast<stw_types::sintn>(Qt::U
 const stw_types::sintn msn_USER_ROLE_INTERACTION_ELEMENT_TYPE = static_cast<stw_types::sintn>(Qt::UserRole) + 70;
 enum E_UserRoleInteractionElementValue
 {
-   eURIEL_NONE = 0,        //Qt default if any or in our case: override by manual implementation
-   eURIEL_LINE_EDIT,       //input: any string (also integer as string), output: same type, supports: min & max handling
-   eURIEL_COMBO_BOX,       //input: integer, output: integer, supports: combo box values list
-   eURIEL_GENERIC_SPIN_BOX //input: integer or floating point, output: same type, only works with min & max handling
+   eURIEL_NONE = 0,              //Qt default if any or in our case: override by manual implementation
+   eURIEL_LINE_EDIT,             //input: any string (also integer as string), output: same type, supports: min & max
+                                 // handling
+   eURIEL_COMBO_BOX,             //input: integer, output: integer, supports: combo box values and strings list
+   eURIEL_GENERIC_SPIN_BOX,      //input: integer or floating point, output: same type, only works with min & max
+                                 // handling
+   eURIEL_MULTI_SELECT_COMBO_BOX //input: QBitArray, output: QBitArray, supports: multi select combo box strings list
 };
 
 //Generic table interface: Minimum value to use if flag set (type: any number)
@@ -248,12 +252,16 @@ const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST = static_
                                                                          77;
 //Generic table interface: Parameters for spin box (type: QStringList, default: none)
 //Expected 4 elements:
-//0: Min of type C_OSCNodeDataPoolContent encoded as string -> TBD
+//0: Min of type C_OSCNodeDataPoolContent encoded as string
 //1: Max of type C_OSCNodeDataPoolContent encoded as string
 //2: Factor (float64) encoded as string
 //3: Offset (float64) encoded as string
 const stw_types::sintn msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST =
    static_cast<stw_types::sintn>(Qt::UserRole) + 78;
+//Generic table interface: Strings for combo box (type: QStringList, default: none)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_MULTI_SELECT_COMBO_BOX_STRINGS_LIST =
+   static_cast<stw_types::sintn>(Qt::UserRole) +
+   79;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 

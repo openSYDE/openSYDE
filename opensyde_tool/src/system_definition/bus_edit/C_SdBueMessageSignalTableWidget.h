@@ -38,6 +38,10 @@ public:
    void SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const;
    void UpdateData(void);
    void InitStaticNames(void) const;
+   void LoadUserSettings(const std::vector<stw_types::sint32> & orc_MessageValues,
+                         const std::vector<stw_types::sint32> & orc_SignalValues) const;
+   void SaveUserSettings(std::vector<stw_types::sint32> & orc_MessageValues,
+                         std::vector<stw_types::sint32> & orc_SignalValues) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

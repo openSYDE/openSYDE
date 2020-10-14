@@ -111,11 +111,18 @@ stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab,
 stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab:selected
 {
 border-style: solid;
-border-bottom-width:4px;
+border-bottom-width:3px;
 margin-right: 5px;
+margin-top: 3px;
 padding-bottom: 1px;
-min-height: 36px;
-min-width: 150px;
+min-height: 26px;
+min-width: 200px;
+}
+
+stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab:first,
+stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab[OnlyOneItem="true"]
+{
+margin-left: 20px;
 }
 
 stw_opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"]::tab,
@@ -125,13 +132,7 @@ border-style: none;
 margin-right: 5px;
 padding-bottom: 4px;
 min-height: 36px;
-min-width: 150px;
-}
-
-stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab:first,
-stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab[OnlyOneItem="true"]
-{
-margin-left: 30px;
+min-width: 200px;
 }
 
 stw_opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"]::tab:first
@@ -139,15 +140,6 @@ stw_opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"]::ta
 margin-left: 9px;
 }
 
-stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab:last[LastItemBig="true"]
-{
-min-width: 300px;
-}
-
-stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab:last[LastItemVeryBig="true"]
-{
-min-width: 470px;
-}
 
 stw_opensyde_gui--C_SyvDaDashboardSelectorTabBar::tab,
 stw_opensyde_gui--C_SyvDaDashboardSelectorTabBar::tab:selected

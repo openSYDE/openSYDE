@@ -284,6 +284,18 @@ sint32 C_UsHandler::GetSdNodeEditSplitterX(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get HALC screen splitter x position value
+
+   \return
+   Current HALC screen splitter x position value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_UsHandler::GetSdNodeEditHalcSplitterX(void) const
+{
+   return this->ms32_SdNodEditHalcSplitterX;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get bus edit tree splitter x position value
 
    \return
@@ -576,6 +588,42 @@ QString C_UsHandler::GetProjSdTopologyLastKnownRtfCompanyLogoPath(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known HALC definition file path
+
+   \return
+   Last known HALC definition file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownHalcDefPath(void) const
+{
+   return this->mc_LastKnownHalcDefPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known HALC import file path
+
+   \return
+   Last known HALC import file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownHalcImportPath(void) const
+{
+   return this->mc_LastKnownHalcImportPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known HALC export file path
+
+   \return
+   Last known HALC export file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownHalcExportPath(void) const
+{
+   return this->mc_LastKnownHalcExportPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get last known import path
 
    \return
@@ -585,6 +633,18 @@ QString C_UsHandler::GetProjSdTopologyLastKnownRtfCompanyLogoPath(void) const
 QString C_UsHandler::GetProjSdTopologyLastKnownImportPath(void) const
 {
    return this->mc_ProjSdTopologyLastKnownImportPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known import path of an device-definition file
+
+   \return
+   Last known import path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetProjSdTopologyLastKnownDeviceDefPath(void) const
+{
+   return this->mc_ProjSdTopologyLastKnownDeviceDefPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -691,17 +751,25 @@ void C_UsHandler::GetProjLastScreenMode(sint32 & ors32_SysDefSubMode, uint32 & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get the last indexes for system definition node and bus edit tabs
+/*! \brief   Get the last index for system definition node edit tab
 
-   \param[out]  orsn_SysDefNodeEditTabIndex  Tab index of node edit
-   \param[out]  orsn_SysDefBusEditTabIndex   Tab index of bus edit
+   \return     Tab index of node edit
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::GetProjLastSysDefTabIndex(sintn & orsn_SysDefNodeEditTabIndex,
-                                            sintn & orsn_SysDefBusEditTabIndex) const
+sintn C_UsHandler::GetProjLastSysDefNodeTabIndex(void) const
 {
-   orsn_SysDefNodeEditTabIndex = this->msn_SysDefNodeEditTabIndex;
-   orsn_SysDefBusEditTabIndex = this->msn_SysDefBusEditTabIndex;
+   return this->msn_SysDefNodeEditTabIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the last index for system definition bus edit tab
+
+   \return     Tab index of bus edit
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sintn C_UsHandler::GetProjLastSysDefBusTabIndex(void) const
+{
+   return this->msn_SysDefBusEditTabIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -728,7 +796,7 @@ sint32 C_UsHandler::SetLanguage(const QString & orc_Lang)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set performance measurement active flag
 
-   \param[in] oq_Active New performance measurement active flag
+   \param[in]  oq_Active   New performance measurement active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetPerformanceActive(const bool oq_Active)
@@ -833,6 +901,17 @@ void C_UsHandler::SetNaviBarNodeSectionSize(const sint32 os32_Value)
 void C_UsHandler::SetSdNodeEditSplitterX(const sint32 os32_Value)
 {
    this->ms32_SdNodeEditSplitterX = os32_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set node edit HALC screen splitter x position value
+
+   \param[in]  os32_Value  New splitter position x value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetSdNodeEditHalcSplitterX(const sint32 os32_Value)
+{
+   this->ms32_SdNodEditHalcSplitterX = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1060,6 +1139,39 @@ void C_UsHandler::SetProjSdTopologyLastKnownRtfCompanyLogoPath(const QString & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known HALC definition file path
+
+   \param[in]  orc_NewPath    Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownHalcDefPath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownHalcDefPath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known HALC definition file path
+
+   \param[in]  orc_NewPath    Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownHalcImportPath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownHalcImportPath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known HALC definition file path
+
+   \param[in]  orc_NewPath    Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownHalcExportPath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownHalcExportPath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set last known import path
 
    \param[in]  orc_New  New value
@@ -1068,6 +1180,17 @@ void C_UsHandler::SetProjSdTopologyLastKnownRtfCompanyLogoPath(const QString & o
 void C_UsHandler::SetProjSdTopologyLastKnownImportPath(const QString & orc_New)
 {
    this->mc_ProjSdTopologyLastKnownImportPath = orc_New;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known import path of a device-definition file
+
+   \param[in]  orc_New  New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdTopologyLastKnownDeviceDefPath(const QString & orc_New)
+{
+   this->mc_ProjSdTopologyLastKnownDeviceDefPath = orc_New;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1088,6 +1211,29 @@ void C_UsHandler::SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName
    {
       C_UsNode c_Node;
       c_Node.SetSelectedDatapoolName(orc_DatapoolName);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system definition node selected protocol
+
+   \param[in]  orc_NodeName   Project system definition node name (identifier)
+   \param[in]  oe_Protocol    Selected protocol
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
+                                                const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedProtocol(oe_Protocol);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetSelectedProtocol(oe_Protocol);
       this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
    }
 }
@@ -1166,6 +1312,64 @@ void C_UsHandler::SetProjSdNodeDatapoolSelectedVariableNames(const QString & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node datapool comm overview column width
+
+   \param[in]  orc_NodeName      Node name
+   \param[in]  orc_DatapoolName  Datapool name
+   \param[in]  orc_ListName      List name
+   \param[in]  orc_Value         Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeDatapoolCommMessageOverviewColumnWidth(const QString & orc_NodeName,
+                                                                      const QString & orc_DatapoolName,
+                                                                      const QString & orc_ListName,
+                                                                      const std::vector<sint32> & orc_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetDatapoolCommMessageOverviewColumnWidth(orc_DatapoolName,
+                                                                                              orc_ListName,
+                                                                                              orc_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetDatapoolCommMessageOverviewColumnWidth(orc_DatapoolName, orc_ListName, orc_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set proj sd node datapool comm signal overview column width
+
+   \param[in]  orc_NodeName      Node name
+   \param[in]  orc_DatapoolName  Datapool name
+   \param[in]  orc_ListName      List name
+   \param[in]  orc_Value         Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeDatapoolCommSignalOverviewColumnWidth(const QString & orc_NodeName,
+                                                                     const QString & orc_DatapoolName,
+                                                                     const QString & orc_ListName,
+                                                                     const std::vector<sint32> & orc_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetDatapoolCommSignalOverviewColumnWidth(orc_DatapoolName,
+                                                                                             orc_ListName,
+                                                                                             orc_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetDatapoolCommSignalOverviewColumnWidth(orc_DatapoolName, orc_ListName, orc_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set project system definition node datapool list selected message
 
    \param[in]  orc_NodeName               Project system definition node name (identifier)
@@ -1233,6 +1437,96 @@ void C_UsHandler::SetProjSdNodeDatapoolListColumnSizes(const QString & orc_NodeN
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node halc overview column width
+
+   \param[in]  orc_NodeName   Node name
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeHalcOverviewColumnWidth(const QString & orc_NodeName,
+                                                       const std::vector<sint32> & orc_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetHalcOverviewColumnWidth(orc_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetHalcOverviewColumnWidth(orc_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node HALC parameter configuration table column width
+
+   \param[in]  orc_NodeName   Node name
+   \param[in]  orc_Value      Column widths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeHalcConfigColumnWidth(const QString & orc_NodeName,
+                                                     const std::vector<sint32> & orc_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetHalcConfigColumnWidth(orc_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetHalcConfigColumnWidth(orc_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node selected HALC domain
+
+   \param[in]  orc_NodeName   Node name
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeSelectedHalcDomain(const QString & orc_NodeName, const QString & orc_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedHalcDomain(orc_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetSelectedHalcDomain(orc_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node selected HALC channel
+
+   \param[in]  orc_NodeName   Node name
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeSelectedHalcChannel(const QString & orc_NodeName, const QString & orc_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedHalcChannel(orc_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetSelectedHalcChannel(orc_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set project system definition bus last selected message
 
    \param[in]  orc_BusName                Project system definition bus name (identifier)
@@ -1260,6 +1554,52 @@ void C_UsHandler::SetProjSdBusSelectedMessage(const QString & orc_BusName,
       C_UsCommunication c_Bus;
       c_Bus.SetMessageSelected(oe_SelectedProtocol, oq_MessageSelected, orc_SelectedMessageName, oq_SignalSelected,
                                orc_SelectedSignalName);
+      this->mc_ProjSdBus.insert(orc_BusName, c_Bus);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition bus comm overview column width
+
+   \param[in]  orc_BusName    Bus name
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdBusCommMessageOverviewColumnWidth(const QString & orc_BusName,
+                                                             const std::vector<sint32> & orc_Value)
+{
+   if (this->mc_ProjSdBus.contains(orc_BusName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdBus.operator [](orc_BusName).SetMessageOverviewColumnWidth(orc_Value);
+   }
+   else
+   {
+      C_UsCommunication c_Bus;
+      c_Bus.SetMessageOverviewColumnWidth(orc_Value);
+      this->mc_ProjSdBus.insert(orc_BusName, c_Bus);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set proj sd bus comm signal overview column width
+
+   \param[in]  orc_BusName    Bus name
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdBusCommSignalOverviewColumnWidth(const QString & orc_BusName,
+                                                            const std::vector<sint32> & orc_Value)
+{
+   if (this->mc_ProjSdBus.contains(orc_BusName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdBus.operator [](orc_BusName).SetSignalOverviewColumnWidth(orc_Value);
+   }
+   else
+   {
+      C_UsCommunication c_Bus;
+      c_Bus.SetSignalOverviewColumnWidth(orc_Value);
       this->mc_ProjSdBus.insert(orc_BusName, c_Bus);
    }
 }
@@ -1779,16 +2119,24 @@ void C_UsHandler::SetProjLastScreenMode(const sint32 os32_SysDefSubMode, const u
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get the last indexes for system definition node and bus edit tabs
+/*! \brief   Get the last index for system definition node edit tab
 
    \param[out]  osn_SysDefNodeEditTabIndex   Tab index of node edit
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjLastSysDefNodeTabIndex(const sintn osn_SysDefNodeEditTabIndex)
+{
+   this->msn_SysDefNodeEditTabIndex = osn_SysDefNodeEditTabIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the last index for system definition bus edit tabs
+
    \param[out]  osn_SysDefBusEditTabIndex    Tab index of bus edit
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjLastSysDefTabIndex(const sintn osn_SysDefNodeEditTabIndex,
-                                            const sintn osn_SysDefBusEditTabIndex)
+void C_UsHandler::SetProjLastSysDefBusTabIndex(const sintn osn_SysDefBusEditTabIndex)
 {
-   this->msn_SysDefNodeEditTabIndex = osn_SysDefNodeEditTabIndex;
    this->msn_SysDefBusEditTabIndex = osn_SysDefBusEditTabIndex;
 }
 
@@ -1925,7 +2273,8 @@ C_UsHandler::C_UsHandler(void) :
    mc_ActualProject(""),
    mc_DefaultProjectsFolder(QString(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) +
                                     "/openSYDE/Projects")),
-   ms32_SdNodeEditSplitterX(0),
+   ms32_SdNodeEditSplitterX(1000),
+   ms32_SdNodEditHalcSplitterX(400),
    ms32_SdBusEditTreeSplitterX(0),
    ms32_SdBusEditLayoutSplitterX(0)
 {

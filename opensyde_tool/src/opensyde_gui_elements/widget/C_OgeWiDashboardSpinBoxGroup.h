@@ -37,7 +37,6 @@ public:
    void SetDesignType(const stw_opensyde_gui_logic::C_PuiSvDbSpinBox::E_Type oe_Type);
 
 protected:
-   virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
 

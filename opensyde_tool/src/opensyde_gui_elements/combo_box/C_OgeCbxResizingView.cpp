@@ -55,7 +55,7 @@ C_OgeCbxResizingView::C_OgeCbxResizingView(QWidget * const opc_Parent) :
 void C_OgeCbxResizingView::ResizeViewToContents(void) const
 {
    sint32 s32_MaxWidth = 0;
-   QFont c_Font = stw_opensyde_gui::mc_STYLE_GUIDE_FONT_REGULAR_14;
+   QFont c_Font = stw_opensyde_gui::mc_STYLE_GUIDE_FONT_REGULAR_12;
 
    c_Font.setPixelSize(c_Font.pointSize());
    {
@@ -74,7 +74,7 @@ void C_OgeCbxResizingView::ResizeViewToContents(void) const
       this->view()->setMinimumWidth(static_cast<sintn>(s32_MaxWidth + 5L));
    }
    //Height: Number of items + border
-   //31: Item height
+   //27: Item height
    //2: Top & bottom border
-   this->view()->setMinimumHeight((this->count() * 31) + 2);
+   this->view()->setMinimumHeight((this->count() * 27) + 2);
 }

@@ -6,16 +6,28 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>801</width>
-    <height>689</height>
+    <width>765</width>
+    <height>462</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <item row="0" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1000,1000,1">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
       <number>0</number>
      </property>
@@ -23,23 +35,7 @@
       <widget class="stw_opensyde_gui::C_SdNdeDpViewWidget" name="pc_WidgetDpView" native="true"/>
      </item>
      <item>
-      <widget class="stw_opensyde_gui::C_SdNdeDpComListWidget" name="pc_ComListsWidget" native="true"/>
-     </item>
-     <item>
-      <widget class="stw_opensyde_gui::C_SdNdeDpListsWidget" name="pc_ListsWidget" native="true"/>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
+      <widget class="stw_opensyde_gui::C_SdNdeDpListEditWidget" name="pc_ListsWidget" native="true"/>
      </item>
     </layout>
    </item>
@@ -53,15 +49,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpListsWidget</class>
+   <class>stw_opensyde_gui::C_SdNdeDpListEditWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeDpListsWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpComListWidget</class>
-   <extends>QWidget</extends>
-   <header>C_SdNdeDpComListWidget.h</header>
+   <header>C_SdNdeDpListEditWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

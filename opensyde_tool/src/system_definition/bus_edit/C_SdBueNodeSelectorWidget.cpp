@@ -113,7 +113,7 @@ void C_SdBueNodeSelectorWidget::SetBusId(const stw_types::uint32 ou32_BusIndex)
 
    C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex, c_NodeIndexes,
                                                                                       c_InterfaceIndexes);
-   if (C_SdUtil::h_GetNames(c_NodeIndexes, c_InterfaceIndexes, c_NodeNames) == C_NO_ERR)
+   if (C_SdUtil::h_GetNames(c_NodeIndexes, c_InterfaceIndexes, c_NodeNames, true) == C_NO_ERR)
    {
       this->mpc_Ui->pc_NodeSelectorListWidget->AddNodes(c_NodeNames, c_NodeIndexes,
                                                         c_InterfaceIndexes);

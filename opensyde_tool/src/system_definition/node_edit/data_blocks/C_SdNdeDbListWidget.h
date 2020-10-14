@@ -51,7 +51,6 @@ Q_SIGNALS:
    void SigDelete(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex);
    void SigAppDisplay(void);
    void SigErrorChange(void) const;
-   void SigReloadDataPools(void);
    void SigOpenDataPool(const stw_types::uint32 ou32_DataPoolIndex);
 
 protected:

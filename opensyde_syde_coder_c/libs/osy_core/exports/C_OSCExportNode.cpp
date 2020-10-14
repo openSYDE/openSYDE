@@ -77,7 +77,7 @@ C_OSCExportNode::C_OSCExportNode(void)
              Datapool does not provide information about owning application or refers to an invalid application
              ApplicationIndex references invalid application
    C_CONFIG  Protocol or Datapool not available in node for interface or
-             Datapool list element factor negative or would be generated as zero
+             Input data not suitable for code generation. Details will be written to OSC Log.
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw_types::uint16 ou16_ApplicationIndex,
@@ -209,7 +209,7 @@ sint32 C_OSCExportNode::mh_CreateOsyInitCode(const C_OSCNode & orc_Node, const u
    \return
    C_NO_ERR Operation success
    C_RD_WR  Cannot store files
-   C_CONFIG Datapool list element factor negative or would be generated as zero
+   C_CONFIG Input data not suitable for code generation. Details will be written to OSC Log.
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_CreateDatapoolCode(const C_OSCNode & orc_Node, const uint16 ou16_ApplicationIndex,
@@ -431,12 +431,16 @@ sint32 C_OSCExportNode::mh_CreateHALConfigCode(const C_OSCNode & orc_Node, const
       if ((rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex) &&
           (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC))
       {
-         s32_Retval = C_OSCExportHalc::h_CreateSourceCode(orc_Path, orc_Node.c_HALCConfig, rc_DataPool,
-                                                          orc_ExportToolInfo);
+         //Create configuration code associated with this Datapool
+         s32_Retval =
+            C_OSCExportHalc::h_CreateSourceCode(
+               orc_Path, orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion, orc_Node.c_HALCConfig,
+               rc_DataPool, orc_ExportToolInfo);
          //Handle file names
          if (s32_Retval == C_NO_ERR)
          {
-            C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path, C_OSCExportHalc::h_GetFileName());
+            C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path,
+                                               C_OSCExportHalc::h_GetFileName(rc_DataPool.q_IsSafety));
          }
       }
    }

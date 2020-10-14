@@ -43,7 +43,7 @@ using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvUpUpdateWidget::mhc_TempFolder = "system_update_temp";
-const sintn C_SyvUpUpdateWidget::mhsn_WidgetBorder = 25;
+const sintn C_SyvUpUpdateWidget::mhsn_WidgetBorder = 12;
 const sintn C_SyvUpUpdateWidget::mhsn_ToolboxInitPosY = 150;
 const stw_types::uint32 C_SyvUpUpdateWidget::mhu32_WaitTime = 5100U;
 
@@ -103,7 +103,7 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * 
    this->mpc_Ui->pc_WiUpdateInformation->SetViewIndex(this->mu32_ViewIndex);
 
    //Splitter
-   this->mpc_Ui->pc_SplitterHori->SetMargins(28, 30);
+   this->mpc_Ui->pc_SplitterHori->SetMargins(20, 20);
    this->mpc_Ui->pc_SplitterHori->setStretchFactor(0, 1);
 
    // create scene for graphics view
@@ -2132,7 +2132,7 @@ void C_SyvUpUpdateWidget::m_InitToolBox(void)
    {
       this->mpc_FixMinimizedProgressLog = new C_OgeWiFixPosition(C_GtGetText::h_GetText("PROGRESS LOG"),
                                                                  ":images/system_views/IconProgressLog.svg",
-                                                                 QRect(1449, 24, 190, 36), this->mpc_ProgressLogParent);
+                                                                 QRect(1449, 14, 190, 36), this->mpc_ProgressLogParent);
    }
 
    // check for saved default values for toolbox

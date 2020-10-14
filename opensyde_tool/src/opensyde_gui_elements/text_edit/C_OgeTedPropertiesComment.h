@@ -30,6 +30,12 @@ class C_OgeTedPropertiesComment :
 public:
    C_OgeTedPropertiesComment(QWidget * const opc_Parent = NULL);
 
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+Q_SIGNALS:
+   //lint -restore
+   void SigEditingFinished(void) const; ///< emitted on focus out (return/enter key press mean "new line" in text edits)
+
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960

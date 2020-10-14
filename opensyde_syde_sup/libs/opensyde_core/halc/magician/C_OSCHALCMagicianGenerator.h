@@ -49,19 +49,12 @@ private:
                                                 const C_OSCHalcConfigChannel & orc_Channel,
                                                 const C_OSCHALCMagicianDatapoolListHandler & orc_Handler,
                                                 const stw_types::uint32 ou32_ItDomain,
-                                                const stw_types::uint32 ou32_ItRelevantChannel) const;
+                                                const stw_types::uint32 ou32_ItRelevantChannel,
+                                                const std::vector<stw_types::uint32> & orc_RelevantParameters,
+                                                const std::vector<C_OSCHalcDefStruct> & orc_DefParam) const;
    static stw_types::sint32 mh_FillHALCElement(C_OSCNodeDataPoolListElement * const opc_Element,
-                                               const C_OSCHalcConfigParameter & orc_HALCParameter,
+                                               const C_OSCHalcDefContent & orc_Value,
                                                const stw_types::uint32 ou32_ChannelIndex);
-   static void mh_AddChanNumVariable(const stw_scl::C_SCLString & orc_DomainSingularName,
-                                     const stw_types::uint32 ou32_NumChannels, const bool oq_AddDataset,
-                                     C_OSCNodeDataPoolList & orc_List);
-   static void mh_AddUseCaseVariable(const stw_scl::C_SCLString & orc_DomainSingularName,
-                                     const stw_types::uint32 ou32_NumChannels, const bool oq_AddDataset,
-                                     C_OSCNodeDataPoolList & orc_List);
-   static void mh_HandleGenericType(C_OSCNodeDataPoolListElement & orc_Element,
-                                    const stw_types::uint32 ou32_NumChannels, const bool oq_AddDataset,
-                                    const bool oq_UseU16);
    static stw_types::sint32 mh_GenerateVariablesForDomain(const C_OSCHalcConfigDomain & orc_Domain,
                                                           C_OSCNodeDataPoolList & orc_HALCListParam,
                                                           C_OSCNodeDataPoolList & orc_HALCListInput,
@@ -97,7 +90,6 @@ private:
                            const bool oq_AddDataset = false);
    static void mh_CleanUpHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools);
    stw_types::sint32 m_AssignHALCDatapools(std::vector<C_OSCNodeDataPool> & orc_Datapools) const;
-   static void mh_SetCommonDefaults(C_OSCNodeDataPoolListElement & orc_Element);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

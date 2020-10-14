@@ -57,7 +57,7 @@ QSize C_SyvDaPeUpdateModeTableHeaderView::sizeHint(void) const
 {
    QSize c_Retval = QHeaderView::sizeHint();
 
-   c_Retval.setHeight(50);
+   c_Retval.setHeight(40);
 
    return c_Retval;
 }

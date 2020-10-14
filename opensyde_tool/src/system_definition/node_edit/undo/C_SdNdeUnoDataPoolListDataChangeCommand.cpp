@@ -140,7 +140,6 @@ void C_SdNdeUnoDataPoolListDataChangeCommand::m_Change(QVariant & orc_PreviousDa
       }
       if (this->mpc_DataPoolListsTreeWidget != NULL)
       {
-         this->mpc_DataPoolListsTreeWidget->RegisterSizeChange();
          this->mpc_DataPoolListsTreeWidget->UpdateUI();
       }
    }

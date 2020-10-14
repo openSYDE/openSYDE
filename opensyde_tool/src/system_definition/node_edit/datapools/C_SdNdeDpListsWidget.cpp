@@ -12,10 +12,11 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "C_GtGetText.h"
+#include "C_PuiSdUtil.h"
+#include "C_PuiSdHandler.h"
 #include "C_SdNdeDpListsWidget.h"
 #include "ui_C_SdNdeDpListsWidget.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -40,7 +41,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpListsWidget::C_SdNdeDpListsWidget(QWidget * const opc_Parent) :
@@ -50,6 +51,10 @@ C_SdNdeDpListsWidget::C_SdNdeDpListsWidget(QWidget * const opc_Parent) :
    mu32_LastKnownTableSelectionCount(0)
 {
    mpc_Ui->setupUi(this);
+
+   this->mpc_Ui->pc_LabelDataPool->SetBackgroundColor(0);
+   this->mpc_Ui->pc_LabelDataPool->SetForegroundColor(3);
+   this->mpc_Ui->pc_LabelDataPool->SetFontPixel(16, true);
 
    Clear();
 
@@ -69,9 +74,9 @@ C_SdNdeDpListsWidget::C_SdNdeDpListsWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_PushButtonPaste, &QPushButton::clicked, this->mpc_Ui->pc_TreeWidget,
            &C_SdNdeDpListsTreeWidget::Paste);
    connect(this->mpc_Ui->pc_TreeWidget, &C_SdNdeDpListsTreeWidget::SigErrorChange, this,
-           &C_SdNdeDpListsWidget::m_HandleErrorChange);
+           &C_SdNdeDpListsWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_TreeWidget, &C_SdNdeDpListsTreeWidget::SigSizeChange, this,
-           &C_SdNdeDpListsWidget::m_HandleSizeChange);
+           &C_SdNdeDpListsWidget::SigSizeChange);
    connect(this->mpc_Ui->pc_TreeWidget, &C_SdNdeDpListsTreeWidget::SigSelectionChanged, this,
            &C_SdNdeDpListsWidget::m_HandleSelection);
    //lint -e{64,918,1025,1703} Qt interface
@@ -146,12 +151,14 @@ void C_SdNdeDpListsWidget::Clear(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new data pool
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Data pool index
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsWidget::SetDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)
+void C_SdNdeDpListsWidget::SetDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
 {
+   this->m_UpdateDpLabel(ou32_NodeIndex, ou32_DataPoolIndex);
+
    //Reactivate all buttons
    this->mpc_Ui->pc_PushButtonAdd->setVisible(true);
    this->mpc_Ui->pc_PushButtonCopy->setVisible(true);
@@ -166,16 +173,16 @@ void C_SdNdeDpListsWidget::SetDataPool(const uint32 & oru32_NodeIndex, const uin
 
    this->mpc_Ui->pc_SelectionLabel->setVisible(false);
 
-   this->mu32_NodeIndex = oru32_NodeIndex;
-   this->mu32_DataPoolIndex = oru32_DataPoolIndex;
-   this->mpc_Ui->pc_TreeWidget->SetDataPool(oru32_NodeIndex, oru32_DataPoolIndex);
+   this->mu32_NodeIndex = ou32_NodeIndex;
+   this->mu32_DataPoolIndex = ou32_DataPoolIndex;
+   this->mpc_Ui->pc_TreeWidget->SetDataPool(ou32_NodeIndex, ou32_DataPoolIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to open a concrete datapool list or dataelement
 
-   \param[in] os32_ListIndex          Optional list index (if not used set to -1)
-   \param[in] os32_DataElementIndex   Optional data element index (if not used set to -1)
+   \param[in]  os32_ListIndex          Optional list index (if not used set to -1)
+   \param[in]  os32_DataElementIndex   Optional data element index (if not used set to -1)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsWidget::OpenDetail(const sint32 os32_ListIndex, const sint32 os32_DataElementIndex) const
@@ -218,30 +225,34 @@ void C_SdNdeDpListsWidget::m_InitButtonIcons() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle error change for complete data pool
+/*! \brief  Update dp label
 
-   \param[in] orq_Error Error status
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsWidget::m_HandleErrorChange(const bool & orq_Error)
+void C_SdNdeDpListsWidget::m_UpdateDpLabel(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex) const
 {
-   Q_EMIT this->SigErrorChange(orq_Error);
-}
+   const C_OSCNodeDataPool * const pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(ou32_NodeIndex,
+                                                                                           ou32_DataPoolIndex);
 
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle size change for complete data pool
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsWidget::m_HandleSizeChange(void)
-{
-   Q_EMIT this->SigSizeChange();
+   if (pc_Dp != NULL)
+   {
+      const sint32 s32_TypeSpecificNum = C_PuiSdHandler::h_GetInstance()->GetDataPoolTypeIndex(ou32_NodeIndex,
+                                                                                               ou32_DataPoolIndex);
+      const QString c_Text = QString(C_GtGetText::h_GetText("%1 Datapool: #%2 %3")).
+                             arg(C_PuiSdUtil::h_ConvertDataPoolTypeToString(pc_Dp->e_Type)).
+                             arg(s32_TypeSpecificNum + 1).
+                             arg(pc_Dp->c_Name.c_str());
+      this->mpc_Ui->pc_LabelDataPool->setText(c_Text);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle table selection change
 
-   \param[in] oru32_Count Number of selected items
-   \param[in] orq_List    Flag if items belong to list
+   \param[in]  oru32_Count    Number of selected items
+   \param[in]  orq_List       Flag if items belong to list
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsWidget::m_HandleSelection(const uint32 & oru32_Count, const bool & orq_List)
@@ -321,13 +332,13 @@ void C_SdNdeDpListsWidget::m_HandleSelection(const uint32 & oru32_Count, const b
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set buttons status
 
-   \param[in] orq_AddActive      Push button add active
-   \param[in] orq_CutActive      Push button cut active
-   \param[in] orq_CopyActive     Push button copy active
-   \param[in] orq_PasteActive    Push button paste active
-   \param[in] orq_DeleteActive   Push button delete active
-   \param[in] orq_MoveDownActive Push button move down active
-   \param[in] orq_MoveUpActive   Push button move up active
+   \param[in]  orq_AddActive        Push button add active
+   \param[in]  orq_CutActive        Push button cut active
+   \param[in]  orq_CopyActive       Push button copy active
+   \param[in]  orq_PasteActive      Push button paste active
+   \param[in]  orq_DeleteActive     Push button delete active
+   \param[in]  orq_MoveDownActive   Push button move down active
+   \param[in]  orq_MoveUpActive     Push button move up active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsWidget::m_HandleButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,

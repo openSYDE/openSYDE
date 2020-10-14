@@ -37,7 +37,7 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeWiDashboardSpinBoxGroup::C_OgeWiDashboardSpinBoxGroup(QWidget * const opc_Parent) :
@@ -67,7 +67,7 @@ void C_OgeWiDashboardSpinBoxGroup::AdjustFontToSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update current unit
 
-   \param[in] orc_Value New unit
+   \param[in]  orc_Value   New unit
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::SetUnit(const QString & orc_Value)
@@ -87,7 +87,7 @@ void C_OgeWiDashboardSpinBoxGroup::SetUnit(const QString & orc_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Activates or deactivates the unit
 
-   \param[in]     oq_ShowUnit    Flag for activating unit
+   \param[in]  oq_ShowUnit    Flag for activating unit
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::SetShowUnit(const bool oq_ShowUnit)
@@ -107,7 +107,7 @@ void C_OgeWiDashboardSpinBoxGroup::SetShowUnit(const bool oq_ShowUnit)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set design type
 
-   \param[in] oe_Type Design type
+   \param[in]  oe_Type  Design type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::SetDesignType(const C_PuiSvDbSpinBox::E_Type oe_Type)
@@ -124,29 +124,11 @@ void C_OgeWiDashboardSpinBoxGroup::SetDesignType(const C_PuiSvDbSpinBox::E_Type 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overwritten key event slot
-
-   Here: handle enter press
-
-   \param[in,out] opc_Event Event identification and information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiDashboardSpinBoxGroup::keyPressEvent(QKeyEvent * const opc_Event)
-{
-   C_OgeWiSpinBoxGroup::keyPressEvent(opc_Event);
-   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_Event->key() == static_cast<sintn>(Qt::Key_Return)))
-   {
-      Q_EMIT this->SigValueChanged();
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten show event slot
 
    Here: adjust font to size
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::showEvent(QShowEvent * const opc_Event)
@@ -161,7 +143,7 @@ void C_OgeWiDashboardSpinBoxGroup::showEvent(QShowEvent * const opc_Event)
 
    Here: Adapt font
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::resizeEvent(QResizeEvent * const opc_Event)

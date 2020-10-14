@@ -32,15 +32,21 @@ public:
 
    stw_types::uint32 u32_ContentVersion;
    stw_scl::C_SCLString c_DeviceName;
-   stw_scl::C_SCLString c_FileString;
+   stw_scl::C_SCLString c_FileString;       ///< Content of corresponding HALC definition as string
+   stw_scl::C_SCLString c_OriginalFileName; ///< Original file name of corresponding HALC definition
 
    virtual void Clear(void);
+   virtual bool IsClear(void) const;
 
    virtual stw_types::uint32 GetDomainSize(void) const = 0;
    virtual const C_OSCHalcDefDomain * GetDomainDefDataConst(const stw_types::uint32 ou32_Index) const = 0;
    virtual void AddDomain(const C_OSCHalcDefDomain & orc_Domain) = 0;
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+
+private:
+   static void mh_AggregateIds(const std::vector<C_OSCHalcDefStruct> & orc_Items,
+                               std::vector<stw_scl::C_SCLString> & orc_DuplicateIds);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

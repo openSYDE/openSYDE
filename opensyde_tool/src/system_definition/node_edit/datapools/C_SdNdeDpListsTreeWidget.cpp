@@ -122,7 +122,7 @@ C_SdNdeDpListsTreeWidget::C_SdNdeDpListsTreeWidget(QWidget * const opc_Parent) :
            &C_SdNdeDpListsTreeWidget::m_ScrollBarRangeChanged);
    //Error handling
    connect(&this->mc_ErrorManager, &C_SdNdeDpListErrorManager::SigErrorChange, this,
-           &C_SdNdeDpListsTreeWidget::m_OnErrorChangePossible);
+           &C_SdNdeDpListsTreeWidget::SigErrorChange);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -198,6 +198,7 @@ void C_SdNdeDpListsTreeWidget::UpdateUI(void)
    {
       if (static_cast<uint32>(this->topLevelItemCount()) == pc_OSCDataPool->c_Lists.size())
       {
+         // update every list because of error handling
          for (sint32 s32_It = 0; s32_It < this->topLevelItemCount(); ++s32_It)
          {
             QTreeWidgetItem * const pc_HeaderItem = this->topLevelItem(s32_It);
@@ -242,7 +243,7 @@ void C_SdNdeDpListsTreeWidget::UpdateUI(void)
    //Do item layout to update the item sizes (Size hint!)
    this->doItemsLayout();
    //Signals
-   Q_EMIT this->SigSizeChange();
+   Q_EMIT (this->SigSizeChange());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -669,16 +670,6 @@ void C_SdNdeDpListsTreeWidget::UpdateModels(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Register size change
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsTreeWidget::RegisterSizeChange(void)
-{
-   this->UpdateUI();
-   m_HandleSizeChange();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle error change signal of any list item
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -1067,14 +1058,9 @@ void C_SdNdeDpListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * const op
            &C_SdNdeDpListsTreeWidget::SigSaveAs);
    connect(pc_ListItem, &C_SdNdeDpListHeaderWidget::SigExpand, this,
            &C_SdNdeDpListsTreeWidget::m_OnExpandRequestedHeader);
-   connect(pc_ListItem, &C_SdNdeDpListHeaderWidget::SigUpdateAddress, this,
-           &C_SdNdeDpListsTreeWidget::m_UpdateAddress);
    //Connect error change
    connect(pc_ListItem, &C_SdNdeDpListHeaderWidget::SigErrorChange, this,
            &C_SdNdeDpListsTreeWidget::HandleErrorChange);
-   //Connect size change to top level
-   connect(pc_ListItem, &C_SdNdeDpListHeaderWidget::SigUpdateAddress, this,
-           &C_SdNdeDpListsTreeWidget::m_HandleSizeChange);
    //Selection handling
    connect(pc_ListItem, &C_SdNdeDpListHeaderWidget::SigExclusiveSelection, this,
            &C_SdNdeDpListsTreeWidget::m_HandleExclusiveListSelection);
@@ -1093,13 +1079,10 @@ void C_SdNdeDpListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * const op
 
       //Connect error change
       connect(pc_TableWidget, &C_SdNdeDpListTableWidget::SigErrorChangePossible, pc_ListItem,
-              &C_SdNdeDpListHeaderWidget::CheckError);
+              &C_SdNdeDpListHeaderWidget::UpdateUI);
       //Update header on internal usage change
       connect(pc_TableWidget, &C_SdNdeDpListTableWidget::SigSizeChangePossible, this,
-              &C_SdNdeDpListsTreeWidget::RegisterSizeChange);
-      //Connect size change to header
-      connect(pc_TableWidget, &C_SdNdeDpListTableWidget::SigErrorChangePossible, pc_ListItem,
-              &C_SdNdeDpListHeaderWidget::VariablesSizeChange);
+              &C_SdNdeDpListsTreeWidget::UpdateUI);
       //Table selection
       connect(pc_TableWidget, &C_SdNdeDpListTableWidget::SigSelectionChanged, this,
               &C_SdNdeDpListsTreeWidget::m_HandleTableSelection);
@@ -1129,6 +1112,8 @@ void C_SdNdeDpListsTreeWidget::m_Move(const std::vector<uint32> & oru32_SourceIn
 {
    this->mc_UndoManager.DoMoveList(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this,
                                    oru32_SourceIndices, oru32_TargetIndices);
+   // for update of table sizes:
+   this->UpdateModels();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1137,9 +1122,6 @@ void C_SdNdeDpListsTreeWidget::m_Move(const std::vector<uint32> & oru32_SourceIn
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListsTreeWidget::m_InitFromData(void)
 {
-   //QElapsedTimer c_Timer;
-
-   //c_Timer.start();
    const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
       this->mu32_NodeIndex,
       this->mu32_DataPoolIndex);
@@ -1149,7 +1131,6 @@ void C_SdNdeDpListsTreeWidget::m_InitFromData(void)
       for (uint32 u32_It = 0; u32_It < pc_OSCDataPool->c_Lists.size(); ++u32_It)
       {
          this->AddEntry();
-         //std::cout << "List" << u32_It << ": generic - " << c_Timer.restart() << " ms" << &std::endl;
          {
             QTreeWidgetItem * const pc_HeaderItem = this->topLevelItem(u32_It);
 
@@ -1182,18 +1163,8 @@ void C_SdNdeDpListsTreeWidget::m_InitFromData(void)
                }
             }
          }
-         //std::cout << "List" << u32_It << ": specific - " << c_Timer.restart() << " ms" << &std::endl;
       }
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update address values
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsTreeWidget::m_UpdateAddress(void)
-{
-   this->UpdateUI();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1325,16 +1296,7 @@ void C_SdNdeDpListsTreeWidget::m_HandleDataSetErrorChange(const uint32 & oru32_N
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle size change signal of any list item
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsTreeWidget::m_HandleSizeChange(void)
-{
-   Q_EMIT this->SigSizeChange();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle table selction change
+/*! \brief   Handle table selection change
 
    \param[in]  oru32_ListIndex   Source list
    \param[in]  oru32_Count       Number of selected items
@@ -1680,17 +1642,6 @@ uint32 C_SdNdeDpListsTreeWidget::m_GetOneAfterHighestSelected(void) const
       }
    }
    return u32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Forward signal
-
-   \param[in]  orq_Error   Changed error status
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsTreeWidget::m_OnErrorChangePossible(const bool & orq_Error)
-{
-   Q_EMIT this->SigErrorChange(orq_Error);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

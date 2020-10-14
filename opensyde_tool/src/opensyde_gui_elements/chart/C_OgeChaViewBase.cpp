@@ -50,7 +50,7 @@ C_OgeChaViewBase::C_OgeChaViewBase(QChart * const opc_Chart, QWidget * const opc
    //this->setRubberBand(QChartView::RectangleRubberBand);
    this->setRubberBand(QChartView::NoRubberBand);
 
-   // TODO BAY: RubberBand deactivated
+   // RubberBand deactivated
    // QChartView does not use the same rubberband as QGraphicsView. So the QGraphicsView functions and signals
    // does not work
    //this->mpc_RubberBand = this->findChild<QRubberBand *>();
@@ -139,7 +139,7 @@ void C_OgeChaViewBase::mousePressEvent(QMouseEvent * const opc_Event)
       }
       else
       {
-         // TODO BAY: RubberBand deactivated
+         // RubberBand deactivated
          //this->mpc_RubberBand->show();
          //this->mc_RubberBandStartPos = opc_Event->pos();
          //this->mpc_RubberBand->setGeometry(QRect(this->mc_RubberBandStartPos, QSize()));
@@ -174,7 +174,7 @@ void C_OgeChaViewBase::mouseMoveEvent(QMouseEvent * const opc_Event)
       }
       else
       {
-         // TODO BAY: Rubberband deactivated
+         // Rubberband deactivated
          //this->mpc_RubberBand->setGeometry(QRect(this->mc_RubberBandStartPos, opc_Event->pos()).normalized());
 
          QChartView::mouseMoveEvent(opc_Event);
@@ -205,7 +205,7 @@ void C_OgeChaViewBase::mouseReleaseEvent(QMouseEvent * const opc_Event)
    }
    else
    {
-      // TODO BAY: RubberBand deactivated
+      // RubberBand deactivated
       /*
       this->mpc_RubberBand->hide();
 

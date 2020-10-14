@@ -51,6 +51,9 @@ public:
 
    void ImportMessages(void) const;
 
+   static const stw_types::sintn hsn_TabIndexProperties;
+   static const stw_types::sintn hsn_TabIndexComm;
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

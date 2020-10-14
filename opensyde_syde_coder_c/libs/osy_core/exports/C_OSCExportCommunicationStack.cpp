@@ -403,6 +403,7 @@ void C_OSCExportCommunicationStack::mh_AddHeader(const C_SCLString & orc_ExportT
       orc_Data.Append("   Defines the communication configuration for protocol type " +
                       mh_GetProtocolNameByType(ore_Protocol) + " on CAN interface " +
                       C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + ".");
+      orc_Data.Append("");
       orc_Data.Append(C_OSCExportUti::h_GetCreationToolInfo(orc_ExportToolInfo));
    }
    else
@@ -594,9 +595,9 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
       {
          orc_Data.Append("///check for correct version of structure definitions");
          orc_Data.Append(
-            "#if OSY_COM_CONFIG_DEFINITION_VERSION != 0x000" +
-            C_SCLString::IntToStr(static_cast<sint32>(C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(
-                                                         ou16_GenCodeVersion))) + "U");
+            "#if OSY_COM_CONFIG_DEFINITION_VERSION != 0x" +
+            C_SCLString::IntToHex(static_cast<sint64>(C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(
+                                                         ou16_GenCodeVersion)), 4U) + "U");
          orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
                          "generated code");
          orc_Data.Append("static T_osy_non_existing_type_" + orc_ProjectId + " mt_Variable;");
@@ -691,14 +692,14 @@ void C_OSCExportCommunicationStack::mh_AddCModuleGlobal(C_SCLStringList & orc_Da
       if  (orc_ComMessage.c_TxMessages.size() > 0)
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_mux_status mat_StatusMuxTxMessages[" +
-                         mh_CountMuxMessages(orc_ComMessage.c_TxMessages) + "];");
+                         C_SCLString::IntToStr(mh_CountMuxMessages(orc_ComMessage.c_TxMessages)) + "];");
       }
 
       // Rx mux messages
       if (orc_ComMessage.c_RxMessages.size() > 0)
       {
          orc_Data.Append("static " + c_SafeRamData + "T_osy_com_message_mux_status mat_StatusMuxRxMessages[" +
-                         mh_CountMuxMessages(orc_ComMessage.c_RxMessages) + "];");
+                         C_SCLString::IntToStr(mh_CountMuxMessages(orc_ComMessage.c_RxMessages)) + "];");
       }
    }
    orc_Data.Append("");

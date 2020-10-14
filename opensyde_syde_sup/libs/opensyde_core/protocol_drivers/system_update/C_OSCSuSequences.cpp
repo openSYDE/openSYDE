@@ -298,7 +298,7 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
    }
 
    //try to open files to check whether we have valid hex files before we start messing with the target's flash memory:
-   for (uint32 u32_File = 0U; u32_File < orc_FilesToFlash.size(); u32_File++)
+   for (uint32 u32_File = 0U; (u32_File < orc_FilesToFlash.size()) && (s32_Return == C_NO_ERR); u32_File++)
    {
       (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_START, C_NO_ERR, 0U, mc_CurrentNode,
                              "Opening HEX file " + orc_FilesToFlash[u32_File] + ".");
@@ -344,7 +344,7 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
       {
          //for all files check whether:
          //* device type in file matches target's device type
-         for (uint32 u32_File = 0U; u32_File < orc_FilesToFlash.size(); u32_File++)
+         for (uint32 u32_File = 0U; (u32_File < orc_FilesToFlash.size()) && (s32_Return == C_NO_ERR); u32_File++)
          {
             C_SCLString c_DeviceNameHexFile;
 
@@ -435,6 +435,7 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
                (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR, C_RD_WR, 20U, mc_CurrentNode,
                                       c_ErrorText);
                s32_Return = C_RD_WR;
+               break;
             }
             else
             {

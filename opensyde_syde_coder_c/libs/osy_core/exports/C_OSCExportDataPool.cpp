@@ -125,10 +125,13 @@ uint16 C_OSCExportDataPool::h_ConvertOverallCodeVersion(const uint16 ou16_GenCod
    \param[in] orc_ExportToolInfo       information about calling executable (name + version)
 
    \return
-   C_NO_ERR Operation success
-   C_RD_WR  Operation failure: cannot store files
-   C_NOACT  Application has unknown code structure version or invalid linkage configuration
-   C_CONFIG Datapool list element factor negative or would be generated as zero
+   C_NO_ERR  Operation success
+   C_RD_WR   Operation failure: cannot store files
+   C_NOACT   Application has unknown code structure version or invalid linkage configuration
+   C_CONFIG  Input data not suitable for code generation. Details will be written to OSC Log.
+             Possible reasons:
+             * Datapool list element factor negative or would be generated as zero
+             * A list contains more than 255 Datasets
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, const uint16 ou16_GenCodeVersion,
@@ -160,6 +163,23 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
       osc_write_log_error("Creating source code",
                           "Did not generate code for Datapool \"" + orc_DataPool.c_Name +
                           "\" because code format version does not support public Datapools.");
+   }
+
+   // defensive checks agains data that we cannot handle:
+   // number of data sets must by <= 255:
+   if (s32_Retval == C_NO_ERR)
+   {
+      for (uint32 u32_ListIndex = 0U; u32_ListIndex < orc_DataPool.c_Lists.size(); u32_ListIndex++)
+      {
+         if (orc_DataPool.c_Lists[u32_ListIndex].c_DataSets.size() > 255U)
+         {
+            s32_Retval = C_CONFIG;
+            osc_write_log_error("Creating source code",
+                                "Did not generate code for Datapool \"" + orc_DataPool.c_Name +
+                                "\" because list \"" + orc_DataPool.c_Lists[u32_ListIndex].c_Name + "\"" +
+                                " has more than 255 Datasets defined.");
+         }
+      }
    }
 
    if (s32_Retval == C_NO_ERR)
@@ -585,9 +605,9 @@ void C_OSCExportDataPool::mh_AddDefinesImpl(C_SCLStringList & orc_Data, const C_
    if (ou16_GenCodeVersion >= 3U)
    {
       orc_Data.Append("///check for correct version of structure definitions");
-      orc_Data.Append("#if OSY_DPA_DATA_POOL_DEFINITION_VERSION != 0x000" +
-                      C_SCLString::IntToStr(static_cast<sint32>(C_OSCExportDataPool::h_ConvertOverallCodeVersion(
-                                                                   ou16_GenCodeVersion))) + "U");
+      orc_Data.Append("#if OSY_DPA_DATA_POOL_DEFINITION_VERSION != 0x" +
+                      C_SCLString::IntToHex(static_cast<sint64>(C_OSCExportDataPool::h_ConvertOverallCodeVersion(
+                                                                   ou16_GenCodeVersion)), 4U) + "U");
       // datapool export version is one less than over all code structure version (no changes from version 1 to 2)
       orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
                       "generated code");
@@ -1033,6 +1053,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
       }
       else
       {
+         //we have either a HALC or DIAG DP: technically this results in a DIAGNOSIS DP
          orc_Data.Append("   OSY_DPA_DATA_POOL_TYPE_DIAGNOSIS,");
       }
       orc_Data.Append("   { 0x" + C_SCLString::IntToHex(orc_DataPool.au8_Version[0], 2U) + "U, 0x" +

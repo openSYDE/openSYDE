@@ -54,7 +54,7 @@
       </widget>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelHeadingDynamic">
+      <widget class="stw_opensyde_gui_elements::C_OgeLabElided" name="pc_LabelHeadingDynamic">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -268,6 +268,11 @@
    <extends>QGroupBox</extends>
    <header>C_CamOgeGbxMessageSignalsBorder.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabElided</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabElided.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

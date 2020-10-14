@@ -47,7 +47,7 @@ using namespace stw_opensyde_gui_elements;
 C_OgePubSystemCommissioningEdit::C_OgePubSystemCommissioningEdit(QWidget * const opc_Parent) :
    C_OgePubSvgIconWithTextBase(opc_Parent)
 {
-   this->SetMargins(16, 25);
+   this->SetMargins(10, 20);
    this->msn_LeftBorderEnabledWidth = 1;
    this->msn_RightBorderDisabledWidth = 1;
    this->msn_LeftBorderDisabledWidth = 1;
@@ -60,10 +60,10 @@ C_OgePubSystemCommissioningEdit::C_OgePubSystemCommissioningEdit(QWidget * const
    this->mc_BorderColorDisabledTop = mc_STYLE_GUIDE_COLOR_10;
    this->mc_TextColorEnabled = mc_STYLE_GUIDE_COLOR_0;
    this->mc_TextColorDisabled = mc_STYLE_GUIDE_COLOR_10;
-   this->mc_FontPixel = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_16);
+   this->mc_FontPixel = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_SEMIBOLD_14);
    this->mc_BackgroundColorDisabled = mc_STYLE_GUIDE_COLOR_11;
    this->mc_BackgroundColorEnabledDefault = mc_STYLE_GUIDE_COLOR_3001;
    this->mc_BackgroundColorEnabledHover = mc_STYLE_GUIDE_COLOR_3;
    this->mc_BackgroundColorEnabledPressed = mc_STYLE_GUIDE_COLOR_2;
-   this->setIconSize(QSize(24, 24));
+   this->setIconSize(QSize(20, 20));
 }

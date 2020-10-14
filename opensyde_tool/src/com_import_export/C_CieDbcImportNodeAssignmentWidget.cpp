@@ -315,7 +315,7 @@ void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32 ou32_BusIndex,
    C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex,
                                                                                       this->mc_NodeIndexes,
                                                                                       this->mc_InterfaceIndexes);
-   tgl_assert(C_SdUtil::h_GetNames(this->mc_NodeIndexes, this->mc_InterfaceIndexes, c_NodeNames) ==
+   tgl_assert(C_SdUtil::h_GetNames(this->mc_NodeIndexes, this->mc_InterfaceIndexes, c_NodeNames, false) ==
               stw_errors::C_NO_ERR);
 
    // mapped messages section: insert item widgets

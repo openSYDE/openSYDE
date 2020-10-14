@@ -10,6 +10,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <limits>
+
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_OSCHALCMagicianUtil.h"
@@ -35,20 +37,22 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHALCMagicianUtil::C_OSCHALCMagicianUtil()
+C_OSCHALCMagicianUtil::C_OSCHALCMagicianUtil(void)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get datapool name
 
+   \param[in]  oq_IsSafe   Safe Datapool flag
+
    \return
    Datapool name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolName()
+stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolName(const bool oq_IsSafe)
 {
-   const stw_scl::C_SCLString c_Retval = "HAL";
+   const stw_scl::C_SCLString c_Retval = (oq_IsSafe == true) ? "HAL_SAFE" : "HAL_NON_SAFE";
 
    return c_Retval;
 }
@@ -160,6 +164,137 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_CombineVariableName(const stw_scl:
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get channel number variable
+
+   \param[in]  orc_DomainSingularName  Domain singular name
+   \param[in]  ou32_NumChannels        Num channels
+   \param[in]  oq_AddDataset           Add dataset
+
+   \return
+   Channel number variable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetChanNumVariable(
+   const stw_scl::C_SCLString & orc_DomainSingularName, const uint32 ou32_NumChannels, const bool oq_AddDataset)
+{
+   C_OSCNodeDataPoolListElement c_Element;
+
+   c_Element.c_Name = C_OSCHALCMagicianUtil::h_GetChanNumVariableName(orc_DomainSingularName);
+   c_Element.c_Comment = "Zero based channel numbers";
+   //Defined defaults
+   h_SetCommonDpElementDefaults(c_Element);
+
+   //Type
+   C_OSCHALCMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, true);
+
+   return c_Element;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get channel number variable name
+
+   \param[in]  orc_DomainSingularName  Domain singular name
+
+   \return
+   Channel number variable name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetChanNumVariableName(const stw_scl::C_SCLString & orc_DomainSingularName)
+{
+   return C_OSCHALCMagicianUtil::h_CombineVariableName(orc_DomainSingularName, "ChannelNumber");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get use case variable
+
+   \param[in]  orc_DomainSingularName  Domain singular name
+   \param[in]  ou32_NumChannels        Num channels
+   \param[in]  oq_AddDataset           Add dataset
+
+   \return
+   Use case variable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetUseCaseVariable(
+   const stw_scl::C_SCLString & orc_DomainSingularName, const uint32 ou32_NumChannels, const bool oq_AddDataset)
+{
+   C_OSCNodeDataPoolListElement c_Element;
+
+   c_Element.c_Name = C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(orc_DomainSingularName);
+   c_Element.c_Comment = "Selected use-case";
+   //Defined defaults
+   h_SetCommonDpElementDefaults(c_Element);
+
+   //Type
+   C_OSCHALCMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, false);
+
+   return c_Element;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get use case variable name
+
+   \param[in]  orc_DomainSingularName  Domain singular name
+
+   \return
+   Use case variable name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(const stw_scl::C_SCLString & orc_DomainSingularName)
+{
+   return C_OSCHALCMagicianUtil::h_CombineVariableName(orc_DomainSingularName, "UseCase");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set common datapool element defaults
+
+   \param[in,out]  orc_Element   Element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHALCMagicianUtil::h_SetCommonDpElementDefaults(C_OSCNodeDataPoolListElement & orc_Element)
+{
+   orc_Element.c_Unit = "";
+   orc_Element.e_Access = C_OSCNodeDataPoolListElement::eACCESS_RW;
+   orc_Element.f64_Factor = 1.0;
+   orc_Element.f64_Offset = 0.0;
+   orc_Element.q_DiagEventCall = false;
+   orc_Element.q_NvmValueIsValid = false;
+   orc_Element.q_NvMValueChanged = false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check channel number variable necessary
+
+   \param[in]  orc_Domain  Domain
+
+   \return
+
+   \retval   true   Necessary
+   \retval   false  Not necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCHALCMagicianUtil::h_CheckChanNumVariableNecessary(const C_OSCHalcConfigDomain & orc_Domain)
+{
+   return orc_Domain.c_ChannelConfigs.size() > 0UL;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check use case variable necessary
+
+   \param[in]  orc_Domain  Domain
+
+   \return
+
+   \retval   true   Necessary
+   \retval   false  Not necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(const C_OSCHalcConfigDomain & orc_Domain)
+{
+   return orc_Domain.c_ChannelUseCases.size() > 0UL;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get element name
 
    \param[in]  orc_Param   Param
@@ -175,4 +310,80 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::mh_GetElementName(const C_OSCHalcDef
    const stw_scl::C_SCLString c_Retval = C_OSCHALCMagicianUtil::h_CombineVariableName(orc_Domain, orc_Param.c_Display);
 
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle generic type
+
+   \param[in,out]  orc_Element         Element
+   \param[in]      ou32_NumChannels    Num channels
+   \param[in]      oq_AddDataset       Add dataset
+   \param[in]      oq_UseU16           Use u16
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHALCMagicianUtil::mh_HandleGenericType(C_OSCNodeDataPoolListElement & orc_Element,
+                                                 const uint32 ou32_NumChannels, const bool oq_AddDataset,
+                                                 const bool oq_UseU16)
+{
+   if (oq_UseU16)
+   {
+      orc_Element.c_MinValue.SetType(C_OSCNodeDataPoolContent::eUINT16);
+   }
+   else
+   {
+      orc_Element.c_MinValue.SetType(C_OSCNodeDataPoolContent::eUINT8);
+   }
+   if (ou32_NumChannels > 1UL)
+   {
+      orc_Element.c_MinValue.SetArray(true);
+      orc_Element.c_MinValue.SetArraySize(ou32_NumChannels);
+   }
+   else
+   {
+      orc_Element.c_MinValue.SetArray(false);
+   }
+
+   //Copy type
+   orc_Element.c_MaxValue = orc_Element.c_MinValue;
+
+   //Value
+   if (ou32_NumChannels > 1UL)
+   {
+      for (uint32 u32_It = 0UL; u32_It < ou32_NumChannels; ++u32_It)
+      {
+         if (oq_UseU16)
+         {
+            orc_Element.c_MinValue.SetValueAU16Element(std::numeric_limits<uint16>::min(), u32_It);
+            orc_Element.c_MaxValue.SetValueAU16Element(std::numeric_limits<uint16>::max(), u32_It);
+         }
+         else
+         {
+            orc_Element.c_MinValue.SetValueAU8Element(std::numeric_limits<uint8>::min(), u32_It);
+            orc_Element.c_MaxValue.SetValueAU8Element(std::numeric_limits<uint8>::max(), u32_It);
+         }
+      }
+   }
+   else
+   {
+      if (oq_UseU16)
+      {
+         orc_Element.c_MinValue.SetValueU16(std::numeric_limits<uint16>::min());
+         orc_Element.c_MaxValue.SetValueU16(std::numeric_limits<uint16>::max());
+      }
+      else
+      {
+         orc_Element.c_MinValue.SetValueU8(std::numeric_limits<uint8>::min());
+         orc_Element.c_MaxValue.SetValueU8(std::numeric_limits<uint8>::max());
+      }
+   }
+
+   //Dataset
+   if (oq_AddDataset)
+   {
+      orc_Element.c_DataSetValues.push_back(orc_Element.c_MinValue);
+   }
+
+   //Init including value
+   orc_Element.c_Value = orc_Element.c_MinValue;
+   orc_Element.c_NvmValue = orc_Element.c_MinValue;
 }

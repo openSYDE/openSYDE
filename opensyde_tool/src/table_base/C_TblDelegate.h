@@ -16,6 +16,7 @@
 
 #include "constants.h"
 #include "C_OgeCbxTableBase.h"
+#include "C_OgeCbxMultiSelect.h"
 #include "C_OgeWiSpinBoxGroup.h"
 #include "C_TblEditLineEditBase.h"
 
@@ -46,8 +47,46 @@ public:
    //lint -restore
 
 protected:
+   //----------------------------------------------------------------------------------------------------------------------
+   /*! \brief  Create combo box
+
+      \param[in,out]  opc_Parent    Parent
+
+      \return
+      Return correctly styled combo box
+   */
+   //----------------------------------------------------------------------------------------------------------------------
    virtual stw_opensyde_gui_elements::C_OgeCbxTableBase * m_CreateComboBox(QWidget * const opc_Parent) const = 0;
+   //----------------------------------------------------------------------------------------------------------------------
+   /*! \brief  Create multi select combo box
+
+      \param[in,out]  opc_Parent    Parent
+
+      \return
+      Return correctly styled multi select combo box
+   */
+   //----------------------------------------------------------------------------------------------------------------------
+   virtual stw_opensyde_gui_elements::C_OgeCbxMultiSelect * m_CreateMultiSelectComboBox(QWidget * const opc_Parent)
+   const = 0;
+   //----------------------------------------------------------------------------------------------------------------------
+   /*! \brief  Create line edit
+
+      \param[in,out]  opc_Parent    Parent
+
+      \return
+      Return correctly styled line edit
+   */
+   //----------------------------------------------------------------------------------------------------------------------
    virtual stw_opensyde_gui::C_TblEditLineEditBase * m_CreateLineEdit(QWidget * const opc_Parent) const = 0;
+   //----------------------------------------------------------------------------------------------------------------------
+   /*! \brief  Create spin box
+
+      \param[in,out]  opc_Parent    Parent
+
+      \return
+      Return correctly styled spin box
+   */
+   //----------------------------------------------------------------------------------------------------------------------
    virtual stw_opensyde_gui_elements::C_OgeWiSpinBoxGroup * m_CreateSpinBox(QWidget * const opc_Parent) const = 0;
 
    bool mq_InitialSelection;

@@ -298,7 +298,7 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
    }
 
    //try to open files to check whether we have valid hex files before we start messing with the target's flash memory:
-   for (uint32 u32_File = 0U; u32_File < orc_FilesToFlash.size(); u32_File++)
+   for (uint32 u32_File = 0U; (u32_File < orc_FilesToFlash.size()) && (s32_Return == C_NO_ERR); u32_File++)
    {
       (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_START, C_NO_ERR, 0U, mc_CurrentNode,
                              "Opening HEX file " + orc_FilesToFlash[u32_File] + ".");
@@ -344,7 +344,7 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
       {
          //for all files check whether:
          //* device type in file matches target's device type
-         for (uint32 u32_File = 0U; u32_File < orc_FilesToFlash.size(); u32_File++)
+         for (uint32 u32_File = 0U; (u32_File < orc_FilesToFlash.size()) && (s32_Return == C_NO_ERR); u32_File++)
          {
             C_SCLString c_DeviceNameHexFile;
 
@@ -435,6 +435,7 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
                (void)m_ReportProgress(eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR, C_RD_WR, 20U, mc_CurrentNode,
                                       c_ErrorText);
                s32_Return = C_RD_WR;
+               break;
             }
             else
             {
@@ -606,9 +607,12 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexData
          uint8 u8_BlockSequenceCounter = 1U;
          uint32 u32_RemainingBytes = u32_AreaSize;
          std::vector<uint8> c_Data;
+         const uint32 u32_AdaptedTransferDataTimeout = m_GetAdaptedTransferDataTimeout(ou32_TransferDataTimeout,
+                                                                                       u32_MaxBlockLength,
+                                                                                       mc_CurrentNode.u8_BusIdentifier);
 
          //set a proper timeout
-         (void)this->mpc_ComDriver->OsySetPollingTimeout(mc_CurrentNode, ou32_TransferDataTimeout);
+         (void)this->mpc_ComDriver->OsySetPollingTimeout(mc_CurrentNode, u32_AdaptedTransferDataTimeout);
 
          while (u32_RemainingBytes > 0U)
          {
@@ -922,9 +926,12 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
       uint8 u8_BlockSequenceCounter = 1U;
       uint32 u32_RemainingBytes = u32_TotalNumberOfBytes;
       std::vector<uint8> c_Data;
+      const uint32 u32_AdaptedTransferDataTimeout = m_GetAdaptedTransferDataTimeout(ou32_TransferDataTimeout,
+                                                                                    u32_MaxBlockLength,
+                                                                                    mc_CurrentNode.u8_BusIdentifier);
 
       //set a proper timeout
-      (void)this->mpc_ComDriver->OsySetPollingTimeout(mc_CurrentNode, ou32_TransferDataTimeout);
+      (void)this->mpc_ComDriver->OsySetPollingTimeout(mc_CurrentNode, u32_AdaptedTransferDataTimeout);
 
       while (u32_RemainingBytes > 0U)
       {
@@ -3635,6 +3642,70 @@ sint32 C_OSCSuSequences::m_DisconnectFromTargetServer(const bool oq_DisconnectOn
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns an adapted device transfer data timeout time for compensating a potential higher bus load
+
+   The device specific time does only cover the needed time of the device itself, but not the real communication
+   time. In case of a high bus load this time can vary a lot.
+
+   Information for the calculation:
+   * Adding the result of the calculation as offset to the original time
+   * Assuming we have 7 bytes per CAN frame
+   * The lowest supported bitrate is 100kB/s
+   * -> 2ms for each CAN message roughly results in the number of messages for each block * 2ms
+   * Assuming a high "Alien" busload of 80% we need to multiply by 5
+   -> (((ou32_MaxBlockLength / 7) * 2ms) * 5) + original device timeout time
+
+   \param[in]       ou32_DeviceTransferDataTimeout     Device specific timeout time as base
+   \param[in]       ou32_MaxBlockLength                Maximum number of bytes of each block
+
+   \return
+   Calculated device transfer data timeout
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCSuSequences::m_GetAdaptedTransferDataTimeout(const uint32 ou32_DeviceTransferDataTimeout,
+                                                         const uint32 ou32_MaxBlockLength,
+                                                         const uint8 ou8_BusIdentifier)
+{
+   uint32 u32_AdaptedTime = ou32_DeviceTransferDataTimeout;
+   uint32 u32_BusCounter;
+   bool q_IsCan = false;
+   uint32 u32_Bitrate = 0U;
+
+   // Search the matching bus for the bus identifier
+   for (u32_BusCounter = 0U; u32_BusCounter < this->mpc_SystemDefinition->c_Buses.size(); ++u32_BusCounter)
+   {
+      const C_OSCSystemBus & rc_Bus = this->mpc_SystemDefinition->c_Buses[u32_BusCounter];
+
+      if (ou8_BusIdentifier == rc_Bus.u8_BusID)
+      {
+         if (rc_Bus.e_Type == C_OSCSystemBus::eCAN)
+         {
+            q_IsCan = true;
+            u32_Bitrate = static_cast<uint32>(rc_Bus.u64_BitRate / 1000ULL);
+         }
+         break;
+      }
+   }
+
+   // In case of Ethernet no offset is necessary
+   if ((q_IsCan == true) &&
+       (u32_Bitrate != 0U))
+   {
+      const uint32 u32_Offset = (ou32_MaxBlockLength * 10U) / 7U;
+
+      // Scale the offset to the expected bitrate on the bus in relation to the slowest bitrate of 100 kBit/s
+      u32_AdaptedTime += (u32_Offset * 100U) / u32_Bitrate;
+   }
+
+   osc_write_log_info("Update Node",
+                      "Used \"transferdatatimeout\" by adding an offset for compensating a "
+                      "potential high bus load: " +
+                      C_SCLString::IntToStr(u32_AdaptedTime) + "ms");
+
+   return u32_AdaptedTime;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

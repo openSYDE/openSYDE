@@ -53,6 +53,7 @@ stw_scl::C_SCLString TGL_PACKAGE TGL_FileIncludeTrailingDelimiter(const stw_scl:
 stw_scl::C_SCLString TGL_PACKAGE TGL_ExtractFileExtension(const stw_scl::C_SCLString & orc_Path);
 stw_scl::C_SCLString TGL_PACKAGE TGL_ChangeFileExtension(const stw_scl::C_SCLString & orc_Path,
                                                          const stw_scl::C_SCLString & orc_Extension);
+stw_scl::C_SCLString TGL_PACKAGE TGL_GetExePath(void);
 stw_scl::C_SCLString TGL_PACKAGE TGL_ExtractFilePath(const stw_scl::C_SCLString & orc_Path);
 stw_scl::C_SCLString TGL_PACKAGE TGL_ExtractFileName(const stw_scl::C_SCLString & orc_Path);
 stw_scl::C_SCLString TGL_PACKAGE TGL_ExpandFileName(const stw_scl::C_SCLString & orc_RelativePath,

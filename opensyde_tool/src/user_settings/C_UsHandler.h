@@ -59,6 +59,7 @@ public:
    stw_types::sint32 GetNaviBarSize(void) const;
    stw_types::sint32 GetNaviBarNodeSectionSize(void) const;
    stw_types::sint32 GetSdNodeEditSplitterX(void) const;
+   stw_types::sint32 GetSdNodeEditHalcSplitterX(void) const;
    stw_types::sint32 GetSdBusEditTreeSplitterX(void) const;
    stw_types::sint32 GetSdBusEditTreeSplitterX2(void) const;
    stw_types::sint32 GetSdBusEditLayoutSplitterX(void) const;
@@ -79,9 +80,13 @@ public:
    QString GetProjSdTopologyLastKnownCodeExportPath(void) const;
    QString GetProjSdTopologyLastKnownExportPath(void) const;
    QString GetProjSdTopologyLastKnownImportPath(void) const;
+   QString GetProjSdTopologyLastKnownDeviceDefPath(void) const;
    QString GetProjSdTopologyLastKnownRtfPath(void) const;
    QString GetProjSdTopologyLastKnownRtfCompanyName(void) const;
    QString GetProjSdTopologyLastKnownRtfCompanyLogoPath(void) const;
+   QString GetLastKnownHalcDefPath(void) const;
+   QString GetLastKnownHalcImportPath(void) const;
+   QString GetLastKnownHalcExportPath(void) const;
    C_UsNode GetProjSdNode(const QString & orc_NodeName) const;
    C_UsCommunication GetProjSdBus(const QString & orc_BusName) const;
    C_UsSystemView GetProjSvSetupView(const QString & orc_ViewName) const;
@@ -91,8 +96,8 @@ public:
    void GetProjLastScreenMode(stw_types::sint32 & ors32_SysDefSubMode, stw_types::uint32 & oru32_SysDefIndex,
                               stw_types::uint32 & oru32_SysDefFlag, stw_types::sint32 & ors32_SysViewSubMode,
                               stw_types::uint32 & oru32_SysViewIndex, stw_types::uint32 & oru32_SysViewFlag) const;
-   void GetProjLastSysDefTabIndex(stw_types::sintn & orsn_SysDefNodeEditTabIndex,
-                                  stw_types::sintn & orsn_SysDefBusEditTabIndex) const;
+   stw_types::sintn GetProjLastSysDefNodeTabIndex(void) const;
+   stw_types::sintn GetProjLastSysDefBusTabIndex(void) const;
 
    //Set
    stw_types::sint32 SetLanguage(const QString & orc_Lang);
@@ -106,6 +111,7 @@ public:
    void SetNaviBarSize(const stw_types::sint32 os32_Value);
    void SetNaviBarNodeSectionSize(const stw_types::sint32 os32_Value);
    void SetSdNodeEditSplitterX(const stw_types::sint32 os32_Value);
+   void SetSdNodeEditHalcSplitterX(const stw_types::sint32 os32_Value);
    void SetSdBusEditTreeSplitterX(const stw_types::sint32 os32_Value);
    void SetSdBusEditTreeSplitterX2(const stw_types::sint32 os32_Value);
    void SetSdBusEditLayoutSplitterX(const stw_types::sint32 os32_Value);
@@ -126,16 +132,30 @@ public:
    void SetProjSdTopologyLastKnownCodeExportPath(const QString & orc_New);
    void SetProjSdTopologyLastKnownExportPath(const QString & orc_New);
    void SetProjSdTopologyLastKnownImportPath(const QString & orc_New);
+   void SetProjSdTopologyLastKnownDeviceDefPath(const QString & orc_New);
    void SetProjSdTopologyLastKnownRtfPath(const QString & orc_New);
    void SetProjSdTopologyLastKnownRtfCompanyName(const QString & orc_New);
    void SetProjSdTopologyLastKnownRtfCompanyLogoPath(const QString & orc_New);
+   void SetLastKnownHalcDefPath(const QString & orc_NewPath);
+   void SetLastKnownHalcImportPath(const QString & orc_NewPath);
+   void SetLastKnownHalcExportPath(const QString & orc_NewPath);
    void SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName, const QString & orc_DatapoolName);
+   void SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
+                                      const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol);
    void SetProjSdNodeDatapoolOpenListNames(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                            const std::vector<QString> & orc_New);
    void SetProjSdNodeDatapoolSelectedListNames(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                                const std::vector<QString> & orc_New);
    void SetProjSdNodeDatapoolSelectedVariableNames(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                                    const std::vector<QString> & orc_New);
+   void SetProjSdNodeDatapoolCommMessageOverviewColumnWidth(const QString & orc_NodeName,
+                                                            const QString & orc_DatapoolName,
+                                                            const QString & orc_ListName,
+                                                            const std::vector<stw_types::sint32> & orc_Value);
+   void SetProjSdNodeDatapoolCommSignalOverviewColumnWidth(const QString & orc_NodeName,
+                                                           const QString & orc_DatapoolName,
+                                                           const QString & orc_ListName,
+                                                           const std::vector<stw_types::sint32> & orc_Value);
    void SetProjSdNodeDatapoolListSelectedMessage(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                                  const QString & orc_ListName,
                                                  const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_SelectedProtocol,
@@ -144,10 +164,20 @@ public:
    void SetProjSdNodeDatapoolListColumnSizes(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                              const QString & orc_ListName,
                                              const std::vector<stw_types::sint32> & orc_ColumnWidths);
+   void SetProjSdNodeHalcOverviewColumnWidth(const QString & orc_NodeName,
+                                             const std::vector<stw_types::sint32> & orc_Value);
+   void SetProjSdNodeHalcConfigColumnWidth(const QString & orc_NodeName,
+                                           const std::vector<stw_types::sint32> & orc_Value);
+   void SetProjSdNodeSelectedHalcDomain(const QString & orc_NodeName, const QString & orc_Value);
+   void SetProjSdNodeSelectedHalcChannel(const QString & orc_NodeName, const QString & orc_Value);
    void SetProjSdBusSelectedMessage(const QString & orc_BusName,
                                     const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_SelectedProtocol,
                                     const bool oq_MessageSelected, const QString & orc_SelectedMessageName,
                                     const bool oq_SignalSelected, const QString & orc_SelectedSignalName);
+   void SetProjSdBusCommMessageOverviewColumnWidth(const QString & orc_BusName,
+                                                   const std::vector<stw_types::sint32> & orc_Value);
+   void SetProjSdBusCommSignalOverviewColumnWidth(const QString & orc_BusName,
+                                                  const std::vector<stw_types::sint32> & orc_Value);
    void SetProjSvNavigationExpandedStatus(const QString & orc_ViewName, const bool oq_NavigationExpandedStatus);
    void SetProjSvSetupViewZoom(const QString & orc_ViewName, const stw_types::sintn osn_New);
    void SetProjSvSetupViewPos(const QString & orc_ViewName, const QPoint & orc_New);
@@ -179,8 +209,8 @@ public:
    void SetProjLastScreenMode(const stw_types::sint32 os32_SysDefSubMode, const stw_types::uint32 ou32_SysDefIndex,
                               const stw_types::uint32 ou32_SysDefFlag, const stw_types::sint32 os32_SysViewSubMode,
                               const stw_types::uint32 ou32_SysViewIndex, const stw_types::uint32 ou32_SysViewFlag);
-   void SetProjLastSysDefTabIndex(const stw_types::sintn osn_SysDefNodeEditTabIndex,
-                                  const stw_types::sintn osn_SysDefBusEditTabIndex);
+   void SetProjLastSysDefNodeTabIndex(const stw_types::sintn osn_SysDefNodeEditTabIndex);
+   void SetProjLastSysDefBusTabIndex(const stw_types::sintn osn_SysDefBusEditTabIndex);
    void CopyProjSvSettings(const QString & orc_SourceViewName, const QString & orc_TargetViewName);
 
    void ClearMaps(void);
@@ -221,9 +251,9 @@ private:
    QSize mc_SdTopologyToolboxSize;                       ///< History of last known sys def toolbox size
    stw_types::sint32 ms32_NaviBarSize;                   ///< Last known navi bar size
    stw_types::sint32 ms32_NaviBarNodeSectionSize;        ///< Last known navi bar node section size
-   stw_types::sint32 ms32_SdNodeEditSplitterX;           ///< History of last known sys def node edit splitter position
-                                                         // x value
-   stw_types::sint32 ms32_SdBusEditTreeSplitterX;        ///< History of last known sys def bus edit tree splitter
+   stw_types::sint32 ms32_SdNodeEditSplitterX;           ///< History of last known node edit splitter position x value
+   stw_types::sint32 ms32_SdNodEditHalcSplitterX;        ///< History of last known halc splitter position x value
+   stw_types::sint32 ms32_SdBusEditTreeSplitterX;        ///< History of last known bus edit tree splitter
                                                          // position x value
    stw_types::sint32 ms32_SdBusEditTreeSplitterX2;       ///< History of last known sys def bus edit tree splitter
                                                          // position 2 x value
@@ -237,9 +267,13 @@ private:
    QString mc_ProjSdTopologyLastKnownCodeExportPath;     ///< History of last known code export path
    QString mc_ProjSdTopologyLastKnownExportPath;         ///< History of last known export path
    QString mc_ProjSdTopologyLastKnownImportPath;         ///< History of last known import path
+   QString mc_ProjSdTopologyLastKnownDeviceDefPath;      ///< History of last known import path for a syde_devdef-file
    QString mc_ProjSdTopologyLastKnownRtfPath;            ///< History of last known rtf file export path
    QString mc_ProjSdTopologyLastKnownRtfCompanyName;     ///< History of last known rtf file export company name
    QString mc_ProjSdTopologyLastKnownRtfCompanyLogoPath; ///< History of last known rtf file export company logo path
+   QString mc_LastKnownHalcDefPath;                      ///< History of last known HALC definition file path
+   QString mc_LastKnownHalcImportPath;                   ///< History of last known HALC import file path
+   QString mc_LastKnownHalcExportPath;                   ///< History of last known HALC export file path
    QMap<QString, C_UsSystemView> mc_ProjSvSetupView;     ///< History of last known view user settings
    QMap<QString, C_UsNode> mc_ProjSdNode;                ///< History of last known node user settings
    QMap<QString, C_UsCommunication> mc_ProjSdBus;        ///< History of last known bus user settings

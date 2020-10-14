@@ -46,6 +46,8 @@ public:
                                             const stw_scl::C_SCLString & orc_Name,
                                             const stw_scl::C_SCLString & orc_Comment, const bool oq_SafetyRelevant,
                                             const stw_types::uint32 ou32_UseCaseIndex);
+   stw_types::sint32 ResetDomainChannelConfig(const stw_types::uint32 ou32_DomainIndex,
+                                              const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex);
    stw_types::sint32 SetDomainChannelConfigName(const stw_types::uint32 ou32_DomainIndex,
                                                 const stw_types::uint32 ou32_ChannelIndex,
                                                 const bool oq_UseChannelIndex, const stw_scl::C_SCLString & orc_Name);
@@ -71,6 +73,12 @@ public:
                                                             const stw_types::uint32 ou32_ElementIndex,
                                                             const bool oq_UseChannelIndex, const stw_opensyde_core::C_OSCHalcConfigParameter &
                                                             orc_Parameter);
+   stw_types::sint32 SetDomainChannelParameterConfigElementPlain(const stw_types::uint32 ou32_DomainIndex,
+                                                                 const stw_types::uint32 ou32_ChannelIndex,
+                                                                 const stw_types::uint32 ou32_ParameterIndex,
+                                                                 const stw_types::uint32 ou32_ElementIndex,
+                                                                 const bool oq_UseChannelIndex,
+                                                                 const C_OSCHalcDefContent & orc_Value);
    stw_types::sint32 SetDomainChannelParameterConfigElementEnum(const stw_types::uint32 ou32_DomainIndex,
                                                                 const stw_types::uint32 ou32_ChannelIndex,
                                                                 const stw_types::uint32 ou32_ParameterIndex,
@@ -84,7 +92,19 @@ public:
                                                                    const bool oq_UseChannelIndex,
                                                                    const stw_scl::C_SCLString & orc_DisplayName,
                                                                    const bool oq_Value);
-
+   stw_types::sint32 GetRelevantIndicesForSelectedUseCase(const stw_types::uint32 ou32_DomainIndex,
+                                                          const stw_types::uint32 ou32_ChannelIndex,
+                                                          const bool oq_UseChannelIndex,
+                                                          std::vector<stw_types::uint32> * const opc_ParameterIndices,
+                                                          std::vector<stw_types::uint32> * const opc_InputIndices,
+                                                          std::vector<stw_types::uint32> * const opc_OutputIndices,
+                                                          std::vector<stw_types::uint32> * const opc_StatusIndices)
+   const;
+   void CheckConfigValid(bool * const opq_DomainsInvalid,
+                         std::vector<stw_types::uint32> * const opc_InvalidDomainIndices) const;
+   void CheckDomainConfigValid(const stw_types::uint32 ou32_DomainIndex, bool * const opq_DomainInvalid,
+                               bool * const opq_ChannelsInvalid,
+                               std::vector<stw_types::uint32> * const opc_InvalidChannelIndices) const;
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
 private:

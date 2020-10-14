@@ -38,8 +38,10 @@ public:
    //Get
    const C_PuiSvData * GetView(const stw_types::uint32 ou32_Index) const;
    stw_types::uint32 GetViewCount(void) const;
+   const std::map<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32> & GetLastKnownHalcCrcs(void) const;
 
    //Set
+   void SetLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32> & orc_Value);
    stw_types::sint32 SetViewName(const stw_types::uint32 ou32_Index, const QString & orc_Name);
    stw_types::sint32 SetViewNodeCheckedState(const stw_types::uint32 ou32_ViewIndex,
                                              const stw_types::uint32 ou32_NodeIndex, const bool oq_Checked);
@@ -108,6 +110,7 @@ public:
                                                               const stw_types::uint32 ou32_LastKnownCrc);
 
    //Add
+   void AddLastKnownHalcCrc(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, const stw_types::uint32 ou32_Crc);
    void AddView(const C_PuiSvData & orc_View, const bool oq_AutoAdaptName, const bool oq_AutoAdaptContent);
    stw_types::sint32 SetView(const stw_types::uint32 ou32_Index, const C_PuiSvData & orc_View);
    stw_types::sint32 InsertView(const stw_types::uint32 ou32_Index, const C_PuiSvData & orc_View,
@@ -218,6 +221,7 @@ public:
    stw_types::sint32 CheckViewReconnectNecessary(const stw_types::uint32 ou32_ViewIndex, bool & orq_ReconnectNecessary);
 
    //Misc
+   stw_types::sint32 CheckAndHandleNewElement(const C_PuiSvDbNodeDataPoolListElementId & orc_NewId);
    stw_types::sint32 CalcViewRoutingCrcName(const stw_types::uint32 ou32_ViewIndex, const QString & orc_NodeName,
                                             stw_types::uint32 & oru32_Crc) const;
    stw_types::sint32 CalcViewRoutingCrcIndex(const stw_types::uint32 ou32_ViewIndex,
@@ -254,6 +258,7 @@ private:
 
    //Sync to system definition
    void m_OnSyncNodeAdded(const stw_types::uint32 ou32_Index);
+   void m_OnSyncNodeHALC(const stw_types::uint32 ou32_Index);
    void m_OnSyncNodeAboutToBeDeleted(const stw_types::uint32 ou32_Index);
    void m_OnSyncBusAdded(const stw_types::uint32 ou32_Index);
    void m_OnSyncBusDeleted(const stw_types::uint32 ou32_Index);
@@ -321,6 +326,7 @@ private:
    void m_OnSyncClear(void);
 
    //Other
+   static QString mh_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id);
    stw_types::uint32 m_CalcHashSystemViews(void) const;
    void m_FixInvalidRailConfig(void);
    std::map<stw_scl::C_SCLString, bool> m_GetExistingViewNames(void) const;
@@ -330,6 +336,8 @@ private:
    std::vector<bool> mc_SdBusErrors;
    stw_types::uint32 mu32_CalculatedHashSystemViews;
    stw_types::uint32 mu32_PreviousSystemDefintionHash;
+
+   std::map<C_PuiSvDbNodeDataPoolListElementId, stw_types::uint32> mc_LastKnownHalcCrcs;
 
    class C_PuiSvViewErrorDetails
    {

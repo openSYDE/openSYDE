@@ -115,6 +115,19 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
       this->mpc_Ui->pc_CommentText->setText(this->mpc_OSCDataPool->c_Comment.c_str());
       this->mpc_Ui->pc_CheckBoxSafety->setChecked(this->mpc_OSCDataPool->q_IsSafety);
 
+      if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eHALC)
+      {
+         // In case of a HAL Datapool, the safety property is not editable
+         if (this->mpc_OSCDataPool->q_IsSafety == true)
+         {
+            this->mpc_Ui->pc_LabelSafety->setText(C_GtGetText::h_GetText("ON"));
+         }
+         else
+         {
+            this->mpc_Ui->pc_LabelSafety->setText(C_GtGetText::h_GetText("OFF"));
+         }
+      }
+
       if (this->mpc_OSCDataPool->q_ScopeIsPrivate == true)
       {
          //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -573,29 +586,46 @@ void C_SdNdeDpProperties::m_ApplyType(const bool oq_SharedDatapool)
    // Type specific settings
    if (this->mpc_OSCDataPool != NULL)
    {
+      const QString c_DataPoolTypeString = C_PuiSdUtil::h_ConvertDataPoolTypeToString(this->mpc_OSCDataPool->e_Type);
+      this->mpc_Ui->pc_LabDatapoolType->setText(c_DataPoolTypeString);
+
       if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eDIAG)
       {
+         this->mpc_Ui->pc_LabelSafety->setVisible(false);
          this->mpc_Ui->pc_LabelComProt->setVisible(false);
          this->mpc_Ui->pc_ComboBoxProtocol->setVisible(false);
          this->mpc_Ui->pc_LabelDatapoolSize->setVisible(false);
          this->mpc_Ui->pc_SpinBoxSize->setVisible(false);
          this->mpc_Ui->pc_LabelDataPoolUsage->setVisible(false);
          this->mpc_Ui->pc_LabelDataPoolReservation->setVisible(false);
-         this->mpc_Ui->pc_LabDatapoolType->setText(C_GtGetText::h_GetText("DIAG"));
       }
       else if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eNVM)
       {
+         this->mpc_Ui->pc_LabelSafety->setVisible(false);
          this->mpc_Ui->pc_LabelComProt->setVisible(false);
          this->mpc_Ui->pc_ComboBoxProtocol->setVisible(false);
-         this->mpc_Ui->pc_LabDatapoolType->setText(C_GtGetText::h_GetText("NVM"));
       }
-      else
+      else if (this->mpc_OSCDataPool->e_Type == C_OSCNodeDataPool::eCOM)
       {
+         this->mpc_Ui->pc_LabelSafety->setVisible(false);
          this->mpc_Ui->pc_LabelDatapoolSize->setVisible(false);
          this->mpc_Ui->pc_SpinBoxSize->setVisible(false);
          this->mpc_Ui->pc_LabelDataPoolUsage->setVisible(false);
          this->mpc_Ui->pc_LabelDataPoolReservation->setVisible(false);
-         this->mpc_Ui->pc_LabDatapoolType->setText(C_GtGetText::h_GetText("COMM"));
+      }
+      else
+      {
+         // HAL Datapool
+         this->mpc_Ui->pc_LineEditDatapoolName->setEnabled(false);
+         this->mpc_Ui->pc_CheckBoxSafety->setVisible(false);
+         this->mpc_Ui->pc_LabelSafety->setVisible(true);
+
+         this->mpc_Ui->pc_LabelComProt->setVisible(false);
+         this->mpc_Ui->pc_ComboBoxProtocol->setVisible(false);
+         this->mpc_Ui->pc_LabelDatapoolSize->setVisible(false);
+         this->mpc_Ui->pc_SpinBoxSize->setVisible(false);
+         this->mpc_Ui->pc_LabelDataPoolUsage->setVisible(false);
+         this->mpc_Ui->pc_LabelDataPoolReservation->setVisible(false);
       }
    }
 

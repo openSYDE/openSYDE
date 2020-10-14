@@ -69,6 +69,9 @@ private:
       const std::vector<C_OSCHalcDefChannelAvailability> & orc_Availability);
    static stw_types::sint32 mh_SaveUseCase(const C_OSCHalcDefChannelUseCase & orc_UseCase,
                                            C_OSCXMLParserBase & orc_XMLParser);
+   static stw_scl::C_SCLString mh_DomainCategoryEnumToString(const C_OSCHalcDefDomain::E_Category oe_Category);
+   static stw_types::sint32 mh_DomainCategoryStringToEnum(const stw_scl::C_SCLString & orc_Category,
+                                                          C_OSCHalcDefDomain::E_Category & ore_Category);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

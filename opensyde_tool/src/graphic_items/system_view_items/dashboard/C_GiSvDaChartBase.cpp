@@ -57,11 +57,11 @@ const uint32 C_GiSvDaChartBase::mhu32_MaximumDataElements = 10U;
 
    Chart needs an offset for the x position of 0.25 to get a clear drawing in 100% view.
 
-   \param[in]     oru32_ViewIndex      Index of system view
-   \param[in]     oru32_DashboardIndex Index of dashboard in system view
-   \param[in]     ors32_DataIndex      Index of data element in dashboard in system view
-   \param[in]     oru64_ID             Unique ID
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in]      oru32_ViewIndex        Index of system view
+   \param[in]      oru32_DashboardIndex   Index of dashboard in system view
+   \param[in]      ors32_DataIndex        Index of data element in dashboard in system view
+   \param[in]      oru64_ID               Unique ID
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaChartBase::C_GiSvDaChartBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
@@ -110,8 +110,8 @@ sintn C_GiSvDaChartBase::type(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply style
 
-   \param[in] oe_Style    New style type
-   \param[in] oq_DarkMode Flag if dark mode is active
+   \param[in]  oe_Style       New style type
+   \param[in]  oq_DarkMode    Flag if dark mode is active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
@@ -221,8 +221,8 @@ void C_GiSvDaChartBase::UpdateShowValue(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparence value configured by the actual timeout state
 
-   \param[in] ou32_DataElementIndex    Index of shown datapool element in widget
-   \param[in] osn_Value                Value for transparence (0..255)
+   \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
+   \param[in]  osn_Value               Value for transparence (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
@@ -237,7 +237,7 @@ void C_GiSvDaChartBase::UpdateTransparence(const uint32 ou32_DataElementIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in]  oq_Active      Flag if connection is active or not active now
+   \param[in]  oq_Active   Flag if connection is active or not active now
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::ConnectionActiveChanged(const bool oq_Active)
@@ -320,6 +320,7 @@ bool C_GiSvDaChartBase::CallProperties(void)
 
                this->mpc_ChartWidget->SetScaling(u32_ConfigIndex, c_Name, c_Tmp.c_ElementScaling);
 
+               tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(c_Tmp.c_ElementId) == C_NO_ERR);
                tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                               this->mu32_DashboardIndex,
                                                                               static_cast<uint32>(this->ms32_Index),
@@ -341,7 +342,7 @@ bool C_GiSvDaChartBase::CallProperties(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Function to activate or deactivate drawing of performance heavy widgets
 
-   \param[in] oq_Active Flag if widgets should currently be drawn
+   \param[in]  oq_Active   Flag if widgets should currently be drawn
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::SetDrawingActive(const bool oq_Active)
@@ -359,8 +360,8 @@ void C_GiSvDaChartBase::SetDrawingActive(const bool oq_Active)
    - Add data element
    - Remove data element
 
-   \param[in]     opc_ContextMenuManager  Pointer to context menu manager for registration of actions
-   \param[in]     oq_Active       Flag if context menu entries have to be shown or not
+   \param[in]  opc_ContextMenuManager  Pointer to context menu manager for registration of actions
+   \param[in]  oq_Active               Flag if context menu entries have to be shown or not
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,

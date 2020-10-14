@@ -96,6 +96,11 @@ private:
    static void mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini);
    static void mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, stw_scl::C_SCLIniFile & orc_Ini,
                                               const QString & orc_ActiveProject);
+
+   static void mh_SaveColumns(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                              const QString & orc_IdBase, const std::vector<stw_types::sint32> & orc_ColumnWidths);
+   static void mh_LoadColumns(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                              const QString & orc_IdBase, std::vector<stw_types::sint32> & orc_ColumnWidths);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

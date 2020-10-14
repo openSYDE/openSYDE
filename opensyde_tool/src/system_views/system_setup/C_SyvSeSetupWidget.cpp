@@ -72,8 +72,8 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * co
 
    //Handle button icons
    this->mpc_Ui->pc_PbCancel->SetSvg("://images/system_views/IconTabCloseClickedDark.svg");
-   this->mpc_Ui->pc_PbCancel->setIconSize(QSize(16, 16));
-   this->mpc_Ui->pc_PbCancel->SetMargins(14, 23);
+   this->mpc_Ui->pc_PbCancel->setIconSize(QSize(14, 14));
+   this->mpc_Ui->pc_PbCancel->SetMargins(12, 21);
 
    //Remove debug label
    this->mpc_Ui->pc_GroupBoxButtons->setTitle("");
@@ -226,8 +226,7 @@ void C_SyvSeSetupWidget::SetEditMode(const bool oq_Active, const bool oq_WithSav
    {
       //Handle button
       this->mpc_Ui->pc_PbConfirm->SetSvg("://images/system_views/IconConfirm.svg");
-      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(22, 22));
-      this->mpc_Ui->pc_PbConfirm->SetMargins(12, 20);
+      this->mpc_Ui->pc_PbConfirm->SetMargins(10, 20);
       this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
 
       // create copy of view in case of clicking cancel
@@ -237,8 +236,7 @@ void C_SyvSeSetupWidget::SetEditMode(const bool oq_Active, const bool oq_WithSav
    {
       //Handle button
       this->mpc_Ui->pc_PbConfirm->SetSvg("://images/main_page_and_navi_bar/IconEdit.svg");
-      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(24, 24));
-      this->mpc_Ui->pc_PbConfirm->SetMargins(16, 25);
+      this->mpc_Ui->pc_PbConfirm->SetMargins(10, 28); // put a bit more space in between
       this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Edit"));
 
       if (oq_WithSave == true)

@@ -27,6 +27,8 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const stw_types::sintn C_SdBueBusEditWidget::hsn_TabIndexProperties = 0;
+const stw_types::sintn C_SdBueBusEditWidget::hsn_TabIndexComm = 1;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -62,7 +64,8 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
 
    InitStaticNames();
 
-   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(0);
+   //lint -e{1938}  static const is guaranteed preinitialized before main
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexProperties);
 
    this->mpc_Ui->pc_BusPropertiesWidget->SetBusId(this->mu32_BusIndex);
 
@@ -74,9 +77,6 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
    this->me_BusType = pc_Bus->e_Type;
    if (this->me_BusType == stw_opensyde_core::C_OSCSystemBus::eCAN)
    {
-      stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TabWidgetPageNavi->tabBar(),
-                                                                     "LastItemBig", true);
-
       this->mpc_Ui->pc_WidgetComIfDescr->SetBusId(this->mu32_BusIndex);
 
       // connecting to signals
@@ -92,8 +92,10 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
    else
    {
       // Ethernet is not supported for the C_SdBueComIfDescriptionWidget yet
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(0);
-      this->mpc_Ui->pc_TabWidgetPageNavi->removeTab(1);
+      //lint -e{1938}  static const is guaranteed preinitialized before main
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexProperties);
+      //lint -e{1938}  static const is guaranteed preinitialized before main
+      this->mpc_Ui->pc_TabWidgetPageNavi->removeTab(hsn_TabIndexComm);
 
       stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TabWidgetPageNavi->tabBar(),
                                                                      "OnlyOneItem",
@@ -113,7 +115,7 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
 void C_SdBueBusEditWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(0, C_GtGetText::h_GetText("Properties"));
-   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(1, C_GtGetText::h_GetText("COMM Interface Description"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(1, C_GtGetText::h_GetText("COMM Messages"));
 
    //Tool tips
 }
@@ -187,7 +189,7 @@ void C_SdBueBusEditWidget::SetFlag(const uint32 ou32_Flag) const
        (ou32_Flag == mu32_FLAG_OPEN_PROPERTIES))
    {
       // open the properties
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(0);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexProperties);
 
       if (ou32_Flag == mu32_FLAG_EDIT_NAME)
       {
@@ -197,7 +199,7 @@ void C_SdBueBusEditWidget::SetFlag(const uint32 ou32_Flag) const
    else if (ou32_Flag == mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR)
    {
       // open the COM interface description
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(1);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexComm);
    }
    else
    {
@@ -226,7 +228,7 @@ void C_SdBueBusEditWidget::OpenDetail(const sint32 os32_NodeIndex, const sint32 
    if (this->me_BusType == stw_opensyde_core::C_OSCSystemBus::eCAN)
    {
       // open the interface description widget
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(1);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexComm);
 
       if (os32_Flag == 1)
       {
@@ -291,6 +293,11 @@ void C_SdBueBusEditWidget::m_TabChanged(const sintn osn_Index) const
    this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->setSizePolicy(QSizePolicy::Preferred,
                                                                         QSizePolicy::Preferred);
    this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->adjustSize();
+
+   if (osn_Index == hsn_TabIndexComm)
+   {
+      this->mpc_Ui->pc_WidgetComIfDescr->SetInitialFocus();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

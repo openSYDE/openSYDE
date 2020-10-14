@@ -58,7 +58,7 @@ C_OgeSpxInt64::C_OgeSpxInt64(QWidget * const opc_Parent, const bool & orq_IsUnsi
    {
       this->SetValue(QVariant(0LL), false);
    }
-   connect(this->lineEdit(), &QLineEdit::editingFinished, this, &C_OgeSpxInt64::SigValueChanged);
+   connect(this, &C_OgeSpxInt64::editingFinished, this, &C_OgeSpxInt64::SigValueChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,7 +85,6 @@ void C_OgeSpxInt64::SetValue(const QVariant & orc_Value, const bool oq_AllowValu
 {
    QString c_ValueStr;
    QVariant c_Value = m_PrepareValue(orc_Value);
-   QLineEdit * const pc_LineEdit = this->lineEdit();
    bool q_Change;
 
    if (this->GetValue() == c_Value)
@@ -128,14 +127,7 @@ void C_OgeSpxInt64::SetValue(const QVariant & orc_Value, const bool oq_AllowValu
          tgl_assert(false);
       }
    }
-   if (this->mc_Suffix.compare("") == 0)
-   {
-      pc_LineEdit->setText(QString("%1").arg(c_ValueStr));
-   }
-   else
-   {
-      pc_LineEdit->setText(QString("%1 %2").arg(c_ValueStr, this->mc_Suffix));
-   }
+   this->m_SetSpinBoxValue(c_ValueStr);
    //Behave as double spin box, only send changes if any
    if ((q_Change == true) && (oq_AllowValueUpdate))
    {
@@ -210,7 +202,7 @@ QVariant C_OgeSpxInt64::GetValue(void) const
    QString c_Text = pc_LineEdit->text();
 
    //Eliminate suffix
-   c_Text = c_Text.remove(this->mc_Suffix);
+   c_Text = this->m_ExtractSpinBoxValue(c_Text);
 
    //Change invalid value if necessary
    this->fixup(c_Text);
@@ -406,11 +398,12 @@ QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orc_Pos) 
       bool * const pc_Result = &q_Result;
       bool q_IsUnderMinimum;
       bool q_IsOverMaximum;
+      const QString c_ValueOnly = this->m_ExtractSpinBoxValue(orc_Input);
 
       Q_UNUSED(orc_Pos)
       if (this->mq_IsUnsigned == true)
       {
-         const uint64 u64_Test = orc_Input.toULongLong(pc_Result);
+         const uint64 u64_Test = c_ValueOnly.toULongLong(pc_Result);
          if (q_Result == true)
          {
             m_CheckMinMax(u64_Test, q_IsUnderMinimum, q_IsOverMaximum);
@@ -430,7 +423,7 @@ QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orc_Pos) 
       }
       else
       {
-         const sint64 s64_Test = orc_Input.toLongLong(pc_Result);
+         const sint64 s64_Test = c_ValueOnly.toLongLong(pc_Result);
          if (q_Result == true)
          {
             m_CheckMinMax(s64_Test, q_IsUnderMinimum, q_IsOverMaximum);
@@ -498,6 +491,61 @@ QAbstractSpinBox::StepEnabled C_OgeSpxInt64::stepEnabled(void) const
       }
    }
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Prepare spin box value
+
+   \param[in]  orc_Text    Text
+
+   \return
+   String with suffix
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxInt64::m_PrepareSpinBoxValue(const QString & orc_Text) const
+{
+   QString c_Retval;
+
+   if (this->mc_Suffix.compare("") == 0)
+   {
+      c_Retval = orc_Text;
+   }
+   else
+   {
+      c_Retval = QString("%1 %2").arg(orc_Text, this->mc_Suffix);
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Extract spin box value
+
+   \param[in]  orc_Text    Text
+
+   \return
+   String without suffix
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_OgeSpxInt64::m_ExtractSpinBoxValue(const QString & orc_Text) const
+{
+   QString c_Retval = orc_Text;
+
+   return c_Retval.remove(this->mc_Suffix);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set spin box value
+
+   \param[in]  orc_Text    Text
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeSpxInt64::m_SetSpinBoxValue(const QString & orc_Text) const
+{
+   QLineEdit * const pc_LineEdit = this->lineEdit();
+
+   const QString c_Tmp = m_PrepareSpinBoxValue(orc_Text);
+
+   pc_LineEdit->setText(c_Tmp);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

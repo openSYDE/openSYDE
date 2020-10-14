@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>828</width>
+    <width>850</width>
     <height>796</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>850</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="focusPolicy">
    <enum>Qt::ClickFocus</enum>
@@ -48,7 +54,7 @@
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="Tab1">
+       <widget class="QWidget" name="pc_TabProperties">
         <attribute name="title">
          <string>Properties</string>
         </attribute>
@@ -60,13 +66,13 @@
           <number>0</number>
          </property>
          <property name="topMargin">
-          <number>21</number>
+          <number>27</number>
          </property>
          <property name="rightMargin">
-          <number>12</number>
+          <number>11</number>
          </property>
          <property name="bottomMargin">
-          <number>12</number>
+          <number>11</number>
          </property>
          <item>
           <widget class="stw_opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
@@ -132,22 +138,22 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_4">
+       <widget class="QWidget" name="pc_TabDatapools">
         <attribute name="title">
          <string>Datapools</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
          <property name="leftMargin">
-          <number>21</number>
+          <number>0</number>
          </property>
          <property name="topMargin">
           <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>12</number>
+          <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>12</number>
+          <number>0</number>
          </property>
          <property name="spacing">
           <number>0</number>
@@ -161,6 +167,33 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="pc_TabCommMessages">
+        <attribute name="title">
+         <string>COMM Messages</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="leftMargin">
+          <number>11</number>
+         </property>
+         <property name="topMargin">
+          <number>30</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="stw_opensyde_gui::C_SdBueComIfDescriptionWidget" name="pc_ComIfDescriptionWidget" native="true"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="stw_opensyde_gui::C_SdNdeHalcWidget" name="pc_TabHalc">
+        <attribute name="title">
+         <string>Hardware Configurator</string>
+        </attribute>
+       </widget>
       </widget>
      </item>
     </layout>
@@ -169,9 +202,21 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
+   <extends>QSplitter</extends>
+   <header>C_OgeSpiStandard.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeTawPageNavi</class>
    <extends>QTabWidget</extends>
    <header>C_OgeTawPageNavi.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SdBueComIfDescriptionWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdBueComIfDescriptionWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -187,15 +232,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
-   <extends>QSplitter</extends>
-   <header>C_OgeSpiStandard.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui::C_SdNdeDbViewWidget</class>
    <extends>QWidget</extends>
    <header>C_SdNdeDbViewWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SdNdeHalcWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeHalcWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

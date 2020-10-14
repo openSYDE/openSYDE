@@ -20,6 +20,7 @@
 #include "C_PuiSdHandler.h"
 #include "C_OgeTreeWidgetToolBarSearchItemDelegate.h"
 #include "C_PuiSdUtil.h"
+#include "TGLUtils.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -99,6 +100,15 @@ C_SdSearchTreeWidget::C_SdSearchTreeWidget(QWidget * const opc_Parent) :
    c_Pixmap.load(":/images/system_definition/IconDataBlock.svg");
    this->mc_IconApplication.addPixmap(c_Pixmap);
 
+   c_Pixmap.load(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
+   this->mc_IconHalcChannel.addPixmap(c_Pixmap);
+
+   c_Pixmap.load(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg");
+   this->mc_IconHalcOutputChannel.addPixmap(c_Pixmap);
+
+   c_Pixmap.load(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg");
+   this->mc_IconHalcInputChannel.addPixmap(c_Pixmap);
+
    connect(this, &QTreeWidget::itemClicked, this, &C_SdSearchTreeWidget::m_ItemClicked);
 }
 
@@ -156,6 +166,8 @@ bool C_SdSearchTreeWidget::Search(const QString & orc_SearchString)
                                                   c_CounterResult.arg(QString::number(this->mu32_DataElementsFound)));
       this->mpc_TreeItemRootApplications->setText(0, C_GtGetText::h_GetText("  Data Blocks") +
                                                   c_CounterResult.arg(QString::number(this->mu32_ApplicationsFound)));
+      this->mpc_TreeItemRootHalcChannels->setText(0, C_GtGetText::h_GetText("  Channels") +
+                                                  c_CounterResult.arg(QString::number(this->mu32_HalcChannelsFound)));
 
       //get result found status
       if ((mu32_NodesFound != 0) ||
@@ -164,7 +176,8 @@ bool C_SdSearchTreeWidget::Search(const QString & orc_SearchString)
           (mu32_ListsFound != 0) ||
           (mu32_MessagesFound != 0) ||
           (mu32_DataElementsFound != 0) ||
-          (mu32_ApplicationsFound != 0))
+          (mu32_ApplicationsFound != 0) ||
+          (mu32_HalcChannelsFound != 0))
       {
          q_ResultsFound = true;
       }
@@ -190,6 +203,7 @@ void C_SdSearchTreeWidget::ClearResult(void)
    this->mu32_MessagesFound = 0U;
    this->mu32_DataElementsFound = 0U;
    this->mu32_ApplicationsFound = 0U;
+   this->mu32_HalcChannelsFound = 0U;
 
    this->mq_ResultsFound = false;
 }
@@ -229,6 +243,10 @@ void C_SdSearchTreeWidget::SetSearchResultFocus(void)
    else if (this->mu32_ApplicationsFound > 0U)
    {
       pc_Item = this->mpc_TreeItemRootApplications->child(0);
+   }
+   else if (this->mu32_HalcChannelsFound > 0U)
+   {
+      pc_Item = this->mpc_TreeItemRootHalcChannels->child(0);
    }
    else
    {
@@ -282,7 +300,7 @@ void C_SdSearchTreeWidget::focusOutEvent(QFocusEvent * const opc_Event)
       (*c_ItItem)->setSelected(false);
    }
 
-   Q_EMIT this->SigFocusOut();
+   Q_EMIT (this->SigFocusOut());
 
    C_OgeTreeWidgetToolBarSearch::focusOutEvent(opc_Event);
 }
@@ -344,6 +362,9 @@ void C_SdSearchTreeWidget::m_SearchNodeContent(const C_OSCNode & orc_Node, const
          this->m_AddApplicationResult(c_DataBlockName, u32_Counter, c_Name, ou32_NodeIndex);
       }
    }
+
+   // search HALC elements
+   this->m_SearchHalcConfigurationContent(orc_Node.c_HALCConfig, c_Name, ou32_NodeIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -465,6 +486,69 @@ void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & o
       }
    }
 }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Searching in HALC configuration of node
+
+   \param[in]       orc_HalcConfig     HALC configuration for searching
+   \param[in]       orc_NodeName       Name of node
+   \param[in]       ou32_NodeIndex     Index of node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdSearchTreeWidget::m_SearchHalcConfigurationContent(const stw_opensyde_core::C_OSCHalcConfig & orc_HalcConfig,
+                                                            const QString & orc_NodeName,
+                                                            const stw_types::uint32 ou32_NodeIndex)
+{
+   const uint32 u32_DomainCount = orc_HalcConfig.GetDomainSize();
+   uint32 u32_DomainCounter;
+
+   for (u32_DomainCounter = 0U; u32_DomainCounter < u32_DomainCount; ++u32_DomainCounter)
+   {
+      const C_OSCHalcDefDomain * const pc_HalcDef = orc_HalcConfig.GetDomainDefDataConst(u32_DomainCounter);
+
+      if (pc_HalcDef != NULL)
+      {
+         QString c_DomainName;
+         c_DomainName = pc_HalcDef->c_Name.c_str();
+
+         if (pc_HalcDef->c_Channels.size() == 0)
+         {
+            // Handling domains without any channels
+            if (c_DomainName.contains(this->mc_SearchString, Qt::CaseInsensitive) == true)
+            {
+               this->m_AddHalcChannelResult(c_DomainName, u32_DomainCounter, "", 0U, false, orc_NodeName,
+                                            ou32_NodeIndex, pc_HalcDef->e_Category);
+            }
+         }
+         else
+         {
+            // Handling domains with channels
+            // Search for domain name is not possible in this case
+            const C_OSCHalcConfigDomain * const pc_HalcConf =
+               orc_HalcConfig.GetDomainConfigDataConst(u32_DomainCounter);
+
+            if (pc_HalcConf != NULL)
+            {
+               uint32 u32_ChannelCounter;
+               tgl_assert(pc_HalcDef->c_Channels.size() == pc_HalcConf->c_ChannelConfigs.size());
+
+               for (u32_ChannelCounter = 0U; u32_ChannelCounter < pc_HalcDef->c_Channels.size(); ++u32_ChannelCounter)
+               {
+                  QString c_UserName = pc_HalcConf->c_ChannelConfigs[u32_ChannelCounter].c_Name.c_str();
+                  QString c_DefName = pc_HalcDef->c_Channels[u32_ChannelCounter].c_Name.c_str();
+
+                  if ((c_UserName.contains(this->mc_SearchString, Qt::CaseInsensitive) == true) ||
+                      (c_DefName.contains(this->mc_SearchString, Qt::CaseInsensitive) == true))
+                  {
+                     QString c_ShownName = c_UserName + " (" + c_DefName + ")";
+                     this->m_AddHalcChannelResult(c_DomainName, u32_DomainCounter, c_ShownName, u32_ChannelCounter,
+                                                  true, orc_NodeName, ou32_NodeIndex, pc_HalcDef->e_Category);
+                  }
+               }
+            }
+         }
+      }
+   }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_SearchBusContent(const C_OSCSystemBus & orc_Bus, const uint32 ou32_BusIndex)
@@ -487,8 +571,8 @@ void C_SdSearchTreeWidget::m_SearchBusContent(const C_OSCSystemBus & orc_Bus, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdSearchTreeWidget::m_CheckWhereToJump(const QTreeWidgetItem * const opc_Item,
-                                              uint32 & oru32_InterfaceIndex) const
+bool C_SdSearchTreeWidget::m_CheckWhereToJumpCan(const QTreeWidgetItem * const opc_Item,
+                                                 uint32 & oru32_InterfaceIndex) const
 {
    // default case is open node
    bool q_Return = false;
@@ -551,7 +635,8 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
           (pc_Item == this->mpc_TreeItemRootLists) ||
           (pc_Item == this->mpc_TreeItemRootDataElements) ||
           (pc_Item == this->mpc_TreeItemRootMessages) ||
-          (pc_Item == this->mpc_TreeItemRootApplications))
+          (pc_Item == this->mpc_TreeItemRootApplications) ||
+          (pc_Item == this->mpc_TreeItemRootHalcChannels))
       {
          //do nothing on root click
       }
@@ -563,17 +648,18 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
          uint32 u32_BusIndex = 0U;
          sint32 s32_Flag;
          bool q_OpenBus = false;
+         bool q_OpenHalc = false;
 
          // special cases: check where to jump, node or bus if a not clear case was clicked
          if ((pc_Item->parent() == this->mpc_TreeItemRootDataElements) && (sn_Type == mhu8_DATAELEMENT_TYPE_SIGNAL))
          {
-            q_OpenBus = this->m_CheckWhereToJump(pc_Item, u32_BusIndex);
+            q_OpenBus = this->m_CheckWhereToJumpCan(pc_Item, u32_BusIndex);
             // flag for handling CAN signals
             s32_Flag = 1;
          }
          else if (pc_Item->parent() == this->mpc_TreeItemRootMessages)
          {
-            q_OpenBus = this->m_CheckWhereToJump(pc_Item, u32_BusIndex);
+            q_OpenBus = this->m_CheckWhereToJumpCan(pc_Item, u32_BusIndex);
             // flag for handling CAN messages
             s32_Flag = 2;
          }
@@ -581,6 +667,14 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
          {
             // flag for handling applications/data blocks
             s32_Flag = 3;
+         }
+         else if ((pc_Item->parent() == this->mpc_TreeItemRootHalcChannels) ||
+                  ((pc_Item->parent() == this->mpc_TreeItemRootDataElements) &&
+                   (sn_Type == mhu8_DATAELEMENT_TYPE_HALC)))
+         {
+            q_OpenHalc = true;
+            // flag for handling HALC view, but no specific channel
+            s32_Flag = 4;
          }
          else
          {
@@ -603,15 +697,16 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
              (pc_Item->parent() == this->mpc_TreeItemRootDataPools) ||
              (pc_Item->parent() == this->mpc_TreeItemRootLists) ||
              (pc_Item->parent() == this->mpc_TreeItemRootApplications) ||
+             (pc_Item->parent() == this->mpc_TreeItemRootHalcChannels) ||
              ((pc_Item->parent() == this->mpc_TreeItemRootDataElements) && (q_OpenBus == false)) ||
              ((pc_Item->parent() == this->mpc_TreeItemRootMessages) && (q_OpenBus == false)))
          {
-            Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, u32_Index, c_Text, "");
+            Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, u32_Index, c_Text, ""));
 
             if ((pc_Item->parent() == this->mpc_TreeItemRootApplications) ||
                 (pc_Item->parent() == this->mpc_TreeItemRootDataPools) ||
                 (pc_Item->parent() == this->mpc_TreeItemRootLists) ||
-                (pc_Item->parent() == this->mpc_TreeItemRootDataElements) ||
+                ((pc_Item->parent() == this->mpc_TreeItemRootDataElements) && (q_OpenHalc == false)) ||
                 (pc_Item->parent() == this->mpc_TreeItemRootMessages))
             {
                // Datapool or application index
@@ -634,7 +729,34 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
                }
 
                // open the concrete element
-               Q_EMIT this->SigOpenDetail(s32_MainIndex, s32_ListIndex, s32_DataElementIndex, -1, s32_Flag);
+               Q_EMIT (this->SigOpenDetail(s32_MainIndex, s32_ListIndex, s32_DataElementIndex, -1, s32_Flag));
+            }
+            else if ((pc_Item->parent() == this->mpc_TreeItemRootDataElements) ||
+                     (pc_Item->parent() == this->mpc_TreeItemRootHalcChannels))
+            {
+               // Open the HALC configuration
+               sint32 s32_DomainIndex = -1;
+               sint32 s32_ChannelIndex = -1;
+
+               // In case of a selection in section data elements, no concrete domain or channel will be selected
+               // Only in case of a selection of an element of the section channels
+               if (pc_Item->parent() == this->mpc_TreeItemRootHalcChannels)
+               {
+                  const bool q_UseChannelIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_4).toBool();
+                  s32_DomainIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_2).toInt();
+
+                  if (q_UseChannelIndex == true)
+                  {
+                     s32_ChannelIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_3).toInt();
+                  }
+               }
+
+               // open the concrete element
+               Q_EMIT (this->SigOpenDetail(s32_DomainIndex, s32_ChannelIndex, -1, -1, s32_Flag));
+            }
+            else
+            {
+               // Nothing to do
             }
          }
          else if ((pc_Item->parent() == this->mpc_TreeItemRootBusses) ||
@@ -653,7 +775,7 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
                }
             }
 
-            Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, u32_Index, c_Text, "");
+            Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, u32_Index, c_Text, ""));
 
             if ((pc_Item->parent() == this->mpc_TreeItemRootMessages) ||
                 (pc_Item->parent() == this->mpc_TreeItemRootDataElements))
@@ -664,8 +786,8 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
                const sint32 s32_DataElementIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_4).toInt();
 
                // open the signal or message
-               Q_EMIT this->SigOpenDetail(s32_NodeIndex, s32_DataPoolIndex, s32_ListIndex, s32_DataElementIndex,
-                                          s32_Flag);
+               Q_EMIT (this->SigOpenDetail(s32_NodeIndex, s32_DataPoolIndex, s32_ListIndex, s32_DataElementIndex,
+                                           s32_Flag));
             }
          }
          else
@@ -680,9 +802,9 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
 void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const uint32 ou32_NodeIndex,
                                            const QString & orc_DeviceType)
 {
-   QTreeWidgetItem * pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootNodes);
+   QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootNodes);
    QString c_ResultString = orc_NodeName;
-   QString c_Subtitle = C_GtGetText::h_GetText("Type: ") + orc_DeviceType;
+   const QString c_Subtitle = C_GtGetText::h_GetText("Type: ") + orc_DeviceType;
 
    this->m_MarkResultString(c_ResultString);
 
@@ -704,9 +826,9 @@ void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const u
 void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uint32 ou32_BusIndex,
                                           const bool oq_Ethernet)
 {
-   QTreeWidgetItem * pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootBusses);
+   QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootBusses);
    QString c_ResultString = orc_BusName;
-   QString c_Subtitle = C_GtGetText::h_GetText("Type: ");
+   const QString c_Subtitle = C_GtGetText::h_GetText("Type: ");
 
    this->m_MarkResultString(c_ResultString);
 
@@ -737,9 +859,9 @@ void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uin
 void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName, const uint32 ou32_DataPoolIndex,
                                                const QString & orc_NodeName, const uint32 ou32_NodeIndex)
 {
-   QTreeWidgetItem * pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootDataPools);
+   QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootDataPools);
    QString c_ResultString = orc_DataPoolName;
-   QString c_Subtitle = C_GtGetText::h_GetText("Node: ") + orc_NodeName;
+   const QString c_Subtitle = C_GtGetText::h_GetText("Node: ") + orc_NodeName;
 
    this->m_MarkResultString(c_ResultString);
 
@@ -763,9 +885,9 @@ void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const u
                                            const QString & orc_DataPoolName, const uint32 ou32_DataPoolIndex,
                                            const QString & orc_NodeName, const uint32 ou32_NodeIndex)
 {
-   QTreeWidgetItem * pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootLists);
+   QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootLists);
    QString c_ResultString = orc_ListName;
-   QString c_Subtitle = orc_NodeName + " - " + orc_DataPoolName;
+   const QString c_Subtitle = orc_NodeName + " - " + orc_DataPoolName;
 
    this->m_MarkResultString(c_ResultString);
 
@@ -791,7 +913,7 @@ void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, c
                                               const QString & orc_ProtocolName, const uint32 ou32_DataPoolIndex,
                                               const QString & orc_NodeName, const uint32 ou32_NodeIndex)
 {
-   QTreeWidgetItem * pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootMessages);
+   QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootMessages);
    QString c_ResultString = orc_MessageName;
    QString c_Subtitle =
       orc_NodeName + " - " + orc_ProtocolName + " - CAN" + QString::number(ou32_ListIndex) + " - ";
@@ -831,9 +953,9 @@ void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataEleme
                                                    const uint32 ou32_DataPoolIndex, const QString & orc_NodeName,
                                                    const uint32 ou32_NodeIndex, const uint8 ou8_Type)
 {
-   QTreeWidgetItem * pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootDataElements);
+   QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootDataElements);
    QString c_ResultString = orc_DataElementName;
-   QString c_Subtitle = orc_NodeName + " - " + orc_DataPoolName + " - " + orc_ListName;
+   const QString c_Subtitle = orc_NodeName + " - " + orc_DataPoolName + " - " + orc_ListName;
 
    this->m_MarkResultString(c_ResultString);
 
@@ -876,9 +998,9 @@ void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_Applicatio
                                                   const uint32 ou32_ApplicationIndex, const QString & orc_NodeName,
                                                   const uint32 ou32_NodeIndex)
 {
-   QTreeWidgetItem * pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootApplications);
+   QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootApplications);
    QString c_ResultString = orc_ApplicationName;
-   QString c_Subtitle = C_GtGetText::h_GetText("Node: ") + orc_NodeName;
+   const QString c_Subtitle = C_GtGetText::h_GetText("Node: ") + orc_NodeName;
 
    this->m_MarkResultString(c_ResultString);
 
@@ -894,6 +1016,70 @@ void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_Applicatio
 
    mpc_TreeItemRootApplications->addChild(pc_Item);
    mpc_TreeItemRootApplications->setHidden(false);
+   //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adding an entry for a found HALC element (domain or channel)
+
+   \param[in]       orc_HalcDomainName      Name of found HALC domain
+   \param[in]       ou32_HalcDomainIndex    Index of found HALC domain
+   \param[in]       orc_HalcChannelName     Name of found HALC channel
+   \param[in]       ou32_HalcChannelIndex   Index of found HALC channel
+   \param[in]       oq_UseElementIndex      Flag if the element is a domain or a channel
+   \param[in]       orc_NodeName            Name of found node of HALC element
+   \param[in]       ou32_NodeIndex          Index of found node of HALC element
+   \param[in]       oe_Category             Category of domain (output, input, other)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdSearchTreeWidget::m_AddHalcChannelResult(const QString & orc_HalcDomainName, const uint32 ou32_HalcDomainIndex,
+                                                  const QString & orc_HalcChannelName,
+                                                  const uint32 ou32_HalcChannelIndex, const bool oq_UseChannelIndex,
+                                                  const QString & orc_NodeName, const uint32 ou32_NodeIndex,
+                                                  const C_OSCHalcDefDomain::E_Category oe_Category)
+{
+   QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootHalcChannels);
+   QString c_ResultString;
+   QString c_Subtitle;
+
+   if (oq_UseChannelIndex == true)
+   {
+      c_ResultString = orc_HalcChannelName;
+      c_Subtitle = orc_NodeName + " - " + orc_HalcDomainName;
+   }
+   else
+   {
+      c_ResultString = orc_HalcDomainName + " (-)";
+      c_Subtitle = C_GtGetText::h_GetText("Node: ") + orc_NodeName;
+   }
+
+   this->m_MarkResultString(c_ResultString);
+
+   pc_Item->setData(0, mhsn_DATAROLE_TITLE, c_ResultString);
+   pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle);
+   pc_Item->setData(0, mhsn_DATAROLE_NAME, orc_NodeName);
+   pc_Item->setData(0, mhsn_DATAROLE_INDEX_1, static_cast<sintn>(ou32_NodeIndex));
+   pc_Item->setData(0, mhsn_DATAROLE_INDEX_2, static_cast<sintn>(ou32_HalcDomainIndex));
+   pc_Item->setData(0, mhsn_DATAROLE_INDEX_3, static_cast<sintn>(ou32_HalcChannelIndex));
+   pc_Item->setData(0, mhsn_DATAROLE_INDEX_4, static_cast<sintn>(oq_UseChannelIndex));
+   if (oe_Category == C_OSCHalcDefDomain::eCA_INPUT)
+   {
+      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconHalcInputChannel);
+   }
+   else if (oe_Category == C_OSCHalcDefDomain::eCA_OUTPUT)
+   {
+      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconHalcOutputChannel);
+   }
+   else
+   {
+      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconHalcChannel);
+   }
+
+   ++this->mu32_HalcChannelsFound;
+   this->mq_ResultsFound = true;
+
+   mpc_TreeItemRootHalcChannels->addChild(pc_Item);
+   mpc_TreeItemRootHalcChannels->setHidden(false);
    //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
 }
 
@@ -944,4 +1130,10 @@ void C_SdSearchTreeWidget::m_SetupStartingState(void)
    this->mpc_TreeItemRootApplications->setFlags(Qt::ItemIsEnabled); // item is not selectable
    this->addTopLevelItem(this->mpc_TreeItemRootApplications);
    this->mpc_TreeItemRootApplications->setHidden(true);
+
+   this->mpc_TreeItemRootHalcChannels = new QTreeWidgetItem();
+   this->mpc_TreeItemRootHalcChannels->setText(0, C_GtGetText::h_GetText("Channels"));
+   this->mpc_TreeItemRootHalcChannels->setFlags(Qt::ItemIsEnabled); // item is not selectable
+   this->addTopLevelItem(this->mpc_TreeItemRootHalcChannels);
+   this->mpc_TreeItemRootHalcChannels->setHidden(true);
 }

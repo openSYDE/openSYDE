@@ -23,6 +23,7 @@ stw_opensyde_gui_logic--C_PopFileTableView,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTableView,
 stw_opensyde_gui--C_SdNdeDpListTableView,
 stw_opensyde_gui--C_SdBueMessageTableView,
+stw_opensyde_gui--C_SdNdeHalcOvTableView,
 stw_opensyde_gui--C_SdBueSignalTableView,
 stw_opensyde_gui--C_SyvDaItPaArView,
 stw_opensyde_gui--C_SyvDaItPaTableView,
@@ -38,11 +39,17 @@ border-style: none;
 outline: none;
 }
 
+stw_opensyde_gui--C_SdNdeSfoResetMessageTableView::item
+{
+padding-top: 1px;
+padding-bottom: 1px;
+}
+
 /* --------------------------------------------------------------------- */
 /* Offset between scroll bars */
 stw_opensyde_gui--C_SyvDaPeUpdateModeTableView
 {
-margin-right: 37px;
+margin-right: 8px;
 }
 
 stw_opensyde_gui--C_SyvDaItPaTableView
@@ -52,6 +59,7 @@ margin-right: 27px;
 
 stw_opensyde_gui_logic--C_PopFileTableView::item,
 stw_opensyde_gui--C_SdBueMessageTableView::item,
+stw_opensyde_gui--C_SdNdeHalcOvTableView::item,
 stw_opensyde_gui--C_SdBueSignalTableView::item,
 stw_opensyde_gui--C_SyvDaItPaArView::item,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTableView::item,
@@ -70,10 +78,9 @@ stw_opensyde_gui_logic--C_PopFileTableView::item
 padding: 6px;
 }
 
-/* SSI: Deaktivated top border. Still no solution for top/bottom border*/
 stw_opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView::section,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF QHeaderView::section
- {
+{
 border-style: solid;
 border: 0px;
 padding: 1px;
@@ -106,7 +113,7 @@ stw_opensyde_gui--C_SdNdeDpListDataSetHeaderView[IsHorizontal="true"]::section
 border-top-width: 0px;
 border-bottom-width: 1px;
 border-left-width: 0px;
-/* 50px */
+border-right-width: 1px;
 margin-top: 7px;
 padding-top: 1px;
 padding-bottom: 1px;
@@ -114,12 +121,6 @@ padding-right: 0px;
 padding-left: 3px;
 }
 
-stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView[IsHorizontal="true"]::section,
-stw_opensyde_gui--C_SdNdeSingleHeaderView[IsHorizontal="true"]::section,
-stw_opensyde_gui--C_SdNdeDpListDataSetHeaderView[IsHorizontal="true"]::section
-{
-border-right-width: 1px;
-}
 stw_opensyde_gui--C_SdNdeDpListDataSetHeaderView[IsHorizontal="true"]::section:first
 {
 border-left-width: 1px;
@@ -170,6 +171,7 @@ border-left-style: solid;
 /* --------------------------------------------------------------------- */
 /* Sort indicator */
 stw_opensyde_gui--C_SdBueMessageTableView QHeaderView::down-arrow,
+stw_opensyde_gui--C_SdNdeHalcOvTableView QHeaderView::down-arrow,
 stw_opensyde_gui--C_SdBueSignalTableView QHeaderView::down-arrow {
 width: 20px;
 height: 20px;
@@ -177,6 +179,7 @@ image: url(://images/system_definition/NodeEdit/lists/IconSortDown.svg) 0 0 0 0 
 }
 
 stw_opensyde_gui--C_SdBueMessageTableView QHeaderView::up-arrow,
+stw_opensyde_gui--C_SdNdeHalcOvTableView QHeaderView::up-arrow,
 stw_opensyde_gui--C_SdBueSignalTableView QHeaderView::up-arrow {
 width: 20px;
 height: 20px;

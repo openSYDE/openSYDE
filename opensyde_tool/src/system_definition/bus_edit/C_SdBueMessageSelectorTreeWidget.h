@@ -105,6 +105,7 @@ Q_SIGNALS:
    void SigSelectName(void);
    void SigZeroMessages(void);
    void SigErrorChanged(void);
+   void SigReload(void);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -134,11 +135,11 @@ private:
    void m_ScrollBarRangeChanged(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
    stw_types::sint32 m_GetFirstConnectedNodeAndInterface(stw_types::uint32 & oru32_NodeIndex,
                                                          stw_types::uint32 & oru32_InterfaceIndex,
-                                                         stw_types::uint32 & oru32_DatapoolIndex) const;
+                                                         stw_types::uint32 & oru32_DatapoolIndex);
    stw_types::sint32 m_MapMessageIdToInternalMessageIndex(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
       stw_types::uint32 & oru32_InternalMessageIndex) const;
-   stw_types::sint32 GetMessageIdForAdd(stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
+   stw_types::sint32 GetMessageIdForAdd(stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_UpdateUniqueMessageIds(void);
    void m_UpdateUniqueMessageIdsSignals(const stw_types::uint32 & oru32_InternalMessageIndex);
    void m_DisconnectSelection(void);

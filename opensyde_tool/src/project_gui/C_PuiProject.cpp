@@ -560,26 +560,17 @@ void C_PuiProject::h_HandlePendingEvents(void)
 
    if (c_PreviousFocusWidget != NULL)
    {
-      //At least two focus changes so we don't accidentally set the focus to the same widget
-      uint32 u32_Counter = 0;
-      const QWidgetList c_WidgetList = QApplication::allWidgets();
-      //Set focus to this so any on focus change events (e.g. edit finished) will be processed before the CRC check
-      for (QWidgetList::const_iterator c_It = c_WidgetList.begin(); (c_It != c_WidgetList.end()) && (u32_Counter < 2);
-           ++c_It)
-      {
-         QWidget * const pc_Widget = (*c_It);
-         if (pc_Widget != NULL)
-         {
-            pc_Widget->setFocus(Qt::MouseFocusReason);
-            ++u32_Counter;
-         }
-      }
+      //Force focus change so any on focus change events (e.g. edit finished) will be processed before the CRC check
+      c_PreviousFocusWidget->clearFocus();
       //Process focus change and handle all pending events which may cause project changes before checking the project
       // for changes
       QApplication::processEvents();
 
-      //Restore original focus
-      c_PreviousFocusWidget->setFocus();
+      //Restore original focus (if possible)
+      if (c_PreviousFocusWidget != NULL)
+      {
+         c_PreviousFocusWidget->setFocus();
+      }
    }
 }
 

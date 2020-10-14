@@ -59,7 +59,7 @@ C_SyvDaPeUpdateModeTreeWidget::C_SyvDaPeUpdateModeTreeWidget(QWidget * const opc
    this->setSelectionMode(QAbstractItemView::NoSelection);
    this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
    this->setAutoExpandDelay(500);
-   this->setIndentation(47);
+   this->setIndentation(15);
    this->setRootIsDecorated(false);
    this->setAnimated(true);
    this->setHeaderHidden(true);

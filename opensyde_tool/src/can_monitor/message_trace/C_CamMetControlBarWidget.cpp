@@ -24,6 +24,10 @@
 #include "C_OgePopUpDialog.h"
 #include "C_CamMetSettingsPopup.h"
 
+#include "C_OgeWiCustomMessage.h"
+
+#include <QDebug>
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
@@ -96,24 +100,26 @@ C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
                                                     "://images/IconSettingsHover.svg",
                                                     "", "", "",
                                                     "://images/IconSettingsPressed.svg");
-   this->mpc_Ui->pc_PushButtonToggleHex->SetSvg("://images/IconNumberFormatDec.svg", "",
-                                                "://images/IconNumberFormatDecHover.svg",
-                                                "://images/IconNumberFormatHex.svg", "",
+   this->mpc_Ui->pc_PushButtonToggleHex->SetSvg("://images/IconNumberFormatHex.svg", "",
                                                 "://images/IconNumberFormatHexHover.svg",
-                                                "://images/IconNumberFormatDecPressed.svg",
-                                                "://images/IconNumberFormatHexPressed.svg");
-   this->mpc_Ui->pc_PushButtonToggleTimeMode->SetSvg("://images/IconTimeModeAbsolute.svg", "",
-                                                     "://images/IconTimeModeAbsoluteHover.svg",
-                                                     "://images/IconTimeModeRelative.svg", "",
+                                                "://images/IconNumberFormatDec.svg", "",
+                                                "://images/IconNumberFormatDecHover.svg",
+                                                "://images/IconNumberFormatHexPressed.svg",
+                                                "://images/IconNumberFormatDecPressed.svg");
+
+   this->mpc_Ui->pc_PushButtonToggleTimeMode->SetSvg("://images/IconTimeModeRelative.svg", "",
                                                      "://images/IconTimeModeRelativeHover.svg",
-                                                     "://images/IconTimeModeAbsolutePressed.svg",
-                                                     "://images/IconTimeModeRelativePressed.svg");
-   this->mpc_Ui->pc_PushButtonToggleDisplayMode->SetSvg("://images/IconToggleToUniqueOff.svg", "",
-                                                        "://images/IconToggleToUniqueOffHover.svg",
-                                                        "://images/IconToggleToUniqueOn.svg", "",
+                                                     "://images/IconTimeModeAbsolute.svg", "",
+                                                     "://images/IconTimeModeAbsoluteHover.svg",
+                                                     "://images/IconTimeModeRelativePressed.svg",
+                                                     "://images/IconTimeModeAbsolutePressed.svg");
+
+   this->mpc_Ui->pc_PushButtonToggleDisplayMode->SetSvg("://images/IconToggleToUniqueOn.svg", "",
                                                         "://images/IconToggleToUniqueOnHover.svg",
-                                                        "://images/IconToggleToUniqueOffPressed.svg",
-                                                        "://images/IconToggleToUniqueOnPressed.svg");
+                                                        "://images/IconToggleToUniqueOff.svg", "",
+                                                        "://images/IconToggleToUniqueOffHover.svg",
+                                                        "://images/IconToggleToUniqueOnPressed.svg",
+                                                        "://images/IconToggleToUniqueOffPressed.svg");
 
    connect(this->mpc_Ui->pc_PushButtonTogglePlay, &QPushButton::toggled, this,
            &C_CamMetControlBarWidget::m_HandleTogglePlay);
@@ -277,10 +283,26 @@ void C_CamMetControlBarWidget::StopLogging(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sets the focus on SearchBar. If Trace is currently running, user gets a message
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetControlBarWidget::SearchBarFocus()
+{
+   if (this->mpc_Ui->pc_PushButtonTogglePlay->isChecked() == true)
+   {
+      this->m_MessageSearchWhileTracing();
+   }
+   else
+   {
+      this->mpc_Ui->pc_ComboBoxSearch->lineEdit()->setFocus();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Triggers searching the next match
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetControlBarWidget::SearchNext(void) const
+void C_CamMetControlBarWidget::SearchNext(void)
 {
    if ((this->mpc_Ui->pc_PushButtonStop->isEnabled() == false) ||
        (this->mpc_Ui->pc_PushButtonTogglePlay->isChecked() == false))
@@ -289,13 +311,17 @@ void C_CamMetControlBarWidget::SearchNext(void) const
 
       this->m_UpdateSearchComboBox();
    }
+   else
+   {
+      this->m_MessageSearchWhileTracing();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Triggers searching the previous match
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetControlBarWidget::SearchPrev(void) const
+void C_CamMetControlBarWidget::SearchPrev(void)
 {
    if ((this->mpc_Ui->pc_PushButtonStop->isEnabled() == false) ||
        (this->mpc_Ui->pc_PushButtonTogglePlay->isChecked() == false))
@@ -303,6 +329,10 @@ void C_CamMetControlBarWidget::SearchPrev(void) const
       Q_EMIT (this->SigSearchTrace(this->mpc_Ui->pc_ComboBoxSearch->currentText(), false));
 
       this->m_UpdateSearchComboBox();
+   }
+   else
+   {
+      this->m_MessageSearchWhileTracing();
    }
 }
 
@@ -520,4 +550,17 @@ void C_CamMetControlBarWidget::m_OpenTraceSettings(void)
    }
 
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Generates a message for the user. User may not use Search while Trace is running
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetControlBarWidget::m_MessageSearchWhileTracing()
+{
+   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eINFORMATION);
+
+   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Trace Search"));
+   c_MessageBox.SetDescription(C_GtGetText::h_GetText("Available only if Trace is paused or stopped"));
+   c_MessageBox.Execute();
 }

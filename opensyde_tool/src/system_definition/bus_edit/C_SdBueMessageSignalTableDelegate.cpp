@@ -13,7 +13,6 @@
 #include "precomp_headers.h"
 
 #include <QPainter>
-#include "stwtypes.h"
 #include "constants.h"
 #include "C_TblTreDelegateUtil.h"
 #include "C_SdBueMessageSignalTableDelegate.h"

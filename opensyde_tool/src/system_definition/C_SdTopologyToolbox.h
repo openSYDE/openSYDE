@@ -64,19 +64,21 @@ private:
 
    QIcon mc_Icon;
    C_SdTopologyListWidget * mpc_List;
-   QListWidgetItem * mpc_Item;
    QSpacerItem * mpc_Spacer;
    stw_opensyde_gui_elements::C_OgeLabTopologyToolboxUserNodes * mpc_Label;
 
    void m_FillToolboxDynamic(void);
    void m_FillToolboxStatic(void);
    void m_FillToolboxWithDynamicNodes(const stw_opensyde_core::C_OSCDeviceDefinition & rc_Device);
-   void m_IconAddNodeClicked(void);
-   void m_AddUserNodeToList(const stw_types::sint32 os32_Return);
    void m_IconClearAllClicked(void);
-   stw_types::sint32 m_LoadDeviceDefinitionFile(void);
-   stw_types::sint32 m_AddUserNode(const QString & orc_DeviceDefinitionPath);
-   stw_types::sint32 m_AddUserNodeFromIni(const QString & orc_UserDevicesIniPath);
+   void m_ErrorHandlingUserFeedback(const QStringList & orc_Errors, const QStringList & orc_PathGood,
+                                    const QStringList & orc_PathFail);
+   void m_FileBrowseDialog(void);
+   void m_LoadUserDeviceDefinitionPaths(const QString & orc_Path, QStringList & orc_UserDeviceDefPaths,
+                                        QStringList & orc_Errors) const;
+   void m_AddUserNodesToIni (const QStringList & orc_UserDeviceDefPaths, QStringList & orc_Errors);
+   void m_AddUserNodesToToolbox(void);
+
    stw_types::sint32 m_DeleteUserNode(const QPoint & orc_Pos);
    stw_types::sint32 m_ClearAllUserNodes(void);
 };

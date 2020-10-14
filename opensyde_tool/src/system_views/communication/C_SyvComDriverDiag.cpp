@@ -1982,8 +1982,7 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
             {
                if (pc_Node->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_KEFEX)
                {
-                  // TODO BAY: Activate when supporting Kefex on dashboard
-
+                  // Activate when supporting Kefex on dashboard
                   /*
                   uint8 u8_DataPoolIndex;
                   uint16 u16_NumberOfDataPoolElements;

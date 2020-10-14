@@ -83,7 +83,8 @@ public:
                                     const bool & orq_AllowNameAdaptation = true,
                                     const bool & orq_AllowDataAdaptation = true);
    stw_types::sint32 RemoveDataPool(const stw_types::uint32 & oru32_NodeIndex,
-                                    const stw_types::uint32 & oru32_DataPoolIndex);
+                                    const stw_types::uint32 & oru32_DataPoolIndex,
+                                    const bool oq_SuppressSyncSignal = false);
    stw_types::sint32 SetDataPool(const stw_types::uint32 & oru32_NodeIndex,
                                  const stw_types::uint32 & oru32_DataPoolIndex,
                                  const stw_opensyde_core::C_OSCNodeDataPool & orc_OSCContent,
@@ -112,6 +113,10 @@ public:
    stw_types::sint32 GetDataPoolIndex(const stw_types::uint32 ou32_NodeIndex,
                                       const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_DataPoolType,
                                       const stw_types::uint32 ou32_DataPoolTypeIndex) const;
+   stw_types::sint32 GetDataPoolTypeIndex(const stw_types::uint32 ou32_NodeIndex,
+                                          const stw_types::uint32 ou32_DataPoolIndex) const;
+   stw_types::sint32 GetDataPoolCount(const stw_types::uint32 ou32_NodeIndex,
+                                      const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_DataPoolType) const;
    bool CheckNodeDataPoolNameAvailable(const stw_types::uint32 & oru32_NodeIndex, const stw_scl::C_SCLString & orc_Name,
                                        const stw_types::uint32 * const opu32_DataPoolIndexToSkip = NULL,
                                        std::vector<stw_scl::C_SCLString> * const opc_ExistingDatapoolNames = NULL) const;

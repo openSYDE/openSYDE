@@ -2170,13 +2170,18 @@ void C_SdBueMessageSelectorTreeWidget::m_ScrollBarRangeChanged(const sintn osn_M
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessageSelectorTreeWidget::m_GetFirstConnectedNodeAndInterface(uint32 & oru32_NodeIndex,
                                                                              uint32 & oru32_InterfaceIndex,
-                                                                             uint32 & oru32_DatapoolIndex) const
+                                                                             uint32 & oru32_DatapoolIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (this->mq_ModeSingleNode == true)
    {
-      tgl_assert(this->mc_DatapoolIndexes.size() > 0);
+      if (this->mc_DatapoolIndexes.size() == 0)
+      {
+         // No Datapool exists, add a new one
+         C_PuiSdHandler::h_GetInstance()->AddAutoGenCommDataPool(this->mu32_NodeIndex, this->me_ProtocolType);
+         Q_EMIT (this->SigReload());
+      }
 
       oru32_NodeIndex = this->mu32_NodeIndex;
       oru32_InterfaceIndex = this->mu32_InterfaceIndex;
@@ -2255,7 +2260,7 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_MapMessageIdToInternalMessageIndex(
    \retval  C_NO_ACT    no valid message id found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueMessageSelectorTreeWidget::GetMessageIdForAdd(C_OSCCanMessageIdentificationIndices & orc_MessageId) const
+sint32 C_SdBueMessageSelectorTreeWidget::GetMessageIdForAdd(C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    uint32 u32_NodeIndex;
    uint32 u32_InterfaceIndex;

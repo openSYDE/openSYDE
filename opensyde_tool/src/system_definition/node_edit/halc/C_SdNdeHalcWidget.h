@@ -37,12 +37,31 @@ public:
    explicit C_SdNdeHalcWidget(QWidget * const opc_Parent = NULL);
    ~C_SdNdeHalcWidget(void);
 
+   void LoadUserSettings(void) const;
+   void SaveUserSettings(void) const;
    void InitStaticNames(void) const;
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
+   void Save(void);
+   void ShowChannel(const stw_types::uint32 ou32_DomainIndex, const stw_types::sint32 os32_ChannelIndex) const;
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+Q_SIGNALS:
+   //lint -restore
+   void SigErrorChange(void) const;
+   void SigHalcDataPoolChanged(void) const;
+
+protected:
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   virtual void hideEvent(QHideEvent * const opc_Event) override;
+   virtual void showEvent(QShowEvent * const opc_Event) override;
+   //lint -restore
 
 private:
    Ui::C_SdNdeHalcWidget * mpc_Ui;
    stw_types::uint32 mu32_NodeIndex;
+   bool mq_HalcDescriptionSelected;
 
    static const QString mhc_CONFIG_FILE_TYPE;
 
@@ -53,19 +72,22 @@ private:
    void m_DisableButtons(const bool oq_Active) const;
    void m_OnImportConfigClicked(void);
    void m_OnExportConfigClicked (void);
-   void m_OnSettingsClicked(void);
    void m_OnCleanUpClicked(void) const;
-   void m_OnLoadClicked(void);
-   void m_OnViewDetailsClicked(void) const;
-   void m_OnMagicRequested(void); // TODO remove - development only
-   void m_OnOverviewToggled(const bool oq_Checked) const;
-   void m_OnChannelSelected(const QModelIndex & orc_Index) const;
+   void m_OnSelectClicked(void);
+   void m_OnUpdateClicked(void);
+   void m_RunDatapoolMagician(void);
+   void m_OnOverviewClicked(void) const;
+   void m_ShowOverview(const bool oq_Show) const;
+   void m_OnChannelSelected(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
+                            const bool oq_UseChannelIndex) const;
    void m_OnChannelUpdate(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
                           const bool oq_UseChannelIndex) const;
-
+   bool m_LoadHalcDefinitionFile(stw_opensyde_core::C_OSCHalcConfig & orc_HalcConfig, QString & orc_HalcDefPath);
    void m_UpdateNodeData(void) const;
+   void m_UpdatePinCount(void) const;
+   void m_UpdateDisplayedData(void) const;
 
-   static QString mh_GetDialogPath(void);
+   static QString mh_GetDialogPath(const QString & orc_LastKnownPath);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

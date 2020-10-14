@@ -506,6 +506,11 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
             C_OSCSuServiceUpdatePackage::h_LoadFilesSection(c_DoFlash.c_FilesToWriteToNvm, u32_NodeCounter,
                                                             u32_UpdatePosition, c_UpdateOrderByNodes, c_TargetUnzipPath,
                                                             c_XMLParser, mc_PARAM_FILES, mc_PARAM_FILE);
+            if (orc_SystemDefinition.c_Nodes[u32_NodeCounter].pc_DeviceDefinition != NULL)
+            {
+               c_DoFlash.c_OtherAcceptedDeviceNames =
+                  orc_SystemDefinition.c_Nodes[u32_NodeCounter].pc_DeviceDefinition->c_OtherAcceptedNames;
+            }
          }
          u32_NodeCounter++;                            // next active node
          orc_ApplicationsToWrite.push_back(c_DoFlash); // push back in any case even if we have no applications

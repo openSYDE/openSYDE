@@ -41,6 +41,7 @@ protected:
    stw_types::sintn msn_TopBorderDisabledWidth;
    stw_types::sintn msn_LeftBorderDisabledWidth;
    stw_types::sintn msn_BottomBorderDisabledWidth;
+   bool mq_IconLeft;
    QColor mc_BorderColorEnabledLeft;
    QColor mc_BorderColorEnabledTop;
    QColor mc_BorderColorEnabledRight;

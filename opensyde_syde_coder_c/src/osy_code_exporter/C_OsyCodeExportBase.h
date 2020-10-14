@@ -85,6 +85,7 @@ protected:
    stw_scl::C_SCLString mc_ExeVersion; //Format: V<M>.<mm>r<r>
    stw_scl::C_SCLString mc_LogFileName;
    stw_scl::C_SCLString mc_ListOfFilesFileName;
+   stw_scl::C_SCLString mc_BinaryHash;
 
    //list of created source code files; to be filled by GenerateSourceCode
    std::vector<stw_scl::C_SCLString> mc_CreatedFiles;

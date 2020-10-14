@@ -432,8 +432,10 @@ sint32 C_OSCExportNode::mh_CreateHALConfigCode(const C_OSCNode & orc_Node, const
           (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC))
       {
          //Create configuration code associated with this Datapool
-         s32_Retval = C_OSCExportHalc::h_CreateSourceCode(orc_Path, orc_Node.c_HALCConfig, rc_DataPool,
-                                                          orc_ExportToolInfo);
+         s32_Retval =
+            C_OSCExportHalc::h_CreateSourceCode(
+               orc_Path, orc_Node.c_Applications[ou16_ApplicationIndex].u16_GenCodeVersion, orc_Node.c_HALCConfig,
+               rc_DataPool, orc_ExportToolInfo);
          //Handle file names
          if (s32_Retval == C_NO_ERR)
          {

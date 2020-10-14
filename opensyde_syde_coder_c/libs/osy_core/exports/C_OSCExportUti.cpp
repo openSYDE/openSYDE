@@ -42,7 +42,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCExportUti::C_OSCExportUti()
+C_OSCExportUti::C_OSCExportUti(void)
 {
 }
 

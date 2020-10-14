@@ -40,7 +40,7 @@ public:
    void InitText(void) const;
 
    void Clear(void) const;
-   void SetDataPool(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex);
+   void SetDataPool(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
    void OpenDetail(const stw_types::sint32 os32_ListIndex, const stw_types::sint32 os32_DataElementIndex) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -66,8 +66,7 @@ private:
    stw_types::uint32 mu32_LastKnownTableSelectionCount;
 
    void m_InitButtonIcons(void) const;
-   void m_HandleErrorChange(const bool & orq_Error);
-   void m_HandleSizeChange(void);
+   void m_UpdateDpLabel(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex) const;
    void m_HandleSelection(const stw_types::uint32 & oru32_Count, const bool & orq_List);
    void m_HandleButtonChange(const bool & orq_AddActive, const bool & orq_CutActive, const bool & orq_CopyActive,
                              const bool & orq_PasteActive, const bool & orq_DeleteActive,

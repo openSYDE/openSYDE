@@ -48,6 +48,7 @@ public:
 
    void StopLogging(void);
 
+   void SearchBarFocus(void) const;
    void SearchNext(void) const;
    void SearchPrev(void) const;
 

@@ -39,9 +39,9 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QString C_SyvDaDashboardsWidget::mhc_DarkModeEnabledIconPath = "://images/system_views/Darkmode_Enable.svg";
-const QString C_SyvDaDashboardsWidget::mhc_DarkModeDisabledIconPath = "://images/system_views/Darkmode_Disable.svg";
-const sintn C_SyvDaDashboardsWidget::mhsn_WidgetBorder = 25;
+const QString C_SyvDaDashboardsWidget::mhc_DarkModeEnabledIconPath = "://images/system_views/Darkmode_Disable.svg";
+const QString C_SyvDaDashboardsWidget::mhc_DarkModeDisabledIconPath = "://images/system_views/Darkmode_Enable.svg";
+const sintn C_SyvDaDashboardsWidget::mhsn_WidgetBorder = 11;
 const sintn C_SyvDaDashboardsWidget::mhsn_ToolboxInitPosY = 150;
 stw_types::uint32 C_SyvDaDashboardsWidget::mhu32_DisconnectTime = 0UL;
 
@@ -60,9 +60,9 @@ stw_types::uint32 C_SyvDaDashboardsWidget::mhu32_DisconnectTime = 0UL;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_ViewIndex    View index
-   \param[in]     opc_ToolboxParent Optional pointer to toolbox parent
-   \param[in,out] opc_Parent        Optional pointer to parent
+   \param[in]      ou32_ViewIndex      View index
+   \param[in]      opc_ToolboxParent   Optional pointer to toolbox parent
+   \param[in,out]  opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QWidget * const opc_ToolboxParent,
@@ -76,6 +76,7 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    mpc_ToolboxParent(opc_ToolboxParent),
    mu32_ViewIndex(ou32_ViewIndex),
    mq_EditModeActive(false),
+   mq_DarkModeActive(false),
    mq_ConnectActive(false),
    me_ConnectState(eCS_DISCONNECTED),
    msn_InitToolboxCounter(0)
@@ -83,6 +84,9 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    mpc_Ui->setupUi(this);
 
    this->InitText();
+
+   // Style
+   this->mpc_Ui->pc_WidgetWhite->SetBackgroundColor(0);
 
    //Style error label
    this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(24);
@@ -143,7 +147,7 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    {
       this->mpc_FixMinimizedToolbox = new C_OgeWiFixPosition(C_GtGetText::h_GetText("TOOLBOX"),
                                                              ":images/IconToolbox.svg",
-                                                             QRect(1277, 24, 190, 36), this->mpc_ToolboxParent);
+                                                             QRect(1277, 14, 190, 36), this->mpc_ToolboxParent);
    }
 }
 
@@ -269,7 +273,7 @@ void C_SyvDaDashboardsWidget::ToggleDarkMode(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the edit mode
 
-   \param[in]     oq_Active      Flag for edit mode
+   \param[in]  oq_Active   Flag for edit mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
@@ -284,8 +288,7 @@ void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
    {
       //Handle button
       this->mpc_Ui->pc_PbConfirm->SetSvg("://images/system_views/IconConfirm.svg");
-      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(22, 22));
-      this->mpc_Ui->pc_PbConfirm->SetMargins(12, 20);
+      this->mpc_Ui->pc_PbConfirm->SetMargins(10, 20);
       this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
 
       //Initially create toolbox
@@ -311,8 +314,7 @@ void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
       //Handle button
       this->mpc_Ui->pc_PbConfirm->SetSvg("://images/main_page_and_navi_bar/IconEdit.svg",
                                          "://images/IconEditDisabledBright.svg");
-      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(24, 24));
-      this->mpc_Ui->pc_PbConfirm->SetMargins(16, 25);
+      this->mpc_Ui->pc_PbConfirm->SetMargins(10, 28); // put a bit more space in between
       this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Edit"));
 
       //Hide toolbox
@@ -330,7 +332,10 @@ void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
       //Also should remember the toolbox settings
       this->Save();
    }
+
+   // style
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBox, "Edit", oq_Active);
+   this->m_AdaptSpaceHolderWidgetColor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -361,7 +366,7 @@ bool C_SyvDaDashboardsWidget::GetConnectActive(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set connected flag
 
-   \param[in] oq_Value New connected flag
+   \param[in]  oq_Value    New connected flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
@@ -483,7 +488,7 @@ void C_SyvDaDashboardsWidget::OnPushButtonConnectPress(void)
 
    Here: hide and delete toolbox
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::hideEvent(QHideEvent * const opc_Event)
@@ -505,7 +510,7 @@ void C_SyvDaDashboardsWidget::hideEvent(QHideEvent * const opc_Event)
 
    Move the toolbox.
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
@@ -587,13 +592,16 @@ void C_SyvDaDashboardsWidget::m_CancelClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply dark mode setting
 
-   \param[in] oq_Active Dark mode value
+   \param[in]  oq_Active   Dark mode value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_ApplyDarkMode(const bool oq_Active)
 {
+   this->mq_DarkModeActive = oq_Active;
    this->mpc_Ui->pc_TabWidget->ApplyDarkMode(oq_Active);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBox, "DarkMode", oq_Active);
+   this->m_AdaptSpaceHolderWidgetColor();
+
    if (this->mpc_Toolbox != NULL)
    {
       this->mpc_Toolbox->ApplyDarkMode(oq_Active);
@@ -725,6 +733,8 @@ void C_SyvDaDashboardsWidget::m_UpdateShowValues(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize C_SyvComDriverDiag
+
+   \param[in,out]  orc_Message   Message
 
    \return
    C_NO_ERR      Operation success
@@ -889,7 +899,7 @@ void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OSCNodeDataPoolListElementI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Attempt to start read NVM list operation
 
-   \param[in] orc_Index List index
+   \param[in]  orc_Index   List index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_NvmReadList(const C_OSCNodeDataPoolListId & orc_Index)
@@ -910,8 +920,8 @@ void C_SyvDaDashboardsWidget::m_NvmReadList(const C_OSCNodeDataPoolListId & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle manual user operation finished event
 
-   \param[in] os32_Result Operation result
-   \param[in] ou8_NRC     Negative response code, if any
+   \param[in]  os32_Result    Operation result
+   \param[in]  ou8_NRC        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
@@ -1064,9 +1074,9 @@ void C_SyvDaDashboardsWidget::m_ConnectStepFinished(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle connection attempt result value
 
-   \param[in] os32_Result        Connection attempt result value
-   \param[in] orc_Message        Error message (if any)
-   \param[in] orc_MessageDetails Error message details (if any)
+   \param[in]  os32_Result          Connection attempt result value
+   \param[in]  orc_Message          Error message (if any)
+   \param[in]  orc_MessageDetails   Error message details (if any)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_HandleConnectionResult(const sint32 os32_Result, const QString & orc_Message,
@@ -1151,5 +1161,21 @@ void C_SyvDaDashboardsWidget::m_WiHoverMinBtnClicked(void)
    if (this->mpc_FixMinimizedToolbox != NULL)
    {
       this->mpc_FixMinimizedToolbox->setVisible(true);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Helper function to adapt space holder widget color
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardsWidget::m_AdaptSpaceHolderWidgetColor(void) const
+{
+   if ((this->mq_EditModeActive == true) && (this->mq_DarkModeActive == true))
+   {
+      this->mpc_Ui->pc_WidgetWhite->SetBackgroundColor(52);
+   }
+   else
+   {
+      this->mpc_Ui->pc_WidgetWhite->SetBackgroundColor(0);
    }
 }

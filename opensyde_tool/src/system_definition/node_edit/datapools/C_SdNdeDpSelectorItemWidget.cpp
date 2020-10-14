@@ -33,8 +33,6 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QSize C_SdNdeDpSelectorItemWidget::hc_MaximumSize = QSize(145, 151);
-const QSize C_SdNdeDpSelectorItemWidget::hc_MinimumSize = QSize(145, 61);
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -61,8 +59,7 @@ C_SdNdeDpSelectorItemWidget::C_SdNdeDpSelectorItemWidget(const bool oq_UsageView
    mq_StateSafety(false),
    mq_StateConflict(false),
    mq_Shared(false),
-   mq_Maximized(true),
-   mq_Active(false),
+   mq_Selected(false),
    mq_UsageViewActive(oq_UsageViewActive),
    mu32_Size(0U),
    mu32_Used(0U),
@@ -80,9 +77,17 @@ C_SdNdeDpSelectorItemWidget::C_SdNdeDpSelectorItemWidget(const bool oq_UsageView
 
    this->mpc_LabelShareImg = new QLabel(this);
    this->mpc_LabelShareImg->raise();
-   this->mpc_LabelShareImg->move(114, 114);
+   this->mpc_LabelShareImg->move(119, 33);
    this->mpc_LabelShareImg->setVisible(false);
-   this->mpc_LabelShareImg->setPixmap(QIcon("://images/system_definition/IconShare.svg").pixmap(mc_ICON_SIZE_20));
+   this->mpc_LabelShareImg->setPixmap(QIcon("://images/system_definition/IconShare.svg").pixmap(mc_ICON_SIZE_16));
+
+   this->mpc_LabelShareImgHovered = new QLabel(this);
+   this->mpc_LabelShareImgHovered->raise();
+   this->mpc_LabelShareImgHovered->move(119, 33);
+   this->mpc_LabelShareImgHovered->setVisible(false);
+   this->mpc_LabelShareImgHovered->setPixmap(QIcon("://images/system_definition/IconShareHover.svg").
+                                             pixmap(mc_ICON_SIZE_16));
+   this->mpc_LabelShareImgHovered->setVisible(false);
 
    if (this->mq_UsageViewActive == false)
    {
@@ -303,8 +308,6 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
       // Share state
       if (this->mq_Shared == true)
       {
-         //c_ToolTipText += C_GtGetText::h_GetText("   Shared Datapool: ");
-
          std::vector<QString> c_SharedDatapoolGroup;
          uint32 u32_DatapoolCounter;
 
@@ -367,32 +370,16 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the widget active or inactive
+/*! \brief   Sets the selected state
 
-   Adapts the stylesheet
-
-   \param[in]     oq_Active   Is widget active or not active
+   \param[in]  oq_Selected    Flag if selected
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorItemWidget::SetActive(const bool oq_Active)
+void C_SdNdeDpSelectorItemWidget::SetSelected(const bool oq_Selected)
 {
-   if (oq_Active == true)
-   {
-      // adapt the styling with the stylesheet
-      this->setStyleSheet("QFrame#pc_FrameSdNdeDpSelectorItem {"
-                          "background-color: " + mc_STYLESHEET_GUIDE_COLOR_4 + ";"
-                          "}"
-                          "QTextEdit#pc_TextEditDpName {"
-                          "color: " + mc_STYLESHEET_GUIDE_COLOR_0 + ";"
-                          "}");
-   }
-   else
-   {
-      // reset stylesheet
-      this->setStyleSheet("");
-   }
+   this->m_SetSelectColor(oq_Selected);
 
-   this->mq_Active = oq_Active;
+   this->mq_Selected = oq_Selected;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -470,6 +457,18 @@ bool C_SdNdeDpSelectorItemWidget::GetStateSafety(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the active state of the widget
+
+   \return
+   Flag for active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeDpSelectorItemWidget::GetSelected(void) const
+{
+   return this->mq_Selected;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the conflict state
 
    \return
@@ -492,68 +491,6 @@ bool C_SdNdeDpSelectorItemWidget::GetStateConflict(void) const
 bool C_SdNdeDpSelectorItemWidget::GetShareDatapool(void) const
 {
    return this->mq_Shared;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sets the widget in maximized or minimized mode
-
-   \param[in]     oq_Maximized   Flag for maximized
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorItemWidget::SetMaximized(const bool oq_Maximized)
-{
-   this->mpc_Ui->pc_TextEditDpComment->setVisible(oq_Maximized);
-
-   if (this->mpc_UsageBar != NULL)
-   {
-      this->mpc_Ui->pc_WidgetDpItemUsage->setVisible(oq_Maximized);
-      this->mpc_UsageBar->setVisible(oq_Maximized);
-   }
-
-   if (oq_Maximized == true)
-   {
-      this->mpc_Ui->pc_FrameSdNdeDpSelectorItem->setMaximumHeight(140);
-      this->mpc_Ui->pc_FrameSdNdeDpSelectorItem->setMinimumHeight(140);
-      this->setMaximumHeight(hc_MaximumSize.height());
-      this->setMinimumHeight(hc_MaximumSize.height());
-   }
-   else
-   {
-      this->mpc_Ui->pc_FrameSdNdeDpSelectorItem->setMinimumHeight(50);
-      this->mpc_Ui->pc_FrameSdNdeDpSelectorItem->setMaximumHeight(50);
-      this->setMaximumHeight(hc_MinimumSize.height());
-      this->setMinimumHeight(hc_MinimumSize.height());
-      // the widget would not adapt the size correctly in the delegate instance if resize will not be called
-      this->resize(hc_MinimumSize);
-   }
-
-   this->update();
-
-   this->mq_Maximized = oq_Maximized;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the maximized state of the widget
-
-   \return
-   Flag for maximized
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpSelectorItemWidget::GetMaximized(void) const
-{
-   return this->mq_Maximized;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the active state of the widget
-
-   \return
-   Flag for active
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpSelectorItemWidget::GetActive(void) const
-{
-   return this->mq_Active;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -618,6 +555,49 @@ void C_SdNdeDpSelectorItemWidget::showEvent(QShowEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
+
+   Here: Necessary that the event function leaveEvent is called. Reason: Unknown
+
+   \param[in,out]  opc_Event  Event identification and information
+
+   \return
+   True  Event was recognized and processed
+   False Event ignored
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeDpSelectorItemWidget::event(QEvent * const opc_Event)
+{
+   if (this->mq_Selected == false)
+   {
+      if (opc_Event->type() == QEvent::Leave)
+      {
+         if ((this->mpc_LabelShareImg != NULL) &&
+             (this->mpc_LabelShareImgHovered != NULL))
+         {
+            this->mpc_LabelShareImg->setVisible(this->mq_Shared);
+            this->mpc_LabelShareImgHovered->setVisible(false);
+         }
+      }
+      else if (opc_Event->type() == QEvent::Enter)
+      {
+         if ((this->mpc_LabelShareImg != NULL) &&
+             (this->mpc_LabelShareImgHovered != NULL))
+         {
+            this->mpc_LabelShareImgHovered->setVisible(this->mq_Shared);
+            this->mpc_LabelShareImg->setVisible(false);
+         }
+      }
+      else
+      {
+         // Nothing to do
+      }
+   }
+
+   return C_OgeWiWithToolTip::event(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemWidget::m_UpdateLabel(void)
 {
    // adapt the color of the percentage label
@@ -671,4 +651,29 @@ void C_SdNdeDpSelectorItemWidget::m_UpdateName(void) const
 {
    this->mpc_Ui->pc_TextEditDpName->setText(QString("#") + QString::number(this->mu32_Number) + QString(" - ") +
                                             this->mc_Name);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the color of the item in case of selection or hover event
+
+   \param[in]       oq_Active     Flag if the color will be set or removed
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorItemWidget::m_SetSelectColor(const bool oq_Active)
+{
+   if (oq_Active == true)
+   {
+      // adapt the styling with the stylesheet
+      this->setStyleSheet("QFrame#pc_FrameSdNdeDpSelectorItem {"
+                          "background-color: " + mc_STYLESHEET_GUIDE_COLOR_4 + ";"
+                          "}"
+                          "QTextEdit#pc_TextEditDpName {"
+                          "color: " + mc_STYLESHEET_GUIDE_COLOR_0 + ";"
+                          "}");
+   }
+   else
+   {
+      // reset stylesheet
+      this->setStyleSheet("");
+   }
 }

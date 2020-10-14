@@ -606,7 +606,7 @@ void C_OSCExportDataPool::mh_AddDefinesImpl(C_SCLStringList & orc_Data, const C_
    {
       orc_Data.Append("///check for correct version of structure definitions");
       orc_Data.Append("#if OSY_DPA_DATA_POOL_DEFINITION_VERSION != 0x" +
-                      C_SCLString::IntToHex(static_cast<sint32>(C_OSCExportDataPool::h_ConvertOverallCodeVersion(
+                      C_SCLString::IntToHex(static_cast<sint64>(C_OSCExportDataPool::h_ConvertOverallCodeVersion(
                                                                    ou16_GenCodeVersion)), 4U) + "U");
       // datapool export version is one less than over all code structure version (no changes from version 1 to 2)
       orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
@@ -1053,6 +1053,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
       }
       else
       {
+         //we have either a HALC or DIAG DP: technically this results in a DIAGNOSIS DP
          orc_Data.Append("   OSY_DPA_DATA_POOL_TYPE_DIAGNOSIS,");
       }
       orc_Data.Append("   { 0x" + C_SCLString::IntToHex(orc_DataPool.au8_Version[0], 2U) + "U, 0x" +

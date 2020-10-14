@@ -96,7 +96,6 @@ C_SCLString::C_SCLString(void) :
 {
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor
 
@@ -138,7 +137,7 @@ C_SCLString::C_SCLString(const stw_types::sint8 os8_InitValue)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
-   Initialize string data to opcn_InitValue.
+   Initialize string data from "const wchar_t *".
    The function will do its best to make sense of the wchar_t array based on the configured LOCALE
    and stop conversion if it finds a character it can't convert.
    For details cf. documentation of wcstombs.
@@ -160,21 +159,36 @@ C_SCLString::C_SCLString(const wchar_t * const opwcn_InitValue)
       pcn_Chars[un_Size - 1] = '\0';
    }
 
-   c_String.operator = (pcn_Chars);
+   c_String.operator =(pcn_Chars);
    delete[] pcn_Chars;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Constructor.
 
-   Initialize string data to oc_InitValue.
+   Initialize string data from "wchar_t *"
+   See documentation of const-variation for details.
+
+   \param[in]  opwcn_InitValue      pointer to zero-terminated initial string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString::C_SCLString(wchar_t * const opwcn_InitValue)
+{
+   //use const constructor for this; so we use a pointer cast; causes some lint messages which are accepted
+   (*this) = reinterpret_cast<const wchar_t *>(opwcn_InitValue); //lint !e929 !e818
+} //lint !e818
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Constructor.
+
+   Initialize string data to orc_InitValue.
 
    \param[in]  orc_InitValue      initial string
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString::C_SCLString(const C_SCLString & orc_InitValue)
 {
-   c_String.operator = (orc_InitValue.c_str());
+   c_String.operator =(orc_InitValue.c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -244,7 +258,7 @@ C_SCLString & C_SCLString::operator =(const C_SCLString & orc_Source)
 {
    if (this != &orc_Source)
    {
-      c_String.operator = (orc_Source.c_str());
+      c_String.operator =(orc_Source.c_str());
    }
    return (*this);
 }
@@ -282,7 +296,7 @@ C_SCLString SCL_PACKAGE stw_scl::operator +(const C_SCLString & orc_Par1, const 
 {
    std::string c_Temp;
    (void)c_Temp.assign(orc_Par1.c_str());
-   c_Temp.operator += (orc_Par2.c_str());
+   c_Temp.operator +=(orc_Par2.c_str());
    return c_Temp.c_str();
 }
 
@@ -455,7 +469,7 @@ C_SCLString C_SCLString::StringOfChar(const charn ocn_Char, const uint32 ou32_Co
    std::string c_StdString;
    C_SCLString c_SCLString;
    (void)c_StdString.assign(ou32_Count, ocn_Char);
-   c_SCLString.operator = (c_StdString.c_str());
+   c_SCLString.operator =(c_StdString.c_str());
    return c_SCLString;
 }
 
@@ -484,9 +498,10 @@ sintn C_SCLString::mh_GetRequiredPrintfSize(const charn * const opcn_Format, va_
 //----------------------------------------------------------------------------------------------------------------------
 
 void C_SCLString::m_SNPrintf(const stw_types::sintn osn_Size, const stw_types::charn * const opcn_Format,
-                                          va_list opv_Args)
+                             va_list opv_Args)
 {
    charn * const pcn_Buffer = new charn[static_cast<uintn>(osn_Size) + 1U];
+
    (void)std::vsnprintf(pcn_Buffer, static_cast<uintn>(osn_Size) + 1U, opcn_Format, opv_Args);
    (void)c_String.assign(pcn_Buffer);
    delete[] pcn_Buffer;
@@ -495,9 +510,10 @@ void C_SCLString::m_SNPrintf(const stw_types::sintn osn_Size, const stw_types::c
 //----------------------------------------------------------------------------------------------------------------------
 
 void C_SCLString::m_CatSNPrintf(const stw_types::sintn osn_Size, const stw_types::charn * const opcn_Format,
-                                          va_list opv_Args)
+                                va_list opv_Args)
 {
    charn * const pcn_Buffer = new charn[static_cast<uintn>(osn_Size) + 1U];
+
    (void)std::vsnprintf(pcn_Buffer, static_cast<uintn>(osn_Size) + 1U, opcn_Format, opv_Args);
    c_String.operator +=(pcn_Buffer);
    delete[] pcn_Buffer;
@@ -1271,6 +1287,7 @@ sintn C_SCLString::ToIntDef(const sintn osn_Default) const
 float64 C_SCLString::ToDouble(void) const
 {
    float64 f64_Return;
+
    std::stringstream c_Stream;
    c_Stream.imbue(std::locale::classic()); //use "C" locale: "." is the decimal separator ...
 
@@ -1309,7 +1326,7 @@ float64 C_SCLString::ToDouble(void) const
 charn C_SCLString::operator [](const sintn osn_Index) const
 {
    m_ThrowIfOutOfRange(osn_Index);
-   return c_String.operator [] (static_cast<uintn>(osn_Index) - 1U);
+   return c_String.operator [](static_cast<uintn>(osn_Index) - 1U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1327,7 +1344,7 @@ charn C_SCLString::operator [](const sintn osn_Index) const
 charn & C_SCLString::operator [](const sintn osn_Index)
 {
    m_ThrowIfOutOfRange(osn_Index);
-   return c_String.operator [] (static_cast<uintn>(osn_Index) - 1U);
+   return c_String.operator [](static_cast<uintn>(osn_Index) - 1U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1374,6 +1391,7 @@ const std::string * C_SCLString::AsStdString(void) const
 C_SCLString C_SCLString::IntToStr(const charn ocn_Value)
 {
    C_SCLString c_Text;
+
    std::stringstream c_Stream;
    //a "sint32" should be enough for a charn on all platforms
    c_Stream << static_cast<sint32>(ocn_Value);
@@ -1403,6 +1421,7 @@ C_SCLString C_SCLString::IntToStr(const charn ocn_Value)
 C_SCLString C_SCLString::IntToHex(const uint8 ou8_Value, const uint32 ou32_Digits)
 {
    C_SCLString c_Text;
+
    std::stringstream c_Stream;
    c_Stream << &std::hex << std::setw(ou32_Digits) << std::setfill('0') << static_cast<uint32>(ou8_Value);
    c_Text.c_String = c_Stream.str();
@@ -1431,6 +1450,7 @@ C_SCLString C_SCLString::IntToHex(const uint8 ou8_Value, const uint32 ou32_Digit
 C_SCLString C_SCLString::IntToHex(const sint8 os8_Value, const uint32 ou32_Digits)
 {
    C_SCLString c_Text;
+
    std::stringstream c_Stream;
    c_Stream << &std::hex << std::setw(ou32_Digits) << std::setfill('0') << static_cast<sint32>(os8_Value);
    c_Text.c_String = c_Stream.str();

@@ -5,7 +5,7 @@
 
    \class       stw_scl::C_SCLString
    \brief       String class
-   
+
    ANSI C++ string handling class.
    Aim: provide most of the functionality that Borland's AnsiString does
    while only using plain ANSI C++.
@@ -32,6 +32,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <string>
 #include <cstdarg>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include "stwtypes.h"
 #include "SCLDynamicArray.h"
 
@@ -77,8 +80,8 @@ class SCL_PACKAGE C_SCLString
 {
 private:
    void m_ThrowIfOutOfRange(const stw_types::sint32 os32_Index) const;
-   static stw_types::sint64 m_StrTos64(const stw_types::charn * const opcn_String, const bool oq_Hex);
-   static stw_types::sint32 m_StrTos32(const stw_types::charn * const opcn_String, const bool oq_Hex);
+   static stw_types::sint64 mh_StrTos64(const stw_types::charn * const opcn_String, const bool oq_Hex);
+   static stw_types::sint32 mh_StrTos32(const stw_types::charn * const opcn_String, const bool oq_Hex);
 
    std::string c_String; ///< actual string data wrapped by C_SCLString
 
@@ -107,27 +110,20 @@ public:
    //lint -e{1960,1916}  signature to stay compatible with AnsiString;
    stw_types::sintn cat_printf(const stw_types::charn * const opcn_Format, ...);
 
-   static C_SCLString IntToHex(const stw_types::sintn osn_Value, const stw_types::uint32 ou32_Digits);
-   static C_SCLString IntToHex(const stw_types::sint64 os64_Value, const stw_types::uint32 ou32_Digits);
-
+   //constructors:
    C_SCLString(void);
-   C_SCLString(const stw_types::charn * const opcn_InitValue);
    C_SCLString(const C_SCLString & orc_InitValue);
    C_SCLString(const stw_types::charn * const opcn_InitValue, const stw_types::uintn oun_Length);
-   C_SCLString(const stw_types::charn ocn_InitValue);
-   C_SCLString(const stw_types::sint16 os16_InitValue);
-   C_SCLString(const stw_types::uint16 ou16_InitValue);
-   C_SCLString(const stw_types::sintn osn_InitValue);
-   C_SCLString(const stw_types::uintn oun_InitValue);
-   C_SCLString(const stw_types::sint32 os32_InitValue);
-   C_SCLString(const stw_types::uint32 ou32_InitValue);
-   C_SCLString(const stw_types::sint64 os64_InitValue);
-   C_SCLString(const stw_types::uint64 ou64_InitValue);
+   C_SCLString(const stw_types::sint8 os8_InitValue);
+   C_SCLString(const stw_types::uint8 ou8_InitValue);
    C_SCLString(const stw_types::float64 of64_InitValue);
-
-   //There's no defined stw_types typedef for wchar_t yet, so use the plain type here:
-   //Also the prefix is just a guess.
    C_SCLString(const wchar_t * const opwcn_InitValue);
+   C_SCLString(wchar_t * const opwcn_InitValue);
+   //PC-lint 9 reports 1036 when calling the constructor with a "charn" which is handled by the template constructor
+   // So there is no ambiguity. False Positive.
+   //lint -estring(1036, "*stw_scl::C_SCLString::C_SCLString(double)*")
+   template <typename T> C_SCLString(const T orc_Value);
+
    virtual ~C_SCLString();
 
    //overloaded operators
@@ -175,19 +171,80 @@ public:
    const std::string * AsStdString(void) const;
    std::string * AsStdString(void);
 
-   //some methods to replace global VCL utility functions:
-   static C_SCLString IntToStr(const stw_types::sint64 os64_Value);
-   static C_SCLString IntToStr(const stw_types::uint64 ou64_Value);
-   static C_SCLString IntToStr(const stw_types::sint32 os32_Value);
-   static C_SCLString IntToStr(const stw_types::uint32 ou32_Value);
-   static C_SCLString IntToStr(const stw_types::sintn osn_Value);
-   static C_SCLString IntToStr(const stw_types::uintn oun_Value);
+   static C_SCLString IntToStr(const stw_types::charn ocn_Value);
+   template <typename T> static C_SCLString IntToStr(const T orc_Value);
+   static C_SCLString IntToHex(const stw_types::uint8 ou8_Value, const stw_types::uint32 ou32_Digits);
+   static C_SCLString IntToHex(const stw_types::sint8 os8_Value, const stw_types::uint32 ou32_Digits);
+   template <typename T> static C_SCLString IntToHex(const T orc_Value, const stw_types::uint32 ou32_Digits);
+
    static C_SCLString FloatToStr(const stw_types::float32 of32_Value);
    static C_SCLString FloatToStr(const stw_types::float64 of64_Value);
    static C_SCLString FloatToStr(const stw_types::float64 of64_Value, const stw_types::sint32 os32_Digits);
 
    void Tokenize(const C_SCLString & orc_Delimiters, SCLDynamicArray<C_SCLString> & orc_TokenizedData) const;
 };
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Constructor
+
+   Covers all integer types.
+
+   \param[in]  orc_Value    value to convert
+*/
+//----------------------------------------------------------------------------------------------------------------------
+template <typename T> C_SCLString::C_SCLString(const T orc_Value)
+{
+   std::stringstream c_Stream;
+   c_Stream << orc_Value;
+   c_String = c_Stream.str();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Convert number to string
+
+   Can be used for integer types.
+
+   \param[in]  orc_Value    value to convert
+
+   \return
+   Resulting string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+template <typename T> C_SCLString C_SCLString::IntToStr(const T orc_Value)
+{
+   const C_SCLString c_Text(orc_Value);
+
+   return c_Text;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Convert number to hexadecimal string
+
+   Compose string from integer value data.
+   Does not insert a "0x" prefix before the data.
+
+   Example:
+   "IntToHex(0x123, 4)" will return 0123.
+
+   \param[in]  orc_Value    value to convert
+   \param[in]  ou32_Digits  number of digits to return (zeroes will be filled in from the left)
+
+   \return
+   Resulting string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+template <typename T> C_SCLString C_SCLString::IntToHex(const T orc_Value, const stw_types::uint32 ou32_Digits)
+{
+   C_SCLString c_Text;
+
+   std::stringstream c_Stream;
+   c_Stream << &std::hex << std::setw(ou32_Digits) << std::setfill('0') << orc_Value;
+   c_Text.c_String = c_Stream.str();
+
+   return c_Text;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 
 extern bool SCL_PACKAGE operator == (const C_SCLString & orc_Par1, const C_SCLString & orc_Par2);
 extern bool SCL_PACKAGE operator != (const C_SCLString & orc_Par1, const C_SCLString & orc_Par2);

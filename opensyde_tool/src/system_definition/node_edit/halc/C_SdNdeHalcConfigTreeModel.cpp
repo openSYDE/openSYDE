@@ -179,17 +179,18 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const s
    // first columns are handled by C_TblTreItem
    if (orc_Index.column() > 0)
    {
-      // get parameter data (of parameter itself or of parameter element)
-      const C_OSCHalcConfigParameter * pc_ParameterElement = m_GetParameterElement(orc_Index);
-      if (pc_ParameterElement != NULL)
-      {
-         const C_SdNdeHalcConfigTreeModel::E_Columns e_Col =
-            C_SdNdeHalcConfigTreeModel::h_ColumnToEnum(orc_Index.column());
+      const C_SdNdeHalcConfigTreeModel::E_Columns e_Col =
+         C_SdNdeHalcConfigTreeModel::h_ColumnToEnum(orc_Index.column());
 
-         if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      {
+         // get parameter data (of parameter itself or of parameter element)
+         const C_OSCHalcConfigParameter * const pc_ParameterElement = m_GetParameterElement(orc_Index);
+         if (pc_ParameterElement != NULL)
          {
             const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & rc_EnumItems =
                pc_ParameterElement->c_Value.GetEnumItems();
+            uint32 u32_Counter = 0;
 
             // show data for column
             switch (e_Col)
@@ -205,17 +206,34 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const s
                   break;
                case C_OSCHalcDefContent::eCT_ENUM:
                   c_Retval = C_GtGetText::h_GetText("unknown");
+
                   for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It =
                           rc_EnumItems.begin(); c_It != rc_EnumItems.end(); ++c_It)
                   {
                      if (c_It->second == pc_ParameterElement->c_Value)
                      {
-                        c_Retval = c_It->first.c_str();
+                        if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                        {
+                           c_Retval = c_It->first.c_str();
+                        }
+                        else
+                        {
+                           c_Retval = static_cast<sint64>(u32_Counter);
+                        }
+                        break;
                      }
+                     u32_Counter++;
                   }
                   break;
                case C_OSCHalcDefContent::eCT_BIT_MASK:
-                  c_Retval = "TODO bitmask";
+                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  {
+                     c_Retval = mh_ConvertBitmasksToString(pc_ParameterElement->c_Value);
+                  }
+                  else
+                  {
+                     c_Retval = mh_ConvertBitmasksToBitArray(pc_ParameterElement->c_Value);
+                  }
                   break;
                }
                break;
@@ -224,37 +242,54 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const s
                break;
             }
          }
-         else if ((osn_Role == msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST) && (e_Col == eVALUE))
+      }
+      else if ((osn_Role == msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST) && (e_Col == eVALUE))
+      {
+         const C_OSCHalcDefElement * pc_DefElement = this->m_GetDefParameterElement(orc_Index);
+         if (pc_DefElement != NULL)
          {
-            const C_OSCHalcDefElement * pc_DefElement = this->m_GetDefParameterElement(orc_Index);
-            if (pc_DefElement != NULL)
-            {
-               // Set generic spin box parameters
-               QStringList c_List;
-               QString c_TmpStr;
-               // minimum
-               c_TmpStr = C_SdNdeDpContentUtil::h_GetAllContentAsString(pc_DefElement->c_MinValue);
-               c_List.push_back(c_TmpStr);
-               // maximum
-               c_TmpStr = C_SdNdeDpContentUtil::h_GetAllContentAsString(pc_DefElement->c_MaxValue);
-               c_List.push_back(c_TmpStr);
-               // factor
-               c_TmpStr = QString::number(1.0);
-               c_List.push_back(c_TmpStr);
-               // offset
-               c_TmpStr = QString::number(0.0);
-               c_List.push_back(c_TmpStr);
+            // Set generic spin box parameters
+            QStringList c_List;
+            QString c_TmpStr;
+            // minimum
+            c_TmpStr = C_SdNdeDpContentUtil::h_GetAllContentAsString(pc_DefElement->c_MinValue);
+            c_List.push_back(c_TmpStr);
+            // maximum
+            c_TmpStr = C_SdNdeDpContentUtil::h_GetAllContentAsString(pc_DefElement->c_MaxValue);
+            c_List.push_back(c_TmpStr);
+            // factor
+            c_TmpStr = QString::number(1.0);
+            c_List.push_back(c_TmpStr);
+            // offset
+            c_TmpStr = QString::number(0.0);
+            c_List.push_back(c_TmpStr);
 
-               c_Retval = c_List;
-            }
+            c_Retval = c_List;
          }
-         else if (((osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST) ||
-                   (osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST)) && (e_Col == eVALUE))
+      }
+      else if ((osn_Role == msn_USER_ROLE_INTERACTION_MULTI_SELECT_COMBO_BOX_STRINGS_LIST) && (e_Col == eVALUE))
+      {
+         // get parameter data (of parameter itself or of parameter element)
+         const C_OSCHalcConfigParameter * const pc_ParameterElement = m_GetParameterElement(orc_Index);
+         if (pc_ParameterElement != NULL)
          {
-            // TODO bitmask handling
+            c_Retval = mh_ConvertBitmasksToStringList(pc_ParameterElement->c_Value);
+         }
+      }
+      else if ((osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST) && (e_Col == eVALUE))
+      {
+         // get parameter data (of parameter itself or of parameter element)
+         const C_OSCHalcConfigParameter * const pc_ParameterElement = m_GetParameterElement(orc_Index);
+         if (pc_ParameterElement != NULL)
+         {
             c_Retval = mh_ConvertEnumsToStringList(pc_ParameterElement->c_Value);
          }
-         else if ((osn_Role == msn_USER_ROLE_INTERACTION_ELEMENT_TYPE) && (e_Col == eVALUE))
+      }
+      else if ((osn_Role == msn_USER_ROLE_INTERACTION_ELEMENT_TYPE) && (e_Col == eVALUE))
+      {
+         // get parameter data (of parameter itself or of parameter element)
+         const C_OSCHalcConfigParameter * const pc_ParameterElement = m_GetParameterElement(orc_Index);
+         if (pc_ParameterElement != NULL)
          {
             // use edit field depending on complex type
             switch (pc_ParameterElement->c_Value.GetComplexType())
@@ -263,15 +298,17 @@ QVariant C_SdNdeHalcConfigTreeModel::data(const QModelIndex & orc_Index, const s
                c_Retval = static_cast<sintn>(eURIEL_GENERIC_SPIN_BOX);
                break;
             case C_OSCHalcDefContent::eCT_ENUM:
-            case C_OSCHalcDefContent::eCT_BIT_MASK:
                c_Retval = static_cast<sintn>(eURIEL_COMBO_BOX);
+               break;
+            case C_OSCHalcDefContent::eCT_BIT_MASK:
+               c_Retval = static_cast<sintn>(eURIEL_MULTI_SELECT_COMBO_BOX);
                break;
             }
          }
-         else
-         {
-            // Use default
-         }
+      }
+      else
+      {
+         // Use default
       }
    }
 
@@ -302,98 +339,123 @@ bool C_SdNdeHalcConfigTreeModel::setData(const QModelIndex & orc_Index, const QV
 
    if ((data(orc_Index, osn_Role) != orc_Value) && (e_Col == eVALUE))
    {
-      // get parameter data (of parameter itself or of parameter element)
-      const C_OSCHalcConfigParameter * pc_ParameterElement = m_GetParameterElement(orc_Index);
-      if (pc_ParameterElement != NULL)
+      bool q_Tmp;
+      std::vector<uint32> c_LinkedChannels;
+      if (C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex, this->mu32_DomainIndex,
+                                                                        this->mu32_ChannelIndex, this->mq_ChannelCase,
+                                                                        q_Tmp, NULL, &c_LinkedChannels) == C_NO_ERR)
       {
-         sint32 s32_Return;
-         uint32 u32_ParameterIndex;
-         uint32 u32_ParameterElementIndex;
-         const bool q_IsParameterElement = mh_GetParameterElementIndexe(orc_Index, u32_ParameterIndex,
-                                                                        u32_ParameterElementIndex);
-
-         // copy and adapt value
-         C_OSCHalcConfigParameter c_NewParameterElement = *pc_ParameterElement;
-
-         // extra handling of enum values
-         // TODO bitmask handling
-         if (c_NewParameterElement.c_Value.GetComplexType() == C_OSCHalcDefContent::eCT_ENUM)
+         // get parameter data (of parameter itself or of parameter element)
+         const C_OSCHalcConfigParameter * pc_ParameterElement = m_GetParameterElement(orc_Index);
+         if (pc_ParameterElement != NULL)
          {
-            QStringList c_Tmp = mh_ConvertEnumsToStringList(pc_ParameterElement->c_Value);
-            const sint32 s32_ComboBoxIndex = static_cast<sint32>(orc_Value.toLongLong());
+            uint32 u32_ParameterIndex;
+            uint32 u32_ParameterElementIndex;
+            mh_GetParameterElementIndexe(orc_Index, u32_ParameterIndex, u32_ParameterElementIndex);
 
-            if (s32_ComboBoxIndex < c_Tmp.size())
+            // extra handling of enum values
+            switch (pc_ParameterElement->c_Value.GetComplexType())
             {
-               s32_Return =
-                  c_NewParameterElement.c_Value.SetEnumValue(c_Tmp.at(s32_ComboBoxIndex).toStdString().c_str());
-            }
-            else
-            {
-               s32_Return = C_RANGE;
-            }
-         }
-         else
-         {
-            s32_Return =
-               C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(orc_Value, c_NewParameterElement.c_Value, 0);
-         }
-
-         if (s32_Return == C_NO_ERR)
-         {
-            const C_OSCHalcDefChannelUseCase * pc_UseCase =
-               C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileUseCaseData(this->mu32_NodeIndex,
-                                                                             this->mu32_DomainIndex,
-                                                                             this->mu32_UseCaseIndex);
-
-            // in domain case pc_UseCase is null but we do not have to update any linked channel too
-            if (pc_UseCase != NULL)
-            {
-               // update data of linked channels
-               for (uint32 u32_AvailabilityCounter = 0; u32_AvailabilityCounter < pc_UseCase->c_Availability.size();
-                    u32_AvailabilityCounter++)
+            case C_OSCHalcDefContent::eCT_ENUM:
                {
-                  if (pc_UseCase->c_Availability.at(u32_AvailabilityCounter).u32_ValueIndex == this->mu32_ChannelIndex)
-                  {
-                     const std::vector<stw_types::uint32> & rc_DependentValues =
-                        pc_UseCase->c_Availability.at(u32_AvailabilityCounter).c_DependentValues;
+                  //Enums
+                  const QStringList c_Tmp = mh_ConvertEnumsToStringList(pc_ParameterElement->c_Value);
+                  const sint32 s32_ComboBoxIndex = static_cast<sint32>(orc_Value.toLongLong());
 
-                     for (uint32 u32_Counter = 0; u32_Counter < rc_DependentValues.size(); u32_Counter++)
+                  if (s32_ComboBoxIndex < c_Tmp.size())
+                  {
+                     const QString c_Value = c_Tmp.at(s32_ComboBoxIndex).toStdString().c_str();
+                     //Set value
+                     if (C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelParameterConfigElementEnum(
+                            this->mu32_NodeIndex,
+                            this->mu32_DomainIndex,
+                            this->mu32_ChannelIndex, u32_ParameterIndex, u32_ParameterElementIndex,
+                            this->mq_ChannelCase,
+                            c_Value.toStdString().c_str()) == C_NO_ERR)
                      {
-                        s32_Return = C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelParameterConfigElement(
-                           this->mu32_NodeIndex, this->mu32_DomainIndex, rc_DependentValues.at(u32_Counter),
-                           u32_ParameterIndex, u32_ParameterElementIndex, this->mq_ChannelCase, c_NewParameterElement);
-                        tgl_assert(s32_Return == C_NO_ERR);
+                        q_Retval = true;
+                        //Linked values
+                        for (uint32 u32_It = 0UL; u32_It < c_LinkedChannels.size(); ++u32_It)
+                        {
+                           tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelParameterConfigElementEnum(
+                                         this->mu32_NodeIndex,
+                                         this->mu32_DomainIndex,
+                                         c_LinkedChannels[u32_It], u32_ParameterIndex, u32_ParameterElementIndex,
+                                         this->mq_ChannelCase,
+                                         c_Value.toStdString().c_str()) == C_NO_ERR);
+                        }
                      }
                   }
                }
-            }
-            // update data
-            if (q_IsParameterElement == true)
-            {
-               // element case
-               s32_Return = C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelParameterConfigElement(
-                  this->mu32_NodeIndex, this->mu32_DomainIndex, this->mu32_ChannelIndex, u32_ParameterIndex,
-                  u32_ParameterElementIndex, mq_ChannelCase, c_NewParameterElement);
-               tgl_assert(s32_Return == C_NO_ERR);
-            }
-            else
-            {
-               // parameter case
-               const C_OSCHalcConfigParameterStruct * pc_Parameter =
-                  C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelParameterConfigData(
-                     mu32_NodeIndex, mu32_DomainIndex, mu32_ChannelIndex, u32_ParameterIndex, mq_ChannelCase);
-               tgl_assert(pc_Parameter != NULL);
-               if (pc_Parameter != NULL)
+               break;
+            case C_OSCHalcDefContent::eCT_BIT_MASK:
                {
-                  // create copy
-                  C_OSCHalcConfigParameterStruct c_NewParameter = *pc_Parameter;
-                  c_NewParameter.c_Value = c_NewParameterElement.c_Value;
-                  s32_Return = C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelParameterConfig(
-                     mu32_NodeIndex, mu32_DomainIndex, mu32_ChannelIndex, u32_ParameterIndex, mq_ChannelCase,
-                     c_NewParameter);
-                  tgl_assert(s32_Return == C_NO_ERR);
+                  //Bitmasks
+                  const QStringList c_Names = mh_ConvertBitmasksToStringList(pc_ParameterElement->c_Value);
+                  const QBitArray c_Bits = orc_Value.toBitArray();
+
+                  if (c_Names.size() == c_Bits.size())
+                  {
+                     for (sintn sn_It = 0; sn_It < c_Names.size(); ++sn_It)
+                     {
+                        //Set value
+                        if (C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelParameterConfigElementBitmask(
+                               this->mu32_NodeIndex,
+                               this->mu32_DomainIndex,
+                               this->mu32_ChannelIndex, u32_ParameterIndex, u32_ParameterElementIndex,
+                               this->mq_ChannelCase,
+                               c_Names.at(sn_It).toStdString().c_str(), c_Bits.at(sn_It)) == C_NO_ERR)
+                        {
+                           q_Retval = true;
+                           //Linked values
+                           for (uint32 u32_It = 0UL; u32_It < c_LinkedChannels.size(); ++u32_It)
+                           {
+                              tgl_assert(
+                                 C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelParameterConfigElementBitmask(
+                                    this->mu32_NodeIndex,
+                                    this->mu32_DomainIndex,
+                                    c_LinkedChannels[u32_It], u32_ParameterIndex, u32_ParameterElementIndex,
+                                    this->mq_ChannelCase,
+                                    c_Names.at(sn_It).toStdString().c_str(), c_Bits.at(sn_It)) == C_NO_ERR);
+                           }
+                        }
+                     }
+                  }
                }
+               break;
+            case C_OSCHalcDefContent::eCT_PLAIN:
+               {
+                  //Plain values
+                  // copy and adapt value
+                  C_OSCHalcDefContent c_NewValue = pc_ParameterElement->c_Value;
+                  if (C_SdNdeDpContentUtil::h_SetDataVariableFromGeneric(orc_Value, c_NewValue, 0) == C_NO_ERR)
+                  {
+                     //Set value
+                     if (C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelParameterConfigElementPlain(
+                            this->mu32_NodeIndex,
+                            this->mu32_DomainIndex,
+                            this->mu32_ChannelIndex, u32_ParameterIndex, u32_ParameterElementIndex,
+                            this->mq_ChannelCase,
+                            c_NewValue) == C_NO_ERR)
+                     {
+                        q_Retval = true;
+                        //Linked values
+                        for (uint32 u32_It = 0UL; u32_It < c_LinkedChannels.size(); ++u32_It)
+                        {
+                           tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelParameterConfigElementPlain(
+                                         this->mu32_NodeIndex,
+                                         this->mu32_DomainIndex,
+                                         c_LinkedChannels[u32_It], u32_ParameterIndex, u32_ParameterElementIndex,
+                                         this->mq_ChannelCase,
+                                         c_NewValue) == C_NO_ERR);
+                        }
+                     }
+                  }
+               }
+               break;
             }
+            //lint -e{1793} Qt example
+            Q_EMIT (this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role));
          }
       }
    }
@@ -416,7 +478,7 @@ Qt::ItemFlags C_SdNdeHalcConfigTreeModel::flags(const QModelIndex & orc_Index) c
    const C_SdNdeHalcConfigTreeModel::E_Columns e_Col =
       C_SdNdeHalcConfigTreeModel::h_ColumnToEnum(orc_Index.column());
 
-   if ((m_GetParameterElement(orc_Index) != NULL) && (e_Col == eVALUE))
+   if ((e_Col == eVALUE) && (this->rowCount(orc_Index) == 0))
    {
       c_Retval = c_Retval | Qt::ItemIsEditable;
    }
@@ -435,6 +497,18 @@ Qt::ItemFlags C_SdNdeHalcConfigTreeModel::flags(const QModelIndex & orc_Index) c
 void C_SdNdeHalcConfigTreeModel::SetNode(const stw_types::uint32 ou32_NodeIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get node index
+
+   \return
+   node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SdNdeHalcConfigTreeModel::GetNodeIndex(void) const
+{
+   return this->mu32_NodeIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -457,8 +531,6 @@ void C_SdNdeHalcConfigTreeModel::SetHalcChannelUseCase(const uint32 ou32_DomainI
    this->mu32_ChannelIndex = ou32_ChannelIndex;
    this->mu32_UseCaseIndex = ou32_UseCaseIndex;
    this->mq_ChannelCase = oq_UseChannelIndex;
-
-   // TODO SFI: Availability indexes stuff
 
    // clear
    this->Clear();
@@ -523,11 +595,12 @@ void C_SdNdeHalcConfigTreeModel::SetHalcChannelUseCase(const uint32 ou32_DomainI
             }
          }
 
-         // add to tree
-         if (this->mpc_InvisibleRootItem != NULL)
+         // add to tree if at least one parameter element is available or if parameter is configurable itself
+         if ((this->mpc_InvisibleRootItem != NULL) &&
+             ((pc_ParameterTreeItem->c_Children.size() > 0) || /* something available*/
+              (rc_Parameter.c_StructElements.size() == 0) /* parameter without elements */))
          {
             this->mpc_InvisibleRootItem->AddChild(pc_ParameterTreeItem);
-            // TODO: only add if at least one child is available for selected use case ?
          }
          else
          {
@@ -636,9 +709,10 @@ const C_OSCHalcConfigParameter * C_SdNdeHalcConfigTreeModel::m_GetParameterEleme
    const bool q_IsParameterElement = mh_GetParameterElementIndexe(orc_Index, u32_ParameterIndex,
                                                                   u32_ParameterElementIndex);
    const C_OSCHalcConfigParameterStruct * pc_Parameter =
-      C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelParameterConfigData(mu32_NodeIndex, mu32_DomainIndex,
-                                                                               mu32_ChannelIndex, u32_ParameterIndex,
-                                                                               mq_ChannelCase);
+      C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelParameterConfigStructData(mu32_NodeIndex, mu32_DomainIndex,
+                                                                                     mu32_ChannelIndex,
+                                                                                     u32_ParameterIndex,
+                                                                                     mq_ChannelCase);
 
    if (pc_Parameter != NULL)
    {
@@ -718,7 +792,7 @@ const C_OSCHalcDefElement * C_SdNdeHalcConfigTreeModel::m_GetDefParameterElement
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Convert enum names to string list
 
-   \param[in]  orc_Value    HALC Def Content value of type enum
+   \param[in]  orc_Value   HALC Def Content value of type enum
 
    \return
    String list of enum value names.
@@ -737,6 +811,96 @@ QStringList C_SdNdeHalcConfigTreeModel::mh_ConvertEnumsToStringList(const C_OSCH
    }
 
    return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert bitmasks to string list
+
+   \param[in]  orc_Value   Value
+
+   \return
+   String list of bitmask value names.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QStringList C_SdNdeHalcConfigTreeModel::mh_ConvertBitmasksToStringList(const C_OSCHalcDefContent & orc_Value)
+{
+   std::vector<stw_scl::C_SCLString> c_Display;
+   QStringList c_Retval;
+   orc_Value.GetBitmaskStatusValues(&c_Display, NULL);
+   c_Retval.reserve(c_Display.size());
+   for (uint32 u32_It = 0UL; u32_It < c_Display.size(); ++u32_It)
+   {
+      c_Retval.push_back(c_Display[u32_It].c_str());
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert bitmasks to string
+
+   \param[in]  orc_Value   Value
+
+   \return
+   String of bitmask value names.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdNdeHalcConfigTreeModel::mh_ConvertBitmasksToString(const C_OSCHalcDefContent & orc_Value)
+{
+   QString c_Display;
+
+   std::vector<stw_scl::C_SCLString> c_Displays;
+   std::vector<bool> c_Values;
+   orc_Value.GetBitmaskStatusValues(&c_Displays, &c_Values);
+   if (c_Displays.size() == c_Values.size())
+   {
+      bool q_Found = false;
+
+      // search for items are checked
+      for (stw_types::uint32 u32_Counter = 0; u32_Counter < c_Displays.size(); ++u32_Counter)
+      {
+         if (c_Values[u32_Counter] == true)
+         {
+            // a checked item is found
+            q_Found = true;
+
+            // set display text
+            if (!c_Display.isEmpty())
+            {
+               c_Display += ", ";
+            }
+            c_Display += c_Displays[u32_Counter].c_str();
+         }
+      }
+
+      // no checked item found
+      if (q_Found == false)
+      {
+         c_Display = C_GtGetText::h_GetText("Not Set");
+      }
+   }
+   return c_Display;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Convert bitmasks to bit array
+
+   \param[in]  orc_Value   Value
+
+   \return
+   Bit array of bitmask values.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QBitArray C_SdNdeHalcConfigTreeModel::mh_ConvertBitmasksToBitArray(const C_OSCHalcDefContent & orc_Value)
+{
+   std::vector<bool> c_Values;
+   QBitArray c_Retval;
+   orc_Value.GetBitmaskStatusValues(NULL, &c_Values);
+   c_Retval.resize(c_Values.size());
+   for (uint32 u32_It = 0UL; u32_It < c_Values.size(); ++u32_It)
+   {
+      c_Retval.setBit(static_cast<sintn>(u32_It), c_Values[u32_It]);
+   }
+   return c_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

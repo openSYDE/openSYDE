@@ -346,6 +346,7 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
                this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
             }
 
+            tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(c_Tmp.c_ElementId) == C_NO_ERR);
             tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                            this->mu32_DashboardIndex,
                                                                            static_cast<uint32>(this->ms32_Index),
@@ -451,6 +452,7 @@ void C_GiSvDaSpinBoxBase::m_UpdateStaticValues(void)
             tgl_assert(this->GetDataPoolElementScaling(0, c_Scaling) == C_NO_ERR);
             this->mpc_SpinBoxWidget->Init(pc_Element->c_MinValue, pc_Element->c_MaxValue, c_Scaling.f64_Factor,
                                           c_Scaling.f64_Offset);
+            this->mpc_SpinBoxWidget->SetShowUnit(pc_Box->q_ShowUnit);
             this->mpc_SpinBoxWidget->SetUnit(c_Scaling.c_Unit);
             tgl_assert(C_SdNdeDpContentUtil::h_SimpleConvertToVariant(pc_Box->c_Value, c_QValue) == C_NO_ERR);
             this->mpc_SpinBoxWidget->SetValue(c_QValue);

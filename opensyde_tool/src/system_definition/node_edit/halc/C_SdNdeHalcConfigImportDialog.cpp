@@ -92,7 +92,7 @@ C_SdNdeHalcConfigImportDialog::~C_SdNdeHalcConfigImportDialog(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcConfigImportDialog::InitStaticNames(void) const
 {
-   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("HALC Configuration"));
+   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Hardware Configuration"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Import"));
    this->mpc_Ui->pc_LabelHeadingPreview->setText(C_GtGetText::h_GetText("Import Configuration"));
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("OK"));
@@ -133,9 +133,9 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
             s32_Return = C_CHECKSUM;
             orc_ErrorDetails =
                C_GtGetText::h_GetText(C_SCLString(
-                                         "Imported HALC configuration is not compatible to this device type.\n"
+                                         "Imported Hardware configuration is not compatible to this device type.\n"
                                          "Current device type: " + pc_Config->c_DeviceName + "\n"
-                                         "Device type of imported HALC configuration: " +
+                                         "Device type of imported Hardware configuration: " +
                                          this->mc_ImportConfig.c_DeviceType + "\n").c_str());
          }
          else if (this->mc_ImportConfig.u32_DefinitionContentVersion != pc_Config->u32_ContentVersion)
@@ -143,11 +143,11 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
             s32_Return = C_CHECKSUM;
             orc_ErrorDetails =
                C_GtGetText::h_GetText(C_SCLString(
-                                         "Imported HALC configuration version does not match the current "
-                                         "used HALC configuration version of this node.\n"
+                                         "Imported Hardware configuration version does not match the current "
+                                         "used Hardware configuration version of this node.\n"
                                          "Current used version: " +
                                          C_SCLString::IntToStr(pc_Config->u32_ContentVersion) + "\n"
-                                         "Version of imported HALC configuration: " +
+                                         "Version of imported Hardware configuration: " +
                                          C_SCLString::IntToStr(this->mc_ImportConfig.u32_DefinitionContentVersion) +
                                          "\n").c_str());
          }
@@ -161,7 +161,7 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
                switch (s32_Return)
                {
                case C_NOACT:
-                  orc_ErrorDetails = C_GtGetText::h_GetText("Imported HALC configuration does not have any elements "
+                  orc_ErrorDetails = C_GtGetText::h_GetText("Imported Hardware configuration does not have any elements "
                                                             "which does match to the current configuration. "
                                                             "Nothing to import.");
                   break;
@@ -184,7 +184,7 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
             orc_ErrorDetails = C_GtGetText::h_GetText("The selected file does not match the expected format.");
             break;
          case C_CONFIG:
-            orc_ErrorDetails = C_GtGetText::h_GetText("The HALC configuration content of the file is invalid.");
+            orc_ErrorDetails = C_GtGetText::h_GetText("The Hardware configuration content of the file is invalid.");
             break;
          default:
             orc_ErrorDetails = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Return));
@@ -195,7 +195,7 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
    else
    {
       orc_ErrorDetails = C_GtGetText::h_GetText(
-         "Current HALC configuration of node is invalid. File can not be imported");
+         "Current Hardware configuration of node is invalid. File can not be imported");
       s32_Return = C_RANGE;
    }
 

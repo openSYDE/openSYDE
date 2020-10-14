@@ -33,6 +33,8 @@
 #include "C_GtGetText.h"
 #include "C_HeHandler.h"
 
+#include <QDebug>
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
@@ -301,6 +303,12 @@ void C_CamMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
          // Search backward on Shift F3
          this->mpc_Ui->pc_TraceWidget->SearchPrev();
       }
+   }
+   // Set focus to SearchBar on Ctrl + F
+   else if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F)) &&
+            (opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true))
+   {
+      this->mpc_Ui->pc_TraceWidget->SearchBarFocus();
    }
    else
    {

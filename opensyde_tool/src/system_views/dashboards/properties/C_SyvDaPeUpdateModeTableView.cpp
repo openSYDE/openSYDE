@@ -76,11 +76,11 @@ C_SyvDaPeUpdateModeTableView::C_SyvDaPeUpdateModeTableView(const uint32 ou32_Vie
    this->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
    //Row Height
    this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-   this->verticalHeader()->setMinimumSectionSize(40);
-   this->verticalHeader()->setMaximumSectionSize(40);
-   this->verticalHeader()->setDefaultSectionSize(40);
+   this->verticalHeader()->setMinimumSectionSize(30);
+   this->verticalHeader()->setMaximumSectionSize(30);
+   this->verticalHeader()->setDefaultSectionSize(30);
    //Icon
-   this->setIconSize(mc_ICON_SIZE_20);
+   this->setIconSize(QSize(16, 16));
 
    //Hide vertical header
    this->verticalHeader()->hide();
@@ -141,8 +141,8 @@ void C_SyvDaPeUpdateModeTableView::AdjustToItems(const bool & orq_Initial, const
    if (((this->mpc_TreeWidgetItem != NULL) && (this->mpc_TreeWidget != NULL)) && (this->model() != NULL))
    {
       //Configure
-      const sintn sn_ConstOffset = 60;
-      const sintn sn_ItemOffset = 40;
+      const sintn sn_ConstOffset = 50;
+      const sintn sn_ItemOffset = 30;
       const uint32 u32_VisibleItemCount = 7;
       const uint32 u32_ItemCount = this->model()->rowCount();
       sintn sn_Height = sn_ConstOffset;

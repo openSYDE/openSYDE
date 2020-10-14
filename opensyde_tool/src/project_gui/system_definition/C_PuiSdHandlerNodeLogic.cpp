@@ -1010,15 +1010,17 @@ sint32 C_PuiSdHandlerNodeLogic::InsertDataPool(const uint32 & oru32_NodeIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Remove data pool
 
-   \param[in]  oru32_NodeIndex      Node index
-   \param[in]  oru32_DataPoolIndex  Data pool index
+   \param[in]  oru32_NodeIndex         Node index
+   \param[in]  oru32_DataPoolIndex     Data pool index
+   \param[in]  oq_SuppressSyncSignal   Suppress sync signal
 
    \return
    C_NO_ERR OK
    C_RANGE  Something out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerNodeLogic::RemoveDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)
+sint32 C_PuiSdHandlerNodeLogic::RemoveDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
+                                               const bool oq_SuppressSyncSignal)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -1032,8 +1034,11 @@ sint32 C_PuiSdHandlerNodeLogic::RemoveDataPool(const uint32 & oru32_NodeIndex, c
       tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
       if (oru32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
       {
-         //Synchronization engine (First!)
-         Q_EMIT (this->SigSyncNodeDataPoolAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex));
+         if (oq_SuppressSyncSignal == false)
+         {
+            //Synchronization engine (First!)
+            Q_EMIT (this->SigSyncNodeDataPoolAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex));
+         }
          //Handle COMM
          m_CleanUpComDataPool(oru32_NodeIndex, oru32_DataPoolIndex);
          rc_UINode.c_UIDataPools.erase(rc_UINode.c_UIDataPools.begin() + oru32_DataPoolIndex);
@@ -1428,6 +1433,58 @@ sint32 C_PuiSdHandlerNodeLogic::GetDataPoolIndex(const uint32 ou32_NodeIndex,
    {
       const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       s32_Return = rc_OSCNode.GetDataPoolIndex(oe_DataPoolType, ou32_DataPoolTypeIndex);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get Datapool type specific index from Datapool index
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_DataPoolIndex   Data pool total index
+
+   \return
+   if datapool is found: zero based index
+   if datapool is not found or parameter out of range: -1
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerNodeLogic::GetDataPoolTypeIndex(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex) const
+{
+   sint32 s32_Return = -1;
+
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (ou32_NodeIndex < this->mc_UINodes.size())
+   {
+      const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      s32_Return = rc_OSCNode.GetDataPoolTypeIndex(ou32_DataPoolIndex);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get number of Datapools of specified type
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  oe_DataPoolType   Data pool type
+
+   \return
+   Number of Datapools (-1 if parameters are invalid)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerNodeLogic::GetDataPoolCount(const uint32 ou32_NodeIndex,
+                                                 const C_OSCNodeDataPool::E_Type oe_DataPoolType) const
+{
+   sint32 s32_Return = -1;
+
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (ou32_NodeIndex < this->mc_UINodes.size())
+   {
+      const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      s32_Return = rc_OSCNode.GetDataPoolCount(oe_DataPoolType);
    }
 
    return s32_Return;

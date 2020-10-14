@@ -4,7 +4,8 @@ stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeSpxDoubleProperties,
 stw_opensyde_gui_elements--C_OgeSpxInt64Properties,
 stw_opensyde_gui_elements--C_OgeSpxFactorProperties,
-stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox,
+stw_opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox
 {
 border-width: 1px;
 border-style: solid;
@@ -87,6 +88,7 @@ stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::up-button,
 stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::up-button,
 stw_opensyde_gui_elements--C_OgeSpxTableDouble::up-button,
 stw_opensyde_gui_elements--C_OgeSpxFactorTable::up-button,
+stw_opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox::up-button,
 QSpinBox::up-button
 {
 image: url(:/images/SpinBoxUpArrow.png) 0 0 0 0 stretch stretch;
@@ -142,6 +144,7 @@ stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::down-butto
 stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::down-button,
 stw_opensyde_gui_elements--C_OgeSpxTableDouble::down-button,
 stw_opensyde_gui_elements--C_OgeSpxFactorTable::down-button,
+stw_opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox::down-button,
 QSpinBox::down-button
 {
 image: url(:/images/GroupBoxDownArrow.png) 0 0 0 0 stretch stretch;
@@ -157,6 +160,7 @@ stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::down-butto
 stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::down-button:!enabled,
 stw_opensyde_gui_elements--C_OgeSpxTableDouble::down-button:!enabled,
 stw_opensyde_gui_elements--C_OgeSpxFactorTable::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox::down-button:!enabled,
 QSpinBox::down-button:!enabled
 {
 image: url(:/images/GroupBoxDownArrowDisabled.png) 0 0 0 0 stretch stretch;
@@ -172,6 +176,7 @@ stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::up-button,
 stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::up-button,
 stw_opensyde_gui_elements--C_OgeSpxTableDouble::up-button,
 stw_opensyde_gui_elements--C_OgeSpxFactorTable::up-button,
+stw_opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox::up-button,
 QSpinBox::up-button
 {
 image: url(:/images/SpinBoxUpArrow.png) 0 0 0 0 stretch stretch;
@@ -187,6 +192,7 @@ stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::up-button:
 stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::up-button:!enabled,
 stw_opensyde_gui_elements--C_OgeSpxTableDouble::up-button:!enabled,
 stw_opensyde_gui_elements--C_OgeSpxFactorTable::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxTableHalc QAbstractSpinBox::up-button:!enabled,
 QSpinBox::up-button:!enabled
 {
 image: url(:/images/SpinBoxUpArrowDisabled.png) 0 0 0 0 stretch stretch;
@@ -274,22 +280,16 @@ image: url(://images/system_views/dashboards/icons/SpinBoxDownGrey.png) 0 0 0 0 
 
 /* --------------------------------------------------------------------- */
 /* Else */
-stw_opensyde_gui_elements--C_OgeSpxEditProperties::down-button:!focus,
-stw_opensyde_gui_elements--C_OgeSpxEditProperties::up-button:!focus
+stw_opensyde_gui_elements--C_OgeSpxEditProperties::down-button:disabled,
+stw_opensyde_gui_elements--C_OgeSpxEditProperties::up-button:disabled
 {
 image: none;
 border-style:none;
 }
 
-stw_opensyde_gui_elements--C_OgeSpxEditProperties
+stw_opensyde_gui_elements--C_OgeSpxEditProperties:disabled
 {
-border-style:none;
-}
-
-stw_opensyde_gui_elements--C_OgeSpxEditProperties:hover ,
-stw_opensyde_gui_elements--C_OgeSpxEditProperties:focus
-{
-border-style:solid;
+border-style: none;
 }
 
 stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable,

@@ -81,7 +81,7 @@ sint32 C_OSCSystemBusFiler::h_LoadBus(C_OSCSystemBus & orc_Bus, C_OSCXMLParserBa
       //Type
       if (orc_XMLParser.SelectNodeChild("type") == "type")
       {
-         s32_Retval = C_OSCSystemFilerUtil::mh_BusTypeStringToEnum(orc_XMLParser.GetNodeContent(), orc_Bus.e_Type);
+         s32_Retval = C_OSCSystemFilerUtil::h_BusTypeStringToEnum(orc_XMLParser.GetNodeContent(), orc_Bus.e_Type);
          if (s32_Retval != C_NO_ERR)
          {
             osc_write_log_error("Loading bus definition", "Could not find \"bus\".\"type\" node.");
@@ -196,7 +196,7 @@ void C_OSCSystemBusFiler::h_SaveBus(const C_OSCSystemBus & orc_Bus, C_OSCXMLPars
    orc_XMLParser.CreateNodeChild("comment", orc_Bus.c_Comment);
    //Type
    tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("type") == "type");
-   orc_XMLParser.SetNodeContent(C_OSCSystemFilerUtil::mh_BusTypeEnumToString(orc_Bus.e_Type));
+   orc_XMLParser.SetNodeContent(C_OSCSystemFilerUtil::h_BusTypeEnumToString(orc_Bus.e_Type));
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
    //Bitrate

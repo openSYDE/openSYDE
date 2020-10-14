@@ -12,8 +12,8 @@
 #define C_SDBUEMESSAGETABLEVIEW_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QTableView>
 #include <QSortFilterProxyModel>
+#include "C_TblViewScroll.h"
 #include "C_SdBueMessageTableModel.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
 #include "C_SdBueMessageSignalTableDelegate.h"
@@ -26,7 +26,7 @@ namespace stw_opensyde_gui
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdBueMessageTableView :
-   public QTableView
+   public C_TblViewScroll
 {
    Q_OBJECT
 
@@ -34,6 +34,8 @@ public:
    C_SdBueMessageTableView(QWidget * const opc_Parent = NULL);
    virtual ~C_SdBueMessageTableView(void);
 
+   void LoadUserSettings(const std::vector<stw_types::sint32> & orc_Values);
+   void SaveUserSettings(std::vector<stw_types::sint32> & orc_Values) const;
    void SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value);
    void UpdateData(void);
    stw_types::sintn GetCountRows(void) const;
@@ -58,7 +60,6 @@ private:
    C_SdBueMessageTableView(const C_SdBueMessageTableView &);
    C_SdBueMessageTableView & operator =(const C_SdBueMessageTableView &);
 
-   void m_ScrollBarRangeChanged(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
    void m_InitColumns(void);
 
    QSortFilterProxyModel mc_SortProxyModel;

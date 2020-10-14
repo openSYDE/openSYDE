@@ -14,23 +14,29 @@
    <string>C_SdNdeHalcWidget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
-   <property name="spacing">
-    <number>10</number>
-   </property>
    <property name="leftMargin">
-    <number>25</number>
+    <number>20</number>
    </property>
    <property name="topMargin">
-    <number>25</number>
+    <number>10</number>
    </property>
    <property name="rightMargin">
-    <number>25</number>
+    <number>12</number>
    </property>
    <property name="bottomMargin">
-    <number>25</number>
+    <number>20</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="pc_LayoutImportExport">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>10</number>
+     </property>
+     <property name="rightMargin">
+      <number>8</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -45,99 +51,166 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pc_PubImportConfig">
+      <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PubImportConfig">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>-Import Config</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pc_PubExportConfig">
+      <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PubExportConfig">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>-Export Config</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="pc_PubSettings">
-       <property name="text">
-        <string>-Settings</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="pc_LayoutActions">
-     <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabFileTitle">
-       <property name="text">
-        <string>-Hardware Description File:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabFileCurrent">
-       <property name="text">
-        <string>-my_description.xyz</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pc_PubMagic">
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 0, 255);</string>
-       </property>
-       <property name="text">
-        <string>Do the MAGIC!</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pc_PubCleanUp">
-       <property name="text">
-        <string>-Clean Up</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pc_PubLoad">
-       <property name="text">
-        <string>-Load</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pc_PubViewDetails">
-       <property name="text">
-        <string>-View Details</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="pc_LayoutContent" stretch="0,1,1">
-     <property name="spacing">
-      <number>20</number>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="rightMargin">
+      <number>8</number>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="pc_LayoutOverview">
+      <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiHalcDefFilePanel" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>40</height>
+        </size>
+       </property>
+       <layout class="QHBoxLayout" name="pc_LayoutActions">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <property name="leftMargin">
+         <number>20</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>11</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileTitle">
+          <property name="text">
+           <string>-Hardware Description File:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileCurrent">
+          <property name="text">
+           <string>-my_description.xyz</string>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubSelect">
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="text">
+           <string>-Select</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubUpdate">
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="text">
+           <string>-Update</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubCleanUp">
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="text">
+           <string>-Delete</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="stw_opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
+     <widget class="QWidget" name="pc_WiChannelTree" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>18</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QPushButton" name="pc_PubOverview">
+        <widget class="stw_opensyde_gui_elements::C_OgePubHalcOverview" name="pc_PubOverview">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>31</height>
+          </size>
+         </property>
          <property name="text">
           <string>-Overview</string>
          </property>
@@ -147,37 +220,50 @@
         <widget class="stw_opensyde_gui::C_SdNdeHalcChannelTreeView" name="pc_TreeChannels"/>
        </item>
       </layout>
-     </item>
-     <item>
-      <widget class="QWidget" name="pc_WiOverviewTable" native="true">
-       <layout class="QVBoxLayout" name="verticalLayout_7">
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>work in progress</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="stw_opensyde_gui::C_SdNdeHalcChannelWidget" name="pc_WiChannelEdit" native="true"/>
-     </item>
-    </layout>
+     </widget>
+     <widget class="QWidget" name="pc_WiContent" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,1">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="stw_opensyde_gui::C_SdNdeHalcOvWidget" name="pc_WiOverviewTable" native="true"/>
+       </item>
+       <item>
+        <widget class="stw_opensyde_gui::C_SdNdeHalcChannelWidget" name="pc_WiChannelEdit" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
+   <extends>QSplitter</extends>
+   <header>C_OgeSpiStandard.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItemValue</class>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItemValue.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui::C_SdNdeHalcChannelTreeView</class>
@@ -189,6 +275,27 @@
    <extends>QWidget</extends>
    <header>C_SdNdeHalcChannelWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubHalcPanel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubHalcPanel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SdNdeHalcOvWidget</class>
+   <extends>QWidget</extends>
+   <header>C_SdNdeHalcOvWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubHalcOverview</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubHalcOverview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubUpdate</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubUpdate.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

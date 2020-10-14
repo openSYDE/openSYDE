@@ -93,7 +93,7 @@ sint32 C_OSCProjectFiler::h_Save(C_OSCProject & orc_Project, const C_SCLString &
       //Normal XML
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = m_SaveInternal(orc_Project, orc_Path, orc_OpenSYDEVersion, q_NewFile);
+         s32_Retval = mh_SaveInternal(orc_Project, orc_Path, orc_OpenSYDEVersion, q_NewFile);
          if (s32_Retval != C_NO_ERR)
          {
             osc_write_log_error("Saving project file", "Could not write to file \"" + orc_Path + "\".");
@@ -210,8 +210,8 @@ sint32 C_OSCProjectFiler::h_Load(C_OSCProject & orc_Project, const C_SCLString &
    C_NOACT    could not write to file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProjectFiler::m_SaveInternal(C_OSCProject & orc_Project, const C_SCLString & orc_Path,
-                                         const C_SCLString & orc_OpenSYDEVersion, const bool oq_New)
+sint32 C_OSCProjectFiler::mh_SaveInternal(C_OSCProject & orc_Project, const C_SCLString & orc_Path,
+                                          const C_SCLString & orc_OpenSYDEVersion, const bool oq_New)
 {
    C_SCLString c_Tmp;
    //Open file

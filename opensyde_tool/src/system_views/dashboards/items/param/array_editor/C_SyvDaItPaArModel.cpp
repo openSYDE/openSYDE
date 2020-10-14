@@ -105,10 +105,6 @@ QVariant C_SyvDaItPaArModel::headerData(const sintn osn_Section, const Qt::Orien
       {
          c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::FontRole))
-      {
-         c_Retval = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13);
-      }
       else
       {
          //No special handling
@@ -119,10 +115,6 @@ QVariant C_SyvDaItPaArModel::headerData(const sintn osn_Section, const Qt::Orien
       if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
       {
          c_Retval = QString::number(osn_Section);
-      }
-      else if (osn_Role == static_cast<sintn>(Qt::FontRole))
-      {
-         c_Retval = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13);
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
@@ -234,7 +226,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
       }
       else if (osn_Role == static_cast<sintn>(Qt::FontRole))
       {
-         QFont c_Font = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13);
+         QFont c_Font = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
          if (this->m_CheckError(orc_Index))
          {
             c_Font.setBold(true);
@@ -247,7 +239,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
          c_Retval = mc_STYLE_GUIDE_COLOR_6;
          if (this->m_CheckError(orc_Index))
          {
-            c_Retval = mc_STYLE_GUIDE_COLOR_24;
+            c_Retval = mc_STYLE_GUIDE_COLOR_18;
          }
       }
    }

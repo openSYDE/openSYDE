@@ -753,7 +753,7 @@ void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
          pc_ArrayEditWidget = new C_SyvDaItPaArWidget(*c_Dialog, u32_ItParamIndex, this->mpc_DataWidget, q_ECU);
          Q_UNUSED(pc_ArrayEditWidget)
          //Resize
-         c_Dialog->SetSize(QSize(937, 330));
+         c_Dialog->SetSize(QSize(871, 318));
          if (c_Dialog->exec() != static_cast<sintn>(QDialog::Accepted))
          {
             //Revert to last known state if not accepted

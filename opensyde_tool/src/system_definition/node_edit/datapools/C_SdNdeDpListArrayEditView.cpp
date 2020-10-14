@@ -68,7 +68,6 @@ C_SdNdeDpListArrayEditView::C_SdNdeDpListArrayEditView(QWidget * const opc_Paren
    mpc_LabelCorner(NULL)
 {
    //UI Settings
-   this->setCornerButtonEnabled(false);
    this->setSortingEnabled(false);
    this->setGridStyle(Qt::NoPen);
    this->setShowGrid(false);
@@ -87,12 +86,13 @@ C_SdNdeDpListArrayEditView::C_SdNdeDpListArrayEditView(QWidget * const opc_Paren
    //Consider all elements for resize
    this->setVerticalHeader(new C_SdNdeSingleHeaderView(Qt::Vertical));
    this->verticalHeader()->setResizeContentsPrecision(-1);
-   this->verticalHeader()->setDefaultSectionSize(40);
+   this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+   this->verticalHeader()->setFixedHeight(30);
    //Row Height
    this->setHorizontalHeader(new C_SdNdeSingleHeaderView(Qt::Horizontal));
    this->horizontalHeader()->setResizeContentsPrecision(-1);
    this->horizontalHeader()->setDefaultSectionSize(70);
-   this->horizontalHeader()->setFixedHeight(35);
+   this->horizontalHeader()->setFixedHeight(30);
    //Corner button
    this->setCornerButtonEnabled(false);
 

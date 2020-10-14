@@ -35,7 +35,7 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SdTopologyWidget::mhsn_WidgetBorder = 25;
+const sintn C_SdTopologyWidget::mhsn_WidgetBorder = 12;
 const sintn C_SdTopologyWidget::mhsn_ToolboxInitPosY = 150;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -144,7 +144,7 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
       // create fix minimized toolbox
       this->mpc_FixMinimizedToolbox = new C_OgeWiFixPosition(C_GtGetText::h_GetText("TOOLBOX"),
                                                              ":images/IconToolbox.svg",
-                                                             QRect(1449, 24, 190, 36), opc_Parent);
+                                                             QRect(1449, 14, 190, 36), opc_Parent);
       // check for saved default values for toolbox
       if (C_UsHandler::h_GetInstance()->GetSdTopologyToolboxPos().x() < 0)
       {

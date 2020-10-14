@@ -27,6 +27,8 @@ public:
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
+   void CheckConfigValid(bool * const opq_NameInvalid) const;
+
    stw_scl::C_SCLString c_Name;                              ///< User configured name for this channel
    stw_scl::C_SCLString c_Comment;                           ///< User configured description for this channel
    bool q_SafetyRelevant;                                    ///< Flag if channel is safety relevant

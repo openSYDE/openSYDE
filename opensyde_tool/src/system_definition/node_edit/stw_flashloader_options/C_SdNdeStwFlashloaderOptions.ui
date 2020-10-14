@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>415</width>
-    <height>551</height>
+    <height>534</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,7 +42,10 @@
        <number>20</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,1">
+       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0,0,1">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
         </property>
@@ -131,6 +134,22 @@
          </layout>
         </item>
         <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>6</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <widget class="stw_opensyde_gui_elements::C_OgeChxProperties" name="pc_CheckBoxUseResetMessage">
           <property name="text">
            <string>CheckBox</string>
@@ -138,122 +157,77 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui::C_SdNdeSfoResetMessageTableView" name="pc_TableView"/>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>6</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1">
-          <property name="topMargin">
-           <number>0</number>
+         <widget class="stw_opensyde_gui::C_SdNdeSfoResetMessageTableView" name="pc_TableView">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>80</height>
+           </size>
           </property>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <property name="spacing">
-             <number>0</number>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="horizontalSpacing">
+           <number>20</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabelSendIdValue">
+            <property name="text">
+             <string>SendIdValue</string>
             </property>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <property name="topMargin">
-               <number>9</number>
-              </property>
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSendId">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>31</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>SendId</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>15</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <property name="topMargin">
-               <number>9</number>
-              </property>
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCompanyId">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>31</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>CID</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>15</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-           </layout>
+           </widget>
           </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <property name="spacing">
-             <number>0</number>
+          <item row="0" column="0">
+           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSendId">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>31</height>
+             </size>
             </property>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <property name="topMargin">
-               <number>9</number>
-              </property>
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabelSendIdValue">
-                <property name="text">
-                 <string>SendIdValue</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <property name="topMargin">
-               <number>9</number>
-              </property>
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabelCompanyIdValue">
-                <property name="text">
-                 <string>CIDValue</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
+            <property name="text">
+             <string>SendId</string>
+            </property>
+           </widget>
           </item>
-          <item>
+          <item row="1" column="0">
+           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCompanyId">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>31</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>CID</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabelCompanyIdValue">
+            <property name="text">
+             <string>CIDValue</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
            <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -261,25 +235,12 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
-              <height>20</height>
+              <height>10</height>
              </size>
             </property>
            </spacer>
           </item>
          </layout>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
         </item>
         <item>
          <spacer name="verticalSpacer">
@@ -289,7 +250,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>40</height>
+            <height>10</height>
            </size>
           </property>
          </spacer>
@@ -418,6 +379,22 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubCancel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubDialog.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbx.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupItem.h</header>
@@ -442,22 +419,6 @@
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItemValue</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupItemValue.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubDialog.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbx.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui::C_SdNdeSfoResetMessageTableView</class>

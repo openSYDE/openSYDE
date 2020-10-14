@@ -56,7 +56,7 @@ C_OSCSystemFilerUtil::C_OSCSystemFilerUtil(void)
    \return  string representation of oe_Type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCSystemFilerUtil::mh_BusTypeEnumToString(const C_OSCSystemBus::E_Type oe_Type)
+C_SCLString C_OSCSystemFilerUtil::h_BusTypeEnumToString(const C_OSCSystemBus::E_Type oe_Type)
 {
    C_SCLString c_Retval;
 
@@ -82,8 +82,8 @@ C_SCLString C_OSCSystemFilerUtil::mh_BusTypeEnumToString(const C_OSCSystemBus::E
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::mh_BusTypeStringToEnum(const stw_scl::C_SCLString & orc_Type,
-                                                    C_OSCSystemBus::E_Type & ore_Type)
+sint32 C_OSCSystemFilerUtil::h_BusTypeStringToEnum(const stw_scl::C_SCLString & orc_Type,
+                                                   C_OSCSystemBus::E_Type & ore_Type)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -119,8 +119,8 @@ sint32 C_OSCSystemFilerUtil::mh_BusTypeStringToEnum(const stw_scl::C_SCLString &
    C_CONFIG   root node not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::mh_GetParserForExistingFile(C_OSCXMLParser & orc_FileXMLParser,
-                                                         const C_SCLString & orc_Path, const C_SCLString & orc_RootNode)
+sint32 C_OSCSystemFilerUtil::h_GetParserForExistingFile(C_OSCXMLParser & orc_FileXMLParser,
+                                                        const C_SCLString & orc_Path, const C_SCLString & orc_RootNode)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -162,8 +162,8 @@ sint32 C_OSCSystemFilerUtil::mh_GetParserForExistingFile(C_OSCXMLParser & orc_Fi
    C_NOACT    existing file could not be deleted
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::mh_GetParserForNewFile(C_OSCXMLParser & orc_FileXMLParser, const C_SCLString & orc_Path,
-                                                    const C_SCLString & orc_RootNode)
+sint32 C_OSCSystemFilerUtil::h_GetParserForNewFile(C_OSCXMLParser & orc_FileXMLParser, const C_SCLString & orc_Path,
+                                                   const C_SCLString & orc_RootNode)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -195,7 +195,7 @@ sint32 C_OSCSystemFilerUtil::mh_GetParserForNewFile(C_OSCXMLParser & orc_FileXML
    C_NOACT    folder could not be created
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::mh_CreateFolder(const C_SCLString & orc_Path)
+sint32 C_OSCSystemFilerUtil::h_CreateFolder(const C_SCLString & orc_Path)
 {
    sint32 s32_Retval;
 
@@ -228,7 +228,7 @@ sint32 C_OSCSystemFilerUtil::mh_CreateFolder(const C_SCLString & orc_Path)
    Item name ready for file name usage
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(const C_SCLString & orc_ItemName)
+C_SCLString C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(const C_SCLString & orc_ItemName)
 {
    return C_OSCUtils::h_NiceifyStringForFileName(orc_ItemName.LowerCase());
 }
@@ -243,10 +243,82 @@ C_SCLString C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(const C_SCLStrin
    Full, combined path
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCSystemFilerUtil::mh_CombinePaths(const C_SCLString & orc_BasePathName,
-                                                  const C_SCLString & orc_SubFolderFileName)
+C_SCLString C_OSCSystemFilerUtil::h_CombinePaths(const C_SCLString & orc_BasePathName,
+                                                 const C_SCLString & orc_SubFolderFileName)
 {
    const C_SCLString c_BasePath = TGL_ExtractFilePath(orc_BasePathName);
 
    return c_BasePath + orc_SubFolderFileName;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Transform export scaling support type to string
+
+   \param[in]  ore_Scaling   Flash loader type
+
+   \return
+   Stringified export scaling support type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SCLString C_OSCSystemFilerUtil::h_CodeExportScalingTypeToString(
+   const C_OSCNodeCodeExportSettings::E_Scaling & ore_Scaling)
+{
+   C_SCLString c_Retval;
+
+   switch (ore_Scaling)
+   {
+   case C_OSCNodeCodeExportSettings::eFLOAT32:
+      c_Retval = "float32";
+      break;
+   case C_OSCNodeCodeExportSettings::eFLOAT64:
+      c_Retval = "float64";
+      break;
+   case C_OSCNodeCodeExportSettings::eNONE:
+      c_Retval = "none";
+      break;
+   default:
+      c_Retval = "invalid";
+      break;
+   }
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Transform string to code export scaling support type.
+
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Scaling   Scaling support type
+
+   \return
+   C_NO_ERR   no error
+   C_RANGE    String unknown
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCSystemFilerUtil::h_StringToCodeExportScalingType(const C_SCLString & orc_String,
+                                                             C_OSCNodeCodeExportSettings::E_Scaling & ore_Scaling)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_String == "float32")
+   {
+      ore_Scaling = C_OSCNodeCodeExportSettings::eFLOAT32;
+   }
+   else if (orc_String == "float64")
+   {
+      ore_Scaling = C_OSCNodeCodeExportSettings::eFLOAT64;
+   }
+   else if (orc_String == "none")
+   {
+      ore_Scaling = C_OSCNodeCodeExportSettings::eNONE;
+   }
+   else
+   {
+      osc_write_log_error("Loading node definition",
+                          "Invalid value for \"properties\".\"code-export-settings\".\"scaling-support\": " +
+                          orc_String);
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
 }

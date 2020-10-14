@@ -193,7 +193,7 @@ QString C_PuiSdUtil::h_ConvertDataPoolTypeToString(const C_OSCNodeDataPool::E_Ty
       c_Name = "NVM";
       break;
    case C_OSCNodeDataPool::eHALC:
-      c_Name = "HALC";
+      c_Name = "HAL";
       break;
    case C_OSCNodeDataPool::eDIAG: // default case
    default:

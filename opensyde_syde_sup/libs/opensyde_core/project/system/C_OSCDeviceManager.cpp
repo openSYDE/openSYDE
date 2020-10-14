@@ -85,13 +85,14 @@ const C_OSCDeviceDefinition * C_OSCDeviceManager::LookForDevice(const C_SCLStrin
    C_NO_ERR   Device added without problems
    C_RD_WR    Could not add device
    C_CONFIG   Device already exists, won't be added
+   C_NOACT    specified file is invalid (invalid XML file)
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDeviceManager::AddDevice(const stw_scl::C_SCLString & orc_DeviceDefinitionFile,
                                      const stw_scl::C_SCLString & orc_DeviceGroup,
                                      const stw_scl::C_SCLString & orc_IniFile)
 {
-   sint32 s32_Return = C_NO_ERR;
+   sint32 s32_Return;
 
    C_OSCDeviceDefinition c_DeviceDefinition;
 
@@ -107,7 +108,8 @@ sint32 C_OSCDeviceManager::AddDevice(const stw_scl::C_SCLString & orc_DeviceDefi
    }
 
    // Load device definition for name checking
-   if (C_OSCDeviceDefinitionFiler::h_Load(c_DeviceDefinition, orc_DeviceDefinitionFile) == C_NO_ERR)
+   s32_Return = C_OSCDeviceDefinitionFiler::h_Load(c_DeviceDefinition, orc_DeviceDefinitionFile);
+   if (s32_Return == C_NO_ERR)
    {
       // Compare new device definition file with existing
       // If the file exists, the device won't add

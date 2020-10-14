@@ -5,7 +5,7 @@
 
    \class       stw_scl::C_SCLString
    \brief       String class
-   
+
    ANSI C++ string handling class.
    Aim: provide most of the functionality that Borland's AnsiString does
    while only using plain ANSI C++.
@@ -118,6 +118,7 @@ public:
    C_SCLString(const stw_types::uint8 ou8_InitValue);
    C_SCLString(const stw_types::float64 of64_InitValue);
    C_SCLString(const wchar_t * const opwcn_InitValue);
+   C_SCLString(wchar_t * const opwcn_InitValue);
    //PC-lint 9 reports 1036 when calling the constructor with a "charn" which is handled by the template constructor
    // So there is no ambiguity. False Positive.
    //lint -estring(1036, "*stw_scl::C_SCLString::C_SCLString(double)*")
@@ -212,6 +213,7 @@ template <typename T> C_SCLString::C_SCLString(const T orc_Value)
 template <typename T> C_SCLString C_SCLString::IntToStr(const T orc_Value)
 {
    const C_SCLString c_Text(orc_Value);
+
    return c_Text;
 }
 
@@ -234,6 +236,7 @@ template <typename T> C_SCLString C_SCLString::IntToStr(const T orc_Value)
 template <typename T> C_SCLString C_SCLString::IntToHex(const T orc_Value, const stw_types::uint32 ou32_Digits)
 {
    C_SCLString c_Text;
+
    std::stringstream c_Stream;
    c_Stream << &std::hex << std::setw(ou32_Digits) << std::setfill('0') << orc_Value;
    c_Text.c_String = c_Stream.str();

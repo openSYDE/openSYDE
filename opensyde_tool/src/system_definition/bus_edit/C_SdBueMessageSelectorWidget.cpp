@@ -87,6 +87,8 @@ C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_P
            this, &C_SdBueMessageSelectorWidget::SigErrorChanged);
    connect(this->mpc_Ui->pc_MessageTreeWidget, &C_SdBueMessageSelectorTreeWidget::SigSelectionChanged,
            this, &C_SdBueMessageSelectorWidget::m_MessagesSelectionChanged);
+   connect(this->mpc_Ui->pc_MessageTreeWidget, &C_SdBueMessageSelectorTreeWidget::SigReload,
+           this, &C_SdBueMessageSelectorWidget::SigCommDataPoolAdded);
    //Selection signals
    connect(this->mpc_Ui->pc_MessageTreeWidget, &C_SdBueMessageSelectorTreeWidget::SigMessageSelected,
            this, &C_SdBueMessageSelectorWidget::m_SelectMessage);

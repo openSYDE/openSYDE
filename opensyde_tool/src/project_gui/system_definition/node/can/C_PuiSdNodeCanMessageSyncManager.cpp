@@ -191,6 +191,92 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the number of the unique messages of a protocol
+
+   \param[in]  oe_ComProtocol      Protocol type
+   \param[out] opu32_SignalCount   Number of unique signals of all unique messages (optional)
+
+   \return
+   Number of messages of the protocol
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_PuiSdNodeCanMessageSyncManager::GetUniqueMessageCount(const C_OSCCanProtocol::E_Type oe_ComProtocol,
+                                                               stw_types::uint32 * const opu32_SignalCount) const
+{
+   uint32 u32_Count = 0U;
+
+   const std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > * pc_UniqueMessages;
+
+   if (oe_ComProtocol == this->me_Protocol)
+   {
+      pc_UniqueMessages = &this->mc_MessageMatches;
+   }
+   else
+   {
+      uint32 u32_ProtocolIndex = 0U;
+
+      switch (this->me_Protocol)
+      {
+      case C_OSCCanProtocol::eLAYER2:          // Same index for ECES in this case
+      case C_OSCCanProtocol::eCAN_OPEN_SAFETY: // Same index for ECES in this case
+         if (oe_ComProtocol == C_OSCCanProtocol::eECES)
+         {
+            u32_ProtocolIndex = 0U;
+         }
+         else
+         {
+            u32_ProtocolIndex = 1U;
+         }
+         break;
+      case C_OSCCanProtocol::eECES:
+         if (oe_ComProtocol == C_OSCCanProtocol::eCAN_OPEN_SAFETY)
+         {
+            u32_ProtocolIndex = 0U;
+         }
+         else
+         {
+            u32_ProtocolIndex = 1U;
+         }
+         break;
+      default:
+         //No idea
+         tgl_assert(false);
+         break;
+      }
+
+      pc_UniqueMessages = &this->mc_MessageMatchesForOtherProtocols[u32_ProtocolIndex];
+   }
+
+   if (opu32_SignalCount == NULL)
+   {
+      u32_Count = mh_GetUniqueMessages(*pc_UniqueMessages).size();
+   }
+   else
+   {
+      std::vector<C_OSCCanMessageIdentificationIndices> c_UniqueMsgIds = mh_GetUniqueMessages(*pc_UniqueMessages);
+      uint32 u32_MsgCounter;
+
+      // Message count
+      u32_Count = c_UniqueMsgIds.size();
+
+      // Signal count
+      *opu32_SignalCount = 0;
+      for (u32_MsgCounter = 0U; u32_MsgCounter < u32_Count; ++u32_MsgCounter)
+      {
+         const C_OSCCanMessage * const pc_Message =
+            C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_UniqueMsgIds[u32_MsgCounter]);
+
+         if (pc_Message != NULL)
+         {
+            *opu32_SignalCount += pc_Message->c_Signals.size();
+         }
+      }
+   }
+
+   return u32_Count;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns all node indexes which are connected to the bus and use the active protocol
 
    \param[in]   ou32_BusIndex          Bus index

@@ -13,6 +13,7 @@
 #include "precomp_headers.h"
 
 #include "CSCLChecksums.h"
+#include "C_OSCUtils.h"
 #include "C_OSCHalcConfigChannel.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -60,5 +61,26 @@ void C_OSCHalcConfigChannel::CalcHash(uint32 & oru32_HashValue) const
    for (uint32 u32_It = 0UL; u32_It < this->c_Parameters.size(); ++u32_It)
    {
       this->c_Parameters[u32_It].CalcHash(oru32_HashValue);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check config valid
+
+   \param[out]  opq_NameInvalid  Name invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfigChannel::CheckConfigValid(bool * const opq_NameInvalid) const
+{
+   if (opq_NameInvalid != NULL)
+   {
+      if (C_OSCUtils::h_CheckValidCName(this->c_Name) == false)
+      {
+         *opq_NameInvalid = true;
+      }
+      else
+      {
+         *opq_NameInvalid = false;
+      }
    }
 }

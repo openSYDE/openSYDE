@@ -83,6 +83,7 @@ Q_SIGNALS:
    void SigMessageCountChanged(void);
    void SigSelectName(void);
    void SigErrorChanged(void);
+   void SigCommDataPoolAdded(void);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions

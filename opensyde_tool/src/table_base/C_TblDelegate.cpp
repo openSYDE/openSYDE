@@ -12,6 +12,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include <QBitArray>
 #include <QSvgRenderer>
 
 #include "TGLUtils.h"
@@ -79,6 +80,7 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
    else
    {
       C_OgeCbxTableBase * pc_ComboBox;
+      C_OgeCbxMultiSelect * pc_MultiSelectComboBox;
       QStringList c_StringList;
       QStringList c_StringListValues;
       QStringList c_StringListStrings;
@@ -97,6 +99,13 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
          //lint -e{64, 918, 929, 1025, 1703} Qt interface (function not recognized because of C++1 usage)
          connect(pc_ComboBox, &QComboBox::currentTextChanged, this, &C_TblDelegate::m_CommitData);
          pc_Retval = pc_ComboBox;
+         break;
+      case eURIEL_MULTI_SELECT_COMBO_BOX:
+         pc_MultiSelectComboBox = m_CreateMultiSelectComboBox(opc_Parent);
+         // connect combo box with model (commit on text change)
+         //lint -e{64, 918, 929, 1025, 1703} Qt interface (function not recognized because of C++1 usage)
+         connect(pc_MultiSelectComboBox, &C_OgeCbxMultiSelect::SigValueChanged, this, &C_TblDelegate::m_CommitData);
+         pc_Retval = pc_MultiSelectComboBox;
          break;
       case eURIEL_GENERIC_SPIN_BOX:
          c_StringList = orc_Index.data(msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST).toStringList();
@@ -141,6 +150,7 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
 {
    C_TblEditLineEditBase * pc_LineEdit;
    C_OgeCbxTableBase * pc_ComboBox;
+   C_OgeCbxMultiSelect * pc_MultiSelectComboBox;
 
    switch (C_TblDelegate::mh_GetInteractionElementValue(orc_Index))
    {
@@ -174,6 +184,17 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
          }
       }
       break;
+   case eURIEL_MULTI_SELECT_COMBO_BOX:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      pc_MultiSelectComboBox = dynamic_cast<C_OgeCbxMultiSelect *>(opc_Editor);
+      if (pc_MultiSelectComboBox != NULL)
+      {
+         const QBitArray c_BitArrayValues = orc_Index.data(static_cast<sintn>(Qt::EditRole)).toBitArray();
+         const QStringList c_StringListStrings =
+            orc_Index.data(msn_USER_ROLE_INTERACTION_MULTI_SELECT_COMBO_BOX_STRINGS_LIST).toStringList();
+         pc_MultiSelectComboBox->Init(c_StringListStrings, c_BitArrayValues);
+      }
+      break;
    case eURIEL_GENERIC_SPIN_BOX:
       m_SetGenericEditorDataVariable(opc_Editor, orc_Index);
       break;
@@ -198,6 +219,7 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
 {
    C_TblEditLineEditBase * pc_LineEdit;
    C_OgeCbxTableBase * pc_ComboBox;
+   C_OgeCbxMultiSelect * pc_MultiSelectComboBox;
 
    switch (C_TblDelegate::mh_GetInteractionElementValue(orc_Index))
    {
@@ -231,6 +253,15 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
       {
          opc_Model->setData(orc_Index, static_cast<sint64>(pc_ComboBox->GetValueForCurrentIndex()),
                             static_cast<sintn>(Qt::EditRole));
+      }
+      break;
+   case eURIEL_MULTI_SELECT_COMBO_BOX:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      pc_MultiSelectComboBox = dynamic_cast<C_OgeCbxMultiSelect *>(opc_Editor);
+      if (pc_MultiSelectComboBox != NULL)
+      {
+         const QBitArray c_BitArrayValues = pc_MultiSelectComboBox->GetValuesAsBitArray();
+         opc_Model->setData(orc_Index, c_BitArrayValues, static_cast<sintn>(Qt::EditRole));
       }
       break;
    case eURIEL_GENERIC_SPIN_BOX:
@@ -300,6 +331,9 @@ E_UserRoleInteractionElementValue C_TblDelegate::mh_GetInteractionElementValue(c
       break;
    case 3:
       e_Retval = eURIEL_GENERIC_SPIN_BOX;
+      break;
+   case 4:
+      e_Retval = eURIEL_MULTI_SELECT_COMBO_BOX;
       break;
    default:
       e_Retval = eURIEL_NONE;

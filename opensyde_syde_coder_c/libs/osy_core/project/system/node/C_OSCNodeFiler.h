@@ -81,10 +81,6 @@ private:
                                                       ore_FlashLoader);
    static stw_types::sint32 mh_StringToFlashLoader(const stw_scl::C_SCLString & orc_String,
                                                    C_OSCNodeProperties::E_FlashLoaderProtocol & ore_Type);
-   static stw_scl::C_SCLString mh_CodeExportScalingTypeToString(const C_OSCNodeCodeExportSettings::E_Scaling &
-                                                                ore_Scaling);
-   static stw_types::sint32 mh_StringToCodeExportScalingType(const stw_scl::C_SCLString & orc_String,
-                                                             C_OSCNodeCodeExportSettings::E_Scaling & ore_Scaling);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

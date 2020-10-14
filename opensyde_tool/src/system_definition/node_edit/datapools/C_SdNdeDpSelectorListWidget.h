@@ -13,7 +13,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
-#include <QTimer>
 #include <QAction>
 
 #include "stwtypes.h"
@@ -45,22 +44,23 @@ public:
 
    bool SetTypeAndNode(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_Type,
                        const stw_types::uint32 ou32_NodeIndex, const bool oq_UsageViewActive);
-   bool SetActualDataPoolConflict(const bool oq_Active) const;
+   void SetSelected(const bool oq_Selected);
+   bool SetActualDataPoolConflict(const stw_types::sintn osn_DataPoolWidgetIndex, const bool oq_Active) const;
    void UpdateActualDataPool(void);
-   void SetActive(const bool oq_Active);
-   void SetMaximized(const bool oq_Maximized);
    void AddNewDatapool(void);
    void Paste(void);
    bool CheckDataPoolsForConflict(std::vector<stw_types::uint32> * const opc_InvalidDatapoolIndices = NULL) const;
-   bool SetDataPoolActive(const stw_types::uint32 ou32_DataPoolIndex);
+
+   void UpdateSizeHint(const stw_types::sintn osn_MaxHeight);
+   virtual QSize sizeHint(void) const override;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
-
 Q_SIGNALS:
    //lint -restore
-   void SigWidgetFocused(const stw_types::sintn osn_DataPoolWidgetIndex, const bool oq_ForceChange = false);
-   void SigDataPoolChanged(const bool oq_InitChange = false);
+   void SigWidgetFocused(void);
+   void SigOpenDataPoolContent(const stw_types::sintn osn_DataPoolWidgetIndex);
+   void SigDataPoolChanged(void);
    void SigErrorCheck(void);
    void SigUpdateLists(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
    void SigNoDataPoolSelected(void);
@@ -73,7 +73,6 @@ protected:
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void focusInEvent(QFocusEvent * const opc_Event) override;
-   virtual void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
    //lint -restore
 
    virtual void m_MoveItem(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex) override;
@@ -107,12 +106,14 @@ private:
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
    void m_SetupContextMenu(void);
    void m_Edit(const bool oq_SelectName = false);
+   void m_EditContent(void);
    void m_Copy(void) const;
    void m_Cut(void);
    void m_DeleteSlot(void);
    void m_Delete(const bool oq_AskUser);
    void m_MoveLeft(void);
    void m_MoveRight(void);
+   void m_ItemClicked(QListWidgetItem * const opc_Item);
    void m_ItemDoubleClicked(QListWidgetItem * const opc_Item);
 
    void m_MoveDatapool(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex);
@@ -126,6 +127,7 @@ private:
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
    QAction * mpc_AddAction;
    QAction * mpc_EditAction;
+   QAction * mpc_EditContentAction;
    QAction * mpc_EditActionSeparator;
    QAction * mpc_DeleteAction;
    QAction * mpc_DeleteActionSeparator;
@@ -135,14 +137,15 @@ private:
    QAction * mpc_MoveActionSeparator;
    QAction * mpc_MoveLeftAction;
    QAction * mpc_MoveRightAction;
+   bool mq_Selected;
 
    stw_types::uint32 mu32_NodeIndex;
-   stw_types::sint32 ms32_LastKnownDpCount;
    stw_opensyde_core::C_OSCNodeDataPool::E_Type me_DataPoolType;
    stw_opensyde_core::C_OSCCanProtocol::E_Type me_ProtocolType;
-   bool mq_ItemActive;
-   bool mq_Maximized;
    bool mq_UsageViewActive;
+   stw_types::sintn msn_ItemWidth;
+   stw_types::sintn msn_ItemHeight;
+   stw_types::sintn msn_HeightHint;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

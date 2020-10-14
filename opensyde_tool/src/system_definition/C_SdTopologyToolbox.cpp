@@ -32,6 +32,7 @@
 #include "C_OgePubIconOnly.h"
 #include "C_ImpUtil.h"
 #include "C_Uti.h"
+#include "C_OSCLoggingHandler.h"
 
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -71,7 +72,6 @@ C_SdTopologyToolbox::C_SdTopologyToolbox(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdTopologyToolbox),
    mpc_List(NULL),
-   mpc_Item(NULL),
    mpc_Spacer(new QSpacerItem(20, 10, QSizePolicy::Expanding)),
    mpc_Label(new C_OgeLabTopologyToolboxUserNodes(this))
 {
@@ -124,7 +124,8 @@ C_SdTopologyToolbox::C_SdTopologyToolbox(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyToolbox::~C_SdTopologyToolbox()
 {
-   //lint -e{1540}  no memory leak because of the parent all elements and the Qt memory management
+   delete mpc_Ui;
+   //lint -e{1740}  no memory leak because of the parent all elements and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -284,28 +285,18 @@ void C_SdTopologyToolbox::dragMoveEvent(QDragMoveEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyToolbox::dropEvent(QDropEvent * const opc_Event)
 {
-   QStringList c_PathList;
+   QStringList c_UserDeviceDefPaths;
+   QStringList c_Errors;
 
    for (sintn sn_Counter = 0; sn_Counter < opc_Event->mimeData()->urls().size(); sn_Counter++)
    {
       QString c_Path = opc_Event->mimeData()->urls().at(sn_Counter).path();
-      QFileInfo c_FileInfo(c_Path);
-      if (c_FileInfo.completeSuffix().toLower() == "syde_devdef")
-      {
-         c_Path = c_Path.remove(0, 1);
-         c_PathList.append(c_Path);
-      }
-      else
-      {
-         this->m_AddUserNodeFromIni(c_Path.remove(0, 1));
-      }
+      this->m_LoadUserDeviceDefinitionPaths(c_Path.remove(0, 1),
+                                            c_UserDeviceDefPaths, c_Errors);
    }
 
-   c_PathList = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_PathList, C_Uti::h_GetExePath());
-   for (sintn sn_ItPath = 0; sn_ItPath < c_PathList.size(); ++sn_ItPath)
-   {
-      this->m_AddUserNode(c_PathList[sn_ItPath]);
-   }
+   c_UserDeviceDefPaths = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_UserDeviceDefPaths, C_Uti::h_GetExePath());
+   this->m_AddUserNodesToIni(c_UserDeviceDefPaths, c_Errors);
 
    QWidget::dropEvent(opc_Event);
 }
@@ -334,7 +325,7 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
 
          if (this->mpc_List != NULL)
          {
-            for (uint32 u32_ItDevice = 0; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
+            for (uint32 u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
             {
                this->m_FillToolboxWithDynamicNodes(c_Devices[u32_ItDevice]);
             }
@@ -354,7 +345,7 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
                                               C_GtGetText::h_GetText(
                                                  "Add user nodes to toolbox from file device desription file (.syde_defdev)"
                                                  " or user nodes ini file (.ini)."));
-         connect(pc_IconButton, &C_OgePubIconOnly::clicked, this, &C_SdTopologyToolbox::m_IconAddNodeClicked);
+         connect(pc_IconButton, &C_OgePubIconOnly::clicked, this, &C_SdTopologyToolbox::m_FileBrowseDialog);
 
          C_OgePubIconOnly * pc_ClearAllUserNodesButton = c_Icons[1];
          pc_ClearAllUserNodesButton->SetToolTipInformation(C_GtGetText::h_GetText("Clear User Nodes"),
@@ -374,7 +365,7 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
          // False: Set label no user devices existing
          if (c_DeviceGroups[u32_ItDeviceGroup].GetGroupName().c_str() == stw_scl::C_SCLString("User Nodes"))
          {
-            for (uint32 u32_ItDevice = 0; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
+            for (uint32 u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
             {
                this->m_FillToolboxWithDynamicNodes(c_Devices[u32_ItDevice]);
             }
@@ -436,72 +427,15 @@ void C_SdTopologyToolbox::m_FillToolboxWithDynamicNodes(const C_OSCDeviceDefinit
 
    if (this->mpc_List != NULL)
    {
+      QListWidgetItem * pc_Item;
       this->mpc_List->addItem(rc_Device.GetDisplayName().c_str());
-      this->mpc_Item = this->mpc_List->item(this->mpc_List->count() - 1);
-      this->mpc_Item->setData(msn_USER_ROLE_ADDITIONAL_INFORMATION, c_DeviceName);
+      pc_Item = this->mpc_List->item(this->mpc_List->count() - 1);
+      pc_Item->setData(msn_USER_ROLE_ADDITIONAL_INFORMATION, c_DeviceName);
       // Toolbox icon
-      this->mpc_Item->setIcon(this->mc_Icon);
+      pc_Item->setIcon(this->mc_Icon);
       // Tooltip
-      this->mpc_Item->setData(msn_USER_ROLE_TOOL_TIP_HEADING, rc_Device.GetDisplayName().c_str());
-      this->mpc_Item->setData(msn_USER_ROLE_TOOL_TIP_CONTENT, c_DeviceDescription);
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of plus button click
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyToolbox::m_IconAddNodeClicked(void)
-{
-   this->m_LoadDeviceDefinitionFile();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add a new user device to toolbox
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyToolbox::m_AddUserNodeToList(const sint32 os32_Return)
-{
-   if (os32_Return == C_NO_ERR)
-   {
-      std::vector<C_OSCDeviceDefinition> c_Devices;
-      std::vector<C_OSCDeviceGroup> c_DeviceGroups = C_OSCSystemDefinition::hc_Devices.GetDeviceGroups();
-      c_Devices = c_DeviceGroups[c_DeviceGroups.size() - 1].GetDevices();
-
-      // Set label invisible and remove spacer
-      if (this->mpc_Label != NULL)
-      {
-         this->mpc_Label->setVisible(false);
-         this->mpc_Ui->pc_VerticalLayout1->removeItem(this->mpc_Spacer);
-      }
-      this->m_FillToolboxWithDynamicNodes(c_Devices[c_Devices.size() - 1]);
-      this->mpc_List->UpdateSize();
-
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eINFORMATION);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Add User Node"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("User node successfully added to toolbox."));
-      c_Message.SetCustomMinHeight(180, 180);
-      c_Message.Execute();
-   }
-   else if (os32_Return == C_CONFIG)
-   {
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Add user node"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("Node of this type already exists in the toolbox."));
-      c_Message.SetCustomMinHeight(180, 180);
-      c_Message.Execute();
-   }
-   else if (os32_Return == C_NOACT)
-   {
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Add user node"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("Wrong file type."));
-      c_Message.SetCustomMinHeight(180, 180);
-      c_Message.Execute();
-   }
-   else
-   {
-      // nothing to do
+      pc_Item->setData(msn_USER_ROLE_TOOL_TIP_HEADING, rc_Device.GetDisplayName().c_str());
+      pc_Item->setData(msn_USER_ROLE_TOOL_TIP_CONTENT, c_DeviceDescription);
    }
 }
 
@@ -528,228 +462,322 @@ void C_SdTopologyToolbox::m_IconClearAllClicked()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Load device definition file for user nodes
+/*! \brief  Handles all GUI Feedback regarding errors on adding user nodes to toolbox
 
-   Supported are .syde_devdef and .ini (only with "User Nodes" TAG) files.
-
-   \return
-   C_NO_ERR    User node added
-   C_WARN      Wrong suffix of device definition file
-   C_CONFIG    Device always exits
-   C_NOACT     No action
+   \param[in]     orc_Errors    list of error messages
+   \param[in]     orc_PathGood  paths to .syde_devdef-files added successfully
+   \param[in]     orc_PathFail  paths to .syde_devdef-file failed to add
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdTopologyToolbox::m_LoadDeviceDefinitionFile(void)
+void C_SdTopologyToolbox::m_ErrorHandlingUserFeedback(const QStringList & orc_Errors, const QStringList & orc_PathGood,
+                                                      const QStringList & orc_PathFail)
 {
-   sint32 s32_Return = C_NOACT;
-   QStringList c_Paths;
+   C_OgeWiCustomMessage c_Message(this);
+   QString c_Description;
+   QString c_Details = "";
+   QString c_Success = "";
+   QString c_Fail = "";
+   QString c_LogLink = C_GtGetText::h_GetText("For details see ") +
+                       C_Uti::h_GetLink(C_GtGetText::h_GetText("log file."), mc_STYLE_GUIDE_COLOR_LINK,
+                                        C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
 
-   // Open file selector with .syde_devdef filter
-   QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownImportPath();
+   // building string c_Success (contains all successful paths)
+   if (orc_PathGood.size() > 0)
+   {
+      c_Success = QString::number(orc_PathGood.size()) + C_GtGetText::h_GetText(
+         " node(s) successfully added to toolbox:<br/>");
+      for (sintn sn_ItPath = 0; sn_ItPath < orc_PathGood.size(); ++sn_ItPath)
+      {
+         c_Success += orc_PathGood[sn_ItPath] + "<br/>";
+      }
+   }
 
-   // Replace default path if necessary
+   // building string c_Fail (contains all failed paths)
+   if (orc_PathFail.size() > 0)
+   {
+      c_Fail = QString::number(orc_PathFail.size()) + C_GtGetText::h_GetText(
+         " node(s) could not be added to toolbox:<br/>");
+      for (sintn sn_ItPath = 0; sn_ItPath < orc_PathFail.size(); ++sn_ItPath)
+      {
+         c_Fail += orc_PathFail[sn_ItPath] + "<br/>";
+      }
+   }
+
+   // no errors
+   if ((orc_Errors.size() == 0) && (orc_PathFail.size() == 0))
+   {
+      c_Description = C_GtGetText::h_GetText("Success! Click Details for further information.\n");
+      c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
+      c_Details = c_Success + c_LogLink;
+   }
+   // errors occured, but nodes could be added to .ini and toolbox
+   else if ((orc_Errors.size() > 0) && (orc_PathGood.size() > 0))
+   {
+      c_Description = C_GtGetText::h_GetText("Node(s) added, but errors occured. See details.\n");
+
+      for (sintn sn_Error = 0; sn_Error < orc_Errors.size(); ++sn_Error)
+      {
+         c_Description += QString::number(sn_Error + 1) + ". " + orc_Errors[sn_Error] + "\n";
+      }
+
+      c_Message.SetType(C_OgeWiCustomMessage::eWARNING);
+      c_Details = c_Success + c_Fail + c_LogLink;
+   }
+   // errors occured, no nodes were added
+   else
+   {
+      c_Description = C_GtGetText::h_GetText("Errors occured! Click Details for further information.\n");
+
+      for (sintn sn_Error = 0; sn_Error < orc_Errors.size(); ++sn_Error)
+      {
+         c_Description += QString::number(sn_Error + 1) + ". " + orc_Errors[sn_Error] + "\n";
+      }
+
+      c_Message.SetType(C_OgeWiCustomMessage::eERROR);
+      c_Details = c_Fail + c_LogLink;
+   }
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("Add User Node"));
+   c_Message.SetDescription(c_Description);
+   c_Message.SetDetails(c_Details);
+   c_Message.SetCustomMinHeight(200, 400);
+   c_Message.Execute();
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Opens on click on "+" Icon. Calls function to handle user device management.
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyToolbox::m_FileBrowseDialog(void)
+{
+   QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownDeviceDefPath();
+
    if (c_Folder.compare("") == 0)
    {
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
 
-   // Load user settings value and folder for file dialog
-   QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select Device Definition File"),
-                        c_Folder, QString(C_GtGetText::h_GetText("Device Definition")) + " (*.syde_devdef *.ini)");
-   c_Dialog.setDefaultSuffix("*.syde_devdef");
-   c_Dialog.setFileMode(QFileDialog::ExistingFiles);
-
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      // if an .ini file was selected, we need to call another function
-      for (sintn sn_Counter = 0; sn_Counter < c_Dialog.selectedFiles().size(); sn_Counter++)
+      QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select Device Definition or Ini File"),
+                           c_Folder, QString(C_GtGetText::h_GetText("Device Definition")) + " (*.syde_devdef *.ini)");
+
+      c_Dialog.setDefaultSuffix("*.syde_devdef");
+      c_Dialog.setFileMode(QFileDialog::ExistingFiles);
+
+      if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
       {
-         if (c_Dialog.selectedFiles().at(sn_Counter).contains(".ini") == true)
+         QStringList c_Errors;
+         QStringList c_UserDeviceDefPaths;
+
+         c_Folder = c_Dialog.directory().absolutePath();
+         C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownDeviceDefPath(c_Folder);
+
+         for (sintn sn_Counter = 0; sn_Counter < c_Dialog.selectedFiles().size(); ++sn_Counter)
          {
-            this->m_AddUserNodeFromIni(c_Dialog.selectedFiles().at(sn_Counter));
+            this->m_LoadUserDeviceDefinitionPaths(c_Dialog.selectedFiles().at(
+                                                     sn_Counter), c_UserDeviceDefPaths, c_Errors);
          }
-         else
-         {
-            c_Paths.append(c_Dialog.selectedFiles().at(sn_Counter));
-            //s32_Return = this->m_AddUserNode(c_Path);
-         }
-      }
-      c_Paths = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Paths, C_Uti::h_GetExePath());
-      for (sintn sn_Counter = 0; sn_Counter < c_Paths.size(); ++sn_Counter)
-      {
-         this->m_AddUserNode(c_Paths[sn_Counter]);
+
+         c_UserDeviceDefPaths =
+            C_ImpUtil::h_AskUserToSaveRelativePath(this, c_UserDeviceDefPaths, C_Uti::h_GetExePath());
+         this->m_AddUserNodesToIni(c_UserDeviceDefPaths, c_Errors);
       }
    }
-
-   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add user node to .ini file
+/*! \brief  collects paths from all user-node files. They may come from a syde_devdef-file directly or from a .ini file
 
-   \return
-   C_NO_ERR    User node added
-   C_WARN      Wrong suffix of device definition file
-   C_CONFIG    Device always exits
-   C_NOACT     No action
+   \param[in]       orc_Path                path to file, chosen by user
+   \param[in,out]   orc_UserDeviceDefPaths  paths to .syde_devdef files
+   \param[in,out]   orc_Errors              error messages for GUI Feedback
+
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdTopologyToolbox::m_AddUserNode(const QString & orc_DeviceDefinitionPath)
+void C_SdTopologyToolbox::m_LoadUserDeviceDefinitionPaths(const QString & orc_Path,
+                                                          QStringList & orc_UserDeviceDefPaths,
+                                                          QStringList & orc_Errors) const
 {
-   sint32 s32_Return = C_NOACT;
+   sint32 s32_Result;
 
-   // Check for user abort (empty string)
-   if (orc_DeviceDefinitionPath != "")
-   {
-      const QFileInfo c_FileInfo(orc_DeviceDefinitionPath);
-      // Store new user settings value
-      C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownImportPath(c_FileInfo.absoluteDir().absolutePath());
-      // Only use lower case suffix
-      if (c_FileInfo.completeSuffix().toLower().contains("syde_devdef") == false)
-      {
-         // Strange
-         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-         c_Message.SetHeading(C_GtGetText::h_GetText("Add user node"));
-         c_Message.SetDescription(C_GtGetText::h_GetText("File type not allowed."));
-         c_Message.SetCustomMinHeight(180, 180);
-         c_Message.Execute();
-         s32_Return = C_WARN;
-      }
-      else
-      {
-         s32_Return = C_NO_ERR;
-      }
-
-      if (s32_Return == C_NO_ERR)
-      {
-         // Add device to device group "User Nodes" in user_devices.ini-File
-         s32_Return = C_OSCSystemDefinition::hc_Devices.AddDevice(stw_scl::C_SCLString(orc_DeviceDefinitionPath
-                                                                                       .toStdString().c_str()),
-                                                                  stw_scl::C_SCLString("User Nodes"),
-                                                                  stw_scl::C_SCLString("../devices/user_devices.ini"));
-      }
-   }
-   this->m_AddUserNodeToList(s32_Return);
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Adds UserNodes to Toolbox on a drag and drop of the user_devices.ini
-
-   \param[in,out]   QString   Path to user_devices.ini based on mouse drag
-
-   \return
-   C_NO_ERR
-   C_RD_WR     wrong file suffix, or wrong .ini file.
-   C_CONFIG    could not add user node
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdTopologyToolbox::m_AddUserNodeFromIni(const QString & orc_UserDevicesIniPath)
-{
-   sint32 s32_Return;
-   sint16 s16_DevCount = 0;
-
+   const QFileInfo c_FileInfo(orc_Path);
    C_OSCDeviceManager c_UserDeviceManager;
 
-   std::vector<C_OSCDeviceGroup> c_DeviceGroups;
-   std::vector<C_OSCDeviceDefinition> c_UserDevices;
-
-   // load ini file
-   s32_Return = c_UserDeviceManager.LoadFromFile(orc_UserDevicesIniPath.toStdString().c_str(), false);
-
-   if (s32_Return == C_NO_ERR)
+   // user selected an ini file?
+   if (c_FileInfo.completeSuffix().toLower().contains("ini") == true)
    {
-      C_SCLString c_CheckString = "User Nodes";
-      // get DeviceGroups from .ini
-      c_DeviceGroups = c_UserDeviceManager.GetDeviceGroups();
+      // load the file
+      s32_Result = c_UserDeviceManager.LoadFromFile(orc_Path.toStdString().c_str(), false);
 
-      for (uint32 u32_ItGroup = 0; u32_ItGroup < c_DeviceGroups.size(); ++u32_ItGroup)
+      // handle errors from c_UserDeviceManager.LoadFromFile
+      if (s32_Result == C_NO_ERR)
       {
-         // is this the user_devices.ini?
-         if (c_DeviceGroups[u32_ItGroup].GetGroupName() == c_CheckString)
+         C_SCLString c_CheckString = "User Nodes";
+         // get DeviceGroups from .ini to check if it is a valid file with user nodes // TODO Paul: comment passt nicht
+         std::vector<C_OSCDeviceGroup> c_DeviceGroups = c_UserDeviceManager.GetDeviceGroups();
+         std::vector<C_OSCDeviceDefinition> c_UserDevices;
+         bool q_IsValidUserIni = false;
+
+         for (uint32 u32_ItGroup = 0U; u32_ItGroup < c_DeviceGroups.size(); ++u32_ItGroup)
          {
-            // get paths to devdef-files
-            c_UserDevices = c_DeviceGroups[u32_ItGroup].GetDevices();
-            s32_Return = C_NO_ERR;
-            break;
+            if (c_DeviceGroups[u32_ItGroup].GetGroupName() == c_CheckString)
+            {
+               c_UserDevices = c_DeviceGroups[u32_ItGroup].GetDevices();
+               for (uint32 u32_ItDev = 0U; u32_ItDev < c_UserDevices.size(); ++u32_ItDev)
+               {
+                  const QString c_Path = QString(c_UserDevices[u32_ItDev].c_FilePath.c_str());
+                  orc_UserDeviceDefPaths.append(c_Path);
+               }
+               q_IsValidUserIni = true;
+               // leave the loop as soon as the GroupName "User Nodes" was found
+               break;
+            }
+            else
+            {
+               q_IsValidUserIni = false;
+            }
          }
-         else
+         if (q_IsValidUserIni == false)
          {
-            s32_Return = C_RD_WR;
+            orc_Errors.append(QString(C_GtGetText::h_GetText("Could not load file: ")) + orc_Path);
+            osc_write_log_error("Loading .ini-file",
+                                "invalid .ini-file \"" + C_SCLString(
+                                   orc_Path.toStdString().c_str()) + "\". File contains no user nodes.");
          }
       }
+      // something went wrong in LoadFromFile: C_RD_WR
+      else
+      {
+         // logging comes from either C_OSCDeviceManager::LoadFromFile or  C_OSCDeviceGroup::LoadGroup
+         orc_Errors.append(QString(C_GtGetText::h_GetText("Could not load file: ")) + orc_Path);
+      }
    }
-
-   // add devices to Toolbox
-   if (s32_Return == C_NO_ERR)
+   else if (c_FileInfo.completeSuffix().toLower().contains("syde_devdef") == true)
    {
+      orc_UserDeviceDefPaths.append(orc_Path);
+   }
+   else
+   {
+      orc_Errors.append(QString(C_GtGetText::h_GetText("Could not load file: ")) + orc_Path);
+      osc_write_log_error("Loading file", "Wrong file suffix \"" + C_SCLString(orc_Path.toStdString().c_str()) + "\".");
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adds user nodes from the given .syde_devdef-files to the user_devices.ini
+
+   \param[in]       orc_UserDeviceDefPaths  paths to .syde_devdef files
+   \param[in,out]   orc_Errors              error messages for GUI Feedback
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyToolbox::m_AddUserNodesToIni(const QStringList & orc_UserDeviceDefPaths, QStringList & orc_Errors)
+{
+   sint32 s32_Result;
+   QStringList c_PathGood;
+   QStringList c_PathFail;
+
+   if (orc_UserDeviceDefPaths.size() > 0)
+   {
+      for (sintn sn_ItPath = 0; sn_ItPath < orc_UserDeviceDefPaths.size(); ++sn_ItPath)
+      {
+         s32_Result = C_OSCSystemDefinition::hc_Devices.AddDevice(
+            orc_UserDeviceDefPaths[sn_ItPath].toStdString().c_str(),
+            "User Nodes",
+            "../devices/user_devices.ini");
+
+         // handling errors from AddDevice
+         switch (s32_Result)
+         {
+         case C_NO_ERR:
+            c_PathGood.append(orc_UserDeviceDefPaths[sn_ItPath]);
+            break;
+         case C_RD_WR:
+            // could not load information -> C_OSCDeviceGroup::LoadGroup already logs this error
+            orc_Errors.append(QString(C_GtGetText::h_GetText("Could not add device: ")) +
+                              orc_UserDeviceDefPaths[sn_ItPath]);
+            c_PathFail.append(orc_UserDeviceDefPaths[sn_ItPath]);
+            break;
+         case C_CONFIG:
+            osc_write_log_error("Add device",
+                                "device already exists \"" + stw_scl::C_SCLString(
+                                   orc_UserDeviceDefPaths[sn_ItPath].toStdString().c_str()) + "\".");
+            orc_Errors.append(QString(C_GtGetText::h_GetText("Could not add device: ")) +
+                              orc_UserDeviceDefPaths[sn_ItPath]);
+            c_PathFail.append(orc_UserDeviceDefPaths[sn_ItPath]);
+            break;
+         case C_NOACT:
+            // invalid xml-file -> C_OSCDeviceDefinitionFiler::h_Load already logs this error.
+            orc_Errors.append(QString(C_GtGetText::h_GetText("Could not add device: ")) +
+                              orc_UserDeviceDefPaths[sn_ItPath]);
+            c_PathFail.append(orc_UserDeviceDefPaths[sn_ItPath]);
+            break;
+         default:
+            osc_write_log_error("Add device",
+                                "unknown error \"" + stw_scl::C_SCLString(
+                                   orc_UserDeviceDefPaths[sn_ItPath].toStdString().c_str()) + "\".");
+            orc_Errors.append(QString(C_GtGetText::h_GetText("Could not add device: ")) +
+                              orc_UserDeviceDefPaths[sn_ItPath] +
+                              QString(C_GtGetText::h_GetText("\n (Unknown error)")));
+            c_PathFail.append(orc_UserDeviceDefPaths[sn_ItPath]);
+            break;
+         }
+      }
+      this->m_AddUserNodesToToolbox();
+      // TODO Check if call always is necessary??
+      this->m_ErrorHandlingUserFeedback(orc_Errors, c_PathGood, c_PathFail);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adds the user node to the toolbox
+
+   Adds a new user node from user_devices.ini to the list widget in toolbox and calls function to actually
+   make the new node visible.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdTopologyToolbox::m_AddUserNodesToToolbox(void)
+{
+   // get names of all nodes, which already are in toolbox
+   if (this->mpc_List != NULL)
+   {
+      std::vector<C_OSCDeviceDefinition> c_UserDevices;
+      const std::vector<C_OSCDeviceGroup> c_DeviceGroups = C_OSCSystemDefinition::hc_Devices.GetDeviceGroups();
+
+      QStringList c_ToolboxItems;
+      const C_SCLString c_CheckString = "User Nodes";
+
+      for (sintn sn_Counter = 0; sn_Counter < this->mpc_List->count(); ++sn_Counter)
+      {
+         c_ToolboxItems.append(this->mpc_List->item(sn_Counter)->text());
+      }
+
+      // get all user nodes
+      for (uint32 u32_ItGroup = 0U; u32_ItGroup < c_DeviceGroups.size(); ++u32_ItGroup)
+      {
+         if (c_DeviceGroups[u32_ItGroup].GetGroupName() == c_CheckString)
+         {
+            c_UserDevices = c_DeviceGroups[u32_ItGroup].GetDevices();
+         }
+      }
+
+      // set label invisible and remove spacer
       if (this->mpc_Label != NULL)
       {
          this->mpc_Label->setVisible(false);
          this->mpc_Ui->pc_VerticalLayout1->removeItem(this->mpc_Spacer);
       }
 
-      for (uint32 u32_ItDef = 0; u32_ItDef < c_UserDevices.size(); ++u32_ItDef)
+      for (uint32 u32_ItDev = 0U; u32_ItDev < c_UserDevices.size(); ++u32_ItDev)
       {
-         // add device in user_devices.ini
-         s32_Return = C_OSCSystemDefinition::hc_Devices.AddDevice(c_UserDevices[u32_ItDef].c_FilePath,
-                                                                  stw_scl::C_SCLString("User Nodes"),
-                                                                  stw_scl::C_SCLString("../devices/user_devices.ini"));
-
-         if (s32_Return == C_NO_ERR)
+         // only add the nodes, which are not already in toolbox
+         if (c_ToolboxItems.contains(QString(c_UserDevices[u32_ItDev].c_DeviceName.c_str())) == false)
          {
-            this->m_FillToolboxWithDynamicNodes(c_UserDevices[u32_ItDef]);
-            this->mpc_List->UpdateSize();
-            s16_DevCount++;
-         }
-         else
-         {
-            break;
+            this->m_FillToolboxWithDynamicNodes(c_UserDevices[u32_ItDev]);
          }
       }
+
+      this->mpc_List->UpdateSize();
    }
-
-   if (s32_Return == C_NO_ERR)
-   {
-      C_SCLString c_Success = "";
-      // sucess message for adding nodes
-      c_Success = C_SCLString::IntToStr(s16_DevCount) + C_GtGetText::h_GetText(" user node(s) successfully added.");
-
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eINFORMATION);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Add User Node"));
-      c_Message.SetDescription(C_GtGetText::h_GetText(c_Success.c_str()));
-      c_Message.SetCustomMinHeight(180, 180);
-      c_Message.Execute();
-   }
-
-   // something went wrong while adding the nodes
-   else if (s32_Return == C_CONFIG)
-   {
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Add user node"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("Could not add user node.\n"
-                                                      "Node of this type already exists in toolbox."));
-      c_Message.SetCustomMinHeight(180, 180);
-      c_Message.Execute();
-   }
-
-   // something went wrong on loading the .ini file or it is another .ini as expected
-   else if (s32_Return == C_RD_WR)
-   {
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Add User Node"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("No user nodes found."));
-      c_Message.SetCustomMinHeight(180, 180);
-      c_Message.Execute();
-   }
-
-   else
-   {
-      // nothing to do here
-   }
-
-   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -786,7 +814,7 @@ sint32 C_SdTopologyToolbox::m_DeleteUserNode(const QPoint & orc_Pos)
       }
 
       // get all nodes, which are currently used in Network Topology
-      for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+      for (uint32 u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
       {
          C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_ItNode);
 
@@ -859,13 +887,13 @@ sint32 C_SdTopologyToolbox::m_ClearAllUserNodes()
       c_Devices = c_DeviceGroups[c_DeviceGroups.size() - 1].GetDevices();
 
       // get all nodes, which are currently used in Network Topology
-      for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+      for (uint32 u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
       {
          C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_ItNode);
 
          if (pc_Node != NULL)
          {
-            for (uint32 u32_ItDevice = 0; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
+            for (uint32 u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
             {
                // check if any of the User Nodes is currently used in Network Topology. If so the Nodes can't be
                // deleted.

@@ -12,7 +12,7 @@
 #define C_SDNDESFORESETMESSAGETABLEVIEW_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QTableView>
+#include "C_TblViewScroll.h"
 #include "stwtypes.h"
 #include "C_SdNdeSfoResetMessageTableModel.h"
 #include "C_SdNdeSfoResetMessageTableDelegate.h"
@@ -25,7 +25,7 @@ namespace stw_opensyde_gui
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeSfoResetMessageTableView :
-   public QTableView
+   public C_TblViewScroll
 {
    Q_OBJECT
 
@@ -39,7 +39,6 @@ private:
    stw_opensyde_gui_logic::C_SdNdeSfoResetMessageTableModel mc_Model;
 
    void m_InitColumns(void);
-   void m_ScrollBarRangeChangedHor(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

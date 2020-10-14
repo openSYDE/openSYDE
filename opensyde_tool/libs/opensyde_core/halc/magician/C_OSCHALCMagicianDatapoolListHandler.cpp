@@ -14,6 +14,7 @@
 
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "C_OSCHALCMagicianUtil.h"
 #include "C_OSCHALCMagicianDatapoolListHandler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -264,6 +265,51 @@ uint32 C_OSCHALCMagicianDatapoolListHandler::h_CountRelevantItems(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Count elements
+
+   \param[in]  orc_Structs    Structs
+
+   \return
+   Number of elements
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCHALCMagicianDatapoolListHandler::h_CountElements(const std::vector<C_OSCHalcDefStruct> & orc_Structs)
+{
+   uint32 u32_Retval = 0UL;
+
+   for (uint32 u32_ItStruct = 0UL; u32_ItStruct < orc_Structs.size(); ++u32_ItStruct)
+   {
+      u32_Retval += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(orc_Structs[u32_ItStruct]);
+   }
+
+   return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Count elements
+
+   \param[in]  orc_Struct  Struct
+
+   \return
+   Number of elements
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCHALCMagicianDatapoolListHandler::h_CountElements(const C_OSCHalcDefStruct & orc_Struct)
+{
+   uint32 u32_Retval = 0UL;
+
+   if (orc_Struct.c_StructElements.size() > 0UL)
+   {
+      u32_Retval = orc_Struct.c_StructElements.size();
+   }
+   else
+   {
+      u32_Retval = 1UL;
+   }
+   return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get list index
 
    \param[in]   ou32_DomainIndex                   Domain index
@@ -310,13 +356,13 @@ const
             if (u32_CountRelevantItems > 0UL)
             {
                //channels
-               if (pc_DomainConfig->c_ChannelConfigs.size() > 0UL)
+               if (C_OSCHALCMagicianUtil::h_CheckChanNumVariableNecessary(*pc_DomainConfig))
                {
                   oru32_ListIndex += 1UL;
                }
 
                //usecase
-               if (pc_DomainConfig->c_ChannelUseCases.size() > 0UL)
+               if (C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(*pc_DomainConfig))
                {
                   oru32_ListIndex += 1UL;
                }
@@ -328,19 +374,19 @@ const
                   switch (oe_Selector)
                   {
                   case C_OSCHalcDefDomain::eVA_PARAM:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(
+                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_DomainValues.c_Parameters);
                      break;
                   case C_OSCHalcDefDomain::eVA_INPUT:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(
+                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_DomainValues.c_InputValues);
                      break;
                   case C_OSCHalcDefDomain::eVA_OUTPUT:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(
+                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_DomainValues.c_OutputValues);
                      break;
                   case C_OSCHalcDefDomain::eVA_STATUS:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(
+                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_DomainValues.c_StatusValues);
                      break;
                   }
@@ -351,19 +397,19 @@ const
                   switch (oe_Selector)
                   {
                   case C_OSCHalcDefDomain::eVA_PARAM:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(
+                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_ChannelValues.c_Parameters);
                      break;
                   case C_OSCHalcDefDomain::eVA_INPUT:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(
+                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_ChannelValues.c_InputValues);
                      break;
                   case C_OSCHalcDefDomain::eVA_OUTPUT:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(
+                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_ChannelValues.c_OutputValues);
                      break;
                   case C_OSCHalcDefDomain::eVA_STATUS:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(
+                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_ChannelValues.c_StatusValues);
                      break;
                   }
@@ -390,13 +436,13 @@ const
             if (u32_CountRelevantItems > 0UL)
             {
                //channels
-               if (pc_CurrentDomainConfig->c_ChannelConfigs.size() > 0UL)
+               if (C_OSCHALCMagicianUtil::h_CheckChanNumVariableNecessary(*pc_CurrentDomainConfig))
                {
                   oru32_ListIndex += 1UL;
                }
 
                //usecase
-               if (pc_CurrentDomain->c_ChannelUseCases.size() > 0UL)
+               if (C_OSCHALCMagicianUtil::h_CheckUseCaseVariableNecessary(*pc_CurrentDomain))
                {
                   oru32_ListIndex += 1UL;
                }
@@ -487,51 +533,6 @@ const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Count elements
-
-   \param[in]  orc_Structs    Structs
-
-   \return
-   Number of elements
-*/
-//----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(const std::vector<C_OSCHalcDefStruct> & orc_Structs)
-{
-   uint32 u32_Retval = 0UL;
-
-   for (uint32 u32_ItStruct = 0UL; u32_ItStruct < orc_Structs.size(); ++u32_ItStruct)
-   {
-      u32_Retval += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(orc_Structs[u32_ItStruct]);
-   }
-
-   return u32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Count elements
-
-   \param[in]  orc_Struct  Struct
-
-   \return
-   Number of elements
-*/
-//----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(const C_OSCHalcDefStruct & orc_Struct)
-{
-   uint32 u32_Retval = 0UL;
-
-   if (orc_Struct.c_StructElements.size() > 0UL)
-   {
-      u32_Retval = orc_Struct.c_StructElements.size();
-   }
-   else
-   {
-      u32_Retval = 1UL;
-   }
-   return u32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Count sub elements
 
    \param[in]   ou32_Index          Index
@@ -556,7 +557,7 @@ sint32 C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(const uint32 
       //Passed structs
       for (uint32 u32_ItStruct = 0UL; u32_ItStruct < ou32_Index; ++u32_ItStruct)
       {
-         oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::mh_CountElements(
+         oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
             orc_Values[u32_ItStruct]);
       }
       //Current struct

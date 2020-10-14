@@ -81,11 +81,12 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
 
    if (this->validate(orc_Input, sn_Pos) == QValidator::Intermediate)
    {
+      const QString c_InputValue = this->m_ExtractSpinBoxValue(orc_Input);
       //Restrict to min & max
       if (this->GetIsUnsigned() == true)
       {
          uint64 u64_Value;
-         if (C_OgeSpxInt64AutoFix::mh_GetUValue(orc_Input, u64_Value) == C_NO_ERR)
+         if (C_OgeSpxInt64AutoFix::mh_GetUValue(c_InputValue, u64_Value) == C_NO_ERR)
          {
             const uint64 u64_Min = this->GetMinimum().toULongLong();
             const uint64 u64_Max = this->GetMaximum().toULongLong();
@@ -105,7 +106,7 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
                   std::round(static_cast<float64>(u64_RangeValue) / static_cast<float64>(this->GetStepWidth()));
                u64_Value = u64_Min + (static_cast<uint64>(f64_Steps) * this->GetStepWidth());
             }
-            orc_Input = QString::number(u64_Value);
+            orc_Input = this->m_PrepareSpinBoxValue(QString::number(u64_Value));
          }
          else
          {
@@ -115,7 +116,7 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
       else
       {
          sint64 s64_Value;
-         if (C_OgeSpxInt64AutoFix::mh_GetSValue(orc_Input, s64_Value) == C_NO_ERR)
+         if (C_OgeSpxInt64AutoFix::mh_GetSValue(c_InputValue, s64_Value) == C_NO_ERR)
          {
             const sint64 s64_Min = this->GetMinimum().toLongLong();
             const sint64 s64_Max = this->GetMaximum().toLongLong();
@@ -136,7 +137,7 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
                const float64 f64_RangeOffset = f64_Steps * static_cast<float64>(this->GetStepWidth());
                s64_Value = s64_Min + static_cast<sint64>(f64_RangeOffset);
             }
-            orc_Input = QString::number(s64_Value);
+            orc_Input = this->m_PrepareSpinBoxValue(QString::number(s64_Value));
          }
          else
          {
@@ -167,10 +168,11 @@ QValidator::State C_OgeSpxInt64AutoFix::validate(QString & orc_Input, sintn & or
    QValidator::State e_Retval = C_OgeSpxInt64::validate(orc_Input, orc_Pos);
    if (e_Retval == QValidator::Acceptable)
    {
+      const QString c_ValueOnly = this->m_ExtractSpinBoxValue(orc_Input);
       if (this->GetIsUnsigned() == true)
       {
          uint64 u64_Value;
-         if (C_OgeSpxInt64AutoFix::mh_GetUValue(orc_Input, u64_Value) == C_NO_ERR)
+         if (C_OgeSpxInt64AutoFix::mh_GetUValue(c_ValueOnly, u64_Value) == C_NO_ERR)
          {
             const uint64 u64_Min = this->GetMinimum().toULongLong();
             const uint64 u64_RangeValue = u64_Value - u64_Min;
@@ -192,7 +194,7 @@ QValidator::State C_OgeSpxInt64AutoFix::validate(QString & orc_Input, sintn & or
       else
       {
          sint64 s64_Value;
-         if (C_OgeSpxInt64AutoFix::mh_GetSValue(orc_Input, s64_Value) == C_NO_ERR)
+         if (C_OgeSpxInt64AutoFix::mh_GetSValue(c_ValueOnly, s64_Value) == C_NO_ERR)
          {
             const sint64 s64_Min = this->GetMinimum().toLongLong();
             const uint64 u64_RangeValue = static_cast<uint64>(s64_Value - s64_Min);

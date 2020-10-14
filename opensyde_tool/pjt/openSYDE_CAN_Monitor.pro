@@ -224,7 +224,10 @@ SOURCES += \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.cpp \
     ../src/can_monitor/table_base/C_CamTblDelegate.cpp \
     ../src/can_monitor/message_trace/C_CamMetUtil.cpp \
-    ../src/can_monitor/message_trace/C_CamMetSettingsPopup.cpp
+    ../src/can_monitor/message_trace/C_CamMetSettingsPopup.cpp \
+    ../src/opensyde_gui_elements/combo_box/C_OgeCbxMultiSelect.cpp \
+    ../src/opensyde_gui_elements/label/C_OgeLabElided.cpp \
+    ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/can_monitor/precomp_headers.h
 
@@ -554,7 +557,10 @@ HEADERS  += \
     ../src/opensyde_gui_elements/push_button/C_OgePubMessageOk.h \
     ../src/can_monitor/table_base/C_CamTblDelegate.h \
     ../src/can_monitor/message_trace/C_CamMetUtil.h \
-    ../src/can_monitor/message_trace/C_CamMetSettingsPopup.h
+    ../src/can_monitor/message_trace/C_CamMetSettingsPopup.h \
+    ../src/opensyde_gui_elements/combo_box/C_OgeCbxMultiSelect.h \
+    ../src/opensyde_gui_elements/label/C_OgeLabElided.h \
+    ../src/opensyde_gui_elements/spin_box/C_OgeSpxDoubleAutoFixCustomTrigger.h
 
 FORMS    += \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.ui \

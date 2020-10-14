@@ -82,7 +82,6 @@ void C_SdNdeDpSelectorListDelegate::paint(QPainter * const opc_Painter, const QS
                               this->mpc_ActualWidget->GetDataPoolUsedSize(),
                               this->mpc_ActualWidget->GetDataPoolReservedSize());
          c_ItemWidget.SetShareDatapool(this->mpc_ActualWidget->GetShareDatapool());
-         c_ItemWidget.SetMaximized(this->mpc_ActualWidget->GetMaximized());
          c_ItemWidget.setStyleSheet(this->mpc_ActualWidget->styleSheet());
 
          // rendering of QWidget itself

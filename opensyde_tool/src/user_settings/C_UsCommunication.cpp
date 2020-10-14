@@ -43,13 +43,59 @@ C_UsCommunication::C_UsCommunication(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get overview column width
+
+   \return
+   Overview column width
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<stw_types::sint32> & C_UsCommunication::GetMessageOverviewColumnWidth(void) const
+{
+   return this->mc_MessageOverviewColumnWidth;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get signal overview column width
+
+   \return
+   Overview column width
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<sint32> & C_UsCommunication::GetSignalOverviewColumnWidth(void) const
+{
+   return this->mc_SignalOverviewColumnWidth;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set overview column width
+
+   \param[in]  orc_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsCommunication::SetMessageOverviewColumnWidth(const std::vector<stw_types::sint32> & orc_Value)
+{
+   this->mc_MessageOverviewColumnWidth = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set overview column width
+
+   \param[in]  orc_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsCommunication::SetSignalOverviewColumnWidth(const std::vector<sint32> & orc_Value)
+{
+   this->mc_SignalOverviewColumnWidth = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set last selected message
 
-   \param[in] oe_SelectedProtocol     Currently selected protocol
-   \param[in] oq_MessageSelected      Set flag if there is a selected message
-   \param[in] orc_SelectedMessageName Selected message name if any
-   \param[in] oq_SignalSelected       Flag if signal selected
-   \param[in] orc_SelectedSignalName  Selected signal name if any
+   \param[in]  oe_SelectedProtocol        Currently selected protocol
+   \param[in]  oq_MessageSelected         Set flag if there is a selected message
+   \param[in]  orc_SelectedMessageName    Selected message name if any
+   \param[in]  oq_SignalSelected          Flag if signal selected
+   \param[in]  orc_SelectedSignalName     Selected signal name if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsCommunication::SetMessageSelected(const C_OSCCanProtocol::E_Type oe_SelectedProtocol,
@@ -66,11 +112,11 @@ void C_UsCommunication::SetMessageSelected(const C_OSCCanProtocol::E_Type oe_Sel
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get last selected message
 
-   \param[out] ore_SelectedProtocol    Currently selected protocol
-   \param[out] orq_MessageSelected     Set flag if there is a selected message
-   \param[out] orc_SelectedMessageName Selected message name if any
-   \param[out] orq_SignalSelected      Flag if signal selected
-   \param[out] orc_SelectedSignalName  Selected signal name if any
+   \param[out]  ore_SelectedProtocol      Currently selected protocol
+   \param[out]  orq_MessageSelected       Set flag if there is a selected message
+   \param[out]  orc_SelectedMessageName   Selected message name if any
+   \param[out]  orq_SignalSelected        Flag if signal selected
+   \param[out]  orc_SelectedSignalName    Selected signal name if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsCommunication::GetLastSelectedMessage(C_OSCCanProtocol::E_Type & ore_SelectedProtocol,

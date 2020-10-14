@@ -32,7 +32,8 @@ public:
 
    stw_types::uint32 u32_ContentVersion;
    stw_scl::C_SCLString c_DeviceName;
-   stw_scl::C_SCLString c_FileString;
+   stw_scl::C_SCLString c_FileString;       ///< Content of corresponding HALC definition as string
+   stw_scl::C_SCLString c_OriginalFileName; ///< Original file name of corresponding HALC definition
 
    virtual void Clear(void);
    virtual bool IsClear(void) const;

@@ -35,7 +35,7 @@ public:
 
    stw_types::sintn GetCountLines(void) const;
    stw_types::sintn GetActualLine(void) const;
-   void SetActualLine(const stw_types::sintn osn_Line, const bool oq_SetActive = false);
+   void SetActualLine(const stw_types::sintn osn_Line);
    void ScrollToItem(const stw_types::sintn osn_Index);
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions

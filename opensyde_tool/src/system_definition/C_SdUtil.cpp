@@ -65,11 +65,13 @@ C_SdUtil::C_SdUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Generate node and interface names
 
-   \param[in]   orc_NodeIndices        Node indices (match with interface indices expected)
-   \param[in]   orc_InterfaceIndices   Interface indices (match with node indices expected)
-   \param[out]  orc_Names              Generate node & interface names
-   \param[in]   opc_DatapoolIndices    Optional pointer to Datapool indices (match with node indices expected)
-   \param[out]  opc_DatapoolNames      Optional pointer to found Datapool names
+   \param[in]   orc_NodeIndices            Node indices (match with interface indices expected)
+   \param[in]   orc_InterfaceIndices       Interface indices (match with node indices expected)
+   \param[out]  orc_Names                  Generate node & interface names
+   \param[in]   oq_NameWithInterfaceAlways Flag if the interface name will be added always, or only in case of
+                                           multiple interfaces of node used
+   \param[in]   opc_DatapoolIndices        Optional pointer to Datapool indices (match with node indices expected)
+   \param[out]  opc_DatapoolNames          Optional pointer to found Datapool names
 
    \return
    C_NO_ERR Operation success
@@ -78,6 +80,7 @@ C_SdUtil::C_SdUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
                             const std::vector<uint32> & orc_InterfaceIndices, std::vector<QString> & orc_Names,
+                            const bool oq_NameWithInterfaceAlways,
                             const std::vector<uint32> * const opc_DatapoolIndices,
                             std::vector<QString> * const opc_DatapoolNames)
 {
@@ -89,8 +92,9 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
       // set for all nodes with more than one interface
       std::set<uint32> c_SetNodesWithMultipleItf;
 
-      // detect all nodes with more than one used interface
-      if (orc_NodeIndices.size() > 1)
+      // detect all nodes with more than one used interface if the interface name should not be visible always
+      if ((oq_NameWithInterfaceAlways == false) &&
+          (orc_NodeIndices.size() > 1))
       {
          for (uint32 u32_NodeCounter = 0U; u32_NodeCounter < (orc_NodeIndices.size() - 1UL); ++u32_NodeCounter)
          {
@@ -116,7 +120,8 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
       for (uint32 u32_NodeCounter = 0U; (u32_NodeCounter < orc_NodeIndices.size()) && (s32_Retval == C_NO_ERR);
            ++u32_NodeCounter)
       {
-         if (c_SetNodesWithMultipleItf.find(orc_NodeIndices[u32_NodeCounter]) != c_SetNodesWithMultipleItf.end())
+         if ((oq_NameWithInterfaceAlways == true) ||
+             (c_SetNodesWithMultipleItf.find(orc_NodeIndices[u32_NodeCounter]) != c_SetNodesWithMultipleItf.end()))
          {
             s32_Retval = h_GetName(orc_NodeIndices[u32_NodeCounter], orc_InterfaceIndices[u32_NodeCounter], c_TmpName);
          }
@@ -469,21 +474,30 @@ void C_SdUtil::h_SortIndicesAscending(std::vector<uint32> & orc_IndicesTmp)
 //----------------------------------------------------------------------------------------------------------------------
 uint8 C_SdUtil::h_GetNodeIdMaximum(const uint32 & oru32_NodeIndex)
 {
-   uint8 u8_Retval;
+   uint8 u8_Retval = mu8_MAX_NODE_ID_OS;
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(oru32_NodeIndex);
-   const C_OSCDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
 
-   //openSYDE server and flashloader require max id = 126.
-   if ((pc_DevDef->q_FlashloaderOpenSydeCan == true) || (pc_DevDef->q_DiagnosticProtocolOpenSydeCan == true))
+   if (pc_Node != NULL)
    {
-      //openSYDE max id
-      u8_Retval = mu8_MAX_NODE_ID_OS;
+      const C_OSCNodeProperties & rc_NodeProp = pc_Node->c_Properties;
+
+      if ((rc_NodeProp.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE) &&
+          (rc_NodeProp.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE))
+      {
+         //openSYDE max id
+         u8_Retval = mu8_MAX_NODE_ID_OS;
+      }
+      else
+      {
+         //STW FL / KEFEX (+ no diag protocol support) max id
+         u8_Retval = mu8_MAX_NODE_ID_STW;
+      }
    }
    else
    {
-      //STW / KEFEX max id
-      u8_Retval = mu8_MAX_NODE_ID_STW;
+      tgl_assert(false);
    }
+
    return u8_Retval;
 }
 

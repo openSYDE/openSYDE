@@ -15,6 +15,7 @@
 
 #include "stwtypes.h"
 
+#include "C_OSCNode.h"
 #include "C_OSCCanProtocol.h"
 #include "C_OSCCanMessage.h"
 #include "C_SdBueUnoManager.h"
@@ -43,20 +44,17 @@ public:
    virtual ~C_SdBueComIfDescriptionWidget(void);
 
    void InitStaticNames(void) const;
-   void SetNodeId(const stw_types::uint32 ou32_NodeIndex, const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol,
-                  const stw_types::uint32 ou32_InterfaceIndex);
+   void SetNodeId(const stw_types::uint32 ou32_NodeIndex,
+                  const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol);
+   void SetProtocolByDataPool(const stw_types::uint32 ou32_DataPoolIndexw);
    void SetBusId(const stw_types::uint32 ou32_BusIndex);
-   void Reload(void);
+   void SetInitialFocus(void) const;
    void PartialReload(void);
-   void SelectMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void SelectMessageSearch(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
                             const stw_types::uint32 ou32_ListIndex, const stw_types::uint32 ou32_MessageIndex) const;
 
-   void SelectSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                     const stw_types::uint32 & oru32_SignalIndex) const;
    void SelectSignalSearch(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
                            const stw_types::uint32 ou32_ListIndex, const stw_types::uint32 ou32_ElementIndex) const;
-
    void AddSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                   const stw_types::uint16 ou16_StartBit) const;
    void AddSignalMultiplexed(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -75,6 +73,8 @@ public:
    stw_opensyde_core::C_OSCCanProtocol::E_Type GetActProtocol(void) const;
    void TriggerLoadOfSplitterUserSettings(void) const;
    void TriggerSaveOfSplitterUserSettings(void) const;
+   void SaveUserSettings(void) const;
+   void LoadUserSettings(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -82,6 +82,9 @@ Q_SIGNALS:
    //lint -restore
    void SigChanged(void);
    void SigErrorChange(void) const;
+   // In case of node mode
+   void SigSwitchToBus(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName) const;
+   void SigCommDataPoolAdded(void) const;
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -102,7 +105,14 @@ private:
    void m_DisconnectNodeFromProt(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
 
    void m_ProtocolChanged(void);
+   void m_InterfaceChanged(void);
+   void m_Reload(void);
    void m_ReloadMessages(void);
+   void m_SelectMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
+   void m_SelectSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                       const stw_types::uint32 & oru32_SignalIndex) const;
+   void m_FillNodeDatapoolIndexes(const stw_opensyde_core::C_OSCNode * const opc_Node);
+   static stw_types::sintn mh_GetIndexOfProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol);
    void m_SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol) const;
    void m_SelectMessageProperties(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void m_SelectSignalProperties(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -111,7 +121,7 @@ private:
    void m_OnMessageNameChange(void) const;
    void m_OnSignalNameChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void m_OnSignalStartBitChange(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
-   void m_OnConnectionChange(void) const;
+   void m_OnConnectionChange(void);
    void m_OnSignalCountOfMessageChanged(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_RecheckErrorGlobal(void) const;
    void m_RecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
@@ -119,18 +129,41 @@ private:
    void m_OnMessageCountChanged(void);
    void m_OnMessageRxChanged(void) const;
    void m_OnChange(void);
-   void m_SaveMessageUserSettings(void) const;
-   void m_RestoreMessageUserSettings(void);
    const std::vector<stw_opensyde_core::C_OSCCanMessage> * m_PrepareMessageId(const stw_types::uint32 ou32_NodeIndex,
                                                                               const stw_types::uint32 ou32_DataPoolIndex, const stw_types::uint32 ou32_ListIndex, stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId)
    const;
+   void m_OnLinkSwitchToBus(const QString & orc_Link) const;
+   void m_UpdateText(void);
+   void m_UpdateTabText(void) const;
+   void m_UpdateTabText(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol) const;
+   void m_UpdateInterfaceText(void) const;
+   void m_UpdateInterfaceText(const stw_types::uint32 ou32_InterfaceIndex) const;
+   void m_GetNodeMessageAndSignalCount(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol,
+                                       const stw_types::uint32 ou32_InterfaceIndex,
+                                       stw_types::uint32 & oru32_MessageCount,
+                                       stw_types::uint32 & oru32_SignalCount) const;
 
    Ui::C_SdBueComIfDescriptionWidget * mpc_Ui;
-   stw_types::uint32 mu32_BusIndex;                   // For bus mode
-   stw_types::uint32 mu32_NodeIndex;                  // For single node mode
-   stw_types::uint32 mu32_InterfaceIndex;             // For single node mode
+   stw_types::uint32 mu32_BusIndex;                      // For bus mode
+   stw_types::uint32 mu32_NodeIndex;                     // For single node mode
+   stw_types::uint32 mu32_InterfaceIndex;                // For single node mode
+   std::vector<std::vector<bool> > mc_ProtocolUsedOnBus; // For single node mode
+   // 1st layer is matching to the protocol types
+   // 2nd layer is matching to the combo box entries
+
+   // Information for the interface combo box in node mode
+   std::vector<QString> mc_InterfaceNames;
+   std::vector<QString> mc_BusNames;
+   std::vector<stw_types::uint32> mc_BusIndexes;
+   // First layer is for protocols
+   // In case of node mode second layer is for interface
+   // In case of bus mode second layer has fixed size 1
+   std::vector<std::vector<stw_types::uint32> > mc_MessageCount;
+   std::vector<std::vector<stw_types::uint32> > mc_SignalCount;
+
    std::vector<stw_types::uint32> mc_DatapoolIndexes; // For single node mode
    bool mq_ModeSingleNode;
+   bool mq_LinkOnly;
    bool mq_IndexValid;
    stw_opensyde_gui_logic::C_SdBueUnoManager mc_UndoManager;
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager mc_MessageSyncManager;

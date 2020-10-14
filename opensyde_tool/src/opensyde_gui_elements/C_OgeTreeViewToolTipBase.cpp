@@ -174,3 +174,47 @@ QModelIndex C_OgeTreeViewToolTipBase::m_IndexAtGlobalPos(const QPoint & orc_Glob
 {
    return this->indexAt(this->viewport()->mapFromGlobal(orc_GlobalPos));
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get column widths
+
+   \return
+   column widths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::vector<sint32> C_OgeTreeViewToolTipBase::m_GetColumnWidths() const
+{
+   std::vector<sint32> c_ColumnWidths;
+   c_ColumnWidths.reserve(this->model()->columnCount());
+   for (sint32 s32_ItColumn = 0; s32_ItColumn < this->model()->columnCount(); ++s32_ItColumn)
+   {
+      c_ColumnWidths.push_back(this->columnWidth(s32_ItColumn));
+   }
+   return c_ColumnWidths;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set column widths
+
+   \param[in]  orc_ColumnWidths  Column widths
+
+   \retval   true    column widths were set
+   \retval   false   column widths invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OgeTreeViewToolTipBase::m_SetColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
+{
+   bool q_Retval = false;
+
+   //Only apply user settings if number of expected columns, otherwise this could lead to unexpected behavior
+   if ((orc_ColumnWidths.size() > 0UL) &&
+       (static_cast<uint32>(this->model()->columnCount()) == orc_ColumnWidths.size()))
+   {
+      q_Retval = true;
+      for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
+      {
+         this->setColumnWidth(static_cast<sint32>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
+      }
+   }
+   return q_Retval;
+}

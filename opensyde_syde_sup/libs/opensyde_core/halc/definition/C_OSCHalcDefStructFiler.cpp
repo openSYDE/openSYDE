@@ -735,11 +735,6 @@ sint32 C_OSCHalcDefStructFiler::h_SetType(C_OSCXMLParserBase & orc_XMLParser, C_
                }
             }
             while ((c_BitmaskItemNode == "bitmask-selection") && (s32_Retval == C_NO_ERR));
-            //Check bitmask content
-            if (C_OSCHalcDefStructFiler::mh_CheckInitialBitmaskContentValid(orc_Content) == false)
-            {
-               s32_Retval = C_CONFIG;
-            }
          }
          if (s32_Retval == C_NO_ERR)
          {
@@ -1235,6 +1230,13 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadDataElement(C_OSCHalcDefElement & orc_Ele
                                                c_BaseTypeStr,
                                                orc_Element.GetComplexType() != C_OSCHalcDefContent::eCT_BIT_MASK,
                                                orc_SingleNodeName);
+
+      //Check bitmask content
+      if (C_OSCHalcDefStructFiler::mh_CheckInitialBitmaskContentValid(orc_Element.c_InitialValue) == false)
+      {
+         s32_Retval = C_CONFIG;
+      }
+
       if (s32_Retval == C_NO_ERR)
       {
          C_OSCNodeDataPoolContentUtil::E_ValueChangedTo e_Tmp;
@@ -1250,6 +1252,11 @@ sint32 C_OSCHalcDefStructFiler::mh_LoadDataElement(C_OSCHalcDefElement & orc_Ele
             s32_Retval = C_CONFIG;
          }
       }
+   }
+   //Handle enum min/max
+   if (s32_Retval == C_NO_ERR)
+   {
+      C_OSCHalcDefStructFiler::mh_HandleEnumMinMax(orc_Element);
    }
    return s32_Retval;
 }
@@ -1665,4 +1672,42 @@ stw_scl::C_SCLString C_OSCHalcDefStructFiler::mh_ConvertToHex(const uint64 ou64_
    c_Mask << "0x" << &std::hex << ou64_Value;
    c_Retval = c_Mask.str().c_str();
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle enum min max
+
+   \param[in,out]  orc_Element   Element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcDefStructFiler::mh_HandleEnumMinMax(C_OSCHalcDefElement & orc_Element)
+{
+   if (orc_Element.GetComplexType() == C_OSCHalcDefContent::eCT_ENUM)
+   {
+      const std::map<stw_scl::C_SCLString,
+                     C_OSCNodeDataPoolContent> & rc_Enums = orc_Element.c_InitialValue.GetEnumItems();
+      for (std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>::const_iterator c_It = rc_Enums.begin();
+           c_It != rc_Enums.end(); ++c_It)
+      {
+         if (c_It == rc_Enums.begin())
+         {
+            //Init
+            tgl_assert(orc_Element.c_MinValue.SetEnumValue(c_It->first) == C_NO_ERR);
+            tgl_assert(orc_Element.c_MaxValue.SetEnumValue(c_It->first) == C_NO_ERR);
+         }
+         else
+         {
+            C_OSCHalcDefContent c_Tmp = orc_Element.c_MinValue;
+            tgl_assert(c_Tmp.SetEnumValue(c_It->first) == C_NO_ERR);
+            if (c_Tmp < orc_Element.c_MinValue)
+            {
+               orc_Element.c_MinValue = c_Tmp;
+            }
+            if (c_Tmp > orc_Element.c_MaxValue)
+            {
+               orc_Element.c_MaxValue = c_Tmp;
+            }
+         }
+      }
+   }
 }

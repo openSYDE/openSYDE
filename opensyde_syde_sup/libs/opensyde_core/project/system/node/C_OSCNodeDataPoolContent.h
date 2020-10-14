@@ -36,6 +36,7 @@ public:
    virtual ~C_OSCNodeDataPoolContent(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   virtual void CalcHashElement(stw_types::uint32 & oru32_HashValue, const stw_types::uint32 ou32_Index) const;
 
    enum E_Type ///< Data type
    {

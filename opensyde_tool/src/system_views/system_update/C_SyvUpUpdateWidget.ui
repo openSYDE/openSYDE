@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>907</width>
+    <width>1023</width>
     <height>556</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>3</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
     <number>4</number>
    </property>
    <property name="rightMargin">
-    <number>2</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
@@ -35,10 +35,10 @@
       <number>0</number>
      </property>
      <property name="leftMargin">
-      <number>28</number>
+      <number>20</number>
      </property>
      <property name="rightMargin">
-      <number>30</number>
+      <number>20</number>
      </property>
      <item>
       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_ErrorFrame">
@@ -129,35 +129,29 @@
       <number>20</number>
      </property>
      <property name="leftMargin">
-      <number>28</number>
+      <number>20</number>
      </property>
      <property name="topMargin">
       <number>0</number>
      </property>
      <property name="rightMargin">
-      <number>30</number>
+      <number>20</number>
      </property>
      <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
       <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PbConnect">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="minimumSize">
         <size>
-         <width>220</width>
-         <height>40</height>
+         <width>190</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>220</width>
-         <height>40</height>
+         <width>190</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="text">
@@ -167,22 +161,16 @@
      </item>
      <item>
       <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PbCancel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="minimumSize">
         <size>
-         <width>220</width>
-         <height>40</height>
+         <width>190</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>220</width>
-         <height>40</height>
+         <width>190</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="text">
@@ -192,22 +180,16 @@
      </item>
      <item>
       <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PbUpdate">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="minimumSize">
         <size>
-         <width>220</width>
-         <height>40</height>
+         <width>190</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>220</width>
-         <height>40</height>
+         <width>190</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="text">
@@ -217,22 +199,16 @@
      </item>
      <item>
       <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PbDisconnnect">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="minimumSize">
         <size>
-         <width>220</width>
-         <height>40</height>
+         <width>190</width>
+         <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>220</width>
-         <height>40</height>
+         <width>190</width>
+         <height>16777215</height>
         </size>
        </property>
        <property name="text">
@@ -279,13 +255,13 @@
      <widget class="QWidget" name="pc_WidgetGraphicsView" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="leftMargin">
-        <number>28</number>
+        <number>20</number>
        </property>
        <property name="topMargin">
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>30</number>
+        <number>20</number>
        </property>
        <property name="bottomMargin">
         <number>15</number>
@@ -457,27 +433,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabFrameError</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabFrameError.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeFrame</class>
    <extends>QFrame</extends>
    <header>C_OgeFrame.h</header>
@@ -489,6 +444,22 @@
    <header>C_SebGraphicsView.h</header>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabSvgOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
    <extends>QSplitter</extends>
    <header>C_OgeSpiStandard.h</header>
@@ -498,6 +469,11 @@
    <class>stw_opensyde_gui_elements::C_OgePubUpdate</class>
    <extends>QPushButton</extends>
    <header>C_OgePubUpdate.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabFrameError</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabFrameError.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui::C_SyvUpInformationWidget</class>

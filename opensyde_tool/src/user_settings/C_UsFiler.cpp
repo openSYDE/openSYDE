@@ -172,8 +172,13 @@ void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                             const QString & orc_NodeName, const C_UsNode & orc_Node)
 {
    const QString c_NodeIdName = QString("%1Name").arg(orc_NodeIdBase);
+   const QString c_HALCOvColumnId = QString("%1HALCOverview").arg(orc_NodeIdBase);
+   const QString c_HALCConfigColumnId = QString("%1HALCParamConfig").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedHALCDomain = QString("%1Selected_HALC_domain").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedHALCChannel = QString("%1Selected_HALC_channel").arg(orc_NodeIdBase);
    const QString c_NodeIdDatapoolCount = QString("%1Datapool_count").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedDatapoolName = QString("%1Selected_datapool_name").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedProtocol = QString("%1Selected_protocol").arg(orc_NodeIdBase);
    const QList<QString> c_DatapoolKeyList = orc_Node.GetDatapoolKeysInternal();
    sintn sn_ItDatapool = 0;
 
@@ -181,11 +186,26 @@ void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_NodeIdName.toStdString().c_str(),
                        orc_NodeName.toStdString().c_str());
 
-   //Selected name
+   //Selected datapool name
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_NodeIdSelectedDatapoolName.toStdString().c_str(),
                        orc_Node.GetSelectedDatapoolName().toStdString().c_str());
 
-   //Dashboard count
+   //Selected protocol
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_NodeIdSelectedProtocol.toStdString().c_str(),
+                        static_cast<sintn>(orc_Node.GetSelectedProtocol()));
+
+   //Selected HALC domain & channel
+   orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_NodeIdSelectedHALCDomain.toStdString().c_str(),
+                       orc_Node.GetSelectedHalcDomainName().toStdString().c_str());
+   orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_NodeIdSelectedHALCChannel.toStdString().c_str(),
+                       orc_Node.GetSelectedHalcChannel().toStdString().c_str());
+
+   // HALC columns
+   C_UsFiler::mh_SaveColumns(orc_Ini, orc_SectionName, c_HALCOvColumnId, orc_Node.GetHalcOverviewColumnWidth());
+   C_UsFiler::mh_SaveColumns(orc_Ini, orc_SectionName, c_HALCConfigColumnId, orc_Node.GetHalcConfigColumnWidth());
+
+   //Datapool count
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_NodeIdDatapoolCount.toStdString().c_str(),
                         c_DatapoolKeyList.size());
    for (QList<QString>::const_iterator c_ItDatapoolKey = c_DatapoolKeyList.begin();
@@ -217,6 +237,8 @@ void C_UsFiler::mh_SaveBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionNa
    const QString c_BusIdName = QString("%1Name").arg(orc_BusIdBase);
    const QString c_BusIdSelectedComProtocol =
       QString("%1Selected_com_protocol").arg(orc_BusIdBase);
+   const QString c_BusIdMessageOverview = QString("%1MessageOverview").arg(orc_BusIdBase);
+   const QString c_BusIdSignalOverview = QString("%1SignalOverview").arg(orc_BusIdBase);
    const QString c_BusIdMessageSelected = QString("%1Message_selected").arg(orc_BusIdBase);
    const QString c_BusIdSelectedMessageName = QString("%1Selected_message_name").arg(orc_BusIdBase);
    const QString c_BusIdSignalSelected = QString("%1Signal_selected").arg(orc_BusIdBase);
@@ -235,6 +257,8 @@ void C_UsFiler::mh_SaveBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionNa
    //Other
    orc_Bus.GetLastSelectedMessage(e_SelectedProtocol, q_MessageSelected, c_MessageName, q_SignalSelected, c_SignalName);
 
+   C_UsFiler::mh_SaveColumns(orc_Ini, orc_SectionName, c_BusIdMessageOverview, orc_Bus.GetMessageOverviewColumnWidth());
+   C_UsFiler::mh_SaveColumns(orc_Ini, orc_SectionName, c_BusIdSignalOverview, orc_Bus.GetSignalOverviewColumnWidth());
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
                         c_BusIdSelectedComProtocol.toStdString().c_str(),
                         static_cast<sintn>(e_SelectedProtocol));
@@ -373,7 +397,6 @@ void C_UsFiler::mh_SaveList(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                             const QString & orc_ListName, const C_UsNodeDatapoolList & orc_List)
 {
    const QString c_ListIdName = QString("%1Name").arg(orc_ListIdBase);
-   const QString c_ListIdColumnCount = QString("%1Column_Count").arg(orc_ListIdBase);
    const std::vector<sint32> & rc_ColumnWidths = orc_List.GetColumnWidths();
 
    //Name
@@ -381,14 +404,7 @@ void C_UsFiler::mh_SaveList(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                        c_ListIdName.toStdString().c_str(), orc_ListName.toStdString().c_str());
 
    //ColumnNumber
-   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
-                        c_ListIdColumnCount.toStdString().c_str(), rc_ColumnWidths.size());
-   for (uint32 u32_ItCol = 0; u32_ItCol < rc_ColumnWidths.size(); ++u32_ItCol)
-   {
-      const QString c_ListIdColumn = QString("%1Column%2").arg(orc_ListIdBase).arg(u32_ItCol);
-      orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ListIdColumn.toStdString().c_str(),
-                           rc_ColumnWidths[u32_ItCol]);
-   }
+   C_UsFiler::mh_SaveColumns(orc_Ini, orc_SectionName, orc_ListIdBase, rc_ColumnWidths);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -815,6 +831,9 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
    // Sys def node edit splitter
    orc_Ini.WriteInteger("SdNodeEdit", "SplitterX", orc_UserSettings.GetSdNodeEditSplitterX());
 
+   // Sys def node edit HALC splitter
+   orc_Ini.WriteInteger("SdNodeEdit", "HalcSplitterX", orc_UserSettings.GetSdNodeEditHalcSplitterX());
+
    // Sys def bus edit splitters
    orc_Ini.WriteInteger("SdBusEdit", "TreeSplitterX", orc_UserSettings.GetSdBusEditTreeSplitterX());
    orc_Ini.WriteInteger("SdBusEdit", "TreeSplitterX2", orc_UserSettings.GetSdBusEditTreeSplitterX2());
@@ -847,8 +866,6 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       sint32 s32_SysViewSubMode;
       uint32 u32_SysViewIndex;
       uint32 u32_SysViewFlag;
-      sintn sn_SysDefNodeEditTabIndex;
-      sintn sn_SysDefBusEditTabIndex;
 
       // project specific settings
       // Mode
@@ -903,6 +920,10 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_export_path",
                           orc_UserSettings.GetProjSdTopologyLastKnownExportPath().toStdString().c_str());
 
+      //Last path from where a .syde_devdef file was loaded
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_device_definition_path",
+                          orc_UserSettings.GetProjSdTopologyLastKnownDeviceDefPath().toStdString().c_str());
+
       //RTF File Export
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_rtf_path",
                           orc_UserSettings.GetProjSdTopologyLastKnownRtfPath().toStdString().c_str());
@@ -911,13 +932,19 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_rtf_company_logo_path",
                           orc_UserSettings.GetProjSdTopologyLastKnownRtfCompanyLogoPath().toStdString().c_str());
 
-      // Last tab index in system definition
-      orc_UserSettings.GetProjLastSysDefTabIndex(sn_SysDefNodeEditTabIndex, sn_SysDefBusEditTabIndex);
+      //HALC Paths
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_halc_def_path",
+                          orc_UserSettings.GetLastKnownHalcDefPath().toStdString().c_str());
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_halc_import_path",
+                          orc_UserSettings.GetLastKnownHalcImportPath().toStdString().c_str());
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_halc_export_path",
+                          orc_UserSettings.GetLastKnownHalcExportPath().toStdString().c_str());
 
+      // Last tab index in system definition
       orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value",
-                           sn_SysDefNodeEditTabIndex);
+                           orc_UserSettings.GetProjLastSysDefNodeTabIndex());
       orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdBusEditTabIndex_value",
-                           sn_SysDefBusEditTabIndex);
+                           orc_UserSettings.GetProjLastSysDefBusTabIndex());
 
       //System definition
       orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNode_count", c_NodeKeyList.size());
@@ -979,13 +1006,44 @@ void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                             const QString & orc_NodeName, C_UsHandler & orc_UserSettings)
 {
    QString c_Tmp;
+
+   stw_opensyde_core::C_OSCCanProtocol::E_Type e_Tmp;
+   std::vector<sint32> c_Columns;
+
+   const QString c_HALCOvColumnId = QString("%1HALCOverview").arg(orc_NodeIdBase);
+   const QString c_HALCConfigColumnId = QString("%1HALCParamConfig").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedHALCDomain = QString("%1Selected_HALC_domain").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedHALCChannel = QString("%1Selected_HALC_channel").arg(orc_NodeIdBase);
    const QString c_NodeIdDatapoolCount = QString("%1Datapool_count").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedDatapoolName = QString("%1Selected_datapool_name").arg(orc_NodeIdBase);
+   const QString c_NodeIdSelectedProtocol = QString("%1Selected_protocol").arg(orc_NodeIdBase);
 
-   //Selected name
+   //Selected datapool name
    c_Tmp = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
                               c_NodeIdSelectedDatapoolName.toStdString().c_str(), "").c_str();
    orc_UserSettings.SetProjSdNodeSelectedDatapoolName(orc_NodeName, c_Tmp);
+   //Selected protocol
+   e_Tmp = static_cast<stw_opensyde_core::C_OSCCanProtocol::E_Type>(orc_Ini.ReadInteger(
+                                                                       orc_SectionName.toStdString().c_str(),
+                                                                       c_NodeIdSelectedProtocol.toStdString().c_str(),
+                                                                       0));
+   orc_UserSettings.SetProjSdNodeSelectedProtocol(orc_NodeName, e_Tmp);
+   //Selected HALC domain & channel
+   c_Tmp = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
+                              c_NodeIdSelectedHALCDomain.toStdString().c_str(), "").c_str();
+   orc_UserSettings.SetProjSdNodeSelectedHalcDomain(orc_NodeName, c_Tmp);
+   c_Tmp = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
+                              c_NodeIdSelectedHALCChannel.toStdString().c_str(), "").c_str();
+   orc_UserSettings.SetProjSdNodeSelectedHalcChannel(orc_NodeName, c_Tmp);
+
+   //HALC Columns
+   c_Columns.clear();
+   C_UsFiler::mh_LoadColumns(orc_Ini, orc_SectionName, c_HALCOvColumnId, c_Columns);
+   orc_UserSettings.SetProjSdNodeHalcOverviewColumnWidth(orc_NodeName, c_Columns);
+   c_Columns.clear();
+   C_UsFiler::mh_LoadColumns(orc_Ini, orc_SectionName, c_HALCConfigColumnId, c_Columns);
+   orc_UserSettings.SetProjSdNodeHalcConfigColumnWidth(orc_NodeName, c_Columns);
+
    //Datapool count
    const sintn sn_DatapoolCount = orc_Ini.ReadInteger(
       orc_SectionName.toStdString().c_str(), c_NodeIdDatapoolCount.toStdString().c_str(), 0);
@@ -1017,6 +1075,8 @@ void C_UsFiler::mh_LoadBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionNa
 {
    const QString c_BusIdSelectedComProtocol =
       QString("%1Selected_com_protocol").arg(orc_BusIdBase);
+   const QString c_BusIdMessageOverview = QString("%1MessageOverview").arg(orc_BusIdBase);
+   const QString c_BusIdSignalOverview = QString("%1SignalOverview").arg(orc_BusIdBase);
    const QString c_BusIdMessageSelected = QString("%1Message_selected").arg(orc_BusIdBase);
    const QString c_BusIdSelectedMessageName = QString("%1Selected_message_name").arg(orc_BusIdBase);
    const QString c_BusIdSignalSelected = QString("%1Signal_selected").arg(orc_BusIdBase);
@@ -1027,6 +1087,11 @@ void C_UsFiler::mh_LoadBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionNa
    QString c_MessageName;
    bool q_SignalSelected;
    QString c_SignalName;
+   std::vector<sint32> c_MessageColumns;
+   std::vector<sint32> c_SignalColumns;
+
+   C_UsFiler::mh_LoadColumns(orc_Ini, orc_SectionName, c_BusIdMessageOverview, c_MessageColumns);
+   C_UsFiler::mh_LoadColumns(orc_Ini, orc_SectionName, c_BusIdSignalOverview, c_SignalColumns);
 
    e_SelectedProtocol = static_cast<stw_opensyde_core::C_OSCCanProtocol::E_Type>(orc_Ini.ReadInteger(
                                                                                     orc_SectionName.toStdString().c_str(),
@@ -1043,11 +1108,17 @@ void C_UsFiler::mh_LoadBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionNa
 
    if (oq_IsBus == true)
    {
+      orc_UserSettings.SetProjSdBusCommMessageOverviewColumnWidth(orc_BusName, c_MessageColumns);
+      orc_UserSettings.SetProjSdBusCommSignalOverviewColumnWidth(orc_BusName, c_SignalColumns);
       orc_UserSettings.SetProjSdBusSelectedMessage(orc_BusName, e_SelectedProtocol, q_MessageSelected, c_MessageName,
                                                    q_SignalSelected, c_SignalName);
    }
    else
    {
+      orc_UserSettings.SetProjSdNodeDatapoolCommMessageOverviewColumnWidth(orc_NodeName, orc_DataPoolName, orc_BusName,
+                                                                           c_MessageColumns);
+      orc_UserSettings.SetProjSdNodeDatapoolCommSignalOverviewColumnWidth(orc_NodeName, orc_DataPoolName, orc_BusName,
+                                                                          c_SignalColumns);
       orc_UserSettings.SetProjSdNodeDatapoolListSelectedMessage(orc_NodeName, orc_DataPoolName, orc_BusName,
                                                                 e_SelectedProtocol, q_MessageSelected, c_MessageName,
                                                                 q_SignalSelected, c_SignalName);
@@ -1190,22 +1261,13 @@ void C_UsFiler::mh_LoadList(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                             C_UsHandler & orc_UserSettings)
 {
    const QString c_ListIdName = QString("%1Name").arg(orc_ListIdBase);
-   const QString c_ListIdColumnCount = QString("%1Column_Count").arg(orc_ListIdBase);
    const QString c_ListName = orc_Ini.ReadString(
       orc_SectionName.toStdString().c_str(), c_ListIdName.toStdString().c_str(), "").c_str();
 
    if (c_ListName.compare("") != 0)
    {
       std::vector<sint32> c_ColumnWidths;
-      const sint32 s32_ColumnCount = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
-                                                         c_ListIdColumnCount.toStdString().c_str(), 0);
-      c_ColumnWidths.reserve(s32_ColumnCount);
-      for (sint32 s32_ItCol = 0; s32_ItCol < s32_ColumnCount; ++s32_ItCol)
-      {
-         const QString c_ListIdColumn = QString("%1Column%2").arg(orc_ListIdBase).arg(s32_ItCol);
-         c_ColumnWidths.push_back(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
-                                                      c_ListIdColumn.toStdString().c_str(), 0));
-      }
+      C_UsFiler::mh_LoadColumns(orc_Ini, orc_SectionName, orc_ListIdBase, c_ColumnWidths);
       orc_UserSettings.SetProjSdNodeDatapoolListColumnSizes(orc_NodeName, orc_DataPoolName, c_ListName, c_ColumnWidths);
    }
 }
@@ -1698,6 +1760,10 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "SplitterX", 1000);
    orc_UserSettings.SetSdNodeEditSplitterX(s32_Value);
 
+   // Sys def node edit HALC splitter
+   s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "HalcSplitterX", 400);
+   orc_UserSettings.SetSdNodeEditHalcSplitterX(s32_Value);
+
    // Sys def bus edit splitters
    s32_Value = orc_Ini.ReadInteger("SdBusEdit", "TreeSplitterX", 0);
    orc_UserSettings.SetSdBusEditTreeSplitterX(s32_Value);
@@ -1735,8 +1801,6 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
       sint32 s32_SysViewSubMode;
       uint32 u32_SysViewIndex;
       uint32 u32_SysViewFlag;
-      sintn sn_SysDefNodeEditTabIndex;
-      sintn sn_SysDefBusEditTabIndex;
 
       // Mode
       s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjMode", 0);
@@ -1794,6 +1858,11 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
          orc_Ini.ReadString(
             orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_export_path", "").c_str());
 
+      //Last path from where a .syde_devdef file was loaded
+      orc_UserSettings.SetProjSdTopologyLastKnownDeviceDefPath(
+         orc_Ini.ReadString(
+            orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_device_definition_path", "").c_str());
+
       //RTF File Export
       orc_UserSettings.SetProjSdTopologyLastKnownRtfPath(
          orc_Ini.ReadString(
@@ -1805,13 +1874,19 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
          orc_Ini.ReadString(
             orc_ActiveProject.toStdString().c_str(), "ProjSdTopology_last_known_rtf_company_logo_path", "").c_str());
 
-      // Last tab index in system definition
-      sn_SysDefNodeEditTabIndex = orc_Ini.ReadInteger(
-         orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value", 0);
-      sn_SysDefBusEditTabIndex = orc_Ini.ReadInteger(
-         orc_ActiveProject.toStdString().c_str(), "ProjSdBusEditTabIndex_value", 0);
+      //HALC Paths
+      orc_UserSettings.SetLastKnownHalcDefPath(
+         orc_Ini.ReadString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_halc_def_path", "").c_str());
+      orc_UserSettings.SetLastKnownHalcImportPath(
+         orc_Ini.ReadString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_halc_import_path", "").c_str());
+      orc_UserSettings.SetLastKnownHalcExportPath(
+         orc_Ini.ReadString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_halc_export_path", "").c_str());
 
-      orc_UserSettings.SetProjLastSysDefTabIndex(sn_SysDefNodeEditTabIndex, sn_SysDefBusEditTabIndex);
+      // Last tab index in system definition
+      s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value", 0);
+      orc_UserSettings.SetProjLastSysDefNodeTabIndex(s32_Value);
+      s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdBusEditTabIndex_value", 0);
+      orc_UserSettings.SetProjLastSysDefBusTabIndex(s32_Value);
 
       //System nodes
       sn_SystemNodeCount = orc_Ini.ReadInteger(
@@ -1893,9 +1968,59 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
       orc_UserSettings.SetProjSdTopologyLastKnownRtfCompanyLogoPath("");
 
       // Last tab index in system definition
-      orc_UserSettings.SetProjLastSysDefTabIndex(0, 0);
+      orc_UserSettings.SetProjLastSysDefNodeTabIndex(0);
+      orc_UserSettings.SetProjLastSysDefBusTabIndex(0);
 
       //System nodes, System buses, System views
       orc_UserSettings.ClearMaps();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save columns
+
+   \param[in,out]  orc_Ini             Ini
+   \param[in]      orc_SectionName     Section name
+   \param[in]      orc_IdBase          Id base
+   \param[in]      orc_ColumnWidths    Column widths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_SaveColumns(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_IdBase,
+                               const std::vector<sint32> & orc_ColumnWidths)
+{
+   const QString c_IdColumnCount = QString("%1Column_Count").arg(orc_IdBase);
+
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_IdColumnCount.toStdString().c_str(), orc_ColumnWidths.size());
+   for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
+   {
+      const QString c_IdColumn = QString("%1Column%2").arg(orc_IdBase).arg(u32_ItCol);
+      orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_IdColumn.toStdString().c_str(),
+                           orc_ColumnWidths[u32_ItCol]);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load columns
+
+   \param[in,out]  orc_Ini             Ini
+   \param[in]      orc_SectionName     Section name
+   \param[in]      orc_IdBase          Id base
+   \param[in,out]  orc_ColumnWidths    Column widths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_LoadColumns(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_IdBase,
+                               std::vector<sint32> & orc_ColumnWidths)
+{
+   const QString c_IdColumnCount = QString("%1Column_Count").arg(orc_IdBase);
+   const sint32 s32_ColumnCount = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                                      c_IdColumnCount.toStdString().c_str(), 0);
+
+   orc_ColumnWidths.reserve(s32_ColumnCount);
+   for (sint32 s32_ItCol = 0; s32_ItCol < s32_ColumnCount; ++s32_ItCol)
+   {
+      const QString c_IdColumn = QString("%1Column%2").arg(orc_IdBase).arg(s32_ItCol);
+      orc_ColumnWidths.push_back(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                                     c_IdColumn.toStdString().c_str(), 0));
    }
 }

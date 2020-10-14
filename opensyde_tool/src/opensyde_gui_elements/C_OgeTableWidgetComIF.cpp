@@ -297,7 +297,8 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
    {
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       QHoverEvent * const pc_HoverEvent = dynamic_cast<QHoverEvent * const>(opc_Event);
-      bool q_IpAddressHovered = false; // for pointing-hand-cursor on link to IP address settings
+      bool q_IpAddressHovered = false;  // for pointing-hand-cursor on link to IP address settings
+      bool q_BusBitrateHovered = false; // for pointing-hand-cursor on link to bus property screen
       if (pc_HoverEvent != NULL)
       {
          m_HandleMouseMoveToolTip(this->mapToGlobal(pc_HoverEvent->pos()));
@@ -312,11 +313,24 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
             {
                q_IpAddressHovered = true;
             }
+            else if ((pc_Label != NULL) &&
+                     ((pc_Label->text().contains("kbit/s")) || (pc_Label->text().contains("ETH"))))
+            {
+               q_BusBitrateHovered = true;
+            }
+            else
+            {
+               //nothing to do here
+            }
          }
       }
 
       // change the cursor if a link was hovered
       if (q_IpAddressHovered == true)
+      {
+         this->setCursor(Qt::PointingHandCursor);
+      }
+      else if (q_BusBitrateHovered == true)
       {
          this->setCursor(Qt::PointingHandCursor);
       }

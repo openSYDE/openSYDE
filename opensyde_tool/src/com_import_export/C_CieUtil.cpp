@@ -87,7 +87,7 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_BusIndex, const C_OSCCanProtoco
    //Load user settings value
    QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownImportPath();
    // open file selector with DBC filter
-   const QString c_Filter = QString(C_GtGetText::h_GetText("COMM Interface Description Files")) +
+   const QString c_Filter = QString(C_GtGetText::h_GetText("COMM Messages Files")) +
                             " (*.dbc *.eds *.dcf)";
    sint32 s32_Return = C_NOACT;
 
@@ -98,7 +98,7 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_BusIndex, const C_OSCCanProtoco
    }
 
    const QString c_FullFilePath =
-      C_OgeWiUtil::h_GetOpenFileName(opc_Parent, C_GtGetText::h_GetText("Select COMM Interface Description File"),
+      C_OgeWiUtil::h_GetOpenFileName(opc_Parent, C_GtGetText::h_GetText("Select COMM Messages File"),
                                      c_Folder, c_Filter, "*.dbc");
 
    // check for user abort (empty string)

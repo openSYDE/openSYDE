@@ -64,6 +64,9 @@ protected:
    virtual StepEnabled stepEnabled(void) const override;
    //lint -restore
 
+   QString m_PrepareSpinBoxValue(const QString & orc_Text) const;
+   QString m_ExtractSpinBoxValue(const QString & orc_Text) const;
+
 private:
    bool mq_IsUnsigned;
    QVariant mc_Minimum;
@@ -71,6 +74,7 @@ private:
    QString mc_Suffix;
    stw_types::uint64 mu64_StepWidth;
 
+   void m_SetSpinBoxValue(const QString & orc_Text) const;
    void m_ApplyMinMax(QVariant & orc_Value) const;
    void m_CheckMinMax(const QVariant & orc_Value, bool & orq_IsUnderMinimum, bool & orq_IsOverMaximum) const;
    void m_ResetMinMax(void);

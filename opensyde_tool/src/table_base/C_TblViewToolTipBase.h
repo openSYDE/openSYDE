@@ -40,6 +40,9 @@ protected:
 
    virtual void m_HideToolTip(void);
 
+   std::vector<stw_types::sint32> m_GetColumnWidths(void) const;
+   bool m_SetColumnWidths(const std::vector<stw_types::sint32> & orc_ColumnWidths);
+
 private:
    C_NagToolTip * mpc_ToolTip;
    stw_types::sint32 ms32_HoveredRow;

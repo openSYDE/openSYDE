@@ -212,6 +212,7 @@ QVariant C_SdNdeDpListTableModel::headerData(const sintn osn_Section, const Qt::
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
       {
          c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+         // header font etc. are styled via stylesheets of class C_SdNdeSingleHeaderView
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
       {
@@ -364,36 +365,6 @@ QVariant C_SdNdeDpListTableModel::headerData(const sintn osn_Section, const Qt::
             break;
          }
       }
-      //Deactivate help icon (Kept for future reactivation)
-      //else if (osn_Role == static_cast<sintn>(Qt::DecorationRole))
-      //{
-      //   switch (e_Col)
-      //   {
-      //   case eNAME:
-      //      c_Retval = QPixmap(":/images/IconHelpLight.png");
-      //      break;
-      //   case eINVALID:
-      //   case eINDEX:
-      //   case eICON:
-      //   case eCOMMENT:
-      //   case eVALUE_TYPE:
-      //   case eARRAY_SIZE:
-      //   case eAUTO_MIN_MAX:
-      //   case eMIN:
-      //   case eMAX:
-      //   case eFACTOR:
-      //   case eOFFSET:
-      //   case eUNIT:
-      //   case eDATA_SET:
-      //   case eACCESS:
-      //   case eDATA_SIZE:
-      //   case eADDRESS:
-      //   case eEVENT_CALL:
-      //   case eUNKNOWN:
-      //   default:
-      //      break;
-      //   }
-      //}
       else
       {
          //No data in default case
@@ -1036,16 +1007,11 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
       }
       else if (osn_Role == static_cast<sintn>(Qt::FontRole))
       {
-         QFont c_Font;
+         QFont c_Font = mc_STYLE_GUIDE_FONT_REGULAR_12;
          //Stylesheets do not allow access of specific columns so we need to set fonts manually
          switch (e_Col)
          {
-         case eCOMMENT:
-            c_Font = mc_STYLE_GUIDE_FONT_REGULAR_12;
-            break;
          case eDATA_SET:
-            //Default
-            c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
             if (m_CheckLink(orc_Index) == true)
             {
                //Special link handling
@@ -1054,8 +1020,6 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
             break;
          case eMIN:
          case eMAX:
-            //Default
-            c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
             if (orc_Index.row() >= 0)
             {
                const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
@@ -1079,6 +1043,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
             }
             break;
          case eNAME:
+         case eCOMMENT:
          case eINVALID:
          case eINDEX:
          case eICON:
@@ -1094,7 +1059,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
          case eEVENT_CALL:
          case eUNKNOWN:
          default:
-            c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
+            // no special font adaption in these cases
             break;
          }
          //Convert point to pixel
@@ -1278,7 +1243,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                   if ((((q_NameConflict == true) || (q_NameInvalid == true)) || (q_MinOverMax == true)) ||
                       (q_DataSetInvalid == true))
                   {
-                     c_Tmp.push_back(QString::number(24));
+                     c_Tmp.push_back(QString::number(20)); // icon size
                      //Show error
                      c_Tmp.push_back("://images/Error_iconV2.svg");
                   }
@@ -1288,7 +1253,7 @@ QVariant C_SdNdeDpListTableModel::data(const QModelIndex & orc_Index, const sint
                if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                     e_DataPoolType) == C_NO_ERR)
                {
-                  c_Tmp.push_back(QString::number(20));
+                  c_Tmp.push_back(QString::number(16)); // icon size
                   if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eDIAG)
                   {
                      c_Tmp.push_back(":/images/system_definition/IconVariable.svg");

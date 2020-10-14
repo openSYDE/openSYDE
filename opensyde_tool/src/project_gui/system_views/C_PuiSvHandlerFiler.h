@@ -50,6 +50,12 @@ public:
    static void h_SaveReadRails(const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
                                           C_PuiSvReadDataConfiguration> & orc_Rails,
                                stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 h_LoadLastKnownHalcCrcs(std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                             stw_types::uint32> & orc_Crcs,
+                                                    stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static void h_SaveLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                      stw_types::uint32> & orc_Crcs,
+                                       stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static QString h_GetViewFileName(const QString & orc_ViewName);
 
 private:

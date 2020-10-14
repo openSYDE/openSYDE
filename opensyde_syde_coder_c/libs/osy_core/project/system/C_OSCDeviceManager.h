@@ -38,7 +38,7 @@ public:
    std::vector<C_OSCDeviceGroup> GetDeviceGroups(void) const;
 
    bool WasLoaded(void) const;
-   stw_types::sint32 LoadFromFile(const stw_scl::C_SCLString & orc_File);
+   stw_types::sint32 LoadFromFile(const stw_scl::C_SCLString & orc_File, const bool oq_Optional);
 
    C_OSCDeviceManager(void);
 

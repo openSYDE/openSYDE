@@ -383,10 +383,12 @@ sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
    \param[out]    opq_NodeIdInvalid             true: Node index is not usable
    \param[out]    opq_DataPoolsInvalid          true: error in data pool was detected
    \param[out]    opq_ApplicationsInvalid       true: error in application was detected
+   \param[out]    opq_DomainsInvalid            true: error in HALC configuration was detected
    \param[in]     orq_AllowComDataPoolException true: allow exception to skip check for connected interface
    \param[in,out] opc_InvalidInterfaceIndices   Optional storage for invalid interface indices
    \param[in,out] opc_InvalidDataPoolIndices    Optional storage for invalid datapool indices
    \param[in,out] opc_InvalidApplicationIndices Optional storage for invalid application indices
+   \param[in,out] opc_InvalidDomainIndices      Optional storage for invalid application indices
 
    \return
    C_NO_ERR Operation success
@@ -396,10 +398,12 @@ sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
 sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool * const opq_NameConflict,
                                              bool * const opq_NameInvalid, bool * const opq_NodeIdInvalid,
                                              bool * const opq_DataPoolsInvalid, bool * const opq_ApplicationsInvalid,
+                                             bool * const opq_DomainsInvalid,
                                              const bool & orq_AllowComDataPoolException,
                                              std::vector<uint32> * const opc_InvalidInterfaceIndices,
                                              std::vector<uint32> * const opc_InvalidDataPoolIndices,
-                                             std::vector<uint32> * const opc_InvalidApplicationIndices) const
+                                             std::vector<uint32> * const opc_InvalidApplicationIndices,
+                                             std::vector<uint32> * const opc_InvalidDomainIndices) const
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -618,6 +622,10 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                }
             }
          }
+      }
+      if (opq_DomainsInvalid != NULL)
+      {
+         rc_CheckedNode.CheckHalcConfigValid(opq_DomainsInvalid, opc_InvalidDomainIndices);
       }
    }
    else

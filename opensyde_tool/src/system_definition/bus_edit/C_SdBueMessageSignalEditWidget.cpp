@@ -57,6 +57,7 @@ C_SdBueMessageSignalEditWidget::C_SdBueMessageSignalEditWidget(QWidget * const o
    this->InitStaticNames();
 
    //Init splitter
+   this->mpc_Ui->pc_Splitter->SetMargins(9, 0);
    this->mpc_Ui->pc_Splitter->setStretchFactor(0, 1);
    this->mpc_Ui->pc_Splitter->setStretchFactor(1, 1000);
 

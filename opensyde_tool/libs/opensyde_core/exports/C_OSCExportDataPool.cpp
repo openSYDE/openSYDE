@@ -1053,6 +1053,7 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
       }
       else
       {
+         //we have either a HALC or DIAG DP: technically this results in a DIAGNOSIS DP
          orc_Data.Append("   OSY_DPA_DATA_POOL_TYPE_DIAGNOSIS,");
       }
       orc_Data.Append("   { 0x" + C_SCLString::IntToHex(orc_DataPool.au8_Version[0], 2U) + "U, 0x" +

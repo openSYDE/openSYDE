@@ -93,12 +93,16 @@ private:
    void m_OnCopy(stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source) const;
    void m_OnEditProperties(stw_opensyde_gui_elements::C_OgeWiDashboardTab * const opc_Source);
    void m_CheckError(void) const;
+   void m_AdaptSpaceHolderWidgetColor(void) const;
+
    //Avoid call
    C_SyvDaTearOffWidget(const C_SyvDaTearOffWidget &);
    C_SyvDaTearOffWidget & operator =(const C_SyvDaTearOffWidget &);
 
    Ui::C_SyvDaTearOffWidget * mpc_Ui;
    C_SyvDaDashboardWidget * mpc_Dashboard;
+   bool mq_EditModeActive;
+   bool mq_DarkModeActive;
 };
 }
 

@@ -109,12 +109,12 @@ C_SdNdeDpListTableView::C_SdNdeDpListTableView(QWidget * const opc_Parent) :
 
    //Row Height
    this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-   this->verticalHeader()->setMinimumSectionSize(40);
-   this->verticalHeader()->setMaximumSectionSize(40);
-   this->verticalHeader()->setDefaultSectionSize(40);
+   this->verticalHeader()->setMinimumSectionSize(30);
+   this->verticalHeader()->setMaximumSectionSize(30);
+   this->verticalHeader()->setDefaultSectionSize(30);
 
    // Icon
-   this->setIconSize(QSize(20, 20));
+   this->setIconSize(QSize(16, 16));
 
    //Hide vertical header
    this->verticalHeader()->hide();
@@ -1219,7 +1219,7 @@ void C_SdNdeDpListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 
                   pc_ArrayEditWidget->SetModelViewManager(this->mpc_ModelViewManager);
                   //Resize
-                  c_Dialog->SetSize(QSize(937, 330));
+                  c_Dialog->SetSize(QSize(871, 318));
                   if (c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
                   {
                      //Register undo
@@ -1317,7 +1317,7 @@ void C_SdNdeDpListTableView::m_OnColumnResize(void)
             //Stylesheet to make complete checkbox area interact-able
             c_Style = QString("stw_opensyde_gui--C_SdNdeDpListTableView::indicator {"
                               "width: %1px;"
-                              "height: 40px;"
+                              "height: 30px;"
                               "}").arg(this->ms32_LastIndicatorSize);
             this->setStyleSheet(c_Style);
          }
@@ -1382,12 +1382,7 @@ void C_SdNdeDpListTableView::m_HandleColumnStateSave(void) const
 
       if (((pc_Node != NULL) && (pc_NodeDataPool != NULL)) && (pc_NodeDataPoolList != NULL))
       {
-         std::vector<sint32> c_ColumnWidths;
-         c_ColumnWidths.reserve(this->model()->columnCount());
-         for (sint32 s32_ItColumn = 0; s32_ItColumn < this->model()->columnCount(); ++s32_ItColumn)
-         {
-            c_ColumnWidths.push_back(this->columnWidth(s32_ItColumn));
-         }
+         const std::vector<sint32> c_ColumnWidths = this->m_GetColumnWidths();
          C_UsHandler::h_GetInstance()->SetProjSdNodeDatapoolListColumnSizes(
             pc_Node->c_Properties.c_Name.c_str(), pc_NodeDataPool->c_Name.c_str(),
             pc_NodeDataPoolList->c_Name.c_str(), c_ColumnWidths);
@@ -1407,7 +1402,7 @@ void C_SdNdeDpListTableView::m_HandleColumnStateRestore(void)
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
       if (pc_Model != NULL)
       {
-         bool q_RestoreDefault = true;
+         bool q_UserSettingsApplied = false;
          const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
          const C_OSCNodeDataPool * const pc_NodeDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex);
@@ -1421,22 +1416,13 @@ void C_SdNdeDpListTableView::m_HandleColumnStateRestore(void)
             const C_UsNodeDatapool c_UserDataPool = c_UserNode.GetDatapool(pc_NodeDataPool->c_Name.c_str());
             const C_UsNodeDatapoolList c_UserList = c_UserDataPool.GetOtherList(pc_NodeDataPoolList->c_Name.c_str());
             const std::vector<sint32> & rc_ColumnWidths = c_UserList.GetColumnWidths();
-            //Only apply user settings if number of expected columns, otherwise this could lead to unexpected behavior
-            if ((rc_ColumnWidths.size() > 0UL) &&
-                (static_cast<uint32>(pc_Model->columnCount()) == rc_ColumnWidths.size()))
-            {
-               q_RestoreDefault = false;
-               for (uint32 u32_ItCol = 0; u32_ItCol < rc_ColumnWidths.size(); ++u32_ItCol)
-               {
-                  this->setColumnWidth(static_cast<sint32>(u32_ItCol), rc_ColumnWidths[u32_ItCol]);
-               }
-            }
+            q_UserSettingsApplied = this->m_SetColumnWidths(rc_ColumnWidths);
          }
-         if (q_RestoreDefault == true)
+         if (q_UserSettingsApplied == false)
          {
             //Table size
-            this->setColumnWidth(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eINVALID), 32);
-            this->setColumnWidth(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eICON), 26);
+            this->setColumnWidth(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eINVALID), 45);
+            this->setColumnWidth(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eICON), 20);
             this->setColumnWidth(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eINDEX), 50);
             this->setColumnWidth(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eNAME), 225);
             this->setColumnWidth(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eCOMMENT), 248);

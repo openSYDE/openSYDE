@@ -54,7 +54,7 @@ public:
    void InitStaticNames(void) const;
    void RegisterExpandOrCollapse(const bool & orq_Expanded) const;
    void CheckError(void);
-   void VariablesSizeChange(void);
+   void UpdateUI(void);
    void UpdateDataSetCount(void);
    void NotifySelection(const bool & orq_Selected);
    void SetEditFocus(void);
@@ -66,9 +66,7 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void SigNewHeight(const C_SdNdeDpListHeaderWidget * const opc_Item);
    void SigExpand(const C_SdNdeDpListHeaderWidget * const opc_Item, const bool oq_Expand);
-   void SigUpdateAddress(void);
    void SigErrorChange(void);
    void SigClose(void);
    void SigSave(void);
@@ -93,13 +91,11 @@ private:
    QTimer mc_DoubleClickTimer;
 
    void m_OnPushButtonExpandClicked(const bool oq_Checked);
-   void m_HandleWidgetResize(const stw_types::uint32 ou32_NewHeight);
    void m_UpdateListNamePrefix(void) const;
    void m_HandleFocus(void);
-   void m_HandleTextEditFocus(const bool oq_Active);
    void m_UpdateUi(void);
    void m_EditNameFinished(void);
-   void m_EditCommentFinished(void);
+   void m_OnEditCommentClicked(void);
    void m_EditSizeFinished(void);
    void m_OpenDataSetEdit(void);
    void m_ChangeName(void) const;

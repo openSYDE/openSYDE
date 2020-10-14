@@ -49,23 +49,28 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_ViewIndex Index of view
-   \param[in]     ou32_DataIndex Index of dashboard
-   \param[in]     orc_Name       Name of dashboard
-   \param[in,out] opc_Widget     Optional dashboard widget to integrate instead of creating a new one
-   \param[in,out] opc_Parent     Optional pointer to parent
+   \param[in]      ou32_ViewIndex   Index of view
+   \param[in]      ou32_DataIndex   Index of dashboard
+   \param[in]      orc_Name         Name of dashboard
+   \param[in,out]  opc_Widget       Optional dashboard widget to integrate instead of creating a new one
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const stw_types::uint32 ou32_DataIndex,
                                            const QString & orc_Name, C_SyvDaDashboardWidget * const opc_Widget,
                                            QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   mpc_Ui(new Ui::C_SyvDaTearOffWidget)
+   mpc_Ui(new Ui::C_SyvDaTearOffWidget),
+   mq_EditModeActive(false),
+   mq_DarkModeActive(false)
 {
    const C_PuiSvData * pc_View;
    QHBoxLayout * pc_Layout;
 
    mpc_Ui->setupUi(this);
+
+   // Style
+   this->mpc_Ui->pc_WidgetWhite->SetBackgroundColor(0);
 
    //Style error label
    this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(24);
@@ -187,7 +192,7 @@ uint32 C_SyvDaTearOffWidget::GetIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set data index
 
-   \param[in] ou32_Value New data index
+   \param[in]  ou32_Value  New data index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetDataIndex(const uint32 ou32_Value)
@@ -222,11 +227,13 @@ C_SyvDaDashboardWidget * C_SyvDaTearOffWidget::GetWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the edit mode
 
-   \param[in]     oq_Active      Flag for edit mode
+   \param[in]  oq_Active   Flag for edit mode
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetEditMode(const bool oq_Active)
 {
+   this->mq_EditModeActive = oq_Active;
+
    this->mpc_Ui->pc_BackgroundWidget->SetEditBackground(oq_Active);
 
    this->mpc_Dashboard->SetEditMode(oq_Active);
@@ -235,8 +242,7 @@ void C_SyvDaTearOffWidget::SetEditMode(const bool oq_Active)
    {
       //Handle button
       this->mpc_Ui->pc_PbConfirm->SetSvg("://images/system_views/IconConfirm.svg");
-      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(22, 22));
-      this->mpc_Ui->pc_PbConfirm->SetMargins(12, 20);
+      this->mpc_Ui->pc_PbConfirm->SetMargins(10, 20);
       this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
    }
    else
@@ -244,8 +250,7 @@ void C_SyvDaTearOffWidget::SetEditMode(const bool oq_Active)
       //Handle button
       this->mpc_Ui->pc_PbConfirm->SetSvg("://images/main_page_and_navi_bar/IconEdit.svg",
                                          "://images/IconEditDisabledBright.svg");
-      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(24, 24));
-      this->mpc_Ui->pc_PbConfirm->SetMargins(16, 25);
+      this->mpc_Ui->pc_PbConfirm->SetMargins(10, 28); // put a bit more space in between
       this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Edit"));
 
       //Also should remember settings
@@ -253,28 +258,32 @@ void C_SyvDaTearOffWidget::SetEditMode(const bool oq_Active)
    }
 
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBox, "Edit", oq_Active);
+   this->m_AdaptSpaceHolderWidgetColor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the dark mode
 
-   \param[in] oq_Active Dark mode active
+   \param[in]  oq_Active   Dark mode active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetDarkMode(const bool oq_Active)
 {
+   this->mq_DarkModeActive = oq_Active;
+
    if (this->mpc_Dashboard != NULL)
    {
       this->mpc_Dashboard->SetDarkMode(oq_Active);
    }
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBox, "DarkMode", oq_Active);
    this->mpc_Ui->pc_WidgetTab->SetDarkMode(oq_Active);
+   this->m_AdaptSpaceHolderWidgetColor();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the confirm button enabled or disabled
 
-   \param[in] oq_Enabled   Flag for enabled
+   \param[in]  oq_Enabled  Flag for enabled
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetEnabled(const bool oq_Enabled) const
@@ -297,8 +306,8 @@ void C_SyvDaTearOffWidget::Save(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle manual user operation finished event
 
-   \param[in] os32_Result Operation result
-   \param[in] ou8_NRC     Negative response code, if any
+   \param[in]  os32_Result    Operation result
+   \param[in]  ou8_NRC        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
@@ -312,8 +321,8 @@ void C_SyvDaTearOffWidget::HandleManualOperationFinished(const sint32 os32_Resul
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Signal all widgets which read rail element ID registrations failed
 
-   \param[in]     orc_FailedIdRegisters    Failed IDs
-   \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
+   \param[in]      orc_FailedIdRegisters     Failed IDs
+   \param[in,out]  orc_FailedIdErrorDetails  Error details for element IDs which failed registration (if any)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetErrorForFailedCyclicElementIdRegistrations(
@@ -330,7 +339,7 @@ void C_SyvDaTearOffWidget::SetErrorForFailedCyclicElementIdRegistrations(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
-   \param[in]     orc_ComDriver    Com driver containing information about all data dealer
+   \param[in]  orc_ComDriver  Com driver containing information about all data dealer
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) const
@@ -344,9 +353,9 @@ void C_SyvDaTearOffWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Information about the start or stop of a connection
 
-   \param[in] oq_Active        Flag if connection is active or not active now
-   \param[in] oq_WidgetTabOnly Optional flag if tab widget should be adapted to the connection change
-                                (use if scene was already changed)
+   \param[in]  oq_Active         Flag if connection is active or not active now
+   \param[in]  oq_WidgetTabOnly  Optional flag if tab widget should be adapted to the connection change
+                                 (use if scene was already changed)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::ConnectionActiveChanged(const bool oq_Active, const bool oq_WidgetTabOnly) const
@@ -388,7 +397,7 @@ void C_SyvDaTearOffWidget::UpdateTransmissionConfiguration(void) const
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::paintEvent(QPaintEvent * const opc_Event)
@@ -401,7 +410,7 @@ void C_SyvDaTearOffWidget::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten close event slot
 
-   \param[in,out] opc_Event    Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::closeEvent(QCloseEvent * const opc_Event)
@@ -419,8 +428,8 @@ void C_SyvDaTearOffWidget::closeEvent(QCloseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle active flag changed
 
-   \param[in] opc_Source Signal source widget
-   \param[in] oq_Active  New active flag
+   \param[in]  opc_Source  Signal source widget
+   \param[in]  oq_Active   New active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::m_OnActiveChange(C_OgeWiDashboardTab * const opc_Source, const bool oq_Active)
@@ -445,7 +454,7 @@ void C_SyvDaTearOffWidget::m_OnActiveChange(C_OgeWiDashboardTab * const opc_Sour
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy dashboard content
 
-   \param[in] opc_Source Signal source widget
+   \param[in]  opc_Source  Signal source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::m_OnCopy(C_OgeWiDashboardTab * const opc_Source) const
@@ -474,7 +483,7 @@ void C_SyvDaTearOffWidget::m_OnCopy(C_OgeWiDashboardTab * const opc_Source) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Open popup to edit dashboard tab properties
 
-   \param[in] opc_Source Signal source widget
+   \param[in]  opc_Source  Signal source widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_Source)
@@ -539,5 +548,21 @@ void C_SyvDaTearOffWidget::m_CheckError(void) const
       {
          this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(false);
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt space holder widget color
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaTearOffWidget::m_AdaptSpaceHolderWidgetColor(void) const
+{
+   if ((this->mq_EditModeActive == true) && (this->mq_DarkModeActive == true))
+   {
+      this->mpc_Ui->pc_WidgetWhite->SetBackgroundColor(52);
+   }
+   else
+   {
+      this->mpc_Ui->pc_WidgetWhite->SetBackgroundColor(0);
    }
 }

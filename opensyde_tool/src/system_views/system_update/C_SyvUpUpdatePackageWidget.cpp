@@ -53,6 +53,10 @@ C_SyvUpUpdatePackageWidget::C_SyvUpUpdatePackageWidget(QWidget * const opc_Paren
    // Init UI
    mpc_Ui->setupUi(this);
 
+   this->mpc_Ui->pc_LabelTitle->SetBackgroundColor(0);
+   this->mpc_Ui->pc_LabelTitle->SetForegroundColor(3);
+   this->mpc_Ui->pc_LabelTitle->SetFontPixel(18, false, true);
+
    this->mpc_Ui->pc_PushButtonClearAll->SetIconSize(24);
    this->mpc_Ui->pc_PushButtonImport->SetIconSize(24);
    this->mpc_Ui->pc_PushButtonExport->SetIconSize(24);

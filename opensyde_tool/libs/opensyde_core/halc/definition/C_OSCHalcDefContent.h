@@ -40,14 +40,18 @@ public:
    stw_types::sint32 AddEnumItem(const stw_scl::C_SCLString & orc_DisplayName,
                                  const C_OSCNodeDataPoolContent & orc_Value);
    stw_types::sint32 SetEnumValue(const stw_scl::C_SCLString & orc_DisplayName);
+   stw_types::sint32 GetEnumValue(stw_scl::C_SCLString & orc_DisplayName);
    const std::map<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> & GetEnumItems(void) const;
 
    void AddBitmaskItem(const C_OSCHalcDefContentBitmaskItem & orc_Value);
    const std::vector<C_OSCHalcDefContentBitmaskItem> & GetBitmaskItems(void) const;
+   void GetBitmaskStatusValues(std::vector<stw_scl::C_SCLString> * const opc_Displays,
+                               std::vector<bool> * const opc_Values) const;
    stw_types::sint32 GetBitmask(const stw_scl::C_SCLString & orc_DisplayName, bool & orq_Value) const;
    stw_types::sint32 SetBitmask(const stw_scl::C_SCLString & orc_DisplayName, const bool oq_Value);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+   virtual void CalcHashElement(stw_types::uint32 & oru32_HashValue, const stw_types::uint32 ou32_Index) const;
 
 private:
    E_ComplexType me_ComplexType;

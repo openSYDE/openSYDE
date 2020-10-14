@@ -1096,6 +1096,70 @@ void C_PuiSvData::OnSyncNodeAdded(const uint32 ou32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Sync view node indices to HALC change
+
+   \param[in]  ou32_Index        Index
+   \param[in]  orc_MapCurToNew   Map cur to new
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvData::OnSyncNodeHALC(const uint32 ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                                         C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew)
+{
+   QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_NewItems;
+   for (uint32 u32_ItDashboard = 0; u32_ItDashboard < this->mc_Dashboards.size(); ++u32_ItDashboard)
+   {
+      C_PuiSvDashboard & rc_Dashboard = this->mc_Dashboards[u32_ItDashboard];
+      rc_Dashboard.OnSyncNodeHALC(ou32_Index, orc_MapCurToNew);
+   }
+   //Read rail assignments
+   for (QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration>::iterator c_ItReadItem =
+           this->mc_ReadRailAssignments.begin();
+        c_ItReadItem != this->mc_ReadRailAssignments.end(); ++c_ItReadItem)
+   {
+      if (ou32_Index == c_ItReadItem.key().u32_NodeIndex)
+      {
+         C_OSCNodeDataPool::E_Type e_Type;
+         if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(c_ItReadItem.key().u32_NodeIndex,
+                                                              c_ItReadItem.key().u32_DataPoolIndex, e_Type) == C_NO_ERR)
+         {
+            if (e_Type == C_OSCNodeDataPool::eHALC)
+            {
+               //Manual compare because only base is necessary
+               for (std::map<C_PuiSvDbNodeDataPoolListElementId,
+                             C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_ItMap =
+                       orc_MapCurToNew.begin();
+                    c_ItMap != orc_MapCurToNew.end(); ++c_ItMap)
+               {
+                  if ((((c_ItMap->first.u32_NodeIndex == c_ItReadItem.key().u32_NodeIndex) &&
+                        (c_ItMap->first.u32_DataPoolIndex == c_ItReadItem.key().u32_DataPoolIndex)) &&
+                       (c_ItMap->first.u32_ListIndex == c_ItReadItem.key().u32_ListIndex)) &&
+                      (c_ItMap->first.u32_ElementIndex == c_ItReadItem.key().u32_ElementIndex))
+                  {
+                     c_NewItems.insert(c_ItMap->second, c_ItReadItem.value());
+                     break;
+                  }
+               }
+            }
+            else
+            {
+               c_NewItems.insert(c_ItReadItem.key(), c_ItReadItem.value());
+            }
+         }
+         else
+         {
+            c_NewItems.insert(c_ItReadItem.key(), c_ItReadItem.value());
+         }
+      }
+      else
+      {
+         c_NewItems.insert(c_ItReadItem.key(), c_ItReadItem.value());
+      }
+   }
+   this->mc_ReadRailAssignments.clear();
+   this->mc_ReadRailAssignments = c_NewItems;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sync view node indices to deleted node index
 
    \param[in]  ou32_Index  Deleted node index

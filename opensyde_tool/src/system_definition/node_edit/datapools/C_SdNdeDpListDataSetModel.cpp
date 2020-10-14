@@ -282,24 +282,6 @@ QVariant C_SdNdeDpListDataSetModel::data(const QModelIndex & orc_Index, const si
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::FontRole))
-      {
-         QFont c_Font;
-         switch (e_Col)
-         {
-         case eNAME:
-            c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
-            break;
-         case eCOMMENT:
-            c_Font = mc_STYLE_GUIDE_FONT_REGULAR_12;
-            break;
-         default:
-            break;
-         }
-         //Convert point to pixel
-         c_Font.setPixelSize(c_Font.pointSize());
-         c_Retval = c_Font;
-      }
       else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
       {
          //Stylesheets do not allow access of specific columns so we need to set t manually

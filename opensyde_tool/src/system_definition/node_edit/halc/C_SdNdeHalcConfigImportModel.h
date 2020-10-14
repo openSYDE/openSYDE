@@ -30,7 +30,6 @@ class C_SdNdeHalcConfigImportItem :
 {
 public:
    C_SdNdeHalcConfigImportItem(void);
-   bool q_UseParentIndex; // Flag if the item has a parent and its indexes should be used instead of its own indexes
    stw_types::uint32 u32_ImportIndex;
    Qt::CheckState e_CheckState;
 
@@ -60,6 +59,10 @@ public:
    //lint -restore
 
 private:
+   void m_CheckChildren(C_SdNdeHalcConfigImportItem * const opc_TreeItem, const QModelIndex & orc_ItemIndex,
+                        QModelIndex & orc_EndIndex);
+   void m_CheckParent(const C_SdNdeHalcConfigImportItem * const opc_TreeItem, const QModelIndex & orc_ItemIndex,
+                      QModelIndex & orc_StartIndex);
    void m_CleanUpLastModel(void);
 
    stw_opensyde_core::C_OSCHalcConfig mc_ConfigCopy;

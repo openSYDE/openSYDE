@@ -91,6 +91,8 @@ public:
 
    stw_types::sint32 GetDataPoolIndex(const C_OSCNodeDataPool::E_Type oe_DataPoolType,
                                       const stw_types::uint32 ou32_DataPoolTypeIndex) const;
+   stw_types::sint32 GetDataPoolTypeIndex(const stw_types::uint32 ou32_DataPoolIndex) const;
+   stw_types::uint32 GetDataPoolCount(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_DataPoolType) const;
 
    static bool h_CompareNameGreater(const C_OSCNode & orc_Node1, const C_OSCNode & orc_Node2);
    stw_types::uint32 GetListsSize(void) const;
@@ -130,6 +132,8 @@ public:
                           const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
    stw_types::sint32 CheckApplicationProcessIdValid(const stw_types::uint32 ou32_ApplicationIndex,
                                                     bool & orq_Valid) const;
+   void CheckHalcConfigValid(bool * const opq_ConfigInvalid,
+                             std::vector<stw_types::uint32> * const opc_InvalidDomainIndices) const;
    void ReCalcCanProtocolDataPoolIndices(void);
    bool IsAnyUpdateAvailable(void) const;
    bool IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const;

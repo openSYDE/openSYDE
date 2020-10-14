@@ -14,6 +14,7 @@
 
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "CSCLChecksums.h"
 #include "C_OSCHalcConfig.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -37,8 +38,86 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfig::C_OSCHalcConfig(void)
+C_OSCHalcConfig::C_OSCHalcConfig(void) :
+   mq_SafeDatablockAssigned(false),
+   mu32_SafeDatablockIndex(0UL),
+   mq_UnsafeDatablockAssigned(false),
+   mu32_UnsafeDatablockIndex(0UL)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get safe datablock assigned
+
+   \return
+   Safe datablock assigned
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCHalcConfig::GetSafeDatablockAssigned() const
+{
+   return mq_SafeDatablockAssigned;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get safe datablock index
+
+   \return
+   Safe datablock index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::uint32 C_OSCHalcConfig::GetSafeDatablockIndex() const
+{
+   return mu32_SafeDatablockIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get unsafe datablock assigned
+
+   \return
+   Unsafe datablock assigned
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCHalcConfig::GetUnsafeDatablockAssigned() const
+{
+   return mq_UnsafeDatablockAssigned;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get unsafe datablock index
+
+   \return
+   Unsafe datablock index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::uint32 C_OSCHalcConfig::GetUnsafeDatablockIndex() const
+{
+   return mu32_UnsafeDatablockIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set safe datablock assigned
+
+   \param[in]  oq_IsSet       Is set
+   \param[in]  ou32_NewValue  New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfig::SetSafeDatablockAssigned(const bool oq_IsSet, const uint32 ou32_NewValue)
+{
+   this->mq_SafeDatablockAssigned = oq_IsSet;
+   this->mu32_SafeDatablockIndex = ou32_NewValue;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set unsafe datablock assigned
+
+   \param[in]  oq_IsSet       Is set
+   \param[in]  ou32_NewValue  New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfig::SetUnsafeDatablockAssigned(const bool oq_IsSet, const uint32 ou32_NewValue)
+{
+   this->mq_UnsafeDatablockAssigned = oq_IsSet;
+   this->mu32_UnsafeDatablockIndex = ou32_NewValue;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,6 +185,25 @@ void C_OSCHalcConfig::Clear()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Checks if the HALC configuration is clear or if it has a loaded definition/configuration
+
+   \retval   true    Definition is cleared. No definition is loaded.
+   \retval   false   The definition is not cleared. A concrete definition is loaded.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCHalcConfig::IsClear(void) const
+{
+   bool q_Return = C_OSCHalcDefBase::IsClear();
+
+   if (q_Return == true)
+   {
+      q_Return = (this->mc_Domains.size() == 0);
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add domain
 
    \param[in]  orc_Domain  Domain
@@ -147,15 +245,11 @@ sint32 C_OSCHalcConfig::SetDomainConfig(const uint32 ou32_Index, const C_OSCHalc
 
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  oq_Active            Active
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  orc_Name             Name
    \param[in]  orc_Comment          Comment
    \param[in]  oq_SafetyRelevant    Safety relevant
-   \param[in]  oq_DatablockSet      Datablock set
-   \param[in]  ou32_DatablockIndex  Datablock index
-   \param[in]  oq_UseCaseSet        Use case set
    \param[in]  ou32_UseCaseIndex    Use case index
-   \param[in]  orc_DatablockConfig  Datablock config
 
    \return
    C_NO_ERR Operation success
@@ -163,33 +257,37 @@ sint32 C_OSCHalcConfig::SetDomainConfig(const uint32 ou32_Index, const C_OSCHalc
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfig::SetDomainChannelConfig(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-                                               const bool oq_Active, const stw_scl::C_SCLString & orc_Name,
+                                               const bool oq_UseChannelIndex, const stw_scl::C_SCLString & orc_Name,
                                                const stw_scl::C_SCLString & orc_Comment, const bool oq_SafetyRelevant,
-                                               const bool oq_DatablockSet, const uint32 ou32_DatablockIndex,
-                                               const bool oq_UseCaseSet, const uint32 ou32_UseCaseIndex,
-                                               const std::vector<C_OSCHalcConfigChannel::E_DataBlockConfig> & orc_DatablockConfig)
+                                               const uint32 ou32_UseCaseIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (ou32_DomainIndex < this->mc_Domains.size())
    {
       C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+      if (oq_UseChannelIndex)
       {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
-         rc_Channel.q_Active = oq_Active;
-         rc_Channel.c_Name = orc_Name;
-         rc_Channel.c_Comment = orc_Comment;
-         rc_Channel.q_SafetyRelevant = oq_SafetyRelevant;
-         rc_Channel.q_DatablockSet = oq_DatablockSet;
-         rc_Channel.u32_DatablockIndex = ou32_DatablockIndex;
-         rc_Channel.q_UseCaseSet = oq_UseCaseSet;
-         rc_Channel.u32_UseCaseIndex = ou32_UseCaseIndex;
-         rc_Channel.c_DatablockConfig = orc_DatablockConfig;
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            rc_Channel.c_Name = orc_Name;
+            rc_Channel.c_Comment = orc_Comment;
+            rc_Channel.q_SafetyRelevant = oq_SafetyRelevant;
+            rc_Channel.u32_UseCaseIndex = ou32_UseCaseIndex;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
       else
       {
-         s32_Retval = C_RANGE;
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
+         rc_Channel.c_Name = orc_Name;
+         rc_Channel.c_Comment = orc_Comment;
+         rc_Channel.q_SafetyRelevant = oq_SafetyRelevant;
+         rc_Channel.u32_UseCaseIndex = ou32_UseCaseIndex;
       }
    }
    else
@@ -200,33 +298,32 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfig(const uint32 ou32_DomainIndex, co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set domain channel config active
+/*! \brief  Reset domain channel config
 
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  oq_Active            Active
+   \param[in]  oq_UseChannelIndex   Use channel index
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcConfig::SetDomainChannelConfigActive(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-                                                     const bool oq_Active)
+sint32 C_OSCHalcConfig::ResetDomainChannelConfig(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+                                                 const bool oq_UseChannelIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (ou32_DomainIndex < this->mc_Domains.size())
    {
       C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+      if (oq_UseChannelIndex)
       {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
-         rc_Channel.q_Active = oq_Active;
+         s32_Retval = rc_Domain.ResetChannelToDefault(ou32_ChannelIndex);
       }
       else
       {
-         s32_Retval = C_RANGE;
+         rc_Domain.ResetDomainToDefault();
       }
    }
    else
@@ -241,6 +338,7 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigActive(const uint32 ou32_DomainInd
 
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  orc_Name             Name
 
    \return
@@ -249,21 +347,29 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigActive(const uint32 ou32_DomainInd
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfig::SetDomainChannelConfigName(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-                                                   const stw_scl::C_SCLString & orc_Name)
+                                                   const bool oq_UseChannelIndex, const stw_scl::C_SCLString & orc_Name)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (ou32_DomainIndex < this->mc_Domains.size())
    {
       C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+      if (oq_UseChannelIndex)
       {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
-         rc_Channel.c_Name = orc_Name;
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            rc_Channel.c_Name = orc_Name;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
       else
       {
-         s32_Retval = C_RANGE;
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
+         rc_Channel.c_Name = orc_Name;
       }
    }
    else
@@ -278,6 +384,7 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigName(const uint32 ou32_DomainIndex
 
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  orc_Comment          Comment
 
    \return
@@ -286,6 +393,7 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigName(const uint32 ou32_DomainIndex
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfig::SetDomainChannelConfigComment(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+                                                      const bool oq_UseChannelIndex,
                                                       const stw_scl::C_SCLString & orc_Comment)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -293,14 +401,22 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigComment(const uint32 ou32_DomainIn
    if (ou32_DomainIndex < this->mc_Domains.size())
    {
       C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+      if (oq_UseChannelIndex)
       {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
-         rc_Channel.c_Comment = orc_Comment;
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            rc_Channel.c_Comment = orc_Comment;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
       else
       {
-         s32_Retval = C_RANGE;
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
+         rc_Channel.c_Comment = orc_Comment;
       }
    }
    else
@@ -315,6 +431,7 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigComment(const uint32 ou32_DomainIn
 
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  oq_SafetyRelevant    Safety relevant
 
    \return
@@ -323,60 +440,29 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigComment(const uint32 ou32_DomainIn
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfig::SetDomainChannelConfigSafety(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-                                                     const bool oq_SafetyRelevant)
+                                                     const bool oq_UseChannelIndex, const bool oq_SafetyRelevant)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (ou32_DomainIndex < this->mc_Domains.size())
    {
       C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+      if (oq_UseChannelIndex)
       {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            rc_Channel.q_SafetyRelevant = oq_SafetyRelevant;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
          rc_Channel.q_SafetyRelevant = oq_SafetyRelevant;
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
-      }
-   }
-   else
-   {
-      s32_Retval = C_RANGE;
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set domain channel config datablock
-
-   \param[in]  ou32_DomainIndex     Domain index
-   \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  oq_DatablockSet      Datablock set
-   \param[in]  ou32_DatablockIndex  Datablock index
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcConfig::SetDomainChannelConfigDatablock(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-                                                        const bool oq_DatablockSet, const uint32 ou32_DatablockIndex)
-{
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (ou32_DomainIndex < this->mc_Domains.size())
-   {
-      C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
-      {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
-         rc_Channel.q_DatablockSet = oq_DatablockSet;
-         rc_Channel.u32_DatablockIndex = ou32_DatablockIndex;
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
       }
    }
    else
@@ -391,7 +477,7 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigDatablock(const uint32 ou32_Domain
 
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  oq_UseCaseSet        Use case set
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  ou32_UseCaseIndex    Use case index
 
    \return
@@ -400,60 +486,29 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigDatablock(const uint32 ou32_Domain
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfig::SetDomainChannelConfigUseCase(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-                                                      const bool oq_UseCaseSet, const uint32 ou32_UseCaseIndex)
+                                                      const bool oq_UseChannelIndex, const uint32 ou32_UseCaseIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
 
    if (ou32_DomainIndex < this->mc_Domains.size())
    {
       C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+      if (oq_UseChannelIndex)
       {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
-         rc_Channel.q_UseCaseSet = oq_UseCaseSet;
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            rc_Channel.u32_UseCaseIndex = ou32_UseCaseIndex;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
          rc_Channel.u32_UseCaseIndex = ou32_UseCaseIndex;
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
-      }
-   }
-   else
-   {
-      s32_Retval = C_RANGE;
-   }
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set domain channel config datablock config
-
-   \param[in]  ou32_DomainIndex     Domain index
-   \param[in]  ou32_ChannelIndex    Channel index
-   \param[in]  orc_DatablockConfig  Datablock config
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcConfig::SetDomainChannelConfigDatablockConfig(const uint32 ou32_DomainIndex,
-                                                              const uint32 ou32_ChannelIndex,
-                                                              const std::vector<C_OSCHalcConfigChannel::E_DataBlockConfig> & orc_DatablockConfig)
-{
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (ou32_DomainIndex < this->mc_Domains.size())
-   {
-      C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
-      {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
-         rc_Channel.c_DatablockConfig = orc_DatablockConfig;
-      }
-      else
-      {
-         s32_Retval = C_RANGE;
       }
    }
    else
@@ -469,6 +524,7 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigDatablockConfig(const uint32 ou32_
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
    \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  orc_Parameter        Parameter
 
    \return
@@ -477,7 +533,7 @@ sint32 C_OSCHalcConfig::SetDomainChannelConfigDatablockConfig(const uint32 ou32_
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCHalcConfig::SetDomainChannelParameterConfig(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-                                                        const uint32 ou32_ParameterIndex,
+                                                        const uint32 ou32_ParameterIndex, const bool oq_UseChannelIndex,
                                                         const C_OSCHalcConfigParameterStruct & orc_Parameter)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -485,12 +541,19 @@ sint32 C_OSCHalcConfig::SetDomainChannelParameterConfig(const uint32 ou32_Domain
    if (ou32_DomainIndex < this->mc_Domains.size())
    {
       C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+      if (oq_UseChannelIndex)
       {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
-         if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
          {
-            rc_Channel.c_Parameters[ou32_ParameterIndex] = orc_Parameter;
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+            {
+               rc_Channel.c_Parameters[ou32_ParameterIndex] = orc_Parameter;
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
          }
          else
          {
@@ -499,7 +562,15 @@ sint32 C_OSCHalcConfig::SetDomainChannelParameterConfig(const uint32 ou32_Domain
       }
       else
       {
-         s32_Retval = C_RANGE;
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
+         if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+         {
+            rc_Channel.c_Parameters[ou32_ParameterIndex] = orc_Parameter;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
    }
    else
@@ -516,6 +587,7 @@ sint32 C_OSCHalcConfig::SetDomainChannelParameterConfig(const uint32 ou32_Domain
    \param[in]  ou32_ChannelIndex    Channel index
    \param[in]  ou32_ParameterIndex  Parameter index
    \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_UseChannelIndex   Use channel index
    \param[in]  orc_Parameter        Parameter
 
    \return
@@ -527,6 +599,7 @@ sint32 C_OSCHalcConfig::SetDomainChannelParameterConfigElement(const uint32 ou32
                                                                const uint32 ou32_ChannelIndex,
                                                                const uint32 ou32_ParameterIndex,
                                                                const uint32 ou32_ElementIndex,
+                                                               const bool oq_UseChannelIndex,
                                                                const C_OSCHalcConfigParameter & orc_Parameter)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -534,9 +607,36 @@ sint32 C_OSCHalcConfig::SetDomainChannelParameterConfigElement(const uint32 ou32
    if (ou32_DomainIndex < this->mc_Domains.size())
    {
       C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
-      if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+      if (oq_UseChannelIndex)
       {
-         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+            {
+               C_OSCHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
+               if (ou32_ElementIndex < rc_Struct.c_ParameterElements.size())
+               {
+                  rc_Struct.c_ParameterElements[ou32_ElementIndex] = orc_Parameter;
+               }
+               else
+               {
+                  s32_Retval = C_RANGE;
+               }
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
          if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
          {
             C_OSCHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
@@ -554,9 +654,103 @@ sint32 C_OSCHalcConfig::SetDomainChannelParameterConfigElement(const uint32 ou32
             s32_Retval = C_RANGE;
          }
       }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set domain channel parameter config element plain value
+
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_UseChannelIndex   Use channel index
+   \param[in]  orc_Value            Value
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfig::SetDomainChannelParameterConfigElementPlain(const uint32 ou32_DomainIndex,
+                                                                    const uint32 ou32_ChannelIndex,
+                                                                    const uint32 ou32_ParameterIndex,
+                                                                    const uint32 ou32_ElementIndex,
+                                                                    const bool oq_UseChannelIndex,
+                                                                    const C_OSCHalcDefContent & orc_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_DomainIndex < this->mc_Domains.size())
+   {
+      C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
+      if (oq_UseChannelIndex)
+      {
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+            {
+               C_OSCHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
+               if (rc_Struct.c_ParameterElements.size() > 0UL)
+               {
+                  if (ou32_ElementIndex < rc_Struct.c_ParameterElements.size())
+                  {
+                     C_OSCHalcConfigParameter & rc_Element = rc_Struct.c_ParameterElements[ou32_ElementIndex];
+                     rc_Element.c_Value = orc_Value;
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
+                  }
+               }
+               else
+               {
+                  rc_Struct.c_Value = orc_Value;
+               }
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
       else
       {
-         s32_Retval = C_RANGE;
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
+         if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+         {
+            C_OSCHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
+            if (rc_Struct.c_ParameterElements.size() > 0UL)
+            {
+               if (ou32_ElementIndex < rc_Struct.c_ParameterElements.size())
+               {
+                  C_OSCHalcConfigParameter & rc_Element = rc_Struct.c_ParameterElements[ou32_ElementIndex];
+                  rc_Element.c_Value = orc_Value;
+               }
+               else
+               {
+                  s32_Retval = C_RANGE;
+               }
+            }
+            else
+            {
+               rc_Struct.c_Value = orc_Value;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
    }
    else
@@ -564,6 +758,353 @@ sint32 C_OSCHalcConfig::SetDomainChannelParameterConfigElement(const uint32 ou32
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set domain channel parameter config element
+
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_UseChannelIndex   Use channel index
+   \param[in]  orc_DisplayName      Display name
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+   C_CONFIG Enum content invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfig::SetDomainChannelParameterConfigElementEnum(const uint32 ou32_DomainIndex,
+                                                                   const uint32 ou32_ChannelIndex,
+                                                                   const uint32 ou32_ParameterIndex,
+                                                                   const uint32 ou32_ElementIndex,
+                                                                   const bool oq_UseChannelIndex,
+                                                                   const stw_scl::C_SCLString & orc_DisplayName)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_DomainIndex < this->mc_Domains.size())
+   {
+      C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
+      if (oq_UseChannelIndex)
+      {
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+            {
+               C_OSCHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
+               if (rc_Struct.c_ParameterElements.size() > 0UL)
+               {
+                  if (ou32_ElementIndex < rc_Struct.c_ParameterElements.size())
+                  {
+                     C_OSCHalcConfigParameter & rc_Element = rc_Struct.c_ParameterElements[ou32_ElementIndex];
+                     s32_Retval = rc_Element.c_Value.SetEnumValue(orc_DisplayName);
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
+                  }
+               }
+               else
+               {
+                  s32_Retval = rc_Struct.c_Value.SetEnumValue(orc_DisplayName);
+               }
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
+         if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+         {
+            C_OSCHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
+            if (rc_Struct.c_ParameterElements.size() > 0UL)
+            {
+               if (ou32_ElementIndex < rc_Struct.c_ParameterElements.size())
+               {
+                  C_OSCHalcConfigParameter & rc_Element = rc_Struct.c_ParameterElements[ou32_ElementIndex];
+                  s32_Retval = rc_Element.c_Value.SetEnumValue(orc_DisplayName);
+               }
+               else
+               {
+                  s32_Retval = C_RANGE;
+               }
+            }
+            else
+            {
+               s32_Retval = rc_Struct.c_Value.SetEnumValue(orc_DisplayName);
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set domain channel parameter config element
+
+   \param[in]  ou32_DomainIndex     Domain index
+   \param[in]  ou32_ChannelIndex    Channel index
+   \param[in]  ou32_ParameterIndex  Parameter index
+   \param[in]  ou32_ElementIndex    Element index
+   \param[in]  oq_UseChannelIndex   Use channel index
+   \param[in]  orc_DisplayName      Display name
+   \param[in]  oq_Value             Value
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+   C_CONFIG Type invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfig::SetDomainChannelParameterConfigElementBitmask(const uint32 ou32_DomainIndex,
+                                                                      const uint32 ou32_ChannelIndex,
+                                                                      const uint32 ou32_ParameterIndex,
+                                                                      const uint32 ou32_ElementIndex,
+                                                                      const bool oq_UseChannelIndex,
+                                                                      const stw_scl::C_SCLString & orc_DisplayName,
+                                                                      const bool oq_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_DomainIndex < this->mc_Domains.size())
+   {
+      C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
+      if (oq_UseChannelIndex)
+      {
+         if (ou32_ChannelIndex < rc_Domain.c_ChannelConfigs.size())
+         {
+            C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[ou32_ChannelIndex];
+            if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+            {
+               C_OSCHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
+               if (rc_Struct.c_ParameterElements.size() > 0UL)
+               {
+                  if (ou32_ElementIndex < rc_Struct.c_ParameterElements.size())
+                  {
+                     C_OSCHalcConfigParameter & rc_Element = rc_Struct.c_ParameterElements[ou32_ElementIndex];
+                     s32_Retval = rc_Element.c_Value.SetBitmask(orc_DisplayName, oq_Value);
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
+                  }
+               }
+               else
+               {
+                  s32_Retval = rc_Struct.c_Value.SetBitmask(orc_DisplayName, oq_Value);
+               }
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_DomainConfig;
+         if (ou32_ParameterIndex < rc_Channel.c_Parameters.size())
+         {
+            C_OSCHalcConfigParameterStruct & rc_Struct = rc_Channel.c_Parameters[ou32_ParameterIndex];
+            if (rc_Struct.c_ParameterElements.size() > 0UL)
+            {
+               if (ou32_ElementIndex < rc_Struct.c_ParameterElements.size())
+               {
+                  C_OSCHalcConfigParameter & rc_Element = rc_Struct.c_ParameterElements[ou32_ElementIndex];
+                  s32_Retval = rc_Element.c_Value.SetBitmask(orc_DisplayName, oq_Value);
+               }
+               else
+               {
+                  s32_Retval = C_RANGE;
+               }
+            }
+            else
+            {
+               s32_Retval = rc_Struct.c_Value.SetBitmask(orc_DisplayName, oq_Value);
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get relevant indices for selected use case
+
+   \param[in]      ou32_DomainIndex       Domain index
+   \param[in]      ou32_ChannelIndex      Channel index
+   \param[in]      oq_UseChannelIndex     Use channel index
+   \param[in,out]  opc_ParameterIndices   Parameter indices
+   \param[in,out]  opc_InputIndices       Input indices
+   \param[in,out]  opc_OutputIndices      Output indices
+   \param[in,out]  opc_StatusIndices      Status indices
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCHalcConfig::GetRelevantIndicesForSelectedUseCase(const uint32 ou32_DomainIndex,
+                                                             const uint32 ou32_ChannelIndex,
+                                                             const bool oq_UseChannelIndex,
+                                                             std::vector<uint32> * const opc_ParameterIndices,
+                                                             std::vector<uint32> * const opc_InputIndices,
+                                                             std::vector<uint32> * const opc_OutputIndices,
+                                                             std::vector<uint32> * const opc_StatusIndices) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_DomainIndex < this->mc_Domains.size())
+   {
+      const C_OSCHalcConfigDomain & rc_Domain = this->mc_Domains[ou32_DomainIndex];
+      rc_Domain.GetRelevantIndicesForSelectedUseCase(ou32_ChannelIndex, oq_UseChannelIndex, opc_ParameterIndices,
+                                                     opc_InputIndices, opc_OutputIndices, opc_StatusIndices);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check config valid
+
+   \param[out]     opq_DomainsInvalid        Domains invalid
+   \param[in,out]  opc_InvalidDomainIndices  Invalid domain indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfig::CheckConfigValid(bool * const opq_DomainsInvalid,
+                                       std::vector<uint32> * const opc_InvalidDomainIndices) const
+{
+   if (opq_DomainsInvalid != NULL)
+   {
+      *opq_DomainsInvalid = false;
+
+      for (uint32 u32_ItDomain = 0; u32_ItDomain < this->mc_Domains.size(); u32_ItDomain++)
+      {
+         bool q_DomainInvalid;
+         bool q_ChannelsInvalid;
+
+         this->CheckDomainConfigValid(u32_ItDomain, &q_DomainInvalid, &q_ChannelsInvalid, NULL);
+
+         if ((q_DomainInvalid == true) || (q_ChannelsInvalid == true))
+         {
+            *opq_DomainsInvalid = true;
+
+            // remember index of invalid domain
+            if (opc_InvalidDomainIndices != NULL)
+            {
+               opc_InvalidDomainIndices->push_back(u32_ItDomain);
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check domain channel config valid
+
+   \param[in]      ou32_DomainIndex             Domain index
+   \param[out]     opq_DomainInvalid            Domain invalid flag
+   \param[out]     opq_ChannelsInvalid          Channels invalid
+   \param[in,out]  opc_InvalidChannelIndices    Invalid channel indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCHalcConfig::CheckDomainConfigValid(const uint32 ou32_DomainIndex, bool * const opq_DomainInvalid,
+                                             bool * const opq_ChannelsInvalid,
+                                             std::vector<uint32> * const opc_InvalidChannelIndices) const
+{
+   if (ou32_DomainIndex < this->mc_Domains.size())
+   {
+      const C_OSCHalcConfigDomain & rc_CheckedDomain = this->mc_Domains[ou32_DomainIndex];
+
+      // check domain configuration itself
+      if (opq_DomainInvalid != NULL)
+      {
+         *opq_DomainInvalid = false;
+
+         bool q_DomainInvalid;
+         rc_CheckedDomain.c_DomainConfig.CheckConfigValid(&q_DomainInvalid);
+         if (q_DomainInvalid == true)
+         {
+            *opq_DomainInvalid = true;
+         }
+      }
+
+      // check all channels
+      if (opq_ChannelsInvalid != NULL)
+      {
+         *opq_ChannelsInvalid = false;
+
+         for (uint32 u32_ItChannel = 0; u32_ItChannel < rc_CheckedDomain.c_ChannelConfigs.size(); u32_ItChannel++)
+         {
+            bool q_NameConflict;
+            bool q_NameInvalid;
+
+            const C_OSCHalcConfigChannel & rc_CheckedChannel = rc_CheckedDomain.c_ChannelConfigs[u32_ItChannel];
+
+            // check channel
+            rc_CheckedChannel.CheckConfigValid(&q_NameInvalid);
+
+            // check name conflict
+            rc_CheckedDomain.CheckChannelNameUnique(u32_ItChannel, &q_NameConflict);
+
+            // result
+            if ((q_NameConflict == true) || (q_NameInvalid == true))
+            {
+               *opq_ChannelsInvalid = true;
+               if (opc_InvalidChannelIndices != NULL)
+               {
+                  opc_InvalidChannelIndices->push_back(u32_ItChannel);
+               }
+            }
+         }
+      }
+   }
+   else
+   {
+      if (opq_DomainInvalid != NULL)
+      {
+         *opq_DomainInvalid = false;
+      }
+      if (opq_ChannelsInvalid != NULL)
+      {
+         *opq_ChannelsInvalid = false;
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -578,6 +1119,15 @@ sint32 C_OSCHalcConfig::SetDomainChannelParameterConfigElement(const uint32 ou32
 void C_OSCHalcConfig::CalcHash(uint32 & oru32_HashValue) const
 {
    C_OSCHalcDefBase::CalcHash(oru32_HashValue);
+
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_SafeDatablockAssigned, sizeof(this->mq_SafeDatablockAssigned),
+                                      oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mu32_SafeDatablockIndex, sizeof(this->mu32_SafeDatablockIndex),
+                                      oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_UnsafeDatablockAssigned, sizeof(this->mq_UnsafeDatablockAssigned),
+                                      oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mu32_UnsafeDatablockIndex, sizeof(this->mu32_UnsafeDatablockIndex),
+                                      oru32_HashValue);
 
    for (uint32 u32_It = 0UL; u32_It < this->mc_Domains.size(); ++u32_It)
    {

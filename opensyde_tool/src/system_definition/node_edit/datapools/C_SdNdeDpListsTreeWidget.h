@@ -59,7 +59,6 @@ public:
    bool CheckDataPoolFull(void) const;
    void OpenDetail(const stw_types::sint32 os32_ListIndex, const stw_types::sint32 os32_DataElementIndex);
    void UpdateModels(void);
-   void RegisterSizeChange(void);
    void HandleErrorChange(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -110,7 +109,6 @@ private:
    void m_Move(const std::vector<stw_types::uint32> & oru32_SourceIndices,
                const std::vector<stw_types::uint32> & oru32_TargetIndices);
    void m_InitFromData(void);
-   void m_UpdateAddress(void);
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
    void m_SetupContextMenu(void);
    void m_OnCollapse(const QModelIndex & orc_Index) const;
@@ -118,7 +116,6 @@ private:
    void m_HandleDataSetErrorChange(const stw_types::uint32 & oru32_NodeIndex,
                                    const stw_types::uint32 & oru32_DataPoolIndex,
                                    const stw_types::uint32 & oru32_ListIndex) const;
-   void m_HandleSizeChange(void);
    void m_HandleTableSelection(const stw_types::uint32 & oru32_ListIndex, const stw_types::uint32 & oru32_Count);
    std::vector<stw_types::uint32> m_GetSelectedIndices(void) const;
    void m_OnButtonChange(const bool & orq_AddActive, const bool & orq_CutActive, const bool & orq_CopyActive,
@@ -135,7 +132,6 @@ private:
                              const stw_types::uint32 & oru32_ListIndex) const;
    void m_ScrollBarRangeChanged(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
    stw_types::uint32 m_GetOneAfterHighestSelected(void) const;
-   void m_OnErrorChangePossible(const bool & orq_Error);
    void m_ClearTableSelection(const stw_types::sint32 & ors32_Exception = -1) const;
    void m_HandleExclusiveListSelection(const stw_types::uint32 & oru32_ListIndex) const;
 

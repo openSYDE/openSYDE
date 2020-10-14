@@ -34,8 +34,8 @@ public:
    static stw_types::sint32 h_Load(C_OSCProject & orc_Project, const stw_scl::C_SCLString & orc_Path);
 
 private:
-   static stw_types::sint32 m_SaveInternal(C_OSCProject & orc_Project, const stw_scl::C_SCLString & orc_Path,
-                                           const stw_scl::C_SCLString & orc_OpenSYDEVersion, const bool oq_New);
+   static stw_types::sint32 mh_SaveInternal(C_OSCProject & orc_Project, const stw_scl::C_SCLString & orc_Path,
+                                            const stw_scl::C_SCLString & orc_OpenSYDEVersion, const bool oq_New);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

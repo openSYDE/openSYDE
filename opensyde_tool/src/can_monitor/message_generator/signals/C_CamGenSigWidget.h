@@ -46,26 +46,17 @@ public:
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
-
 Q_SIGNALS:
    //lint -restore
    void SigUpdateMessageData(const stw_types::uint32 ou32_MessageIndex);
    void SigTriggerModelUpdateCyclicMessage(const stw_types::uint32 ou32_MessageIndex, const bool oq_Active);
 
-protected:
-   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
-   //lint -save -e1960
-   virtual void resizeEvent(QResizeEvent * const opc_Event) override;
-   //lint -restore
-
 private:
    Ui::C_CamGenSigWidget * mpc_Ui;
    stw_types::uint32 mu32_NumSelectedItems;
    stw_types::uint32 mu32_Row;
-   QString mc_DynamicName;
 
    void m_Reset(void);
-   void m_SetDynamicNameElided(void);
 
    //Avoid call
    C_CamGenSigWidget(const C_CamGenSigWidget &);

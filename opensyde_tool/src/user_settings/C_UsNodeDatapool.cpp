@@ -52,7 +52,7 @@ const std::vector<QString> & C_UsNodeDatapool::GetExpandedListNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set system definition node datapool expanded list names
 
-   \param[in] orc_Value New system definition node datapool expanded list names
+   \param[in]  orc_Value   New system definition node datapool expanded list names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetExpandedListNames(const std::vector<QString> & orc_Value)
@@ -75,7 +75,7 @@ const std::vector<QString> & C_UsNodeDatapool::GetSelectedListNames() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set system definition node datapool selected list names
 
-   \param[in] orc_Value New system definition node datapool selected list names
+   \param[in]  orc_Value   New system definition node datapool selected list names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetSelectedListNames(const std::vector<QString> & orc_Value)
@@ -98,7 +98,7 @@ const std::vector<QString> & C_UsNodeDatapool::GetSelectedVariableNames(void) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set system definition node datapool selected variable names
 
-   \param[in] orc_Value New system definition node datapool selected variable names
+   \param[in]  orc_Value   New system definition node datapool selected variable names
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetSelectedVariableNames(const std::vector<QString> & orc_Value)
@@ -121,7 +121,7 @@ const QList<QString> C_UsNodeDatapool::GetInterfaceSettingsKeysInternal(void) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get list user settings
 
-   \param[in] orc_ListName List name (identifier)
+   \param[in]  orc_ListName   List name (identifier)
 
    \return
    List user settings
@@ -133,14 +133,60 @@ C_UsCommunication C_UsNodeDatapool::GetCommList(const QString & orc_ListName) co
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set comm overview column width
+
+   \param[in]  orc_ListName   List name
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNodeDatapool::SetCommMessageOverviewColumnWidth(const QString & orc_ListName,
+                                                         const std::vector<stw_types::sint32> & orc_Value)
+{
+   if (this->mc_InterfaceSettings.contains(orc_ListName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_InterfaceSettings.operator [](orc_ListName).SetMessageOverviewColumnWidth(orc_Value);
+   }
+   else
+   {
+      C_UsCommunication c_Bus;
+      c_Bus.SetMessageOverviewColumnWidth(orc_Value);
+      this->mc_InterfaceSettings.insert(orc_ListName, c_Bus);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set comm signal overview column width
+
+   \param[in]  orc_ListName   List name
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNodeDatapool::SetCommSignalOverviewColumnWidth(const QString & orc_ListName,
+                                                        const std::vector<stw_types::sint32> & orc_Value)
+{
+   if (this->mc_InterfaceSettings.contains(orc_ListName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_InterfaceSettings.operator [](orc_ListName).SetSignalOverviewColumnWidth(orc_Value);
+   }
+   else
+   {
+      C_UsCommunication c_Bus;
+      c_Bus.SetSignalOverviewColumnWidth(orc_Value);
+      this->mc_InterfaceSettings.insert(orc_ListName, c_Bus);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set list last selected message
 
-   \param[in] orc_ListName            List name (identifier)
-   \param[in] oe_SelectedProtocol     Currently selected protocol
-   \param[in] oq_MessageSelected      Set flag if there is a selected message
-   \param[in] orc_SelectedMessageName Selected message name if any
-   \param[in] oq_SignalSelected       Flag if signal selected
-   \param[in] orc_SelectedSignalName  Selected signal name if any
+   \param[in]  orc_ListName               List name (identifier)
+   \param[in]  oe_SelectedProtocol        Currently selected protocol
+   \param[in]  oq_MessageSelected         Set flag if there is a selected message
+   \param[in]  orc_SelectedMessageName    Selected message name if any
+   \param[in]  oq_SignalSelected          Flag if signal selected
+   \param[in]  orc_SelectedSignalName     Selected signal name if any
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetListSelectedMessage(const QString & orc_ListName,
@@ -180,7 +226,7 @@ const QList<QString> C_UsNodeDatapool::GetListSettingsKeysInternal() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get list user settings
 
-   \param[in] orc_ListName List name (identifier)
+   \param[in]  orc_ListName   List name (identifier)
 
    \return
    List user settings
@@ -194,8 +240,8 @@ C_UsNodeDatapoolList C_UsNodeDatapool::GetOtherList(const QString & orc_ListName
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set list column widths
 
-   \param[in] orc_ListName     Project system definition node datapool list name (identifier)
-   \param[in] orc_ColumnWidths Last known column widths
+   \param[in]  orc_ListName      Project system definition node datapool list name (identifier)
+   \param[in]  orc_ColumnWidths  Last known column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetListColumnSizes(const QString & orc_ListName,

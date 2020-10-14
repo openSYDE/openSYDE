@@ -75,8 +75,6 @@ C_SdNdeDbViewWidget::C_SdNdeDbViewWidget(QWidget * const opc_Parent) :
            &C_SdNdeDbViewWidget::m_OnAppDisplay);
    connect(this->mpc_Ui->pc_PushButtonAdd, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked, this,
            &C_SdNdeDbViewWidget::AddApp);
-   connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigReloadDataPools, this,
-           &C_SdNdeDbViewWidget::SigReloadDataPools);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigOpenDataPool, this,
            &C_SdNdeDbViewWidget::SigOpenDataPool);
    connect(this->mpc_Ui->pc_PushButtonCodeGenerationOptions, &QPushButton::clicked, this,

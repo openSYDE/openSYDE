@@ -38,7 +38,7 @@ public:
    C_SdUtil(void);
    static stw_types::sint32 h_GetNames(const std::vector<stw_types::uint32> & orc_NodeIndices,
                                        const std::vector<stw_types::uint32> & orc_InterfaceIndices,
-                                       std::vector<QString> & orc_Names,
+                                       std::vector<QString> & orc_Names, const bool oq_NameWithInterfaceAlways,
                                        const std::vector<stw_types::uint32> * const opc_DatapoolIndices = NULL,
                                        std::vector<QString> * const opc_DatapoolNames = NULL);
    static stw_types::sint32 h_GetName(const stw_types::uint32 & oru32_NodeIndex, QString & orc_Name);

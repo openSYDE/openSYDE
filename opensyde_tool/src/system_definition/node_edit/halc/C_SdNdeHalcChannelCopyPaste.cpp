@@ -56,22 +56,20 @@ void C_SdNdeHalcChannelCopyPaste::h_Copy(const uint32 ou32_NodeIndex, const QMod
    uint32 u32_DomainIndex;
    uint32 u32_ChannelIndex;
    bool q_ChannelCase;
+   const C_OSCHalcConfig * pc_Config;
 
    C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(orc_CurrentChannel, u32_DomainIndex, u32_ChannelIndex,
                                                            q_ChannelCase);
 
-   if (q_ChannelCase == true) // domain copy not supported
+   pc_Config = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(ou32_NodeIndex);
+   if (pc_Config != NULL)
    {
-      const C_OSCHalcConfig * pc_Config = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(ou32_NodeIndex);
+      C_OSCHalcConfigStandalone c_CopyData;
+      tgl_assert(C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(*pc_Config, u32_DomainIndex, u32_ChannelIndex,
+                                                                   !q_ChannelCase,
+                                                                   c_CopyData) == C_NO_ERR);
 
-      if (pc_Config != NULL)
-      {
-         C_OSCHalcConfigStandalone c_CopyData;
-         tgl_assert(C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(*pc_Config, u32_DomainIndex, u32_ChannelIndex,
-                                                                      c_CopyData) == C_NO_ERR);
-
-         C_SdClipBoardHelper::h_StoreHalcItemConfigToClipboard(c_CopyData);
-      }
+      C_SdClipBoardHelper::h_StoreHalcItemConfigToClipboard(c_CopyData);
    }
 }
 
@@ -96,21 +94,32 @@ bool C_SdNdeHalcChannelCopyPaste::h_Paste(QWidget * const opc_Parent, const uint
    // ignore if invalid clipboard data
    if (C_SdClipBoardHelper::h_LoadHalcItemConfigFromClipboard(c_Data) == C_NO_ERR)
    {
+      bool q_ChannelCase;
+
       // check prerequisites
       if ((mh_CheckDataFromClipboard(ou32_NodeIndex, c_Data, c_ErrorDescription) == true) &&
-          (mh_CheckSelectedChannels(ou32_NodeIndex, c_Data, orc_TargetIndexes, c_ErrorDescription) == true))
+          (mh_CheckSelectedChannels(ou32_NodeIndex, c_Data, orc_TargetIndexes, q_ChannelCase,
+                                    c_ErrorDescription) == true))
       {
          // paste
-         mh_PasteToSelectedChannels(ou32_NodeIndex, c_Data, orc_TargetIndexes);
+         if (q_ChannelCase == true)
+         {
+            mh_PasteToSelectedChannels(ou32_NodeIndex, c_Data, orc_TargetIndexes);
+         }
+         else
+         {
+            mh_PasteToSelectedDomain(ou32_NodeIndex, c_Data, orc_TargetIndexes);
+         }
+
          q_Return = true;
       }
       else
       {
          // report error
          C_OgeWiCustomMessage c_ErrorMessage(opc_Parent, C_OgeWiCustomMessage::eERROR,
-                                             C_GtGetText::h_GetText("Could not paste channel configuration."));
+                                             C_GtGetText::h_GetText("Could not apply channel configuration."));
          c_ErrorMessage.SetDetails(c_ErrorDescription);
-         c_ErrorMessage.SetHeading(C_GtGetText::h_GetText("Paste Channel"));
+         c_ErrorMessage.SetHeading(C_GtGetText::h_GetText("Apply Channel"));
          c_ErrorMessage.SetCustomMinHeight(230, 400);
          c_ErrorMessage.SetCustomMinWidth(600);
          c_ErrorMessage.Execute();
@@ -152,14 +161,14 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckDataFromClipboard(const uint32 ou32_No
       if (orc_HalcConfig.c_DeviceType != pc_Config->c_DeviceName)
       {
          q_Return = false;
-         orc_ErrorDescription += QString(C_GtGetText::h_GetText("Cannot paste HALC channel configuration for device "
+         orc_ErrorDescription += QString(C_GtGetText::h_GetText("Cannot apply HALC channel configuration for device "
                                                                 "type %1 to device type %2.")).
                                  arg(orc_HalcConfig.c_DeviceType.c_str(), pc_Config->c_DeviceName.c_str());
       }
       else if (orc_HalcConfig.u32_DefinitionContentVersion != pc_Config->u32_ContentVersion)
       {
          q_Return = false;
-         orc_ErrorDescription += QString(C_GtGetText::h_GetText("Cannot paste HALC channel configuration with content "
+         orc_ErrorDescription += QString(C_GtGetText::h_GetText("Cannot apply HALC channel configuration with content "
                                                                 "version %1 to configuration with content version %2."))
                                  .arg(orc_HalcConfig.u32_DefinitionContentVersion).arg(pc_Config->u32_ContentVersion);
       }
@@ -182,8 +191,8 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckDataFromClipboard(const uint32 ou32_No
       {
          const C_OSCHalcConfigStandaloneDomain & rc_Domain = orc_HalcConfig.c_Domains[0];
 
-         // only one channel?
-         if ((rc_Domain.c_ChannelConfigs.size() != 1) || (rc_Domain.c_StandaloneChannels.size() != 1))
+         // only one channel or domain only?
+         if ((rc_Domain.c_ChannelConfigs.size() > 1) || (rc_Domain.c_StandaloneChannels.size() > 1))
          {
             q_Return = false;
             orc_ErrorDescription += C_GtGetText::h_GetText("Data from clipboard contains more than one channel. ");
@@ -203,6 +212,7 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckDataFromClipboard(const uint32 ou32_No
    \param[in]      ou32_NodeIndex         Node index
    \param[in]      orc_HalcConfig         HALC standalone configuration (copy source)
    \param[in]      orc_TargetIndexes      Target indexes
+   \param[out]     orq_ChannelCase        Flag if the selected channel is a channel or domain only
    \param[in,out]  orc_ErrorDescription   Error description
 
    \retval true: on selected channels can be pasted
@@ -212,41 +222,80 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckDataFromClipboard(const uint32 ou32_No
 bool C_SdNdeHalcChannelCopyPaste::mh_CheckSelectedChannels(const uint32 ou32_NodeIndex,
                                                            const C_OSCHalcConfigStandalone & orc_HalcConfig,
                                                            const QModelIndexList & orc_TargetIndexes,
-                                                           QString & orc_ErrorDescription)
+                                                           bool & orq_ChannelCase, QString & orc_ErrorDescription)
 {
    bool q_Return = false;
 
-   tgl_assert((orc_HalcConfig.c_Domains.size() == 1) &&
-              (orc_HalcConfig.c_Domains[0].c_ChannelConfigs.size() == 1) &&
-              (orc_HalcConfig.c_Domains[0].c_StandaloneChannels.size() == 1));
-   if ((orc_HalcConfig.c_Domains.size() == 1) &&
-       (orc_HalcConfig.c_Domains[0].c_ChannelConfigs.size() == 1) &&
-       (orc_HalcConfig.c_Domains[0].c_StandaloneChannels.size() == 1))
+   if (orc_HalcConfig.c_Domains.size() == 1)
    {
       const C_OSCHalcConfigStandaloneDomain & rc_Domain = orc_HalcConfig.c_Domains[0];
-      const C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[0];
-      QString c_InvalidChannels;
-      bool q_AllChannelsValid = true;
 
-      for (QModelIndexList::const_iterator c_ItIndex = orc_TargetIndexes.begin();
-           (c_ItIndex != orc_TargetIndexes.end()); ++c_ItIndex)
+      // One specific channel
+      if ((orc_HalcConfig.c_Domains[0].c_ChannelConfigs.size() == 1) &&
+          (orc_HalcConfig.c_Domains[0].c_StandaloneChannels.size() == 1))
       {
-         if (mh_CheckSelectedChannel(ou32_NodeIndex, rc_Domain, rc_Channel, *c_ItIndex, c_InvalidChannels) == false)
+         const C_OSCHalcConfigChannel & rc_Channel = rc_Domain.c_ChannelConfigs[0];
+         QString c_InvalidChannels;
+         bool q_AllChannelsValid = true;
+
+         orq_ChannelCase = true;
+
+         for (QModelIndexList::const_iterator c_ItIndex = orc_TargetIndexes.begin();
+              (c_ItIndex != orc_TargetIndexes.end()); ++c_ItIndex)
          {
-            q_AllChannelsValid = false;
-            // do not break as we want a complete list of invalid channels
+            if (mh_CheckSelectedChannel(ou32_NodeIndex, rc_Domain, rc_Channel, *c_ItIndex, c_InvalidChannels) == false)
+            {
+               q_AllChannelsValid = false;
+               // do not break as we want a complete list of invalid channels
+            }
+         }
+
+         if (q_AllChannelsValid == false)
+         {
+            orc_ErrorDescription += C_GtGetText::h_GetText("The following items are invalid targets:\n");
+            orc_ErrorDescription += c_InvalidChannels;
+         }
+         else
+         {
+            q_Return = true;
          }
       }
-
-      if (q_AllChannelsValid == false)
+      else if ((orc_HalcConfig.c_Domains[0].c_ChannelConfigs.size() == 0) &&
+               (orc_HalcConfig.c_Domains[0].c_StandaloneChannels.size() == 0))
       {
-         orc_ErrorDescription += C_GtGetText::h_GetText("The following items are invalid as paste targets:\n");
-         orc_ErrorDescription += c_InvalidChannels;
+         orq_ChannelCase = false;
+
+         if (orc_TargetIndexes.size() == 1)
+         {
+            QString c_InvalidDomain;
+            // On domain layer only one index is possible
+            const QModelIndexList::const_iterator c_ItIndex = orc_TargetIndexes.begin();
+
+            // One specific domain only
+            if (mh_CheckSelectedDomain(ou32_NodeIndex, rc_Domain, *c_ItIndex, c_InvalidDomain) == false)
+            {
+               orc_ErrorDescription += C_GtGetText::h_GetText("The following domain is an invalid target:\n");
+               orc_ErrorDescription += c_InvalidDomain;
+            }
+            else
+            {
+               q_Return = true;
+            }
+         }
+         else
+         {
+            orc_ErrorDescription += C_GtGetText::h_GetText("Only one specific domain can be selected as target"
+                                                           " when applying a copied domain configuration.\n");
+         }
       }
       else
       {
-         q_Return = true;
+         tgl_assert(false);
       }
+   }
+   else
+   {
+      tgl_assert(false);
    }
 
    return q_Return;
@@ -391,6 +440,94 @@ bool C_SdNdeHalcChannelCopyPaste::mh_CheckSelectedChannel(const uint32 ou32_Node
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if selected domain is compatible with the domain as source standalone HALC config.
+
+   \param[in]      ou32_NodeIndex         Node index
+   \param[in]      orc_SourceDomain       HALC standalone domain (copy source)
+   \param[in]      orc_TargetIndex        Target index
+   \param[in,out]  orc_InvalidDomain      Invalid domain
+
+   \retval true: on selected domain can be pasted
+   \retval false: on selected domain cannot be pasted (see error description for details)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeHalcChannelCopyPaste::mh_CheckSelectedDomain(const stw_types::uint32 ou32_NodeIndex,
+                                                         const stw_opensyde_core::C_OSCHalcConfigStandaloneDomain & orc_SourceDomain, const QModelIndex & orc_TargetIndex,
+                                                         QString & orc_InvalidDomain)
+{
+   bool q_Return = true;
+
+   uint32 u32_DomainIndex;
+   uint32 u32_ChannelIndex;
+   bool q_ChannelCase;
+
+   C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(orc_TargetIndex, u32_DomainIndex, u32_ChannelIndex,
+                                                           q_ChannelCase);
+   const C_OSCHalcConfigDomain * pc_Domain =
+      C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(ou32_NodeIndex, u32_DomainIndex);
+
+   tgl_assert(pc_Domain != NULL);
+   if ((pc_Domain != NULL))
+   {
+      QString c_ProblemDescription;
+
+      // Handle channel (Copy domain configuration to channel configuration is not supported)
+      if (q_ChannelCase == true)
+      {
+         q_Return = false;
+         c_ProblemDescription = C_GtGetText::h_GetText("Cannot copy domain configuration to channel.\n");
+      }
+
+      // check domain
+      if ((q_Return == true) && (pc_Domain->c_Id != orc_SourceDomain.c_Id))
+      {
+         q_Return = false;
+         c_ProblemDescription =
+            QString(C_GtGetText::h_GetText("Source domain %1 (%2) differs from target domain %3 (%4).")).
+            arg(orc_SourceDomain.c_DomainConfig.c_Name.c_str(), orc_SourceDomain.c_Id.c_str(),
+                pc_Domain->c_Name.c_str(), pc_Domain->c_Id.c_str());
+      }
+
+      // check use case
+      if (q_Return == true)
+      {
+         // No different use cases possible in domain
+         if (pc_Domain->c_DomainConfig.u32_UseCaseIndex != orc_SourceDomain.c_DomainConfig.u32_UseCaseIndex)
+         {
+            // check if configured use case is available
+            q_Return = false;
+            c_ProblemDescription =
+               QString(C_GtGetText::h_GetText("Use case configuration of domain is not valid."));
+         }
+      }
+
+      // check parameter IDs not necessary as already covered by the combination of device type, content version and use
+      // case availability checks
+
+      // add error information
+      if (q_Return == false)
+      {
+         QString c_DomainId;
+
+         if (u32_ChannelIndex < pc_Domain->c_Channels.size())
+         {
+            c_DomainId = QString(" (%1)").arg(pc_Domain->c_Id.c_str());
+         }
+         orc_InvalidDomain += pc_Domain->c_Name.c_str();
+         orc_InvalidDomain += c_DomainId + ": ";
+         orc_InvalidDomain += c_ProblemDescription;
+         orc_InvalidDomain += "\n";
+      }
+   }
+   else
+   {
+      q_Return = false;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Paste to selected channels
 
    \param[in]  ou32_NodeIndex       Node index
@@ -421,14 +558,14 @@ void C_SdNdeHalcChannelCopyPaste::mh_PasteToSelectedChannels(const uint32 ou32_N
          C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(*c_ItIndex, u32_DomainIndex, u32_ChannelIndex,
                                                                  q_ChannelCase);
 
-         // adapt name to have unique name, if current channel does not already have the same name as the copied one
          const C_OSCHalcConfigChannel * pc_CurrentChannel =
             C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, u32_DomainIndex,
                                                                             u32_ChannelIndex, q_ChannelCase);
-         if ((pc_CurrentChannel != NULL) && (pc_CurrentChannel->c_Name != c_CopiedChannel.c_Name))
+         if (pc_CurrentChannel != NULL)
          {
-            c_CopiedChannel.c_Name = C_Uti::h_GetUniqueName(mh_GetExistingChannelNames(ou32_NodeIndex, u32_DomainIndex),
-                                                            c_CopiedChannel.c_Name);
+            // keep name and comment
+            c_CopiedChannel.c_Name = pc_CurrentChannel->c_Name;
+            c_CopiedChannel.c_Comment = pc_CurrentChannel->c_Comment;
          }
 
          // set config
@@ -447,27 +584,58 @@ void C_SdNdeHalcChannelCopyPaste::mh_PasteToSelectedChannels(const uint32 ou32_N
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get all existing channel names
+/*! \brief  Paste to selected channels
 
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  ou32_DomainIndex  Domain index
-
-   \return
-   Vector of pointers to all currently registered channel names of specified node and domain
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  orc_HalcConfig       HALC standalone configuration (copy source)
+   \param[in]  orc_TargetIndexes    Target indexes
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::map<stw_scl::C_SCLString, bool> C_SdNdeHalcChannelCopyPaste::mh_GetExistingChannelNames(
-   const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex)
+void C_SdNdeHalcChannelCopyPaste::mh_PasteToSelectedDomain(const uint32 ou32_NodeIndex,
+                                                           const C_OSCHalcConfigStandalone & orc_HalcConfig,
+                                                           const QModelIndexList & orc_TargetIndexes)
 {
-   std::map<C_SCLString, bool> c_Retval;
-   const C_OSCHalcConfigDomain * const pc_Domain =
-      C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(ou32_NodeIndex, ou32_DomainIndex);
-   if (pc_Domain != NULL)
+   tgl_assert((orc_HalcConfig.c_Domains.size() == 1) &&
+              (orc_HalcConfig.c_Domains[0].c_ChannelConfigs.size() == 0) &&
+              (orc_HalcConfig.c_Domains[0].c_StandaloneChannels.size() == 0) &&
+              (orc_TargetIndexes.size() == 1));
+   if ((orc_HalcConfig.c_Domains.size() == 1) &&
+       (orc_HalcConfig.c_Domains[0].c_ChannelConfigs.size() == 0) &&
+       (orc_HalcConfig.c_Domains[0].c_StandaloneChannels.size() == 0) &&
+       (orc_TargetIndexes.size() == 1))
    {
-      for (uint32 u32_ItChannel = 0; u32_ItChannel < pc_Domain->c_ChannelConfigs.size(); ++u32_ItChannel)
+      const QModelIndexList::const_iterator c_ItIndex = orc_TargetIndexes.begin();
+      uint32 u32_DomainIndex;
+      uint32 u32_ChannelIndex;
+      bool q_ChannelCase;
+
+      // get index
+      C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(*c_ItIndex, u32_DomainIndex, u32_ChannelIndex,
+                                                              q_ChannelCase);
+
+      tgl_assert(q_ChannelCase == false);
+      if (q_ChannelCase == false)
       {
-         c_Retval[pc_Domain->c_ChannelConfigs[u32_ItChannel].c_Name] = true;
+         const C_OSCHalcConfigDomain * pc_CurrentDomain =
+            C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(ou32_NodeIndex, u32_DomainIndex);
+
+         tgl_assert(pc_CurrentDomain != NULL);
+         if (pc_CurrentDomain != NULL)
+         {
+            // Copy original domain
+            C_OSCHalcConfigDomain c_CurrentDomain = *pc_CurrentDomain;
+
+            // Name and comment will not be chaqnge. Use case index is not changeable for domains
+            // Get the relevant configuration data for the domain
+            c_CurrentDomain.c_DomainConfig.q_SafetyRelevant =
+               orc_HalcConfig.c_Domains[0].c_DomainConfig.q_SafetyRelevant;
+
+            c_CurrentDomain.c_DomainConfig.c_Parameters = orc_HalcConfig.c_Domains[0].c_DomainConfig.c_Parameters;
+
+            // set config
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCDomainConfig(ou32_NodeIndex, u32_DomainIndex,
+                                                                            c_CurrentDomain) == C_NO_ERR);
+         }
       }
    }
-   return c_Retval;
 }

@@ -13,7 +13,7 @@
 
 #include "stwtypes.h"
 
-#include "C_SdNdeHalcConfigTreeModel.h"
+#include "C_OSCHalcConfigDomain.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -40,6 +40,9 @@ public:
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
    void SetChannel(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex);
    void ReloadChannel(void);
+   void SetNameFocus(void) const;
+   void LoadUserSettings(void) const;
+   void SaveUserSettings(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -47,6 +50,8 @@ Q_SIGNALS:
    //lint -restore
    void SigUpdateChannel(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
                          const bool oq_UseChannelIndex);
+   void SigChannelSelected(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
+                           const bool oq_UseChannelIndex);
 
 private:
    Ui::C_SdNdeHalcChannelWidget * mpc_Ui;
@@ -56,8 +61,8 @@ private:
    stw_types::uint32 mu32_ChannelIndex;
    bool mq_UseChannelIndex;
    std::vector<stw_types::uint32> mc_CbxUseCaseIndices;
-   stw_opensyde_gui_logic::C_SdNdeHalcConfigTreeModel mc_Model;
    stw_types::uint32 mu32_Value;
+   stw_types::sint32 ms32_OldUseCaseIndex;
 
    //Avoid call
    C_SdNdeHalcChannelWidget(const C_SdNdeHalcChannelWidget &);
@@ -66,7 +71,11 @@ private:
    void m_OnNameEdited(void);
    void m_OnCommentEdited(void);
    void m_OnSafetyToggled(const bool oq_Checked) const;
+   void m_OnBitfieldsChanged (const QString & orc_ItemText, const bool oq_Checked) const;
+   void m_OnBitmarksChanged (const QString & orc_ItemText, const bool oq_Checked) const;
    void m_OnUseCaseChanged(const stw_types::sint32 os32_NewIndex);
+   void m_OnLinkedChannelClicked(const QString & orc_LinkedChannelName);
+   void m_OnViewDatapoolDetailsClicked(void);
    stw_types::sint32 m_FindAndSetDefaultUseCase(stw_types::sint32 os32_Return,
                                                 const std::vector<stw_opensyde_core::C_OSCHalcDefChannelUseCase> & orc_DefaultUseCases,
                                                 const stw_types::uint32 & oru32_OldDependentValue) const;
@@ -84,7 +93,7 @@ private:
    void m_LoadChannelData(void);
    void m_EmitUpdateSignal(void);
    void m_ConnectWidgets(const bool oq_Connect);
-   void m_CheckName(const QString & rc_NewName) const;
+   void m_CheckName(const QString & orc_NewName) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

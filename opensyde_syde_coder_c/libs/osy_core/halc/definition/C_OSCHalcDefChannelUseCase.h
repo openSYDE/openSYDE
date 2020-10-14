@@ -32,6 +32,7 @@ public:
    stw_scl::C_SCLString c_Comment;                              ///< Description to display to user
    C_OSCNodeDataPoolContent c_Value;                            ///< Internal value to use
    std::vector<C_OSCHalcDefChannelAvailability> c_Availability; ///< Channel availability settings
+   std::vector<stw_types::uint32> c_DefaultChannels;            ///< Indices of channels which use this as default
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

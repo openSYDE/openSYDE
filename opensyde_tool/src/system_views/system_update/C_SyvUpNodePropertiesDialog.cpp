@@ -86,6 +86,10 @@ C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elemen
    this->mpc_Ui->pc_TextEditDataBlocks->setReadOnly(true);
    this->mpc_Ui->pc_TextEditFlash->setReadOnly(true);
 
+   // Label style
+   this->mpc_Ui->pc_LabelDescription->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelDescription->SetFontPixel(16);
+
    // register the widget for showing
    this->mrc_ParentDialog.SetWidget(this);
 

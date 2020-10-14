@@ -28,6 +28,11 @@
 #include <windows.h>
 #include <cstdio>
 #include <cstring>
+#include <vector>
+#include <map>
+#include <list>
+
+#include "CSCLString.h"
 
 #endif
 

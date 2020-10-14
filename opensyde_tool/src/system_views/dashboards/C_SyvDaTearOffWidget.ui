@@ -166,17 +166,17 @@
           </spacer>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PbCancel">
+          <widget class="stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit" name="pc_PbCancel">
            <property name="minimumSize">
             <size>
              <width>131</width>
-             <height>40</height>
+             <height>30</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>131</width>
-             <height>40</height>
+             <height>30</height>
             </size>
            </property>
            <property name="text">
@@ -189,13 +189,13 @@
            <property name="minimumSize">
             <size>
              <width>131</width>
-             <height>40</height>
+             <height>30</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>131</width>
-             <height>40</height>
+             <height>30</height>
             </size>
            </property>
            <property name="text">
@@ -207,7 +207,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeWiEditBackground" name="pc_WidgetWhite" native="true">
+       <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WidgetWhite" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -298,15 +298,20 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabFrameError</class>
    <extends>QLabel</extends>
    <header>C_OgeLabFrameError.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiEditBackground</class>
-   <extends>QWidget</extends>
-   <header>C_OgeWiEditBackground.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
@@ -314,9 +319,10 @@
    <header>C_OgeLabSvgOnly.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <class>stw_opensyde_gui_elements::C_OgeWiEditBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiEditBackground.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit</class>
@@ -334,11 +340,6 @@
    <extends>QWidget</extends>
    <header>C_OgeWiDashboardTab.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubUpdate</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubUpdate.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

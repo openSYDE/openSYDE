@@ -47,8 +47,9 @@ public:
 
    void StopLogging(void);
 
-   void SearchNext(void) const;
-   void SearchPrev(void) const;
+   void SearchBarFocus(void);
+   void SearchNext(void);
+   void SearchPrev(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -96,6 +97,8 @@ private:
    void m_UpdateSearchComboBox(void) const;
 
    void m_OpenTraceSettings(void);
+
+   void m_MessageSearchWhileTracing(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

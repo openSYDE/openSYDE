@@ -119,11 +119,13 @@ public:
                                            const stw_types::uint32 ou32_DataPoolIndex,
                                            const stw_types::uint32 ou32_ListIndex,
                                            const stw_types::sintn osn_MaximumHeight = 0);
-
    static stw_types::sint32 h_GetSharedDatapoolGroup(const stw_types::uint32 ou32_SharedDatapoolGroup,
                                                      const stw_opensyde_core::C_OSCNodeDataPoolId & orc_BaseDatapoolId,
                                                      const stw_types::uint32 ou32_NodeIndex,
                                                      std::vector<QString> & orc_SharedDatapoolNameGroup);
+   static stw_types::sint32 h_GetNextDiagOrNvmDpIndex(const stw_types::uint32 ou32_NodeIndex,
+                                                      const stw_types::uint32 ou32_DatapoolIndex,
+                                                      const bool oq_Forwards);
 
 private:
    C_SdNdeDpUtil();

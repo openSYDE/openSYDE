@@ -44,6 +44,9 @@ protected:
    virtual bool m_BaseEvent(QEvent * const opc_Event) override;
    virtual void m_SetMouseTracking(const bool oq_Active) override;
    virtual QModelIndex m_IndexAtGlobalPos(const QPoint & orc_GlobalPos) const override;
+
+   std::vector<stw_types::sint32> m_GetColumnWidths(void) const;
+   bool m_SetColumnWidths(const std::vector<stw_types::sint32> & orc_ColumnWidths);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

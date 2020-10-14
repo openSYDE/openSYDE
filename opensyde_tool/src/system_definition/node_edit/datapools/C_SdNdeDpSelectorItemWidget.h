@@ -47,25 +47,20 @@ public:
                 const stw_types::uint32 ou32_Size, const stw_types::uint32 ou32_Used,
                 const stw_types::uint32 ou32_Reserved);
    void UpdateData(void);
-   void SetActive(const bool oq_Active);
+   void SetSelected(const bool oq_Selected);
    void SetStateConflict(const bool oq_Active);
    void SetShareDatapool(const bool oq_Shared);
    const stw_opensyde_core::C_OSCNodeDataPoolId & GetDatapoolId(void) const;
    QString GetDatapoolName(void) const;
    QString GetDatapoolComment(void) const;
    bool GetStateSafety(void) const;
+   bool GetSelected(void) const;
    bool GetStateConflict(void) const;
    bool GetShareDatapool(void) const;
-   void SetMaximized(const bool oq_Maximized);
-   bool GetMaximized(void) const;
-   bool GetActive(void) const;
    bool GetUsageViewActive(void) const;
    stw_types::uint32 GetDataPoolSize(void) const;
    stw_types::uint32 GetDataPoolUsedSize(void) const;
    stw_types::uint32 GetDataPoolReservedSize(void) const;
-
-   static const QSize hc_MaximumSize;
-   static const QSize hc_MinimumSize;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -78,6 +73,7 @@ protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
    virtual void showEvent(QShowEvent * const opc_Event) override;
+   virtual bool event(QEvent * const opc_Event) override;
    //lint -restore
 
 private:
@@ -87,10 +83,12 @@ private:
 
    void m_UpdateLabel(void);
    void m_UpdateName(void) const;
+   void m_SetSelectColor(const bool oq_Active);
 
    Ui::C_SdNdeDpSelectorItemWidget * mpc_Ui;
    stw_opensyde_gui_elements::C_OgeLabToolTipBase * mpc_LabelStateImg;
    QLabel * mpc_LabelShareImg;
+   QLabel * mpc_LabelShareImgHovered;
    C_SdNdeDpSelectorItemUsageWidget * mpc_UsageBar;
    QPixmap mc_ConflictImg;
 
@@ -98,8 +96,7 @@ private:
    bool mq_StateSafety;
    bool mq_StateConflict;
    bool mq_Shared;
-   bool mq_Maximized;
-   bool mq_Active;
+   bool mq_Selected;
    const bool mq_UsageViewActive;
    stw_types::uint32 mu32_Size;
    stw_types::uint32 mu32_Used;

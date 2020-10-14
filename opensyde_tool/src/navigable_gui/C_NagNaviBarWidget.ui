@@ -194,14 +194,6 @@
            <bool>true</bool>
           </property>
           <widget class="QWidget" name="pc_ScrollAreaWidgetContents">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>284</width>
-             <height>360</height>
-            </rect>
-           </property>
            <layout class="QVBoxLayout" name="pc_VerticalLayout2" stretch="1,1">
             <property name="spacing">
              <number>0</number>

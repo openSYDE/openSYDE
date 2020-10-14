@@ -45,7 +45,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpEditWidget::C_SdNdeDpEditWidget(QWidget * const opc_Parent) :
@@ -56,46 +56,44 @@ C_SdNdeDpEditWidget::C_SdNdeDpEditWidget(QWidget * const opc_Parent) :
    // Init Ui
    mpc_Ui->setupUi(this);
    this->mpc_Ui->pc_ListsWidget->setVisible(false);
-   this->mpc_Ui->pc_ComListsWidget->setVisible(false);
 
    // connect to get the selected datapool in the selector
    // must happen before SetNode
    connect(this->mpc_Ui->pc_WidgetDpView, &C_SdNdeDpViewWidget::SigErrorChange,
            this, &C_SdNdeDpEditWidget::SigErrorChange);
-   connect(this->mpc_Ui->pc_WidgetDpView, &C_SdNdeDpViewWidget::SigDataPoolSelected,
-           this, &C_SdNdeDpEditWidget::m_DataPoolSelected);
+   connect(this->mpc_Ui->pc_WidgetDpView, &C_SdNdeDpViewWidget::SigOpenDataPoolContent,
+           this, &C_SdNdeDpEditWidget::m_OpenDataPoolContent);
    connect(this->mpc_Ui->pc_WidgetDpView, &C_SdNdeDpViewWidget::SigNoDataPoolSelected,
-           this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListsWidget::Clear);
-   connect(this->mpc_Ui->pc_WidgetDpView, &C_SdNdeDpViewWidget::SigNoDataPoolSelected,
-           this->mpc_Ui->pc_ComListsWidget, &C_SdNdeDpComListWidget::Clear);
+           this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListEditWidget::Clear);
 
    // forwarding of the changed signal
    connect(this->mpc_Ui->pc_WidgetDpView, &C_SdNdeDpViewWidget::SigChanged,
            this, &C_SdNdeDpEditWidget::SigChanged);
-   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListsWidget::SigChanged,
+   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListEditWidget::SigChanged,
            this, &C_SdNdeDpEditWidget::SigChanged);
+   // forwarding of the changed signal only if the entire Datapool is affected
+   connect(this->mpc_Ui->pc_WidgetDpView, &C_SdNdeDpViewWidget::SigChanged,
+           this, &C_SdNdeDpEditWidget::SigDataPoolsChanged);
 
    //Connect error handling
-   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListsWidget::SigErrorChange, this,
+   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListEditWidget::SigErrorChange, this,
            &C_SdNdeDpEditWidget::m_OnErrorChange);
    //Connect size handling
-   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListsWidget::SigSizeChange, this,
+   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListEditWidget::SigSizeChange, this,
            &C_SdNdeDpEditWidget::m_OnSizeChange);
    //Bus enter
-   connect(this->mpc_Ui->pc_ComListsWidget, &C_SdNdeDpComListWidget::SigSwitchToBus, this,
-           &C_SdNdeDpEditWidget::m_OnSwitchToBus);
-   // COM datapool edit
-   connect(this->mpc_Ui->pc_ComListsWidget, &C_SdNdeDpComListWidget::SigEdit, this,
-           &C_SdNdeDpEditWidget::SigEdit);
    connect(this->mpc_Ui->pc_WidgetDpView, &C_SdNdeDpViewWidget::SigUpdateLists, this->mpc_Ui->pc_ListsWidget,
-           &C_SdNdeDpListsWidget::SetDataPool);
-   connect(this->mpc_Ui->pc_ComListsWidget, &C_SdNdeDpComListWidget::SigErrorChange, this,
-           &C_SdNdeDpEditWidget::m_OnErrorChange);
+           &C_SdNdeDpListEditWidget::SetDataPool);
    //Connect save commands
-   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListsWidget::SigSave, this,
+   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListEditWidget::SigSave, this,
            &C_SdNdeDpEditWidget::SigSave);
-   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListsWidget::SigSaveAs, this,
+   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListEditWidget::SigSaveAs, this,
            &C_SdNdeDpEditWidget::SigSaveAs);
+   //Connect navigation
+   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListEditWidget::SigBack, this,
+           &C_SdNdeDpEditWidget::m_OnListsBack);
+   connect(this->mpc_Ui->pc_ListsWidget, &C_SdNdeDpListEditWidget::SigNavigate, this,
+           &C_SdNdeDpEditWidget::m_OnListsNavigate);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,14 +110,13 @@ C_SdNdeDpEditWidget::~C_SdNdeDpEditWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new node
 
-   \param[in] oru32_NodeIndex Node index
+   \param[in]  oru32_NodeIndex   Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpEditWidget::SetNode(const uint32 & oru32_NodeIndex)
 {
    //Reset visibility
    this->mpc_Ui->pc_ListsWidget->setVisible(false);
-   this->mpc_Ui->pc_ComListsWidget->setVisible(false);
    this->mu32_NodeIndex = oru32_NodeIndex;
    this->mpc_Ui->pc_WidgetDpView->SetNode(oru32_NodeIndex);
 }
@@ -127,9 +124,9 @@ void C_SdNdeDpEditWidget::SetNode(const uint32 & oru32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to open a concrete datapool, datapool list or dataelement
 
-   \param[in] os32_DataPoolIndex      Datapool index
-   \param[in] os32_ListIndex          Optional list index (if not used set to -1)
-   \param[in] os32_DataElementIndex   Optional data element index (if not used set to -1)
+   \param[in]  os32_DataPoolIndex      Datapool index
+   \param[in]  os32_ListIndex          Optional list index (if not used set to -1)
+   \param[in]  os32_DataElementIndex   Optional data element index (if not used set to -1)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpEditWidget::OpenDetail(const sint32 os32_DataPoolIndex, const sint32 os32_ListIndex,
@@ -141,9 +138,11 @@ void C_SdNdeDpEditWidget::OpenDetail(const sint32 os32_DataPoolIndex, const sint
    if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(this->mu32_NodeIndex, static_cast<uint32>(os32_DataPoolIndex),
                                                         e_Type) == C_NO_ERR)
    {
-      this->m_DataPoolSelected(os32_DataPoolIndex);
+      this->m_OpenDataPoolContent(os32_DataPoolIndex);
 
-      if ((os32_ListIndex >= 0) && (e_Type != C_OSCNodeDataPool::eCOM))
+      if ((os32_ListIndex >= 0) &&
+          (e_Type != C_OSCNodeDataPool::eCOM) &&
+          (e_Type != C_OSCNodeDataPool::eHALC))
       {
          this->mpc_Ui->pc_ListsWidget->OpenDetail(os32_ListIndex, os32_DataElementIndex);
       }
@@ -151,43 +150,80 @@ void C_SdNdeDpEditWidget::OpenDetail(const sint32 os32_DataPoolIndex, const sint
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Update communication lists
+/*! \brief   Shows the Datapool overview again if it is visible
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpEditWidget::UpdateComLists(void) const
+void C_SdNdeDpEditWidget::OpenOverview(void) const
 {
-   this->mpc_Ui->pc_ComListsWidget->Update();
+   if (this->mpc_Ui->pc_WidgetDpView->isVisible() == false)
+   {
+      this->m_OnListsBack();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Change of actual selected datapool
-
-   \param[in] ou32_DataPoolIndex Index of selected datapool
+/*! \brief  On lists back
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpEditWidget::m_DataPoolSelected(const uint32 ou32_DataPoolIndex) const
+void C_SdNdeDpEditWidget::m_OnListsBack(void) const
+{
+   this->mpc_Ui->pc_ListsWidget->setVisible(false);
+   this->mpc_Ui->pc_WidgetDpView->setVisible(true);
+   this->mpc_Ui->pc_WidgetDpView->SetNoActualDataPool();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On lists navigate
+
+   \param[in]  oq_Forward  true: navigate to next Datapool
+                           false: navigate to previous Datapool
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpEditWidget::m_OnListsNavigate(const bool oq_Forwards) const
+{
+   this->mpc_Ui->pc_WidgetDpView->NavigateToNextDataPool(oq_Forwards);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Opens the the matching actual Datapool content widget
+
+   \param[in]  ou32_DataPoolIndex   Index of selected datapool
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpEditWidget::m_OpenDataPoolContent(const uint32 ou32_DataPoolIndex) const
 {
    C_OSCNodeDataPool::E_Type e_Type;
    if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(this->mu32_NodeIndex, ou32_DataPoolIndex, e_Type) == C_NO_ERR)
    {
+      bool q_ShowInternalWidget = true;
+
       //Decide
       if (e_Type == C_OSCNodeDataPool::eCOM)
       {
-         this->mpc_Ui->pc_ComListsWidget->setVisible(true);
-         this->mpc_Ui->pc_ListsWidget->setVisible(false);
-         this->mpc_Ui->pc_ComListsWidget->SetDataPool(this->mu32_NodeIndex, ou32_DataPoolIndex);
+         Q_EMIT (this->SigSwitchToCommMessages(ou32_DataPoolIndex));
+         q_ShowInternalWidget = false;
+      }
+      // Comment this else if block out, to get the HAL Datapool in the list edit widget
+      else if (e_Type == C_OSCNodeDataPool::eHALC)
+      {
+         Q_EMIT (this->SigSwitchToHalc());
+         q_ShowInternalWidget = false;
       }
       else
       {
-         this->mpc_Ui->pc_ComListsWidget->setVisible(false);
-         this->mpc_Ui->pc_ListsWidget->setVisible(true);
+         this->mpc_Ui->pc_ListsWidget->SetDefaultVisible();
          this->mpc_Ui->pc_ListsWidget->SetDataPool(this->mu32_NodeIndex, ou32_DataPoolIndex);
       }
+
+      this->mpc_Ui->pc_ListsWidget->setVisible(q_ShowInternalWidget);
+      this->mpc_Ui->pc_WidgetDpView->setVisible(!q_ShowInternalWidget);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle error change
+
+   \param[in]  orq_Error   Error
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpEditWidget::m_OnErrorChange(const bool & orq_Error) const
@@ -203,16 +239,4 @@ void C_SdNdeDpEditWidget::m_OnErrorChange(const bool & orq_Error) const
 void C_SdNdeDpEditWidget::m_OnSizeChange(void) const
 {
    this->mpc_Ui->pc_WidgetDpView->UpdateActualDataPool();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Forward signal
-
-   \param[in] oru32_BusIndex Bus index
-   \param[in] orc_BusName  Bus name
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpEditWidget::m_OnSwitchToBus(const uint32 & oru32_BusIndex, const QString & orc_BusName)
-{
-   Q_EMIT (this->SigSwitchToBus(oru32_BusIndex, orc_BusName));
 }

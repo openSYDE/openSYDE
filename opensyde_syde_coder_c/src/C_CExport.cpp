@@ -26,6 +26,7 @@
 #include "TGLFile.h"
 #include "C_OsyCodeExportBase.h"
 
+#include "C_OSCBinaryHash.h"
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
@@ -79,7 +80,8 @@ C_OsyCodeExportBase::E_ResultCode C_CExport::m_CreateApplicationCode(const C_OSC
                                                                      const C_SCLString & orc_OutputPath,
                                                                      std::vector<C_SCLString> & orc_CreatedFiles)
 {
-   const C_SCLString c_SydeCoderCInfo = stw_tgl::TGL_ExtractFileName(mc_ExeName) + " " + mc_ExeVersion;
+   const C_SCLString c_SydeCoderCInfo = stw_tgl::TGL_ExtractFileName(mc_ExeName) + " " + mc_ExeVersion +
+                                        ", MD5-Checksum: " + stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash();
    const sint32 s32_Return = C_OSCExportNode::h_CreateSourceCode(orc_Node, ou16_ApplicationIndex, orc_OutputPath,
                                                                  orc_CreatedFiles, c_SydeCoderCInfo);
 

@@ -1029,6 +1029,7 @@ void C_SdClipBoardHelper::h_StoreMessageIndexToString(
       c_StringXml.SetAttributeUint32("node-index", rc_CurrentElement.u32_NodeIndex);
       c_StringXml.SetAttributeUint32("interface-index", rc_CurrentElement.u32_InterfaceIndex);
       c_StringXml.SetAttributeUint32("message-index", rc_CurrentElement.u32_MessageIndex);
+      c_StringXml.SetAttributeUint32("datapool-index", rc_CurrentElement.u32_DatapoolIndex);
       c_StringXml.SetAttributeBool("message-tx-flag", rc_CurrentElement.q_MessageIsTx);
       c_StringXml.CreateNodeChild("protocol-type",
                                   C_OSCNodeCommFiler::h_CommunicationProtocolToString(rc_CurrentElement.e_ComProtocol));
@@ -1074,6 +1075,7 @@ sint32 C_SdClipBoardHelper::h_LoadMessageIndexFromString(const QString & orc_Inp
                c_MessageId.u32_NodeIndex = c_StringXml.GetAttributeUint32("node-index");
                c_MessageId.u32_InterfaceIndex = c_StringXml.GetAttributeUint32("interface-index");
                c_MessageId.u32_MessageIndex = c_StringXml.GetAttributeUint32("message-index");
+               c_MessageId.u32_DatapoolIndex = c_StringXml.GetAttributeUint32("datapool-index");
                c_MessageId.q_MessageIsTx = c_StringXml.GetAttributeBool("message-tx-flag");
 
                if (c_StringXml.SelectNodeChild("protocol-type") == "protocol-type")

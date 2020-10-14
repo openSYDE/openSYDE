@@ -49,7 +49,7 @@ C_OgeTedPropertiesComment::C_OgeTedPropertiesComment(QWidget * const opc_Parent)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten focus out event slot
 
-   Here: clear text selection
+   Here: clear text selection and emit signal
 
    \param[in,out] opc_Event Event identification and information
 */
@@ -64,6 +64,8 @@ void C_OgeTedPropertiesComment::focusOutEvent(QFocusEvent * const opc_Event)
 
       c_TempTextCursor.clearSelection();
       this->setTextCursor(c_TempTextCursor);
+
+      Q_EMIT (this->SigEditingFinished());
    }
 
    QTextEdit::focusOutEvent(opc_Event);

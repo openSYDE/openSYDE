@@ -63,7 +63,7 @@ C_OSCNodeDataPoolContent::C_OSCNodeDataPoolContent(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy constructor
 
-   \param[in]     orc_Source      Reference to source
+   \param[in]  orc_Source  Reference to source
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent::C_OSCNodeDataPoolContent(const C_OSCNodeDataPoolContent & orc_Source) :
@@ -76,7 +76,7 @@ C_OSCNodeDataPoolContent::C_OSCNodeDataPoolContent(const C_OSCNodeDataPoolConten
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy operator
 
-   \param[in]     orc_Source      Reference to source
+   \param[in]  orc_Source  Reference to source
 
    \return
 */
@@ -107,7 +107,7 @@ C_OSCNodeDataPoolContent::~C_OSCNodeDataPoolContent(void)
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
-   \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::CalcHash(uint32 & oru32_HashValue) const
@@ -119,10 +119,80 @@ void C_OSCNodeDataPoolContent::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calculates the hash value over one element
+
+   The hash value is a 32 bit CRC value.
+
+   \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
+   \param[in]      ou32_Index       Index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeDataPoolContent::CalcHashElement(uint32 & oru32_HashValue, const uint32 ou32_Index) const
+{
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_Type, sizeof(this->me_Type), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_Array, sizeof(this->mq_Array), oru32_HashValue);
+   if ((this->mq_Array) && (ou32_Index < this->GetArraySize()))
+   {
+      uint64 u64_Val = 0ULL;
+      sint64 s64_Val = 0LL;
+      float64 f64_Val = 0.0;
+      switch (this->me_Type)
+      {
+      case C_OSCNodeDataPoolContent::eUINT8:
+         u64_Val = static_cast<uint64>(this->GetValueAU8Element(ou32_Index));
+         stw_scl::C_SCLChecksums::CalcCRC32(&u64_Val, sizeof(u64_Val), oru32_HashValue);
+         break;
+      case C_OSCNodeDataPoolContent::eUINT16:
+         u64_Val = static_cast<uint64>(this->GetValueAU16Element(ou32_Index));
+         stw_scl::C_SCLChecksums::CalcCRC32(&u64_Val, sizeof(u64_Val), oru32_HashValue);
+         break;
+      case C_OSCNodeDataPoolContent::eUINT32:
+         u64_Val = static_cast<uint64>(this->GetValueAU32Element(ou32_Index));
+         stw_scl::C_SCLChecksums::CalcCRC32(&u64_Val, sizeof(u64_Val), oru32_HashValue);
+         break;
+      case C_OSCNodeDataPoolContent::eUINT64:
+         u64_Val = this->GetValueAU64Element(ou32_Index);
+         stw_scl::C_SCLChecksums::CalcCRC32(&u64_Val, sizeof(u64_Val), oru32_HashValue);
+         break;
+      case C_OSCNodeDataPoolContent::eSINT8:
+         s64_Val = static_cast<sint64>(this->GetValueAS8Element(ou32_Index));
+         stw_scl::C_SCLChecksums::CalcCRC32(&s64_Val, sizeof(s64_Val), oru32_HashValue);
+         break;
+      case C_OSCNodeDataPoolContent::eSINT16:
+         s64_Val = static_cast<sint64>(this->GetValueAS16Element(ou32_Index));
+         stw_scl::C_SCLChecksums::CalcCRC32(&s64_Val, sizeof(s64_Val), oru32_HashValue);
+         break;
+      case C_OSCNodeDataPoolContent::eSINT32:
+         s64_Val = static_cast<sint64>(this->GetValueAS32Element(ou32_Index));
+         stw_scl::C_SCLChecksums::CalcCRC32(&s64_Val, sizeof(s64_Val), oru32_HashValue);
+         break;
+      case C_OSCNodeDataPoolContent::eSINT64:
+         s64_Val = this->GetValueAS64Element(ou32_Index);
+         stw_scl::C_SCLChecksums::CalcCRC32(&s64_Val, sizeof(s64_Val), oru32_HashValue);
+         break;
+      case C_OSCNodeDataPoolContent::eFLOAT32:
+         f64_Val = static_cast<float64>(this->GetValueAF32Element(ou32_Index));
+         stw_scl::C_SCLChecksums::CalcCRC32(&f64_Val, sizeof(f64_Val), oru32_HashValue);
+         break;
+      case C_OSCNodeDataPoolContent::eFLOAT64:
+         f64_Val = this->GetValueAF64Element(ou32_Index);
+         stw_scl::C_SCLChecksums::CalcCRC32(&f64_Val, sizeof(f64_Val), oru32_HashValue);
+         break;
+      }
+   }
+   else
+   {
+      //Just one element
+      stw_scl::C_SCLChecksums::CalcCRC32(&this->mc_Data[0], static_cast<uint32>(this->mc_Data.size()),
+                                         oru32_HashValue);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: set current value for simply type of any type
 
-   \param[in] orc_Value  New value
-   \param[in] oe_Type    supposed type held in this class
+   \param[in]  orc_Value   New value
+   \param[in]  oe_Type     supposed type held in this class
 
    \return
    No direct return. If we do not hold a plain type exception C_CONFIG is thrown as sint32
@@ -152,8 +222,8 @@ template <typename T> void C_OSCNodeDataPoolContent::m_SetValue(const T & orc_Va
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: set current value for simply type of any type
 
-   \param[in] orc_Value  New value
-   \param[in] oe_Type    supposed type held in this class
+   \param[in]  oe_Type     supposed type held in this class
+   \param[in]  orc_Value   New value
 
    \return
    No direct return. If we do not hold a plain type exception C_CONFIG is thrown as sint32
@@ -183,10 +253,7 @@ template <typename T> void C_OSCNodeDataPoolContent::m_GetValue(const E_Type oe_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for uint8 type
 
-   \param[in] ou8_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  ou8_Value   New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueU8(const uint8 ou8_Value)
@@ -213,10 +280,7 @@ uint8 C_OSCNodeDataPoolContent::GetValueU8(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for uint16 type
 
-   \param[in] ou16_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  ou16_Value  New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueU16(const uint16 ou16_Value)
@@ -243,10 +307,7 @@ uint16 C_OSCNodeDataPoolContent::GetValueU16(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for uint32 type
 
-   \param[in] ou32_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  ou32_Value  New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueU32(const uint32 ou32_Value)
@@ -273,10 +334,7 @@ uint32 C_OSCNodeDataPoolContent::GetValueU32(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for uint64 type
 
-   \param[in] ou64_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  ou64_Value  New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueU64(const uint64 ou64_Value)
@@ -303,10 +361,7 @@ uint64 C_OSCNodeDataPoolContent::GetValueU64(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for sint8 type
 
-   \param[in] os8_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  os8_Value   New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueS8(const sint8 os8_Value)
@@ -333,10 +388,7 @@ sint8 C_OSCNodeDataPoolContent::GetValueS8(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for sint16 type
 
-   \param[in] os16_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  os16_Value  New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueS16(const sint16 os16_Value)
@@ -363,10 +415,7 @@ sint16 C_OSCNodeDataPoolContent::GetValueS16(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for sint32 type
 
-   \param[in] os32_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  os32_Value  New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueS32(const sint32 os32_Value)
@@ -393,10 +442,7 @@ sint32 C_OSCNodeDataPoolContent::GetValueS32(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for sint64 type
 
-   \param[in] os64_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  os64_Value  New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueS64(const sint64 os64_Value)
@@ -423,10 +469,7 @@ sint64 C_OSCNodeDataPoolContent::GetValueS64(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for float32 type
 
-   \param[in] of32_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  of32_Value  New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueF32(const float32 of32_Value)
@@ -453,10 +496,7 @@ float32 C_OSCNodeDataPoolContent::GetValueF32(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for float64 type
 
-   \param[in] of64_Value   New assignment value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  of64_Value  New assignment value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueF64(const float64 of64_Value)
@@ -483,10 +523,7 @@ float64 C_OSCNodeDataPoolContent::GetValueF64(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of uint8 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAU8(const std::vector<uint8> & orc_Value)
@@ -497,12 +534,8 @@ void C_OSCNodeDataPoolContent::SetValueAU8(const std::vector<uint8> & orc_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of uint8 type
 
-   \param[in] ou8_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  ou8_Value   New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAU8Element(const uint8 ou8_Value, const uint32 ou32_Index)
@@ -528,7 +561,7 @@ const std::vector<uint8> C_OSCNodeDataPoolContent::GetValueAU8(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of uint8 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -546,10 +579,7 @@ uint8 C_OSCNodeDataPoolContent::GetValueAU8Element(const uint32 ou32_Index) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of uint16 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAU16(const std::vector<uint16> & orc_Value)
@@ -560,12 +590,8 @@ void C_OSCNodeDataPoolContent::SetValueAU16(const std::vector<uint16> & orc_Valu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of uint16 type
 
-   \param[in] ou16_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  ou16_Value  New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAU16Element(const uint16 ou16_Value, const uint32 ou32_Index)
@@ -591,7 +617,7 @@ const std::vector<uint16> C_OSCNodeDataPoolContent::GetValueAU16(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of uint16 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -609,8 +635,8 @@ uint16 C_OSCNodeDataPoolContent::GetValueAU16Element(const uint32 ou32_Index) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: set current value for array of any type
 
-   \param[in] orc_Value New values
-   \param[in] oe_Type   supposed type held in this class
+   \param[in]  orc_Value   New values
+   \param[in]  oe_Type     supposed type held in this class
 
    \return
    No direct return. If we do not hold an array type exception C_CONFIG is thrown as sint32
@@ -641,9 +667,9 @@ template <typename T> void C_OSCNodeDataPoolContent::m_SetValueArray(const T & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: set new value for array element of any type
 
-   \param[in] orc_Value   New value
-   \param[in] ou32_Index  Index to access
-   \param[in] oe_Type   supposed type held in this class
+   \param[in]  orc_Value   New value
+   \param[in]  ou32_Index  Index to access
+   \param[in]  oe_Type     supposed type held in this class
 
    \return
    No direct return.
@@ -684,8 +710,8 @@ template <typename T> void C_OSCNodeDataPoolContent::m_SetValueArrayElement(cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: get current value of array
 
-   \param[in]  oe_Type     supposed type held in this class
-   \param[out] orc_Result  value of array content
+   \param[in]   oe_Type       supposed type held in this class
+   \param[out]  orc_Result    value of array content
 
    \return
    No direct return.If we do not hold an array type exception C_CONFIG is thrown as sint32
@@ -716,9 +742,9 @@ template <typename T> void C_OSCNodeDataPoolContent::m_GetValueArray(const E_Typ
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: get current value of array element
 
-   \param[in]  oe_Type     supposed type held in this class
-   \param[in]  ou32_Index  index within array
-   \param[out] orc_Result  value of array element
+   \param[in]   oe_Type       supposed type held in this class
+   \param[in]   ou32_Index    index within array
+   \param[out]  orc_Result    value of array element
 
    \return
    No direct return.
@@ -759,10 +785,7 @@ template <typename T> void C_OSCNodeDataPoolContent::m_GetValueArrayElement(cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of uint32 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAU32(const std::vector<uint32> & orc_Value)
@@ -773,12 +796,8 @@ void C_OSCNodeDataPoolContent::SetValueAU32(const std::vector<uint32> & orc_Valu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of uint32 type
 
-   \param[in] ou32_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  ou32_Value  New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAU32Element(const uint32 ou32_Value, const uint32 ou32_Index)
@@ -804,7 +823,7 @@ const std::vector<uint32> C_OSCNodeDataPoolContent::GetValueAU32(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of uint32 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -822,10 +841,7 @@ uint32 C_OSCNodeDataPoolContent::GetValueAU32Element(const uint32 ou32_Index) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of uint64 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAU64(const std::vector<uint64> & orc_Value)
@@ -836,12 +852,8 @@ void C_OSCNodeDataPoolContent::SetValueAU64(const std::vector<uint64> & orc_Valu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of uint64 type
 
-   \param[in] ou64_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  ou64_Value  New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAU64Element(const uint64 ou64_Value, const uint32 ou32_Index)
@@ -867,7 +879,7 @@ const std::vector<uint64> C_OSCNodeDataPoolContent::GetValueAU64(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of uint64 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -885,10 +897,7 @@ uint64 C_OSCNodeDataPoolContent::GetValueAU64Element(const uint32 ou32_Index) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of sint8 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAS8(const std::vector<sint8> & orc_Value)
@@ -899,12 +908,8 @@ void C_OSCNodeDataPoolContent::SetValueAS8(const std::vector<sint8> & orc_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of sint8 type
 
-   \param[in] os8_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  os8_Value   New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAS8Element(const sint8 os8_Value, const uint32 ou32_Index)
@@ -930,7 +935,7 @@ const std::vector<sint8> C_OSCNodeDataPoolContent::GetValueAS8(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of sint8 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -948,10 +953,7 @@ sint8 C_OSCNodeDataPoolContent::GetValueAS8Element(const uint32 ou32_Index) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of sint16 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAS16(const std::vector<sint16> & orc_Value)
@@ -962,12 +964,8 @@ void C_OSCNodeDataPoolContent::SetValueAS16(const std::vector<sint16> & orc_Valu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of sint16 type
 
-   \param[in] os16_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  os16_Value  New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAS16Element(const sint16 os16_Value, const uint32 ou32_Index)
@@ -993,7 +991,7 @@ const std::vector<sint16> C_OSCNodeDataPoolContent::GetValueAS16(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of sint16 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -1011,10 +1009,7 @@ sint16 C_OSCNodeDataPoolContent::GetValueAS16Element(const uint32 ou32_Index) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of sint32 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAS32(const std::vector<sint32> & orc_Value)
@@ -1025,12 +1020,8 @@ void C_OSCNodeDataPoolContent::SetValueAS32(const std::vector<sint32> & orc_Valu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of sint32 type
 
-   \param[in] os32_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  os32_Value  New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAS32Element(const sint32 os32_Value, const uint32 ou32_Index)
@@ -1056,7 +1047,7 @@ const std::vector<sint32> C_OSCNodeDataPoolContent::GetValueAS32(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of sint32 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -1074,10 +1065,7 @@ sint32 C_OSCNodeDataPoolContent::GetValueAS32Element(const uint32 ou32_Index) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of sint64 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAS64(const std::vector<sint64> & orc_Value)
@@ -1088,12 +1076,8 @@ void C_OSCNodeDataPoolContent::SetValueAS64(const std::vector<sint64> & orc_Valu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of sint64 type
 
-   \param[in] os64_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  os64_Value  New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAS64Element(const sint64 os64_Value, const uint32 ou32_Index)
@@ -1119,7 +1103,7 @@ const std::vector<sint64> C_OSCNodeDataPoolContent::GetValueAS64(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of sint64 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -1137,10 +1121,7 @@ sint64 C_OSCNodeDataPoolContent::GetValueAS64Element(const uint32 ou32_Index) co
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of float32 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAF32(const std::vector<float32> & orc_Value)
@@ -1151,12 +1132,8 @@ void C_OSCNodeDataPoolContent::SetValueAF32(const std::vector<float32> & orc_Val
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of float32 type
 
-   \param[in] of32_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  of32_Value  New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAF32Element(const float32 of32_Value, const uint32 ou32_Index)
@@ -1182,7 +1159,7 @@ const std::vector<float32> C_OSCNodeDataPoolContent::GetValueAF32(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of float32 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -1200,10 +1177,7 @@ float32 C_OSCNodeDataPoolContent::GetValueAF32Element(const uint32 ou32_Index) c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set current value for array of float64 type
 
-   \param[in] orc_Value New values
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  orc_Value   New values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAF64(const std::vector<float64> & orc_Value)
@@ -1214,12 +1188,8 @@ void C_OSCNodeDataPoolContent::SetValueAF64(const std::vector<float64> & orc_Val
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value at specific index for array of float64 type
 
-   \param[in] of64_Value New value
-   \param[in] ou32_Index Index to access
-
-   \return
-   Type mismatch:       Exception C_CONFIG
-   Array out of bounds: Exception C_RANGE
+   \param[in]  of64_Value  New value
+   \param[in]  ou32_Index  Index to access
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetValueAF64Element(const float64 of64_Value, const uint32 ou32_Index)
@@ -1245,7 +1215,7 @@ const std::vector<float64> C_OSCNodeDataPoolContent::GetValueAF64(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current value for specific index for array of float64 type
 
-   \param[in] ou32_Index Index to access
+   \param[in]  ou32_Index  Index to access
 
    \return
    Type match:    currently set value
@@ -1263,10 +1233,7 @@ float64 C_OSCNodeDataPoolContent::GetValueAF64Element(const uint32 ou32_Index) c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Resize current array
 
-   \param[in] oru32_Size New size value
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  oru32_Size  New size value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetArraySize(const uint32 & oru32_Size)
@@ -1351,10 +1318,7 @@ uint32 C_OSCNodeDataPoolContent::GetArraySize(void) const
 
    Attempt conversion of previous value(s) to new type
 
-   \param[in] ore_Value New Type
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]  ore_Value   New Type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetType(const E_Type & ore_Value)
@@ -1700,7 +1664,7 @@ bool C_OSCNodeDataPoolContent::GetArray(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Change array status
 
-   \param[in] oq_Value New value
+   \param[in]  oq_Value    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::SetArray(const bool oq_Value)
@@ -1753,7 +1717,7 @@ uint32 C_OSCNodeDataPoolContent::GetSizeByte(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if current content value(s) inside range of new type
 
-   \param[in] ore_Type Type to test for
+   \param[in]  ore_Type    Type to test for
 
    \return
    true  Conversion possible
@@ -2191,7 +2155,7 @@ bool C_OSCNodeDataPoolContent::CheckInsideRange(const C_OSCNodeDataPoolContent::
 
    Warning: Due to array comparison no comparison function may be combined.
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current smaller or equal than orc_Cmp
@@ -2265,7 +2229,7 @@ bool C_OSCNodeDataPoolContent::operator <=(const C_OSCNodeDataPoolContent & orc_
 
    Warning: Due to array comparison no comparison function may be combined.
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current greater or equal than orc_Cmp
@@ -2340,7 +2304,7 @@ bool C_OSCNodeDataPoolContent::operator >=(const C_OSCNodeDataPoolContent & orc_
 
    Warning: Due to array comparison no comparison function may be combined.
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current greater than orc_Cmp
@@ -2415,7 +2379,7 @@ bool C_OSCNodeDataPoolContent::operator >(const C_OSCNodeDataPoolContent & orc_C
 
    Warning: Due to array comparison no comparison function may be combined.
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current smaller than orc_Cmp
@@ -2490,7 +2454,7 @@ bool C_OSCNodeDataPoolContent::operator <(const C_OSCNodeDataPoolContent & orc_C
 
    Warning: Due to array comparison no comparison function may be combined.
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current equal to orc_Cmp
@@ -2565,7 +2529,7 @@ bool C_OSCNodeDataPoolContent::operator ==(const C_OSCNodeDataPoolContent & orc_
 
    Warning: Due to array comparison no comparison function may be combined.
 
-   \param[in] orc_Cmp Compared instance
+   \param[in]  orc_Cmp  Compared instance
 
    \return
    Current not equal to orc_Cmp
@@ -2641,8 +2605,8 @@ bool C_OSCNodeDataPoolContent::operator !=(const C_OSCNodeDataPoolContent & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if value at array index greater or equal to orc_Cmp
 
-   \param[in] orc_Cmp     Compared instance
-   \param[in] ou32_Index  Array index instance
+   \param[in]  orc_Cmp     Compared instance
+   \param[in]  ou32_Index  Array index instance
 
    \return
    Current greater or equal to orc_Cmp
@@ -2701,8 +2665,8 @@ bool C_OSCNodeDataPoolContent::CompareArrayGreaterOrEqual(const C_OSCNodeDataPoo
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if value at array index greater than orc_Cmp
 
-   \param[in] orc_Cmp     Compared instance
-   \param[in] ou32_Index Array index instance
+   \param[in]  orc_Cmp     Compared instance
+   \param[in]  ou32_Index  Array index instance
 
    \return
    Current greater than orc_Cmp
@@ -2766,10 +2730,10 @@ bool C_OSCNodeDataPoolContent::CompareArrayGreater(const C_OSCNodeDataPoolConten
          - The postfix e+001 will be skipped (if the number has less than 6 digits)
          - The last digit will get rounded if necessary
 
-   \param[in]  of64_Factor Scaling factor
-   \param[in]  of64_Offset Scaling offset
-   \param[out] orc_Output  Scaled string
-   \param[in]  ou32_Index  Index to use in case of array
+   \param[in]   of64_Factor   Scaling factor
+   \param[in]   of64_Offset   Scaling offset
+   \param[out]  orc_Output    Scaled string
+   \param[in]   ou32_Index    Index to use in case of array
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::GetValueAsScaledString(const float64 of64_Factor, const float64 of64_Offset,
@@ -2864,8 +2828,8 @@ void C_OSCNodeDataPoolContent::GetValueAsScaledString(const float64 of64_Factor,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert value to float64
 
-   \param[in]  orf64_Output Output value
-   \param[in]  ou32_Index   Optional fallback index if array
+   \param[in]  orf64_Output   Output value
+   \param[in]  ou32_Index     Optional fallback index if array
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::GetAnyValueAsFloat64(float64 & orf64_Output, const uint32 ou32_Index) const
@@ -2952,8 +2916,8 @@ void C_OSCNodeDataPoolContent::GetAnyValueAsFloat64(float64 & orf64_Output, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if value at array index equal to orc_Cmp
 
-   \param[in] orc_Cmp     Compared instance
-   \param[in] ou32_Index  Array index instance
+   \param[in]  orc_Cmp     Compared instance
+   \param[in]  ou32_Index  Array index instance
 
    \return
    Current equal to orc_Cmp
@@ -2969,8 +2933,8 @@ bool C_OSCNodeDataPoolContent::m_CompareArrayEqual(const C_OSCNodeDataPoolConten
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if value at array index not equal to orc_Cmp
 
-   \param[in] orc_Cmp     Compared instance
-   \param[in] ou32_Index Array index instance
+   \param[in]  orc_Cmp     Compared instance
+   \param[in]  ou32_Index  Array index instance
 
    \return
    Current not equal to orc_Cmp
@@ -3033,15 +2997,12 @@ bool C_OSCNodeDataPoolContent::m_CompareArrayNotEqual(const C_OSCNodeDataPoolCon
 
    Warning: should only be used for non array type
 
-   \param[out] orq_IsUintBase   Indicator if current type is any unsigned integer type
-   \param[out] orq_IsSintBase   Indicator if current type is any signed integer type
-   \param[out] orq_IsFloatBase  Indicator if current type is any floating point type
-   \param[out] oru64_UintValue  Current value, if any unsigned integer type
-   \param[out] ors64_SintValue  Current value, if any signed integer type
-   \param[out] orf64_FloatValue Current value, if any floating point type
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[out]  orq_IsUintBase      Indicator if current type is any unsigned integer type
+   \param[out]  orq_IsSintBase      Indicator if current type is any signed integer type
+   \param[out]  orq_IsFloatBase     Indicator if current type is any floating point type
+   \param[out]  oru64_UintValue     Current value, if any unsigned integer type
+   \param[out]  ors64_SintValue     Current value, if any signed integer type
+   \param[out]  orf64_FloatValue    Current value, if any floating point type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::m_GetBaseType(bool & orq_IsUintBase, bool & orq_IsSintBase, bool & orq_IsFloatBase,
@@ -3110,16 +3071,13 @@ void C_OSCNodeDataPoolContent::m_GetBaseType(bool & orq_IsUintBase, bool & orq_I
 
    Warning: should only be used for array type
 
-   \param[in]  oru32_Index      Array index
-   \param[out] orq_IsUintBase   Indicator if current type is any unsigned integer type
-   \param[out] orq_IsSintBase   Indicator if current type is any signed integer type
-   \param[out] orq_IsFloatBase  Indicator if current type is any floating point type
-   \param[out] oru64_UintValue  Current value, if any unsigned integer type
-   \param[out] ors64_SintValue  Current value, if any signed integer type
-   \param[out] orf64_FloatValue Current value, if any floating point type
-
-   \return
-   Type mismatch: Exception C_CONFIG
+   \param[in]   oru32_Index         Array index
+   \param[out]  orq_IsUintBase      Indicator if current type is any unsigned integer type
+   \param[out]  orq_IsSintBase      Indicator if current type is any signed integer type
+   \param[out]  orq_IsFloatBase     Indicator if current type is any floating point type
+   \param[out]  oru64_UintValue     Current value, if any unsigned integer type
+   \param[out]  ors64_SintValue     Current value, if any signed integer type
+   \param[out]  orf64_FloatValue    Current value, if any floating point type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::m_GetBaseTypeArray(const uint32 & oru32_Index, bool & orq_IsUintBase,
@@ -3190,7 +3148,7 @@ void C_OSCNodeDataPoolContent::m_GetBaseTypeArray(const uint32 & oru32_Index, bo
    Convert BLOB to values.
    Considers configured element type.
 
-   \param[in]     orc_Data    data to set
+   \param[in]  orc_Data    data to set
 
    \return
    C_NO_ERR   value set
@@ -3376,7 +3334,7 @@ sint32 C_OSCNodeDataPoolContent::SetValueFromBigEndianBlob(const std::vector<uin
    Convert BLOB to values.
    Considers configured element type.
 
-   \param[in]     orc_Data    data to set
+   \param[in]  orc_Data    data to set
 
    \return
    C_NO_ERR   value set
@@ -3564,7 +3522,7 @@ sint32 C_OSCNodeDataPoolContent::SetValueFromLittleEndianBlob(const std::vector<
    Convert content value to BLOB.
    Considers configured element type.
 
-   \param[out]     orc_Data    data to set
+   \param[out]  orc_Data   data to set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::GetValueAsBigEndianBlob(std::vector<uint8> & orc_Data) const
@@ -3729,7 +3687,7 @@ void C_OSCNodeDataPoolContent::GetValueAsBigEndianBlob(std::vector<uint8> & orc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: Get uint64 from binary array in big endian order
 
-   \param[in]     opu8_Data    resulting data (caller is responsible to pass 8 bytes buffer)
+   \param[in]  opu8_Data   resulting data (caller is responsible to pass 8 bytes buffer)
 
    \return  converted data
 */
@@ -3750,7 +3708,7 @@ uint64 C_OSCNodeDataPoolContent::mh_BinaryToUInt64Big(const uint8 * const opu8_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: Get uint32 from binary array in big endian order
 
-   \param[in]     opu8_Data    resulting data (caller is responsible to pass 4 bytes buffer)
+   \param[in]  opu8_Data   resulting data (caller is responsible to pass 4 bytes buffer)
 
    \return  converted data
 */
@@ -3767,7 +3725,7 @@ uint32 C_OSCNodeDataPoolContent::mh_BinaryToUInt32Big(const uint8 * const opu8_D
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: Get uint64 from binary array in little endian order
 
-   \param[in]     opu8_Data    resulting data (caller is responsible to pass 8 bytes buffer)
+   \param[in]  opu8_Data   resulting data (caller is responsible to pass 8 bytes buffer)
 
    \return  converted data
 */
@@ -3788,7 +3746,7 @@ uint64 C_OSCNodeDataPoolContent::mh_BinaryToUInt64Little(const uint8 * const opu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility: Get uint64 from binary array in little endian order
 
-   \param[in]     opu8_Data    resulting data (caller is responsible to pass 4 bytes buffer)
+   \param[in]  opu8_Data   resulting data (caller is responsible to pass 4 bytes buffer)
 
    \return  converted data
 */
@@ -3807,8 +3765,8 @@ uint32 C_OSCNodeDataPoolContent::mh_BinaryToUInt32Little(const uint8 * const opu
 
    Copy uint64 value to byte array in big endian order
 
-   \param[in]      ou64_Data    data to fill in
-   \param[out]     opu8_Data    resulting data (caller is responsible to pass 8 bytes buffer)
+   \param[in]   ou64_Data  data to fill in
+   \param[out]  opu8_Data  resulting data (caller is responsible to pass 8 bytes buffer)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::mh_UInt64ToBinaryBig(const uint64 ou64_Data, uint8 * const opu8_Data)
@@ -3829,8 +3787,8 @@ void C_OSCNodeDataPoolContent::mh_UInt64ToBinaryBig(const uint64 ou64_Data, uint
 
    Copy uint32 value to byte array in big endian order
 
-   \param[in]      ou32_Data    data to fill in
-   \param[out]     opu8_Data    resulting data (caller is responsible to pass 4 bytes buffer)
+   \param[in]   ou32_Data  data to fill in
+   \param[out]  opu8_Data  resulting data (caller is responsible to pass 4 bytes buffer)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::mh_UInt32ToBinaryBig(const uint32 ou32_Data, uint8 * const opu8_Data)
@@ -3847,8 +3805,8 @@ void C_OSCNodeDataPoolContent::mh_UInt32ToBinaryBig(const uint32 ou32_Data, uint
 
    Copy uint64 value to byte array in little endian order
 
-   \param[in]      ou64_Data    data to fill in
-   \param[out]     opu8_Data    resulting data (caller is responsible to pass 8 bytes buffer)
+   \param[in]   ou64_Data  data to fill in
+   \param[out]  opu8_Data  resulting data (caller is responsible to pass 8 bytes buffer)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::mh_UInt64ToBinaryLittle(const uint64 ou64_Data, uint8 * const opu8_Data)
@@ -3869,8 +3827,8 @@ void C_OSCNodeDataPoolContent::mh_UInt64ToBinaryLittle(const uint64 ou64_Data, u
 
    Copy uint32 value to byte array in little endian order
 
-   \param[in]      ou32_Data    data to fill in
-   \param[out]     opu8_Data    resulting data (caller is responsible to pass 4 bytes buffer)
+   \param[in]   ou32_Data  data to fill in
+   \param[out]  opu8_Data  resulting data (caller is responsible to pass 4 bytes buffer)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::mh_UInt32ToBinaryLittle(const uint32 ou32_Data, uint8 * const opu8_Data)
@@ -3888,7 +3846,7 @@ void C_OSCNodeDataPoolContent::mh_UInt32ToBinaryLittle(const uint32 ou32_Data, u
    Convert content value to BLOB.
    Considers configured element type.
 
-   \param[out]     orc_Data    data to set
+   \param[out]  orc_Data   data to set
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPoolContent::GetValueAsLittleEndianBlob(std::vector<uint8> & orc_Data) const

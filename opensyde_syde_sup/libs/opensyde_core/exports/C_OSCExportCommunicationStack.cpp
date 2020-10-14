@@ -596,7 +596,7 @@ void C_OSCExportCommunicationStack::mh_AddDefines(C_SCLStringList & orc_Data,
          orc_Data.Append("///check for correct version of structure definitions");
          orc_Data.Append(
             "#if OSY_COM_CONFIG_DEFINITION_VERSION != 0x" +
-            C_SCLString::IntToHex(static_cast<sint32>(C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(
+            C_SCLString::IntToHex(static_cast<sint64>(C_OSCExportCommunicationStack::h_ConvertOverallCodeVersion(
                                                          ou16_GenCodeVersion)), 4U) + "U");
          orc_Data.Append("///if compilation fails here the openSYDE library version does not match the version of the "
                          "generated code");

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>900</width>
+    <height>220</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -184,6 +184,11 @@
    <header>C_SyvDaItPaArView.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>pc_TableView</tabstop>
+  <tabstop>pc_BushButtonOk</tabstop>
+  <tabstop>pc_BushButtonCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

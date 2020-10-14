@@ -62,9 +62,11 @@ private:
                                 const stw_types::uint32 ou32_NodeIndex);
    void m_SearchCanProtocolContent(const stw_opensyde_core::C_OSCCanProtocol & orc_CanProtocol,
                                    const QString & orc_NodeName, const stw_types::uint32 ou32_NodeIndex);
+   void m_SearchHalcConfigurationContent(const stw_opensyde_core::C_OSCHalcConfig & orc_HalcConfig,
+                                         const QString & orc_NodeName, const stw_types::uint32 ou32_NodeIndex);
    void m_SearchBusContent(const stw_opensyde_core::C_OSCSystemBus & orc_Bus, const stw_types::uint32 ou32_BusIndex);
 
-   bool m_CheckWhereToJump(const QTreeWidgetItem * const opc_Item, stw_types::uint32 & oru32_InterfaceIndex) const;
+   bool m_CheckWhereToJumpCan(const QTreeWidgetItem * const opc_Item, stw_types::uint32 & oru32_InterfaceIndex) const;
    void m_ItemClicked(void);
 
    void m_AddNodeResult(const QString & orc_NodeName, const stw_types::uint32 ou32_NodeIndex,
@@ -86,6 +88,11 @@ private:
                                 const stw_types::uint8 ou8_Type);
    void m_AddApplicationResult(const QString & orc_ApplicationName, const stw_types::uint32 ou32_ApplicationIndex,
                                const QString & orc_NodeName, const stw_types::uint32 ou32_NodeIndex);
+   void m_AddHalcChannelResult(const QString & orc_HalcDomainName, const stw_types::uint32 ou32_HalcDomainIndex,
+                               const QString & orc_HalcChannelName, const stw_types::uint32 ou32_HalcChannelIndex,
+                               const bool oq_UseChannelIndex, const QString & orc_NodeName,
+                               const stw_types::uint32 ou32_NodeIndex,
+                               const stw_opensyde_core::C_OSCHalcDefDomain::E_Category oe_Category);
    void m_SetupStartingState(void);
 
    QTreeWidgetItem * mpc_TreeItemRootNodes;
@@ -95,6 +102,7 @@ private:
    QTreeWidgetItem * mpc_TreeItemRootMessages;
    QTreeWidgetItem * mpc_TreeItemRootDataElements;
    QTreeWidgetItem * mpc_TreeItemRootApplications;
+   QTreeWidgetItem * mpc_TreeItemRootHalcChannels;
 
    stw_types::uint32 mu32_NodesFound;
    stw_types::uint32 mu32_BussesFound;
@@ -103,6 +111,7 @@ private:
    stw_types::uint32 mu32_MessagesFound;
    stw_types::uint32 mu32_DataElementsFound;
    stw_types::uint32 mu32_ApplicationsFound;
+   stw_types::uint32 mu32_HalcChannelsFound;
 
    QIcon mc_IconNode;
    QIcon mc_IconBusCan;
@@ -114,6 +123,9 @@ private:
    QIcon mc_IconList;
    QIcon mc_IconDataPool;
    QIcon mc_IconApplication;
+   QIcon mc_IconHalcChannel;
+   QIcon mc_IconHalcInputChannel;
+   QIcon mc_IconHalcOutputChannel;
 
    static const stw_types::sintn mhsn_DATAROLE_TITLE;
    static const stw_types::sintn mhsn_DATAROLE_SUBTITLE;

@@ -35,6 +35,7 @@
 #include "C_SdNdeIpAddressConfigurationWidget.h"
 #include "C_OgeLabNodePropComIfTable.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_SdNdeNodeEditWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -78,7 +79,9 @@ const stw_types::sint32 C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_ENABLED = 1;
 C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeNodePropertiesWidget),
-   mu32_NodeIndex(0)
+   mu32_NodeIndex(0),
+   mu32_BusIndex(0),
+   mc_BusName("")
 {
    QPixmap c_ImgLogo;
    QSizePolicy c_SizePolicy;
@@ -190,13 +193,18 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    connect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
            &C_SdNdeNodePropertiesWidget::m_CheckComIfId);
    connect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellClicked, this,
-           &C_SdNdeNodePropertiesWidget::m_IpAddressClick);
+           &C_SdNdeNodePropertiesWidget::m_HandleCellClick);
    connect(this->mpc_Ui->pc_PushButtonFlashloaderOptions, &C_OgePubOptions::clicked, this,
            &C_SdNdeNodePropertiesWidget::m_FlashloaderOptions);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxProtocol,
            static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged), this,
            &C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange);
+
+   // see m_BusBitrateClicked for details
+   this->mc_Timer.setSingleShot(true);
+   this->mc_Timer.setInterval(100);
+   connect(&this->mc_Timer, &QTimer::timeout, this, &C_SdNdeNodePropertiesWidget::m_OpenBus);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -588,14 +596,6 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                q_IsDiagnosisAvailable = pc_DevDef->IsDiagnosisAvailable(C_OSCSystemBus::eETHERNET);
             }
 
-            //SSI: 17.04.18
-            //Feature drop: Disable not connected interfaces
-            //Reason: Node IFs properties has to be defined also if the interface is not connected to a bus
-            //E.g.: No eds import permitted for node ids = 0.
-            //
-            //To avoid logic changes and to keep the possibility for quick feature revert
-            //the q_Connected flag is set to true per default.
-            bool q_Connected = true;
             QString c_IpAddressString;
 
             /**********************************************************************************************************/
@@ -643,8 +643,6 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                      // add the bitrate
                      c_BusName += " (" + QString::number(pc_Bus->u64_BitRate / 1000ULL) + " kbit/s)";
                   }
-
-                  q_Connected = true;
                }
             }
             else
@@ -655,15 +653,21 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(
                                        u16_ComIfCnt, sn_ColConnection))->setText(c_BusName);
-            this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_ColConnection)->setEnabled(
-               q_Connected);
 
-            /**********************************************************************************************************/
-            //INTERFACE style
-            //lint -e944 Kept for possibility to revert to previous implementation
-            C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TableWidgetComIfSettings
-                                                   ->cellWidget(u16_ComIfCnt, sn_ColInterface), "Disabled",
-                                                   !q_Connected);
+            if (c_BusName != "-")
+            {
+               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_ColConnection)->setEnabled(
+                  true);
+               C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TableWidgetComIfSettings
+                                                      ->cellWidget(u16_ComIfCnt, sn_ColConnection),
+                                                      "COMIF_TableCell_Hyperlink", true);
+            }
+            //if the node isn't connected to a bus, the link to bus definition shall not work
+            else
+            {
+               this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt, sn_ColConnection)->setEnabled(
+                  false);
+            }
 
             /**********************************************************************************************************/
             //NODE ID
@@ -675,16 +679,8 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             this->mpc_Ui->pc_TableWidgetComIfSettings->item(u16_ComIfCnt, sn_ColNodeId)->
             setText(QString::number(pc_Node->c_Properties.c_ComInterfaces[u16_ComIfCnt].u8_NodeID));
 
-            //lint -e948 Kept for possibility to revert to previous implementation
-            if (q_Connected == true)
-            {
-               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u16_ComIfCnt, sn_ColNodeId)->setFlags(
-                  Qt::ItemIsEnabled | Qt::ItemIsEditable);
-            }
-            else
-            {
-               this->mpc_Ui->pc_TableWidgetComIfSettings->item(u16_ComIfCnt, sn_ColNodeId)->setFlags(Qt::NoItemFlags);
-            }
+            this->mpc_Ui->pc_TableWidgetComIfSettings->item(u16_ComIfCnt, sn_ColNodeId)->setFlags(
+               Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
             /**********************************************************************************************************/
             //IP Address
@@ -719,7 +715,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                                        u16_ComIfCnt, sn_ColIpAddress))->setAlignment(Qt::AlignCenter);
 
             //apply enabled/disabled style
-            //if can, disable per default
+            //if CAN, disable per default
             if (u16_ComIfCnt < pc_DevDef->u8_NumCanBusses)
             {
                this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
@@ -728,11 +724,11 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             else
             {
                this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(u16_ComIfCnt,
-                                                                     sn_ColIpAddress)->setEnabled(q_Connected);
+                                                                     sn_ColIpAddress)->setEnabled(true);
                //apply special style
                C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TableWidgetComIfSettings
                                                       ->cellWidget(u16_ComIfCnt,
-                                                                   sn_ColIpAddress), "Enabled_IP_Address_Cell", true);
+                                                                   sn_ColIpAddress), "COMIF_TableCell_Hyperlink", true);
             }
 
             //hide the ip address column for devices without Ethernet interfaces
@@ -748,7 +744,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u16_ComIfCnt, sn_ColUpdate, new C_OgeChxTristate(
                                                                         this));
             //set node value
-            if ((q_IsUpdateAvailable == true) && (q_Connected == true))
+            if (q_IsUpdateAvailable == true)
             {
                //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
                dynamic_cast<C_OgeChxTristate *> (this->mpc_Ui->pc_TableWidgetComIfSettings
@@ -773,7 +769,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
                u16_ComIfCnt, sn_ColRouting, new C_OgeChxTristate(
                   this));
 
-            if ((q_IsRoutingAvailable == true) && (q_Connected == true))
+            if (q_IsRoutingAvailable == true)
             {
                //set node value
                //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -799,7 +795,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
             this->mpc_Ui->pc_TableWidgetComIfSettings->setCellWidget(u16_ComIfCnt, sn_ColDiagnostic, new C_OgeChxTristate(
                                                                         this));
 
-            if ((q_IsDiagnosisAvailable == true) && (q_Connected == true))
+            if (q_IsDiagnosisAvailable == true)
             {
                //set node value
                //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -1308,49 +1304,133 @@ void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const ui
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   m_IpAddressClick
+/*! \brief  Short function description
 
-   - check if ip cell is clicked
-   - ...
+   Decides which column in Communication Interfaces Settings Table was clicked and which action to perform after click.
+   If a IP-Address is clicked, a pop up to edit the IP-Address will show up.
+   If a Bus-Bitrate was clicked, Tool jumps to "Edit Bus Properties" Screen.
 
-   \param[in]  ou32_Row       Row
-   \param[in]  ou32_Column    Column
+   \param[in]       ou32_Row        Table Row
+   \param[in]       ou32_Column     Table Column
+
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row, const uint32 ou32_Column)
+void C_SdNdeNodePropertiesWidget::m_HandleCellClick(const uint32 ou32_Row, const uint32 ou32_Column)
 {
    const sintn sn_ColIpAddress = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-   bool q_EnabledCell = this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(ou32_Row,
-                                                                              sn_ColIpAddress)->isEnabled();
+   const sintn sn_ColBusBitrate = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eCONNECTION);
+   bool q_EnabledCellIp = this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(ou32_Row,
+                                                                                sn_ColIpAddress)->isEnabled();
+   bool q_EnabledCellBus = this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(ou32_Row,
+                                                                                 sn_ColBusBitrate)->isEnabled();
 
-   //enabled ip address column clicked?
-   if ((ou32_Column == sn_ColIpAddress) && (q_EnabledCell == true))
+   if ((ou32_Column == sn_ColIpAddress) && (q_EnabledCellIp == true))
    {
-      if (pc_Node != NULL)
+      this->m_IpAddressClick(ou32_Row);
+   }
+   else if ((ou32_Column == sn_ColBusBitrate) && (q_EnabledCellBus == true))
+   {
+      this->m_BusBitrateClick(ou32_Row, ou32_Column);
+   }
+   else
+   {
+      //nothing to do
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   m_IpAddressClick
+
+   open Pop Up for clicked IP Cell
+
+   \param[in]  ou32_Row       Row
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row)
+{
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      //Set parent for better hierarchy handling via window manager
+      QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
+      C_SdNdeIpAddressConfigurationWidget * const pc_Dialog =
+         new C_SdNdeIpAddressConfigurationWidget(*c_New, this->mu32_NodeIndex, ou32_Row);
+      Q_UNUSED(pc_Dialog)
+
+      //Resize
+      c_New->SetSize(QSize(600, 300));
+
+      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
       {
-         //Set parent for better hierarchy handling via window manager
-         QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
-         C_SdNdeIpAddressConfigurationWidget * const pc_Dialog =
-            new C_SdNdeIpAddressConfigurationWidget(*c_New, this->mu32_NodeIndex, ou32_Row);
-         Q_UNUSED(pc_Dialog)
+         //refresh table
+         this->m_LoadFromData();
+      }
+      //Hide overlay after dialog is not relevant anymore
+      if (c_New.isNull() == false)
+      {
+         c_New->HideOverlay();
+      }
+      //lint -e{429}  no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
+   }
+}
 
-         //Resize
-         c_New->SetSize(QSize(600, 300));
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  collects info about the bus, which got clicked in table and sends signal to change screen. Timer is needed
+ *          to delay the signal, that a cell was clicked and the screen should change to bus properties. Without this
+ *          opensyde crashes, because of unexpected behaviour of the table. It seems that the table still wants to
+ *          perform actions after signal is out and screen is changed (while parent widget is already deleted).
 
-         if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   \param[in]       ou32     Table Row
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodePropertiesWidget::m_BusBitrateClick(const uint32 ou32_Row, const stw_types::uint32 ou32_Column)
+{
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   C_OSCNodeProperties c_Prop = pc_Node->c_Properties;
+
+   std::vector<C_OSCNodeComInterfaceSettings> c_ComInterfaces = c_Prop.c_ComInterfaces;
+
+   for (uint32 u32_It = 0; u32_It < c_ComInterfaces.size(); ++u32_It)
+   {
+      //check to which buses the node is connected
+      if (pc_Node->c_Properties.c_ComInterfaces[u32_It].q_IsBusConnected == true)
+      {
+         uint32 u32_BusIndex = c_ComInterfaces[u32_It].u32_BusIndex;
+         //get name of connected bus
+         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+            pc_Node->c_Properties.c_ComInterfaces[u32_It].u32_BusIndex);
+         QString c_BusName = pc_Bus->c_Name.c_str();
+
+         //get label text of the cell, that was clicked
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         QLabel * pc_CellLabel =
+            dynamic_cast<QLabel *> (this->mpc_Ui->pc_TableWidgetComIfSettings->cellWidget(ou32_Row, ou32_Column));
+
+         if (pc_CellLabel != NULL)
          {
-            //refresh table
-            this->m_LoadFromData();
+            QString c_Text = pc_CellLabel->text();
+            // do we have a match? change screen
+            if (c_Text.contains(c_BusName) == true)
+            {
+               this->mu32_BusIndex = u32_BusIndex;
+               this->mc_BusName = c_BusName;
+               this->mc_Timer.start();
+               break;
+            }
          }
-         //Hide overlay after dialog is not relevant anymore
-         if (c_New.isNull() == false)
-         {
-            c_New->HideOverlay();
-         }
-         //lint -e{429}  no memory leak because of the parent of pc_New and pc_Dialog and the Qt memory management
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot for Timer::timeout to walk around the screen change on table-click.
+ *          See m_BusBitrateClicked for details.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodePropertiesWidget::m_OpenBus(void)
+{
+   Q_EMIT (this->SigBusBitrateClicked(this->mu32_BusIndex, this->mc_BusName));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1371,7 +1451,7 @@ void C_SdNdeNodePropertiesWidget::m_FlashloaderOptions(void) const
       Q_UNUSED(pc_Dialog)
 
       //Resize
-      c_New->SetSize(QSize(768, 518));
+      c_New->SetSize(QSize(780, 480));
 
       if (c_New->exec() != static_cast<sintn>(QDialog::Accepted))
       {

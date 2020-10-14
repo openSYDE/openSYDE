@@ -31,6 +31,15 @@ public:
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
    void CheckChannelNameUnique(const stw_types::uint32 ou32_ChannelIndex, bool * const opq_NameConflict) const;
+   stw_types::sint32 ResetChannelToDefault(const stw_types::uint32 ou32_ChannelIndex);
+   void ResetDomainToDefault(void);
+   stw_types::sint32 GetRelevantIndicesForSelectedUseCase(const stw_types::uint32 ou32_ChannelIndex,
+                                                          const bool oq_UseChannelIndex,
+                                                          std::vector<stw_types::uint32> * const opc_ParameterIndices,
+                                                          std::vector<stw_types::uint32> * const opc_InputIndices,
+                                                          std::vector<stw_types::uint32> * const opc_OutputIndices,
+                                                          std::vector<stw_types::uint32> * const opc_StatusIndices)
+   const;
 
    C_OSCHalcConfigChannel c_DomainConfig;                ///< Domain specific configuration
    std::vector<C_OSCHalcConfigChannel> c_ChannelConfigs; ///< Channels of domain of IO description (synced with
@@ -40,6 +49,8 @@ private:
    static void mh_AddParameters(const std::vector<C_OSCHalcDefStruct> & orc_Parameters,
                                 std::vector<C_OSCHalcConfigParameterStruct> & orc_ParamConfig);
    static C_OSCHalcConfigChannel mh_InitConfigFromName(const stw_scl::C_SCLString & orc_Name);
+   C_OSCHalcConfigChannel m_InitChannelConfig(const stw_types::uint32 ou32_ChannelIndex);
+   void m_InitDomainConfig(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

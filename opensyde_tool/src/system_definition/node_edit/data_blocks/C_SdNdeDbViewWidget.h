@@ -49,7 +49,6 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigErrorChange(void);
-   void SigReloadDataPools(void);
    void SigOpenDataPool(const stw_types::uint32 ou32_DataPoolIndex);
 
 private:

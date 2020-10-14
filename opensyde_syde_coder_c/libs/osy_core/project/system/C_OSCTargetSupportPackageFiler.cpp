@@ -19,6 +19,7 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCXMLParser.h"
 #include "CSCLString.h"
+#include "C_OSCSystemFilerUtil.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -156,6 +157,28 @@ sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_T
          orc_TargetSupportPackage.c_Comment = orc_XMLParser.GetNodeContent();
       }
       orc_XMLParser.SelectNodeParent();
+   }
+
+   //Code export settings
+   if ((orc_XMLParser.SelectNodeChild("code-export-settings") == "code-export-settings") && (s32_Return == C_NO_ERR))
+   {
+      if (orc_XMLParser.SelectNodeChild("scaling-support") == "scaling-support")
+      {
+         s32_Return = C_OSCSystemFilerUtil::h_StringToCodeExportScalingType(
+            orc_XMLParser.GetNodeContent(), orc_TargetSupportPackage.c_CodeExportSettings.e_ScalingSupport);
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "code-export-settings");
+      }
+      else
+      {
+         orc_TargetSupportPackage.c_CodeExportSettings.e_ScalingSupport = C_OSCNodeCodeExportSettings::eFLOAT32;
+      }
+      //Return
+      orc_XMLParser.SelectNodeParent();
+   }
+   else
+   {
+      orc_TargetSupportPackage.c_CodeExportSettings.Initialize();
    }
 
    //openSYDE server settings

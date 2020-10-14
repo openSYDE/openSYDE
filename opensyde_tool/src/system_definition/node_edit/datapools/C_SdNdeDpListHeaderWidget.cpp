@@ -30,6 +30,7 @@
 #include "C_OSCUtils.h"
 #include "C_SdNdeDpListPopUp.h"
 #include "TGLUtils.h"
+#include "C_SdNdeDpListCommentDialog.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -41,9 +42,6 @@ using namespace stw_errors;
 using namespace stw_tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SdNdeDpListHeaderWidget::mhu32_HeaderHeight = 66;
-const uint32 C_SdNdeDpListHeaderWidget::mhu32_HeaderExpandedHeight = 66;
-const sintn C_SdNdeDpListHeaderWidget::mhsn_GroupSize = 270;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -85,42 +83,41 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
    mq_InitActive(true),
    mq_DataSetError(false)
 {
+   QSizePolicy c_SizePolicy;
+
    mpc_Ui->setupUi(this);
-   this->mpc_Ui->pc_LabelDataSetsInfo->setTextInteractionFlags(Qt::TextBrowserInteraction);
-   this->mpc_Ui->pc_LabelDataSetsInfo->setFocusPolicy(Qt::NoFocus);
-   this->mpc_Ui->pc_LabelDataSetsInfo->setContextMenuPolicy(Qt::NoContextMenu);
 
    this->mpc_Ui->pc_UsageWidget->SetToolTipWidgetName(QString(C_GtGetText::h_GetText("List")));
    this->NotifySelection(false);
-
-   //Ui restriction
-   this->mpc_Ui->pc_LineEditName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
 
    //Init buttons
    this->mpc_Ui->pc_PushButtonFullScreen->SetCustomIcons("://images/system_definition/NodeEdit/lists/Fullscreen.svg",
                                                          "://images/system_definition/NodeEdit/lists/FullscreenHovered.svg",
                                                          "://images/system_definition/NodeEdit/lists/FullscreenClicked.svg",
                                                          "://images/system_definition/NodeEdit/lists/FullscreenDisabled.svg");
-   RegisterExpandOrCollapse(false);
-
-   //Icon
-   this->mpc_Ui->pc_LabelListError->setPixmap(QIcon("://images/Error_iconV2.svg").pixmap(mc_ICON_SIZE_24));
-
-   //Inital expand false
-   //lint -e{1938}  static const is guaranteed preinitialized before main
-   m_HandleWidgetResize(mhu32_HeaderHeight);
-
-   //Init labels
-   InitStaticNames();
-
-   //Deactivate debug label
-   this->mpc_Ui->pc_GroupBoxCount->setTitle("");
-
-   // Expand Button
    this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconOpenList.svg",
                                                      "://images/IconOpenListHovered.svg",
                                                      "://images/IconOpenListClicked.svg",
                                                      "://images/IconOpenListDisabledBright.svg");
+   this->mpc_Ui->pc_PushButtonComment->SetSvg("://images/system_definition/IconCommentAdd.svg");
+   this->mpc_Ui->pc_PushButtonDataset->SetSvg("://images/system_definition/NodeEdit/datasets/IconDatasets0.svg");
+
+   RegisterExpandOrCollapse(false);
+
+   // Error icon
+   this->mpc_Ui->pc_LabelListError->setText("");
+   this->mpc_Ui->pc_LabelListError->setPixmap(QIcon("://images/Error_iconV2.svg").pixmap(mc_ICON_SIZE_20));
+   c_SizePolicy = this->mpc_Ui->pc_LabelListError->sizePolicy();
+   c_SizePolicy.setRetainSizeWhenHidden(true);
+   this->mpc_Ui->pc_LabelListError->setSizePolicy(c_SizePolicy); // keep space free when invisible
+
+   //Init labels
+   InitStaticNames();
+   this->mpc_Ui->pc_LabelComment->SetFontPixel(14);
+   this->mpc_Ui->pc_LabelComment->SetForegroundColor(6);
+
+   //Deactivate debug label
+   this->mpc_Ui->pc_GroupBoxUsage->setTitle("");
 
    //Spin box
    this->mpc_Ui->pc_SpinBoxSize->SetMinimumCustom(10);
@@ -132,36 +129,35 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
    connect(&this->mc_DoubleClickTimer, &QTimer::timeout, this,
            &C_SdNdeDpListHeaderWidget::m_OnDoubleClickTimeout);
 
-   //OK button (exit fullscreen)
-   this->mpc_Ui->pc_PushButtonOK->SetCustomIcons("://images/system_definition/NodeEdit/lists/FullscreenExit.svg",
-                                                 "://images/system_definition/NodeEdit/lists/FullscreenExitHovered.svg",
-                                                 "://images/system_definition/NodeEdit/lists/FullscreenExitClicked.svg",
-                                                 "://images/system_definition/NodeEdit/lists/FullscreenExitDisabled.svg");
+   //OK button (exit full screen)
+   this->mpc_Ui->pc_PushButtonCollapse->SetCustomIcons("://images/system_definition/NodeEdit/lists/FullscreenExit.svg",
+                                                       "://images/system_definition/NodeEdit/lists/FullscreenExitHovered.svg",
+                                                       "://images/system_definition/NodeEdit/lists/FullscreenExitClicked.svg",
+                                                       "://images/system_definition/NodeEdit/lists/FullscreenExitDisabled.svg");
 
-   this->mpc_Ui->pc_PushButtonOK->hide();
-   connect(this->mpc_Ui->pc_PushButtonOK, &C_OgePubIconOnly::clicked, this, &C_SdNdeDpListHeaderWidget::m_OnOK);
+   this->mpc_Ui->pc_PushButtonCollapse->hide();
+   connect(this->mpc_Ui->pc_PushButtonCollapse, &C_OgePubIconOnly::clicked, this, &C_SdNdeDpListHeaderWidget::m_OnOK);
 
    //signals & slots
    connect(this->mpc_Ui->pc_PushButtonExpand, &QPushButton::toggled, this,
            &C_SdNdeDpListHeaderWidget::m_OnPushButtonExpandClicked);
    connect(this->mpc_Ui->pc_PushButtonFullScreen, &QPushButton::clicked, this,
            &C_SdNdeDpListHeaderWidget::PopUp);
-   connect(this->mpc_Ui->pc_LabelDataSetsInfo, &QLabel::linkActivated, this,
+   connect(this->mpc_Ui->pc_PushButtonDataset, &C_OgePubSvgIconOnly::clicked, this,
            &C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit);
    connect(this->mpc_Ui->pc_LineEditName, &stw_opensyde_gui_elements::C_OgeLeListHeader::textChanged, this,
            &C_SdNdeDpListHeaderWidget::m_ChangeName);
+   connect(this->mpc_Ui->pc_PushButtonComment, &C_OgePubSvgIconOnly::clicked, this,
+           &C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked);
 
    //Data changes
    connect(this->mpc_Ui->pc_SpinBoxSize, &stw_opensyde_gui_elements::C_OgeSpxEditProperties::editingFinished, this,
            &C_SdNdeDpListHeaderWidget::m_EditSizeFinished);
    connect(this->mpc_Ui->pc_LineEditName, &stw_opensyde_gui_elements::C_OgeLeListHeader::editingFinished, this,
            &C_SdNdeDpListHeaderWidget::m_EditNameFinished);
-   connect(this->mpc_Ui->pc_TextEditComment, &stw_opensyde_gui_elements::C_OgeTedListHeaderBase::SigEditFinished, this,
-           &C_SdNdeDpListHeaderWidget::m_EditCommentFinished);
+
    //Focus
    connect(this->mpc_Ui->pc_LineEditName, &stw_opensyde_gui_elements::C_OgeLeListHeader::SigFocus, this,
-           &C_SdNdeDpListHeaderWidget::m_HandleFocus);
-   connect(this->mpc_Ui->pc_TextEditComment, &stw_opensyde_gui_elements::C_OgeTedListHeaderBase::SigFocus, this,
            &C_SdNdeDpListHeaderWidget::m_HandleFocus);
    connect(this->mpc_Ui->pc_SpinBoxSize, &stw_opensyde_gui_elements::C_OgeSpxEditProperties::SigFocus, this,
            &C_SdNdeDpListHeaderWidget::m_HandleFocus);
@@ -169,14 +165,10 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
            &C_SdNdeDpListHeaderWidget::m_HandleFocus);
    connect(this->mpc_Ui->pc_PushButtonFullScreen, &stw_opensyde_gui_elements::C_OgePubIconOnly::pressed, this,
            &C_SdNdeDpListHeaderWidget::m_HandleFocus);
-   connect(this->mpc_Ui->pc_TextEditComment, &stw_opensyde_gui_elements::C_OgeTedListHeaderBase::SigFocus, this,
-           &C_SdNdeDpListHeaderWidget::m_HandleTextEditFocus);
-   connect(this->mpc_Ui->pc_SpinBoxSize, &stw_opensyde_gui_elements::C_OgeSpxEditProperties::editingFinished,
-           this->mpc_Ui->pc_SpinBoxSize,
-           &stw_opensyde_gui_elements::C_OgeSpxEditProperties::clearFocus);
-   connect(this->mpc_Ui->pc_LineEditName, &stw_opensyde_gui_elements::C_OgeLeListHeader::editingFinished,
-           this->mpc_Ui->pc_LineEditName,
-           &stw_opensyde_gui_elements::C_OgeLeListHeader::clearFocus);
+   connect(this->mpc_Ui->pc_PushButtonComment, &C_OgePubSvgIconOnly::pressed,
+           this, &C_SdNdeDpListHeaderWidget::m_HandleFocus);
+   connect(this->mpc_Ui->pc_PushButtonDataset, &C_OgePubSvgIconOnly::pressed,
+           this, &C_SdNdeDpListHeaderWidget::m_HandleFocus);
    connect(this->mpc_Ui->pc_LabelListError, &C_OgeLabToolTipBase::SigLastChanceToUpdateToolTip, this,
            &C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip);
 }
@@ -242,18 +234,21 @@ void C_SdNdeDpListHeaderWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelSize->setText(C_GtGetText::h_GetText("Size: "));
    this->mpc_Ui->pc_SpinBoxSize->setSuffix(C_GtGetText::h_GetText(" Bytes"));
    this->mpc_Ui->pc_LineEditName->setPlaceholderText(C_GtGetText::h_GetText("Add your List Name"));
-   this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
-   this->mpc_Ui->pc_PushButtonFullScreen->SetToolTipInformation("Fullscreen",
-                                                                "Shows this list in fullscreen mode to improve your editing experience.");
-   this->mpc_Ui->pc_PushButtonOK->SetToolTipInformation(C_GtGetText::h_GetText("Exit Fullscreen"),
-                                                        C_GtGetText::h_GetText(
-                                                           "Go back to Datapools."));
-   this->mpc_Ui->pc_LabelSize->SetToolTipInformation(C_GtGetText::h_GetText("Size"),
-                                                     C_GtGetText::h_GetText(
-                                                        "Set the number of bytes which this list will reserve."));
-   this->mpc_Ui->pc_LabelDataSetsInfo->SetToolTipInformation(C_GtGetText::h_GetText("Datasets"),
-                                                             C_GtGetText::h_GetText(
-                                                                "Edit the Datasets which can be used to set defined value for each variable contained in this list."));
+   this->mpc_Ui->pc_PushButtonComment->SetToolTipInformation(
+      C_GtGetText::h_GetText("Edit Comment"),
+      C_GtGetText::h_GetText("Add or edit comment for this List."));
+   this->mpc_Ui->pc_PushButtonFullScreen->SetToolTipInformation(
+      C_GtGetText::h_GetText("Full Screen"),
+      C_GtGetText::h_GetText("Shows this list in full-screen-mode to improve your editing experience."));
+   this->mpc_Ui->pc_PushButtonCollapse->SetToolTipInformation(
+      C_GtGetText::h_GetText("Exit Full Screen"),
+      C_GtGetText::h_GetText("Go back to Datapool Lists."));
+   this->mpc_Ui->pc_LabelSize->SetToolTipInformation(
+      C_GtGetText::h_GetText("Size"),
+      C_GtGetText::h_GetText("Set the number of bytes which this list will reserve."));
+   this->mpc_Ui->pc_PushButtonDataset->SetToolTipInformation(
+      C_GtGetText::h_GetText("Edit Datasets"),
+      C_GtGetText::h_GetText("Datasets can be used to set defined values for each element contained in this list."));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -268,7 +263,7 @@ void C_SdNdeDpListHeaderWidget::RegisterExpandOrCollapse(const bool & orq_Expand
    this->mpc_Ui->pc_PushButtonExpand->setChecked(orq_Expanded);
    if (orq_Expanded == true)
    {
-      this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconArrowBottom.svg",
+      this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconCloseList.svg",
                                                         "://images/IconArrowBottomHovered.svg",
                                                         "://images/IconArrowBottomClicked.svg",
                                                         "://images/IconArrowBottomDisabledBright.svg");
@@ -336,8 +331,7 @@ void C_SdNdeDpListHeaderWidget::CheckError(void)
       //Set error color
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditName, "Valid",
                                              ((q_NameConflict == false) && (q_NameInvalid == false)));
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCount, "Valid", (q_UsageInvalid == false));
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCountNumber, "Valid", (q_UsageInvalid == false));
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelUsage, "Valid", (q_UsageInvalid == false));
       UpdateDataSetCount();
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelSize, "Valid", (q_OutOfDataPool == false));
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxSize, "Valid", (q_OutOfDataPool == false));
@@ -345,10 +339,10 @@ void C_SdNdeDpListHeaderWidget::CheckError(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle variables size change
+/*! \brief   Update UI elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListHeaderWidget::VariablesSizeChange(void)
+void C_SdNdeDpListHeaderWidget::UpdateUI(void)
 {
    m_UpdateUi();
 }
@@ -364,27 +358,23 @@ void C_SdNdeDpListHeaderWidget::UpdateDataSetCount(void)
 
    if (pc_List != NULL)
    {
-      QString c_Text;
-      if (pc_List->c_DataSets.size() == 0UL)
+      const QString c_Error = this->mq_DataSetError ? "Error" : "";
+      QString c_Svg;
+
+      if (pc_List->c_DataSets.size() < 11)
       {
-         c_Text = C_Uti::h_GetLink("No Datasets");
+         c_Svg = QString("://images/system_definition/NodeEdit/datasets/IconDatasets%1%2.svg").
+                 arg(pc_List->c_DataSets.size()).arg(c_Error);
       }
       else
       {
-         if (this->mq_DataSetError == true)
-         {
-            c_Text = C_Uti::h_GetLink(QString(C_GtGetText::h_GetText("Datasets: %1 ")).arg(pc_List->c_DataSets.size()),
-                                      mc_STYLE_GUIDE_COLOR_24);
-         }
-         else
-         {
-            c_Text =
-               C_Uti::h_GetLink(QString(C_GtGetText::h_GetText("Datasets: %1 ")).arg(pc_List->c_DataSets.size()));
-         }
+         c_Svg = QString("://images/system_definition/NodeEdit/datasets/IconDatasetsMore%1.svg").arg(c_Error);
       }
-      this->mpc_Ui->pc_LabelDataSetsInfo->setText(c_Text);
+
+      this->mpc_Ui->pc_PushButtonDataset->SetSvg(c_Svg);
    }
-   Q_EMIT this->SigUpdated();
+
+   Q_EMIT (this->SigUpdated());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -400,12 +390,12 @@ void C_SdNdeDpListHeaderWidget::NotifySelection(const bool & orq_Selected)
       this->mc_DoubleClickTimer.stop();
       this->mpc_Ui->pc_UsageWidget->SetColorFree(mc_STYLE_GUIDE_COLOR_10);
       this->mpc_Ui->pc_LineEditName->setEnabled(false);
-      this->mpc_Ui->pc_TextEditComment->setEnabled(false);
       this->mpc_Ui->pc_SpinBoxSize->setEnabled(false);
    }
    else
    {
       this->mpc_Ui->pc_UsageWidget->SetColorFree(mc_STYLE_GUIDE_COLOR_11);
+      this->mpc_Ui->pc_SpinBoxSize->setEnabled(true);
       this->mc_DoubleClickTimer.start();
    }
 }
@@ -421,8 +411,8 @@ void C_SdNdeDpListHeaderWidget::SetEditFocus(void)
       this->mc_DoubleClickTimer.stop();
       m_OnDoubleClickTimeout();
    }
-   this->mpc_Ui->pc_LineEditName->selectAll();
    this->mpc_Ui->pc_LineEditName->setFocus();
+   this->mpc_Ui->pc_LineEditName->selectAll();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -432,7 +422,7 @@ void C_SdNdeDpListHeaderWidget::SetEditFocus(void)
 void C_SdNdeDpListHeaderWidget::PrepareExpandedMode(void) const
 {
    this->mpc_Ui->pc_PushButtonFullScreen->hide();
-   this->mpc_Ui->pc_PushButtonOK->setVisible(true);
+   this->mpc_Ui->pc_PushButtonCollapse->setVisible(true);
    this->mpc_Ui->pc_PushButtonExpand->setChecked(true);
    this->mpc_Ui->pc_PushButtonExpand->setEnabled(false);
    //Allow interaction
@@ -468,19 +458,16 @@ void C_SdNdeDpListHeaderWidget::PopUp(void)
       disconnect(pc_PopUp, &C_SdNdeDpListPopUp::SigSave, this, &C_SdNdeDpListHeaderWidget::SigSave);
       if (pc_PopUp->GetSaveAsAfterClose() == true)
       {
-         Q_EMIT this->SigSaveAs();
+         Q_EMIT (this->SigSaveAs());
       }
       //Update UI only if not in save as screen
       else
       {
          //Disconnect
-         disconnect(this, &C_SdNdeDpListHeaderWidget::SigUpdated, pc_PopUp,
-                    &C_SdNdeDpListPopUp::UpdateHeader);
-         //Check error
-         Q_EMIT (this->SigErrorChange());
+         disconnect(this, &C_SdNdeDpListHeaderWidget::SigUpdated, pc_PopUp, &C_SdNdeDpListPopUp::UpdateHeader);
          //Reload
          this->m_UpdateUi();
-         Q_EMIT this->SigUpdateTable();
+         Q_EMIT (this->SigUpdateTable());
       }
 
       c_Dialog->HideOverlay();
@@ -496,11 +483,11 @@ void C_SdNdeDpListHeaderWidget::m_OnPushButtonExpandClicked(const bool oq_Checke
    //Resize expanded
    if (oq_Checked == true)
    {
-      this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconArrowBottom.svg",
+      this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconCloseList.svg",
                                                         "://images/IconArrowBottomHovered.svg",
                                                         "://images/IconArrowBottomClicked.svg",
                                                         "://images/IconArrowBottomDisabledBright.svg");
-      Q_EMIT this->SigExpand(this, true);
+      Q_EMIT (this->SigExpand(this, true));
    }
    else
    {
@@ -508,27 +495,8 @@ void C_SdNdeDpListHeaderWidget::m_OnPushButtonExpandClicked(const bool oq_Checke
                                                         "://images/IconOpenListHovered.svg",
                                                         "://images/IconOpenListClicked.svg",
                                                         "://images/IconOpenListDisabledBright.svg");
-      Q_EMIT this->SigExpand(this, false);
+      Q_EMIT (this->SigExpand(this, false));
    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle widget resize (including signal to parent class)
-
-   \param[in] ou32_NewHeight New height of widget
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListHeaderWidget::m_HandleWidgetResize(const uint32 ou32_NewHeight)
-{
-   this->setMinimumHeight(static_cast<sintn>(ou32_NewHeight));
-   this->setMaximumHeight(static_cast<sintn>(ou32_NewHeight));
-   if (this->mpc_TreeWidget == NULL)
-   {
-      //Adapted for missing borders (no delegate notification necessary as this one has no delegate)
-      this->setMinimumHeight(static_cast<sintn>(ou32_NewHeight - 2UL));
-      this->setMaximumHeight(static_cast<sintn>(ou32_NewHeight - 2UL));
-   }
-   Q_EMIT this->SigNewHeight(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -548,26 +516,7 @@ void C_SdNdeDpListHeaderWidget::m_UpdateListNamePrefix(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::m_HandleFocus(void)
 {
-   Q_EMIT this->SigExclusiveSelection(this->mu32_ListIndex);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Handle text edit focus change
-
-   \param[in] oq_Active true:  focus
-                        false: no focus
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListHeaderWidget::m_HandleTextEditFocus(const bool oq_Active)
-{
-   if (oq_Active == true)
-   {
-      m_HandleWidgetResize(C_SdNdeDpListHeaderWidget::mhu32_HeaderExpandedHeight);
-   }
-   else
-   {
-      m_HandleWidgetResize(C_SdNdeDpListHeaderWidget::mhu32_HeaderHeight);
-   }
+   Q_EMIT (this->SigExclusiveSelection(this->mu32_ListIndex));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -589,9 +538,23 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
    tgl_assert(pc_Node != NULL);
    if ((pc_Node != NULL) && ((pc_List != NULL) && (pc_DataPool != NULL)))
    {
-      this->mpc_Ui->pc_LineEditName->setText(pc_List->c_Name.c_str());
-      this->mpc_Ui->pc_TextEditComment->setText(pc_List->c_Comment.c_str());
-      this->mpc_Ui->pc_TextEditComment->HideFullText();
+      // name and comment
+      const QString c_SimplifiedComment = QString(pc_List->c_Comment.c_str()).simplified();
+
+      this->mpc_Ui->pc_LineEditName->SetName(pc_List->c_Name.c_str());
+      this->mpc_Ui->pc_LineEditName->SetCounter(pc_List->c_Elements.size());
+      this->mpc_Ui->pc_LabelComment->SetCompleteText(c_SimplifiedComment);
+      this->mpc_Ui->pc_LabelComment->SetToolTipInformation("", pc_List->c_Comment.c_str());
+
+      if (pc_List->c_Comment.IsEmpty() == true)
+      {
+         this->mpc_Ui->pc_PushButtonComment->SetSvg("://images/system_definition/IconCommentAdd.svg");
+      }
+      else
+      {
+         this->mpc_Ui->pc_PushButtonComment->SetSvg("://images/system_definition/IconComment.svg");
+      }
+
       //Data sets
       UpdateDataSetCount();
       //Size & address
@@ -602,13 +565,8 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
                                                                          pc_List->GetNumBytesUsed());
          this->mpc_Ui->pc_UsageWidget->update();
 
-         //adapt count label
-         this->mpc_Ui->pc_LabelCount->setText(C_GtGetText::h_GetText("Parameters: "));
-
          this->mpc_Ui->pc_GroupBoxUsage->setVisible(true);
          this->mpc_Ui->pc_GroupBoxSize->setVisible(true);
-         //May be used later
-         this->mpc_Ui->pc_GroupBoxAddress->setVisible(false);
 
          //Size max
          tgl_assert(pc_Device != NULL);
@@ -620,41 +578,19 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
 
          //Size value
          this->mpc_Ui->pc_SpinBoxSize->setValue(pc_List->u32_NvMSize);
-
-         //User info
-         this->mpc_Ui->pc_LabelStartAddress->setText(QString(C_GtGetText::h_GetText("Start address: %1 (%2)")).arg(
-                                                        pc_List->u32_NvMStartAddress).arg(pc_Node->
-                                                                                          GetListAbsoluteAddress(this->
-                                                                                                                 mu32_DataPoolIndex,
-                                                                                                                 this->
-                                                                                                                 mu32_ListIndex)));
-         this->mpc_Ui->pc_LabelCountNumber->setText(QString(C_GtGetText::h_GetText("%1 (%2%)")).arg(pc_List->
-                                                                                                    c_Elements.
-                                                                                                    size()).arg(
-                                                       u32_Usage));
-         //Spacing issue
-         this->mpc_Ui->pc_GroupBoxCount->setMinimumWidth(mhsn_GroupSize);
-         this->mpc_Ui->pc_GroupBoxCount->setMaximumWidth(mhsn_GroupSize);
+         this->mpc_Ui->pc_LabelUsage->setText(QString(C_GtGetText::h_GetText("Usage: %1%")).arg(u32_Usage));
       }
       else
       {
-         //adapt count label
-         this->mpc_Ui->pc_LabelCount->setText(C_GtGetText::h_GetText("Variables: "));
-
+         //hide size specific elements
          this->mpc_Ui->pc_GroupBoxUsage->setVisible(false);
          this->mpc_Ui->pc_GroupBoxSize->setVisible(false);
-         //May be used later
-         this->mpc_Ui->pc_GroupBoxAddress->setVisible(false);
-         this->mpc_Ui->pc_LabelCountNumber->setText(QString("%1").arg(pc_List->c_Elements.size()));
-         //Spacing issue
-         this->mpc_Ui->pc_GroupBoxCount->setMinimumWidth(mhsn_GroupSize - 90);
-         this->mpc_Ui->pc_GroupBoxCount->setMaximumWidth(mhsn_GroupSize - 90);
       }
       //Error handling
       CheckError();
    }
    //Reconnect
-   Q_EMIT this->SigUpdated();
+   Q_EMIT (this->SigUpdated());
    this->mq_InitActive = false;
 }
 
@@ -666,7 +602,7 @@ void C_SdNdeDpListHeaderWidget::m_EditNameFinished(void)
 {
    if (this->mq_InitActive == false)
    {
-      const QVariant c_Data = this->mpc_Ui->pc_LineEditName->text();
+      const QVariant c_Data = this->mpc_Ui->pc_LineEditName->GetName();
 
       if (this->mpc_UndoManager != NULL)
       {
@@ -676,7 +612,6 @@ void C_SdNdeDpListHeaderWidget::m_EditNameFinished(void)
                                                                                                 mpc_TreeWidget),
                                                  this->mu32_ListIndex, c_Data, C_SdNdeDpUtil::eLIST_NAME);
       }
-      Q_EMIT this->SigUpdateAddress();
    }
 }
 
@@ -684,20 +619,35 @@ void C_SdNdeDpListHeaderWidget::m_EditNameFinished(void)
 /*! \brief   Register edit comment finished
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListHeaderWidget::m_EditCommentFinished(void)
+void C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked(void)
 {
    if (this->mq_InitActive == false)
    {
-      const QVariant c_Data = this->mpc_Ui->pc_TextEditComment->GetFullText();
+      // open comment edit popup
+      QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
+      C_SdNdeDpListCommentDialog * const pc_ArrayEditWidget =
+         new C_SdNdeDpListCommentDialog(*c_Dialog, this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+                                        this->mu32_ListIndex);
+      //Resize
+      c_Dialog->SetSize(QSize(750, 400));
 
-      if (this->mpc_UndoManager != NULL)
+      if ((c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted)) && (this->mpc_UndoManager != NULL))
       {
+         // save to data on ok
+         const QVariant c_Data = pc_ArrayEditWidget->GetComment();
          //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          this->mpc_UndoManager->DoChangeListData(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                 dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->
-                                                                                                mpc_TreeWidget),
+                                                 dynamic_cast<C_SdNdeDpListsTreeWidget * const>(this->mpc_TreeWidget),
                                                  this->mu32_ListIndex, c_Data, C_SdNdeDpUtil::eLIST_COMMENT);
+         // this also triggers label and icon update
       }
+
+      if (c_Dialog != NULL)
+      {
+         c_Dialog->HideOverlay();
+      }
+
+      //lint -e{429}  no memory leak because of the parent of pc_ImportDialog and the Qt memory management
    }
 }
 
@@ -720,7 +670,6 @@ void C_SdNdeDpListHeaderWidget::m_EditSizeFinished(void)
                                                                                                 mpc_TreeWidget),
                                                  this->mu32_ListIndex, c_Data, C_SdNdeDpUtil::eLIST_SIZE);
       }
-      Q_EMIT this->SigUpdateAddress();
    }
 }
 
@@ -745,7 +694,7 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
 
       pc_DataSetWidget->SetModelViewManager(this->mpc_ModelViewManager);
       //Resize
-      c_Dialog->SetSize(QSize(800, 550));
+      c_Dialog->SetSize(QSize(790, 540));
       if (c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
       {
          //Register undo
@@ -783,7 +732,7 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
 void C_SdNdeDpListHeaderWidget::m_ChangeName(void) const
 {
    QString c_Content;
-   const stw_scl::C_SCLString c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
+   const stw_scl::C_SCLString c_Name = this->mpc_Ui->pc_LineEditName->GetName().toStdString().c_str();
 
    //check
    bool q_NameIsValid = C_OSCUtils::h_CheckValidCName(c_Name);
@@ -822,8 +771,6 @@ void C_SdNdeDpListHeaderWidget::m_ChangeName(void) const
 void C_SdNdeDpListHeaderWidget::m_OnDoubleClickTimeout(void) const
 {
    this->mpc_Ui->pc_LineEditName->setEnabled(true);
-   this->mpc_Ui->pc_TextEditComment->setEnabled(true);
-   this->mpc_Ui->pc_SpinBoxSize->setEnabled(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -832,7 +779,7 @@ void C_SdNdeDpListHeaderWidget::m_OnDoubleClickTimeout(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::m_OnOK(void)
 {
-   Q_EMIT this->SigClose();
+   Q_EMIT (this->SigClose());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

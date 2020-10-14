@@ -36,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSignalTableWidget::C_SdBueMessageSignalTableWidget(QWidget * const opc_Parent) :
@@ -81,7 +81,7 @@ C_SdBueMessageSignalTableWidget::~C_SdBueMessageSignalTableWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set message sync manager
 
-   \param[in,out] opc_Value Message sync manager
+   \param[in,out]  opc_Value  Message sync manager
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::SetMessageSyncManager(
@@ -117,9 +117,37 @@ void C_SdBueMessageSignalTableWidget::InitStaticNames(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load user settings
+
+   \param[in]  orc_MessageValues    Message values
+   \param[in]  orc_SignalValues     Signal values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalTableWidget::LoadUserSettings(const std::vector<stw_types::sint32> & orc_MessageValues,
+                                                       const std::vector<stw_types::sint32> & orc_SignalValues) const
+{
+   this->mpc_Ui->pc_TableViewSignals->LoadUserSettings(orc_SignalValues);
+   this->mpc_Ui->pc_TableViewMessages->LoadUserSettings(orc_MessageValues);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save user settings
+
+   \param[in,out]  orc_MessageValues   Message values
+   \param[in,out]  orc_SignalValues    Signal values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalTableWidget::SaveUserSettings(std::vector<stw_types::sint32> & orc_MessageValues,
+                                                       std::vector<stw_types::sint32> & orc_SignalValues) const
+{
+   this->mpc_Ui->pc_TableViewSignals->SaveUserSettings(orc_SignalValues);
+   this->mpc_Ui->pc_TableViewMessages->SaveUserSettings(orc_MessageValues);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle messages radio button toggle
 
-   \param[in] orq_Checked Radio button state
+   \param[in]  orq_Checked    Radio button state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnMessagesToggle(const bool & orq_Checked)
@@ -132,7 +160,7 @@ void C_SdBueMessageSignalTableWidget::m_OnMessagesToggle(const bool & orq_Checke
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle signals radio button toggle
 
-   \param[in] orq_Checked Radio button state
+   \param[in]  orq_Checked    Radio button state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnSignalsToggle(const bool & orq_Checked)
@@ -143,7 +171,7 @@ void C_SdBueMessageSignalTableWidget::m_OnSignalsToggle(const bool & orq_Checked
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle message selection
 
-   \param[in] orc_MessageId Message identification indices
+   \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnMessageSelected(
@@ -155,8 +183,8 @@ void C_SdBueMessageSignalTableWidget::m_OnMessageSelected(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle signal selection
 
-   \param[in] orc_MessageId     Message identification indices
-   \param[in] oru32_SignalIndex Signal index
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnSignalSelected(

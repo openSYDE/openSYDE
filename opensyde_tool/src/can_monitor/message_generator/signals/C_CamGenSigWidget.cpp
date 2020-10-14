@@ -49,8 +49,7 @@ C_CamGenSigWidget::C_CamGenSigWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamGenSigWidget),
    mu32_NumSelectedItems(0UL),
-   mu32_Row(0UL),
-   mc_DynamicName("")
+   mu32_Row(0UL)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -150,9 +149,10 @@ void C_CamGenSigWidget::UpdateMessageDLC(const stw_types::uint32 ou32_MessageInd
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelectedItems, const stw_types::uint32 ou32_Row)
 {
+   QString c_Name = "-";
+
    this->mu32_NumSelectedItems = ou32_NumSelectedItems;
    this->mu32_Row = ou32_Row;
-   this->mc_DynamicName = "-";
    if (ou32_NumSelectedItems == 0UL)
    {
       this->mpc_Ui->pc_GroupBoxNoSignals->setVisible(true);
@@ -173,7 +173,7 @@ void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelected
       if (ou32_Row < C_CamProHandler::h_GetInstance()->GetMessages().size())
       {
          const C_CamProMessageData & rc_Message = C_CamProHandler::h_GetInstance()->GetMessages()[ou32_Row];
-         this->mc_DynamicName = C_CamProHandler::h_GetCompleteMessageName(rc_Message);
+         c_Name = C_CamProHandler::h_GetCompleteMessageName(rc_Message);
          //Either DBC or OSY message should return a valid message
          if (rc_Message.c_DataBaseFilePath.IsEmpty() == false)
          {
@@ -203,7 +203,7 @@ void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelected
       else
       {
          //Case: no database and no message found
-         this->mc_DynamicName = C_GtGetText::h_GetText("Unknown");
+         c_Name = C_GtGetText::h_GetText("Unknown");
          this->mpc_Ui->pc_GroupBoxNoDatabase->setVisible(false);
          this->mpc_Ui->pc_TableView->setVisible(true);
       }
@@ -211,22 +211,8 @@ void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelected
    }
 
    // update label
-   this->mpc_Ui->pc_LabelHeadingDynamic->SetToolTipInformation("", this->mc_DynamicName);
-   this->m_SetDynamicNameElided();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Overwritten resize event slot
-
-   Here: elide text of dynamic label if necessary
-
-   \param[in,out]  opc_Event  Event identification and information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamGenSigWidget::resizeEvent(QResizeEvent * const opc_Event)
-{
-   this->m_SetDynamicNameElided();
-   C_OgeWiOnlyBackground::resizeEvent(opc_Event);
+   this->mpc_Ui->pc_LabelHeadingDynamic->SetCompleteText(c_Name);
+   this->mpc_Ui->pc_LabelHeadingDynamic->SetToolTipInformation("", c_Name);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -236,17 +222,4 @@ void C_CamGenSigWidget::resizeEvent(QResizeEvent * const opc_Event)
 void C_CamGenSigWidget::m_Reset(void)
 {
    this->UpdateSelection(0UL, 0UL);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set name and elide if necessary.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_CamGenSigWidget::m_SetDynamicNameElided(void)
-{
-   const QFontMetrics c_Metric = QFontMetrics(C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_SEMIBOLD_14));
-
-   this->mpc_Ui->pc_LabelHeadingDynamic->
-   setText(c_Metric.elidedText(this->mc_DynamicName, Qt::ElideRight,
-                               this->mpc_Ui->pc_LabelHeadingDynamic->width() - 3)); // right margin 3
 }

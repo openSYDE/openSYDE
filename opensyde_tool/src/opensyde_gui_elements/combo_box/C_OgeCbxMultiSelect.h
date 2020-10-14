@@ -9,11 +9,12 @@
 #define C_OGECBXMULTISELECT_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "stwtypes.h"
-#include "C_OgeCbxTableBase.h"
-
 #include <QComboBox>
+#include <QBitArray>
+#include <QFrame>
 #include <QListWidget>
+
+#include "stwtypes.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
@@ -23,7 +24,7 @@ namespace stw_opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeCbxMultiSelect :
-   public C_OgeCbxTableBase
+   public QComboBox
 {
    Q_OBJECT
 
@@ -34,11 +35,20 @@ public:
    void SetDisplayText(const QString oc_Text);
    QString GetDisplayText() const;
    void RemoveAllItems();
+   QBitArray GetValuesAsBitArray(void) const;
    // add a item to the list
    void AddItem(const QString & orc_Text, const QVariant & orc_UserData = QVariant());
+   void SetItem(const QString & orc_DisplayName);
+   void Init(const QStringList & orc_Strings, const QBitArray & orc_Values);
    // replace standard QComboBox Popup
    virtual void showPopup();
    virtual void hidePopup();
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+Q_SIGNALS:
+   //lint -restore
+   void SigValueChanged(const QString & orc_ItemText, const bool oq_Checked);
 
 protected:
    // custom paint
@@ -60,7 +70,6 @@ private:
    QFrame * mpc_PopFrame;
    // multi selection list in the popup frame
    QListWidget * mpc_ListWidget;
-   QListWidgetItem * mpc_ListWidgetItem;
 
    // react on changes of the item checkbox
    void m_ScanItemSelect(const QListWidgetItem * const opc_Item);

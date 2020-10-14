@@ -73,6 +73,7 @@ Q_SIGNALS:
    void SigNodesChanged(void);
    void SigBussesChanged(void);
    void SigSyncNodeAdded(const stw_types::uint32 ou32_Index);
+   void SigSyncNodeHALC(const stw_types::uint32 ou32_Index);
    void SigSyncNodeAboutToBeDeleted(const stw_types::uint32 ou32_Index);
    void SigSyncNodeDataPoolAdded(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
    void SigSyncNodeDataPoolMoved(const stw_types::uint32 ou32_NodeIndex,

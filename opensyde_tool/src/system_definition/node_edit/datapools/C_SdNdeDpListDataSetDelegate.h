@@ -38,8 +38,7 @@ public:
    virtual void setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const;
    virtual void setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                              const QModelIndex & orc_Index) const;
-   virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
-                      const QModelIndex & orc_Index) const;
+
    //lint -restore
    bool SetHoveredCol(const stw_types::sint32 & ors32_Value);
    void SetModel(const C_SdNdeDpListDataSetModel * const opc_Value);

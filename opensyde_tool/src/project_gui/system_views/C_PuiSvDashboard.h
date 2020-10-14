@@ -87,6 +87,8 @@ public:
 
    //Sync to system definition
    void OnSyncNodeAdded(const stw_types::uint32 ou32_Index);
+   void OnSyncNodeHALC(const stw_types::uint32 ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                                          C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew);
    void OnSyncNodeAboutToBeDeleted(const stw_types::uint32 ou32_Index);
    void OnSyncNodeDataPoolAdded(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
    void OnSyncNodeDataPoolMoved(const stw_types::uint32 ou32_NodeIndex,
@@ -142,6 +144,9 @@ public:
                                                       const stw_types::uint32 ou32_ElementIndex);
    static void h_OnSyncNodeAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
                                  const stw_types::uint32 ou32_Index);
+   static void h_OnSyncNodeHALC(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                const stw_types::uint32 ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                                                   C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew);
    static void h_OnSyncNodeAboutToBeDeleted(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
                                             const stw_types::uint32 ou32_Index);
    static void h_OnSyncNodeDataPoolAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,

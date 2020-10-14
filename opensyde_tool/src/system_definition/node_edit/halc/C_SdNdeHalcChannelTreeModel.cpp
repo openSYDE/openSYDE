@@ -15,12 +15,16 @@
 #include "C_SdNdeHalcChannelTreeModel.h"
 #include "C_TblTreItem.h"
 
+#include "constants.h"
+
 #include "TGLUtils.h"
+#include "C_SdUtil.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeHalcChannelCopyPaste.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
+using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
@@ -110,9 +114,19 @@ void C_SdNdeHalcChannelTreeModel::SetNode(const stw_types::uint32 ou32_NodeIndex
          {
             C_TblTreItem * const pc_DomainTreeItem = new C_TblTreItem();
 
-            pc_DomainTreeItem->c_Name = QString("%1 (%2)").arg(pc_Domain->c_Name.c_str())
-                                        .arg(pc_Domain->c_Channels.size());
-            // TODO Tooltip?
+            if (pc_Domain->c_Channels.empty() == false)
+            {
+               pc_DomainTreeItem->c_Name = QString("%1 (%2)").arg(pc_Domain->c_Name.c_str())
+                                           .arg(pc_Domain->c_Channels.size());
+            }
+            else
+            {
+               pc_DomainTreeItem->c_Name = pc_Domain->c_Name.c_str();
+            }
+            pc_DomainTreeItem->c_ToolTipHeading = pc_Domain->c_Name.c_str();
+            pc_DomainTreeItem->c_ToolTipContent = pc_Domain->c_DomainConfig.c_Comment.c_str();
+
+            // icon is done by CheckError()
 
             tgl_assert(pc_Domain->c_Channels.size() == pc_Domain->c_ChannelConfigs.size());
             if (pc_Domain->c_Channels.size() == pc_Domain->c_ChannelConfigs.size())
@@ -132,11 +146,12 @@ void C_SdNdeHalcChannelTreeModel::SetNode(const stw_types::uint32 ou32_NodeIndex
                   C_TblTreItem * const pc_Child = new C_TblTreItem();
                   const C_OSCHalcConfigChannel & rc_ConfigChannel = pc_Domain->c_ChannelConfigs[u32_ChannelIt];
 
-                  pc_Child->c_Name = QString("%1 (%2)").arg(rc_ConfigChannel.c_Name.c_str(),
-                                                            pc_Domain->c_Channels[u32_ChannelIt].c_Name.c_str());
-                  pc_Child->c_ToolTipHeading = pc_Child->c_Name;
-                  pc_Child->c_ToolTipContent = rc_ConfigChannel.c_Comment.c_str();
+                  mh_SetChannelText(pc_Child, rc_ConfigChannel.c_Name.c_str(),
+                                    pc_Domain->c_Channels[u32_ChannelIt].c_Name.c_str(),
+                                    rc_ConfigChannel.c_Comment.c_str());
                   pc_Child->u32_Index = u32_ChannelIt;
+
+                  // icon is done by CheckError()
 
                   // add to tree
                   pc_DomainTreeItem->AddChild(pc_Child);
@@ -150,9 +165,13 @@ void C_SdNdeHalcChannelTreeModel::SetNode(const stw_types::uint32 ou32_NodeIndex
             }
             else
             {
+               pc_DomainTreeItem->ClearChildren();
                delete pc_DomainTreeItem;
             }
          }
+
+         // error check and icons
+         this->CheckError(u32_DomainIt);
       }
 
       this->endResetModel();
@@ -160,7 +179,7 @@ void C_SdNdeHalcChannelTreeModel::SetNode(const stw_types::uint32 ou32_NodeIndex
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Update texts of specified channel.
+/*! \brief  Update texts and icon of specified channel.
 
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
@@ -184,27 +203,32 @@ void C_SdNdeHalcChannelTreeModel::UpdateChannelText(const uint32 ou32_DomainInde
             C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(this->mu32_NodeIndex, ou32_DomainIndex,
                                                                             ou32_ChannelIndex, oq_UseChannelIndex);
          C_TblTreItem * const pc_ChannelItem =
-            oq_UseChannelIndex ? pc_DomainItem->GetItem(ou32_ChannelIndex) : pc_DomainItem;
+            (oq_UseChannelIndex == true) ? pc_DomainItem->GetItem(ou32_ChannelIndex) : pc_DomainItem;
 
          if ((pc_Domain != NULL) && (pc_ChannelItem != NULL))
          {
-            // insert model data
+            // name and comment
             if (ou32_ChannelIndex < pc_Domain->c_Channels.size())
             {
                // channel case
-               pc_ChannelItem->c_Name = QString("%1 (%2)").arg(pc_Channel->c_Name.c_str(),
-                                                               pc_Domain->c_Channels[ou32_ChannelIndex].c_Name.c_str());
+               mh_SetChannelText(pc_ChannelItem, pc_Channel->c_Name.c_str(),
+                                 pc_Domain->c_Channels[ou32_ChannelIndex].c_Name.c_str(),
+                                 pc_Channel->c_Comment.c_str());
             }
             else
             {
                // domain case
                pc_ChannelItem->c_Name = pc_Channel->c_Name.c_str();
+               pc_ChannelItem->c_ToolTipHeading = pc_Channel->c_Name.c_str();
+               pc_ChannelItem->c_ToolTipContent = pc_Channel->c_Comment.c_str();
             }
-            pc_ChannelItem->c_ToolTipHeading = pc_ChannelItem->c_Name;
-            pc_ChannelItem->c_ToolTipContent = pc_Channel->c_Comment.c_str();
 
-            Q_EMIT (dataChanged(m_GetModelIndexFromIndexes(ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex),
-                                m_GetModelIndexFromIndexes(ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex)));
+            // update domain and channel visualization
+            //lint -e{1793} Qt example
+            Q_EMIT (dataChanged(GetModelIndexFromIndexes(ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex),
+                                GetModelIndexFromIndexes(ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex),
+                                QVector<stw_types::sintn>() << static_cast<stw_types::sintn>(Qt::DisplayRole) <<
+                                msn_USER_ROLE_TOOL_TIP_HEADING << msn_USER_ROLE_TOOL_TIP_CONTENT));
          }
       }
    }
@@ -260,19 +284,123 @@ void C_SdNdeHalcChannelTreeModel::Paste(QWidget * const opc_Parent, const QModel
 {
    if (C_SdNdeHalcChannelCopyPaste::h_Paste(opc_Parent, this->mu32_NodeIndex, orc_TargetIndexes) == true)
    {
-      // update
-      for (QModelIndexList::const_iterator c_ItIndex = orc_TargetIndexes.begin();
-           c_ItIndex != orc_TargetIndexes.end(); ++c_ItIndex)
+      if (orc_TargetIndexes.empty() == false)
       {
-         uint32 u32_DomainIndex;
+         uint32 u32_DomainIndex = 0;
          uint32 u32_ChannelIndex;
          bool q_ChannelCase;
-
-         C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(*c_ItIndex, u32_DomainIndex, u32_ChannelIndex,
-                                                                 q_ChannelCase);
-         this->UpdateChannelText(u32_DomainIndex, u32_ChannelIndex, q_ChannelCase);
+         C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(*(orc_TargetIndexes.begin()), u32_DomainIndex,
+                                                                 u32_ChannelIndex, q_ChannelCase);
+         // update error icons
+         this->CheckError(u32_DomainIndex);
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Reset configuration of specified indices
+
+   \param[in]  orc_Indexes    Indexes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcChannelTreeModel::Reset(const QModelIndexList & orc_Indexes)
+{
+   uint32 u32_DomainIndex = 0;
+   uint32 u32_ChannelIndex;
+   bool q_ChannelCase;
+
+   for (QModelIndexList::const_iterator c_ItIndex = orc_Indexes.begin(); c_ItIndex != orc_Indexes.end(); ++c_ItIndex)
+   {
+      C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(*c_ItIndex, u32_DomainIndex, u32_ChannelIndex,
+                                                              q_ChannelCase);
+      C_PuiSdHandler::h_GetInstance()->ResetHALCDomainChannelConfig(this->mu32_NodeIndex, u32_DomainIndex,
+                                                                    u32_ChannelIndex, q_ChannelCase);
+      this->UpdateChannelText(u32_DomainIndex, u32_ChannelIndex, q_ChannelCase);
+   }
+
+   if (orc_Indexes.empty() == false)
+   {
+      // update error icon
+      this->CheckError(u32_DomainIndex);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check error and adapt icon accordingly
+
+   Always check complete domain, as the domain must show the error too.
+
+   \param[in]  ou32_DomainIndex  Domain index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcChannelTreeModel::CheckError(const uint32 ou32_DomainIndex)
+{
+   const C_OSCHalcConfigDomain * pc_Domain =
+      C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(this->mu32_NodeIndex, ou32_DomainIndex);
+
+   if (pc_Domain != NULL)
+   {
+      if ((this->mpc_InvisibleRootItem != NULL) && (ou32_DomainIndex < this->mpc_InvisibleRootItem->c_Children.size()))
+      {
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         C_TblTreItem * const pc_DomainItem =
+            dynamic_cast<C_TblTreItem *>(this->mpc_InvisibleRootItem->c_Children[ou32_DomainIndex]);
+
+         if (pc_DomainItem != NULL)
+         {
+            bool q_AtLeastOneChannelInvalid = false;
+            bool q_DomainNameInvalid;
+
+            // check channels
+            for (uint32 u32_ItChannel = 0; u32_ItChannel < pc_Domain->c_ChannelConfigs.size(); u32_ItChannel++)
+            {
+               bool q_Invalid;
+               bool q_Linked;
+               C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelError(this->mu32_NodeIndex, ou32_DomainIndex,
+                                                                            u32_ItChannel, true, q_Invalid);
+               C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex, ou32_DomainIndex,
+                                                                             u32_ItChannel, true, q_Linked);
+               C_TblTreItem * const pc_ChannelItem = pc_DomainItem->GetItem(u32_ItChannel);
+
+               // channel icon
+               mh_SetIcon(pc_ChannelItem, pc_Domain->e_Category, false, q_Invalid, q_Linked);
+               if (q_Invalid == true)
+               {
+                  q_AtLeastOneChannelInvalid = true;
+               }
+            }
+
+            // check domain
+            pc_Domain->c_DomainConfig.CheckConfigValid(&q_DomainNameInvalid);
+            // domain icon
+            mh_SetIcon(pc_DomainItem, pc_Domain->e_Category, true,
+                       (q_DomainNameInvalid || q_AtLeastOneChannelInvalid), false);
+
+            // update domain and channel visualization
+            //lint -e{1793} Qt example
+            Q_EMIT (dataChanged(GetModelIndexFromIndexes(ou32_DomainIndex, 0, true),
+                                GetModelIndexFromIndexes(ou32_DomainIndex, pc_Domain->c_ChannelConfigs.size(),
+                                                         true),
+                                QVector<stw_types::sintn>() << static_cast<stw_types::sintn>(Qt::DecorationRole)));
+            //lint -e{1793} Qt example
+            Q_EMIT (dataChanged(GetModelIndexFromIndexes(ou32_DomainIndex, 0 /*irrelevant*/, false),
+                                GetModelIndexFromIndexes(ou32_DomainIndex, 0 /*irrelevant*/, false),
+                                QVector<stw_types::sintn>() << static_cast<stw_types::sintn>(Qt::DecorationRole)));
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get node index
+
+   \return
+   node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_SdNdeHalcChannelTreeModel::GetNodeIndex(void) const
+{
+   return this->mu32_NodeIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -312,7 +440,7 @@ void C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(const QModelIndex &
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get model indexes from indexes
+/*! \brief  Convert domain and channel indexes to model index
 
    \param[in]  ou32_DomainIndex     Domain index
    \param[in]  ou32_ChannelIndex    Channel index
@@ -321,9 +449,9 @@ void C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(const QModelIndex &
    \return  Corresponding model index
 */
 //----------------------------------------------------------------------------------------------------------------------
-QModelIndex C_SdNdeHalcChannelTreeModel::m_GetModelIndexFromIndexes(const uint32 ou32_DomainIndex,
-                                                                    const uint32 ou32_ChannelIndex,
-                                                                    const bool oq_ChannelCase) const
+QModelIndex C_SdNdeHalcChannelTreeModel::GetModelIndexFromIndexes(const uint32 ou32_DomainIndex,
+                                                                  const uint32 ou32_ChannelIndex,
+                                                                  const bool oq_ChannelCase) const
 {
    QModelIndex c_ModelIndex = this->index(ou32_DomainIndex, 0); // flat tree so column is always 0
 
@@ -333,4 +461,82 @@ QModelIndex C_SdNdeHalcChannelTreeModel::m_GetModelIndexFromIndexes(const uint32
    }
 
    return c_ModelIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set item name and tooltip
+
+   \param[in,out]  opc_Item         Item
+   \param[in]      orc_ChannelName  Channel name
+   \param[in]      orc_ChannelID    Channel ID
+   \param[in]      orc_Comment      Comment
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcChannelTreeModel::mh_SetChannelText(C_TblTreItem * const opc_Item, const QString & orc_ChannelName,
+                                                    const QString & orc_ChannelID, const QString & orc_Comment)
+{
+   if (opc_Item != NULL)
+   {
+      opc_Item->c_Name = QString("%1  %2").arg(orc_ChannelID, orc_ChannelName);
+      opc_Item->c_ToolTipHeading = QString("%1 (%2)").arg(orc_ChannelName, orc_ChannelID);
+      opc_Item->c_ToolTipContent = orc_Comment;
+   }
+   //lint -e{429} no memory leak because of correct tree clean up
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set item icon depending on properties
+
+   \param[in,out]  opc_Item      Item
+   \param[in]      oe_Category   Category (input, output, other)
+   \param[in]      oq_Large      Large (vs. small)
+   \param[in]      oq_Error      Error
+   \param[in]      oq_Linked     Linked
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcChannelTreeModel::mh_SetIcon(C_TblTreItem * const opc_Item,
+                                             const C_OSCHalcDefDomain::E_Category oe_Category, const bool oq_Large,
+                                             const bool oq_Error, const bool oq_Linked)
+{
+   if (opc_Item != NULL)
+   {
+      QString c_IconPath = "://images/system_definition/NodeEdit/halc/";
+      QIcon c_Icon;
+      QSize c_IconSize = QSize(16, 16);
+
+      switch (oe_Category)
+      {
+      case C_OSCHalcDefDomain::eCA_INPUT:
+         c_IconPath += "Input";
+         break;
+      case C_OSCHalcDefDomain::eCA_OUTPUT:
+         c_IconPath += "Output";
+         break;
+      case C_OSCHalcDefDomain::eCA_OTHER:
+         c_IconPath += "Other";
+         break;
+      }
+
+      c_IconPath += oq_Large ? "LargeCenter" : "Small";
+
+      c_IconPath += oq_Linked ? "Linked" : "";
+
+      if (oq_Error == true)
+      {
+         c_IconPath += "Error";
+
+         // use same icon for all modes & states
+         c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + ".svg", c_IconSize);
+      }
+      else
+      {
+         c_Icon = C_SdUtil::h_InitStaticIconSvg(c_IconPath + "Inactive.svg", c_IconSize);
+         // use different colored icon for active state
+         c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_IconSize), QIcon::Selected, QIcon::On);
+         c_Icon.addPixmap(QIcon(c_IconPath + "Active.svg").pixmap(c_IconSize), QIcon::Selected, QIcon::Off);
+         // "off" icon is used in branch-closed state
+      }
+
+      opc_Item->c_Icon = c_Icon;
+   }
 }

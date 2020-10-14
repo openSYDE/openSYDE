@@ -268,6 +268,10 @@ private:
                                                const stw_types::uint32 ou32_NodeIndex = 0U);
    stw_types::sint32 m_DisconnectFromTargetServer(const bool oq_DisconnectOnIp2IpRouting = true);
 
+   stw_types::uint32 m_GetAdaptedTransferDataTimeout(const stw_types::uint32 ou32_DeviceTransferDataTimeout,
+                                                     const stw_types::uint32 ou32_MaxBlockLength,
+                                                     const stw_types::uint8 ou8_BusIdentifier);
+
    static stw_types::sint32 mh_CopyFile(const stw_scl::C_SCLString & orc_SourceFile,
                                         const stw_scl::C_SCLString & orc_TargetFile,
                                         stw_scl::C_SCLString * const opc_ErrorPath = NULL);

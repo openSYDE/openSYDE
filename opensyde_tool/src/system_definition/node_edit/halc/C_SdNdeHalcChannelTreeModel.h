@@ -10,6 +10,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblTreModel.h"
+#include "C_TblTreItem.h"
 #include "C_OSCHalcConfig.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -40,9 +41,14 @@ public:
    void Clear(void);
    void Copy(const QModelIndex & orc_CurrentChannel) const;
    void Paste(QWidget * const opc_Parent, const QModelIndexList & orc_TargetIndexes);
+   void Reset(const QModelIndexList & orc_Indexes);
+   void CheckError(const stw_types::uint32 ou32_DomainIndex);
+   stw_types::uint32 GetNodeIndex(void) const;
 
    static void h_GetIndexesFromModelIndex(const QModelIndex & orc_ModelIndex, stw_types::uint32 & oru32_DomainIndex,
                                           stw_types::uint32 & oru32_ChannelIndex, bool & orq_ChannelCase);
+   QModelIndex GetModelIndexFromIndexes(const stw_types::uint32 ou32_DomainIndex,
+                                        const stw_types::uint32 ou32_ChannelIndex, const bool oq_ChannelCase) const;
 
 private:
    C_SdNdeHalcChannelTreeModel(const C_SdNdeHalcChannelTreeModel &);
@@ -50,8 +56,11 @@ private:
 
    stw_types::uint32 mu32_NodeIndex;
 
-   QModelIndex m_GetModelIndexFromIndexes(const stw_types::uint32 ou32_DomainIndex,
-                                          const stw_types::uint32 ou32_ChannelIndex, const bool oq_ChannelCase) const;
+   static void mh_SetChannelText(C_TblTreItem * const opc_Item, const QString & orc_ChannelName,
+                                 const QString & orc_ChannelID, const QString & orc_Comment);
+   static void mh_SetIcon(C_TblTreItem * const opc_Item,
+                          const stw_opensyde_core::C_OSCHalcDefDomain::E_Category oe_Category, const bool oq_Large,
+                          const bool oq_Error, const bool oq_Linked);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -69,7 +69,6 @@ C_SdNdeDpListDataSetView::C_SdNdeDpListDataSetView(QWidget * const opc_Parent) :
    mq_AllowMoveRight(true)
 {
    //UI Settings
-   this->setCornerButtonEnabled(false);
    this->setSortingEnabled(false);
    this->setGridStyle(Qt::NoPen);
    this->setShowGrid(false);
@@ -722,8 +721,8 @@ void C_SdNdeDpListDataSetView::m_UpdateModelView(void)
          this->mc_Delegate.SetModel(pc_Model);
          m_CheckActions(this->m_GetSelectedIndices());
          //Row height seems to be reset on model change
-         this->setRowHeight(0, 40);
-         this->setRowHeight(1, 120);
+         this->setRowHeight(C_SdNdeDpListDataSetModel::h_EnumToRow(C_SdNdeDpListDataSetModel::eNAME), 35);
+         this->setRowHeight(C_SdNdeDpListDataSetModel::h_EnumToRow(C_SdNdeDpListDataSetModel::eCOMMENT), 110);
       }
    }
    if (this->mpc_ModelViewManager != NULL)

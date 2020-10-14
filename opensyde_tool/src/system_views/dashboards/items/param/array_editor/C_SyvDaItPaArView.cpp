@@ -52,7 +52,6 @@ C_SyvDaItPaArView::C_SyvDaItPaArView(QWidget * const opc_Parent) :
    mpc_LabelCorner(NULL)
 {
    //UI Settings
-   this->setCornerButtonEnabled(false);
    this->setSortingEnabled(false);
    this->setGridStyle(Qt::NoPen);
    this->setShowGrid(false);
@@ -65,17 +64,18 @@ C_SyvDaItPaArView::C_SyvDaItPaArView(QWidget * const opc_Parent) :
    this->setLineWidth(0);
    this->setFrameShadow(QAbstractItemView::Shadow::Plain);
    this->setFrameShape(QAbstractItemView::Shape::NoFrame);
-   this->setEditTriggers(
-      QAbstractItemView::DoubleClicked | QAbstractItemView::CurrentChanged | QAbstractItemView::SelectedClicked);
+   this->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed |
+                         QAbstractItemView::EditKeyPressed);
    //Consider all elements for resize
    this->setVerticalHeader(new C_SdNdeSingleHeaderView(Qt::Vertical));
    this->verticalHeader()->setResizeContentsPrecision(-1);
-   this->verticalHeader()->setDefaultSectionSize(40);
+   this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+   this->verticalHeader()->setFixedHeight(30);
    //Row Height
    this->setHorizontalHeader(new C_SdNdeSingleHeaderView(Qt::Horizontal));
    this->horizontalHeader()->setResizeContentsPrecision(-1);
    this->horizontalHeader()->setDefaultSectionSize(70);
-   this->horizontalHeader()->setFixedHeight(35);
+   this->horizontalHeader()->setFixedHeight(30);
    //Corner button
    this->setCornerButtonEnabled(false);
 

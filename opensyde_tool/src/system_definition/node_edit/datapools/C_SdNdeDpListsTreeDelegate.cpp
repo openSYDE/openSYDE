@@ -79,6 +79,7 @@ QSize C_SdNdeDpListsTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Opti
 
    if (orc_Index.isValid() == true)
    {
+      //Header height is static and set in C_SdNdeDpListHeaderWidget, so only adapt children height
       if (orc_Index.parent().isValid() == true)
       {
          //dynamic
@@ -88,12 +89,6 @@ QSize C_SdNdeDpListsTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Opti
                                                                                                 .row()),
                                                                             this->msn_MaximumHeight);
          c_Retval.setHeight(s32_Height);
-      }
-      else
-      {
-         //Header
-         //static
-         c_Retval.setHeight(66);
       }
    }
    return c_Retval;

@@ -25,55 +25,94 @@ class C_OSCHalcConfig :
 public:
    C_OSCHalcConfig(void);
 
+   //General
+   bool GetSafeDatablockAssigned() const;
+   stw_types::uint32 GetSafeDatablockIndex() const;
+   bool GetUnsafeDatablockAssigned() const;
+   stw_types::uint32 GetUnsafeDatablockIndex() const;
+   void SetSafeDatablockAssigned(const bool oq_IsSet, const stw_types::uint32 ou32_NewValue);
+   void SetUnsafeDatablockAssigned(const bool oq_IsSet, const stw_types::uint32 ou32_NewValue);
+
+   //Domains
    virtual stw_types::uint32 GetDomainSize(void) const;
    const C_OSCHalcConfigDomain * GetDomainConfigDataConst(const stw_types::uint32 ou32_Index) const;
    virtual const C_OSCHalcDefDomain * GetDomainDefDataConst(const stw_types::uint32 ou32_Index) const;
    virtual void Clear(void);
+   virtual bool IsClear(void) const;
    virtual void AddDomain(const C_OSCHalcDefDomain & orc_Domain);
    stw_types::sint32 SetDomainConfig(const stw_types::uint32 ou32_Index, const C_OSCHalcConfigDomain & orc_Domain);
    stw_types::sint32 SetDomainChannelConfig(const stw_types::uint32 ou32_DomainIndex,
-                                            const stw_types::uint32 ou32_ChannelIndex, const bool oq_Active,
+                                            const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
                                             const stw_scl::C_SCLString & orc_Name,
                                             const stw_scl::C_SCLString & orc_Comment, const bool oq_SafetyRelevant,
-                                            const bool oq_DatablockSet, const stw_types::uint32 ou32_DatablockIndex,
-                                            const bool oq_UseCaseSet, const stw_types::uint32 ou32_UseCaseIndex,
-                                            const std::vector<C_OSCHalcConfigChannel::E_DataBlockConfig> & orc_DatablockConfig);
-   stw_types::sint32 SetDomainChannelConfigActive(const stw_types::uint32 ou32_DomainIndex,
-                                                  const stw_types::uint32 ou32_ChannelIndex, const bool
-                                                  oq_Active);
+                                            const stw_types::uint32 ou32_UseCaseIndex);
+   stw_types::sint32 ResetDomainChannelConfig(const stw_types::uint32 ou32_DomainIndex,
+                                              const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex);
    stw_types::sint32 SetDomainChannelConfigName(const stw_types::uint32 ou32_DomainIndex,
                                                 const stw_types::uint32 ou32_ChannelIndex,
-                                                const stw_scl::C_SCLString & orc_Name);
+                                                const bool oq_UseChannelIndex, const stw_scl::C_SCLString & orc_Name);
    stw_types::sint32 SetDomainChannelConfigComment(const stw_types::uint32 ou32_DomainIndex,
                                                    const stw_types::uint32 ou32_ChannelIndex,
+                                                   const bool oq_UseChannelIndex,
                                                    const stw_scl::C_SCLString & orc_Comment);
    stw_types::sint32 SetDomainChannelConfigSafety(const stw_types::uint32 ou32_DomainIndex,
                                                   const stw_types::uint32 ou32_ChannelIndex,
-                                                  const bool oq_SafetyRelevant);
-   stw_types::sint32 SetDomainChannelConfigDatablock(const stw_types::uint32 ou32_DomainIndex,
-                                                     const stw_types::uint32 ou32_ChannelIndex,
-                                                     const bool oq_DatablockSet,
-                                                     const stw_types::uint32 ou32_DatablockIndex);
+                                                  const bool oq_UseChannelIndex, const bool oq_SafetyRelevant);
    stw_types::sint32 SetDomainChannelConfigUseCase(const stw_types::uint32 ou32_DomainIndex,
-                                                   const stw_types::uint32 ou32_ChannelIndex, const bool oq_UseCaseSet,
+                                                   const stw_types::uint32 ou32_ChannelIndex,
+                                                   const bool oq_UseChannelIndex,
                                                    const stw_types::uint32 ou32_UseCaseIndex);
-   stw_types::sint32 SetDomainChannelConfigDatablockConfig(const stw_types::uint32 ou32_DomainIndex,
-                                                           const stw_types::uint32 ou32_ChannelIndex, const
-                                                           std::vector<stw_opensyde_core::C_OSCHalcConfigChannel::E_DataBlockConfig> & orc_DatablockConfig);
    stw_types::sint32 SetDomainChannelParameterConfig(const stw_types::uint32 ou32_DomainIndex,
                                                      const stw_types::uint32 ou32_ChannelIndex,
                                                      const stw_types::uint32 ou32_ParameterIndex,
+                                                     const bool oq_UseChannelIndex,
                                                      const stw_opensyde_core::C_OSCHalcConfigParameterStruct & orc_Parameter);
    stw_types::sint32 SetDomainChannelParameterConfigElement(const stw_types::uint32 ou32_DomainIndex,
                                                             const stw_types::uint32 ou32_ChannelIndex,
                                                             const stw_types::uint32 ou32_ParameterIndex,
-                                                            const stw_types::uint32 ou32_ElementIndex, const stw_opensyde_core::C_OSCHalcConfigParameter &
+                                                            const stw_types::uint32 ou32_ElementIndex,
+                                                            const bool oq_UseChannelIndex, const stw_opensyde_core::C_OSCHalcConfigParameter &
                                                             orc_Parameter);
-
+   stw_types::sint32 SetDomainChannelParameterConfigElementPlain(const stw_types::uint32 ou32_DomainIndex,
+                                                                 const stw_types::uint32 ou32_ChannelIndex,
+                                                                 const stw_types::uint32 ou32_ParameterIndex,
+                                                                 const stw_types::uint32 ou32_ElementIndex,
+                                                                 const bool oq_UseChannelIndex,
+                                                                 const C_OSCHalcDefContent & orc_Value);
+   stw_types::sint32 SetDomainChannelParameterConfigElementEnum(const stw_types::uint32 ou32_DomainIndex,
+                                                                const stw_types::uint32 ou32_ChannelIndex,
+                                                                const stw_types::uint32 ou32_ParameterIndex,
+                                                                const stw_types::uint32 ou32_ElementIndex,
+                                                                const bool oq_UseChannelIndex,
+                                                                const stw_scl::C_SCLString & orc_DisplayName);
+   stw_types::sint32 SetDomainChannelParameterConfigElementBitmask(const stw_types::uint32 ou32_DomainIndex,
+                                                                   const stw_types::uint32 ou32_ChannelIndex,
+                                                                   const stw_types::uint32 ou32_ParameterIndex,
+                                                                   const stw_types::uint32 ou32_ElementIndex,
+                                                                   const bool oq_UseChannelIndex,
+                                                                   const stw_scl::C_SCLString & orc_DisplayName,
+                                                                   const bool oq_Value);
+   stw_types::sint32 GetRelevantIndicesForSelectedUseCase(const stw_types::uint32 ou32_DomainIndex,
+                                                          const stw_types::uint32 ou32_ChannelIndex,
+                                                          const bool oq_UseChannelIndex,
+                                                          std::vector<stw_types::uint32> * const opc_ParameterIndices,
+                                                          std::vector<stw_types::uint32> * const opc_InputIndices,
+                                                          std::vector<stw_types::uint32> * const opc_OutputIndices,
+                                                          std::vector<stw_types::uint32> * const opc_StatusIndices)
+   const;
+   void CheckConfigValid(bool * const opq_DomainsInvalid,
+                         std::vector<stw_types::uint32> * const opc_InvalidDomainIndices) const;
+   void CheckDomainConfigValid(const stw_types::uint32 ou32_DomainIndex, bool * const opq_DomainInvalid,
+                               bool * const opq_ChannelsInvalid,
+                               std::vector<stw_types::uint32> * const opc_InvalidChannelIndices) const;
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
 private:
    std::vector<C_OSCHalcConfigDomain> mc_Domains; ///< Domains of HALC configuration (synced with C_OSCHalcDefBase)
+   bool mq_SafeDatablockAssigned;                 ///< Flag if safe datablock is assigned
+   stw_types::uint32 mu32_SafeDatablockIndex;     ///< Safe datablock index
+   bool mq_UnsafeDatablockAssigned;               ///< Flag if unsafe datablock is assigned
+   stw_types::uint32 mu32_UnsafeDatablockIndex;   ///< Unsafe datablock index
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

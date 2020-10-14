@@ -41,6 +41,10 @@ public:
 
    const QList<QString> GetInterfaceSettingsKeysInternal(void) const;
    C_UsCommunication GetCommList(const QString & orc_ListName) const;
+   void SetCommMessageOverviewColumnWidth(const QString & orc_ListName,
+                                          const std::vector<stw_types::sint32> & orc_Value);
+   void SetCommSignalOverviewColumnWidth(const QString & orc_ListName,
+                                         const std::vector<stw_types::sint32> & orc_Value);
    void SetListSelectedMessage(const QString & orc_ListName,
                                const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_SelectedProtocol,
                                const bool oq_MessageSelected, const QString & orc_SelectedMessageName,

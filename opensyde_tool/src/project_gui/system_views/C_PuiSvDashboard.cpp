@@ -16,6 +16,7 @@
 #include "stwerrors.h"
 #include "TGLUtils.h"
 #include "C_CieUtil.h"
+#include "C_GtGetText.h"
 #include "CSCLChecksums.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvDashboard.h"
@@ -981,6 +982,43 @@ void C_PuiSvDashboard::OnSyncNodeAdded(const uint32 ou32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt to system definition change
+
+   \param[in]  ou32_Index        Index
+   \param[in]  orc_MapCurToNew   Map cur to new
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeHALC(const uint32 ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                                              C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeHALC(rc_DataElementId, ou32_Index, orc_MapCurToNew);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeHALC(rc_DataElementConfig.c_ExpandedId, ou32_Index, orc_MapCurToNew);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
    \param[in]  ou32_Index  Node index
@@ -1795,6 +1833,48 @@ void C_PuiSvDashboard::h_OnSyncNodeAdded(C_PuiSvDbNodeDataPoolListElementId & or
       if (orc_DataElementId.u32_NodeIndex >= ou32_Index)
       {
          ++orc_DataElementId.u32_NodeIndex;
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt to system definition change
+
+   \param[in,out]  orc_DataElementId   Data element id
+   \param[in]      ou32_Index          Index
+   \param[in]      orc_MapCurToNew     Map cur to new
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeHALC(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId, const uint32 ou32_Index,
+                                        const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                                                       C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if (orc_DataElementId.u32_NodeIndex == ou32_Index)
+      {
+         C_OSCNodeDataPool::E_Type e_Type;
+         if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(ou32_Index, orc_DataElementId.u32_DataPoolIndex,
+                                                              e_Type) == C_NO_ERR)
+         {
+            if (e_Type == C_OSCNodeDataPool::eHALC)
+            {
+               const std::map<C_PuiSvDbNodeDataPoolListElementId,
+                              C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_It = orc_MapCurToNew.find(
+                  orc_DataElementId);
+               if (c_It != orc_MapCurToNew.end())
+               {
+                  //Replace
+                  orc_DataElementId = c_It->second;
+               }
+               else
+               {
+                  //Delete
+                  orc_DataElementId.MarkInvalid(C_OSCNodeDataPool::eHALC,
+                                                C_GtGetText::h_GetText("Unknown HAL data element"));
+               }
+            }
+         }
       }
    }
 }

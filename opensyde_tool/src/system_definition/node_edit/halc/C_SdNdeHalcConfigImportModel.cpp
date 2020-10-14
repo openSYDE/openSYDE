@@ -41,7 +41,6 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcConfigImportItem::C_SdNdeHalcConfigImportItem(void) :
    C_TblTreItem(),
-   q_UseParentIndex(false),
    u32_ImportIndex(0UL),
    e_CheckState(Qt::Unchecked),
    q_Checkable(false)
@@ -87,7 +86,8 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
 {
    sint32 s32_Return = C_NO_ERR;
    uint32 u32_ImpDomainCounter;
-   bool q_AtLeastOnEnabled = false;
+   bool q_AtLeastOneExists = false;
+   C_SdNdeHalcConfigImportItem * pc_VisibleRootItem;
 
    // Save both configuration
    this->mc_ConfigCopy = orc_Config;
@@ -97,7 +97,11 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
 
    // Clear
    this->m_CleanUpLastModel();
+
    this->mpc_InvisibleRootItem = new C_SdNdeHalcConfigImportItem();
+
+   pc_VisibleRootItem = new C_SdNdeHalcConfigImportItem();
+   pc_VisibleRootItem->c_Name = C_GtGetText::h_GetText("Configuration");
 
    // Check domains
    for (u32_ImpDomainCounter = 0U; u32_ImpDomainCounter < this->mc_ImportConfigCopy.c_Domains.size();
@@ -125,53 +129,48 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
                uint32 u32_ImpChannelCounter;
 
                pc_DomainItem->u32_Index = u32_CurDomainCounter;
+               pc_DomainItem->q_Selectable = false;
 
-               // If the domain does not have any channels, add the domain configuration itself as item
+               // If the domain does not have any channels
                if (pc_CurConfig->c_Channels.size() == 0)
                {
-                  C_SdNdeHalcConfigImportItem * const pc_DomainConfigItem = new C_SdNdeHalcConfigImportItem();
-
-                  pc_DomainConfigItem->c_Name = C_GtGetText::h_GetText("Domain configuration");
-                  pc_DomainConfigItem->q_UseParentIndex = true;
-                  pc_DomainConfigItem->q_Selectable = false;
-                  pc_DomainConfigItem->q_Enabled = true;
-                  pc_DomainConfigItem->q_Checkable = true;
-
-                  pc_DomainItem->AddChild(pc_DomainConfigItem);
+                  pc_DomainItem->c_Name += " (-)";
                }
-
-               // Check channels
-               for (u32_ImpChannelCounter = 0U; u32_ImpChannelCounter < rc_ImpDomain.c_StandaloneChannels.size();
-                    ++u32_ImpChannelCounter)
+               else
                {
-                  C_SdNdeHalcConfigImportItem * const pc_ChannelItem = new C_SdNdeHalcConfigImportItem();
-                  uint32 u32_CurChannelCounter;
-
-                  pc_ChannelItem->c_Name = rc_ImpDomain.c_Channels[u32_ImpChannelCounter].c_Name.c_str();
-                  pc_ChannelItem->c_Name =
-                     QString("%1 (%2)").arg(rc_ImpDomain.c_ChannelConfigs[u32_ImpChannelCounter].c_Name.c_str(),
-                                            rc_ImpDomain.c_Channels[u32_ImpChannelCounter].c_Name.c_str());
-
-                  pc_ChannelItem->u32_ImportIndex = u32_ImpChannelCounter;
-                  pc_ChannelItem->q_Enabled = false;
-                  pc_ChannelItem->q_Selectable = false;
-
-                  for (u32_CurChannelCounter = 0U; u32_CurChannelCounter < pc_CurConfig->c_Channels.size();
-                       ++u32_CurChannelCounter)
+                  // Check channels
+                  for (u32_ImpChannelCounter = 0U; u32_ImpChannelCounter < rc_ImpDomain.c_StandaloneChannels.size();
+                       ++u32_ImpChannelCounter)
                   {
-                     if (pc_CurConfig->c_Channels[u32_CurChannelCounter].c_Name ==
-                         rc_ImpDomain.c_Channels[u32_ImpChannelCounter].c_Name)
+                     C_SdNdeHalcConfigImportItem * const pc_ChannelItem = new C_SdNdeHalcConfigImportItem();
+                     uint32 u32_CurChannelCounter;
+
+                     pc_ChannelItem->c_Name = rc_ImpDomain.c_Channels[u32_ImpChannelCounter].c_Name.c_str();
+                     pc_ChannelItem->c_Name =
+                        QString("%1 (%2)").arg(rc_ImpDomain.c_ChannelConfigs[u32_ImpChannelCounter].c_Name.c_str(),
+                                               rc_ImpDomain.c_Channels[u32_ImpChannelCounter].c_Name.c_str());
+
+                     pc_ChannelItem->u32_ImportIndex = u32_ImpChannelCounter;
+                     pc_ChannelItem->q_Enabled = false;
+                     pc_ChannelItem->q_Selectable = false;
+
+                     for (u32_CurChannelCounter = 0U; u32_CurChannelCounter < pc_CurConfig->c_Channels.size();
+                          ++u32_CurChannelCounter)
                      {
-                        // Channel Ids match found
-                        pc_ChannelItem->u32_Index = u32_CurChannelCounter;
-                        pc_ChannelItem->q_Enabled = true;
-                        pc_ChannelItem->q_Checkable = true;
+                        if (pc_CurConfig->c_Channels[u32_CurChannelCounter].c_Name ==
+                            rc_ImpDomain.c_Channels[u32_ImpChannelCounter].c_Name)
+                        {
+                           // Channel Ids match found
+                           pc_ChannelItem->u32_Index = u32_CurChannelCounter;
+                           pc_ChannelItem->q_Enabled = true;
+                           pc_ChannelItem->q_Checkable = true;
 
-                        break;
+                           break;
+                        }
                      }
-                  }
 
-                  pc_DomainItem->AddChild(pc_ChannelItem);
+                     pc_DomainItem->AddChild(pc_ChannelItem);
+                  }
                }
 
                break;
@@ -179,24 +178,21 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
          }
       }
 
-      if (pc_DomainItem->c_Children.size() > 0)
-      {
-         q_AtLeastOnEnabled = true;
-         pc_DomainItem->q_Enabled = true;
-         pc_DomainItem->q_Checkable = true;
-      }
-      else
-      {
-         pc_DomainItem->q_Enabled = false;
-         pc_DomainItem->q_Selectable = false;
-      }
+      q_AtLeastOneExists = true;
+      pc_DomainItem->q_Enabled = true;
+      pc_DomainItem->q_Checkable = true;
 
-      this->mpc_InvisibleRootItem->AddChild(pc_DomainItem);
+      pc_VisibleRootItem->AddChild(pc_DomainItem);
    }
 
+   pc_VisibleRootItem->q_Enabled = q_AtLeastOneExists;
+   pc_VisibleRootItem->q_Checkable = q_AtLeastOneExists;
+   pc_VisibleRootItem->q_Selectable = false;
+
+   this->mpc_InvisibleRootItem->AddChild(pc_VisibleRootItem);
    this->endResetModel();
 
-   if (q_AtLeastOnEnabled == false)
+   if (q_AtLeastOneExists == false)
    {
       // Nothing to import
       s32_Return = C_NOACT;
@@ -214,68 +210,85 @@ sint32 C_SdNdeHalcConfigImportModel::Init(const C_OSCHalcConfig & orc_Config,
 void C_SdNdeHalcConfigImportModel::GetAdaptedConfiguration(C_OSCHalcConfig & orc_AdaptedConfig)
 {
    uint32 u32_DomainCounter;
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   const C_SdNdeHalcConfigImportItem * pc_VisibleRootItem = NULL;
 
-   orc_AdaptedConfig = this->mc_ConfigCopy;
-
-   for (u32_DomainCounter = 0UL; u32_DomainCounter < this->mpc_InvisibleRootItem->c_Children.size();
-        ++u32_DomainCounter)
+   if (this->mpc_InvisibleRootItem->c_Children.size() > 0)
    {
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      const C_SdNdeHalcConfigImportItem * const pc_DomainItem =
-         dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(
-            this->mpc_InvisibleRootItem->c_Children[u32_DomainCounter]);
+      pc_VisibleRootItem =
+         dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(this->mpc_InvisibleRootItem->c_Children[0]);
+   }
 
-      if ((pc_DomainItem != NULL) &&
-          (pc_DomainItem->q_Enabled == true))
+   if (pc_VisibleRootItem != NULL)
+   {
+      orc_AdaptedConfig = this->mc_ConfigCopy;
+
+      for (u32_DomainCounter = 0UL; u32_DomainCounter < pc_VisibleRootItem->c_Children.size();
+           ++u32_DomainCounter)
       {
-         uint32 u32_ChannelCounter;
-         const C_OSCHalcConfigDomain * const pc_DomainConfigToAdapt = orc_AdaptedConfig.GetDomainConfigDataConst(
-            pc_DomainItem->u32_Index);
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         const C_SdNdeHalcConfigImportItem * const pc_DomainItem =
+            dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(pc_VisibleRootItem->c_Children[u32_DomainCounter]);
 
-         tgl_assert(pc_DomainConfigToAdapt != NULL);
-         tgl_assert(pc_DomainItem->u32_Index < orc_AdaptedConfig.GetDomainSize());
-         tgl_assert(pc_DomainItem->u32_ImportIndex < this->mc_ImportConfigCopy.c_Domains.size());
-
-         if (pc_DomainConfigToAdapt != NULL)
+         if ((pc_DomainItem != NULL) &&
+             (pc_DomainItem->q_Enabled == true))
          {
-            C_OSCHalcConfigDomain c_DomainConfigAdaption = *pc_DomainConfigToAdapt;
-            const C_OSCHalcConfigDomain & rc_ImpDomainConfig =
-               this->mc_ImportConfigCopy.c_Domains[pc_DomainItem->u32_ImportIndex];
-            bool q_Changed = false;
+            uint32 u32_ChannelCounter;
+            const C_OSCHalcConfigDomain * const pc_DomainConfigToAdapt = orc_AdaptedConfig.GetDomainConfigDataConst(
+               pc_DomainItem->u32_Index);
 
-            // Domain configuration and channels
-            for (u32_ChannelCounter = 0UL; u32_ChannelCounter < pc_DomainItem->c_Children.size(); ++u32_ChannelCounter)
+            tgl_assert(pc_DomainConfigToAdapt != NULL);
+            tgl_assert(pc_DomainItem->u32_Index < orc_AdaptedConfig.GetDomainSize());
+            tgl_assert(pc_DomainItem->u32_ImportIndex < this->mc_ImportConfigCopy.c_Domains.size());
+
+            if (pc_DomainConfigToAdapt != NULL)
             {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-               const C_SdNdeHalcConfigImportItem * const pc_ChildItem =
-                  dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(
-                     pc_DomainItem->c_Children[u32_ChannelCounter]);
+               C_OSCHalcConfigDomain c_DomainConfigAdaption = *pc_DomainConfigToAdapt;
+               const C_OSCHalcConfigDomain & rc_ImpDomainConfig =
+                  this->mc_ImportConfigCopy.c_Domains[pc_DomainItem->u32_ImportIndex];
+               bool q_Changed = false;
 
-               if ((pc_ChildItem != NULL) &&
-                   (pc_ChildItem->e_CheckState != Qt::Unchecked))
+               if (pc_DomainItem->c_Children.size() == 0)
                {
-                  if (pc_ChildItem->q_UseParentIndex == true)
+                  if (pc_DomainItem->e_CheckState != Qt::Unchecked)
                   {
                      // Adapt domain configuration
                      // Update the domain specific properties without channel configuration
                      c_DomainConfigAdaption.c_DomainConfig = rc_ImpDomainConfig.c_DomainConfig;
-                  }
-                  else
-                  {
-                     // Adapt channel
-                     c_DomainConfigAdaption.c_ChannelConfigs[pc_ChildItem->u32_Index] =
-                        rc_ImpDomainConfig.c_ChannelConfigs[pc_ChildItem->u32_ImportIndex];
-                  }
 
-                  q_Changed = true;
+                     q_Changed = true;
+                  }
                }
-            }
+               else
+               {
+                  // Channel configurations
+                  for (u32_ChannelCounter = 0UL; u32_ChannelCounter < pc_DomainItem->c_Children.size();
+                       ++u32_ChannelCounter)
+                  {
+                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+                     const C_SdNdeHalcConfigImportItem * const pc_ChildItem =
+                        dynamic_cast<const C_SdNdeHalcConfigImportItem * const>(
+                           pc_DomainItem->c_Children[u32_ChannelCounter]);
 
-            if (q_Changed == true)
-            {
-               // Update the configuration with the adapted domain and channel configuration
-               tgl_assert(orc_AdaptedConfig.SetDomainConfig(pc_DomainItem->u32_Index,
-                                                            c_DomainConfigAdaption) == C_NO_ERR);
+                     if ((pc_ChildItem != NULL) &&
+                         (pc_ChildItem->e_CheckState != Qt::Unchecked))
+                     {
+                        // Adapt channel
+                        c_DomainConfigAdaption.c_ChannelConfigs[pc_ChildItem->u32_Index] =
+                           rc_ImpDomainConfig.c_ChannelConfigs[pc_ChildItem->u32_ImportIndex];
+
+                        q_Changed = true;
+                     }
+                  }
+               }
+
+               if (q_Changed == true)
+               {
+                  // Update the configuration with the adapted domain and channel configuration
+                  tgl_assert(orc_AdaptedConfig.SetDomainConfig(pc_DomainItem->u32_Index,
+                                                               c_DomainConfigAdaption) == C_NO_ERR);
+               }
             }
          }
       }
@@ -365,78 +378,10 @@ bool C_SdNdeHalcConfigImportModel::setData(const QModelIndex & orc_Index, const 
             pc_TreeItem->e_CheckState = (pc_TreeItem->e_CheckState == Qt::Checked) ? Qt::Unchecked : Qt::Checked;
 
             // Check if the item has children
-            if (pc_TreeItem->c_Children.size() > 0)
-            {
-               uint32 u32_ChildCounter;
-               const uint32 u32_IndexLastChild = pc_TreeItem->c_Children.size() - 1UL;
+            this->m_CheckChildren(pc_TreeItem, c_StartIndex, c_EndIndex);
 
-               for (u32_ChildCounter = 0U; u32_ChildCounter < pc_TreeItem->c_Children.size(); ++u32_ChildCounter)
-               {
-                  //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-                  C_SdNdeHalcConfigImportItem * const pc_ChildItem =
-                     dynamic_cast<C_SdNdeHalcConfigImportItem * const>(pc_TreeItem->c_Children[u32_ChildCounter]);
-
-                  // Set all children to the same checked state
-                  if (pc_ChildItem != NULL)
-                  {
-                     pc_ChildItem->e_CheckState = pc_TreeItem->e_CheckState;
-                  }
-               }
-
-               c_EndIndex = this->index(u32_IndexLastChild, 0, c_StartIndex);
-            }
             // or has a parent
-            else if (pc_TreeItem->pc_Parent != NULL)
-            {
-               //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-               C_SdNdeHalcConfigImportItem * const pc_ParentItem =
-                  dynamic_cast<C_SdNdeHalcConfigImportItem * const>(pc_TreeItem->pc_Parent);
-
-               if (pc_ParentItem != NULL)
-               {
-                  bool q_AllAreChecked = true;
-                  bool q_AtLeastOneIsChecked = false;
-                  uint32 u32_ChildCounter;
-                  c_StartIndex = this->parent(orc_Index);
-
-                  // Check the other children to get the necessary state of the parent
-                  for (u32_ChildCounter = 0U; u32_ChildCounter < pc_ParentItem->c_Children.size(); ++u32_ChildCounter)
-                  {
-                     //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-                     C_SdNdeHalcConfigImportItem * const pc_ChildItem =
-                        dynamic_cast<C_SdNdeHalcConfigImportItem * const>(pc_ParentItem->c_Children[u32_ChildCounter]);
-
-                     if (pc_ChildItem != NULL)
-                     {
-                        if (pc_ChildItem->e_CheckState == Qt::Unchecked)
-                        {
-                           q_AllAreChecked = false;
-                        }
-                        else
-                        {
-                           q_AtLeastOneIsChecked = true;
-                        }
-                     }
-                  }
-
-                  if (q_AllAreChecked == true)
-                  {
-                     pc_ParentItem->e_CheckState = Qt::Checked;
-                  }
-                  else if (q_AtLeastOneIsChecked == true)
-                  {
-                     pc_ParentItem->e_CheckState = Qt::PartiallyChecked;
-                  }
-                  else
-                  {
-                     pc_ParentItem->e_CheckState = Qt::Unchecked;
-                  }
-               }
-            }
-            else
-            {
-               // Nothing to do
-            }
+            this->m_CheckParent(pc_TreeItem, orc_Index, c_StartIndex);
 
             //lint -e{1793} Qt example
             Q_EMIT (this->dataChanged(c_StartIndex, c_EndIndex, QVector<stw_types::sintn>() << osn_Role));
@@ -480,6 +425,107 @@ Qt::ItemFlags C_SdNdeHalcConfigImportModel::flags(const QModelIndex & orc_Index)
    }
 
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks all children (recursive) and adapts the check state to the state of the parent
+
+   \param[in,out]   opc_TreeItem   Parent to check its children
+   \param[in]       orc_ItemIndex  Index of the parent
+   \param[out]      orc_EndIndex   Last index of the last child
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcConfigImportModel::m_CheckChildren(C_SdNdeHalcConfigImportItem * const opc_TreeItem,
+                                                   const QModelIndex & orc_ItemIndex, QModelIndex & orc_EndIndex)
+{
+   if (opc_TreeItem->c_Children.size() > 0)
+   {
+      uint32 u32_ChildCounter;
+      const uint32 u32_IndexLastChild = opc_TreeItem->c_Children.size() - 1UL;
+
+      orc_EndIndex = this->index(u32_IndexLastChild, 0, orc_ItemIndex);
+
+      for (u32_ChildCounter = 0U; u32_ChildCounter < opc_TreeItem->c_Children.size(); ++u32_ChildCounter)
+      {
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         C_SdNdeHalcConfigImportItem * const pc_ChildItem =
+            dynamic_cast<C_SdNdeHalcConfigImportItem * const>(opc_TreeItem->c_Children[u32_ChildCounter]);
+         const QModelIndex c_ChildIndex = this->index(u32_ChildCounter, 0, orc_ItemIndex);
+
+         // Set all children to the same checked state
+         if (pc_ChildItem != NULL)
+         {
+            pc_ChildItem->e_CheckState = opc_TreeItem->e_CheckState;
+
+            // Check the children for their children
+            this->m_CheckChildren(pc_ChildItem, c_ChildIndex, orc_EndIndex);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks the parent (recursive) and adapts the check state to the state of the child
+
+   \param[in]       opc_TreeItem   Parent to check its children
+   \param[in]       orc_ItemIndex  Index of the child
+   \param[out]      orc_StartIndex First index of the first parent
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcConfigImportModel::m_CheckParent(const C_SdNdeHalcConfigImportItem * const opc_TreeItem,
+                                                 const QModelIndex & orc_ItemIndex, QModelIndex & orc_StartIndex)
+{
+   if (opc_TreeItem->pc_Parent != NULL)
+   {
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_SdNdeHalcConfigImportItem * const pc_ParentItem =
+         dynamic_cast<C_SdNdeHalcConfigImportItem * const>(opc_TreeItem->pc_Parent);
+
+      if (pc_ParentItem != NULL)
+      {
+         bool q_AllAreChecked = true;
+         bool q_AtLeastOneIsChecked = false;
+         uint32 u32_ChildCounter;
+         const QModelIndex c_ParentIndex = this->parent(orc_ItemIndex);
+         orc_StartIndex = c_ParentIndex;
+
+         // Check the other children to get the necessary state of the parent
+         for (u32_ChildCounter = 0U; u32_ChildCounter < pc_ParentItem->c_Children.size(); ++u32_ChildCounter)
+         {
+            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            C_SdNdeHalcConfigImportItem * const pc_ChildItem =
+               dynamic_cast<C_SdNdeHalcConfigImportItem * const>(pc_ParentItem->c_Children[u32_ChildCounter]);
+
+            if (pc_ChildItem != NULL)
+            {
+               if (pc_ChildItem->e_CheckState == Qt::Unchecked)
+               {
+                  q_AllAreChecked = false;
+               }
+               else
+               {
+                  q_AtLeastOneIsChecked = true;
+               }
+            }
+         }
+
+         if (q_AllAreChecked == true)
+         {
+            pc_ParentItem->e_CheckState = Qt::Checked;
+         }
+         else if (q_AtLeastOneIsChecked == true)
+         {
+            pc_ParentItem->e_CheckState = Qt::PartiallyChecked;
+         }
+         else
+         {
+            pc_ParentItem->e_CheckState = Qt::Unchecked;
+         }
+
+         // Check the parent of the parent
+         this->m_CheckParent(pc_ParentItem, c_ParentIndex, orc_StartIndex);
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

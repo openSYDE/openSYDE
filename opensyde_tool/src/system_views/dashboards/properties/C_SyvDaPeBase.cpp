@@ -921,15 +921,7 @@ void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId &
    if (orc_Id.GetIsValid() == true)
    {
       const QString c_UpdateModeInfo = C_SyvUtil::h_GetUpdateModeDescription(this->mu32_ViewIndex, orc_Id);
-      QString c_Edit;
-      if (orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
-      {
-         c_Edit = C_PuiSvHandler::h_GetNamespace(orc_Id);
-      }
-      else
-      {
-         c_Edit = C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(orc_Id);
-      }
+      const QString c_Edit = C_PuiSvHandler::h_GetNamespace(orc_Id);
 
       this->mpc_Ui->pc_LineEditDataElement->setText(c_Edit);
       this->mpc_Ui->pc_LineEditDataElement->SetToolTipInformation("", c_Edit);

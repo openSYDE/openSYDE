@@ -888,6 +888,63 @@ stw_types::sint32 C_OSCNode::GetDataPoolIndex(const C_OSCNodeDataPool::E_Type oe
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get Datapool type specific index from Datapool index
+
+   \param[in]  ou32_DataPoolIndex   Data pool index
+
+   \return
+   if datapool is found: zero based index
+   if datapool is not found or parameter out of range: -1
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNode::GetDataPoolTypeIndex(const uint32 ou32_DataPoolIndex) const
+{
+   sint32 s32_Retval = -1;
+
+   if (ou32_DataPoolIndex < this->c_DataPools.size())
+   {
+      const C_OSCNodeDataPool & rc_Dp = this->c_DataPools[ou32_DataPoolIndex];
+
+      uint32 u32_Counter = 0UL;
+      for (uint32 u32_ItDp = 0UL; u32_ItDp < ou32_DataPoolIndex; ++u32_ItDp)
+      {
+         const C_OSCNodeDataPool & rc_OtherDp = this->c_DataPools[u32_ItDp];
+         if (rc_OtherDp.e_Type == rc_Dp.e_Type)
+         {
+            ++u32_Counter;
+         }
+      }
+
+      s32_Retval = u32_Counter;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get number of Datapools of specified type
+
+   \param[in]  oe_DataPoolType   Data pool type
+
+   \return
+   Number of Datapools of specified type
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCNode::GetDataPoolCount(const C_OSCNodeDataPool::E_Type oe_DataPoolType) const
+{
+   uint32 u32_Retval = 0U;
+   uint32 u32_Index;
+
+   for (u32_Index = 0U; u32_Index < this->c_DataPools.size(); ++u32_Index)
+   {
+      if (this->c_DataPools[u32_Index].e_Type == oe_DataPoolType)
+      {
+         ++u32_Retval;
+      }
+   }
+   return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Compare node names for greater
 
    Nodes are compared by name.

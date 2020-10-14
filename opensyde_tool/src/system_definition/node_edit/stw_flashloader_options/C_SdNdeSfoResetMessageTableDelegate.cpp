@@ -15,7 +15,7 @@
 #include "constants.h"
 #include "C_GtGetText.h"
 #include "C_OgeCbxTable.h"
-#include "C_OgeSpxTableComIf.h"
+#include "C_OgeSpxTable.h"
 #include "C_SdNdeSfoResetMessageTableModel.h"
 #include "C_SdNdeSfoResetMessageTableDelegate.h"
 
@@ -72,14 +72,14 @@ QWidget * C_SdNdeSfoResetMessageTableDelegate::createEditor(QWidget * const opc_
    Q_UNUSED(orc_Option)
    if (orc_Index.isValid() == true)
    {
-      C_OgeSpxTableComIf * pc_SpinBox;
-      QComboBox * pc_ComboBox;
+      C_OgeSpxTable * pc_SpinBox;
+      C_OgeCbxTable * pc_ComboBox;
       const C_SdNdeSfoResetMessageTableModel::E_Columns e_Col = C_SdNdeSfoResetMessageTableModel::h_ColumnToEnum(
          orc_Index.column());
       switch (e_Col)
       {
       case C_SdNdeSfoResetMessageTableModel::eID:
-         pc_SpinBox = new C_OgeSpxTableComIf(opc_Parent);
+         pc_SpinBox = new C_OgeSpxTable(opc_Parent);
          pc_SpinBox->setPrefix(C_GtGetText::h_GetText("0x"));
          pc_SpinBox->setDisplayIntegerBase(16);
          pc_SpinBox->SetMinimumCustom(0);
@@ -94,7 +94,7 @@ QWidget * C_SdNdeSfoResetMessageTableDelegate::createEditor(QWidget * const opc_
          pc_Retval = pc_SpinBox;
          break;
       case C_SdNdeSfoResetMessageTableModel::eDLC:
-         pc_SpinBox = new C_OgeSpxTableComIf(opc_Parent);
+         pc_SpinBox = new C_OgeSpxTable(opc_Parent);
          pc_SpinBox->SetMinimumCustom(0);
          pc_SpinBox->SetMaximumCustom(8);
          pc_Retval = pc_SpinBox;
@@ -107,7 +107,7 @@ QWidget * C_SdNdeSfoResetMessageTableDelegate::createEditor(QWidget * const opc_
       case C_SdNdeSfoResetMessageTableModel::eBYTE6:
       case C_SdNdeSfoResetMessageTableModel::eBYTE7:
       case C_SdNdeSfoResetMessageTableModel::eBYTE8:
-         pc_SpinBox = new C_OgeSpxTableComIf(opc_Parent);
+         pc_SpinBox = new C_OgeSpxTable(opc_Parent);
          pc_SpinBox->setPrefix(C_GtGetText::h_GetText("0x"));
          pc_SpinBox->setDisplayIntegerBase(16);
          pc_SpinBox->SetMinimumCustom(0);

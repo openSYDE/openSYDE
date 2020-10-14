@@ -134,7 +134,7 @@ void C_SdNdeDpListArrayEditWidget::InitStaticNames(void) const
                                    pc_Element->c_Name.c_str()).arg(c_EditType));
    }
 
-   this->mrc_Parent.SetSubTitle(QString(C_GtGetText::h_GetText("Array Edit")));
+   this->mrc_Parent.SetSubTitle(QString(C_GtGetText::h_GetText("Array Editor")));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

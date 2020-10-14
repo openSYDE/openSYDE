@@ -32,6 +32,13 @@ public:
       eVA_STATUS
    };
 
+   enum E_Category
+   {
+      eCA_INPUT,
+      eCA_OUTPUT,
+      eCA_OTHER
+   };
+
    C_OSCHalcDefDomain(void);
    virtual ~C_OSCHalcDefDomain(void);
 
@@ -45,6 +52,7 @@ public:
    std::vector<C_OSCHalcDefChannelUseCase> c_ChannelUseCases; ///< All available channel use-cases for this domain
    C_OSCHalcDefChannelValues c_DomainValues;                  ///< All available values for the domain
    C_OSCHalcDefChannelValues c_ChannelValues;                 ///< All available values for each channel
+   E_Category e_Category;                                     ///< Optional category
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

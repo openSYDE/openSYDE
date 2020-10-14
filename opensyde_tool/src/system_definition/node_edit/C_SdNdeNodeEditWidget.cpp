@@ -31,6 +31,10 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TabIndexProperties = 0;
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TabIndexDataPool = 1;
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TabIndexComm = 2;
+const stw_types::sintn C_SdNdeNodeEditWidget::hsn_TabIndexHalc = 3;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -47,17 +51,15 @@ using namespace stw_opensyde_core;
 
    Set up GUI with all elements.
 
-   \param[in]     ou32_NodeIndex    Node index
-   \param[in]     osn_TabIndex      Tab index to show
-   \param[in,out] opc_parent        Optional pointer to parent
+   \param[in]      ou32_NodeIndex   Node index
+   \param[in]      osn_TabIndex     Tab index to show
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const sintn osn_TabIndex,
                                              QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeNodeEditWidget),
-   mpc_TabThreeWidget(NULL),
-   mpc_ComIfDescriptionWidget(NULL),
    mu32_NodeIndex(ou32_NodeIndex),
    mq_DataChanged(false)
 {
@@ -73,59 +75,54 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
 
    this->mpc_Ui->pc_NodePropWidget->SetNodeId(this->mu32_NodeIndex);
    this->mpc_Ui->pc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
+   this->mpc_Ui->pc_TabHalc->SetNode(this->mu32_NodeIndex);
+   this->mpc_Ui->pc_ComIfDescriptionWidget->SetNodeId(this->mu32_NodeIndex, C_OSCCanProtocol::eLAYER2);
 
-   // configure the dynamic widget for editing the COM datapools of nodes
-   this->mpc_TabThreeWidget = new QWidget();
-   if (this->mpc_TabThreeWidget != NULL)
-   {
-      QVBoxLayout * const pc_Layout = new QVBoxLayout();
-      pc_Layout->setContentsMargins(21, 11, 4, 0);
-      this->mpc_TabThreeWidget->setLayout(pc_Layout);
-
-      this->mpc_ComIfDescriptionWidget = new C_SdBueComIfDescriptionWidget();
-      pc_Layout->addWidget(this->mpc_ComIfDescriptionWidget);
-
-      // connecting to signals
-      connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigChanged,
-              this, &C_SdNdeNodeEditWidget::m_DataChanged);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigChanged,
-              this, &C_SdNdeNodeEditWidget::m_DataChanged);
-      connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigChanged,
-              this, &C_SdNdeNodeEditWidget::m_DataChanged);
-      connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange,
-              this, &C_SdNdeNodeEditWidget::SigErrorChange);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToBus,
-              this, &C_SdNdeNodeEditWidget::m_OnSwitchToBus);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigEdit,
-              this, &C_SdNdeNodeEditWidget::m_EditComDataPool);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSave,
-              this, &C_SdNdeNodeEditWidget::SigSave);
-      connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSaveAs,
-              this, &C_SdNdeNodeEditWidget::SigSaveAs);
-      connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::currentChanged,
-              this, &C_SdNdeNodeEditWidget::m_CurrentTabChanged);
-      connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigNameChanged,
-              this, &C_SdNdeNodeEditWidget::SigNameChanged);
-
-      //lint -e{429}  no memory leak because of the parent of pc_Layout and the Qt memory management
-   }
+   // connecting to signals
+   connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigChanged,
+           this, &C_SdNdeNodeEditWidget::m_DataChanged);
+   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigChanged,
+           this, &C_SdNdeNodeEditWidget::m_DataChanged);
+   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigDataPoolsChanged,
+           this, &C_SdNdeNodeEditWidget::m_ReloadCommMessages);
+   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigChanged,
+           this, &C_SdNdeNodeEditWidget::m_DataChanged);
+   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange,
+           this, &C_SdNdeNodeEditWidget::SigErrorChange);
+   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigSwitchToBus,
+           this, &C_SdNdeNodeEditWidget::m_OnSwitchToBus);
+   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToHalc,
+           this, &C_SdNdeNodeEditWidget::m_OnSwitchToHalc);
+   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToCommMessages,
+           this, &C_SdNdeNodeEditWidget::m_OnSwitchToCommMessages);
+   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSave,
+           this, &C_SdNdeNodeEditWidget::SigSave);
+   connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSaveAs,
+           this, &C_SdNdeNodeEditWidget::SigSaveAs);
+   connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::currentChanged,
+           this, &C_SdNdeNodeEditWidget::m_CurrentTabChanged);
+   connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::tabBarClicked,
+           this, &C_SdNdeNodeEditWidget::m_TabClicked);
+   connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigNameChanged,
+           this, &C_SdNdeNodeEditWidget::SigNameChanged);
+   connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigBusBitrateClicked,
+           this, &C_SdNdeNodeEditWidget::SigSwitchToBusProperties);
 
    // show the initial tab
-   if (osn_TabIndex == 0)
-   {
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(0);
-   }
-   else
-   {
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(1);
-   }
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(osn_TabIndex);
 
    //Other connects
    connect(this->mpc_Ui->pc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigErrorChange,
            this, &C_SdNdeNodeEditWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigErrorChange, this,
            &C_SdNdeNodeEditWidget::SigErrorChange);
-   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigReloadDataPools, this,
+   connect(this->mpc_Ui->pc_TabHalc, &C_SdNdeHalcWidget::SigErrorChange, this,
+           &C_SdNdeNodeEditWidget::SigErrorChange);
+   connect(this->mpc_Ui->pc_TabHalc, &C_SdNdeHalcWidget::SigHalcDataPoolChanged, this,
+           &C_SdNdeNodeEditWidget::m_ReloadDataPools);
+   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigCommDataPoolAdded, this,
+           &C_SdNdeNodeEditWidget::m_ReloadDataPools);
+   connect(this->mpc_Ui->pc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange, this,
            &C_SdNdeNodeEditWidget::m_ReloadDataPools);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOpenDataPool, this,
            &C_SdNdeNodeEditWidget::m_OpenDataPool);
@@ -142,19 +139,7 @@ C_SdNdeNodeEditWidget::~C_SdNdeNodeEditWidget()
    //Store splitter position
    this->m_SaveUserSettings();
 
-   //Other
-   if (this->mpc_Ui->pc_TabWidgetPageNavi->count() >= 2)
-   {
-      // disconnect tab changed because this signal is emitted on delete and therefore leads to crash
-      // (m_CurrentTabChanged updates tabs sub widgets which may not exist anymore)
-      disconnect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::currentChanged,
-                 this, &C_SdNdeNodeEditWidget::m_CurrentTabChanged);
-      // delete the widget if not in the tab with no parent
-      delete this->mpc_TabThreeWidget;
-   }
-
    delete mpc_Ui;
-   //lint -e{1740}  no memory leak because of the parent of mpc_ComIfDescriptionWidget and the Qt memory management
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -163,8 +148,10 @@ C_SdNdeNodeEditWidget::~C_SdNdeNodeEditWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(0, C_GtGetText::h_GetText("Properties"));
-   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(1, C_GtGetText::h_GetText("Datapools"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TabIndexProperties, C_GtGetText::h_GetText("Properties"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TabIndexDataPool, C_GtGetText::h_GetText("Datapools"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TabIndexComm, C_GtGetText::h_GetText("COMM Messages"));
+   this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(hsn_TabIndexHalc, C_GtGetText::h_GetText("Hardware Configurator"));
 
    //Tool tips
 }
@@ -189,6 +176,11 @@ bool C_SdNdeNodeEditWidget::WasChanged(void) const
 void C_SdNdeNodeEditWidget::Save(void) const
 {
    this->mpc_Ui->pc_NodePropWidget->SaveToData();
+
+   if (this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex() == hsn_TabIndexHalc)
+   {
+      this->mpc_Ui->pc_TabHalc->Save();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -197,7 +189,7 @@ void C_SdNdeNodeEditWidget::Save(void) const
    mu32_FLAG_EDIT_NAME           Opens the properties and selects the name for editing
    mu32_FLAG_OPEN_PROPERTIES     Opens the properties
 
-   \param[in]     ou32_Flag       Flag for specific functionality
+   \param[in]  ou32_Flag   Flag for specific functionality
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::SetFlag(const uint32 ou32_Flag) const
@@ -206,7 +198,7 @@ void C_SdNdeNodeEditWidget::SetFlag(const uint32 ou32_Flag) const
        (ou32_Flag == mu32_FLAG_OPEN_PROPERTIES))
    {
       // open the properties
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(0);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexProperties);
 
       if (ou32_Flag == mu32_FLAG_EDIT_NAME)
       {
@@ -218,44 +210,49 @@ void C_SdNdeNodeEditWidget::SetFlag(const uint32 ou32_Flag) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to open a concrete datapool, datapool list or dataelement
 
-   \param[in] os32_MainIndex          Datapool index (os32_Flag is 0,1,2) or Application index (os32_Flag is 3)
-   \param[in] os32_ListIndex          Optional list index (if not used set to -1)
-   \param[in] os32_ElementIndex       Optional element index (if not used set to -1)
-                                      Index depends of value of os32_Flag
-   \param[in] os32_Flag               Optional flag for further information
-                                      0: os32_ElementIndex is index of datapool data element without CAN reference
-                                      1: os32_ElementIndex is index of datapool data element with associated CAN signal
-                                      2: os32_ElementIndex is index of CAN message
-                                      3: os32_MainIndex is index of application / data block
+   \param[in]  os32_MainIndex       Datapool index (os32_Flag is 0,1,2) or Application index (os32_Flag is 3) or
+                                    HALC domain index (os32_Flag is 4)
+   \param[in]  os32_ListIndex       Optional list index (if not used set to -1) or optional HALC channel
+                                    index (os32_Flag is 4)
+   \param[in]  os32_ElementIndex    Optional element index (if not used set to -1)
+                                    Index depends of value of os32_Flag
+   \param[in]  os32_Flag            Optional flag for further information
+                                    0: os32_ElementIndex is index of datapool data element without CAN reference
+                                    1: os32_ElementIndex is index of datapool data element with associated CAN signal
+                                    2: os32_ElementIndex is index of CAN message
+                                    3: os32_MainIndex is index of application / data block
+                                    4: os32_MainIndex is index of HALC domain and os32_ListIndex is index of
+                                    HALC channel of domain (optional)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::OpenDetail(const sint32 os32_MainIndex, const sint32 os32_ListIndex,
-                                       const sint32 os32_ElementIndex, const sint32 os32_Flag)
+                                       const sint32 os32_ElementIndex, const sint32 os32_Flag) const
 {
    if (os32_Flag == 0)
    {
       // open the datapool
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(1);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexDataPool);
       this->mpc_Ui->pc_DataPoolEditWidget->OpenDetail(os32_MainIndex, os32_ListIndex, os32_ElementIndex);
    }
    else if ((os32_Flag == 1) ||
             (os32_Flag == 2))
    {
       // open the interface description widget
-      this->m_EditComDataPool(static_cast<uint32>(os32_MainIndex), static_cast<uint32>(os32_ListIndex));
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexComm);
 
       if (os32_Flag == 1)
       {
-         this->mpc_ComIfDescriptionWidget->SelectSignalSearch(this->mu32_NodeIndex, static_cast<uint32>(os32_MainIndex),
-                                                              static_cast<uint32>(os32_ListIndex),
-                                                              static_cast<uint32>(os32_ElementIndex));
+         this->mpc_Ui->pc_ComIfDescriptionWidget->SelectSignalSearch(this->mu32_NodeIndex,
+                                                                     static_cast<uint32>(os32_MainIndex),
+                                                                     static_cast<uint32>(os32_ListIndex),
+                                                                     static_cast<uint32>(os32_ElementIndex));
       }
       else if (os32_Flag == 2)
       {
-         this->mpc_ComIfDescriptionWidget->SelectMessageSearch(this->mu32_NodeIndex,
-                                                               static_cast<uint32>(os32_MainIndex),
-                                                               static_cast<uint32>(os32_ListIndex),
-                                                               static_cast<uint32>(os32_ElementIndex));
+         this->mpc_Ui->pc_ComIfDescriptionWidget->SelectMessageSearch(this->mu32_NodeIndex,
+                                                                      static_cast<uint32>(os32_MainIndex),
+                                                                      static_cast<uint32>(os32_ListIndex),
+                                                                      static_cast<uint32>(os32_ElementIndex));
       }
       else
       {
@@ -265,8 +262,14 @@ void C_SdNdeNodeEditWidget::OpenDetail(const sint32 os32_MainIndex, const sint32
    else if (os32_Flag == 3)
    {
       // show the application / data block
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(0);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexProperties);
       this->mpc_Ui->pc_WidgetApplications->ShowApplication(os32_MainIndex);
+   }
+   else if (os32_Flag == 4)
+   {
+      // show HALC
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexHalc);
+      this->mpc_Ui->pc_TabHalc->ShowChannel(os32_MainIndex, os32_ListIndex);
    }
    else
    {
@@ -291,14 +294,12 @@ sintn C_SdNdeNodeEditWidget::GetTabIndex(void) const
 
    Here: Load splitter position
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::showEvent(QShowEvent * const opc_Event)
 {
-   const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdNodeEditSplitterX();
-
-   this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
+   this->m_LoadUserSettings();
    QWidget::showEvent(opc_Event);
 }
 
@@ -307,7 +308,7 @@ void C_SdNdeNodeEditWidget::showEvent(QShowEvent * const opc_Event)
 
    Here: Save splitter position
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::hideEvent(QHideEvent * const opc_Event)
@@ -317,7 +318,21 @@ void C_SdNdeNodeEditWidget::hideEvent(QHideEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Save splitter user settings
+/*! \brief  Load user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_LoadUserSettings() const
+{
+   const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdNodeEditSplitterX();
+
+   this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex());
+   this->mpc_Ui->pc_TabHalc->LoadUserSettings();
+   this->mpc_Ui->pc_ComIfDescriptionWidget->LoadUserSettings();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save user settings
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_SaveUserSettings() const
@@ -328,78 +343,49 @@ void C_SdNdeNodeEditWidget::m_SaveUserSettings() const
    {
       C_UsHandler::h_GetInstance()->SetSdNodeEditSplitterX(c_Sizes.at(0));
    }
+   C_UsHandler::h_GetInstance()->SetProjLastSysDefNodeTabIndex(this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex());
+   this->mpc_Ui->pc_TabHalc->SaveUserSettings();
+   this->mpc_Ui->pc_ComIfDescriptionWidget->SaveUserSettings();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_DataChanged(void)
 {
    this->mq_DataChanged = true;
-   Q_EMIT this->SigChanged();
+   Q_EMIT (this->SigChanged());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Forward signal
 
-   \param[in] oru32_BusIndex Bus index
-   \param[in] orc_BusName  Bus name
+   \param[in]  oru32_BusIndex    Bus index
+   \param[in]  orc_BusName       Bus name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_OnSwitchToBus(const uint32 & oru32_BusIndex, const QString & orc_BusName)
 {
-   Q_EMIT this->SigSwitchToBus(oru32_BusIndex, orc_BusName);
+   Q_EMIT (this->SigSwitchToBus(oru32_BusIndex, orc_BusName));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::m_EditComDataPool(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex)
+/*! \brief   Open the HALC tab
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_OnSwitchToHalc(void) const
 {
-   sintn sn_Index;
-   const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-   QString c_Title;
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexHalc);
+}
 
-   if (ou32_DataPoolIndex < pc_Node->c_DataPools.size())
-   {
-      const C_OSCCanProtocol * const pc_Protocol = pc_Node->GetRelatedCANProtocolConst(ou32_DataPoolIndex);
-      // build the title for the tab widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open the COMM messages tab
 
-      // each interface are two lists
-      c_Title = C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN, static_cast<uint8>(ou32_ListIndex / 2U)) + " ";
-
-      if (pc_Protocol != NULL)
-      {
-         switch (pc_Protocol->e_Type)
-         {
-         case C_OSCCanProtocol::eLAYER2:
-            c_Title += "(OSI Layer 2)";
-            break;
-         case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
-            c_Title += "(ECoS)";
-            break;
-         case C_OSCCanProtocol::eECES:
-            c_Title += "(ECeS)";
-            break;
-         default:
-            break;
-         }
-
-         c_Title += C_GtGetText::h_GetText(" - COMM Interface Description");
-
-         // add the necessary widget to the tab widget
-         sn_Index = this->mpc_Ui->pc_TabWidgetPageNavi->addTab(this->mpc_TabThreeWidget, c_Title);
-         this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(sn_Index);
-
-         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TabWidgetPageNavi->tabBar(),
-                                                "LastItemVeryBig",
-                                                true);
-
-         // set the data
-         if (this->mpc_ComIfDescriptionWidget != NULL)
-         {
-            //For each interface two lists
-            this->mpc_ComIfDescriptionWidget->SetNodeId(this->mu32_NodeIndex, pc_Protocol->e_Type,
-                                                        ou32_ListIndex / 2);
-         }
-      }
-   }
+   \param[in]  ou32_DataPoolIndex   Index of COMM Datapool
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_OnSwitchToCommMessages(const uint32 ou32_DataPoolIndex) const
+{
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TabIndexComm);
+   this->mpc_Ui->pc_ComIfDescriptionWidget->SetProtocolByDataPool(ou32_DataPoolIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -412,26 +398,13 @@ void C_SdNdeNodeEditWidget::m_EditComDataPool(const uint32 ou32_DataPoolIndex, c
    widgets have no impact on the current size of the tab widget.
    The changed widget of the current tab must be reseted to the preferred size
 
-   \param[in]     osn_Index         Index of selected tab
+   \param[in]  osn_Index   Index of selected tab
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
 {
    sintn sn_Counter;
 
-   // remove the COM datapool edit widget if it is visible
-   if ((osn_Index < 2) &&
-       (this->mpc_Ui->pc_TabWidgetPageNavi->count() >= 2))
-   {
-      this->mpc_Ui->pc_TabWidgetPageNavi->removeTab(2);
-      this->mpc_Ui->pc_TabWidgetPageNavi->tabBar()->adjustSize(); // resize to avoid datapool tab takes the space
-
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TabWidgetPageNavi->tabBar(),
-                                             "LastItemVeryBig",
-                                             false);
-
-      this->mpc_Ui->pc_DataPoolEditWidget->UpdateComLists();
-   }
    //Simple trigger update
    this->mpc_Ui->pc_WidgetApplications->UpdateApplications();
 
@@ -452,6 +425,29 @@ void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
    // This can cause a wrong size of the widget. A further call of adjustSize seems to repair the problem
    // The origin reason why the widget is resized two times with different sizes is unknown
    this->mpc_Ui->pc_DataPoolEditWidget->adjustSize();
+
+   if (osn_Index == hsn_TabIndexComm)
+   {
+      this->mpc_Ui->pc_ComIfDescriptionWidget->SetInitialFocus();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for tab click of pc_TabWidgetPageNavi
+
+   Navigate back to Datapool overview if a specific NVM or DIAG Datapool content was opened
+
+   \param[in]  osn_Index   Index of selected tab
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_TabClicked(const sintn osn_Index) const
+{
+   if ((this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex() == hsn_TabIndexDataPool) &&
+       (osn_Index == hsn_TabIndexDataPool))
+   {
+      // Only relevant if no other tab than the Datapool tab was clicked and no other tab was selected before
+      this->mpc_Ui->pc_DataPoolEditWidget->OpenOverview();
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -464,12 +460,24 @@ void C_SdNdeNodeEditWidget::m_ReloadDataPools(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Show data pool properties
+/*! \brief   Trigger entire reload of COMM messages
 
-   \param[in] ou32_DataPoolIndex Data pool index
+   Necessary if Datapool order or existence has changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodeEditWidget::m_OpenDataPool(const uint32 ou32_DataPoolIndex)
+void C_SdNdeNodeEditWidget::m_ReloadCommMessages(void) const
+{
+   this->mpc_Ui->pc_ComIfDescriptionWidget->SetNodeId(this->mu32_NodeIndex,
+                                                      this->mpc_Ui->pc_ComIfDescriptionWidget->GetActProtocol());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show data pool properties
+
+   \param[in]  ou32_DataPoolIndex   Data pool index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_OpenDataPool(const uint32 ou32_DataPoolIndex) const
 {
    this->OpenDetail(ou32_DataPoolIndex, -1, -1, 0);
 }

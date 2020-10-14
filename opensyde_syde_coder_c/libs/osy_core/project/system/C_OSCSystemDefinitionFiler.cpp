@@ -222,8 +222,8 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(std::vector<C_OSCNode> & orc_Node
          C_OSCNode c_Item;
          if (oq_UseFileInterface)
          {
-            const C_SCLString c_FileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath,
-                                                                                 orc_XMLParser.GetNodeContent());
+            const C_SCLString c_FileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                orc_XMLParser.GetNodeContent());
             s32_Retval = C_OSCNodeFiler::h_LoadNodeFile(c_Item, c_FileName);
          }
          else
@@ -386,8 +386,8 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & or
          std::vector<C_SCLString> c_CreatedFiles;
          const C_SCLString c_FolderName = C_OSCNodeFiler::h_GetFolderName(rc_Node.c_Properties.c_Name);
          const C_SCLString c_FileName = c_FolderName + "/" + C_OSCNodeFiler::h_GetFileName();
-         const C_SCLString c_CombinedFolderName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath, c_FolderName);
-         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath, c_FileName);
+         const C_SCLString c_CombinedFolderName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FolderName);
+         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
          //Create folder
          if (TGL_CreateDirectory(c_CombinedFolderName) != 0)
          {
@@ -479,7 +479,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition 
    if ((oq_UseDeviceDefinitions == true) &&
        (C_OSCSystemDefinition::hc_Devices.WasLoaded() == false))
    {
-      s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions);
+      s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions, false);
       if (s32_Retval != C_NO_ERR)
       {
          osc_write_log_error("Loading System Definition", "Could not load Device definitions.");

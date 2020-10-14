@@ -133,7 +133,7 @@ bool C_SCLIniFile::m_Load(const C_SCLString & orc_FileName)
    //(performance increase)
    for (s32_Index = 0; s32_Index < c_List.Strings.GetLength(); s32_Index++)
    {
-      c_Line = c_List.Strings[s32_Index];
+      c_Line = c_List.Strings[s32_Index].Trim(); //Trim to be defensive against whitespaces
 
       if (c_Line.Pos(mcn_CommentIndicator) == 1U)
       {

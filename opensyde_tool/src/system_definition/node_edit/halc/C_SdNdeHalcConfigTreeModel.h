@@ -10,6 +10,8 @@
 #define C_SDNDEHALCCONFIGTREEMODEL_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <QBitArray>
+
 #include "C_TblTreModel.h"
 #include "C_OSCHalcConfig.h"
 
@@ -49,6 +51,7 @@ public:
    //lint -restore
 
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
+   stw_types::uint32 GetNodeIndex(void) const;
    void SetHalcChannelUseCase(const stw_types::uint32 ou32_DomainIndex, const stw_types::uint32 ou32_ChannelIndex,
                               const stw_types::uint32 ou32_UseCaseIndex, const bool oq_UseChannelIndex);
    void Clear(void);
@@ -71,6 +74,9 @@ private:
    const stw_opensyde_core::C_OSCHalcConfigParameter * m_GetParameterElement(const QModelIndex & orc_Index) const;
    const stw_opensyde_core::C_OSCHalcDefElement * m_GetDefParameterElement(const QModelIndex & orc_Index) const;
    static QStringList mh_ConvertEnumsToStringList(const stw_opensyde_core::C_OSCHalcDefContent & orc_Value);
+   static QStringList mh_ConvertBitmasksToStringList(const stw_opensyde_core::C_OSCHalcDefContent & orc_Value);
+   static QString mh_ConvertBitmasksToString(const stw_opensyde_core::C_OSCHalcDefContent & orc_Value);
+   static QBitArray mh_ConvertBitmasksToBitArray(const stw_opensyde_core::C_OSCHalcDefContent & orc_Value);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

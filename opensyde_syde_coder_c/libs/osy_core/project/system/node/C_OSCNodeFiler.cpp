@@ -55,8 +55,8 @@ using namespace stw_opensyde_core;
 sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & orc_FilePath)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForExistingFile(c_XMLParser, orc_FilePath,
-                                                                         "opensyde-node-core-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser, orc_FilePath,
+                                                                        "opensyde-node-core-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -159,8 +159,8 @@ sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLStr
                                       std::vector<C_SCLString> * const opc_CreatedFiles)
 {
    C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::mh_GetParserForNewFile(c_XMLParser, orc_FilePath,
-                                                                    "opensyde-node-core-definition");
+   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForNewFile(c_XMLParser, orc_FilePath,
+                                                                   "opensyde-node-core-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -281,7 +281,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & or
             else
             {
                s32_Retval = C_OSCNodeCommFiler::h_LoadNodeComProtocolFile(c_CurComProtocol,
-                                                                          C_OSCSystemFilerUtil::mh_CombinePaths(
+                                                                          C_OSCSystemFilerUtil::h_CombinePaths(
                                                                              orc_BasePath,
                                                                              orc_XMLParser.GetNodeContent()),
                                                                           orc_NodeDataPools);
@@ -356,7 +356,7 @@ sint32 C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
          else
          {
             const C_SCLString c_FileName = C_OSCNodeCommFiler::h_GetFileName(rc_CurDatapool.c_Name);
-            const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath, c_FileName);
+            const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
             //Save comm definition file
             s32_Retval = C_OSCNodeCommFiler::h_SaveNodeComProtocolFile(orc_NodeComProtocols[u32_ItComProtocol],
                                                                        c_CombinedFileName,
@@ -394,7 +394,7 @@ sint32 C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCNodeFiler::h_GetFolderName(const C_SCLString & orc_NodeName)
 {
-   return "node_" + C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(orc_NodeName);
+   return "node_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(orc_NodeName);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -550,8 +550,8 @@ sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropertie
       {
          if (orc_XMLParser.SelectNodeChild("scaling-support") == "scaling-support")
          {
-            s32_Retval = mh_StringToCodeExportScalingType(orc_XMLParser.GetNodeContent(),
-                                                          orc_NodeProperties.c_CodeExportSettings.e_ScalingSupport);
+            s32_Retval = C_OSCSystemFilerUtil::h_StringToCodeExportScalingType(
+               orc_XMLParser.GetNodeContent(), orc_NodeProperties.c_CodeExportSettings.e_ScalingSupport);
             //Return
             tgl_assert(orc_XMLParser.SelectNodeParent() == "code-export-settings");
          }
@@ -624,8 +624,9 @@ void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePrope
    //Code export settings
    orc_XMLParser.CreateAndSelectNodeChild("code-export-settings");
    orc_XMLParser.CreateNodeChild("scaling-support",
-                                 mh_CodeExportScalingTypeToString(orc_NodeProperties.c_CodeExportSettings.
-                                                                  e_ScalingSupport));
+                                 C_OSCSystemFilerUtil::h_CodeExportScalingTypeToString(orc_NodeProperties.
+                                                                                       c_CodeExportSettings.
+                                                                                       e_ScalingSupport));
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
 
@@ -810,7 +811,7 @@ sint32 C_OSCNodeFiler::mh_LoadComInterface(std::vector<C_OSCNodeComInterfaceSett
          //Type
          if ((orc_XMLParser.SelectNodeChild("type") == "type") && (s32_Retval == C_NO_ERR))
          {
-            s32_Retval = C_OSCSystemFilerUtil::mh_BusTypeStringToEnum(
+            s32_Retval = C_OSCSystemFilerUtil::h_BusTypeStringToEnum(
                orc_XMLParser.GetNodeContent(), c_ComInterface.e_InterfaceType);
             //Return
             tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
@@ -933,7 +934,7 @@ void C_OSCNodeFiler::mh_SaveComInterface(const std::vector<C_OSCNodeComInterface
       orc_XMLParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
       orc_XMLParser.SetAttributeBool("diagnosis-available", rc_CurComInterface.q_IsDiagnosisEnabled);
       orc_XMLParser.CreateNodeChild("type",
-                                    C_OSCSystemFilerUtil::mh_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
+                                    C_OSCSystemFilerUtil::h_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
       if (rc_CurComInterface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
       {
          orc_XMLParser.CreateAndSelectNodeChild("ip-address");
@@ -1258,9 +1259,9 @@ sint32 C_OSCNodeFiler::mh_LoadDataPools(C_OSCNode & orc_Node, C_OSCXMLParserBase
             {
                s32_Retval =
                   C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(c_CurDataPool,
-                                                             C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath,
-                                                                                                   orc_XMLParser.
-                                                                                                   GetNodeContent()));
+                                                             C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                                  orc_XMLParser.
+                                                                                                  GetNodeContent()));
             }
             if (s32_Retval != C_NO_ERR)
             {
@@ -1326,7 +1327,7 @@ sint32 C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
    sint32 s32_Retval = C_NO_ERR;
 
    orc_XMLParser.CreateAndSelectNodeChild("data-pools");
-   orc_XMLParser.SetAttributeString("length", orc_NodeDataPools.size());
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeDataPools.size());
    for (uint32 u32_ItDataPool = 0; (u32_ItDataPool < orc_NodeDataPools.size()) && (s32_Retval == C_NO_ERR);
         ++u32_ItDataPool)
    {
@@ -1340,7 +1341,7 @@ sint32 C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
       else
       {
          const C_SCLString c_FileName = C_OSCNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
-         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath, c_FileName);
+         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
          //Save datapool file
          s32_Retval = C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(rc_CurDatapool, c_CombinedFileName);
          //Set file reference
@@ -1389,9 +1390,9 @@ sint32 C_OSCNodeFiler::mh_LoadHALC(C_OSCHalcConfig & orc_Config, C_OSCXMLParserB
       {
          s32_Retval =
             C_OSCHalcConfigFiler::h_LoadFile(orc_Config,
-                                             C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath,
-                                                                                   orc_XMLParser.
-                                                                                   GetNodeContent()), orc_BasePath);
+                                             C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                  orc_XMLParser.
+                                                                                  GetNodeContent()), orc_BasePath);
       }
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
@@ -1435,7 +1436,7 @@ sint32 C_OSCNodeFiler::mh_SaveHALC(const C_OSCHalcConfig & orc_Config, C_OSCXMLP
          // const C_SCLString c_FileName = C_OSCNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
          //Fix
          const C_SCLString c_FileName = "halc.xml";
-         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::mh_CombinePaths(orc_BasePath, c_FileName);
+         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
          //Save datapool file
          s32_Retval = C_OSCHalcConfigFiler::h_SaveFile(orc_Config, c_CombinedFileName, orc_BasePath, opc_CreatedFiles);
          //Set file reference
@@ -1585,77 +1586,6 @@ sint32 C_OSCNodeFiler::mh_StringToFlashLoader(const C_SCLString & orc_String,
    {
       osc_write_log_error("Loading node definition",
                           "Invalid value for \"properties\".\"flash-loader\": " + orc_String);
-      s32_Retval = C_RANGE;
-   }
-
-   return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Transform export scaling support type to string
-
-   \param[in]  ore_Scaling   Flash loader type
-
-   \return
-   Stringified export scaling support type
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeFiler::mh_CodeExportScalingTypeToString(const C_OSCNodeCodeExportSettings::E_Scaling & ore_Scaling)
-{
-   C_SCLString c_Retval;
-
-   switch (ore_Scaling)
-   {
-   case C_OSCNodeCodeExportSettings::eFLOAT32:
-      c_Retval = "float32";
-      break;
-   case C_OSCNodeCodeExportSettings::eFLOAT64:
-      c_Retval = "float64";
-      break;
-   case C_OSCNodeCodeExportSettings::eNONE:
-      c_Retval = "none";
-      break;
-   default:
-      c_Retval = "invalid";
-      break;
-   }
-
-   return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Transform string to code export scaling support type.
-
-   \param[in]   orc_String    String to interpret
-   \param[out]  ore_Scaling   Scaling support type
-
-   \return
-   C_NO_ERR   no error
-   C_RANGE    String unknown
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFiler::mh_StringToCodeExportScalingType(const C_SCLString & orc_String,
-                                                        C_OSCNodeCodeExportSettings::E_Scaling & ore_Scaling)
-{
-   sint32 s32_Retval = C_NO_ERR;
-
-   if (orc_String == "float32")
-   {
-      ore_Scaling = C_OSCNodeCodeExportSettings::eFLOAT32;
-   }
-   else if (orc_String == "float64")
-   {
-      ore_Scaling = C_OSCNodeCodeExportSettings::eFLOAT64;
-   }
-   else if (orc_String == "none")
-   {
-      ore_Scaling = C_OSCNodeCodeExportSettings::eNONE;
-   }
-   else
-   {
-      osc_write_log_error("Loading node definition",
-                          "Invalid value for \"properties\".\"code-export-settings\".\"scaling-support\": " +
-                          orc_String);
       s32_Retval = C_RANGE;
    }
 
